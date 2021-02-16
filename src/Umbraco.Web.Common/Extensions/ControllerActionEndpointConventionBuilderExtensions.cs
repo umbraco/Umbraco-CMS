@@ -20,7 +20,7 @@ namespace Umbraco.Web.Common.Extensions
         /// </summary>
         public static void ForUmbracoPage(
             this ControllerActionEndpointConventionBuilder builder,
-            Func<HttpContext, IPublishedContent> findContent)
+            Func<ActionExecutingContext, IPublishedContent> findContent)
             => builder.Add(convention =>
             {
                 // filter out matched endpoints that are suppressed
@@ -35,8 +35,18 @@ namespace Umbraco.Web.Common.Extensions
                         // to execute in order to find the IPublishedContent for the request.
 
                         var filter = new UmbracoVirtualPageFilterAttribute();
-                        actionDescriptor.FilterDescriptors.Add(new FilterDescriptor(filter, 0));
-                        convention.Metadata.Add(filter);
+
+                        // Check if this already contains this filter since we don't want it applied twice.
+                        // This could occur if the controller being routed is IVirtualPageController AND
+                        // is being routed with ForUmbracoPage. In that case, ForUmbracoPage wins
+                        // because the UmbracoVirtualPageFilterAttribute will check for the metadata first since
+                        // that is more explicit and flexible in case the same controller is routed multiple times.
+                        if (!actionDescriptor.FilterDescriptors.Any(x => x.Filter is UmbracoVirtualPageFilterAttribute))
+                        {
+                            actionDescriptor.FilterDescriptors.Add(new FilterDescriptor(filter, 0));
+                            convention.Metadata.Add(filter);
+                        }
+
                         convention.Metadata.Add(new CustomRouteContentFinderDelegate(findContent));
                     }
                 }

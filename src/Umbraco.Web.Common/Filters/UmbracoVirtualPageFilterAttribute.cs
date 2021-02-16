@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -30,18 +31,22 @@ namespace Umbraco.Web.Common.Filters
 
             if (contentFinder != null)
             {
-                await SetUmbracoRouteValues(context, contentFinder.FindContent(context.HttpContext));
+                await SetUmbracoRouteValues(context, contentFinder.FindContent(context));
             }
             else
             {
                 // Check if the controller is IVirtualPageController and then use that to FindContent
                 if (context.Controller is IVirtualPageController ctrl)
                 {
-                    await SetUmbracoRouteValues(context, ctrl.FindContent());
+                    await SetUmbracoRouteValues(context, ctrl.FindContent(context));
                 }
             }
 
-            await next();
+            // if we've assigned not found, just exit
+            if (!(context.Result is NotFoundResult))
+            {
+                await next();
+            }
         }
 
         private async Task SetUmbracoRouteValues(ActionExecutingContext context, IPublishedContent content)
@@ -59,6 +64,11 @@ namespace Umbraco.Web.Common.Filters
                     (ControllerActionDescriptor)context.ActionDescriptor);
 
                 context.HttpContext.Features.Set(routeValues);
+            }
+            else
+            {
+                // if there is no content then it should be a not found
+                context.Result = new NotFoundResult();
             }
         }
     }

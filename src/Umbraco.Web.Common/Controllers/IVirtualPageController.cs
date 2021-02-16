@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.PublishedContent;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Common.Controllers
 {
@@ -10,6 +11,6 @@ namespace Umbraco.Web.Common.Controllers
         /// <summary>
         /// Returns the <see cref="IPublishedContent"/> to use as the current page for the request
         /// </summary>
-        IPublishedContent FindContent();
+        IPublishedContent FindContent(ActionExecutingContext actionExecutingContext);
     }
 }
