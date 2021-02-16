@@ -60,6 +60,7 @@ namespace Umbraco.Tests.TestHelpers
         protected IVariationContextAccessor VariationContextAccessor => new TestVariationContextAccessor();
 
         internal ScopeProvider ScopeProvider => Current.ScopeProvider as ScopeProvider;
+        internal IUmbracoDatabaseFactory UmbracoDatabaseFactory => Factory.GetRequiredService<IUmbracoDatabaseFactory>();
 
         protected ISqlContext SqlContext => Factory.GetRequiredService<ISqlContext>();
 

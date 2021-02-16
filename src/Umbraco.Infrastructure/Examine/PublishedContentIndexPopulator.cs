@@ -13,8 +13,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
     /// </remarks>
     public class PublishedContentIndexPopulator : ContentIndexPopulator
     {
-        public PublishedContentIndexPopulator(IContentService contentService, ISqlContext sqlContext, IPublishedContentValueSetBuilder contentValueSetBuilder) :
-            base(true, null, contentService, sqlContext, contentValueSetBuilder)
+        public PublishedContentIndexPopulator(IContentService contentService, IUmbracoDatabaseFactory umbracoDatabaseFactory, IPublishedContentValueSetBuilder contentValueSetBuilder) :
+            base(true, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder)
         {
         }
     }

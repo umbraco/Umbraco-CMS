@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Tests.TestHelpers;
 using IContentService = Umbraco.Cms.Core.Services.IContentService;
 using IMediaService = Umbraco.Cms.Core.Services.IMediaService;
@@ -42,10 +43,10 @@ namespace Umbraco.Tests.UmbracoExamine
             return contentValueSetBuilder;
         }
 
-        public static ContentIndexPopulator GetContentIndexRebuilder(PropertyEditorCollection propertyEditors, IContentService contentService, IScopeProvider scopeProvider, bool publishedValuesOnly)
+        public static ContentIndexPopulator GetContentIndexRebuilder(PropertyEditorCollection propertyEditors, IContentService contentService, IScopeProvider scopeProvider, IUmbracoDatabaseFactory umbracoDatabaseFactory, bool publishedValuesOnly)
         {
             var contentValueSetBuilder = GetContentValueSetBuilder(propertyEditors, scopeProvider, publishedValuesOnly);
-            var contentIndexDataSource = new ContentIndexPopulator(publishedValuesOnly, null, contentService, scopeProvider.SqlContext, contentValueSetBuilder);
+            var contentIndexDataSource = new ContentIndexPopulator(publishedValuesOnly, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder);
             return contentIndexDataSource;
         }
 
