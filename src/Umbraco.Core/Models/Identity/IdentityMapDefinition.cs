@@ -1,5 +1,6 @@
 ﻿using System;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models.Membership;
@@ -15,14 +16,19 @@ namespace Umbraco.Core.Models.Identity
         private readonly AppCaches _appCaches;
 
         [Obsolete("Use constructor specifying all dependencies")]
-        public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings)
+        public IdentityMapDefinition(
+            ILocalizedTextService textService,
+            IEntityService entityService,
+            IGlobalSettings globalSettings)
+            : this(textService, entityService, globalSettings, Current.AppCaches)
         {
-            _textService = textService;
-            _entityService = entityService;
-            _globalSettings = globalSettings;
         }
 
-        public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IGlobalSettings globalSettings, AppCaches appCaches)
+        public IdentityMapDefinition(
+            ILocalizedTextService textService,
+            IEntityService entityService,
+            IGlobalSettings globalSettings,
+            AppCaches appCaches)
         {
             _textService = textService;
             _entityService = entityService;
