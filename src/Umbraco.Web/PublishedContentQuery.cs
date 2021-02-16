@@ -212,6 +212,62 @@ namespace Umbraco.Web
             }
 
             var query = umbIndex.GetSearcher().CreateQuery(IndexTypes.Content);
+            if(loadedFields != null)
+            {
+                query.SelectFields(loadedFields);
+            }
+
+            IQueryExecutor queryExecutor;
+            if (culture == "*")
+            {
+                // Search everything
+                queryExecutor = query.ManagedQuery(term);
+            }
+            else if (string.IsNullOrWhiteSpace(culture))
+            {
+                // Only search invariant
+                queryExecutor = query.Field(UmbracoContentIndex.VariesByCultureFieldName, "n") // Must not vary by culture
+                    .And().ManagedQuery(term);
+            }
+            else
+            {
+                // Only search the specified culture
+                var fields = umbIndex.GetCultureAndInvariantFields(culture).ToArray(); // Get all index fields suffixed with the culture name supplied
+                queryExecutor = query.ManagedQuery(term, fields);
+            }
+
+            var results = skip == 0 && take == 0
+                ? queryExecutor.Execute()
+                : queryExecutor.Execute(take,skip);
+
+            totalRecords = results.TotalItemCount;
+
+            return new CultureContextualSearchResults(results.Skip(0).ToPublishedSearchResults(_publishedSnapshot.Content), _variationContextAccessor, culture);
+        }
+        /// <inheritdoc />
+        public IEnumerable<PublishedSearchResult> Search(string term, int skip, int take, out long totalRecords, string culture = "*", string indexName = Constants.UmbracoIndexes.ExternalIndexName,ISet<string> loadedFields = null)
+        {
+            if (skip < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(skip), skip, "The value must be greater than or equal to zero.");
+            }
+
+            if (take < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(take), take, "The value must be greater than or equal to zero.");
+            }
+
+            if (string.IsNullOrEmpty(indexName))
+            {
+                indexName = Constants.UmbracoIndexes.ExternalIndexName;
+            }
+
+            if (!_examineManager.TryGetIndex(indexName, out var index) || !(index is IUmbracoIndex umbIndex))
+            {
+                throw new InvalidOperationException($"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
+            }
+
+            var query = umbIndex.GetSearcher().CreateQuery(IndexTypes.Content);
 
 
             IQueryExecutor queryExecutor;

@@ -158,7 +158,6 @@ namespace Umbraco.Web.Search
 
             var pagedResult = result.Skip(Convert.ToInt32(pageIndex));
 
-
             switch (entityType)
             {
                 case UmbracoEntityTypes.Member:
