@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
+using Examine.Search;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Examine;
@@ -17,6 +18,7 @@ namespace Umbraco.Web.Search
         private readonly IIndex _index;
         private static readonly string[] IgnoreProperties = { "Description" };
 
+        private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
         public GenericIndexDiagnostics(IIndex index)
         {
             _index = index;
@@ -34,7 +36,7 @@ namespace Umbraco.Web.Search
             try
             {
                 var searcher = _index.GetSearcher();
-                var result = searcher.Search("test");
+                var result = searcher.CreateQuery().ManagedQuery("test").SelectFields(_idOnlyFieldSet).Execute(1);
                 return Attempt<string>.Succeed(); //if we can search we'll assume it's healthy
             }
             catch (Exception e)

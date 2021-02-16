@@ -63,7 +63,7 @@
   <ItemGroup>
     <PackageReference Include="ClientDependency" Version="1.9.9" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.0.2" />
+    <PackageReference Include="Examine" Version="1.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="HtmlSanitizer">
       <Version>4.0.217</Version>
@@ -284,6 +284,7 @@
     <Compile Include="Search\ExamineFinalComposer.cs" />
     <Compile Include="Search\ExamineUserComponent.cs" />
     <Compile Include="Search\IUmbracoTreeSearcherFields.cs" />
+    <Compile Include="Search\IUmbracoTreeSearcherFields2.cs" />
     <Compile Include="Search\UmbracoTreeSearcherFields.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderErrorMiddlware.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderErrors.cs" />

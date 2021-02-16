@@ -19,6 +19,7 @@ using Umbraco.Core.Composing;
 using System.ComponentModel;
 using System.Threading;
 using Umbraco.Web.Scheduling;
+using Examine.Search;
 
 namespace Umbraco.Web.Search
 {
@@ -39,6 +40,7 @@ namespace Umbraco.Web.Search
         private readonly IProfilingLogger _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
         private readonly BackgroundTaskRunner<IBackgroundTask> _indexItemTaskRunner;
+        private readonly ISet<string> _idOnlyFieldSet = new HashSet<string> { "id" };
 
 
         // the default enlist priority is 100
@@ -425,7 +427,7 @@ namespace Umbraco.Web.Search
                         while (page * pageSize < total)
                         {
                             //paging with examine, see https://shazwazza.com/post/paging-with-examine/
-                            var results = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).Execute(maxResults: pageSize * (page + 1));
+                            var results = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).SelectFields(_idOnlyFieldSet).Execute(maxResults: pageSize * (page + 1));
                             total = results.TotalItemCount;
                             var paged = results.Skip(page * pageSize);
 
