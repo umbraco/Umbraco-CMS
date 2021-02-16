@@ -14,7 +14,7 @@ namespace Umbraco.Core.Security
     {
         // TODO: Ideally we remove this class and only deal with ClaimsIdentity as a best practice. All things relevant to our own
         // identity are part of claims. This class would essentially become extension methods on a ClaimsIdentity for resolving
-        // values from it. 
+        // values from it.
         public static bool FromClaimsIdentity(ClaimsIdentity identity, out UmbracoBackOfficeIdentity backOfficeIdentity)
         {
             // validate that all claims exist
@@ -214,19 +214,5 @@ namespace Umbraco.Core.Security
         public string SecurityStamp => this.FindFirstValue(Constants.Security.SecurityStampClaimType);
 
         public string[] Roles => FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
-
-        /// <summary>
-        /// Overridden to remove any temporary claims that shouldn't be copied
-        /// </summary>
-        /// <returns></returns>
-        public override ClaimsIdentity Clone()
-        {
-            var clone = base.Clone();
-
-            foreach (var claim in clone.FindAll(x => x.Type == Constants.Security.TicketExpiresClaimType).ToList())
-                clone.RemoveClaim(claim);
-
-            return clone;
-        }
     }
 }
