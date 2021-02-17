@@ -40,7 +40,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         {
             return _propertyEditors.TryGet(propertyType.EditorAlias, out var editor)
                    && editor.GetValueEditor().ValueType.InvariantEquals(ValueTypes.Json)
-                   && Array.IndexOf(ExcludedPropertyEditors, propertyType.EditorAlias) == -1;
+                   && ExcludedPropertyEditors.Contains(propertyType.EditorAlias) == false;
         }
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
