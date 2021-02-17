@@ -119,7 +119,7 @@ namespace Umbraco.Web.BackOffice.Security
             options.CookieManager = new BackOfficeCookieManager(
                 _umbracoContextAccessor,
                 _runtimeState,
-                _umbracoRequestPaths); 
+                _umbracoRequestPaths);
 
             options.Events = new CookieAuthenticationEvents
             {
@@ -171,7 +171,7 @@ namespace Umbraco.Web.BackOffice.Security
                         // generate a session id and assign it
                         // create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
                         Guid session = _runtimeState.Level == RuntimeLevel.Run
-                            ? _userService.CreateLoginSession(backOfficeIdentity.Id, _ipResolver.GetCurrentRequestIpAddress())
+                            ? _userService.CreateLoginSession(backOfficeIdentity.GetId(), _ipResolver.GetCurrentRequestIpAddress())
                             : Guid.NewGuid();
 
                         // add our session claim

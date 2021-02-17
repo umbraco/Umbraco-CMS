@@ -130,6 +130,7 @@ namespace Umbraco.Core.Security
             IEnumerable<int> startContentNodes, IEnumerable<int> startMediaNodes, string culture,
             string securityStamp, IEnumerable<string> allowedApps, IEnumerable<string> roles)
         {
+            // TODO: This has been moved, delete
             //This is the id that 'identity' uses to check for the user id
             if (HasClaim(x => x.Type == ClaimTypes.NameIdentifier) == false)
                 AddClaim(new Claim(ClaimTypes.NameIdentifier, userId, ClaimValueTypes.String, Issuer, Issuer, this));
@@ -193,26 +194,5 @@ namespace Umbraco.Core.Security
         /// The type of authenticated identity. This property always returns "UmbracoBackOffice".
         /// </returns>
         public override string AuthenticationType => Issuer;
-
-        private int[] _startContentNodes;
-        public int[] StartContentNodes => _startContentNodes ?? (_startContentNodes = FindAll(x => x.Type == Constants.Security.StartContentNodeIdClaimType).Select(app => int.TryParse(app.Value, out var i) ? i : default).Where(x => x != default).ToArray());
-
-        private int[] _startMediaNodes;
-        public int[] StartMediaNodes => _startMediaNodes ?? (_startMediaNodes = FindAll(x => x.Type == Constants.Security.StartMediaNodeIdClaimType).Select(app => int.TryParse(app.Value, out var i) ? i : default).Where(x => x != default).ToArray());
-
-        private string[] _allowedApplications;
-        public string[] AllowedApplications => _allowedApplications ?? (_allowedApplications = FindAll(x => x.Type == Constants.Security.AllowedApplicationsClaimType).Select(app => app.Value).ToArray());
-
-        public int Id => int.Parse(this.FindFirstValue(ClaimTypes.NameIdentifier));
-
-        public string RealName => this.FindFirstValue(ClaimTypes.GivenName);
-
-        public string Username => this.FindFirstValue(ClaimTypes.Name);
-
-        public string Culture => this.FindFirstValue(ClaimTypes.Locality);
-
-        public string SecurityStamp => this.FindFirstValue(Constants.Security.SecurityStampClaimType);
-
-        public string[] Roles => FindAll(x => x.Type == DefaultRoleClaimType).Select(role => role.Value).ToArray();
     }
 }

@@ -7,6 +7,7 @@ using System.Security.Claims;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
 {
@@ -44,16 +45,16 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
             }
 
             Assert.IsNull(backofficeIdentity.Actor);
-            Assert.AreEqual(1234, backofficeIdentity.Id);
+            Assert.AreEqual(1234, backofficeIdentity.GetId());
             //// Assert.AreEqual(sessionId, backofficeIdentity.SessionId);
-            Assert.AreEqual(securityStamp, backofficeIdentity.SecurityStamp);
-            Assert.AreEqual("testing", backofficeIdentity.Username);
-            Assert.AreEqual("hello world", backofficeIdentity.RealName);
-            Assert.AreEqual(1, backofficeIdentity.StartContentNodes.Length);
-            Assert.IsTrue(backofficeIdentity.StartMediaNodes.UnsortedSequenceEqual(new[] { 5543, 5555 }));
-            Assert.IsTrue(new[] { "content", "media" }.SequenceEqual(backofficeIdentity.AllowedApplications));
-            Assert.AreEqual("en-us", backofficeIdentity.Culture);
-            Assert.IsTrue(new[] { "admin" }.SequenceEqual(backofficeIdentity.Roles));
+            Assert.AreEqual(securityStamp, backofficeIdentity.GetSecurityStamp());
+            Assert.AreEqual("testing", backofficeIdentity.GetUsername());
+            Assert.AreEqual("hello world", backofficeIdentity.GetRealName());
+            Assert.AreEqual(1, backofficeIdentity.GetStartContentNodes().Length);
+            Assert.IsTrue(backofficeIdentity.GetStartMediaNodes().UnsortedSequenceEqual(new[] { 5543, 5555 }));
+            Assert.IsTrue(new[] { "content", "media" }.SequenceEqual(backofficeIdentity.GetAllowedApplications()));
+            Assert.AreEqual("en-us", backofficeIdentity.GetCultureString());
+            Assert.IsTrue(new[] { "admin" }.SequenceEqual(backofficeIdentity.GetRoles()));
 
             Assert.AreEqual(11, backofficeIdentity.Claims.Count());
         }

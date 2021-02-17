@@ -70,7 +70,7 @@ namespace Umbraco.Core.Compose
             get
             {
                 var identity = Thread.CurrentPrincipal?.GetUmbracoIdentity();
-                var user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.Id));
+                var user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.GetId()));
                 return user ?? UnknownUser(_globalSettings);
             }
         }

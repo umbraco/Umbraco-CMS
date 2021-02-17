@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Security.Principal;
 using System.Threading;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Security
 {
@@ -22,7 +23,7 @@ namespace Umbraco.Core.Security
         {
             if (identity is UmbracoBackOfficeIdentity umbIdentity && umbIdentity.IsAuthenticated)
             {
-                return CultureInfo.GetCultureInfo(umbIdentity.Culture);
+                return CultureInfo.GetCultureInfo(umbIdentity.GetCultureString());
             }
 
             return null;

@@ -142,7 +142,7 @@ namespace Umbraco.Extensions
 
         public static string GetUsername(this ClaimsIdentity identity) => identity.FindFirstValue(ClaimTypes.Name);
 
-        public static string GetCulture(this ClaimsIdentity identity) => identity.FindFirstValue(ClaimTypes.Locality);
+        public static string GetCultureString(this ClaimsIdentity identity) => identity.FindFirstValue(ClaimTypes.Locality);
 
         public static string GetSecurityStamp(this ClaimsIdentity identity) => identity.FindFirstValue(Constants.Security.SecurityStampClaimType);
 
