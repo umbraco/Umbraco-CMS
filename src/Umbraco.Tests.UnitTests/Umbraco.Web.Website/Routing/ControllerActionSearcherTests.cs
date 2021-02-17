@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
 
         private class Render2Controller : RenderController
         {
-            public Render2Controller(ILogger<RenderController> logger, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
+            public Render2Controller(ILogger<Render2Controller> logger, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
                 : base(logger, compositeViewEngine, umbracoContextAccessor)
             {
             }

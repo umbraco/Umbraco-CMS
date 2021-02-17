@@ -177,7 +177,19 @@ namespace Umbraco.Cms.Web.Common.Routing
                     // We don't want to include dynamic endpoints in this check since we would have no idea if that
                     // matches since they will probably match everything.
                     bool isDynamic = x.Metadata.OfType<IDynamicEndpointMetadata>().Any(x => x.IsDynamic);
-                    return !isDynamic;
+                    if (isDynamic)
+                    {
+                        return false;
+                    }
+
+                    // filter out matched endpoints that are suppressed
+                    var isSuppressed = x.Metadata.OfType<ISuppressMatchingMetadata>().FirstOrDefault()?.SuppressMatching == true;
+                    if (isSuppressed)
+                    {
+                        return false;
+                    }
+
+                    return true;
                 });
 
             var routeValues = new RouteValueDictionary();

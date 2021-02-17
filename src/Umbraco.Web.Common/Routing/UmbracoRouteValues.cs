@@ -21,12 +21,10 @@ namespace Umbraco.Cms.Web.Common.Routing
         public UmbracoRouteValues(
             IPublishedRequest publishedRequest,
             ControllerActionDescriptor controllerActionDescriptor,
-            string templateName = null,
-            bool hasHijackedRoute = false)
+            string templateName = null)
         {
             PublishedRequest = publishedRequest;
             ControllerActionDescriptor = controllerActionDescriptor;
-            HasHijackedRoute = hasHijackedRoute;
             TemplateName = templateName;
         }
 
@@ -59,10 +57,5 @@ namespace Umbraco.Cms.Web.Common.Routing
         /// Gets the <see cref="IPublishedRequest"/>
         /// </summary>
         public IPublishedRequest PublishedRequest { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the current request has a hijacked route/user controller routed for it
-        /// </summary>
-        public bool HasHijackedRoute { get; }
     }
 }

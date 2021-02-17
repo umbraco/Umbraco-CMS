@@ -35,14 +35,15 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private readonly IControllerFactory _controllerFactory;
         private readonly IActionDescriptorCollectionProvider _actionDescriptorCollectionProvider;
 
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApplicationTreeController"/> class.
+        /// </summary>
         public ApplicationTreeController(
             ITreeService treeService,
             ISectionService sectionService,
             ILocalizedTextService localizedTextService,
             IControllerFactory controllerFactory,
-            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider
-            )
+            IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
         {
             _treeService = treeService;
             _sectionService = sectionService;
@@ -56,28 +57,31 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         /// <param name="application">The application to load tree for</param>
         /// <param name="tree">An optional single tree alias, if specified will only load the single tree for the request app</param>
-        /// <param name="queryStrings"></param>
+        /// <param name="queryStrings">The query strings</param>
         /// <param name="use">Tree use.</param>
-        /// <returns></returns>
         public async Task<ActionResult<TreeRootNode>> GetApplicationTrees(string application, string tree, [ModelBinder(typeof(HttpQueryStringModelBinder))] FormCollection queryStrings, TreeUse use = TreeUse.Main)
         {
             application = application.CleanForXss();
 
             if (string.IsNullOrEmpty(application))
+            {
                 return NotFound();
+            }
 
             var section = _sectionService.GetByAlias(application);
             if (section == null)
+            {
                 return NotFound();
+            }
 
-            //find all tree definitions that have the current application alias
+            // find all tree definitions that have the current application alias
             var groupedTrees = _treeService.GetBySectionGrouped(application, use);
             var allTrees = groupedTrees.Values.SelectMany(x => x).ToList();
 
             if (allTrees.Count == 0)
             {
-                //if there are no trees defined for this section but the section is defined then we can have a simple
-                //full screen section without trees
+                // if there are no trees defined for this section but the section is defined then we can have a simple
+                // full screen section without trees
                 var name = _localizedTextService.Localize("sections/" + application);
                 return TreeRootNode.CreateSingleTreeRoot(Constants.System.RootString, null, null, name, TreeNodeCollection.Empty, true);
             }
@@ -90,7 +94,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     : allTrees.FirstOrDefault(x => x.TreeAlias == tree);
 
                 if (t == null)
+                {
                     return NotFound();
+                }
 
                 var treeRootNode = await GetTreeRootNode(t, Constants.System.Root, queryStrings);
 
@@ -114,9 +120,12 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     {
                         return nodeResult.Result;
                     }
+
                     var node = nodeResult.Value;
                     if (node != null)
+                    {
                         nodes.Add(node);
+                    }
                 }
 
                 var name = _localizedTextService.Localize("sections/" + application);
@@ -148,11 +157,15 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     var node = nodeResult.Value;
 
                     if (node != null)
+                    {
                         nodes.Add(node);
+                    }
                 }
 
                 if (nodes.Count == 0)
+                {
                     continue;
+                }
 
                 // no name => third party
                 // use localization key treeHeaders/thirdPartyGroup
@@ -179,7 +192,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private async Task<ActionResult<TreeNode>> TryGetRootNode(Tree tree, FormCollection querystring)
         {
             if (tree == null)
+            {
                 throw new ArgumentNullException(nameof(tree));
+            }
 
             return await GetRootNode(tree, querystring);
         }
@@ -190,7 +205,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private async Task<ActionResult<TreeRootNode>> GetTreeRootNode(Tree tree, int id, FormCollection querystring)
         {
             if (tree == null)
+            {
                 throw new ArgumentNullException(nameof(tree));
+            }
 
             var childrenResult = await GetChildren(tree, id, querystring);
             if (!(childrenResult.Result is null))
@@ -222,7 +239,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             sectionRoot.Path = rootNode.Path;
 
             foreach (var d in rootNode.AdditionalData)
+            {
                 sectionRoot.AdditionalData[d.Key] = d.Value;
+            }
 
             return sectionRoot;
         }
@@ -233,7 +252,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private async Task<ActionResult<TreeNode>> GetRootNode(Tree tree, FormCollection querystring)
         {
             if (tree == null)
+            {
                 throw new ArgumentNullException(nameof(tree));
+            }
 
             var result = await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring);
 
@@ -253,7 +274,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var rootNode = rootNodeResult.Value;
 
             if (rootNode == null)
+            {
                 throw new InvalidOperationException($"Failed to get root node for tree \"{tree.TreeAlias}\".");
+            }
+
             return rootNode;
         }
 
@@ -263,7 +287,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private async Task<ActionResult<TreeNodeCollection>> GetChildren(Tree tree, int id, FormCollection querystring)
         {
             if (tree == null)
+            {
                 throw new ArgumentNullException(nameof(tree));
+            }
 
             // the method we proxy has an 'id' parameter which is *not* in the querystring,
             // we need to add it for the proxy to work (else, it does not find the method,
@@ -299,7 +325,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             // note: this is all required in order to execute the auth-filters for the sub request, we
             // need to "trick" mvc into thinking that it is actually executing the proxied controller.
 
-            var controllerName = controllerType.Name.Substring(0, controllerType.Name.Length - 10); // remove controller part of name;
+            var controllerName = ControllerExtensions.GetControllerName(controllerType);
+
             // create proxy route data specifying the action & controller to execute
             var routeData = new RouteData(new RouteValueDictionary()
             {
@@ -324,9 +351,12 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var proxyControllerContext = new ControllerContext(actionContext);
             var controller = (TreeController)_controllerFactory.CreateController(proxyControllerContext);
 
+            // TODO: What about other filters? Will they execute?
             var isAllowed = await controller.ControllerContext.InvokeAuthorizationFiltersForRequest(actionContext);
             if (!isAllowed)
+            {
                 return Forbid();
+            }
 
             return controller;
         }

@@ -8,9 +8,7 @@ namespace Umbraco.Cms.Web.Common.ApplicationModels
 
     public class BackOfficeIdentityCultureConvention : IActionModelConvention
     {
-        public void Apply(ActionModel action)
-        {
-            action.Filters.Add(new BackOfficeCultureFilter());
-        }
+        /// <inheritdoc/>
+        public void Apply(ActionModel action) => action.Filters.Add(new BackOfficeCultureFilter());
     }
 }
