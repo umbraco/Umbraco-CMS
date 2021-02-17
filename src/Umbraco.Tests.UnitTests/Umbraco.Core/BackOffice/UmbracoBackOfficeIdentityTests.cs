@@ -112,8 +112,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim("TestClaim1", "test", ClaimValueTypes.Integer32, TestIssuer, TestIssuer)
             });
 
-            var identity = new UmbracoBackOfficeIdentity(
-                claimsIdentity,
+            claimsIdentity.AddRequiredClaims(
                 "1234",
                 "testing",
                 "hello world",
@@ -124,8 +123,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
                 new[] { "content", "media" },
                 new[] { "admin" });
 
-            Assert.AreEqual(12, identity.Claims.Count());
-            Assert.IsNull(identity.Actor);
+            Assert.AreEqual(12, claimsIdentity.Claims.Count());
+            Assert.IsNull(claimsIdentity.Actor);
         }
     }
 }

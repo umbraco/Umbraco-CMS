@@ -82,7 +82,8 @@ namespace Umbraco.Extensions
                 }
             }
 
-            if (identity.HasClaim(x => x.Type == Constants.Security.StartMediaNodeIdClaimType) == false)
+            if (identity.HasClaim(x => x.Type == Constants.Security.StartMediaNodeIdClaimType) == false &&
+                startMediaNodes != null)
             {
                 foreach (var startMediaNode in startMediaNodes)
                 {

@@ -56,13 +56,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
         }
 
         [Test]
-        public async Task CreateAsync_Should_Create_Principal_With_Umbraco_Identity()
+        public async Task CreateAsync_Should_Create_Principal_With_Claims_Identity()
         {
             BackOfficeClaimsPrincipalFactory sut = CreateSut();
 
             ClaimsPrincipal claimsPrincipal = await sut.CreateAsync(_testUser);
 
-            var umbracoBackOfficeIdentity = claimsPrincipal.Identity as UmbracoBackOfficeIdentity;
+            var umbracoBackOfficeIdentity = claimsPrincipal.Identity as ClaimsIdentity;
             Assert.IsNotNull(umbracoBackOfficeIdentity);
         }
 

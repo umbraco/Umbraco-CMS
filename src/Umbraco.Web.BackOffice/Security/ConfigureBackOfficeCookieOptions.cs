@@ -19,6 +19,7 @@ using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Net;
 using Umbraco.Web.Common.Security;
+using ClaimsIdentityExtensions = Umbraco.Extensions.ClaimsIdentityExtensions;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -157,8 +158,8 @@ namespace Umbraco.Web.BackOffice.Security
                         Constants.Security.TicketExpiresClaimType,
                         ctx.Properties.ExpiresUtc.Value.ToString("o"),
                         ClaimValueTypes.DateTime,
-                        UmbracoBackOfficeIdentity.Issuer,
-                        UmbracoBackOfficeIdentity.Issuer,
+                        ClaimsIdentityExtensions.Issuer,
+                        ClaimsIdentityExtensions.Issuer,
                         backOfficeIdentity));
 
                 },
@@ -175,10 +176,10 @@ namespace Umbraco.Web.BackOffice.Security
                             : Guid.NewGuid();
 
                         // add our session claim
-                        backOfficeIdentity.AddClaim(new Claim(Constants.Security.SessionIdClaimType, session.ToString(), ClaimValueTypes.String, UmbracoBackOfficeIdentity.Issuer, UmbracoBackOfficeIdentity.Issuer, backOfficeIdentity));
+                        backOfficeIdentity.AddClaim(new Claim(Constants.Security.SessionIdClaimType, session.ToString(), ClaimValueTypes.String, ClaimsIdentityExtensions.Issuer, ClaimsIdentityExtensions.Issuer, backOfficeIdentity));
 
                         // since it is a cookie-based authentication add that claim
-                        backOfficeIdentity.AddClaim(new Claim(ClaimTypes.CookiePath, "/", ClaimValueTypes.String, UmbracoBackOfficeIdentity.Issuer, UmbracoBackOfficeIdentity.Issuer, backOfficeIdentity));
+                        backOfficeIdentity.AddClaim(new Claim(ClaimTypes.CookiePath, "/", ClaimValueTypes.String, ClaimsIdentityExtensions.Issuer, ClaimsIdentityExtensions.Issuer, backOfficeIdentity));
                     }
 
                     return Task.CompletedTask;

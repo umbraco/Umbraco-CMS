@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
+using ClaimsIdentityExtensions = Umbraco.Extensions.ClaimsIdentityExtensions;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
 {
@@ -17,7 +18,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         [Test]
         public void Get_Remaining_Ticket_Seconds()
         {
-            var backOfficeIdentity = new UmbracoBackOfficeIdentity(
+            var backOfficeIdentity = new ClaimsIdentity();
+            backOfficeIdentity.AddRequiredClaims(
                 Constants.Security.SuperUserIdAsString,
                 "test",
                 "test",
@@ -27,6 +29,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
                 Guid.NewGuid().ToString(),
                 Enumerable.Empty<string>(),
                 Enumerable.Empty<string>());
+
             var principal = new ClaimsPrincipal(backOfficeIdentity);
 
             var expireSeconds = 99;
@@ -40,8 +43,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
                         Constants.Security.TicketExpiresClaimType,
                         expires,
                         ClaimValueTypes.DateTime,
-                        UmbracoBackOfficeIdentity.Issuer,
-                        UmbracoBackOfficeIdentity.Issuer,
+                        ClaimsIdentityExtensions.Issuer,
+                        ClaimsIdentityExtensions.Issuer,
                         backOfficeIdentity));
 
             var ticketRemainingSeconds = principal.GetRemainingAuthSeconds(then);

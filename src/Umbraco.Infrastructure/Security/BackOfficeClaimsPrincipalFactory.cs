@@ -4,7 +4,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Security
 {
@@ -45,8 +45,7 @@ namespace Umbraco.Core.Security
 
             // TODO: We want to remove UmbracoBackOfficeIdentity and only rely on ClaimsIdentity, once
             // that is done then we'll create a ClaimsIdentity with all of the requirements here instead
-            var umbracoIdentity = new UmbracoBackOfficeIdentity(
-                baseIdentity,
+            baseIdentity.AddRequiredClaims(
                 user.Id,
                 user.UserName,
                 user.Name,
@@ -57,7 +56,7 @@ namespace Umbraco.Core.Security
                 user.AllowedSections,
                 user.Roles.Select(x => x.RoleId).ToArray());
 
-            return new ClaimsPrincipal(umbracoIdentity);
+            return new ClaimsPrincipal(baseIdentity);
         }
 
         /// <inheritdoc />
