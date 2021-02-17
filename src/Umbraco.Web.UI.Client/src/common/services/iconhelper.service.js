@@ -88,12 +88,58 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
     var collectedIcons;
 
     var imageConverter = [
-            {oldImage: "contour.png", newIcon: "icon-umb-contour"}
-            ];
+        {oldImage: "contour.png", newIcon: "icon-umb-contour"}
+    ];
 
     var iconCache = [];
-    var liveRequests = [];
-    var allIconsRequested = false;
+    var resourceLoadStatus = "none";
+    var promiseQueue = [];
+
+    /**
+     * This is the same approach as use for loading the localized text json 
+     * We don't want multiple requests for the icon collection, so need to track
+     * the current request state, and resolve the queued requests once the icons arrive
+     * Subsequent requests are returned immediately as the icons are cached into 
+     */
+    function init() {       
+        var deferred = $q.defer();
+
+        if (resourceLoadStatus === "loaded") {
+            deferred.resolve(iconCache);
+            return deferred.promise;
+        }
+
+        if (resourceLoadStatus === "loading") {
+            promiseQueue.push(deferred);
+            return deferred.promise;
+        }
+
+        resourceLoadStatus = "loading";
+
+        $http({ method: "GET", url: Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + 'GetIcons' })
+            .then(function (response) {
+                resourceLoadStatus = "loaded";
+
+                for (const [key, value] of Object.entries(response.data.Data)) {
+                    iconCache.push({name: key, svgString: $sce.trustAsHtml(value)})
+                }
+
+                deferred.resolve(iconCache);
+
+                //ensure all other queued promises are resolved
+                for (var p in resourceLoadingPromise) {
+                    promiseQueue[p].resolve(iconCache);
+                }
+            }, function (err) {
+                deferred.reject("Something broke");
+                //ensure all other queued promises are resolved
+                for (var p in resourceLoadingPromise) {
+                    promiseQueue[p].reject("Something broke");
+                }
+            });
+
+        return deferred.promise;    
+    }
 
     return {
 
@@ -187,67 +233,12 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
 
         /** Gets a single IconModel */
         getIcon: function(iconName) {
-            return $q((resolve, reject) => {
-                var icon = this._getIconFromCache(iconName);
-
-                 if(icon !== undefined) {
-                    resolve(icon);
-                } else {
-                    var iconRequestPath = Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl +  'GetIcon?iconName=' + iconName;
-
-                     // If the current icon is being requested, wait a bit so that we don't have to make another http request and can instead get the icon from the cache.
-                    // This is a bit rough and ready and could probably be improved used an event based system
-                    if(liveRequests.indexOf(iconRequestPath) >= 0) {
-                        setTimeout(() => {
-                            resolve(this.getIcon(iconName));
-                        }, 10);
-                    } else {
-                        liveRequests.push(iconRequestPath);
-                        // TODO - fix bug where Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl is undefinied when help icon
-                        umbRequestHelper.resourcePromise(
-                            $http.get(iconRequestPath)
-                            ,'Failed to retrieve icon: ' + iconName)
-                        .then(icon => {
-                            if(icon) {
-                                var trustedIcon = this.defineIcon(icon.Name, icon.SvgString);
-
-                                liveRequests = _.filter(liveRequests, iconRequestPath);
-
-                                resolve(trustedIcon);
-                            }
-                        })
-                        .catch(err => {
-                            console.warn(err);
-                        });
-                    };
-
-                 }
-            });
+            return init().then(icons => icons.find(i => i.name === iconName));
         },
 
         /** Gets all the available icons in the backoffice icon folder and returns them as an array of IconModels */
          getAllIcons: function() {
-            return $q((resolve, reject) => {
-                if(allIconsRequested === false) {
-                    allIconsRequested = true;
-
-                     umbRequestHelper.resourcePromise(
-                        $http.get(Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + 'GetAllIcons')
-                        ,'Failed to retrieve icons')
-                    .then(icons => {
-                        icons.forEach(icon => {
-                            this.defineIcon(icon.Name, icon.SvgString);
-                        });
-
-                        resolve(iconCache);
-                    })
-                    .catch(err => {
-                        console.warn(err);
-                    });;
-                } else {
-                    resolve(iconCache);
-                }
-            });
+            return init().then(icons => icons);
         },
 
         /** LEGACY - Return a list of icons from icon fonts, optionally filter them */
