@@ -31,7 +31,6 @@
 
                     <umb-block-card
                         class="umb-outline"
-                        umb-auto-focus="vm.model.filter === false && $index === 0"
                         ng-repeat="block in vm.model.availableItems | filter: vm.filter.searchTerm"
                         block-config-model="block.blockConfigModel"
                         element-type-model="block.elementTypeModel"
