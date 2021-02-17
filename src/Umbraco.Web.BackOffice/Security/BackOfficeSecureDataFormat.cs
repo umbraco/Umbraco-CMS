@@ -9,7 +9,7 @@ namespace Umbraco.Web.BackOffice.Security
 {
 
     /// <summary>
-    /// Custom secure format that ensures the Identity in the ticket is <see cref="UmbracoBackOfficeIdentity"/> and not just a ClaimsIdentity
+    /// Custom secure format that ensures the Identity in the ticket is verified <see cref="ClaimsIdentity"/>
     /// </summary>
     internal class BackOfficeSecureDataFormat : ISecureDataFormat<AuthenticationTicket>
     {

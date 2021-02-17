@@ -112,7 +112,7 @@ namespace Umbraco.Web.BackOffice.Filters
                         return;
                     }
 
-                    var identity = actionContext.HttpContext.User.Identity as UmbracoBackOfficeIdentity;
+                    var identity = actionContext.HttpContext.User.Identity as ClaimsIdentity;
                     if (identity == null)
                     {
                         return;

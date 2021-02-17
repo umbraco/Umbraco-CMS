@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -93,7 +94,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             //chuck it into the props since this is what MS does when hosted and it's needed there
             request.Properties["MS_HttpContext"] = httpContext;
 
-            var backofficeIdentity = (UmbracoBackOfficeIdentity) owinContext.Authentication.User.Identity;
+            var backofficeIdentity = (ClaimsIdentity) owinContext.Authentication.User.Identity;
 
             var backofficeSecurity = new Mock<IBackOfficeSecurity>();
 
