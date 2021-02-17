@@ -19,7 +19,6 @@ namespace Umbraco.Core.Composing
         private readonly IReadOnlyList<Assembly> _assemblies;
         private readonly Dictionary<Assembly, Classification> _classifications;
         private readonly List<Assembly> _lookup = new List<Assembly>();
-
         public ReferenceResolver(IReadOnlyList<string> targetAssemblies, IReadOnlyList<Assembly> entryPointAssemblies)
         {
             _umbracoAssemblies = new HashSet<string>(targetAssemblies, StringComparer.Ordinal);
@@ -54,19 +53,31 @@ namespace Umbraco.Core.Composing
             {
                 foreach(var dll in Directory.EnumerateFiles(dir, "*.dll"))
                 {
-                    var assemblyName = AssemblyName.GetAssemblyName(dll);
+                    AssemblyName assemblyName = null;
+                    try
+                    {
+                        assemblyName = AssemblyName.GetAssemblyName(dll);
+                    }
+                    catch (BadImageFormatException e)
+                    {
+                        // TODO: Add logging?
+                    }
 
-                    // don't include if this is excluded
-                    if (TypeFinder.KnownAssemblyExclusionFilter.Any(f => assemblyName.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))
-                        continue;
+                    if (assemblyName != null)
+                    {
+                        // don't include if this is excluded
+                        if (TypeFinder.KnownAssemblyExclusionFilter.Any(f =>
+                            assemblyName.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))
+                            continue;
 
-                    // don't include this item if it's Umbraco
-                    // TODO: We should maybe pass an explicit list of these names in?
-                    if (assemblyName.FullName.StartsWith("Umbraco.") || assemblyName.Name.EndsWith(".Views"))
-                        continue;
+                        // don't include this item if it's Umbraco
+                        // TODO: We should maybe pass an explicit list of these names in?
+                        if (assemblyName.FullName.StartsWith("Umbraco.") || assemblyName.Name.EndsWith(".Views"))
+                            continue;
 
-                    var assembly = Assembly.Load(assemblyName);
-                    assemblies.Add(assembly);
+                        var assembly = Assembly.Load(assemblyName);
+                        assemblies.Add(assembly);
+                    }
                 }
             }
 
