@@ -282,91 +282,35 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
-        public CreatedContentTypeCollectionResult PostCreateCollection(int parentId, string collectionName, bool collectionCreateTemplate, string collectionItemName, bool collectionItemCreateTemplate, string collectionIcon, string collectionItemIcon)
-        {
-            // create item doctype
-            var itemDocType = new ContentType(parentId);
-            itemDocType.Name = collectionItemName;
-            itemDocType.Alias = collectionItemName.ToSafeAlias(true);
-            itemDocType.Icon = collectionItemIcon;
-
-            // create item doctype template
-            if (collectionItemCreateTemplate)
-            {
-                var template = CreateTemplateForContentType(itemDocType.Alias, itemDocType.Name);
-                itemDocType.SetDefaultTemplate(template);
-            }
-
-            // save item doctype
-            Services.ContentTypeService.Save(itemDocType);
-
-            // create collection doctype
-            var collectionDocType = new ContentType(parentId);
-            collectionDocType.Name = collectionName;
-            collectionDocType.Alias = collectionName.ToSafeAlias(true);
-            collectionDocType.Icon = collectionIcon;
-            collectionDocType.IsContainer = true;
-            collectionDocType.AllowedContentTypes = new List<ContentTypeSort>()
-            {
-                new ContentTypeSort(itemDocType.Id, 0)
-            };
-
-            // create collection doctype template
-            if (collectionCreateTemplate)
-            {
-                var template = CreateTemplateForContentType(collectionDocType.Alias, collectionDocType.Name);
-                collectionDocType.SetDefaultTemplate(template);
-            }
-
-            // save collection doctype
-            Services.ContentTypeService.Save(collectionDocType);
-
-            // test if the parent exist and then allow the collection underneath
-            var parentCt = Services.ContentTypeService.Get(parentId);
-            if (parentCt != null)
-            {
-                var allowedCts = parentCt.AllowedContentTypes.ToList();
-                allowedCts.Add(new ContentTypeSort(collectionDocType.Id, allowedCts.Count()));
-                parentCt.AllowedContentTypes = allowedCts;
-                Services.ContentTypeService.Save(parentCt);
-            }
-
-            return new CreatedContentTypeCollectionResult
-            {
-                CollectionId = collectionDocType.Id,
-                ContainerId = itemDocType.Id
-            };
-        }
-
         public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
         {
-            //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.
-            //If the doc type does not allow content variations, we need to update all of it's property types to not allow this either
-            //else we may end up with ysods. I'm unsure if the service level handles this but we'll make sure it is updated here
+            //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.	
+            //If the doc type does not allow content variations, we need to update all of it's property types to not allow this either	
+            //else we may end up with ysods. I'm unsure if the service level handles this but we'll make sure it is updated here	
             if (!contentTypeSave.AllowCultureVariant)
             {
-                foreach(var prop in contentTypeSave.Groups.SelectMany(x => x.Properties))
+                foreach (var prop in contentTypeSave.Groups.SelectMany(x => x.Properties))
                 {
                     prop.AllowCultureVariant = false;
                 }
             }
 
             var savedCt = PerformPostSave<DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
-                contentTypeSave:    contentTypeSave,
-                getContentType:     i => Services.ContentTypeService.Get(i),
-                saveContentType:    type => Services.ContentTypeService.Save(type),
-                beforeCreateNew:    ctSave =>
+                contentTypeSave: contentTypeSave,
+                getContentType: i => Services.ContentTypeService.Get(i),
+                saveContentType: type => Services.ContentTypeService.Save(type),
+                beforeCreateNew: ctSave =>
                 {
-                    //create a default template if it doesn't exist -but only if default template is == to the content type
+                    //create a default template if it doesn't exist -but only if default template is == to the content type	
                     if (ctSave.DefaultTemplate.IsNullOrWhiteSpace() == false && ctSave.DefaultTemplate == ctSave.Alias)
                     {
                         var template = CreateTemplateForContentType(ctSave.Alias, ctSave.Name);
 
-                        // If the alias has been manually updated before the first save,
-                        // make sure to also update the first allowed template, as the
-                        // name will come back as a SafeAlias of the document type name,
-                        // not as the actual document type alias.
-                        // For more info: http://issues.umbraco.org/issue/U4-11059
+                        // If the alias has been manually updated before the first save,	
+                        // make sure to also update the first allowed template, as the	
+                        // name will come back as a SafeAlias of the document type name,	
+                        // not as the actual document type alias.	
+                        // For more info: http://issues.umbraco.org/issue/U4-11059	
                         if (ctSave.DefaultTemplate != template.Alias)
                         {
                             var allowedTemplates = ctSave.AllowedTemplates.ToArray();
@@ -375,7 +319,7 @@ namespace Umbraco.Web.Editors
                             ctSave.AllowedTemplates = allowedTemplates;
                         }
 
-                        //make sure the template alias is set on the default and allowed template so we can map it back
+                        //make sure the template alias is set on the default and allowed template so we can map it back	
                         ctSave.DefaultTemplate = template.Alias;
 
                     }
@@ -629,7 +573,7 @@ namespace Umbraco.Web.Editors
             var model = new ContentTypeImportModel();
 
             var file = result.FileData[0];
-            var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
+            var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote);
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
             var destFileName = root + "\\" + fileName;

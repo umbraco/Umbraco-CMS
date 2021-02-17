@@ -337,7 +337,7 @@ namespace Umbraco.Web.Routing
         {
             var stopNodeId = rootNodeId ?? -1;
 
-            return path.Split(',')
+            return path.Split(Constants.CharArrays.Comma)
                        .Reverse()
                        .Select(int.Parse)
                        .TakeWhile(id => id != stopNodeId)

@@ -323,12 +323,12 @@
                             filterAvailableCompositions(selectedContentType, newSelection).then(function () {
                             deferred.resolve({ selectedContentType, newSelection });
                                 // TODO: Here we could probably re-enable selection if we previously showed a throbber or something
-                    }, function () { 
+                    }, function () {
                                 deferred.reject();
                             });
                         }
 
-                        return deferred.promise; 
+                        return deferred.promise;
                     }
                 };
 
@@ -353,7 +353,7 @@
                     }),
                     //get where used document types
                     whereUsedContentTypeResource(scope.model.id).then(function (whereUsed) {
-                        //pass to the dialog model the content type eg documentType or mediaType 
+                        //pass to the dialog model the content type eg documentType or mediaType
                         scope.compositionsDialogModel.section = scope.contentType;
                         //pass the list of 'where used' document types
                         scope.compositionsDialogModel.whereCompositionUsed = whereUsed;
@@ -566,6 +566,7 @@
                             property.isSensitiveValue = propertyModel.isSensitiveValue;
                             property.allowCultureVariant = propertyModel.allowCultureVariant;
                             property.allowSegmentVariant = propertyModel.allowSegmentVariant;
+                            property.labelOnTop = propertyModel.labelOnTop;
 
                             // update existing data types
                             if (model.updateSameDataTypes) {
@@ -647,7 +648,8 @@
                         mandatoryMessage: null,
                         pattern: null,
                         patternMessage: null
-                    }
+                    },
+                    labelOnTop: false
                 };
 
                 // check if there already is an init property

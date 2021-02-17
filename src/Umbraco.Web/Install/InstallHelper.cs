@@ -145,7 +145,7 @@ namespace Umbraco.Web.Install
                     return true;
                 }
 
-                return _databaseBuilder.HasSomeNonDefaultUser() == false;
+                return _databaseBuilder.IsUmbracoInstalled() == false;
             }
         }
 

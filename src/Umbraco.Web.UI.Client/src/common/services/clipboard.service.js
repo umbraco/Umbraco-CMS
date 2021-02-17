@@ -10,32 +10,66 @@
  * The service has a set way for defining a data-set by a entryType and alias, which later will be used to retrive the posible entries for a paste scenario.
  *
  */
-function clipboardService(notificationsService, eventsService, localStorageService, iconHelper) {
+function clipboardService($window, notificationsService, eventsService, localStorageService, iconHelper) {
 
 
     const TYPES = {};
     TYPES.ELEMENT_TYPE = "elementType";
+    TYPES.BLOCK = "block";
     TYPES.RAW = "raw";
 
     var clearPropertyResolvers = {};
     var pastePropertyResolvers = {};
     var clipboardTypeResolvers = {};
 
-    clipboardTypeResolvers[TYPES.ELEMENT_TYPE] = function(data, propMethod) {
-        for (var t = 0; t < data.variants[0].tabs.length; t++) {
-            var tab = data.variants[0].tabs[t];
+    clipboardTypeResolvers[TYPES.ELEMENT_TYPE] = function(element, propMethod) {
+        for (var t = 0; t < element.variants[0].tabs.length; t++) {
+            var tab = element.variants[0].tabs[t];
             for (var p = 0; p < tab.properties.length; p++) {
                 var prop = tab.properties[p];
                 propMethod(prop, TYPES.ELEMENT_TYPE);
             }
         }
     }
+    clipboardTypeResolvers[TYPES.BLOCK] = function (block, propMethod) {
+
+        propMethod(block, TYPES.BLOCK);
+
+        if(block.data) {
+            Object.keys(block.data).forEach( key => {
+                if(key === 'udi' || key === 'contentTypeKey') {
+                    return;
+                }
+                propMethod(block.data[key], TYPES.RAW);
+            });
+        }
+
+        if(block.settingsData) {
+            Object.keys(block.settingsData).forEach( key => {
+                if(key === 'udi' || key === 'contentTypeKey') {
+                    return;
+                }
+                propMethod(block.settingsData[key], TYPES.RAW);
+            });
+        }
+
+        /*
+        // Concept for supporting Block that contains other Blocks.
+        // Missing clarifications:
+        // How do we ensure that the inner blocks of a block is supported in the new scenario. Not that likely but still relevant, so considerations should be made.
+        if(block.references) {
+            // A Block clipboard entry can contain other Block Clipboard Entries, here we will make sure to resolve those identical to the main entry.
+            for (var r = 0; r < block.references.length; r++) {
+                clipboardTypeResolvers[TYPES.BLOCK](block.references[r], propMethod);
+            }
+        }
+        */
+    }
     clipboardTypeResolvers[TYPES.RAW] = function(data, propMethod) {
         for (var p = 0; p < data.length; p++) {
             propMethod(data[p], TYPES.RAW);
         }
     }
-
 
     var STORAGE_KEY = "umbClipboardService";
 
@@ -64,7 +98,10 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         var storageString = JSON.stringify(storage);
 
         try {
+            // Check that we can parse the JSON:
             var storageJSON = JSON.parse(storageString);
+
+            // Store the string:
             localStorageService.set(STORAGE_KEY, storageString);
 
             eventsService.emit("clipboardService.storageUpdate");
@@ -82,11 +119,11 @@ function clipboardService(notificationsService, eventsService, localStorageServi
 
         type = type || "raw";
         var resolvers = clearPropertyResolvers[type];
-
-        for (var i=0; i<resolvers.length; i++) {
-            resolvers[i](prop, resolvePropertyForStorage);
+        if (resolvers) {
+            for (var i=0; i<resolvers.length; i++) {
+                resolvers[i](prop, resolvePropertyForStorage);
+            }
         }
-
     }
 
     var prepareEntryForStorage = function(type, entryData, firstLevelClearupMethod) {
@@ -123,9 +160,10 @@ function clipboardService(notificationsService, eventsService, localStorageServi
 
         type = type || "raw";
         var resolvers = pastePropertyResolvers[type];
-
-        for (var i=0; i<resolvers.length; i++) {
-            resolvers[i](prop, resolvePropertyForPaste);
+        if (resolvers) {
+            for (var i=0; i<resolvers.length; i++) {
+                resolvers[i](prop, resolvePropertyForPaste);
+            }
         }
     }
 
@@ -154,7 +192,7 @@ function clipboardService(notificationsService, eventsService, localStorageServi
         var cloneData = Utilities.copy(pasteEntryData);
 
         var typeResolver = clipboardTypeResolvers[type];
-        if(typeResolver) {
+        if (typeResolver) {
             typeResolver(cloneData, resolvePropertyForPaste);
         } else {
             console.warn("Umbraco.service.clipboardService has no type resolver for '" + type + "'.");
@@ -427,10 +465,17 @@ function clipboardService(notificationsService, eventsService, localStorageServi
     };
 
 
+    var emitClipboardStorageUpdate = _.debounce(function(e) {
+        eventsService.emit("clipboardService.storageUpdate");
+    }, 1000);
+
+    // Fires if LocalStorage was changed from another tab than this one.
+    $window.addEventListener("storage", emitClipboardStorageUpdate);
+
+
 
     return service;
 }
 
 
 angular.module("umbraco.services").factory("clipboardService", clipboardService);
-
