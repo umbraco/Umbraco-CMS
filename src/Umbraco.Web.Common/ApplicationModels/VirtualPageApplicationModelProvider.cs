@@ -1,11 +1,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.Controllers;
 
-namespace Umbraco.Web.Common.ApplicationModels
+namespace Umbraco.Cms.Web.Common.ApplicationModels
 {
     /// <summary>
     /// Applies the <see cref="VirtualPageConvention"/> to any action on a controller that is <see cref="IVirtualPageController"/>
