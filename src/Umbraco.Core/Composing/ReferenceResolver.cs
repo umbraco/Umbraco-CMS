@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security;
+using Microsoft.Extensions.Logging;
 
 namespace Umbraco.Core.Composing
 {
@@ -19,10 +21,12 @@ namespace Umbraco.Core.Composing
         private readonly IReadOnlyList<Assembly> _assemblies;
         private readonly Dictionary<Assembly, Classification> _classifications;
         private readonly List<Assembly> _lookup = new List<Assembly>();
-        public ReferenceResolver(IReadOnlyList<string> targetAssemblies, IReadOnlyList<Assembly> entryPointAssemblies)
+        private readonly ILogger _logger;
+        public ReferenceResolver(IReadOnlyList<string> targetAssemblies, IReadOnlyList<Assembly> entryPointAssemblies, ILogger<ReferenceResolver> logger)
         {
             _umbracoAssemblies = new HashSet<string>(targetAssemblies, StringComparer.Ordinal);
             _assemblies = entryPointAssemblies;
+            _logger = logger;
             _classifications = new Dictionary<Assembly, Classification>();
 
             foreach (var item in entryPointAssemblies)
@@ -60,7 +64,15 @@ namespace Umbraco.Core.Composing
                     }
                     catch (BadImageFormatException e)
                     {
-                        // TODO: Add logging?
+                        _logger.LogDebug(e, "Could not load {dll} for type scanning, skipping", dll);
+                    }
+                    catch (SecurityException e)
+                    {
+                        _logger.LogError(e, "Could not access {dll} for type scanning due to a security problem", dll);
+                    }
+                    catch (Exception e)
+                    {
+                        _logger.LogInformation(e, "Error: could not load {dll} for type scanning", dll);
                     }
 
                     if (assemblyName != null)
