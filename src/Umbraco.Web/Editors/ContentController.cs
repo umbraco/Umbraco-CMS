@@ -699,7 +699,7 @@ namespace Umbraco.Web.Editors
 
             //The default validation language will be either: The default languauge, else if the content is brand new and the default culture is
             // not marked to be saved, it will be the first culture in the list marked for saving.
-            var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.CultureName;
+            var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.IsoCode;
             var cultureForInvariantErrors = CultureImpact.GetCultureForInvariantErrors(
                 contentItem.PersistedContent,
                 contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),
@@ -1168,7 +1168,7 @@ namespace Umbraco.Web.Editors
                     //if this item's path has already been denied or if the user doesn't have access to it, add to the deny list
                     if (denied.Any(x => c.Path.StartsWith($"{x.Path},"))
                         || (ContentPermissionsHelper.CheckPermissions(c,
-                            Security.CurrentUser, Services.UserService, Services.EntityService,
+                            Security.CurrentUser, Services.UserService, Services.EntityService, AppCaches,
                             ActionPublish.ActionLetter) == ContentPermissionsHelper.ContentAccess.Denied))
                     {
                         denied.Add(c);

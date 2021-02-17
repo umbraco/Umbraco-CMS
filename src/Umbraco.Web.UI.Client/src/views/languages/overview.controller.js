@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function LanguagesOverviewController($q, $timeout, $location, $routeParams, navigationService, localizationService, languageResource, eventsService, overlayService) {
+    function LanguagesOverviewController($q, $timeout, $location, $routeParams, navigationService, localizationService, languageResource, eventsService, overlayService, $scope) {
         var vm = this;
 
         vm.page = {};
@@ -29,6 +29,7 @@
             // Localize labels
             promises.push(localizationService.localize("treeHeaders_languages").then(function (value) {
                 vm.page.name = value;
+                $scope.$emit("$changeTitle", value);
             }));
 
             // Load all languages

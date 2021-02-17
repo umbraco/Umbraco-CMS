@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NPoco;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -6,12 +7,12 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Web;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
+using MapperCollection = Umbraco.Core.Persistence.Mappers.MapperCollection;
 
 namespace Umbraco.Core.Runtime
 {
@@ -27,29 +28,32 @@ namespace Umbraco.Core.Runtime
         private readonly UmbracoDatabaseFactory _dbFactory;
         private bool _errorDuringAcquiring;
         private object _locker = new object();
+        private bool _hasTable = false;
 
         public SqlMainDomLock(ILogger logger)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
             _logger = logger;
-            
+
             _dbFactory = new UmbracoDatabaseFactory(
                Constants.System.UmbracoConnectionName,
                _logger,
-               new Lazy<IMapperCollection>(() => new Persistence.Mappers.MapperCollection(Enumerable.Empty<BaseMapper>())));
+               new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
         {
             if (!_dbFactory.Configured)
             {
-                // if we aren't configured, then we're in an install state, in which case we have no choice but to assume we can acquire
+                // if we aren't configured then we're in an install state, in which case we have no choice but to assume we can acquire
                 return true;
             }
 
             if (!(_dbFactory.SqlContext.SqlSyntax is SqlServerSyntaxProvider sqlServerSyntaxProvider))
+            {
                 throw new NotSupportedException("SqlMainDomLock is only supported for Sql Server");
+            }
 
             _sqlServerSyntax = sqlServerSyntaxProvider;
 
@@ -57,15 +61,25 @@ namespace Umbraco.Core.Runtime
 
             var tempId = Guid.NewGuid().ToString();
 
-            using var db = _dbFactory.CreateDatabase();
-            using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
+            IUmbracoDatabase db = null;
 
             try
             {
+                db = _dbFactory.CreateDatabase();
+
+                _hasTable = db.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
+                if (!_hasTable)
+                {
+                    // the Db does not contain the required table, we must be in an install state we have no choice but to assume we can acquire
+                    return true;
+                }
+
+                db.BeginTransaction(IsolationLevel.ReadCommitted);
+
                 try
                 {
                     // wait to get a write lock
-                    _sqlServerSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Constants.Locks.MainDom);                    
+                    _sqlServerSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Constants.Locks.MainDom);
                 }
                 catch(SqlException ex)
                 {
@@ -102,9 +116,10 @@ namespace Umbraco.Core.Runtime
             }
             finally
             {
-                transaction.Complete();
+                db?.CompleteTransaction();
+                db?.Dispose();
             }
-            
+
 
             return await WaitForExistingAsync(tempId, millisecondsTimeout);
         }
@@ -119,7 +134,12 @@ namespace Umbraco.Core.Runtime
 
             // Create a long running task (dedicated thread)
             // to poll to check if we are still the MainDom registered in the DB
-            return Task.Factory.StartNew(ListeningLoop, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning, TaskScheduler.Default);
+            return Task.Factory.StartNew(
+                ListeningLoop,
+                _cancellationTokenSource.Token,
+                TaskCreationOptions.LongRunning,
+                // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                TaskScheduler.Default);
 
         }
 
@@ -147,12 +167,6 @@ namespace Umbraco.Core.Runtime
                     continue;
                 }
 
-                if (!_dbFactory.Configured)
-                {
-                    // if we aren't configured, we just keep looping since we can't query the db
-                    continue;
-                }
-
                 lock (_locker)
                 {
                     // If cancellation has been requested we will just exit. Depending on timing of the shutdown,
@@ -160,12 +174,29 @@ namespace Umbraco.Core.Runtime
                     // the other MainDom is taking to startup. In this case the db row will just be deleted and the
                     // new MainDom will just take over.
                     if (_cancellationTokenSource.IsCancellationRequested)
+                    {
+                        _logger.Debug<SqlMainDomLock>("Task canceled, exiting loop");
                         return;
+                    }
+                    IUmbracoDatabase db = null;
 
-                    using var db = _dbFactory.CreateDatabase();
-                    using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
                     try
                     {
+                        db = _dbFactory.CreateDatabase();
+
+                        if (!_hasTable)
+                        {
+                            // re-check if its still false, we don't want to re-query once we know its there since this
+                            // loop needs to use minimal resources
+                            _hasTable = db.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
+                            if (!_hasTable)
+                            {
+                                // the Db does not contain the required table, we just keep looping since we can't query the db
+                                continue;
+                            }
+                        }
+
+                        db.BeginTransaction(IsolationLevel.ReadCommitted);
                         // get a read lock
                         _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
 
@@ -184,12 +215,15 @@ namespace Umbraco.Core.Runtime
                         // We need to keep on listening unless we've been notified by our own AppDomain to shutdown since
                         // we don't want to shutdown resources controlled by MainDom inadvertently. We'll just keep listening otherwise.
                         if (_cancellationTokenSource.IsCancellationRequested)
+                        {
+                            _logger.Debug<SqlMainDomLock>("Task canceled, exiting loop");
                             return;
-
+                        }
                     }
                     finally
                     {
-                        transaction.Complete();
+                        db?.CompleteTransaction();
+                        db?.Dispose();
                     }
                 }
 
@@ -208,38 +242,51 @@ namespace Umbraco.Core.Runtime
 
             return Task.Run(() =>
             {
-                using var db = _dbFactory.CreateDatabase();
-
-                var watch = new Stopwatch();
-                watch.Start();
-                while (true)
+                try
                 {
-                    // poll very often, we need to take over as fast as we can
-                    // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
-                    Thread.Sleep(1000);
+                    using var db = _dbFactory.CreateDatabase();
 
-                    var acquired = TryAcquire(db, tempId, updatedTempId);
-                    if (acquired.HasValue)
-                        return acquired.Value;
-
-                    if (watch.ElapsedMilliseconds >= millisecondsTimeout)
+                    var watch = new Stopwatch();
+                    watch.Start();
+                    while (true)
                     {
-                        return AcquireWhenMaxWaitTimeElapsed(db);
+                        // poll very often, we need to take over as fast as we can
+                        // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
+                        Thread.Sleep(1000);
+
+                        var acquired = TryAcquire(db, tempId, updatedTempId);
+                        if (acquired.HasValue)
+                            return acquired.Value;
+
+                        if (watch.ElapsedMilliseconds >= millisecondsTimeout)
+                        {
+                            return AcquireWhenMaxWaitTimeElapsed(db);
+                        }
                     }
                 }
+                catch (Exception ex)
+                {
+                    _logger.Error<SqlMainDomLock>(ex, "An error occurred trying to acquire and waiting for existing SqlMainDomLock to shutdown");
+                    return false;
+                }
+
             }, _cancellationTokenSource.Token);
         }
 
         private bool? TryAcquire(IUmbracoDatabase db, string tempId, string updatedTempId)
         {
-            using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
+            // Creates a separate transaction to the DB instance so we aren't allocating tons of new DB instances for each transaction
+            // since this is executed in a tight loop
+
+            ITransaction transaction = null;
 
             try
             {
+                transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
                 // get a read lock
                 _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
 
-                // the row 
+                // the row
                 var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
 
                 if (mainDomRows.Count == 0 || mainDomRows[0].Value == updatedTempId)
@@ -281,7 +328,8 @@ namespace Umbraco.Core.Runtime
             }
             finally
             {
-                transaction.Complete();
+                transaction?.Complete();
+                transaction?.Dispose();
             }
 
             return null; // continue
@@ -289,6 +337,9 @@ namespace Umbraco.Core.Runtime
 
         private bool AcquireWhenMaxWaitTimeElapsed(IUmbracoDatabase db)
         {
+            // Creates a separate transaction to the DB instance so we aren't allocating tons of new DB instances for each transaction
+            // since this is executed in a tight loop
+
             // if the timeout has elapsed, it either means that the other main dom is taking too long to shutdown,
             // or it could mean that the previous appdomain was terminated and didn't clear out the main dom SQL row
             // and it's just been left as an orphan row.
@@ -298,10 +349,12 @@ namespace Umbraco.Core.Runtime
 
             _logger.Debug<SqlMainDomLock>("Timeout elapsed, assuming orphan row, acquiring MainDom.");
 
-            using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
+            ITransaction transaction = null;
 
             try
             {
+                transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
+
                 _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
 
                 // so now we update the row with our appdomain id
@@ -324,12 +377,13 @@ namespace Umbraco.Core.Runtime
             }
             finally
             {
-                transaction.Complete();
+                transaction?.Complete();
+                transaction?.Dispose();
             }
         }
 
         /// <summary>
-        /// Inserts or updates the key/value row 
+        /// Inserts or updates the key/value row
         /// </summary>
         private RecordPersistenceType InsertLockRecord(string id, IUmbracoDatabase db)
         {
@@ -369,17 +423,20 @@ namespace Umbraco.Core.Runtime
                 {
                     lock (_locker)
                     {
+                        _logger.Debug<SqlMainDomLock>($"{nameof(SqlMainDomLock)} Disposing...");
+
                         // immediately cancel all sub-tasks, we don't want them to keep querying
                         _cancellationTokenSource.Cancel();
                         _cancellationTokenSource.Dispose();
 
-                        if (_dbFactory.Configured)
+                        if (_dbFactory.Configured && _hasTable)
                         {
-                            using var db = _dbFactory.CreateDatabase();
-                            using var transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
-
+                            IUmbracoDatabase db = null;
                             try
                             {
+                                db = _dbFactory.CreateDatabase();
+                                db.BeginTransaction(IsolationLevel.ReadCommitted);
+
                                 // get a write lock
                                 _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
 
@@ -406,7 +463,15 @@ namespace Umbraco.Core.Runtime
                             }
                             finally
                             {
-                                transaction.Complete();
+                                try
+                                {
+                                    db?.CompleteTransaction();
+                                    db?.Dispose();
+                                }
+                                catch (Exception ex)
+                                {
+                                    _logger.Error<SqlMainDomLock>(ex, "Unexpected error during dispose when completing transaction.");
+                                }
                             }
                         }
                     }

@@ -12,7 +12,6 @@
         vm.breadcrumbs = [];
         vm.labels = {};
         vm.showDefaultLanguageInfo = false;
-
         vm.save = save;
         vm.back = back;
         vm.goToPage = goToPage;
@@ -30,11 +29,13 @@
             promises.push(localizationService.localizeMany([
                 "treeHeaders_languages",
                 "languages_addLanguage",
-                "defaultdialogs_confirmSure"
+                "defaultdialogs_confirmSure",
+                "defaultdialogs_editlanguage"
             ]).then(function (values) {
                 vm.labels.languages = values[0];
                 vm.labels.addLanguage = values[1];
                 vm.labels.areYouSure = values[2];
+                vm.labels.editLanguage = values[3];
 
                 if ($routeParams.create) {
                     vm.isNew = true;
@@ -70,6 +71,12 @@
             }
 
             $q.all(promises).then(function () {
+                if ($routeParams.create) {
+                    $scope.$emit("$changeTitle", vm.labels.addLanguage);
+                } else {
+                    $scope.$emit("$changeTitle", vm.labels.editLanguage + ": " + vm.language.name);
+                }
+
                 vm.loading = false;
             });
 
@@ -115,6 +122,8 @@
 
                 vm.language = lang;
                 vm.saveButtonState = "success";
+
+                $scope.$emit("$changeTitle", vm.labels.editLanguage + ": " + vm.language.name);
 
                 localizationService.localize("speechBubbles_languageSaved").then(function (value) {
                     notificationsService.success(value);

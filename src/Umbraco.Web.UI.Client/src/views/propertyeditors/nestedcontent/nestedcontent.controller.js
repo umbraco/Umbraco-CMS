@@ -352,7 +352,7 @@
                         item["$index"] = (idx + 1);
 
                         var newName = contentType.nameExp(item);
-                        if (newName && (newName = $.trim(newName))) {
+                        if (newName && (newName = newName.trim())) {
                             name = newName;
                         }
 
@@ -507,8 +507,10 @@
             vm.showPaste = clipboardService.hasEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
         }
 
-        eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
-
+        var storageUpdate = eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
+        $scope.$on('$destroy', function () {
+            storageUpdate();
+        });
         var notSupported = [
             "Umbraco.Tags",
             "Umbraco.UploadField",

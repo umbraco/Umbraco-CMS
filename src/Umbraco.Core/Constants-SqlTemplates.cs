@@ -14,7 +14,16 @@
                 public const string GetParentNode = "Umbraco.Core.VersionableRepository.GetParentNode";
                 public const string GetReservedId = "Umbraco.Core.VersionableRepository.GetReservedId";
             }
+            public static class RelationRepository
+            {
+                public const string DeleteByParentAll = "Umbraco.Core.RelationRepository.DeleteByParent";
+                public const string DeleteByParentIn = "Umbraco.Core.RelationRepository.DeleteByParentIn";
+            }
 
+            public static class DataTypeRepository
+            {
+                public const string EnsureUniqueNodeName = "Umbraco.Core.DataTypeDefinitionRepository.EnsureUniqueNodeName";
+            }
         }
     }
 }

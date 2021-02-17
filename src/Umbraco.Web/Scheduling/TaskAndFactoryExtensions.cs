@@ -8,6 +8,7 @@ namespace Umbraco.Web.Scheduling
     {
         #region Task Extensions
 
+        // TODO: Not used, is this used in Deploy or something?
         static void SetCompletionSource<TResult>(TaskCompletionSource<TResult> completionSource, Task task)
         {
             if (task.IsFaulted)
@@ -16,6 +17,7 @@ namespace Umbraco.Web.Scheduling
                 completionSource.SetResult(default(TResult));
         }
 
+        // TODO: Not used, is this used in Deploy or something?
         static void SetCompletionSource<TResult>(TaskCompletionSource<TResult> completionSource, Task<TResult> task)
         {
             if (task.IsFaulted)
@@ -24,17 +26,33 @@ namespace Umbraco.Web.Scheduling
                 completionSource.SetResult(task.Result);
         }
 
+        // TODO: Not used, is this used in Deploy or something?
         public static Task ContinueWithTask(this Task task, Func<Task, Task> continuation)
         {
             var completionSource = new TaskCompletionSource<object>();
-            task.ContinueWith(atask => continuation(atask).ContinueWith(atask2 => SetCompletionSource(completionSource, atask2)));
+            task.ContinueWith(atask => continuation(atask).ContinueWith(
+                    atask2 => SetCompletionSource(completionSource, atask2),
+                    // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                    TaskScheduler.Default),
+                // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                TaskScheduler.Default);
             return completionSource.Task;
         }
 
+        // TODO: Not used, is this used in Deploy or something?
         public static Task ContinueWithTask(this Task task, Func<Task, Task> continuation, CancellationToken token)
         {
             var completionSource = new TaskCompletionSource<object>();
-            task.ContinueWith(atask => continuation(atask).ContinueWith(atask2 => SetCompletionSource(completionSource, atask2), token), token);
+            task.ContinueWith(atask => continuation(atask).ContinueWith(
+                    atask2 => SetCompletionSource(completionSource, atask2),
+                    token,
+                    TaskContinuationOptions.None,
+                    // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                    TaskScheduler.Default),
+                token,
+                TaskContinuationOptions.None,
+                // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
+                TaskScheduler.Default);
             return completionSource.Task;
         }
 
