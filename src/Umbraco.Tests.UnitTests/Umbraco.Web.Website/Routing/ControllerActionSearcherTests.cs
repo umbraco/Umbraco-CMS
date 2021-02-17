@@ -3,15 +3,12 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
-using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -53,8 +50,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 
         private class Render2Controller : RenderController
         {
-            public Render2Controller(ILoggerFactory loggerFactory, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
-                : base(loggerFactory, compositeViewEngine, umbracoContextAccessor)
+            public Render2Controller(ILogger<Render2Controller> logger, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
+                : base(logger, compositeViewEngine, umbracoContextAccessor)
             {
             }
         }

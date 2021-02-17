@@ -3,11 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Models;
 using Umbraco.Web.Routing;
 
@@ -27,10 +25,10 @@ namespace Umbraco.Web.Common.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="RenderController"/> class.
         /// </summary>
-        public RenderController(ILoggerFactory loggerFactory, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
-            : base(loggerFactory, compositeViewEngine)
+        public RenderController(ILogger<RenderController> logger, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
+            : base(logger, compositeViewEngine)
         {
-            _logger = loggerFactory.CreateLogger<RenderController>();
+            _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 

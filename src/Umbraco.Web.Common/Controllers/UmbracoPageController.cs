@@ -20,9 +20,9 @@ namespace Umbraco.Web.Common.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoPageController"/> class.
         /// </summary>
-        protected UmbracoPageController(ILoggerFactory loggerFactory, ICompositeViewEngine compositeViewEngine)
+        protected UmbracoPageController(ILogger<UmbracoPageController> logger, ICompositeViewEngine compositeViewEngine)
         {
-            _logger = loggerFactory.CreateLogger<UmbracoPageController>();
+            _logger = logger;
             _compositeViewEngine = compositeViewEngine;
         }
 

@@ -325,8 +325,7 @@ namespace Umbraco.Web.BackOffice.Trees
             // note: this is all required in order to execute the auth-filters for the sub request, we
             // need to "trick" mvc into thinking that it is actually executing the proxied controller.
 
-            // TODO: We have a method for this: ControllerExtensions.GetControllerName
-            var controllerName = controllerType.Name.Substring(0, controllerType.Name.Length - 10); // remove controller part of name;
+            var controllerName = ControllerExtensions.GetControllerName(controllerType);
 
             // create proxy route data specifying the action & controller to execute
             var routeData = new RouteData(new RouteValueDictionary()

@@ -188,8 +188,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 
         private class TestController : RenderController
         {
-            public TestController(ILoggerFactory loggerFactory, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
-                : base(loggerFactory, compositeViewEngine, umbracoContextAccessor)
+            public TestController(ILogger<TestController> logger, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
+                : base(logger, compositeViewEngine, umbracoContextAccessor)
             {
             }
         }
