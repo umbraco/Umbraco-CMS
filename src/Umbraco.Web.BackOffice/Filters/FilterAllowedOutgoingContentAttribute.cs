@@ -95,7 +95,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 var ids = new List<int>();
                 for (var i = 0; i < length; i++)
                 {
-                    ids.Add(((dynamic)items[i]).GetId());
+                    ids.Add(((dynamic)items[i]).Id);
                 }
                 //get all the permissions for these nodes in one call
                 var permissions = _userService.GetPermissions(user, ids.ToArray());
@@ -104,7 +104,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 {
                     //get the combined permission set across all user groups for this node
                     //we're in the world of dynamics here so we need to cast
-                    var nodePermission = ((IEnumerable<string>)permissions.GetAllPermissions(item.GetId())).ToArray();
+                    var nodePermission = ((IEnumerable<string>)permissions.GetAllPermissions(item.Id)).ToArray();
 
                     //if the permission being checked doesn't exist then remove the item
                     if (nodePermission.Contains(_permissionToCheck.ToString(CultureInfo.InvariantCulture)) == false)
