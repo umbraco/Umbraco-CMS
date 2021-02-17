@@ -19,7 +19,7 @@
                 <div class="umb-control-group" ng-if="vm.model.filter === true" style="margin-bottom: 20px;">
                     <umb-search-filter
                         input-id="icon-search"
-                        model="searchTerm"
+                        model="vm.filter.searchTerm"
                         label-key="placeholders_filter"
                         text="Type to filter..."
                         css-class="w-100"
@@ -27,27 +27,17 @@
                     </umb-search-filter>
                 </div>
 
-                <!--<div class="form-search" ng-if="vm.model.filter === true" style="margin-bottom: 20px;">
-                    <i class="icon-search"></i>
-                    <input type="text"
-                            ng-model="searchTerm"
-                            class="umb-search-field search-query input-block-level -full-width-input"
-                            localize="placeholder"
-                            placeholder="@placeholders_filter"
-                            umb-auto-focus
-                            no-dirty-check />
-                </div>-->
-
                 <div class="umb-block-card-grid">
 
                     <umb-block-card
                         class="umb-outline"
                         umb-auto-focus="vm.model.filter === false && $index === 0"
-                        ng-repeat="block in vm.model.availableItems | filter:searchTerm"
+                        ng-repeat="block in vm.model.availableItems | filter: vm.filter.searchTerm"
                         block-config-model="block.blockConfigModel"
                         element-type-model="block.elementTypeModel"
                         ng-click="vm.selectItem(block, $event)">
                     </umb-block-card>
+
                 </div>
             </div>
 
@@ -70,62 +60,11 @@
                         ng-repeat="block in vm.model.clipboardItems"
                         ng-click="vm.model.clickPasteItem(block, $event)">
                     </umb-block-card>
+
                 </div>
             </div>
 
         </umb-editor-container>
-
-        <!--<div class="umb-editor-container umb-panel-body umb-scrollable row-fluid">
-
-            <div class="umb-pane" ng-if="vm.activeTab.alias === 'empty'">
-
-                <div class="form-search" ng-if="vm.model.filter === true" style="margin-bottom: 20px;">
-                    <i class="icon-search"></i>
-                    <input type="text"
-                           ng-model="searchTerm"
-                           class="umb-search-field search-query input-block-level -full-width-input"
-                           localize="placeholder"
-                           placeholder="@placeholders_filter"
-                           umb-auto-focus
-                           no-dirty-check />
-                </div>
-
-                <div class="umb-block-card-grid">
-
-                    <umb-block-card
-                        class="umb-outline"
-                        umb-auto-focus="vm.model.filter === false && $index === 0"
-                        ng-repeat="block in vm.model.availableItems | filter:searchTerm"
-                        block-config-model="block.blockConfigModel"
-                        element-type-model="block.elementTypeModel"
-                        ng-click="vm.selectItem(block, $event)">
-                    </umb-block-card>
-                </div>
-            </div>
-
-            <div class="umb-pane" ng-if="vm.activeTab.alias === 'clipboard'">
-                <div style="margin-bottom:20px; text-align: right;">
-                    <umb-button
-                        type="button"
-                        icon="icon-trash"
-                        button-style="link"
-                        label-key="clipboard_labelForClearClipboard"
-                        action="vm.clickClearClipboard()">
-                    </umb-button>
-                </div>
-
-                <div class="umb-block-card-grid">
-
-                    <umb-block-card
-                        block-config-model="block.blockConfigModel"
-                        element-type-model="block.elementTypeModel"
-                        ng-repeat="block in vm.model.clipboardItems"
-                        ng-click="vm.model.clickPasteItem(block, $event)">
-                    </umb-block-card>
-                </div>
-            </div>
-
-        </div>-->
 
         <umb-editor-footer>
 
