@@ -57,6 +57,7 @@ using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Web.Common.DependencyInjection
 {
+
     // TODO: We could add parameters to configure each of these for flexibility
 
     /// <summary>
@@ -101,6 +102,10 @@ namespace Umbraco.Web.Common.DependencyInjection
 
             ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
             TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, tempHostingEnvironment, loggerFactory, appCaches, config, profiler);
+
+            // adds the umbraco startup filter which will call UseUmbraco early on before
+            // other start filters are applied (depending on the ordering of IStartupFilters in DI).
+            services.AddTransient<IStartupFilter, UmbracoStartupFilter>();
 
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory);
         }
@@ -228,6 +233,7 @@ namespace Umbraco.Web.Common.DependencyInjection
             builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, VirtualPageApplicationModelProvider>());
             builder.Services.AddUmbracoImageSharp(builder.Config);
 
             // AspNetCore specific services

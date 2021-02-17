@@ -19,10 +19,8 @@ using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.Models;
 using Umbraco.Web.Website;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Web.Common.Views
 {
-    // TODO: Should be in Views namespace?
-
     public abstract class UmbracoViewPage : UmbracoViewPage<IPublishedContent>
     {
 

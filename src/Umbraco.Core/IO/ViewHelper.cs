@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -70,7 +70,7 @@ namespace Umbraco.Core.IO
             // @inherits Umbraco.Web.Mvc.UmbracoViewPage
             // @inherits Umbraco.Web.Mvc.UmbracoViewPage<ModelClass>
             content.AppendLine("@using Umbraco.Web.PublishedModels;");
-            content.Append("@inherits Umbraco.Web.Common.AspNetCore.UmbracoViewPage");
+            content.Append("@inherits Umbraco.Web.Common.Views.UmbracoViewPage");
             if (modelClassName.IsNullOrWhiteSpace() == false)
             {
                 content.Append("<");

@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Umbraco.Core;
 using Umbraco.Web.Common.Attributes;
 
@@ -27,13 +27,18 @@ namespace Umbraco.Web.Common.ApplicationModels
     /// </remarks>
     public class UmbracoApiBehaviorApplicationModelProvider : IApplicationModelProvider
     {
+        private readonly List<IActionModelConvention> _actionModelConventions;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoApiBehaviorApplicationModelProvider"/> class.
+        /// </summary>
         public UmbracoApiBehaviorApplicationModelProvider(IModelMetadataProvider modelMetadataProvider)
         {
             // see see https://docs.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-3.1#apicontroller-attribute
             // for what these things actually do
             // NOTE: we don't have attribute routing requirements and we cannot use ApiVisibilityConvention without attribute routing
 
-            ActionModelConventions = new List<IActionModelConvention>()
+            _actionModelConventions = new List<IActionModelConvention>()
             {
                 new ClientErrorResultFilterConvention(), // Ensures the responses without any body is converted into a simple json object with info instead of a string like "Status Code: 404; Not Found"
                 new ConsumesConstraintForFormFileParameterConvention(), // If an controller accepts files, it must accept multipart/form-data.
@@ -47,32 +52,33 @@ namespace Umbraco.Web.Common.ApplicationModels
             // TODO: Need to determine exactly how this affects errors
             var defaultErrorType = typeof(ProblemDetails);
             var defaultErrorTypeAttribute = new ProducesErrorResponseTypeAttribute(defaultErrorType);
-            ActionModelConventions.Add(new ApiConventionApplicationModelConvention(defaultErrorTypeAttribute));
+            _actionModelConventions.Add(new ApiConventionApplicationModelConvention(defaultErrorTypeAttribute));
         }
 
+        /// <inheritdoc/>
         /// <summary>
         /// Will execute after <see cref="DefaultApplicationModelProvider"/>
         /// </summary>
         public int Order => 0;
 
-        public List<IActionModelConvention> ActionModelConventions { get; }
-
+        /// <inheritdoc/>
         public void OnProvidersExecuted(ApplicationModelProviderContext context)
         {
         }
 
+        /// <inheritdoc/>
         public void OnProvidersExecuting(ApplicationModelProviderContext context)
         {
             foreach (var controller in context.Result.Controllers)
             {
                 if (!IsUmbracoApiController(controller))
+                {
                     continue;
-
-
+                }
 
                 foreach (var action in controller.Actions)
                 {
-                    foreach (var convention in ActionModelConventions)
+                    foreach (var convention in _actionModelConventions)
                     {
                         convention.Apply(action);
                     }
