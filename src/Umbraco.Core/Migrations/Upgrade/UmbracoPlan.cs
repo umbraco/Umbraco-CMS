@@ -133,8 +133,8 @@ namespace Umbraco.Core.Migrations.Upgrade
             To<SuperZero>("{9DF05B77-11D1-475C-A00A-B656AF7E0908}");
             To<AddPropertyTypeValidationMessageColumns>("{3D67D2C8-5E65-47D0-A9E1-DC2EE0779D6B}");  // 8.6.0 changed, compatibility
             To<AddContentTypeIsElementColumn>("{0009109C-A0B8-4F3F-8FEB-C137BBDDA268}");
-            To<LegacyPickersPropertyEditorsMigration>("{258CE811-4201-4004-95EF-402086B38B77}");
             To<NestedContentPropertyEditorsMigration>("{a730b327-300b-4b60-bd18-9a4f05b8e931}");
+            To<LegacyPickersPropertyEditorsMigration>("{258CE811-4201-4004-95EF-402086B38B77}");
             To<PropertyEditorsMigration>("{6FE3EF34-44A0-4992-B379-B40BC4EF1C4D}");
             To<LanguageColumns>("{7F59355A-0EC9-4438-8157-EB517E6D2727}");
             ToWithReplace<AddVariationTables2, AddVariationTables1A>("{941B2ABA-2D06-4E04-81F5-74224F1DB037}", "{76DF5CD7-A884-41A5-8DC6-7860D95B1DF5}"); // kill AddVariationTable1
