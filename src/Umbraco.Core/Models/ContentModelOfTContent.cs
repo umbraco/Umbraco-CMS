@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.Models
 {
@@ -8,12 +8,8 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentModel{TContent}"/> class with a content.
         /// </summary>
-        /// <param name="content"></param>
         public ContentModel(TContent content)
-            : base(content)
-        {
-            Content = content;
-        }
+            : base(content) => Content = content;
 
         /// <summary>
         /// Gets the content.

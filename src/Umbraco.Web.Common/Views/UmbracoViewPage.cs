@@ -20,8 +20,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore
 {
-    // TODO: Should be in Views namespace?
-
     public abstract class UmbracoViewPage : UmbracoViewPage<IPublishedContent>
     {
 

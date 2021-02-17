@@ -51,12 +51,12 @@
   {
     param ( $semver )
 
-    $release = "" + $semver.Major + "." + $semver.Minor + "." + $semver.Patch
-
-    Write-Host "Update IIS Express port in csproj"
-    $updater = New-Object "Umbraco.Build.ExpressPortUpdater"
-    $csproj = "$($this.SolutionRoot)\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
-    $updater.Update($csproj, $release)
+    $port = "" + $semver.Major + $semver.Minor + ("" + $semver.Patch).PadLeft(2, '0')
+    Write-Host "Update port in launchSettings.json to $port"
+    $filePath = "$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Properties\launchSettings.json"
+    $this.ReplaceFileText($filePath, `
+      "http://localhost:(\d+)?", `
+      "http://localhost:$port")
   })
 
   $ubuild.DefineMethod("SandboxNode",

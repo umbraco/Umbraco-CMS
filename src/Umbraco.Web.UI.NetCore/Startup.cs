@@ -59,7 +59,6 @@ namespace Umbraco.Cms.Web.UI.NetCore
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseUmbraco();
             app.UseUmbracoBackOffice();
             app.UseUmbracoWebsite();
         }
