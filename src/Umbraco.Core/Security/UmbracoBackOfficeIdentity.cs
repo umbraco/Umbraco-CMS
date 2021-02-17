@@ -15,22 +15,22 @@ namespace Umbraco.Core.Security
         // TODO: Ideally we remove this class and only deal with ClaimsIdentity as a best practice. All things relevant to our own
         // identity are part of claims. This class would essentially become extension methods on a ClaimsIdentity for resolving
         // values from it.
-        public static bool FromClaimsIdentity(ClaimsIdentity identity, out UmbracoBackOfficeIdentity backOfficeIdentity)
-        {
-            // validate that all claims exist
-            foreach (var t in RequiredBackOfficeIdentityClaimTypes)
-            {
-                // if the identity doesn't have the claim, or the claim value is null
-                if (identity.HasClaim(x => x.Type == t) == false || identity.HasClaim(x => x.Type == t && x.Value.IsNullOrWhiteSpace()))
-                {
-                    backOfficeIdentity = null;
-                    return false;
-                }
-            }
-
-            backOfficeIdentity = new UmbracoBackOfficeIdentity(identity);
-            return true;
-        }
+        // public static bool FromClaimsIdentity(ClaimsIdentity identity, out UmbracoBackOfficeIdentity backOfficeIdentity)
+        // {
+        //     // validate that all claims exist
+        //     foreach (var t in RequiredBackOfficeIdentityClaimTypes)
+        //     {
+        //         // if the identity doesn't have the claim, or the claim value is null
+        //         if (identity.HasClaim(x => x.Type == t) == false || identity.HasClaim(x => x.Type == t && x.Value.IsNullOrWhiteSpace()))
+        //         {
+        //             backOfficeIdentity = null;
+        //             return false;
+        //         }
+        //     }
+        //
+        //     backOfficeIdentity = new UmbracoBackOfficeIdentity(identity);
+        //     return true;
+        // }
 
         /// <summary>
         /// Create a back office identity based on an existing claims identity

@@ -21,8 +21,8 @@ namespace Umbraco.Extensions
             ClaimTypes.NameIdentifier, //id
             ClaimTypes.Name,  //username
             ClaimTypes.GivenName,
-            Constants.Security.StartContentNodeIdClaimType,
-            Constants.Security.StartMediaNodeIdClaimType,
+            // Constants.Security.StartContentNodeIdClaimType, These seem to be able to be null...
+            // Constants.Security.StartMediaNodeIdClaimType,
             ClaimTypes.Locality,
             Constants.Security.SecurityStampClaimType
         };

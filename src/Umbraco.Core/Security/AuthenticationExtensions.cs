@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
 using Umbraco.Extensions;
@@ -21,7 +22,7 @@ namespace Umbraco.Core.Security
 
         public static CultureInfo GetCulture(this IIdentity identity)
         {
-            if (identity is UmbracoBackOfficeIdentity umbIdentity && umbIdentity.IsAuthenticated)
+            if (identity is ClaimsIdentity umbIdentity && umbIdentity.VerifyBackOfficeIdentity(out _) && umbIdentity.IsAuthenticated)
             {
                 return CultureInfo.GetCultureInfo(umbIdentity.GetCultureString());
             }

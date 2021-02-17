@@ -39,24 +39,24 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim(Constants.Security.SecurityStampClaimType, securityStamp, ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
-            if (!UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out UmbracoBackOfficeIdentity backofficeIdentity))
+            if (!claimsIdentity.VerifyBackOfficeIdentity(out ClaimsIdentity verifiedIdentity))
             {
                 Assert.Fail();
             }
 
-            Assert.IsNull(backofficeIdentity.Actor);
-            Assert.AreEqual(1234, backofficeIdentity.GetId());
+            Assert.IsNull(verifiedIdentity.Actor);
+            Assert.AreEqual(1234, verifiedIdentity.GetId());
             //// Assert.AreEqual(sessionId, backofficeIdentity.SessionId);
-            Assert.AreEqual(securityStamp, backofficeIdentity.GetSecurityStamp());
-            Assert.AreEqual("testing", backofficeIdentity.GetUsername());
-            Assert.AreEqual("hello world", backofficeIdentity.GetRealName());
-            Assert.AreEqual(1, backofficeIdentity.GetStartContentNodes().Length);
-            Assert.IsTrue(backofficeIdentity.GetStartMediaNodes().UnsortedSequenceEqual(new[] { 5543, 5555 }));
-            Assert.IsTrue(new[] { "content", "media" }.SequenceEqual(backofficeIdentity.GetAllowedApplications()));
-            Assert.AreEqual("en-us", backofficeIdentity.GetCultureString());
-            Assert.IsTrue(new[] { "admin" }.SequenceEqual(backofficeIdentity.GetRoles()));
+            Assert.AreEqual(securityStamp, verifiedIdentity.GetSecurityStamp());
+            Assert.AreEqual("testing", verifiedIdentity.GetUsername());
+            Assert.AreEqual("hello world", verifiedIdentity.GetRealName());
+            Assert.AreEqual(1, verifiedIdentity.GetStartContentNodes().Length);
+            Assert.IsTrue(verifiedIdentity.GetStartMediaNodes().UnsortedSequenceEqual(new[] { 5543, 5555 }));
+            Assert.IsTrue(new[] { "content", "media" }.SequenceEqual(verifiedIdentity.GetAllowedApplications()));
+            Assert.AreEqual("en-us", verifiedIdentity.GetCultureString());
+            Assert.IsTrue(new[] { "admin" }.SequenceEqual(verifiedIdentity.GetRoles()));
 
-            Assert.AreEqual(11, backofficeIdentity.Claims.Count());
+            Assert.AreEqual(11, verifiedIdentity.Claims.Count());
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim(ClaimTypes.Name, "testing", ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
-            if (UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out _))
+            if (claimsIdentity.VerifyBackOfficeIdentity(out _))
             {
                 Assert.Fail();
             }
@@ -93,7 +93,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin", ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
-            if (UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out _))
+            if (claimsIdentity.VerifyBackOfficeIdentity(out _))
             {
                 Assert.Fail();
             }

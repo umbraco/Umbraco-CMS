@@ -1,7 +1,9 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using System;
 using System.Security.Claims;
+using MimeKit.Cryptography;
 using Umbraco.Core.Security;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.BackOffice.Security
 {
@@ -19,7 +21,7 @@ namespace Umbraco.Web.BackOffice.Security
             _loginTimeoutMinutes = loginTimeoutMinutes;
             _ticketDataFormat = ticketDataFormat ?? throw new ArgumentNullException(nameof(ticketDataFormat));
         }
-        
+
         public string Protect(AuthenticationTicket data, string purpose)
         {
             // create a new ticket based on the passed in tickets details, however, we'll adjust the expires utc based on the specified timeout mins
@@ -38,7 +40,7 @@ namespace Umbraco.Web.BackOffice.Security
 
         public string Protect(AuthenticationTicket data) => Protect(data, string.Empty);
 
-        
+
         public AuthenticationTicket Unprotect(string protectedText) => Unprotect(protectedText, string.Empty);
 
         /// <summary>
@@ -59,11 +61,14 @@ namespace Umbraco.Web.BackOffice.Security
                 return null;
             }
 
-            if (!UmbracoBackOfficeIdentity.FromClaimsIdentity((ClaimsIdentity)decrypt.Principal.Identity, out var identity))
+            var identity = (ClaimsIdentity)decrypt.Principal.Identity;
+            if (!identity.VerifyBackOfficeIdentity(out ClaimsIdentity verifiedIdentity))
+            {
                 return null;
+            }
 
             //return the ticket with a UmbracoBackOfficeIdentity
-            var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), decrypt.Properties, decrypt.AuthenticationScheme);
+            var ticket = new AuthenticationTicket(new ClaimsPrincipal(verifiedIdentity), decrypt.Properties, decrypt.AuthenticationScheme);
 
             return ticket;
         }
