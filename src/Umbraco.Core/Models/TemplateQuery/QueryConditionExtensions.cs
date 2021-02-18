@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq.Expressions;
 using System.Reflection;
+using Umbraco.Cms.Core.Models.TemplateQuery;
 
-namespace Umbraco.Web.Models.TemplateQuery
+namespace Umbraco.Extensions
 {
     public static class QueryConditionExtensions
     {

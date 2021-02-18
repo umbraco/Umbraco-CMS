@@ -4,8 +4,10 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Tests.Routing
 {

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     public interface IMembershipRoleService<out T>
         where T : class, IMembershipUser

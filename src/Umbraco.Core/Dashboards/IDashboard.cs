@@ -1,7 +1,6 @@
 ﻿using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
 
-namespace Umbraco.Core.Dashboards
+namespace Umbraco.Cms.Core.Dashboards
 {
     /// <summary>
     /// Represents a dashboard.

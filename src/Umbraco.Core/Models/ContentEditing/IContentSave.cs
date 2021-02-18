@@ -1,6 +1,4 @@
-﻿using Umbraco.Core.Models;
-
-namespace Umbraco.Web.Models.ContentEditing
+﻿namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// An interface exposes the shared parts of content, media, members that we use during model binding in order to share logic

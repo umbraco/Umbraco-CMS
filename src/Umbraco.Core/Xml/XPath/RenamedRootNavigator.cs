@@ -1,7 +1,7 @@
 ﻿using System.Xml;
 using System.Xml.XPath;
 
-namespace Umbraco.Core.Xml.XPath
+namespace Umbraco.Cms.Core.Xml.XPath
 {
     public class RenamedRootNavigator : XPathNavigator
     {

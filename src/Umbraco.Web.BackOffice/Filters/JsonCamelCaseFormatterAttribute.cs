@@ -1,14 +1,12 @@
-﻿using System;
-using System.Buffers;
+﻿using System.Buffers;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Serialization;
-using Umbraco.Web.Common.Formatters;
+using Umbraco.Cms.Web.Common.Formatters;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     public class JsonCamelCaseFormatterAttribute : TypeFilterAttribute
     {

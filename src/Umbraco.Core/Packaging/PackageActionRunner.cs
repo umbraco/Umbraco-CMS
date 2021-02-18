@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.PackageActions;
+using Umbraco.Cms.Core.PackageActions;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     /// <summary>
     /// Package actions are executed on package install / uninstall.

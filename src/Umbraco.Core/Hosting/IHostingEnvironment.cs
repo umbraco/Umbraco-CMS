@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Core.Hosting
+namespace Umbraco.Cms.Core.Hosting
 {
     public interface IHostingEnvironment
     {

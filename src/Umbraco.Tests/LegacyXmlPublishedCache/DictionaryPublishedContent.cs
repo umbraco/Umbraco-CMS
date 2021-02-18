@@ -1,15 +1,14 @@
-﻿using Examine;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Xml.XPath;
+using Examine;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache

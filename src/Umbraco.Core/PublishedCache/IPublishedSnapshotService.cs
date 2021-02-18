@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Umbraco.Web.Cache;
+using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Web.PublishedCache
+namespace Umbraco.Cms.Core.PublishedCache
 {
 
     /// <summary>

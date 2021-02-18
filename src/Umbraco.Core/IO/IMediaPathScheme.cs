@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     /// <summary>
     /// Represents a media file path scheme.

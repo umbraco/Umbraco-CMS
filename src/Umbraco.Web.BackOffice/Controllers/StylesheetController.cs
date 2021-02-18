@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used for retrieving available stylesheets

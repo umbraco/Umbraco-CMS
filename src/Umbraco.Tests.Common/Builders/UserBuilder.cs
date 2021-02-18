@@ -4,12 +4,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Tests.Common.Builders.Extensions;
-using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class UserBuilder : UserBuilder<object>
     {

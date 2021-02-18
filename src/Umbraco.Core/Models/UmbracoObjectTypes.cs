@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.CodeAnnotations;
+﻿using Umbraco.Cms.Core.CodeAnnotations;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Enum used to represent the Umbraco Object Types and their associated GUIDs

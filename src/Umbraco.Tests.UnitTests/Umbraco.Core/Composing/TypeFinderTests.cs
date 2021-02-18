@@ -9,10 +9,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
-using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Web.BackOffice.Trees;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Composing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
 {
     /// <summary>
     /// Tests for typefinder

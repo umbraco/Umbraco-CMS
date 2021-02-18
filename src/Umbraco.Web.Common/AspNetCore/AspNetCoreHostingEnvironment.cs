@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.IO;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Extensions;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore
 {
-    public class AspNetCoreHostingEnvironment : Core.Hosting.IHostingEnvironment
+    public class AspNetCoreHostingEnvironment : IHostingEnvironment
     {
         private readonly ISet<Uri> _applicationUrls = new HashSet<Uri>();
         private readonly IOptionsMonitor<HostingSettings> _hostingSettings;
@@ -85,7 +86,7 @@ namespace Umbraco.Web.Common.AspNetCore
 
                     default:
 
-                        return _localTempPath = MapPathContentRoot(Core.Constants.SystemDirectories.TempData);
+                        return _localTempPath = MapPathContentRoot(Cms.Core.Constants.SystemDirectories.TempData);
                 }
             }
         }

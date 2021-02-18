@@ -5,14 +5,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
-using Umbraco.Tests.Common;
-using Umbraco.Web;
-using Umbraco.Web.Website.Controllers;
-using Umbraco.Web.Website.Models;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Web.Website.Controllers;
+using Umbraco.Cms.Web.Website.Models;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Controllers
 {
     [TestFixture]
     public class RenderNoContentControllerTests

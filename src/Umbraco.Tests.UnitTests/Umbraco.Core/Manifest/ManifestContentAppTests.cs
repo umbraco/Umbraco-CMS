@@ -6,13 +6,13 @@ using System.Linq;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Manifest
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest
 {
     [TestFixture]
     public class ManifestContentAppTests

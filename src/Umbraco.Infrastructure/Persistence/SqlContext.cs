@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using NPoco;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;

@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Web.PublishedCache.NuCache;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Infrastructure.PublishedCache.Persistence
+namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
 {
     public interface INuCacheContentRepository
     {

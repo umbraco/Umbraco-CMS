@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     /// <inheritdoc />
     public class BackOfficeExternalLoginProviders : IBackOfficeExternalLoginProviders

@@ -3,13 +3,17 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Install;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Migrations.Upgrade;
-using Umbraco.Web.Install.Models;
+using Umbraco.Extensions;
 using Umbraco.Web.Migrations.PostMigrations;
 
 namespace Umbraco.Web.Install.InstallSteps

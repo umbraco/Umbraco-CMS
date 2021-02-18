@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Migrations

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Services.Changes
+﻿namespace Umbraco.Cms.Core.Services.Changes
 {
     public enum DomainChangeTypes : byte
     {

@@ -1,7 +1,11 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Examine;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Extensions;
 
 namespace Umbraco.Examine
 {

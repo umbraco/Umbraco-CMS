@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Net.Http.Headers;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
     /// <summary>
     /// Ensures that the request is not cached by the browser

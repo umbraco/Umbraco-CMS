@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Security
+﻿namespace Umbraco.Cms.Core.Security
 {
     public enum RegisterMemberStatus
     {

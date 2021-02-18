@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.HealthChecks.Checks.Security
+namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
 {
     /// <summary>
     /// Health check for the recommended production setup regarding unnecessary headers.

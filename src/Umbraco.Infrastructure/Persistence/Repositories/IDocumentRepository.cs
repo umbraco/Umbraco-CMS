@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 
 namespace Umbraco.Core.Persistence.Repositories
 {
@@ -67,7 +69,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <param name="entityId"></param>
         /// <returns></returns>
         EntityPermissionCollection GetPermissionsForEntity(int entityId);
-        
+
         /// <summary>
         /// Used to add/update a permission for a content item
         /// </summary>

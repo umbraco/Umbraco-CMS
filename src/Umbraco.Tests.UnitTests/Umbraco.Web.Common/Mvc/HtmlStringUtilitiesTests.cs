@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Web.Common.Mvc;
+using Umbraco.Cms.Web.Common.Mvc;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Mvc
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Mvc
 {
     [TestFixture]
     public class HtmlStringUtilitiesTests

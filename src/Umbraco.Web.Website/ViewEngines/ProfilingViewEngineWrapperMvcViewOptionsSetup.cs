@@ -4,9 +4,9 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core.Logging;
 
-namespace Umbraco.Web.Website.ViewEngines
+namespace Umbraco.Cms.Web.Website.ViewEngines
 {
     /// <summary>
     /// Wraps all view engines with a <see cref="ProfilingViewEngine"/>

@@ -1,6 +1,8 @@
 ﻿using System.Linq;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Core.Models;
-using Umbraco.Core.Services.Changes;
 
 namespace Umbraco.Web.Cache
 {

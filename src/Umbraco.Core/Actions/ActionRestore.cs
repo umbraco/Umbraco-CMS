@@ -1,6 +1,6 @@
 ﻿
 
-namespace Umbraco.Web.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked when the content/media item is to be restored from the recycle bin

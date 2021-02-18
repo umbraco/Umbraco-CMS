@@ -5,11 +5,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
 using NPoco.FluentMappings;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence
 {

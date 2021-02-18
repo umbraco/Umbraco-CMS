@@ -1,23 +1,22 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.IO;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models;
+using Microsoft.AspNetCore.Authorization;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used for getting log history
@@ -112,9 +111,8 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             var mappedItems = items.ToList();
             var userIds = mappedItems.Select(x => x.UserId).ToArray();
-            var userAvatars = _userService.GetUsersById(userIds)
-                .ToDictionary(x => x.Id, x => x.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator));
-            var userNames = _userService.GetUsersById(userIds).ToDictionary(x => x.Id, x => x.Name);
+            var userAvatars = Enumerable.ToDictionary(_userService.GetUsersById(userIds), x => x.Id, x => x.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator));
+            var userNames = Enumerable.ToDictionary(_userService.GetUsersById(userIds), x => x.Id, x => x.Name);
             foreach (var item in mappedItems)
             {
                 if (userAvatars.TryGetValue(item.UserId, out var avatars))

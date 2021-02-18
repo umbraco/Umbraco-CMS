@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// The IcacheRefresher Interface is used for load balancing.

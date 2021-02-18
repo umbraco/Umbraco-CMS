@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 
-namespace Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.Common.Authorization
 {
 
     /// <summary>

@@ -3,7 +3,6 @@
 
 using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
@@ -11,7 +10,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Core.Persistence;
 
 // ReSharper disable ConvertToUsingDeclaration
-namespace Umbraco.Tests.Integration.Testing
+namespace Umbraco.Cms.Tests.Integration.Testing
 {
     /// <remarks>
     /// It's not meant to be pretty, rushed port of LocalDb.cs + LocalDbTestDatabase.cs

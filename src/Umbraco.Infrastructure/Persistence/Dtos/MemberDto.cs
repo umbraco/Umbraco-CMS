@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class MemberDto
     {
-        private const string TableName = Constants.DatabaseSchema.Tables.Member;
+        private const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.Member;
 
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false)]

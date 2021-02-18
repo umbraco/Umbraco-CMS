@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.PropertyEditors
+﻿namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Indicates the level of a value.

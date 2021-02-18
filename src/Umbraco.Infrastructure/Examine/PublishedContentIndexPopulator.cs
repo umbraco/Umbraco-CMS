@@ -1,5 +1,5 @@
-﻿using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
+﻿using Umbraco.Cms.Core.Services;
+using Umbraco.Core.Persistence;
 
 namespace Umbraco.Examine
 {

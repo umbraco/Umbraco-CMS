@@ -1,6 +1,4 @@
-﻿using Umbraco.Web.Security;
-
-namespace Umbraco.Core
+﻿namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Creates and manages <see cref="IBackOfficeSecurity"/> instances.

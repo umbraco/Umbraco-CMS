@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.DocumentType)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.DocumentType)]
     [PrimaryKey("contentTypeNodeId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class ContentTypeTemplateDto

@@ -3,10 +3,10 @@
 
 using System;
 using System.Globalization;
-using Umbraco.Core.Models;
-using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
-namespace Umbraco.Tests.Common.Builders.Extensions
+namespace Umbraco.Cms.Tests.Common.Builders.Extensions
 {
     public static class BuilderExtensions
     {

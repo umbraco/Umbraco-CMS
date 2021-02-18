@@ -1,8 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Tests.Common.Extensions;
 using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Tests.Testing;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {

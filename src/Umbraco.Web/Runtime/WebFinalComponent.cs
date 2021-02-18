@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Web.Http;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Web.Runtime
 {

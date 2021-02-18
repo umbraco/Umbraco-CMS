@@ -1,5 +1,5 @@
 
-namespace Umbraco.Tests.Integration.Testing
+namespace Umbraco.Cms.Tests.Integration.Testing
 {
     public class TestDatabaseSettings
     {

@@ -2,13 +2,15 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
+using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {

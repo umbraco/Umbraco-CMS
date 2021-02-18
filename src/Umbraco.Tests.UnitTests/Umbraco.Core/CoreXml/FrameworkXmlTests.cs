@@ -5,7 +5,7 @@ using System.Xml;
 using System.Xml.XPath;
 using NUnit.Framework;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreXml
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreXml
 {
     [TestFixture]
     public class FrameworkXmlTests

@@ -1,19 +1,22 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using Examine;
+using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using Umbraco.Core;
-using Examine;
-using Examine.LuceneEngine;
 using Lucene.Net.Store;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Directory = Lucene.Net.Store.Directory;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Services;
+using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Examine
 {

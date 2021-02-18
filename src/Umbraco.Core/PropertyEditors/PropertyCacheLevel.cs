@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.PropertyEditors
+﻿namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Specifies the level of cache for a property value.

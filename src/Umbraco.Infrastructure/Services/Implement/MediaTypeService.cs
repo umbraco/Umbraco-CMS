@@ -1,6 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -21,12 +25,12 @@ namespace Umbraco.Core.Services.Implement
         protected override IMediaTypeService This => this;
 
         // beware! order is important to avoid deadlocks
-        protected override int[] ReadLockIds { get; } = { Constants.Locks.MediaTypes };
-        protected override int[] WriteLockIds { get; } = { Constants.Locks.MediaTree, Constants.Locks.MediaTypes };
+        protected override int[] ReadLockIds { get; } = { Cms.Core.Constants.Locks.MediaTypes };
+        protected override int[] WriteLockIds { get; } = { Cms.Core.Constants.Locks.MediaTree, Cms.Core.Constants.Locks.MediaTypes };
 
         private IMediaService MediaService { get; }
 
-        protected override Guid ContainedObjectType => Constants.ObjectTypes.MediaType;
+        protected override Guid ContainedObjectType => Cms.Core.Constants.ObjectTypes.MediaType;
 
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {

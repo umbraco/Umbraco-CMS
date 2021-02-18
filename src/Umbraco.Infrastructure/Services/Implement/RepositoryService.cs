@@ -1,5 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;

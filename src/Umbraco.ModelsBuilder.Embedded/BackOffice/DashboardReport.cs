@@ -1,11 +1,11 @@
 using System.Text;
 using Microsoft.Extensions.Options;
-using Umbraco.Configuration;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.ModelsBuilder.Embedded.BackOffice
+namespace Umbraco.Cms.ModelsBuilder.Embedded.BackOffice
 {
     internal class DashboardReport
     {

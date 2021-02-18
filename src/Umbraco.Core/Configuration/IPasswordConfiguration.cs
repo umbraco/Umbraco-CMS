@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Cms.Core.Configuration
 {
     /// <summary>
     /// Password configuration

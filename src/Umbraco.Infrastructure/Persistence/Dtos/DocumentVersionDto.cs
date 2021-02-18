@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     public class DocumentVersionDto
     {
-        private const string TableName = Constants.DatabaseSchema.Tables.DocumentVersion;
+        private const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion;
 
         [Column("id")]
         [PrimaryKeyColumn(AutoIncrement = false)]

@@ -5,10 +5,11 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Reflection;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
-    
+
     /// <summary>
     /// A utility class for type checking, this provides internal caching so that calls to these methods will be faster
     /// than doing a manual type check in c#
@@ -19,10 +20,10 @@ namespace Umbraco.Core.Composing
             = new ConcurrentDictionary<Tuple<Type, bool, bool, bool>, PropertyInfo[]>();
         private static readonly ConcurrentDictionary<Type, FieldInfo[]> GetFieldsCache
             = new ConcurrentDictionary<Type, FieldInfo[]>();
-        
+
         private static readonly Assembly[] EmptyAssemblies  = new Assembly[0];
 
-        
+
 
         /// <summary>
         /// Based on a type we'll check if it is IEnumerable{T} (or similar) and if so we'll return a List{T}, this will also deal with array types and return List{T} for those too.

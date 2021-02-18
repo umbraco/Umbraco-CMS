@@ -16,7 +16,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models
     /// <remarks>
     /// This is required during migrations before 8.6 since the schema has changed and running SQL against the new table would result in errors
     /// </remarks>
-    [TableName(Constants.DatabaseSchema.Tables.PropertyType)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class PropertyTypeDto80

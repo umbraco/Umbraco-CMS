@@ -1,18 +1,15 @@
 using System;
 using System.IO;
-using System.Linq;
-using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Migrations.Install
 {

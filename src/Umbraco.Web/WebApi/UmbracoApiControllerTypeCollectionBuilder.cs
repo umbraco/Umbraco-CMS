@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Web.WebApi
 {

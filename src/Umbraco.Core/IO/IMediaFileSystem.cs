@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     /// <summary>
     /// Provides methods allowing the manipulation of media files.

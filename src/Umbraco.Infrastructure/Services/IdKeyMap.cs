@@ -2,6 +2,9 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.Scoping;
 
@@ -174,7 +177,7 @@ namespace Umbraco.Core.Services
                     else
                     {
                         val = scope.Database.ExecuteScalar<int?>("SELECT id FROM umbracoNode WHERE uniqueId=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                            new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservation });
+                            new { id = key, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Cms.Core.Constants.ObjectTypes.IdReservation });
                     }
                     scope.Complete();
                 }
@@ -262,7 +265,7 @@ namespace Umbraco.Core.Services
                     else
                     {
                         val = scope.Database.ExecuteScalar<Guid?>("SELECT uniqueId FROM umbracoNode WHERE id=@id AND (nodeObjectType=@type OR nodeObjectType=@reservation)",
-                            new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Constants.ObjectTypes.IdReservation });
+                            new { id, type = GetNodeObjectTypeGuid(umbracoObjectType), reservation = Cms.Core.Constants.ObjectTypes.IdReservation });
                     }
                     scope.Complete();
                 }

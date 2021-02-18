@@ -7,7 +7,7 @@ using System.Reflection;
 using System.Security;
 using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Resolves assemblies that reference one of the specified "targetAssemblies" either directly or transitively.

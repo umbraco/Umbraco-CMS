@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Examine;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Examine;
 using Umbraco.Web.PublishedCache;
 

@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Collections;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     /// <summary>
     /// An IEventDispatcher that queues events.

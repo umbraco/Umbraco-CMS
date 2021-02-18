@@ -1,8 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Semver;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Semver;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IUpgradeCheckRepository
     {

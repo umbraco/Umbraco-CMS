@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.ModelsBuilder.Embedded.Building
+namespace Umbraco.Cms.ModelsBuilder.Embedded.Building
 {
     // NOTE
     // The idea was to have different types of builder, because I wanted to experiment with
@@ -28,10 +28,13 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
         {
             "System",
             "System.Linq.Expressions",
-            "Umbraco.Core.Models.PublishedContent",
-            "Umbraco.Web.PublishedCache",
-            "Umbraco.ModelsBuilder.Embedded",
-            "Umbraco.Core"
+            "Umbraco.Cms.Core.Models.PublishedContent",
+            "Umbraco.Web.PublishedCache", // Todo: Remove/Edit this once namespaces has been aligned.
+            "Umbraco.Cms.Core.PublishedCache",
+            "Umbraco.Cms.ModelsBuilder.Embedded",
+            "Umbraco.Cms.Core",
+            "Umbraco.Core", // TODO: Remove once namespace is gone, after which BuilderTests needs to be adjusted.
+            "Umbraco.Extensions"
         };
 
         /// <summary>

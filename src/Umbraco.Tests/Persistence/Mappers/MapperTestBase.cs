@@ -1,8 +1,8 @@
 ﻿using System;
 using Moq;
+using Umbraco.Cms.Persistence.SqlCe;
 using Umbraco.Core.Persistence;
 using Umbraco.Infrastructure.Persistence.Mappers;
-using Umbraco.Persistence.SqlCe;
 
 namespace Umbraco.Tests.Persistence.Mappers
 {

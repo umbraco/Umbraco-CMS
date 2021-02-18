@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Umbraco.Web.Install.Models;
+using Umbraco.Cms.Core.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

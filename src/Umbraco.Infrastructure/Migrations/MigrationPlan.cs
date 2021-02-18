@@ -2,7 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Core.Scoping;
+using Umbraco.Extensions;
 using Type = System.Type;
 
 namespace Umbraco.Core.Migrations

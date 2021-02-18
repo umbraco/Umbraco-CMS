@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Marks a class that represents a data editor.

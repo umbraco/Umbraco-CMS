@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.PublishedCache.NuCache.DataSource
+namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
     // read-only dto
     internal class ContentSourceDto

@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core.Persistence;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// A set of helper methods for dealing with expressions

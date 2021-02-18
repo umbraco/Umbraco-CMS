@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Core.Security
 {

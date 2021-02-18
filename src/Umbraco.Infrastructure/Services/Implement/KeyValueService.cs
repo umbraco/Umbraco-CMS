@@ -1,4 +1,7 @@
 ﻿using System;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Scoping;
@@ -30,7 +33,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = _scopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.KeyValues);
+                scope.WriteLock(Cms.Core.Constants.Locks.KeyValues);
 
                 var keyValue = _repository.Get(key);
                 if (keyValue == null)
@@ -66,7 +69,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = _scopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.KeyValues);
+                scope.WriteLock(Cms.Core.Constants.Locks.KeyValues);
 
                 var keyValue = _repository.Get(key);
                 if (keyValue == null || keyValue.Value != originalValue)

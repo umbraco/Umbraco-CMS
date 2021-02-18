@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models.Packaging;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models.Packaging;
+using Umbraco.Cms.Core.Packaging;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Packaging
 {

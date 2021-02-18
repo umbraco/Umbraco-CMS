@@ -1,8 +1,8 @@
 ﻿using System;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     public class ExportedMemberEventArgs : EventArgs
     {

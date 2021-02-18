@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Umbraco.Web.PublishedCache.NuCache.DataSource
+namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
     /// <summary>
     /// Represents the culture variation information on a content item

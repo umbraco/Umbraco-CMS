@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
 
     /// <summary>

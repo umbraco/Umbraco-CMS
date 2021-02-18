@@ -5,16 +5,18 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Core.Logging;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Profiler;
-using Umbraco.Web.PublishedCache.NuCache;
 
-namespace Umbraco.Web.Common.Middleware
+namespace Umbraco.Cms.Web.Common.Middleware
 {
 
     /// <summary>

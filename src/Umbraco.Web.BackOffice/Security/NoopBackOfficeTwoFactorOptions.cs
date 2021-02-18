@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.BackOffice.Security
+﻿namespace Umbraco.Cms.Web.BackOffice.Security
 {
     public class NoopBackOfficeTwoFactorOptions : IBackOfficeTwoFactorOptions
     {

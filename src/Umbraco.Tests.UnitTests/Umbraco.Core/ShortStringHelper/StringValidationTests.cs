@@ -4,7 +4,7 @@
 using System.ComponentModel.DataAnnotations;
 using NUnit.Framework;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
     [TestFixture]
     public class StringValidationTests

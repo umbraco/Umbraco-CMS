@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Persistence.Querying
+﻿namespace Umbraco.Cms.Core.Persistence.Querying
 {
     /// <summary>
     /// Determines how to match a string property value

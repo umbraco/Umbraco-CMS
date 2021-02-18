@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extensions for strongly typed access

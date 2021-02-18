@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
 
     /// <summary>

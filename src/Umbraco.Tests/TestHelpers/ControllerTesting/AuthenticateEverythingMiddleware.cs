@@ -4,6 +4,8 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
@@ -29,7 +31,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             {
                 var securityStamp = Guid.NewGuid().ToString();
                 var identity = new UmbracoBackOfficeIdentity(
-                    Umbraco.Core.Constants.Security.SuperUserIdAsString, "admin", "Admin", new[] { -1 }, new[] { -1 }, "en-US", securityStamp, new[] { "content", "media", "members" }, new[] { "admin" });
+                    Constants.Security.SuperUserIdAsString, "admin", "Admin", new[] { -1 }, new[] { -1 }, "en-US", securityStamp, new[] { "content", "media", "members" }, new[] { "admin" });
 
                 return Task.FromResult(new AuthenticationTicket(
                     identity,

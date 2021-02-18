@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Cms.Core.Deploy;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Deploy

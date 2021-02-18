@@ -1,11 +1,11 @@
 ﻿using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core.Dashboards;
-using Umbraco.Core.Events;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.ContentEditing;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// Used to emit events for editor models in the back office

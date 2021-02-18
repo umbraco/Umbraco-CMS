@@ -1,10 +1,12 @@
 ﻿using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Tests.Common;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
 using Umbraco.Web.Routing;

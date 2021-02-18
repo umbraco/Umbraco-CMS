@@ -4,9 +4,10 @@
 using System;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core.Cache;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache
 {
     public abstract class RuntimeAppCacheTests : AppCacheTests
     {

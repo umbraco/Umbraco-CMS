@@ -1,7 +1,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static class StaticApplicationLogging
     {

@@ -11,30 +11,31 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Events;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.ContentApps;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.BackOffice.Extensions;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.ModelBinders;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Core.Strings;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Models.ContentEditing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <remarks>
     /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
@@ -126,7 +127,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var name = foundType != null ? foundType.Name : listName;
 
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, listName, "member", Core.Constants.DataTypes.DefaultMembersListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, listName, "member", Constants.DataTypes.DefaultMembersListView));
             apps[0].Active = true;
 
             var display = new MemberListDisplay

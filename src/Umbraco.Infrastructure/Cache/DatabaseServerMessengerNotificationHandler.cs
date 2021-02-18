@@ -1,4 +1,7 @@
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Core.Events;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Sync;

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Composing
+﻿namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Represents a core <see cref="IComposer"/>.

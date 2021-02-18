@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.ViewFeatures;
 
-namespace Umbraco.Web.Common.Controllers
+namespace Umbraco.Cms.Web.Common.Controllers
 {
     /// <summary>
     /// A request feature to allowing proxying viewdata from one controller to another

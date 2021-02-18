@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Hosting
+﻿namespace Umbraco.Cms.Core.Hosting
 {
     internal class NoopApplicationShutdownRegistry : IApplicationShutdownRegistry
     {

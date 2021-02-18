@@ -1,8 +1,8 @@
-﻿using System.Runtime.Serialization;
-using System.Net;
-using Umbraco.Core.Configuration;
+﻿using System.Net;
+using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Configuration;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     [DataContract(Name = "upgrade", Namespace = "")]
     public class UpgradeCheckResponse

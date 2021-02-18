@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Reflection;
-using Semver;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Cms.Core.Configuration
 {
     /// <summary>
     /// Represents the version of the executing code.

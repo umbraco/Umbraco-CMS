@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.DependencyInjection;
+﻿using Umbraco.Cms.Core.DependencyInjection;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Provides a base class for composers which compose a component.

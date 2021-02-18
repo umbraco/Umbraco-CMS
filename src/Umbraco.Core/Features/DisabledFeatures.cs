@@ -1,6 +1,6 @@
-using Umbraco.Core.Collections;
+using Umbraco.Cms.Core.Collections;
 
-namespace Umbraco.Web.Features
+namespace Umbraco.Cms.Core.Features
 {
     /// <summary>
     /// Represents disabled features.

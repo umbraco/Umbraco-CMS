@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -12,18 +11,20 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Common.Security;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Website.Controllers;
-using static Umbraco.Core.Constants.Web.Routing;
-using RouteDirection = Umbraco.Web.Routing.RouteDirection;
+using static Umbraco.Cms.Core.Constants.Web.Routing;
+using RouteDirection = Umbraco.Cms.Core.Routing.RouteDirection;
 
-namespace Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Web.Website.Routing
 {
     /// <summary>
     /// The route value transformer for Umbraco front-end routes

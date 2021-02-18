@@ -2,6 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
+        <RootNamespace>Umbraco.Cms.Infrastructure.PublishedCache</RootNamespace>
+        <LangVersion>8</LangVersion>
         <RootNamespace>Umbraco.Infrastructure.PublishedCache</RootNamespace>
     </PropertyGroup>
 

@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Web.Trees;
+using Umbraco.Cms.Core.Trees;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     /// <summary>
     /// Identifies a section tree.

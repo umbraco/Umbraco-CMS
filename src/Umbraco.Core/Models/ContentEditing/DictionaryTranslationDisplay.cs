@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <inheritdoc />
     /// <summary>
@@ -13,6 +13,6 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Gets or sets the display name.
         /// </summary>
         [DataMember(Name = "displayName")]
-        public string DisplayName { get; set; }        
+        public string DisplayName { get; set; }
     }
 }

@@ -1,5 +1,5 @@
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Core.Persistence;
 
 namespace Umbraco.Core.Migrations.Install

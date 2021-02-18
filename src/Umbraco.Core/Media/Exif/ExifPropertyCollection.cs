@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Represents a collection of <see cref="ExifProperty"/> objects.

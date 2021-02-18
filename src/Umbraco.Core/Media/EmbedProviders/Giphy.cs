@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Web.Media.EmbedProviders
+namespace Umbraco.Cms.Core.Media.EmbedProviders
 {
     /// <summary>
     /// Embed Provider for Giphy.com the popular online GIFs and animated sticker provider.

@@ -6,15 +6,15 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
     {
         private readonly string[] _editors =
         {
-            Constants.PropertyEditors.Legacy.Aliases.MediaPicker2,
-            Constants.PropertyEditors.Aliases.MediaPicker
+            Cms.Core.Constants.PropertyEditors.Legacy.Aliases.MediaPicker2,
+            Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker
         };
 
         public override bool CanMigrate(string editorAlias)
             => _editors.Contains(editorAlias);
 
         public override string GetNewAlias(string editorAlias)
-            => Constants.PropertyEditors.Aliases.MediaPicker;
+            => Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker;
 
         // you wish - but MediaPickerConfiguration lives in Umbraco.Web
         /*

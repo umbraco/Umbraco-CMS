@@ -1,12 +1,15 @@
-﻿using Microsoft.Extensions.Logging;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Web.Models.Mapping
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     /// <summary>
     /// Creates a ContentPropertyDisplay from a Property

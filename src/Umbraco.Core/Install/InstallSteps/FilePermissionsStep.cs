@@ -4,11 +4,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Umbraco.Core.Services;
-using Umbraco.Web.Install;
-using Umbraco.Web.Install.Models;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Install.InstallSteps
+namespace Umbraco.Cms.Core.Install.InstallSteps
 {
     /// <summary>
     /// Represents a step in the installation that ensure all the required permissions on files and folders are correct.

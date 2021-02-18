@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.RelationType)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.RelationType)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class RelationTypeDto

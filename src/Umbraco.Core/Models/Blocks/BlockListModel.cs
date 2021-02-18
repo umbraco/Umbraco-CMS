@@ -4,7 +4,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Models.Blocks
+namespace Umbraco.Cms.Core.Models.Blocks
 {
     /// <summary>
     /// The strongly typed model for the Block List editor.

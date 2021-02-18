@@ -1,10 +1,10 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     [DataContract(Name = "DomainDisplay")]
     public class DomainDisplay
-    {        
+    {
         public DomainDisplay(string name, int lang)
         {
             Name = name;

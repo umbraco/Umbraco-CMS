@@ -1,11 +1,12 @@
 ﻿using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 using Serilog;
 using Serilog.Events;
-using Serilog.Extensions.Logging;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Extensions;
+using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
 namespace Umbraco.Core.Logging.Serilog
 {

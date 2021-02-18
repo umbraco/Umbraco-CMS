@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Web.Trees;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     /// <summary>
     /// Builds a <see cref="TreeCollection"/>.

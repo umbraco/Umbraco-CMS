@@ -3,11 +3,11 @@
 
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Tests.Common.Builders.Extensions;
-using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class MemberBuilder
         : BuilderBase<Member>,

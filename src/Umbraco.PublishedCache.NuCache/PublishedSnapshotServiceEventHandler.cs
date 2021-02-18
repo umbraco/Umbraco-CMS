@@ -1,15 +1,17 @@
 using System;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Infrastructure.PublishedCache.Persistence;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     /// <summary>
     /// Subscribes to Umbraco events to ensure nucache remains consistent with the source data
@@ -157,7 +159,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <summary>
         /// If a <see cref="ILanguage"/> is ever saved with a different culture, we need to rebuild all of the content nucache database table
         /// </summary>
-        private void OnLanguageSaved(ILocalizationService sender, Core.Events.SaveEventArgs<ILanguage> e)
+        private void OnLanguageSaved(ILocalizationService sender, SaveEventArgs<ILanguage> e)
         {
             // culture changed on an existing language
             var cultureChanged = e.SavedEntities.Any(x => !x.WasPropertyDirty(nameof(ILanguage.Id)) && x.WasPropertyDirty(nameof(ILanguage.IsoCode)));

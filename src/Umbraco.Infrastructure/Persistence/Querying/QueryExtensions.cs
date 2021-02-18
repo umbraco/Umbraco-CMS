@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Querying
 {

@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Umbraco.Web.Common.Filters;
+﻿using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Umbraco.Cms.Web.Common.Filters;
 
-namespace Umbraco.Web.Common.ApplicationModels
+namespace Umbraco.Cms.Web.Common.ApplicationModels
 {
 
     // TODO: This should just exist in the back office project

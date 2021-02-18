@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 
-namespace Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.BackOffice.Authorization
 {
     /// <summary>
     /// Authorization requirements for <see cref="SectionHandler"/>

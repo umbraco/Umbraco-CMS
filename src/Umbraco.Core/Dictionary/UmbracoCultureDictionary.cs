@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Dictionary
+namespace Umbraco.Cms.Core.Dictionary
 {
-
     /// <summary>
     /// A culture dictionary that uses the Umbraco ILocalizationService
     /// </summary>

@@ -1,6 +1,7 @@
 using System;
+using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Cms.Core.Editors
 {
     public sealed class EditorModelEventArgs<T> : EditorModelEventArgs
     {
