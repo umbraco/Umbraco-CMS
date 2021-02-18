@@ -10,7 +10,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Editors;
 using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.ModelsBuilder.Embedded.BackOffice
+namespace Umbraco.Web.BackOffice.ModelsBuilder
 {
     public abstract class ContentTypeModelValidatorBase<TModel, TProperty> : EditorValidator<TModel>
         where TModel : ContentTypeSave<TProperty>

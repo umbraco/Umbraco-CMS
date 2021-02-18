@@ -1,9 +1,7 @@
 using Umbraco.Core.Events;
-using Umbraco.ModelsBuilder.Embedded.BackOffice;
-using Umbraco.ModelsBuilder.Embedded.DependencyInjection;
 using Umbraco.Web.Features;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Web.BackOffice.ModelsBuilder
 {
     /// <summary>
     /// Used in conjunction with <see cref="UmbracoBuilderExtensions.DisableModelsBuilderControllers"/>
@@ -17,10 +15,8 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// <summary>
         /// Handles the <see cref="UmbracoApplicationStarting"/> notification to disable MB controller features
         /// </summary>
-        public void Handle(UmbracoApplicationStarting notification)
-        {
+        public void Handle(UmbracoApplicationStarting notification) =>
             // disable the embedded dashboard controller
             _features.Disabled.Controllers.Add<ModelsBuilderDashboardController>();
-        }
     }
 }

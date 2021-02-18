@@ -4,8 +4,9 @@ using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
+using Umbraco.Infrastructure.ModelsBuilder;
 
-namespace Umbraco.ModelsBuilder.Embedded.BackOffice
+namespace Umbraco.Web.BackOffice.ModelsBuilder
 {
     internal class DashboardReport
     {
