@@ -40,6 +40,7 @@ namespace Umbraco.Core.WebAssets
         /// Creates a JS bundle
         /// </summary>
         /// <param name="bundleName"></param>
+        /// <param name="optimizeOutput"></param>
         /// <param name="filePaths"></param>
         /// <remarks>
         /// All files must be absolute paths, relative paths will throw <see cref="InvalidOperationException"/>
@@ -47,7 +48,7 @@ namespace Umbraco.Core.WebAssets
         /// <exception cref="InvalidOperationException">
         /// Thrown if any of the paths specified are not absolute
         /// </exception>
-        void CreateJsBundle(string bundleName, params string[] filePaths);
+        void CreateJsBundle(string bundleName, bool optimizeOutput, params string[] filePaths);
 
         /// <summary>
         /// Renders the html script tag for the bundle
