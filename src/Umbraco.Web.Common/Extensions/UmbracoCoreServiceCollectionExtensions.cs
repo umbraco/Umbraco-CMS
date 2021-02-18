@@ -76,7 +76,7 @@ namespace Umbraco.Extensions
 
             var typeFinder =  new TypeFinder(
                 loggerFactory.CreateLogger<TypeFinder>(),
-                new DefaultUmbracoAssemblyProvider(entryAssembly),
+                new DefaultUmbracoAssemblyProvider(entryAssembly, loggerFactory),
                 runtimeHash,
                 new TypeFinderConfig(Options.Create(typeFinderSettings))
             );

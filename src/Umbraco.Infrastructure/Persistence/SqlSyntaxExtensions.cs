@@ -4,7 +4,6 @@ using System.Reflection;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
-using Umbraco.Extensions;
 
 namespace Umbraco.Extensions
 {

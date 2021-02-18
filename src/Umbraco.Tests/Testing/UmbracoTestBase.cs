@@ -194,7 +194,7 @@ namespace Umbraco.Tests.Testing
             var proflogger = new ProfilingLogger(loggerFactory.CreateLogger<ProfilingLogger>(), profiler);
             IOHelper = TestHelper.IOHelper;
 
-            TypeFinder = new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            TypeFinder = new TypeFinder(loggerFactory.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly, loggerFactory), new VaryingRuntimeHash());
             var appCaches = GetAppCaches();
             var globalSettings = new GlobalSettings();
             var settings = new WebRoutingSettings();

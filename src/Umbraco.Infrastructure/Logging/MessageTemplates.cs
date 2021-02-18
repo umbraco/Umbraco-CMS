@@ -4,6 +4,7 @@ using System.Linq;
 using Serilog;
 using Serilog.Events;
 using Serilog.Parsing;
+using Umbraco.Cms.Core.Logging;
 
 namespace Umbraco.Cms.Core.Logging
 {
