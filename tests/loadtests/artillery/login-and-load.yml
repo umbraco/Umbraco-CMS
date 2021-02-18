@@ -5,14 +5,14 @@ config:
     backOfficeApiPath: "/umbraco/backoffice/UmbracoApi"
   processor: "./umbraco-flow.js"
   phases:
-    - duration: 30
+    - duration: 1
       arrivalRate: 1
 scenarios:
   - name: "Login and default back office load"
     beforeScenario: "beforeScenario"
     afterScenario: "afterScenario"
-    beforeRequest: "sendXsrf"
-    afterResponse: "captureXsrf"
+    beforeRequest: "sendAuthValues"
+    afterResponse: "captureCookies"
     flow:
     - post:
         url: "{{ backOfficeApiPath }}/Authentication/PostLogin"

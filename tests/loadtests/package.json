@@ -6,7 +6,9 @@
   "dependencies": {},
   "devDependencies": {
     "artillery": "^1.6.1",
-    "perfmon": "^0.2.0"
+    "lodash": "^4.17.20",
+    "perfmon": "^0.2.0",
+    "tough-cookie": "^4.0.0"
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

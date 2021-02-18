@@ -7,6 +7,10 @@ $Env:U_PASS = "testtesttest"
 $Env:U_SERVERNAME = "TEAMCANADA3"
 $Env:U_PROCESSNAME = "iisexpress"
 
+$RunCount = 1;
+$Rate = 1;
+$ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $RunCount + ', ""arrivalRate"": ' + $Rate + '}]}}'
+
 # good posts on Private Bytes vs Working Set
 #   https://stackoverflow.com/a/1986486/694494
 #   https://michaelscodingspot.com/performance-counters/
@@ -35,7 +39,8 @@ $GetCountersScript = {
 }
 
 $Artillery = @(
-    "login-and-load.yml"
+    "login-and-load.yml",
+    "create-doctype.yml"
 )
 
 foreach ( $a in $Artillery )
@@ -46,7 +51,10 @@ foreach ( $a in $Artillery )
 
     try {
         # Execute artillery
-        $Artillery | & artillery run "$PSScriptRoot\artillery\$a" --output "$PSScriptRoot\output\$a.json" --target $Env:U_BASE_URL
+        # TODO: We can adjust the phase duration time from here: https://webkul.com/blog/artillery-execute-script/
+        # like: artillery run –overrides ‘{“config”: {“phases”: [{“duration”: 10, “arrivalRate”: 1}]}}’ test. yaml
+
+        $Artillery | & artillery run "$PSScriptRoot\artillery\$a" --output "$PSScriptRoot\output\$a.json" --target $Env:U_BASE_URL --overrides $ArtilleryOverrides
         & artillery report --output "$PSScriptRoot\output\$a.html" "$PSScriptRoot\output\$a.json"
     }
     finally {
