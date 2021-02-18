@@ -6,11 +6,10 @@ using Umbraco.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Events;
-using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Web.Cache;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Infrastructure.ModelsBuilder
 {
     // supports LiveAppData - but not PureLive
     public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStarting>,  INotificationHandler<UmbracoRequestEnd>

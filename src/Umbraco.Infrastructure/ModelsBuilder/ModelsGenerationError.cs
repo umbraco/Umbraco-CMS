@@ -6,7 +6,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Infrastructure.ModelsBuilder
 {
     public sealed class ModelsGenerationError
     {

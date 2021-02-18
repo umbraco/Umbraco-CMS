@@ -1,10 +1,10 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Infrastructure.ModelsBuilder
 {
     /// <summary>
     /// This is called from within the generated model classes

@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Infrastructure.ModelsBuilder
 {
     /// <summary>
     /// Indicates that an Assembly is a Models Builder assembly.

@@ -6,7 +6,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Hosting;
 using Umbraco.Web.Cache;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Infrastructure.ModelsBuilder
 {
     /// <summary>
     /// Used to track if ModelsBuilder models are out of date/stale

@@ -7,9 +7,9 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
-using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Infrastructure.ModelsBuilder.Building;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Infrastructure.ModelsBuilder
 {
 
     public sealed class UmbracoServices

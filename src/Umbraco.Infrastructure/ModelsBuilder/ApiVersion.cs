@@ -1,8 +1,8 @@
-﻿using System;
+using System;
 using System.Reflection;
 using Semver;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Infrastructure.ModelsBuilder
 {
     /// <summary>
     /// Manages API version handshake between client and server.
@@ -14,10 +14,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         /// </summary>
         /// <param name="executingVersion">The currently executing version.</param>
         /// <exception cref="ArgumentNullException"></exception>
-        internal ApiVersion(SemVersion executingVersion)
-        {
-            Version = executingVersion ?? throw new ArgumentNullException(nameof(executingVersion));
-        }
+        internal ApiVersion(SemVersion executingVersion) => Version = executingVersion ?? throw new ArgumentNullException(nameof(executingVersion));
 
         private static SemVersion CurrentAssemblyVersion
             => SemVersion.Parse(Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);

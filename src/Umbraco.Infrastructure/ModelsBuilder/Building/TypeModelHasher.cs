@@ -1,13 +1,11 @@
-﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text;
 using Umbraco.Core;
 
-namespace Umbraco.ModelsBuilder.Embedded.Building
+namespace Umbraco.Infrastructure.ModelsBuilder.Building
 {
-    internal class TypeModelHasher
+    public class TypeModelHasher
     {
         public static string Hash(IEnumerable<TypeModel> typeModels)
         {

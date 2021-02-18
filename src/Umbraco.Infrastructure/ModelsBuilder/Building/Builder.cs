@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 
-namespace Umbraco.ModelsBuilder.Embedded.Building
+namespace Umbraco.Infrastructure.ModelsBuilder.Building
 {
     // NOTE
     // The idea was to have different types of builder, because I wanted to experiment with
@@ -30,7 +30,6 @@ namespace Umbraco.ModelsBuilder.Embedded.Building
             "System.Linq.Expressions",
             "Umbraco.Core.Models.PublishedContent",
             "Umbraco.Web.PublishedCache",
-            "Umbraco.ModelsBuilder.Embedded",
             "Umbraco.Core"
         };
 

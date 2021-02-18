@@ -2,7 +2,7 @@ using System;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Infrastructure.ModelsBuilder
 {
     [Weight(40)]
     public class ModelsBuilderDashboard : IDashboard

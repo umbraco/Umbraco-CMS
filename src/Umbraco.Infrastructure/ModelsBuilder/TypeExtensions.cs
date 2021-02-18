@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Infrastructure.ModelsBuilder
 {
     internal static class TypeExtensions
     {
