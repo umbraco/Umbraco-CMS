@@ -3,12 +3,9 @@
 config:
   variables:
     backOfficeApiPath: "/umbraco/backoffice/UmbracoApi"
-  target: "{{ $processEnvironment.U_BASE_URL }}"
-  #http:
-  #  pool: 30
   processor: "./umbraco-flow.js"
   phases:
-    - duration: 1
+    - duration: 30
       arrivalRate: 1
 scenarios:
   - name: "Login and default back office load"
