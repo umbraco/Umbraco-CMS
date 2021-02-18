@@ -119,7 +119,7 @@ namespace Umbraco.Web
                 // assembly we can get and we can only get that if we put this code into the WebRuntime since the executing assembly is the 'current' one.
                 // For this purpose, it doesn't matter if it's Umbraco.Web or Umbraco.Infrastructure since all assemblies are in that same path and we are
                 // getting rid of netframework.
-                Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly()), runtimeHash);
+                Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly(), _loggerFactory), runtimeHash);
         }
 
         /// <summary>

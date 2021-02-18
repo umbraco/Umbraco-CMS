@@ -41,7 +41,7 @@ namespace Umbraco.Tests.Common
         protected TestHelperBase(Assembly entryAssembly)
         {
             MainDom = new SimpleMainDom();
-            _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
+            _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly, NullLoggerFactory.Instance), new VaryingRuntimeHash());
         }
 
         public ITypeFinder GetTypeFinder() => _typeFinder;
