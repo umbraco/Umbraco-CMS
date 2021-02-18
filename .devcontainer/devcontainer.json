@@ -34,7 +34,8 @@
 
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// 1433 for SQL if you want to connect from local into the one running inside the container
-	//"forwardPorts": [1433],
+	// Can connect to the SQL Server running in the image on local with 'host.docker.internal' as hostname
+	"forwardPorts": [1433],
 
 	// [Optional] To reuse of your local HTTPS dev cert:
 	//
@@ -56,6 +57,6 @@
 	//      3. Open a terminal in VS Code and run "mkdir -p /home/vscode/.aspnet/https && mv aspnetapp.pfx /home/vscode/.aspnet/https"
 
 	// postCreateCommand.sh parameters: $1=SA password, $2=dacpac path, $3=sql script(s) path
-	"postCreateCommand":"bash .devcontainer/mssql/postCreateCommand.sh 'P@ssw0rd' './bin/Debug/' './.devcontainer/mssql/' && bash .devcontainer/init-umbraco-build.sh"
+	"postCreateCommand":"bash .devcontainer/mssql/postCreateCommand.sh 'P@ssw0rd' './bin/Debug/' './.devcontainer/mssql/'"
 
 }
