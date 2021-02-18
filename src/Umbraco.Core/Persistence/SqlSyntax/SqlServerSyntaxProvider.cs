@@ -258,7 +258,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
         {
             // soon as we get Database, a transaction is started
 
-            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+            if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
 
             ObtainWriteLock(db, timeout, lockId);
@@ -268,7 +268,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
         {
             // soon as we get Database, a transaction is started
 
-            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+            if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
 
             var timeout = TimeSpan.FromMilliseconds(Current.Configs.Global().SqlWriteLockTimeOut);
@@ -293,7 +293,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
         {
             // soon as we get Database, a transaction is started
 
-            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+            if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
 
             ObtainReadLock(db, timeout, lockId);
