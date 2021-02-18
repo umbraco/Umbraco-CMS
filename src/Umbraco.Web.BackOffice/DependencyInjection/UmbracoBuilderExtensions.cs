@@ -20,6 +20,7 @@ using Umbraco.Web.BackOffice.Trees;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.DependencyInjection;
 using Umbraco.Web.WebAssets;
+using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
 
 namespace Umbraco.Web.BackOffice.DependencyInjection
 {
@@ -31,11 +32,11 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
         /// <summary>
         /// Adds all required components to run the Umbraco back office
         /// </summary>
-        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder) => builder
+        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, IWebHostEnvironment webHostEnvironment) => builder
                 .AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
-                .AddRuntimeMinifier()
+                .AddRuntimeMinifier(webHostEnvironment)
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()

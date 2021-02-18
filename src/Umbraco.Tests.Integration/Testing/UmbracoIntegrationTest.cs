@@ -215,7 +215,7 @@ namespace Umbraco.Tests.Integration.Testing
             builder.AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
-                .AddRuntimeMinifier()
+                .AddRuntimeMinifier(webHostEnvironment)
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddTestServices(TestHelper, GetAppCaches());

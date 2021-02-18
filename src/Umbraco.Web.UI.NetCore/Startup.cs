@@ -46,7 +46,7 @@ namespace Umbraco.Web.UI.NetCore
         {
 #pragma warning disable IDE0022 // Use expression body for methods
             services.AddUmbraco(_env, _config)
-                .AddBackOffice()
+                .AddBackOffice(_env)
                 .AddWebsite()
                 .AddComposers()
                 .Build();
