@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.DependencyInjection;
-using Umbraco.ModelsBuilder.Embedded.DependencyInjection;
+using Umbraco.Web.Common.ModelsBuilder.DependencyInjection;
 using Umbraco.Web.Common.Routing;
 using Umbraco.Web.Website.Collections;
 using Umbraco.Web.Website.Controllers;

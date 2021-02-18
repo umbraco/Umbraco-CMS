@@ -9,8 +9,8 @@ using NUnit.Framework;
 using Semver;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder.Embedded;
-using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Infrastructure.ModelsBuilder;
+using Umbraco.Infrastructure.ModelsBuilder.Building;
 
 namespace Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
 {
@@ -61,7 +61,6 @@ using System;
 using System.Linq.Expressions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
-using Umbraco.ModelsBuilder.Embedded;
 using Umbraco.Core;
 
 namespace Umbraco.Web.PublishedModels
@@ -166,7 +165,6 @@ using System;
 using System.Linq.Expressions;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
-using Umbraco.ModelsBuilder.Embedded;
 using Umbraco.Core;
 
 namespace Umbraco.Web.PublishedModels

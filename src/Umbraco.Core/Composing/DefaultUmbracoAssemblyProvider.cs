@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
 
@@ -19,7 +19,6 @@ namespace Umbraco.Core.Composing
                 "Umbraco.Core",
                 "Umbraco.Infrastructure",
                 "Umbraco.PublishedCache.NuCache",
-                "Umbraco.ModelsBuilder.Embedded",
                 "Umbraco.Examine.Lucene",
                 "Umbraco.Web.Common",
                 "Umbraco.Web.BackOffice",
