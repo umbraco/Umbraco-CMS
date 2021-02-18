@@ -60,7 +60,8 @@
 	"postCreateCommand": "bash .devcontainer/mssql/postCreateCommand.sh 'P@ssw0rd' './bin/Debug/' './.devcontainer/mssql/'",
 	"portsAttributes": {
 		"9000": {
-			"label": "Umbraco Site localhost:9000"
+			"label": "Umbraco Site localhost:9000",
+			"onAutoForward": "notify"
 		}
 	}
 
