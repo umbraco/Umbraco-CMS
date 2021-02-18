@@ -158,6 +158,16 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             return result > 0;
         }
 
+        public override void WriteLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            ObtainWriteLock(db, timeout, lockId);
+        }
+
         public override void WriteLock(IDatabase db, params int[] lockIds)
         {
             // soon as we get Database, a transaction is started
@@ -165,15 +175,30 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
 
-            var timeOut = Current.Configs.Global().SqlWriteLockTimeOut;
-            db.Execute(@"SET LOCK_TIMEOUT " + timeOut  + ";");
-            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            var timeout = TimeSpan.FromMilliseconds(Current.Configs.Global().SqlWriteLockTimeOut);
+
             foreach (var lockId in lockIds)
             {
-                var i = db.Execute(@"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
-                if (i == 0) // ensure we are actually locking!
-                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+                ObtainWriteLock(db, timeout, lockId);
             }
+        }
+
+        private static void ObtainWriteLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            db.Execute(@"SET LOCK_TIMEOUT " + timeout.TotalMilliseconds  + ";");
+            var i = db.Execute(@"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+            if (i == 0) // ensure we are actually locking!
+                throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+        }
+
+        public override void ReadLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            ObtainReadLock(db, timeout, lockId);
         }
 
         public override void ReadLock(IDatabase db, params int[] lockIds)
@@ -183,13 +208,20 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
 
-            // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
+            var timeout = TimeSpan.FromMilliseconds(Current.Configs.Global().SqlWriteLockTimeOut);
+
             foreach (var lockId in lockIds)
             {
-                var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new { id = lockId });
-                if (i == null) // ensure we are actually locking!
-                    throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+                ObtainReadLock(db, timeout, lockId);
             }
+        }
+
+        private static void ObtainReadLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            db.Execute(@"SET LOCK_TIMEOUT " + timeout.TotalMilliseconds + ";");
+            var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new {id = lockId});
+            if (i == null) // ensure we are actually locking!
+                throw new ArgumentException($"LockObject with id={lockId} does not exist.");
         }
 
         protected override string FormatIdentity(ColumnDefinition column)

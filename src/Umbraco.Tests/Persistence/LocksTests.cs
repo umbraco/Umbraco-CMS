@@ -6,6 +6,7 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
 
@@ -273,6 +274,32 @@ namespace Umbraco.Tests.Persistence
 
             Assert.IsNull(e1);
             Assert.IsNull(e2);
+        }
+
+        [Test]
+        public void LockTimeoutTest()
+        {
+            // Can't set test timeouts higher as NUnit stops running a test after 60 seconds
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var realScope = (Scope)scope;
+                // a really long timeout
+                realScope.WriteLock(TimeSpan.FromMilliseconds(25000), Constants.Locks.ContentTree);
+                Thread.Sleep(25100); // Wait longer than the timeout
+                scope.Complete();
+            }
+
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var realScope = (Scope)scope;
+                // a really long timeout
+                realScope.ReadLock(TimeSpan.FromMilliseconds(20000), Constants.Locks.ContentTree);
+                Thread.Sleep(20100); // Wait longer than the timeout
+                scope.Complete();
+            }
+
+            // No exception .. :(
         }
 
         private void NoDeadLockTestThread(int id, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)

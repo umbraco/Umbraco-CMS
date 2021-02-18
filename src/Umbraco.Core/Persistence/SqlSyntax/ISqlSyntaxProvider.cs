@@ -77,7 +77,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string ConvertIntegerToOrderableString { get; }
         string ConvertDateToOrderableString { get; }
         string ConvertDecimalToOrderableString { get; }
-        
+
         /// <summary>
         /// Returns the default isolation level for the database
         /// </summary>
@@ -130,5 +130,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         void ReadLock(IDatabase db, params int[] lockIds);
         void WriteLock(IDatabase db, params int[] lockIds);
+        void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
+        void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
     }
 }

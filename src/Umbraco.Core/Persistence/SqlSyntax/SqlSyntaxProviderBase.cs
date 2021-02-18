@@ -235,6 +235,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public abstract void ReadLock(IDatabase db, params int[] lockIds);
         public abstract void WriteLock(IDatabase db, params int[] lockIds);
+        public abstract void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
+
+        public abstract void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
 
         public virtual bool DoesTableExist(IDatabase db, string tableName)
         {
