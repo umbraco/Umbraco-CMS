@@ -60,7 +60,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
  *   graph includes all of the above mentioned services, all the way up to the RazorProjectEngine and it's LazyMetadataReferenceFeature.
  */
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Web.Common.ModelsBuilder
 {
     /// <summary>
     /// Custom <see cref="IRazorViewEngine"/> that wraps aspnetcore's default implementation

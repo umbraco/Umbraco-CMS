@@ -1,7 +1,7 @@
 using System.Reflection;
 using System.Runtime.Loader;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Web.Common.ModelsBuilder
 {
     internal class UmbracoAssemblyLoadContext : AssemblyLoadContext
     {

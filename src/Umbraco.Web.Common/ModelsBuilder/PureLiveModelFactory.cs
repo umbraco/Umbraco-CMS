@@ -10,7 +10,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
-using Microsoft.CodeAnalysis;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Core;
@@ -19,10 +18,10 @@ using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder.Embedded.Building;
-using File = System.IO.File;
+using Umbraco.Infrastructure.ModelsBuilder;
+using Umbraco.Infrastructure.ModelsBuilder.Building;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Web.Common.ModelsBuilder
 {
     internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
     {
