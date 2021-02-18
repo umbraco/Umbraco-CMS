@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
@@ -38,6 +40,19 @@ namespace Umbraco.Web.Editors
         public IList<IconModel> GetAllIcons()
         {
             return _iconService.GetAllIcons();
+        }
+
+        /// <summary>
+        /// Gets JSON blob containing all the known icons
+        /// </summary>
+        /// <param name="culture"></param>
+        /// <returns></returns>
+        public JsonNetResult GetIcons()
+        {
+            var dictionary = _iconService.GetAllIcons()
+                .ToDictionary(i => i.Name, i => i.SvgString);      
+
+            return new JsonNetResult { Data = dictionary, Formatting = Formatting.None };
         }
     }
 }
