@@ -20,7 +20,10 @@
 				"savePassword": false,
 				"profileName": "mssql-container"
 			}
-		]
+		],
+		"omnisharp.defaultLaunchSolution": "umbraco-netcore-only.sln",
+		"omnisharp.enableDecompilationSupport": true,
+		"omnisharp.enableRoslynAnalyzers": true
 	},
 
 	// Add the IDs of extensions you want installed when the container is created.
