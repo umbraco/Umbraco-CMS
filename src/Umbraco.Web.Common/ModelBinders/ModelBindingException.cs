@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Common.ModelBinders
+namespace Umbraco.Cms.Web.Common.ModelBinders
 {
     /// <summary>
     /// The exception that is thrown when an error occurs while binding a source to a model.

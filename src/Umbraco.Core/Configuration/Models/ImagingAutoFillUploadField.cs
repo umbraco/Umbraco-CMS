@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Core.Configuration.Models.Validation;
+using Umbraco.Cms.Core.Configuration.Models.Validation;
 
-namespace Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for image autofill upload settings.

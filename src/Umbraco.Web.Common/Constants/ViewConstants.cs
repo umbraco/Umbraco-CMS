@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Common.Constants
+﻿namespace Umbraco.Cms.Web.Common.Constants
 {
     /// <summary>
     /// constants

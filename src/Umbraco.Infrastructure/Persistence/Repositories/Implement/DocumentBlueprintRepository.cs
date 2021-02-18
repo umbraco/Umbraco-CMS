@@ -1,7 +1,11 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
@@ -43,6 +47,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override bool EnsureUniqueNaming => false; // duplicates are allowed
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.DocumentBlueprint;
+        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.DocumentBlueprint;
     }
 }

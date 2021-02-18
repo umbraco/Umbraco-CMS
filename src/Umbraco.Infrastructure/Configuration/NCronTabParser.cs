@@ -1,5 +1,6 @@
 using System;
 using NCrontab;
+using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Core.Configuration
 {

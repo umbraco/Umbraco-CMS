@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Examine;
-using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Infrastructure.Examine
 {

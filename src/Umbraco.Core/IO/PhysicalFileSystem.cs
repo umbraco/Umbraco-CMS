@@ -4,9 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     public interface IPhysicalFileSystem : IFileSystem {}
     public class PhysicalFileSystem : IPhysicalFileSystem

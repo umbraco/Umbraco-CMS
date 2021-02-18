@@ -3,19 +3,18 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     /// <summary>
     /// Defines mappings for content/media/members type mappings

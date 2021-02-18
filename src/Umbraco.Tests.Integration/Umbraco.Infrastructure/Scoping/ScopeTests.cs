@@ -3,13 +3,14 @@
 
 using System;
 using NUnit.Framework;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerFixture)]

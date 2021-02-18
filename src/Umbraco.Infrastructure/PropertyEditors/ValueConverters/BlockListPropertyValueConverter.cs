@@ -1,14 +1,15 @@
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models.Blocks;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Core.Models.Blocks;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -93,7 +94,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 foreach (var layoutItem in blockListLayout)
                 {
                     // get the content reference
-                    var contentGuidUdi = (GuidUdi)layoutItem.ContentUdi;                    
+                    var contentGuidUdi = (GuidUdi)layoutItem.ContentUdi;
                     if (!contentPublishedElements.TryGetValue(contentGuidUdi.Guid, out var contentData))
                         continue;
 

@@ -1,6 +1,4 @@
-﻿using Umbraco.Core;
-
-namespace Umbraco.Web.Actions
+﻿namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked when a document is protected or unprotected

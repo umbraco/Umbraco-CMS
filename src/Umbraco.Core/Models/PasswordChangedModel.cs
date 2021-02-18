@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// A model representing an attempt at changing a password

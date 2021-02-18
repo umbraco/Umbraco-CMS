@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.UserStartNode)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.UserStartNode)]
     [PrimaryKey("id", AutoIncrement = true)]
     [ExplicitColumns]
     internal class UserStartNodeDto : IEquatable<UserStartNodeDto>

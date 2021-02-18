@@ -1,10 +1,10 @@
-@using Umbraco.Core.Models.PublishedContent
+@using Umbraco.Cms.Core
+@using Umbraco.Cms.Core.Media
+@using Umbraco.Cms.Core.Models.PublishedContent
+@using Umbraco.Cms.Core.Routing
 @using Umbraco.Web
-@using Umbraco.Core
-@using Umbraco.Core.Media
 @using Umbraco.Extensions
-@using Umbraco.Web.Routing
-@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage
+@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
 @inject IPublishedValueFallback PublishedValueFallback
 @inject IPublishedContentQuery PublishedContentQuery
 @inject IVariationContextAccessor VariationContextAccessor

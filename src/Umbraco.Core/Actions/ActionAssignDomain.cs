@@ -1,8 +1,4 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.CodeAnnotations;
-
-
-namespace Umbraco.Web.Actions
+﻿namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked when a domain is being assigned to a document

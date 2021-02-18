@@ -1,8 +1,9 @@
 ﻿using System;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     // implements published snapshot
     internal class PublishedSnapshot : IPublishedSnapshot, IDisposable

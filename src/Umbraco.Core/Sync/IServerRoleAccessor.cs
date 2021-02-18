@@ -1,6 +1,4 @@
-using System.Collections.Generic;
-
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Core.Sync
 {
     /// <summary>
     /// Gets the current server's <see cref="ServerRole"/>

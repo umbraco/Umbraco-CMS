@@ -3,10 +3,13 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Install;
+using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Web.Install.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -95,7 +98,7 @@ namespace Umbraco.Web.Install.InstallSteps
             // NOTE: Type.GetType will only return types that are currently loaded into the appdomain. In this case
             // that is ok because we know if this is availalbe we will have manually loaded it into the appdomain.
             // Else we'd have to use Assembly.LoadFrom and need to know the DLL location here which we don't need to do.
-            return !(Type.GetType("Umbraco.Persistence.SqlCe.SqlCeSyntaxProvider, Umbraco.Persistence.SqlCe") is null);
+            return !(Type.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider, Umbraco.Persistence.SqlCe") is null);
         }
 
         public override string View => ShouldDisplayView() ? base.View : "";

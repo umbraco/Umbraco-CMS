@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Smidge;
 
-namespace Umbraco.Web.Common.RuntimeMinification
+namespace Umbraco.Cms.Web.Common.RuntimeMinification
 {
     // work around for SmidgeHelper being request/scope lifetime
     public sealed class SmidgeHelperAccessor

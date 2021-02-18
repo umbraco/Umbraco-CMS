@@ -1,22 +1,17 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Extensions;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.WebApi;
-using Umbraco.Web.Website.Collections;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web.Mvc;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Website.Collections;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Web.Website.Routing
 {
     /// <summary>
     /// Creates routes for surface controllers

@@ -2,11 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.Models.Sections;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Manifest;
 
-namespace Umbraco.Web.Sections
+namespace Umbraco.Cms.Core.Sections
 {
     public class SectionCollectionBuilder : OrderedCollectionBuilderBase<SectionCollectionBuilder, SectionCollection, ISection>
     {

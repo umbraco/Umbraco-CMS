@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Cms.Core.DependencyInjection
 {
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/>

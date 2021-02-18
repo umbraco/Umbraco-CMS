@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Umbraco.Core.Collections;
+using Umbraco.Cms.Core.Collections;
 
 namespace Umbraco.Examine
 {

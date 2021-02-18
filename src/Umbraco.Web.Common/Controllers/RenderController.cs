@@ -4,12 +4,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Models;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Filters;
 
-namespace Umbraco.Web.Common.Controllers
+namespace Umbraco.Cms.Web.Common.Controllers
 {
 
     /// <summary>

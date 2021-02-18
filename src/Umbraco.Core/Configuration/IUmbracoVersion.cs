@@ -1,7 +1,7 @@
 using System;
-using Semver;
+using Umbraco.Cms.Core.Semver;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Cms.Core.Configuration
 {
     public interface IUmbracoVersion
     {

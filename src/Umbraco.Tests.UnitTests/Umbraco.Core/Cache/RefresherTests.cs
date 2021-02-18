@@ -4,10 +4,10 @@
 using System;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core.Services.Changes;
-using Umbraco.Web.Cache;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Services.Changes;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache
 {
     [TestFixture]
     public class RefresherTests

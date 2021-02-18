@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Manages <see cref="IMediaType"/> objects.

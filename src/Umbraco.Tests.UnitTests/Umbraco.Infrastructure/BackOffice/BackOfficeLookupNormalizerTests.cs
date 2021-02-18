@@ -5,7 +5,7 @@ using System;
 using NUnit.Framework;
 using Umbraco.Core.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.BackOffice
 {
     public class BackOfficeLookupNormalizerTests
     {

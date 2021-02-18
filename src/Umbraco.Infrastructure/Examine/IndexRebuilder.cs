@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Examine;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Core.Logging;
 
 namespace Umbraco.Examine

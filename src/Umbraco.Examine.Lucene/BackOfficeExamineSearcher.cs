@@ -1,15 +1,19 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Examine;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Examine
 {

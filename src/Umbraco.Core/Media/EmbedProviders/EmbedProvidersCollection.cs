@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Media;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Media.EmbedProviders
+namespace Umbraco.Cms.Core.Media.EmbedProviders
 {
     public class EmbedProvidersCollection : BuilderCollectionBase<IEmbedProvider>
     {

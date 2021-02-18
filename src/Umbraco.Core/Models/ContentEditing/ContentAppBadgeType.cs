@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     // TODO: This was marked with `[StringEnumConverter]` to inform the serializer
     // to serialize the values to string instead of INT (which is the default)

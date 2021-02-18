@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Install
+namespace Umbraco.Cms.Core.Install
 {
     /// <summary>
     /// Used for steps to be able to return a JSON structure back to the UI.

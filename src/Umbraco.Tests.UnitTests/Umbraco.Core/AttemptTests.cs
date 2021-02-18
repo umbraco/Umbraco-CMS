@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class AttemptTests

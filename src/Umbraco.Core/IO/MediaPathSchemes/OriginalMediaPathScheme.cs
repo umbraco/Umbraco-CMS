@@ -2,10 +2,8 @@
 using System.Globalization;
 using System.IO;
 using System.Threading;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
 
-namespace Umbraco.Core.IO.MediaPathSchemes
+namespace Umbraco.Cms.Core.IO.MediaPathSchemes
 {
     /// <summary>
     /// Implements the original media path scheme.

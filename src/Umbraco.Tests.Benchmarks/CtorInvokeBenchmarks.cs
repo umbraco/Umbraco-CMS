@@ -7,6 +7,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using Perfolizer.Horology;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 
 namespace Umbraco.Tests.Benchmarks

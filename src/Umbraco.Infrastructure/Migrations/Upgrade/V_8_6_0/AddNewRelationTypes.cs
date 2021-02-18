@@ -14,18 +14,18 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
         public override void Migrate()
         {
             CreateRelation(
-                Constants.Conventions.RelationTypes.RelatedMediaAlias,
-                Constants.Conventions.RelationTypes.RelatedMediaName);
+                Cms.Core.Constants.Conventions.RelationTypes.RelatedMediaAlias,
+                Cms.Core.Constants.Conventions.RelationTypes.RelatedMediaName);
 
             CreateRelation(
-                Constants.Conventions.RelationTypes.RelatedDocumentAlias,
-                Constants.Conventions.RelationTypes.RelatedDocumentName);
+                Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentAlias,
+                Cms.Core.Constants.Conventions.RelationTypes.RelatedDocumentName);
         }
 
         private void CreateRelation(string alias, string name)
         {
             var uniqueId = DatabaseDataCreator.CreateUniqueRelationTypeId(alias ,name); //this is the same as how it installs so everything is consistent
-            Insert.IntoTable(Constants.DatabaseSchema.Tables.RelationType)
+            Insert.IntoTable(Cms.Core.Constants.DatabaseSchema.Tables.RelationType)
                .Row(new { typeUniqueId = uniqueId, dual = 0, name, alias })
                .Do();
         }

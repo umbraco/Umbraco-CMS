@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Scoping;
-using Umbraco.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache.NuCache;
 
 namespace Umbraco.Tests.Testing.Objects
 {

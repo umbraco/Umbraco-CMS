@@ -1,7 +1,6 @@
-﻿using Umbraco.Core.Cache;
-using Umbraco.Core.Models.PublishedContent;
+﻿using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Web.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Implements a hybrid <see cref="IVariationContextAccessor"/>.

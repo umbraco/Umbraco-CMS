@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Media.EmbedProviders
+namespace Umbraco.Cms.Core.Media.EmbedProviders
 {
     /// <summary>
     /// Wrapper class for OEmbed response

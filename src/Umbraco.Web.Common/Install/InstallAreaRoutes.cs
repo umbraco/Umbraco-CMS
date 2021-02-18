@@ -1,16 +1,13 @@
-﻿using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http.Extensions;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
-using System;
-using System.Threading.Tasks;
-using Umbraco.Core;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Extensions;
-using Umbraco.Web.Common.Routing;
 
-namespace Umbraco.Web.Common.Install
+namespace Umbraco.Cms.Web.Common.Install
 {
 
     public class InstallAreaRoutes : IAreaRoutes
@@ -28,23 +25,23 @@ namespace Umbraco.Web.Common.Install
 
         public void CreateRoutes(IEndpointRouteBuilder endpoints)
         {
-            var installPathSegment = _hostingEnvironment.ToAbsolute(Core.Constants.SystemDirectories.Install).TrimStart('/');
+            var installPathSegment = _hostingEnvironment.ToAbsolute(Cms.Core.Constants.SystemDirectories.Install).TrimStart('/');
 
             switch (_runtime.Level)
             {
                 case RuntimeLevel.Install:
                 case RuntimeLevel.Upgrade:
 
-                    endpoints.MapUmbracoRoute<InstallApiController>(installPathSegment, Core.Constants.Web.Mvc.InstallArea, "api", includeControllerNameInRoute: false);
-                    endpoints.MapUmbracoRoute<InstallController>(installPathSegment, Core.Constants.Web.Mvc.InstallArea, string.Empty, includeControllerNameInRoute: false);
+                    endpoints.MapUmbracoRoute<InstallApiController>(installPathSegment, Cms.Core.Constants.Web.Mvc.InstallArea, "api", includeControllerNameInRoute: false);
+                    endpoints.MapUmbracoRoute<InstallController>(installPathSegment, Cms.Core.Constants.Web.Mvc.InstallArea, string.Empty, includeControllerNameInRoute: false);
 
                     // register catch all because if we are in install/upgrade mode then we'll catch everything and redirect
                     endpoints.MapFallbackToAreaController(
                         "Redirect",
                         ControllerExtensions.GetControllerName<InstallController>(),
-                        Core.Constants.Web.Mvc.InstallArea);
+                        Cms.Core.Constants.Web.Mvc.InstallArea);
 
-                    
+
                     break;
                 case RuntimeLevel.Run:
 
@@ -61,10 +58,10 @@ namespace Umbraco.Web.Common.Install
                 case RuntimeLevel.Unknown:
                 case RuntimeLevel.Boot:
                     break;
-                
+
             }
         }
 
-        
+
     }
 }

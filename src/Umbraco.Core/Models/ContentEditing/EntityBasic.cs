@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using Umbraco.Core;
-using Umbraco.Core.Models.Validation;
+using Umbraco.Cms.Core.Models.Validation;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     [DataContract(Name = "entity", Namespace = "")]
     public class EntityBasic

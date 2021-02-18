@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     public interface IServerRegistrationService
     {

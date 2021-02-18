@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Collections;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     [Serializable]
     [DataContract(IsReference = true)]
@@ -77,7 +76,7 @@ namespace Umbraco.Core.Models
 
             }
         }
-        
+
         public IEnumerable<Guid> RemovedRules => _removedRules;
 
         public IEnumerable<PublicAccessRule> Rules => _ruleCollection;

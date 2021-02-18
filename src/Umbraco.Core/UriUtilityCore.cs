@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core
 {
     public static class UriUtilityCore
     {

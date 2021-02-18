@@ -2,7 +2,7 @@
 using System.Runtime.Serialization;
 using System.Xml.Linq;
 
-namespace Umbraco.Core.Models.Packaging
+namespace Umbraco.Cms.Core.Models.Packaging
 {
     /// <summary>
     /// Defines a package action declared within a package manifest

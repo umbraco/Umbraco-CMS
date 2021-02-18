@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Text;
 
-namespace Umbraco.Web.Media.TypeDetector
+namespace Umbraco.Cms.Core.Media.TypeDetector
 {
     public class TIFFDetector
     {

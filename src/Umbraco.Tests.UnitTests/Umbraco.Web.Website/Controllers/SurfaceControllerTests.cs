@@ -3,28 +3,28 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Features;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Common;
-using Umbraco.Tests.Testing;
-using Umbraco.Tests.UnitTests.TestHelpers.Objects;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
+using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Web;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Website.Controllers;
-using CoreConstants = Umbraco.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Controllers
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Controllers
 {
     [TestFixture]
     [UmbracoTest(WithApplication = true)]

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Xml.Linq;
 
-namespace Umbraco.Core.Models.Packaging
+namespace Umbraco.Cms.Core.Models.Packaging
 {
     /// <summary>
     /// The model of the package definition within an umbraco (zip) package file

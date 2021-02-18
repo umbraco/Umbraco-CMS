@@ -4,7 +4,7 @@
 using System;
 using System.IO;
 
-namespace Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for image cache settings.

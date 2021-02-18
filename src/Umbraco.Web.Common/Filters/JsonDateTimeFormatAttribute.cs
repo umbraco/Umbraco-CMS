@@ -1,14 +1,12 @@
 using System.Buffers;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Umbraco.Web.Common.Formatters;
+using Umbraco.Cms.Web.Common.Formatters;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
     /// <summary>
     /// Applying this attribute to any controller will ensure that it only contains one json formatter compatible with the angular json vulnerability prevention.

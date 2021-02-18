@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.HealthChecks.NotificationMethods
+﻿namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
 {
     public interface IMarkdownToHtmlConverter
     {

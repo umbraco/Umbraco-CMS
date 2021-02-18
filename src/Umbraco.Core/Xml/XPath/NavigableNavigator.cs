@@ -20,7 +20,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
 
-namespace Umbraco.Core.Xml.XPath
+namespace Umbraco.Cms.Core.Xml.XPath
 {
     /// <summary>
     /// Provides a cursor model for navigating Umbraco data as if it were XML.

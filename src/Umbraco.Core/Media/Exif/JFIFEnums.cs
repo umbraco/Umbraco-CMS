@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Media.Exif
+﻿namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Represents the units for the X and Y densities

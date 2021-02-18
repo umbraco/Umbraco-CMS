@@ -5,18 +5,18 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Persistence.SqlCe;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
-using Umbraco.Persistence.SqlCe;
 using Umbraco.Web.Composing;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.TestHelpers
 {

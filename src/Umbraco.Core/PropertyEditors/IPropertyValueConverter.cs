@@ -1,8 +1,8 @@
 ﻿using System;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Provides published content properties conversion service.

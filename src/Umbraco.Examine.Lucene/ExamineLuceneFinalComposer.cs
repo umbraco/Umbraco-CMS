@@ -1,4 +1,7 @@
-﻿using Umbraco.Core.Composing;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Examine
 {

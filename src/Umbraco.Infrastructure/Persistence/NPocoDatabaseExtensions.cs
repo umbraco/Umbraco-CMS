@@ -5,8 +5,10 @@ using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using NPoco;
 using StackExchange.Profiling.Data;
+using Umbraco.Cms.Core;
 using Umbraco.Core.Persistence.FaultHandling;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence
 {

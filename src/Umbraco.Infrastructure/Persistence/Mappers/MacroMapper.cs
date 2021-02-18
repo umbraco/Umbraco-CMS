@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Infrastructure.Persistence.Mappers;

@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.HealthChecks.NotificationMethods
+namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
 {
     public interface IHealthCheckNotificationMethod : IDiscoverable
     {

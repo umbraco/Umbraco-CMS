@@ -1,10 +1,9 @@
 ﻿using System.Runtime.Serialization;
-using Umbraco.Core;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
-    /// Represents the 'startNode' value for the <see cref="Umbraco.Web.PropertyEditors.MultiNodePickerConfiguration"/>
+    /// Represents the 'startNode' value for the <see cref="MultiNodePickerConfiguration"/>
     /// </summary>
     [DataContract]
     public class MultiNodePickerConfigurationTreeSource

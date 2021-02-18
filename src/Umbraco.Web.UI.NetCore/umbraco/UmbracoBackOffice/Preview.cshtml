@@ -1,13 +1,14 @@
 ﻿@using Microsoft.Extensions.Options;
+@using Umbraco.Cms.Core.Configuration
+@using Umbraco.Cms.Core.Configuration.Models
+@using Umbraco.Cms.Core.Hosting
+@using Umbraco.Cms.Core.Logging
+@using Umbraco.Cms.Core.Services
+@using Umbraco.Cms.Core.WebAssets
+@using Umbraco.Cms.Web.BackOffice.Controllers
+@using Umbraco.Cms.Web.BackOffice.Security
 @using Umbraco.Web.WebAssets
-@using Umbraco.Web.Common.Security
-@using Umbraco.Core.WebAssets
-@using Umbraco.Core.Configuration
-@using Umbraco.Core.Configuration.Models
-@using Umbraco.Core.Hosting
 @using Umbraco.Extensions
-@using Umbraco.Core.Logging
-@using Umbraco.Web.BackOffice.Controllers
 @inject IBackOfficeSignInManager SignInManager
 @inject BackOfficeServerVariables BackOfficeServerVariables
 @inject IUmbracoVersion UmbracoVersion
@@ -16,9 +17,8 @@
 @inject IRuntimeMinifier RuntimeMinifier
 @inject IProfilerHtml ProfilerHtml
 @inject ILocalizedTextService LocalizedTextService
-@using Umbraco.Core.Services
 
-@model Umbraco.Web.Editors.BackOfficePreviewModel
+@model Umbraco.Cms.Core.Editors.BackOfficePreviewModel
 @{
     var disableDevicePreview = Model.DisableDevicePreview.ToString().ToLowerInvariant();
 

@@ -12,7 +12,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         public override void Migrate()
         {
             // add the new languages lock object
-            AddLockObjects.EnsureLockObject(Database, Constants.Locks.Languages, "Languages");
+            AddLockObjects.EnsureLockObject(Database, Cms.Core.Constants.Locks.Languages, "Languages");
 
             // get all existing languages
             var selectDtos = Sql()

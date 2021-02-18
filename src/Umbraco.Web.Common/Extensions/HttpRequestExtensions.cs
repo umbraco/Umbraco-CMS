@@ -4,8 +4,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core;
-using Umbraco.Core.Routing;
+using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Extensions
 {
@@ -18,7 +17,7 @@ namespace Umbraco.Extensions
         /// Check if a preview cookie exist
         /// </summary>
         public static bool HasPreviewCookie(this HttpRequest request)
-            => request.Cookies.TryGetValue(Constants.Web.PreviewCookieName, out var cookieVal) && !cookieVal.IsNullOrWhiteSpace();
+            => request.Cookies.TryGetValue(Cms.Core.Constants.Web.PreviewCookieName, out var cookieVal) && !cookieVal.IsNullOrWhiteSpace();
 
         /// <summary>
         /// Returns true if the request is a back office request

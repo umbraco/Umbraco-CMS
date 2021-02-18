@@ -5,17 +5,17 @@ using System;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Tests.Common;
-using Umbraco.Tests.UnitTests.TestHelpers.Objects;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Templates;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Templates
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Templates
 {
     [TestFixture]
     public class HtmlLocalLinkParserTests

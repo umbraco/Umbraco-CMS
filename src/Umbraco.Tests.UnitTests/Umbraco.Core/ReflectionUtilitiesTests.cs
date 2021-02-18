@@ -7,9 +7,10 @@ using System.Linq;
 using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class ReflectionUtilitiesTests

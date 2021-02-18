@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Consent)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.Consent)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     public class ConsentDto

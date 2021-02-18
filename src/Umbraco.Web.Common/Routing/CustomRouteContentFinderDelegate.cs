@@ -1,9 +1,8 @@
 using System;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Web.Common.Extensions
+namespace Umbraco.Cms.Web.Common.Routing
 {
     internal class CustomRouteContentFinderDelegate
     {

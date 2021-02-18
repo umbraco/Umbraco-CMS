@@ -1,10 +1,10 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Attributes;
 
-namespace Umbraco.Web.Common.ApplicationModels
+namespace Umbraco.Cms.Web.Common.ApplicationModels
 {
 
     // TODO: This should just exist in the back office project

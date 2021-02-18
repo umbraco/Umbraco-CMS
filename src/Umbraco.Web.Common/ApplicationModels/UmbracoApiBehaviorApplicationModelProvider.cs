@@ -1,12 +1,11 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Core;
-using Umbraco.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Attributes;
 
-namespace Umbraco.Web.Common.ApplicationModels
+namespace Umbraco.Cms.Web.Common.ApplicationModels
 {
 
     /// <summary>

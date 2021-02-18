@@ -3,16 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.SqlExtensionsStatics;
+using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -285,7 +289,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var sql = GetBaseQuery(false);
 
             if (ordering == null || ordering.IsEmpty)
-                ordering = Ordering.By(SqlSyntax.GetQuotedColumn(Constants.DatabaseSchema.Tables.Relation, "id"));
+                ordering = Ordering.By(SqlSyntax.GetQuotedColumn(Cms.Core.Constants.DatabaseSchema.Tables.Relation, "id"));
 
             var translator = new SqlTranslator<IRelation>(sql, query);
             sql = translator.Translate();
@@ -334,7 +338,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (relationTypeAliases.Length > 0)
                 {
                     var template = SqlContext.Templates.Get(
-                        Constants.SqlTemplates.RelationRepository.DeleteByParentIn,
+                        Cms.Core.Constants.SqlTemplates.RelationRepository.DeleteByParentIn,
                         tsql => Sql().Delete<RelationDto>()
                             .From<RelationDto>()
                             .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)
@@ -348,7 +352,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 else
                 {
                     var template = SqlContext.Templates.Get(
-                        Constants.SqlTemplates.RelationRepository.DeleteByParentAll,
+                        Cms.Core.Constants.SqlTemplates.RelationRepository.DeleteByParentAll,
                         tsql => Sql().Delete<RelationDto>()
                             .From<RelationDto>()
                             .InnerJoin<RelationTypeDto>().On<RelationDto, RelationTypeDto>(x => x.RelationType, x => x.Id)

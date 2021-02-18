@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models.Entities
+﻿namespace Umbraco.Cms.Core.Models.Entities
 {
     /// <summary>
     /// Defines an entity that belongs to a tree.

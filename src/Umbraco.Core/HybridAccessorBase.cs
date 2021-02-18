@@ -1,9 +1,8 @@
 ﻿using System;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Provides a base class for hybrid accessors.

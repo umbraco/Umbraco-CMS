@@ -4,18 +4,21 @@ using System.Data;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 using NPoco;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -43,7 +46,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer container)
         {
-            var parentId = Constants.System.Root;
+            var parentId = Cms.Core.Constants.System.Root;
             if (container != null)
             {
                 // check path
@@ -68,7 +71,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // move to parent (or -1), update path, save
             moving.ParentId = parentId;
             var movingPath = moving.Path + ","; // save before changing
-            moving.Path = (container == null ? Constants.System.RootString : container.Path) + "," + moving.Id;
+            moving.Path = (container == null ? Cms.Core.Constants.System.RootString : container.Path) + "," + moving.Id;
             moving.Level = container == null ? 1 : container.Level + 1;
             Save(moving);
 
@@ -286,7 +289,7 @@ AND umbracoNode.id <> @id",
                     .SelectAll()
                     .From<ContentDto>()
                     .InnerJoin<NodeDto>().On<ContentDto, NodeDto>(left => left.NodeId, right => right.NodeId)
-                    .Where<NodeDto>(x => x.NodeObjectType == Constants.ObjectTypes.Document)
+                    .Where<NodeDto>(x => x.NodeObjectType == Cms.Core.Constants.ObjectTypes.Document)
                     .Where<ContentDto>(x => x.ContentTypeId == entity.Id);
                 var contentDtos = Database.Fetch<ContentDto>(sql);
 
@@ -1345,8 +1348,8 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         public bool HasContainerInPath(params int[] ids)
         {
             var sql = new Sql($@"SELECT COUNT(*) FROM cmsContentType
-INNER JOIN {Constants.DatabaseSchema.Tables.Content} ON cmsContentType.nodeId={Constants.DatabaseSchema.Tables.Content}.contentTypeId
-WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
+INNER JOIN {Cms.Core.Constants.DatabaseSchema.Tables.Content} ON cmsContentType.nodeId={Cms.Core.Constants.DatabaseSchema.Tables.Content}.contentTypeId
+WHERE {Cms.Core.Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentType.isContainer=@isContainer", new { ids, isContainer = true });
             return Database.ExecuteScalar<int>(sql) > 0;
         }
 
@@ -1356,7 +1359,7 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
         public bool HasContentNodes(int id)
         {
             var sql = new Sql(
-                $"SELECT CASE WHEN EXISTS (SELECT * FROM {Constants.DatabaseSchema.Tables.Content} WHERE contentTypeId = @id) THEN 1 ELSE 0 END",
+                $"SELECT CASE WHEN EXISTS (SELECT * FROM {Cms.Core.Constants.DatabaseSchema.Tables.Content} WHERE contentTypeId = @id) THEN 1 ELSE 0 END",
                 new { id });
             return Database.ExecuteScalar<int>(sql) == 1;
         }
@@ -1376,7 +1379,7 @@ WHERE {Constants.DatabaseSchema.Tables.Content}.nodeId IN (@ids) AND cmsContentT
                 "DELETE FROM cmsContentTypeAllowedContentType WHERE AllowedId = @id",
                 "DELETE FROM cmsContentType2ContentType WHERE parentContentTypeId = @id",
                 "DELETE FROM cmsContentType2ContentType WHERE childContentTypeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyData + " WHERE propertyTypeId IN (SELECT id FROM cmsPropertyType WHERE contentTypeId = @id)",
                 "DELETE FROM cmsPropertyType WHERE contentTypeId = @id",
                 "DELETE FROM cmsPropertyTypeGroup WHERE contenttypeNodeId = @id",
             };

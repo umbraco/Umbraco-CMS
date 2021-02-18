@@ -1,11 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Text.RegularExpressions;
-using Umbraco.Core;
+using System.Threading;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
      /// <summary>
     /// Provides utilities to handle site domains.

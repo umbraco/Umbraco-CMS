@@ -10,16 +10,15 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Models;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.ModelBinders;
+using Umbraco.Cms.Web.Common.Routing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
 {
     [TestFixture]
     public class ContentModelBinderTests

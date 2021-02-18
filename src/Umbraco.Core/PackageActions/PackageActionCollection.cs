@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.PackageActions
+namespace Umbraco.Cms.Core.PackageActions
 {
     public sealed class PackageActionCollection : BuilderCollectionBase<IPackageAction>
     {

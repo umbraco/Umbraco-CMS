@@ -2,9 +2,9 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Web.Common.Localization
+namespace Umbraco.Cms.Web.Common.Localization
 {
     /// <summary>
     /// Custom Umbraco options configuration for <see cref="RequestLocalizationOptions"/>

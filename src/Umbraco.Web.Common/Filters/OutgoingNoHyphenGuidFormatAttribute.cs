@@ -1,16 +1,13 @@
 ﻿using System;
 using System.Buffers;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
-using Umbraco.Core;
-using Umbraco.Web.Common.Formatters;
+using Umbraco.Cms.Web.Common.Formatters;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
     public class OutgoingNoHyphenGuidFormatAttribute : TypeFilterAttribute
     {

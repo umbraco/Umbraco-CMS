@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Core.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Cache
 {

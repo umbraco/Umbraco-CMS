@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Web.Common.Install;
+using Umbraco.Cms.Web.Common.Install;
 
 namespace Umbraco.Extensions
 {

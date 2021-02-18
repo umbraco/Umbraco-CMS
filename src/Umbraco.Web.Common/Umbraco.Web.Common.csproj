@@ -3,6 +3,8 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <OutputType>Library</OutputType>
+        <LangVersion>latest</LangVersion>
+        <RootNamespace>Umbraco.Cms.Web.Common</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

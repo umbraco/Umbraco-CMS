@@ -1,8 +1,12 @@
-﻿using System;
-using System.Diagnostics;
-using Umbraco.Core.Services;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Web.Trees
+using System;
+using System.Diagnostics;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.Trees
 {
     [DebuggerDisplay("Tree - {SectionAlias}/{TreeAlias}")]
     public class Tree : ITree

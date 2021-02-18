@@ -7,15 +7,17 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Implementations;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.IO
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
 {
     [TestFixture]
     [UmbracoTest]

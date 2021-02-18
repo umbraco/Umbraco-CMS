@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -20,7 +21,7 @@ namespace Umbraco.Core.PropertyEditors
             // get the value type
             // not simply deserializing Json because we want to validate the valueType
 
-            if (editorValues.TryGetValue(Constants.PropertyEditors.ConfigurationKeys.DataValueType, out var valueTypeObj)
+            if (editorValues.TryGetValue(Cms.Core.Constants.PropertyEditors.ConfigurationKeys.DataValueType, out var valueTypeObj)
                 && valueTypeObj is string stringValue)
             {
                 if (!string.IsNullOrWhiteSpace(stringValue) && ValueTypes.IsValue(stringValue)) // validate

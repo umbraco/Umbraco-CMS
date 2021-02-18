@@ -1,6 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Core.Serialization
 {

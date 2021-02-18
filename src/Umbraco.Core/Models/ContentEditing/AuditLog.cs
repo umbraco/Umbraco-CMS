@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     [DataContract(Name = "auditLog", Namespace = "")]
     public class AuditLog
@@ -13,7 +13,7 @@ namespace Umbraco.Web.Models.ContentEditing
         public string UserName { get; set; }
 
         [DataMember(Name = "userAvatars")]
-        public string[] UserAvatars { get; set; }        
+        public string[] UserAvatars { get; set; }
 
         [DataMember(Name = "nodeId")]
         public int NodeId { get; set; }

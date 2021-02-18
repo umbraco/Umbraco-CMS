@@ -6,18 +6,18 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
                 contentType.ParentId = contentType.Id;
                 repository.Save(contentType2);
 
-                global::Umbraco.Core.Events.MoveEventInfo<IMediaType>[] result = repository.Move(contentType, container1).ToArray();
+                global::Umbraco.Cms.Core.Events.MoveEventInfo<IMediaType>[] result = repository.Move(contentType, container1).ToArray();
 
                 Assert.AreEqual(2, result.Length);
 

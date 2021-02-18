@@ -1,7 +1,8 @@
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Mvc
 {

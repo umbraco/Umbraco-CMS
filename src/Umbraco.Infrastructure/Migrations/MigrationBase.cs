@@ -1,6 +1,7 @@
 ﻿using System;
 using NPoco;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Core.Migrations.Expressions.Alter;
 using Umbraco.Core.Migrations.Expressions.Create;
 using Umbraco.Core.Migrations.Expressions.Delete;

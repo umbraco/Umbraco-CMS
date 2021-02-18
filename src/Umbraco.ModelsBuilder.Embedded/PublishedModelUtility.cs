@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Cms.ModelsBuilder.Embedded
 {
     /// <summary>
     /// This is called from within the generated model classes
@@ -29,7 +29,7 @@ namespace Umbraco.ModelsBuilder.Embedded
         //    var contentType = PublishedContentType.Get(itemType, alias);
         //    // etc...
         //}
-        
+
         public static IPublishedContentType GetModelContentType(IPublishedSnapshotAccessor publishedSnapshotAccessor, PublishedItemType itemType, string alias)
         {
             var facade = publishedSnapshotAccessor.PublishedSnapshot;

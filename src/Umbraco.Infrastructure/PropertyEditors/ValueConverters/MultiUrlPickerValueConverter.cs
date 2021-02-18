@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
-using Umbraco.Web.Models;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {
@@ -63,7 +65,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
                     if (dto.Udi != null)
                     {
-                        type = dto.Udi.EntityType == Core.Constants.UdiEntityType.Media
+                        type = dto.Udi.EntityType == Constants.UdiEntityType.Media
                             ? LinkType.Media
                             : LinkType.Content;
 

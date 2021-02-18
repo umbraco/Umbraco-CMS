@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore
 {
     public class AspNetCoreBackOfficeInfo : IBackOfficeInfo
     {

@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Template file.

@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.Tests.Common
+namespace Umbraco.Cms.Tests.Common
 {
     public class TestDefaultCultureAccessor : IDefaultCultureAccessor
     {

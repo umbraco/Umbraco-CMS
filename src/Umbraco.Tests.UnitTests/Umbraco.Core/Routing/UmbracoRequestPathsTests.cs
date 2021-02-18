@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Routing;
-using Umbraco.Web.Common.AspNetCore;
-using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 {
     [TestFixture]
     public class UmbracoRequestPathsTests

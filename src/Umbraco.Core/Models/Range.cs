@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Globalization;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a range with a minimum and maximum value.

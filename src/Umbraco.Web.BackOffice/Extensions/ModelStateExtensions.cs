@@ -3,14 +3,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Core;
-using Umbraco.Web.BackOffice.PropertyEditors.Validation;
+using Umbraco.Cms.Web.BackOffice.PropertyEditors.Validation;
+using Umbraco.Extensions;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Cms.Web.BackOffice.Extensions
 {
     internal static class ModelStateExtensions
     {
-
         /// <summary>
         /// Checks if there are any model errors on any fields containing the prefix
         /// </summary>

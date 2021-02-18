@@ -10,9 +10,9 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.Filters;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
 {
     [TestFixture]
     public class ValidationFilterAttributeTests

@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Semver;
-using Umbraco.Core;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Extensions
 {

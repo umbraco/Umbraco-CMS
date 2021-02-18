@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     public class ContentDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.Content;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.Content;
 
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false)]

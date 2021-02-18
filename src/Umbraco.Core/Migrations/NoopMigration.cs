@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations
+﻿namespace Umbraco.Cms.Core.Migrations
 {
     public class NoopMigration : IMigration
     {

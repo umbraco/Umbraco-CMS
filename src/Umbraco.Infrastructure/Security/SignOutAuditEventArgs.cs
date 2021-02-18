@@ -1,3 +1,4 @@
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Security
@@ -8,7 +9,7 @@ namespace Umbraco.Core.Security
     /// </summary>
     public class SignOutAuditEventArgs : IdentityAuditEventArgs
     {
-        public SignOutAuditEventArgs(AuditEvent action, string ipAddress, string comment = null, string performingUser = Constants.Security.SuperUserIdAsString, string affectedUser = Constants.Security.SuperUserIdAsString)
+        public SignOutAuditEventArgs(AuditEvent action, string ipAddress, string comment = null, string performingUser = Cms.Core.Constants.Security.SuperUserIdAsString, string affectedUser = Cms.Core.Constants.Security.SuperUserIdAsString)
             : base(action, ipAddress, performingUser, comment, affectedUser, null)
         {
         }

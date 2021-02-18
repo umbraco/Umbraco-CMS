@@ -1,9 +1,8 @@
 using System.Threading.Tasks;
-using Semver;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Semver;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     public class UpgradeService : IUpgradeService
     {

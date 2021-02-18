@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using NPoco;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Composing;
+using Umbraco.Extensions;
 using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Core.Persistence.Mappers

@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Implements <see cref="IAppPolicyCache"/> by wrapping an inner other <see cref="IAppPolicyCache"/>

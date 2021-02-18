@@ -1,4 +1,5 @@
 ﻿using System.Runtime.Serialization;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Core.PropertyEditors
 {

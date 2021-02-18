@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Configuration
+﻿namespace Umbraco.Cms.Core.Configuration
 {
     public interface ITypeFinderSettings
     {

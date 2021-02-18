@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Xml;
 using Newtonsoft.Json;
-using Umbraco.Core.Collections;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Core
 {

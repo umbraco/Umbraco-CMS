@@ -5,7 +5,7 @@ using System.Xml.XPath;
 
 // source: mvpxml.codeplex.com
 
-namespace Umbraco.Core.Xml
+namespace Umbraco.Cms.Core.Xml
 {
     public class XmlNodeListFactory
     {

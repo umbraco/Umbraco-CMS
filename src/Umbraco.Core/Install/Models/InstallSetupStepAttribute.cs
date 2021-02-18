@@ -1,7 +1,6 @@
 ﻿using System;
-using System.Text.RegularExpressions;
 
-namespace Umbraco.Web.Install.Models
+namespace Umbraco.Cms.Core.Install.Models
 {
     public sealed class InstallSetupStepAttribute : Attribute
     {

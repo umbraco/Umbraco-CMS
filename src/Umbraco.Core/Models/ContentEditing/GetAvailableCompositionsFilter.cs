@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Models.ContentEditing
+﻿namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     public class GetAvailableCompositionsFilter
     {

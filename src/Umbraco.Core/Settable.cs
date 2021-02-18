@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Represents a value that can be assigned a value.

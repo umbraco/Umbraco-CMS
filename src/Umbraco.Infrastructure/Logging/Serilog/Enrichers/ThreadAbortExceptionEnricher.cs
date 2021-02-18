@@ -4,9 +4,9 @@ using System.Threading;
 using Microsoft.Extensions.Options;
 using Serilog.Core;
 using Serilog.Events;
-using Umbraco.Core.Diagnostics;
-using Umbraco.Core.Hosting;
-using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
+using Umbraco.Cms.Core.Diagnostics;
+using Umbraco.Cms.Core.Hosting;
+using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Infrastructure.Logging.Serilog.Enrichers
 {

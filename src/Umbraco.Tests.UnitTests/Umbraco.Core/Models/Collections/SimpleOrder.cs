@@ -6,7 +6,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.Linq;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models.Collections
 {
     public class SimpleOrder : KeyedCollection<int, OrderItem>, INotifyCollectionChanged
     {

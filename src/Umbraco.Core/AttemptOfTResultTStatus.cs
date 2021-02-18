@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Represents the result of an operation attempt.

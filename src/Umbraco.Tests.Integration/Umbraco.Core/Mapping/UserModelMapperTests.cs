@@ -5,13 +5,13 @@ using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.Integration.Umbraco.Core.Mapping
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
 {
     [TestFixture]
     [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]

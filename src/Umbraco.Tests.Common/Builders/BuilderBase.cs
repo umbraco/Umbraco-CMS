@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public abstract class BuilderBase<T>
     {

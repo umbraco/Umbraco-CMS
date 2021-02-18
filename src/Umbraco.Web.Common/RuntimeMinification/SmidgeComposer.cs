@@ -1,11 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Smidge.FileProcessors;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Runtime;
-using Umbraco.Core.WebAssets;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.RuntimeMinification
+namespace Umbraco.Cms.Web.Common.RuntimeMinification
 {
     public sealed class SmidgeComposer : IComposer
     {

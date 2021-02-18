@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Concurrent;
 using System.Web.Hosting;
-using Umbraco.Core.Hosting;
-using IRegisteredObject = Umbraco.Core.IRegisteredObject;
+using Umbraco.Cms.Core.Hosting;
+using IRegisteredObject = Umbraco.Cms.Core.IRegisteredObject;
 
 namespace Umbraco.Web.Hosting
 {

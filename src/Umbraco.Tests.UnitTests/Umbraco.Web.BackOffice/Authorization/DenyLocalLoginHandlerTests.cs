@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.BackOffice.Security;
+using Umbraco.Cms.Web.BackOffice.Authorization;
+using Umbraco.Cms.Web.BackOffice.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 {
     public class DenyLocalLoginHandlerTests
     {

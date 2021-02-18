@@ -3,9 +3,9 @@
 
 using System;
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Core.Configuration.Models.Validation;
+using Umbraco.Cms.Core.Configuration.Models.Validation;
 
-namespace Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration for a content error page.
