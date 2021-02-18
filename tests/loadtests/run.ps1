@@ -40,6 +40,9 @@ $GetCountersScript = {
 
 $Artillery = @(
     "login-and-load.yml",
+
+    # TODO: Ok, so now we need to be able to set a few GUIDs as env variables I think:
+    # Set a GUID for a new content type that we'll create which can be used for it's aliases, etc...
     "create-doctype.yml"
 )
 
