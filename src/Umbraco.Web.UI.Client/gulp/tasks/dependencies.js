@@ -282,17 +282,17 @@ function dependencies() {
     //css, fonts and image files
     
     var assetsTask = gulp.src(config.sources.globs.assets, { allowEmpty: true });
-    assetsTask = assetsTask.pipe(imagemin([
-        imagemin.gifsicle({interlaced: true}),
-        imagemin.mozjpeg({progressive: true}),
-        imagemin.optipng({optimizationLevel: 5}),
-        imagemin.svgo({
-            plugins: [
-                {removeViewBox: true},
-                {cleanupIDs: false}
-            ]
-        })
-    ]));
+    // assetsTask = assetsTask.pipe(imagemin([
+    //     imagemin.gifsicle({interlaced: true}),
+    //     imagemin.mozjpeg({progressive: true}),
+    //     imagemin.optipng({optimizationLevel: 5}),
+    //     imagemin.svgo({
+    //         plugins: [
+    //             {removeViewBox: true},
+    //             {cleanupIDs: false}
+    //         ]
+    //     })
+    // ]));
 
     _.forEach(config.roots, function(root){
         assetsTask = assetsTask.pipe(gulp.dest(root + config.targets.assets));
