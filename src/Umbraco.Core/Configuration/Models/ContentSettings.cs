@@ -145,7 +145,7 @@ namespace Umbraco.Core.Configuration.Models
                     width:1em;
                 }}
             </style>
-            <script type=""text/javascript"" data-umbraco-path=""{0}"" src=""{0}/js/umbraco.websitepreview.js""></script>";
+            <script type=""text/javascript"" data-umbraco-path=""{0}"" src=""{0}/js/umbraco.websitepreview.min.js""></script>";
 
         /// <summary>
         /// Gets or sets a value for the content notification settings.
