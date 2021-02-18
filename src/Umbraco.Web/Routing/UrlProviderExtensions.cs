@@ -78,7 +78,7 @@ namespace Umbraco.Web.Routing
                 if (urls.Add(otherUrl)) //avoid duplicates
                     yield return otherUrl;
         }
-        
+
         /// <summary>
         /// Tries to return a <see cref="UrlInfo"/> for each culture for the content while detecting collisions/errors
         /// </summary>
@@ -131,10 +131,14 @@ namespace Umbraco.Web.Routing
 
                     // got a URL, deal with collisions, add URL
                     default:
-                        if (DetectCollision(content, url, culture, umbracoContext, publishedRouter, textService, out var urlInfo)) // detect collisions, etc
+                        if (DetectCollision(logger, content, url, culture, umbracoContext, publishedRouter, textService, out var urlInfo)) // detect collisions, etc
+                        {
                             yield return urlInfo;
+                        }
                         else
+                        {
                             yield return UrlInfo.Url(url, culture);
+                        }
                         break;
                 }
             }
@@ -152,16 +156,23 @@ namespace Umbraco.Web.Routing
             while (parent != null && parent.Published && (!parent.ContentType.VariesByCulture() || parent.IsCulturePublished(culture)));
 
             if (parent == null) // oops, internal error
+            {
                 return UrlInfo.Message(textService.Localize("content/parentNotPublishedAnomaly"), culture);
+            }
 
             else if (!parent.Published) // totally not published
-                return UrlInfo.Message(textService.Localize("content/parentNotPublished", new[] {parent.Name}), culture);
+            {
+                return UrlInfo.Message(textService.Localize("content/parentNotPublished", new[] { parent.Name }), culture);
+            }
 
-            else // culture not published
-                return UrlInfo.Message(textService.Localize("content/parentCultureNotPublished", new[] {parent.Name}), culture);
+            else
+            {
+                // culture not published
+                return UrlInfo.Message(textService.Localize("content/parentCultureNotPublished", new[] { parent.Name }), culture);
+            }
         }
 
-        private static bool DetectCollision(IContent content, string url, string culture, UmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, out UrlInfo urlInfo)
+        private static bool DetectCollision(ILogger logger, IContent content, string url, string culture, UmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, out UrlInfo urlInfo)
         {
             // test for collisions on the 'main' URL
             var uri = new Uri(url.TrimEnd(Constants.CharArrays.ForwardSlash), UriKind.RelativeOrAbsolute);
@@ -174,6 +185,16 @@ namespace Umbraco.Web.Routing
 
             if (pcr.HasPublishedContent == false)
             {
+                var logMsg = nameof(DetectCollision) + " did not resolve a content item for original url: {Url}, translated to {TranslatedUrl} and culture: {Culture}";
+                if (pcr.IgnorePublishedContentCollisions)
+                {
+                    logger.Debug(typeof(UrlProviderExtensions), logMsg, url, uri, culture);
+                }
+                else
+                {
+                    logger.Warn(typeof(UrlProviderExtensions), logMsg, url, uri, culture);
+                }
+
                 urlInfo = UrlInfo.Message(textService.Localize("content/routeErrorCannotRoute"), culture);
                 return true;
             }
@@ -193,7 +214,7 @@ namespace Umbraco.Web.Routing
                 l.Reverse();
                 var s = "/" + string.Join("/", l) + " (id=" + pcr.PublishedContent.Id + ")";
 
-                 urlInfo = UrlInfo.Message(textService.Localize("content/routeError", new[] { s }), culture);
+                urlInfo = UrlInfo.Message(textService.Localize("content/routeError", new[] { s }), culture);
                 return true;
             }
 

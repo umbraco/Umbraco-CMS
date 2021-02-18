@@ -126,12 +126,12 @@ namespace Umbraco.Web.Trees
             switch (RecycleBinId)
             {
                 case Constants.System.RecycleBinMedia:
-                    startNodeIds = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                    startNodePaths = Security.CurrentUser.GetMediaStartNodePaths(Services.EntityService);
+                    startNodeIds = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches);
+                    startNodePaths = Security.CurrentUser.GetMediaStartNodePaths(Services.EntityService, AppCaches);
                     break;
                 case Constants.System.RecycleBinContent:
-                    startNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                    startNodePaths = Security.CurrentUser.GetContentStartNodePaths(Services.EntityService);
+                    startNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService, AppCaches);
+                    startNodePaths = Security.CurrentUser.GetContentStartNodePaths(Services.EntityService, AppCaches);
                     break;
                 default:
                     throw new NotSupportedException("Path access is only determined on content or media");
@@ -291,8 +291,8 @@ namespace Umbraco.Web.Trees
         {
             if (entity == null) return false;
             return RecycleBinId == Constants.System.RecycleBinContent
-                ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService)
-                : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService);
+                ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService, AppCaches)
+                : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService, AppCaches);
         }
 
         /// <summary>
