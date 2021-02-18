@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Core.DependencyInjection;
+using Umbraco.Web.Common.ModelsBuilder;
 
 namespace Umbraco.Web.BackOffice.ModelsBuilder
 {
@@ -14,6 +15,7 @@ namespace Umbraco.Web.BackOffice.ModelsBuilder
         public static IUmbracoBuilder DisableModelsBuilderControllers(this IUmbracoBuilder builder)
         {
             builder.Services.AddSingleton<DisableModelsBuilderNotificationHandler>();
+            builder.Services.AddUnique<IModelsBuilderDashboardProvider, ModelsBuilderDashboardProvider>();
             return builder;
         }
 

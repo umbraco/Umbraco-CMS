@@ -1,17 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Models;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
-using Umbraco.ModelsBuilder.Embedded.Building;
+using Umbraco.Infrastructure.ModelsBuilder;
+using Umbraco.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
@@ -73,7 +70,7 @@ using Umbraco.Web.WebAssets;
  *   graph includes all of the above mentioned services, all the way up to the RazorProjectEngine and it's LazyMetadataReferenceFeature.
  */
 
-namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
+namespace Umbraco.Web.Common.ModelsBuilder.DependencyInjection
 {
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality
@@ -126,15 +123,8 @@ namespace Umbraco.ModelsBuilder.Embedded.DependencyInjection
                 }
             });
 
-            return builder;
-        }
+            builder.Services.AddUnique<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
 
-        /// <summary>
-        /// Can be called if using an external models builder to remove the embedded models builder controller features
-        /// </summary>
-        public static IUmbracoBuilder DisableModelsBuilderControllers(this IUmbracoBuilder builder)
-        {
-            builder.Services.AddSingleton<DisableModelsBuilderNotificationHandler>();
             return builder;
         }
 

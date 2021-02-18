@@ -11,12 +11,11 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
-using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded.BackOffice;
+using Umbraco.Infrastructure.ModelsBuilder;
 using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Web.Common.ModelsBuilder
 {
 
     /// <summary>
@@ -26,17 +25,16 @@ namespace Umbraco.ModelsBuilder.Embedded
     {
         private readonly ModelsBuilderSettings _config;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly LinkGenerator _linkGenerator;
+        private readonly IModelsBuilderDashboardProvider _modelsBuilderDashboardProvider;
 
         public ModelsBuilderNotificationHandler(
             IOptions<ModelsBuilderSettings> config,
             IShortStringHelper shortStringHelper,
-            LinkGenerator linkGenerator)
+            IModelsBuilderDashboardProvider modelsBuilderDashboardProvider)
         {
             _config = config.Value;
             _shortStringHelper = shortStringHelper;
-            _shortStringHelper = shortStringHelper;
-            _linkGenerator = linkGenerator;
+            _modelsBuilderDashboardProvider = modelsBuilderDashboardProvider;
         }
 
         /// <summary>
@@ -85,7 +83,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                 throw new ArgumentException("Invalid umbracoPlugins");
             }
 
-            umbracoUrls["modelsBuilderBaseUrl"] = _linkGenerator.GetUmbracoApiServiceBaseUrl<ModelsBuilderDashboardController>(controller => controller.BuildModels());
+            umbracoUrls["modelsBuilderBaseUrl"] = _modelsBuilderDashboardProvider.GetUrl();
             umbracoPlugins["modelsBuilder"] = GetModelsBuilderSettings();
         }
 
