@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data.SqlServerCe;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -277,29 +279,149 @@ namespace Umbraco.Tests.Persistence
         }
 
         [Test]
-        public void LockTimeoutTest()
+        public void Throws_When_Lock_Timeout_Is_Exceeded()
+        {   
+            var t1 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Write lock A");
+                    // This will acquire right away 
+                    realScope.WriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
+                    Thread.Sleep(6000); // Wait longer than the Read Lock B timeout
+                    scope.Complete();
+                    Console.WriteLine("Finished Write lock A");
+                }
+            });
+
+            Thread.Sleep(500); // 100% sure task 1 starts first
+
+            var t2 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Read lock B");
+
+                    // This will wait for the write lock to release but it isn't going to wait long
+                    // enough so an exception will be thrown.
+                    Assert.Throws<SqlCeLockTimeoutException>(() =>
+                        realScope.ReadLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
+
+                    scope.Complete();
+                    Console.WriteLine("Finished Read lock B");
+                }
+            });
+
+            var t3 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Write lock C");
+
+                    // This will wait for the write lock to release but it isn't going to wait long
+                    // enough so an exception will be thrown.
+                    Assert.Throws<SqlCeLockTimeoutException>(() =>
+                        realScope.WriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
+
+                    scope.Complete();
+                    Console.WriteLine("Finished Write lock C");
+                }
+            });
+
+            Task.WaitAll(t1, t2, t3);
+        }
+
+        [Test]
+        public void Read_Lock_Waits_For_Write_Lock()
         {
-            // Can't set test timeouts higher as NUnit stops running a test after 60 seconds
+            var locksCompleted = 0;
 
+            var t1 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Write lock A");
+                    // This will acquire right away 
+                    realScope.WriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
+                    Thread.Sleep(4000); // Wait less than the Read Lock B timeout
+                    scope.Complete();
+                    Interlocked.Increment(ref locksCompleted);
+                    Console.WriteLine("Finished Write lock A");
+                }
+            });
+
+            Thread.Sleep(500); // 100% sure task 1 starts first
+
+            var t2 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Read lock B");
+
+                    // This will wait for the write lock to release
+                    Assert.DoesNotThrow(() =>
+                        realScope.ReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
+
+                    Assert.GreaterOrEqual(locksCompleted, 1);
+
+                    scope.Complete();
+                    Interlocked.Increment(ref locksCompleted);
+                    Console.WriteLine("Finished Read lock B");
+                }                
+            });
+
+            var t3 = Task.Run(() =>
+            {
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    var realScope = (Scope)scope;
+
+                    Console.WriteLine("Read lock C");
+
+                    // This will wait for the write lock to release
+                    Assert.DoesNotThrow(() =>
+                        realScope.ReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
+
+                    Assert.GreaterOrEqual(locksCompleted, 1);
+
+                    scope.Complete();
+                    Interlocked.Increment(ref locksCompleted);
+                    Console.WriteLine("Finished Read lock C");
+                }
+            });
+
+            Task.WaitAll(t1, t2, t3);
+
+            Assert.AreEqual(3, locksCompleted);
+        }
+
+        [Test]
+        [NUnit.Framework.Ignore("We cannot run this test with SQLCE because it does not support a Command Timeout")]
+        public void Lock_Exceeds_Command_Timeout()
+        {
             using (var scope = ScopeProvider.CreateScope())
             {
                 var realScope = (Scope)scope;
-                // a really long timeout
-                realScope.WriteLock(TimeSpan.FromMilliseconds(25000), Constants.Locks.ContentTree);
-                Thread.Sleep(25100); // Wait longer than the timeout
-                scope.Complete();
-            }
 
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var realScope = (Scope)scope;
-                // a really long timeout
-                realScope.ReadLock(TimeSpan.FromMilliseconds(20000), Constants.Locks.ContentTree);
-                Thread.Sleep(20100); // Wait longer than the timeout
-                scope.Complete();
-            }
+                var realDb = (Database)realScope.Database;
+                realDb.CommandTimeout = 1000;
 
-            // No exception .. :(
+                Console.WriteLine("Write lock A");
+                // TODO: In theory this would throw
+                realScope.WriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree);
+                scope.Complete();
+                Console.WriteLine("Finished Write lock A");
+            }
         }
 
         private void NoDeadLockTestThread(int id, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
