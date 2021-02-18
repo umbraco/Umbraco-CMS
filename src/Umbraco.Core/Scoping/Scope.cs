@@ -6,6 +6,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Persistence.SqlSyntax;
 
 namespace Umbraco.Core.Scoping
 {
@@ -13,7 +14,7 @@ namespace Umbraco.Core.Scoping
     /// Implements <see cref="IScope"/>.
     /// </summary>
     /// <remarks>Not thread-safe obviously.</remarks>
-    internal class Scope : IScope
+    internal class Scope : IScope2
     {
         private readonly ScopeProvider _scopeProvider;
         private readonly ILogger _logger;
@@ -489,14 +490,28 @@ namespace Umbraco.Core.Scoping
         public void ReadLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.ReadLock(Database, lockIds);
 
         /// <inheritdoc />
-        public void ReadLock(TimeSpan timeout, int lockId) =>
-            Database.SqlContext.SqlSyntax.ReadLock(Database, timeout, lockId);
+        public void ReadLock(TimeSpan timeout, int lockId)
+        {
+            var syntax2 = Database.SqlContext.SqlSyntax as ISqlSyntaxProvider2;
+            if (syntax2 == null)
+            {
+                throw new InvalidOperationException($"{Database.SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
+            }
+            syntax2.ReadLock(Database, timeout, lockId);
+        }
 
         /// <inheritdoc />
         public void WriteLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.WriteLock(Database, lockIds);
 
         /// <inheritdoc />
-        public void WriteLock(TimeSpan timeout, int lockId) =>
-            Database.SqlContext.SqlSyntax.WriteLock(Database, timeout, lockId);
+        public void WriteLock(TimeSpan timeout, int lockId)
+        {
+            var syntax2 = Database.SqlContext.SqlSyntax as ISqlSyntaxProvider2;
+            if (syntax2 == null)
+            {
+                throw new InvalidOperationException($"{Database.SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
+            }
+            syntax2.WriteLock(Database, timeout, lockId);
+        }
     }
 }

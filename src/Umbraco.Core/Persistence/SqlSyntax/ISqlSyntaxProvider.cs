@@ -9,6 +9,12 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
+    public interface ISqlSyntaxProvider2 : ISqlSyntaxProvider
+    {
+        void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
+        void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
+    }
+
     /// <summary>
     /// Defines an SqlSyntaxProvider
     /// </summary>
@@ -130,7 +136,5 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         void ReadLock(IDatabase db, params int[] lockIds);
         void WriteLock(IDatabase db, params int[] lockIds);
-        void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
-        void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
     }
 }
