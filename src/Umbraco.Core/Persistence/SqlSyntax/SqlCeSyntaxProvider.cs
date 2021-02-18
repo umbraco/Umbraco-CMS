@@ -208,18 +208,21 @@ where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault()
             if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
                 throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
 
-            var timeout = TimeSpan.FromMilliseconds(Current.Configs.Global().SqlWriteLockTimeOut);
-
             foreach (var lockId in lockIds)
             {
-                ObtainReadLock(db, timeout, lockId);
+                ObtainReadLock(db, null, lockId);
             }
         }
 
-        private static void ObtainReadLock(IDatabase db, TimeSpan timeout, int lockId)
+        private static void ObtainReadLock(IDatabase db, TimeSpan? timeout, int lockId)
         {
-            db.Execute(@"SET LOCK_TIMEOUT " + timeout.TotalMilliseconds + ";");
+            if (timeout.HasValue)
+            {
+                db.Execute(@"SET LOCK_TIMEOUT " + timeout.Value.TotalMilliseconds + ";");
+            }
+
             var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new {id = lockId});
+
             if (i == null) // ensure we are actually locking!
                 throw new ArgumentException($"LockObject with id={lockId} does not exist.");
         }
