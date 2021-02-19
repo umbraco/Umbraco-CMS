@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
@@ -636,19 +636,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private static void InitializeCacheConfig()
         {
-            var value = ConfigurationManager.AppSettings[Constants.AppSettings.PublishedMediaCacheSeconds];
-            int seconds;
-            if (int.TryParse(value, out seconds) == false)
-                seconds = PublishedMediaCacheTimespanSeconds;
-            if (seconds > 0)
-            {
-                _publishedMediaCacheEnabled = true;
-                _publishedMediaCacheTimespan = TimeSpan.FromSeconds(seconds);
-            }
-            else
-            {
-                _publishedMediaCacheEnabled = false;
-            }
+            _publishedMediaCacheEnabled = true;
+            _publishedMediaCacheTimespan = TimeSpan.FromSeconds(PublishedMediaCacheTimespanSeconds);
         }
 
         internal IPublishedContent CreateFromCacheValues(CacheValues cacheValues)
