@@ -4,7 +4,7 @@
 
     ---- NOTE ----
     Any .sql files in this folder will be executed 
-    Along with any .dacpac in the folder will be restored as databases 
+    Along with any .dacpac will be restored as databases 
     See postCreateCommand.sh for specifics 
 */
 CREATE DATABASE UmbracoUnicore;
