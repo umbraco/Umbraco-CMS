@@ -9,7 +9,7 @@ config:
       arrivalRate: 1
 scenarios:
   - name: "Create document type"
-    beforeScenario: "beforeScenario"
+    beforeScenario: "createDocType"
     afterScenario: "afterScenario"
     beforeRequest: "beforeRequest"
     afterResponse: "afterResponse"

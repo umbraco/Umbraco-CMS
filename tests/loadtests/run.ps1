@@ -6,8 +6,9 @@ $Env:U_USERNAME = "sdeminick2@gmail.com"
 $Env:U_PASS = "testtesttest"
 $Env:U_SERVERNAME = "TEAMCANADA3"
 $Env:U_PROCESSNAME = "iisexpress"
+$Env:U_SCRIPTROOT = $PSScriptRoot
 
-$RunCount = 1;
+$RunCount = 5;
 $Rate = 1;
 $ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $RunCount + ', ""arrivalRate"": ' + $Rate + '}]}}'
 

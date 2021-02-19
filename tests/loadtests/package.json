@@ -7,6 +7,7 @@
   "devDependencies": {
     "artillery": "^1.6.1",
     "lodash": "^4.17.20",
+    "node-powershell": "^4.0.0",
     "perfmon": "^0.2.0",
     "tough-cookie": "^4.0.0",
     "uuid": "^8.3.2"

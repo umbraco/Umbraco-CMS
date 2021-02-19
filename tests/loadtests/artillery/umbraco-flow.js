@@ -1,18 +1,24 @@
 // Export methods for Artillery to be able to use
 module.exports = {
     beforeRequest: beforeRequest,
-    beforeScenario: beforeScenario,
+    loginAndLoad: loginAndLoad,
+    createDocType: createDocType,
     afterScenario: afterScenario,
     afterResponse: afterResponse
 }
 
-let fs = require('fs');
-let _ = require('lodash');
-let tough = require('tough-cookie');
+const fs = require('fs');
+const _ = require('lodash');
+const tough = require('tough-cookie');
 const { v4: uuidv4 } = require('uuid');
+const Shell = require('node-powershell');
+const ps = new Shell({
+    executionPolicy: 'Bypass',
+    noProfile: true
+});
 
-let tempData = {};
 const tempDataPath = "output/run.tmp";
+let tempData = {};
 
 const loadTempData = new Promise((resolve, reject) => {
     if (fs.existsSync(tempDataPath)) {
@@ -75,23 +81,85 @@ function replaceAndStoreGuid(requestParams) {
         let guid = uuidv4();
         requestParams.body = requestParams.body.replace(/NEW_GUID/g, guid);
 
-        let uuids = [];
-        if (tempData.uuids) {
-            uuids = tempData.uuids;
+        let guids = [];
+        if (tempData.guids) {
+            guids = tempData.guids;
         }
-        uuids.push(guid);
+        guids.push(guid);
 
         // update/persist this value to temp storage
-        updateTempStorage({ uuids: uuids });
+        updateTempStorage({ guids: guids });
     }
+}
+
+function stopProfilingCounters() {
+    let cmd = `
+    Write-Verbose "Stopping counters"
+    $Job | Receive-Job -Keep # see if there are any errors
+    $Batch = Get-Job -Name "MyCounters"
+    $Batch | Stop-Job
+    $Batch | Remove-Job
+    `
+
+    ps.addCommand(cmd);
+
+    return ps.invoke()
+        .then(output => {
+            console.log(output);
+        })
+        .catch(err => {
+            console.log(err);
+        });
+}
+
+function startProfilingCounters(name, context) {
+
+    let cmd = `
+
+    $Counters = @(
+        "\\\\__U_SERVERNAME__\\Process(__U_PROCESSNAME__)\\% Processor Time",
+        # We won't use Private Bytes because this is not compat with dotnet-counters
+        #"\\\\__U_SERVERNAME__\\Process(__U_PROCESSNAME__)\\Private Bytes",
+        "\\\\__U_SERVERNAME__\\Process(__U_PROCESSNAME__)\\Working Set",
+        # We don't care too much about this one, it normally is just small/consistent Gen1+ is the important ones
+        "\\\\__U_SERVERNAME__\\.NET CLR Memory(__U_PROCESSNAME__)\\Gen 0 heap size",
+        "\\\\__U_SERVERNAME__\\.NET CLR Memory(__U_PROCESSNAME__)\\Gen 1 heap size",
+        "\\\\__U_SERVERNAME__\\.NET CLR Memory(__U_PROCESSNAME__)\\Gen 2 heap size",
+        "\\\\__U_SERVERNAME__\\.NET CLR Memory(__U_PROCESSNAME__)\\Large Object Heap size",
+        # Includes the sum of all managed heaps – Gen 0 + Gen 1 + Gen 2 + LOH. This represents the allocated managed memory size.
+        "\\\\__U_SERVERNAME__\\.NET CLR Memory(__U_PROCESSNAME__)\\# Bytes in all Heaps")
+
+    $GetCountersScript = {
+        Get-Counter -Counter $args[0] -ComputerName $args[1] -MaxSamples 1000 | Export-Counter -path "$($args[2])" -FileFormat csv -Force
+    }
+    $Job = Start-Job $GetCountersScript -Name "MyCounters" -ArgumentList $Counters,__U_SERVERNAME__,"__U_SCRIPTROOT__\\output\\__SCENARIO__.csv"
+    $Job | Receive-Job -Keep
+
+    `;
+
+    cmd = cmd.replace(/__U_SERVERNAME__/g, context.vars.$processEnvironment.U_SERVERNAME);
+    cmd = cmd.replace(/__U_PROCESSNAME__/g, context.vars.$processEnvironment.U_PROCESSNAME);
+    cmd = cmd.replace(/__SCENARIO__/g, name);
+    cmd = cmd.replace(/__U_SCRIPTROOT__/g, context.vars.$processEnvironment.U_SCRIPTROOT);
+
+    console.log(cmd);
+
+    ps.addCommand(cmd);
+
+    return ps.invoke()
+        .then(output => {
+            console.log(output);
+        })
+        .catch(err => {
+            console.log(err);
+        });
 }
 
 /** Called when artillery sends a request to set xsrf/cookies */
 function beforeRequest(requestParams, context, ee, next) {
-    loadTempData.then(function () {
+    return loadTempData.then(function () {
 
         replaceAndStoreGuid(requestParams);
-        console.log(requestParams);
 
         // set the xsrf header if we've captured it
         if (context.vars.umbXsrf) {
@@ -122,7 +190,7 @@ function afterResponse(requestParams, response, context, ee, next) {
         console.error(response.body);
     }
 
-    loadTempData.then(function () {
+    return loadTempData.then(function () {
 
         var xsrf = getCookieValueFromResponse("UMB-XSRF-TOKEN", response);
         if (xsrf) {
@@ -149,12 +217,17 @@ function afterResponse(requestParams, response, context, ee, next) {
     });
 }
 
-function beforeScenario(context, ee, next) {
-    // TODO: We could execute things before/after each scenario
-    return next();
+function loginAndLoad(context, ee, next) {
+    return startProfilingCounters("loginAndLoad", context).then(x => next());
+}
+
+function createDocType(context, ee, next) {
+    return startProfilingCounters("createDocType", context).then(x => next());
 }
 
 function afterScenario(context, ee, next) {
     // TODO: We could execute things before/after each scenario
-    return next();
+    // TODO: Would it be possible to notify powershell somehow when this occurs?
+    // As it turns out we can run powershell from within nodejs! crazy.
+    return stopProfilingCounters().then(x => next());
 }
