@@ -242,7 +242,7 @@ namespace Umbraco.Tests.Testing
 
             TestObjects = new TestObjects();
             Compose();
-            Current.Factory = Factory = Builder.CreateServiceProvider();
+            Current.Factory = Factory = TestHelper.CreateServiceProvider(Builder);
             Initialize();
         }
 
