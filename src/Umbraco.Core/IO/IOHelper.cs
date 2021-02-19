@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -36,29 +36,12 @@ namespace Umbraco.Cms.Core.IO
             return retval;
         }
 
-        // TODO: This is the same as IHostingEnvironment.ToAbsolute
+        // TODO: This is the same as IHostingEnvironment.ToAbsolute - marked as obsolete in IIOHelper for now
         public string ResolveUrl(string virtualPath)
         {
             if (string.IsNullOrWhiteSpace(virtualPath)) return virtualPath;
             return _hostingEnvironment.ToAbsolute(virtualPath);
 
-        }
-
-        public Attempt<string> TryResolveUrl(string virtualPath)
-        {
-            try
-            {
-                if (virtualPath.StartsWith("~"))
-                    return Attempt.Succeed(virtualPath.Replace("~", _hostingEnvironment.ApplicationVirtualPath).Replace("//", "/"));
-                if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
-                    return Attempt.Succeed(virtualPath);
-
-                return Attempt.Succeed(_hostingEnvironment.ToAbsolute(virtualPath));
-            }
-            catch (Exception ex)
-            {
-                return Attempt.Fail(virtualPath, ex);
-            }
         }
 
         public string MapPath(string path)
