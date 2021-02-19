@@ -11,8 +11,8 @@ scenarios:
   - name: "Login and default back office load"
     beforeScenario: "beforeScenario"
     afterScenario: "afterScenario"
-    beforeRequest: "sendAuthValues"
-    afterResponse: "captureCookies"
+    beforeRequest: "beforeRequest"
+    afterResponse: "afterResponse"
     flow:
     - post:
         url: "{{ backOfficeApiPath }}/Authentication/PostLogin"

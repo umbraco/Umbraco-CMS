@@ -1,37 +1,40 @@
 // Export methods for Artillery to be able to use
 module.exports = {
-    sendAuthValues: sendAuthValues,
+    beforeRequest: beforeRequest,
     beforeScenario: beforeScenario,
     afterScenario: afterScenario,
-    captureCookies: captureCookies
+    afterResponse: afterResponse
 }
 
 let fs = require('fs');
 let _ = require('lodash');
 let tough = require('tough-cookie');
+const { v4: uuidv4 } = require('uuid');
 
-let tempData = null;
+let tempData = {};
+const tempDataPath = "output/run.tmp";
 
 const loadTempData = new Promise((resolve, reject) => {
-    // we use a persisted file to store/share information between
-    // this artillery process (node) and the parent powershell process.
-    fs.readFile('output/run.tmp', function (err, data) {
-        if (err) return console.log(err);
+    if (fs.existsSync(tempDataPath)) {
+        // we use a persisted file to store/share information between
+        // this artillery process (node) and the parent powershell process.
+        fs.readFile(tempDataPath, function (err, data) {
+            if (err) return console.log(err);
 
-        if (data) {
-            tempData = JSON.parse(data);
-            resolve(true);
-        }
-    });
+            if (data) {
+                tempData = JSON.parse(data);
+                resolve(true);
+            }
+        });
+    }
+    else {
+        resolve(true);
+    }
 });
 
 function updateTempStorage(t) {
-    if (!tempData) {
-        tempData = {};
-    }
     tempData = Object.assign(tempData, t);
-
-    fs.writeFile("output/run.tmp", JSON.stringify(tempData, null, 2), function (err) {
+    fs.writeFile(tempDataPath, JSON.stringify(tempData, null, 2), function (err) {
         if (err) return console.log(err);
     });
 }
@@ -66,9 +69,29 @@ function setCookieIfMissing(context, cookieDictionary) {
     });
 }
 
-/** Called when artillery sends a request */
-function sendAuthValues(requestParams, context, ee, next) {
+/** This will check for the special NEW_GUID string in the body and replace with a new GUID and store in persisted storage */
+function replaceAndStoreGuid(requestParams) {
+    if (requestParams.body) {
+        let guid = uuidv4();
+        requestParams.body = requestParams.body.replace(/NEW_GUID/g, guid);
+
+        let uuids = [];
+        if (tempData.uuids) {
+            uuids = tempData.uuids;
+        }
+        uuids.push(guid);
+
+        // update/persist this value to temp storage
+        updateTempStorage({ uuids: uuids });
+    }
+}
+
+/** Called when artillery sends a request to set xsrf/cookies */
+function beforeRequest(requestParams, context, ee, next) {
     loadTempData.then(function () {
+
+        replaceAndStoreGuid(requestParams);
+        console.log(requestParams);
 
         // set the xsrf header if we've captured it
         if (context.vars.umbXsrf) {
@@ -92,10 +115,10 @@ function sendAuthValues(requestParams, context, ee, next) {
     });
 }
 
-/** Called when artillery receives a response to capture the xsrf */
-function captureCookies(requestParams, response, context, ee, next) {
+/** Called when artillery receives a response to capture the cookies/xsrf */
+function afterResponse(requestParams, response, context, ee, next) {
 
-    if (response.statusCode == 500) {
+    if (response.statusCode != 200) {
         console.error(response.body);
     }
 

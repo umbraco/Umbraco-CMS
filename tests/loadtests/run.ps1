@@ -38,6 +38,11 @@ $GetCountersScript = {
     Get-Counter -Counter $args[0] -ComputerName $args[1] -Continuous | Export-Counter -path "$($args[2])" -FileFormat csv -Force
 }
 
+## Clear our temp storage first
+if (Test-Path "$PSScriptRoot\output\run.tmp"){
+    Remove-Item "$PSScriptRoot\output\run.tmp"
+}
+
 $Artillery = @(
     "login-and-load.yml",
 
