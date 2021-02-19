@@ -415,7 +415,7 @@ namespace Umbraco.Extensions
                 _webRooFileProvider = webRooFileProvider;
             }
 
-            public IFileInfo GetFileInfo(string subpath) => subpath.InvariantStartsWith(Core.Constants.SystemDirectories.AppPlugins)
+            public IFileInfo GetFileInfo(string subpath) => subpath.InvariantStartsWith(Constants.SystemDirectories.AppPlugins)
                 ? _contentRootFileProvider.GetFileInfo(subpath)
                 : _webRooFileProvider.GetFileInfo(subpath);
 
