@@ -125,6 +125,7 @@ namespace Umbraco.Extensions
             }
             else
             {
+                app.UseMiddleware<PreviewAuthenticationMiddleware>();
                 app.UseMiddleware<UmbracoRequestMiddleware>();
                 app.UseMiddleware<MiniProfilerMiddleware>();
             }
