@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -49,8 +49,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 try
                 {
-                    var version = new SemVersion(_umbracoVersion.Current.Major, _umbracoVersion.Current.Minor,
-                        _umbracoVersion.Current.Build, _umbracoVersion.Comment);
+                    var version = new SemVersion(_umbracoVersion.Version.Major, _umbracoVersion.Version.Minor,
+                        _umbracoVersion.Version.Build, _umbracoVersion.Comment);
                     var result = await _upgradeService.CheckUpgrade(version);
 
                     return new UpgradeCheckResponse(result.UpgradeType, result.Comment, result.UpgradeUrl, _umbracoVersion);

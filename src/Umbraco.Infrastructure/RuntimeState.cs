@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -54,7 +54,7 @@ namespace Umbraco.Core
 
 
         /// <inheritdoc />
-        public Version Version => _umbracoVersion.Current;
+        public Version Version => _umbracoVersion.Version;
 
         /// <inheritdoc />
         public string VersionComment => _umbracoVersion.Comment;

@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (ins.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
                 var packageMinVersion = ins.UmbracoVersion;
-                if (_umbracoVersion.Current < packageMinVersion)
+                if (_umbracoVersion.Version < packageMinVersion)
                 {
                     model.IsCompatible = false;
                 }
@@ -223,7 +223,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 var packageFile = await _packagingService.FetchPackageFileAsync(
                     Guid.Parse(packageGuid),
-                    _umbracoVersion.Current,
+                    _umbracoVersion.Version,
                     _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
                 fileName = packageFile.Name;
@@ -267,7 +267,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (packageInfo.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
                 var packageMinVersion = packageInfo.UmbracoVersion;
-                if (_umbracoVersion.Current < packageMinVersion)
+                if (_umbracoVersion.Version < packageMinVersion)
                     return ValidationErrorResult.CreateNotificationValidationErrorResult(
                         _localizedTextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()}));
             }

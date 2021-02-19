@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
@@ -319,7 +319,7 @@ namespace Umbraco.Web.Security.Providers
             if (userIsOnline)
             {
                 // when upgrading from 7.2 to 7.3 trying to save will throw
-                if (_umbracoVersion.Current >= new Version(7, 3, 0, 0))
+                if (_umbracoVersion.Version >= new Version(7, 3, 0, 0))
                 {
                     var now = DateTime.Now;
                     // update the database data directly instead of a full member save which requires DB locks
@@ -566,7 +566,7 @@ namespace Umbraco.Web.Security.Providers
             if (requiresFullSave)
             {
                 // when upgrading from 7.2 to 7.3 trying to save will throw
-                if (_umbracoVersion.Current >= new Version(7, 3, 0, 0))
+                if (_umbracoVersion.Version >= new Version(7, 3, 0, 0))
                     MemberService.Save(member, false);
             }
             else
