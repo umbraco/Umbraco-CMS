@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -33,11 +33,6 @@ namespace Umbraco.Core.Migrations
         public DatabaseType DatabaseType => Context.Database.DatabaseType;
 
         public List<IMigrationExpression> Expressions => _expressions ?? (_expressions = new List<IMigrationExpression>());
-
-        public virtual string Process(IMigrationContext context)
-        {
-            return ToString();
-        }
 
         protected virtual string GetSql()
         {
