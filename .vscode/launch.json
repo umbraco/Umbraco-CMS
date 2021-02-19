@@ -8,7 +8,7 @@
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "Build",
+            "preLaunchTask": "Dotnet build",
             // If you have changed target frameworks, make sure to update the program path.
             "program": "${workspaceFolder}/src/Umbraco.Web.UI.NetCore/bin/Debug/net5.0/Umbraco.Web.UI.NetCore.dll",
             "args": [],
