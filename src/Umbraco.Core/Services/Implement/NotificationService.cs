@@ -77,9 +77,6 @@ namespace Umbraco.Core.Services.Implement
             //exit if there are no entities
             if (entitiesL.Count == 0) return;
 
-            //put all entity's paths into a list with the same indices
-            var paths = entitiesL.Select(x => x.Path.Split(',').Select(int.Parse).ToArray()).ToArray();
-
             // lazily get versions
             var prevVersionDictionary = new Dictionary<int, IContentBase>();
 
@@ -102,10 +99,9 @@ namespace Umbraco.Core.Services.Implement
                     for (var j = 0; j < entitiesL.Count; j++)
                     {
                         var content = entitiesL[j];
-                        var path = paths[j];
 
                         // test if the notification applies to the path ie to this entity
-                        if (path.Contains(notifications[i].EntityId) == false) continue; // next entity
+                        if (content.Id != notifications[i].EntityId) continue; // next entity
 
                         if (prevVersionDictionary.ContainsKey(content.Id) == false)
                         {
