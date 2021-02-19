@@ -268,10 +268,20 @@ namespace Umbraco.Web.BackOffice.Controllers
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    Task<ActionResult<bool>> updateSuccessful = UpdateMemberAsync(contentItem);
+                    ActionResult<bool> updateSuccessful = await UpdateMemberAsync(contentItem);
+                    if (!(updateSuccessful.Result is null))
+                    {
+                        return updateSuccessful.Result;
+                    }
+
                     break;
                 case ContentSaveAction.SaveNew:
-                    Task<ActionResult<bool>> createSuccessful = CreateMemberAsync(contentItem);
+                    ActionResult<bool> createSuccessful = await CreateMemberAsync(contentItem);
+                    if (!(createSuccessful.Result is null))
+                    {
+                        return createSuccessful.Result;
+                    }
+
                     break;
                 default:
                     // we don't support anything else for members
