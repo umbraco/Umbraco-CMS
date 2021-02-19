@@ -20,7 +20,7 @@
                 <div class="umb-control-group">
                     <umb-search-filter
                         input-id="icon-search"
-                        model="searchTerm"
+                        model="vm.filter.searchTerm"
                         label-key="placeholders_filter"
                         text="Type to filter..."
                         css-class="w-100"
@@ -42,7 +42,7 @@
 
                 <div class="umb-control-group" ng-show="!vm.loading && filtered.length > 0 ">
                     <ul class="umb-iconpicker" ng-class="vm.color.value" ng-show="vm.icons">
-                        <li class="umb-iconpicker-item" ng-class="{'-selected': icon.name == model.icon}" ng-repeat="icon in filtered = (vm.icons | filter: searchTerm | orderBy:'name') track by $id(icon)">
+                        <li class="umb-iconpicker-item" ng-class="{'-selected': icon.name == model.icon}" ng-repeat="icon in filtered = (vm.icons | filter: { 'name': vm.filter.searchTerm } | orderBy:'name') track by $id(icon)">
                             <button type="button" title="{{icon.name}}" ng-click="vm.selectIcon(icon.name, vm.color.value)">
                                 <umb-icon class="umb-iconpicker-svg {{icon.name}} large" icon="{{icon.name}}"></umb-icon>
                                 <span class="sr-only"><localize key="buttons_select">Select</localize> {{icon.name}}</span>
