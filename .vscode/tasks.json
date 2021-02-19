@@ -8,7 +8,7 @@
             "group": "build",
             "dependsOn": [
                 "Client Build",
-                "dotnet build"
+                "Dotnet build"
             ],
             "problemMatcher": []
         },
@@ -26,9 +26,6 @@
             "detail": "runs npm run build for Umbraco.Web.UI.Client",
             "promptOnClose": true,
             "group": "build",
-            "dependsOn": [
-                "Client Install"
-            ],
             "type": "npm",
             "script": "build",
             "path": "src/Umbraco.Web.UI.Client/",
@@ -37,7 +34,7 @@
             ]
         },
         {
-            "label": "dotnet build",
+            "label": "Dotnet build",
             "detail": "Dotnet build of SLN",
             "promptOnClose": true,
             "group": "build",
@@ -52,7 +49,7 @@
             "problemMatcher": "$msCompile"
         },
         {
-            "label": "watch",
+            "label": "Dotnet watch",
             "detail": "Dotnet run and watch of Web.UI.NetCore",
             "promptOnClose": true,
             "command": "dotnet",
