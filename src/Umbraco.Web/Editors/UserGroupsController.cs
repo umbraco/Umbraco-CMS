@@ -28,7 +28,11 @@ namespace Umbraco.Web.Editors
 
             //authorize that the user has access to save this user group
             var authHelper = new UserGroupEditorAuthorizationHelper(
-                Services.UserService, Services.ContentService, Services.MediaService, Services.EntityService);
+                Services.UserService,
+                Services.ContentService,
+                Services.MediaService,
+                Services.EntityService,
+                AppCaches);
 
             var isAuthorized = authHelper.AuthorizeGroupAccess(Security.CurrentUser, userGroupSave.Alias);
             if (isAuthorized == false)
