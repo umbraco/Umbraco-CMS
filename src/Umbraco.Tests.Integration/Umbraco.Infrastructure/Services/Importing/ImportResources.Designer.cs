@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Umbraco.Tests.Services.Importing {
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing {
     using System;
     
     
@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Services.Importing {
     // class via a tool like ResGen or Visual Studio.
     // To add or remove a member, edit your .ResX file then rerun ResGen
     // with the /str option, or rebuild your VS project.
-    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "4.0.0.0")]
+    [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "16.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
     internal class ImportResources {
@@ -39,8 +39,8 @@ namespace Umbraco.Tests.Services.Importing {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Umbraco.Tests.Integration.Umbraco.Infrastructure.Services.Importing.ImportResourc" +
-                            "es", typeof(ImportResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing.ImportRes" +
+                            "ources", typeof(ImportResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
