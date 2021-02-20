@@ -62,7 +62,9 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="ClientDependency" Version="1.9.9" />
-    <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
+    <PackageReference Include="CSharpTest.Net.Collections">
+      <Version>14.906.1403.1082</Version>
+    </PackageReference>
     <PackageReference Include="Examine" Version="1.0.2" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="HtmlSanitizer">
@@ -266,6 +268,10 @@
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionary.cs" />
+    <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionaryFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\BPlusTreeTransactionScope.cs" />
+    <Compile Include="PublishedCache\NuCache\ContentCacheEntityType.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializationResult.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializerEntityType.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializer.cs" />
@@ -283,6 +289,9 @@
     <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializerFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\ITransactableDictionary.cs" />
+    <Compile Include="PublishedCache\NuCache\ITransactableDictionaryFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\ITransactionScope.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
@@ -622,7 +631,6 @@
     <Compile Include="PublishedCache\NuCache\ContentNode.cs" />
     <Compile Include="PublishedCache\NuCache\ContentNodeKit.cs" />
     <Compile Include="PublishedCache\NuCache\ContentStore.cs" />
-    <Compile Include="PublishedCache\NuCache\DataSource\BTree.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentData.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentSourceDto.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\DatabaseDataSource.cs" />

@@ -3,20 +3,13 @@ using CSharpTest.Net.Serialization;
 
 namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
-    internal class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
+    public class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
     {
-        public ContentNodeKitSerializer(ContentDataSerializer contentDataSerializer = null)
+        public ContentNodeKitSerializer(ISerializer<ContentData> contentDataSerializer = null)
         {
             _contentDataSerializer = contentDataSerializer;
-            if(_contentDataSerializer == null)
-            {
-                _contentDataSerializer = DefaultDataSerializer;
-            }
         }
-        static readonly ContentDataSerializer DefaultDataSerializer = new ContentDataSerializer();
-        private readonly ContentDataSerializer _contentDataSerializer;
-
-        //static readonly ListOfIntSerializer ChildContentIdsSerializer = new ListOfIntSerializer();
+        private readonly ISerializer<ContentData> _contentDataSerializer;
 
         public ContentNodeKit ReadFrom(Stream stream)
         {

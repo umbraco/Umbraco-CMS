@@ -10,7 +10,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// Lazily decompresses a LZ4 Pickler compressed UTF8 string
     /// </summary>
     [DebuggerDisplay("{Display}")]
-    internal struct LazyCompressedString
+    public struct LazyCompressedString
     {
         private byte[] _bytes;
         private string _str;

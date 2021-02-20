@@ -32,13 +32,7 @@ namespace Umbraco.Web.Editors
         public string RebuildDbCache()
         {
             var service = PublishedSnapshotService;
-            service.RebuildContentDbCache();
-            service.RebuildMediaDbCache();
-            service.RebuildMemberDbCache();
-
-            // TODO: Shouldn't this just be ??
-            // service.Rebuild();
-
+            service.Rebuild();
 
             return service.GetStatus();
         }

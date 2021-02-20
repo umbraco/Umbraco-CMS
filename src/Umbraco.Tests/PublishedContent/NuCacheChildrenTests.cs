@@ -136,7 +136,7 @@ namespace Umbraco.Tests.PublishedContent
             // create a data source for NuCache
             _source = new TestDataSource(kits());
             _contentNestedDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
-
+            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory(globalSettings);
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(options,
@@ -149,16 +149,12 @@ namespace Umbraco.Tests.PublishedContent
                 _variationAccesor,
                 Mock.Of<IProfilingLogger>(),
                 scopeProvider.Object,
-                Mock.Of<IDocumentRepository>(),
-                Mock.Of<IMediaRepository>(),
-                Mock.Of<IMemberRepository>(),
                 new TestDefaultCultureAccessor(),
                 _source,
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                _contentNestedDataSerializerFactory);
+                transactableDictionaryFactory);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using CSharpTest.Net.Serialization;
+using System.Collections.Generic;
+using System.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.PropertyEditors;
@@ -25,7 +27,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             composition.RegisterUnique<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
 
-            composition.RegisterUnique(factory => new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
+            composition.RegisterUnique<ISerializer<IDictionary<string, PropertyData[]>>, DictionaryOfPropertyDataSerializer>();
+            composition.RegisterUnique<ISerializer<IReadOnlyDictionary<string, CultureVariation>>, DictionaryOfCultureVariationSerializer>();
+            composition.RegisterUnique<ISerializer<ContentData>, ContentDataSerializer>();
+            composition.RegisterUnique<ISerializer<ContentNodeKit>, ContentNodeKitSerializer>();
+
+            composition.RegisterUnique<ITransactableDictionaryFactory, BPlusTreeTransactableDictionaryFactory>();
 
             // register the NuCache database data source
             composition.RegisterUnique<IDataSource, DatabaseDataSource>();
