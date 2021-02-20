@@ -348,7 +348,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             };
 
             $scope.selectEnabledNodeClass = node =>
-                node && node.selected ? 'icon umb-tree-icon sprTree icon-check green temporary' : '';            
+                node && node.selected ? 'icon sprTree icon-check green temporary' : '-hidden';
 
             /* helper to force reloading children of a tree node */
             $scope.loadChildren = (node, forceReload) => loadChildren(node, forceReload);
@@ -409,8 +409,8 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 //load the tree
                 loadTree().then(function () {
                     //because angular doesn't return a promise for the resolve method, we need to resort to some hackery, else
-                    //like normal JS promises we could do resolve(...).then() 
-                    if (args && args.onLoaded && angular.isFunction(args.onLoaded)) {
+                    //like normal JS promises we could do resolve(...).then()
+                    if (args && args.onLoaded && Utilities.isFunction(args.onLoaded)) {
                         args.onLoaded();
                     }
                 });

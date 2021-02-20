@@ -556,7 +556,7 @@ namespace Umbraco.Core.Packaging
                     && ((string)infoElement.Element("Master")).IsNullOrWhiteSpace())
                 {
                     var alias = documentType.Element("Info").Element("Alias").Value;
-                    var folders = foldersAttribute.Value.Split('/');
+                    var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
                     var rootFolder = HttpUtility.UrlDecode(folders[0]);
                     //level 1 = root level folders, there can only be one with the same name
                     var current = _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
@@ -976,7 +976,7 @@ namespace Umbraco.Core.Packaging
                 if (foldersAttribute != null)
                 {
                     var name = datatypeElement.Attribute("Name").Value;
-                    var folders = foldersAttribute.Value.Split('/');
+                    var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
                     var rootFolder = HttpUtility.UrlDecode(folders[0]);
                     //there will only be a single result by name for level 1 (root) containers
                     var current = _dataTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
