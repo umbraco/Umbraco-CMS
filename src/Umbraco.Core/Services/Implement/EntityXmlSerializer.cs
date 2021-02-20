@@ -554,8 +554,7 @@ namespace Umbraco.Core.Services.Implement
                 new XAttribute("isDoc", ""));
 
 
-            // Add Culture Specific Nodenames
-            // https://github.com/umbraco/Umbraco.Cloud.Issues/issues/135
+            // Add culture specific node names
             foreach (var culture in contentBase.AvailableCultures)
             {
                 xml.Add(new XAttribute("nodeName-" + culture, contentBase.GetCultureName(culture)));
