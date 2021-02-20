@@ -5,7 +5,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
 {
     public class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
     {
-        public ContentNodeKitSerializer(ISerializer<ContentData> contentDataSerializer = null)
+        public ContentNodeKitSerializer(ISerializer<ContentData> contentDataSerializer)
         {
             _contentDataSerializer = contentDataSerializer;
         }

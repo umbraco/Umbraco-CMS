@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web.Routing;
+using CSharpTest.Net.Serialization;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -82,7 +83,12 @@ namespace Umbraco.Tests.Scoping
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
             var globalSettings = Factory.GetInstance<IGlobalSettings>();
-            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory(globalSettings);
+            ISerializer<IDictionary<string, PropertyData[]>> dictionaryPropertySerializer = new DictionaryOfPropertyDataSerializer();
+            ISerializer<IReadOnlyDictionary<string, CultureVariation>> dictionaryCultureSerializer = new DictionaryOfCultureVariationSerializer();
+            ISerializer<ContentData> contentDataSerializer = new ContentDataSerializer(dictionaryPropertySerializer, dictionaryCultureSerializer);
+            ISerializer<ContentNodeKit> contentNodeKitSerializer = new ContentNodeKitSerializer(contentDataSerializer);
+            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory(globalSettings, contentNodeKitSerializer);
+            INucacheRepositoryFactory nucacheRepositoryFactory = new TransactableDictionaryNucacheRepositoryFactory(transactableDictionaryFactory);
             var nestedContentDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
             return new PublishedSnapshotService(
                 options,
@@ -101,7 +107,8 @@ namespace Umbraco.Tests.Scoping
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-               transactableDictionaryFactory);
+                nucacheRepositoryFactory.GetMediaRepository(),
+                nucacheRepositoryFactory.GetDocumentRepository());
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

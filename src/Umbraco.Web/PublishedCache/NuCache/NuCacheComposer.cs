@@ -33,6 +33,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             composition.RegisterUnique<ISerializer<ContentNodeKit>, ContentNodeKitSerializer>();
 
             composition.RegisterUnique<ITransactableDictionaryFactory, BPlusTreeTransactableDictionaryFactory>();
+            composition.RegisterUnique<INucacheRepositoryFactory, TransactableDictionaryNucacheRepositoryFactory>();
+            composition.Register<INucacheDocumentRepository>(factory => factory.GetInstance<INucacheRepositoryFactory>().GetDocumentRepository()
+            , Lifetime.Singleton);
+            composition.Register<INucacheMediaRepository>(factory => factory.GetInstance<INucacheRepositoryFactory>().GetMediaRepository()
+            , Lifetime.Singleton);
 
             // register the NuCache database data source
             composition.RegisterUnique<IDataSource, DatabaseDataSource>();

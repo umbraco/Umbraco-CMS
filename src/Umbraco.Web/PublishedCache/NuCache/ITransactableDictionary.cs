@@ -26,14 +26,27 @@ namespace Umbraco.Web.PublishedCache.NuCache
         bool IsPopulated();
 
         /// <summary>
-        /// Drop the database
+        /// Clears the contents of the database.
         /// </summary>
         void Drop();
+
 
         /// <summary>
         /// Begin Transaction
         /// </summary>
         /// <returns>Transaction Scope</returns>
         ITransactionScope BeginTransaction();
+
+        /// <summary>
+        /// Initialize
+        /// </summary>
+        void Init();
+
+        /// <summary>
+        /// Ensures that the ITransactableDictionaryFactory has the proper environment to run.
+        /// </summary>
+        /// <param name="errors">The errors, if any.</param>
+        /// <returns>A value indicating whether the ITransactableDictionaryFactory has the proper environment to run.</returns>
+        bool EnsureEnvironment(out IEnumerable<string> errors);
     }
 }

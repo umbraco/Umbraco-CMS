@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using CSharpTest.Net.Serialization;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
@@ -136,7 +137,12 @@ namespace Umbraco.Tests.PublishedContent
             // create a data source for NuCache
             _source = new TestDataSource(kits());
             _contentNestedDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
-            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory(globalSettings);
+            ISerializer<IDictionary<string, PropertyData[]>> dictionaryPropertySerializer = new DictionaryOfPropertyDataSerializer();
+            ISerializer<IReadOnlyDictionary<string, CultureVariation>> dictionaryCultureSerializer = new DictionaryOfCultureVariationSerializer();
+            ISerializer<ContentData> contentDataSerializer = new ContentDataSerializer(dictionaryPropertySerializer, dictionaryCultureSerializer);
+            ISerializer<ContentNodeKit> contentNodeKitSerializer = new ContentNodeKitSerializer(contentDataSerializer);
+            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory(globalSettings, contentNodeKitSerializer);
+            INucacheRepositoryFactory nucacheRepositoryFactory = new TransactableDictionaryNucacheRepositoryFactory(transactableDictionaryFactory);
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(options,
@@ -154,7 +160,8 @@ namespace Umbraco.Tests.PublishedContent
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                transactableDictionaryFactory);
+                nucacheRepositoryFactory.GetMediaRepository(),
+                nucacheRepositoryFactory.GetDocumentRepository());
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

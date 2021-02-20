@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Umbraco.Web.Install;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
@@ -137,5 +138,23 @@ namespace Umbraco.Web.PublishedCache.NuCache
         }
 
         public bool IsPopulated() => _isPopulated;
+
+        /// <summary>
+        /// Ensures that the ITransactableDictionaryFactory has the proper environment to run.
+        /// </summary>
+        /// <param name="errors">The errors, if any.</param>
+        /// <returns>A value indicating whether the ITransactableDictionaryFactory has the proper environment to run.</returns>
+        public bool EnsureEnvironment(out IEnumerable<string> errors)
+        {
+            // must have app_data and be able to write files into it
+            var ok = FilePermissionHelper.TryCreateDirectory(_filePath);
+            errors = ok ? Enumerable.Empty<string>() : new[] { "NuCache local files." };
+            return ok;
+        }
+
+        public void Init()
+        {
+            
+        }
     }
 }

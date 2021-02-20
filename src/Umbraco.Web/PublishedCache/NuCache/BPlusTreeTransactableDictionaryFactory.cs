@@ -16,7 +16,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IGlobalSettings _globalSettings;
         private readonly ISerializer<ContentNodeKit> _contentNodeKitSerializer;
 
-        public BPlusTreeTransactableDictionaryFactory(IGlobalSettings globalSettings, ISerializer<ContentNodeKit> contentNodeKitSerializer = null)
+        public BPlusTreeTransactableDictionaryFactory(IGlobalSettings globalSettings, ISerializer<ContentNodeKit> contentNodeKitSerializer)
         {
             _globalSettings = globalSettings;
             _contentNodeKitSerializer = contentNodeKitSerializer;

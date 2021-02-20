@@ -34,7 +34,6 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly IDataSource _dataSource;
         private readonly IProfilingLogger _logger;
         private readonly IGlobalSettings _globalSettings;
-        private readonly ITransactableDictionaryFactory _transactableDictionaryFactory;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
@@ -48,8 +47,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly object _storesLock = new object();
         private readonly object _elementsLock = new object();
 
-        private ITransactableDictionary<int, ContentNodeKit> _localContentDb;
-        private ITransactableDictionary<int, ContentNodeKit> _localMediaDb;
+        private INucacheDocumentRepository _documentRepository;
+        private INucacheMediaRepository _mediaRepository;
 
         // define constant - determines whether to use cache when previewing
         // to store eg routes, property converted values, anything - caching
@@ -68,7 +67,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDataSource dataSource, IGlobalSettings globalSettings,
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
-            ITransactableDictionaryFactory transactableDictionaryFactory)
+            INucacheMediaRepository nucacheMediaRepository,
+            INucacheDocumentRepository nucacheContentRepository)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -81,7 +81,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _scopeProvider = scopeProvider;
             _defaultCultureAccessor = defaultCultureAccessor;
             _globalSettings = globalSettings;
-            _transactableDictionaryFactory = transactableDictionaryFactory;
+            _documentRepository = nucacheContentRepository;
+            _mediaRepository = nucacheMediaRepository;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -115,10 +116,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                     // figure out whether it can read the databases or it should populate them from sql
 
-                    _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDb.IsPopulated());
-                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localContentDb);
-                    _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localContentDb.IsPopulated());
-                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _localMediaDb);
+                    _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _documentRepository.IsPopulated());
+                    _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _documentRepository);
+                    _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _documentRepository.IsPopulated());
+                    _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _mediaRepository);
                 }
                 else
                 {
@@ -156,9 +157,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private void MainDomRegister()
         {
             // if both local databases exist then Get will open them, else new databases will be created
-            _localContentDb = _transactableDictionaryFactory.Get(ContentCacheEntityType.Document);
-            _localMediaDb = _transactableDictionaryFactory.Get(ContentCacheEntityType.Media);
-            _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _localContentDb.IsPopulated(), _localMediaDb.IsPopulated());
+            _documentRepository.Init();
+            _mediaRepository.Init();
+            _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _documentRepository.IsPopulated(), _mediaRepository.IsPopulated());
         }
 
         /// <summary>
@@ -175,11 +176,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 _logger.Debug<PublishedSnapshotService>("Releasing content store...");
                 _contentStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
-                _localContentDb = null;
+                _documentRepository = null;
 
                 _logger.Debug<PublishedSnapshotService>("Releasing media store...");
                 _mediaStore?.ReleaseLocalDb(); //null check because we could shut down before being assigned
-                _localMediaDb = null;
+                _mediaRepository = null;
 
                 _logger.Info<PublishedSnapshotService>("Released from MainDom");
             }
@@ -196,14 +197,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             try
             {
-                if ((_localContentDb != null && _localContentDb.IsPopulated()))
+                if ((_documentRepository != null && _documentRepository.IsPopulated()))
                 {
                     okContent = LockAndLoadContent(scope => LoadContentFromLocalDbLocked(true));
                     if (!okContent)
                         _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
                 }
 
-                if ((_localMediaDb != null && _localMediaDb.IsPopulated()))
+                if ((_mediaRepository != null && _mediaRepository.IsPopulated()))
                 {
                     okMedia = LockAndLoadMedia(scope => LoadMediaFromLocalDbLocked(true));
                     if (!okMedia)
@@ -276,8 +277,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override void Dispose()
         {
             TearDownRepositoryEvents();
-            _localContentDb?.Dispose();
-            _localMediaDb?.Dispose();
+            _documentRepository?.Dispose();
+            _mediaRepository?.Dispose();
             base.Dispose();
         }
 
@@ -285,21 +286,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region Local files
 
-       
+
 
         private void DeleteLocalFilesForContent()
         {
-            if (_isReady && _localContentDb != null)
+            if (_isReady && _documentRepository != null)
                 throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
-            _transactableDictionaryFactory.Drop(ContentCacheEntityType.Document);
+            _documentRepository.Drop();
         }
 
         private void DeleteLocalFilesForMedia()
         {
-            if (_isReady && _localMediaDb != null)
+            if (_isReady && _mediaRepository != null)
                 throw new InvalidOperationException("Cannot delete local files while the cache uses them.");
 
-            _transactableDictionaryFactory.Drop(ContentCacheEntityType.Media);
+            _mediaRepository.Drop();
         }
 
         #endregion
@@ -308,7 +309,21 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override bool EnsureEnvironment(out IEnumerable<string> errors)
         {
-            return _transactableDictionaryFactory.EnsureEnvironment(out errors);
+            bool mediaEnsured = _mediaRepository.EnsureEnvironment(out IEnumerable<string> mediaErrors);
+
+            bool documentEnsured = _documentRepository.EnsureEnvironment(out IEnumerable<string> documentErrors);
+
+            List<string> allErrors = new List<string>();
+            if(mediaErrors != null)
+            {
+                allErrors.AddRange(mediaErrors);
+            }
+            if (documentErrors != null)
+            {
+                allErrors.AddRange(documentErrors);
+            }
+            errors = allErrors;
+            return mediaEnsured && documentEnsured;
         }
 
         #endregion
@@ -351,7 +366,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // beware! at that point the cache is inconsistent,
                 // assuming we are going to SetAll content items!
 
-                _localContentDb?.Clear();
+                _documentRepository?.Clear();
 
                 // IMPORTANT GetAllContentSources sorts kits by level + parentId + sortOrder
                 var kits = _dataSource.GetAllContentSources(scope);
@@ -370,7 +385,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // beware! at that point the cache is inconsistent,
                 // assuming we are going to SetAll content items!
 
-                return LoadEntitiesFromLocalDbLocked(onStartup, _localContentDb, _contentStore, "content");
+                return LoadEntitiesFromLocalDbLocked(onStartup, _documentRepository, _contentStore, "content");
             }
         }
 
@@ -422,7 +437,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // beware! at that point the cache is inconsistent,
                 // assuming we are going to SetAll content items!
 
-                _localMediaDb?.Clear();
+                _mediaRepository?.Clear();
 
                 _logger.Debug<PublishedSnapshotService>("Loading media from database...");
                 // IMPORTANT GetAllMediaSources sorts kits by level + parentId + sortOrder
@@ -442,18 +457,14 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // beware! at that point the cache is inconsistent,
                 // assuming we are going to SetAll content items!
 
-                return LoadEntitiesFromLocalDbLocked(onStartup, _localMediaDb, _mediaStore, "media");
+                return LoadEntitiesFromLocalDbLocked(onStartup, _mediaRepository, _mediaStore, "media");
             }
 
         }
 
-        private bool LoadEntitiesFromLocalDbLocked(bool onStartup, ITransactableDictionary<int, ContentNodeKit> localDb, ContentStore store, string entityType)
+        private bool LoadEntitiesFromLocalDbLocked(bool onStartup, INucacheRepositoryBase<int,ContentNodeKit> repository, ContentStore store, string entityType)
         {
-            var kits = localDb.Select(x => x.Value)
-                    .OrderBy(x => x.Node.Level)
-                    .ThenBy(x => x.Node.ParentContentId)
-                    .ThenBy(x => x.Node.SortOrder) // IMPORTANT sort by level + parentId + sortOrder
-                    .ToList();
+            var kits = repository.GetAllSorted();
 
             if (kits.Count == 0)
             {
@@ -472,12 +483,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // Update: We will still return false here even though the above mentioned race condition has been fixed since we now
                 // lock the entire operation of creating/populating the cache file with the same lock as releasing/closing the cache file
 
+                // What if the repository was not local at all? What if the repository is shared? Perhaps the repository should have it's own locking mechanism
+
                 _logger.Info<PublishedSnapshotService>($"Tried to load {entityType} from the local cache file but it was empty.");
                 return false;
             }
 
             return onStartup ? store.SetAllFastSortedLocked(kits, false) : store.SetAllLocked(kits);
         }
+
 
         // keep these around - might be useful
 
