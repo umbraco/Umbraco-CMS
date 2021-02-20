@@ -119,6 +119,7 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
         $http({ method: "GET", url: Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + 'GetIcons' })
             .then(function (response) {
                 resourceLoadStatus = "loaded";
+                var resourceLoadingPromise = [];
 
                 for (const [key, value] of Object.entries(response.data.Data)) {
                     iconCache.push({name: key, svgString: $sce.trustAsHtml(value)})
