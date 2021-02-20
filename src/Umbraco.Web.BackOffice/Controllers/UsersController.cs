@@ -23,6 +23,7 @@ using Umbraco.Core.Mail;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
@@ -56,7 +57,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly SecuritySettings _securitySettings;
         private readonly IEmailSender _emailSender;
-        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly AppCaches _appCaches;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUserService _userService;
@@ -68,6 +69,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly LinkGenerator _linkGenerator;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
+        private readonly IPasswordChanger<BackOfficeIdentityUser> _passwordChanger;
         private readonly ILogger<UsersController> _logger;
 
         public UsersController(
@@ -89,7 +91,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILoggerFactory loggerFactory,
             LinkGenerator linkGenerator,
             IBackOfficeExternalLoginProviders externalLogins,
-            UserEditorAuthorizationHelper userEditorAuthorizationHelper)
+            UserEditorAuthorizationHelper userEditorAuthorizationHelper,
+            IPasswordChanger<BackOfficeIdentityUser> passwordChanger)
         {
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings.Value;
@@ -98,7 +101,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _imageUrlGenerator = imageUrlGenerator;
             _securitySettings = securitySettings.Value;
             _emailSender = emailSender;
-            _backofficeSecurityAccessor = backofficeSecurityAccessor;
+            _backOfficeSecurityAccessor = backofficeSecurityAccessor;
             _appCaches = appCaches;
             _shortStringHelper = shortStringHelper;
             _userService = userService;
@@ -110,6 +113,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _linkGenerator = linkGenerator;
             _externalLogins = externalLogins;
             _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
+            _passwordChanger = passwordChanger;
             _logger = _loggerFactory.CreateLogger<UsersController>();
         }
 
@@ -119,7 +123,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         public ActionResult<string[]> GetCurrentUserAvatarUrls()
         {
-            var urls = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
+            var urls = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
             if (urls == null)
                 return new ValidationErrorResult("Could not access Gravatar endpoint");
 
@@ -285,7 +289,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var hideDisabledUsers = _securitySettings.HideDisabledUsersInBackOffice;
             var excludeUserGroups = new string[0];
-            var isAdmin = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin();
+            var isAdmin = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin();
             if (isAdmin == false)
             {
                 //this user is not an admin so in that case we need to exclude all admin users
@@ -294,7 +298,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             var filterQuery = _sqlContext.Query<IUser>();
 
-            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsSuper())
+            if (!_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsSuper())
             {
                 // only super can see super - but don't use IsSuper, cannot be mapped to SQL
                 //filterQuery.Where(x => !x.IsSuper());
@@ -359,7 +363,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, null, null, null, userSave.UserGroups);
+            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser, null, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 return Unauthorized(canSaveUser.Result);
@@ -448,7 +452,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, userSave.UserGroups);
+            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 return new ValidationErrorResult(canSaveUser.Result, StatusCodes.Status401Unauthorized);
@@ -511,7 +515,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 //send the email
 
-                await SendUserInviteEmailAsync(display, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Email, user, userSave.Message);
+                await SendUserInviteEmailAsync(display, _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Name, _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Email, user, userSave.Message);
 
             }
 
@@ -605,7 +609,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return NotFound();
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
+            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 return Unauthorized(canSaveUser.Result);
@@ -665,7 +669,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var display = _umbracoMapper.Map<UserDisplay>(user);
 
             // determine if the user has changed their own language;
-            var currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             var userHasChangedOwnLanguage =
                 user.Id == currentUser.Id && currentUser.Language != user.Language;
 
@@ -691,21 +695,25 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
-            var intId = changingPasswordModel.Id.TryConvertTo<int>();
+            Attempt<int> intId = changingPasswordModel.Id.TryConvertTo<int>();
             if (intId.Success == false)
             {
                 return NotFound();
             }
 
-            var found = _userService.GetUserById(intId.Result);
+            IUser found = _userService.GetUserById(intId.Result);
             if (found == null)
             {
                 return NotFound();
             }
 
-            // TODO: Why don't we inject this? Then we can just inject a logger
-            var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
-            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, changingPasswordModel, _userManager);
+            IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            changingPasswordModel.CurrentUserHasSectionAccess = currentUser.HasSectionAccess(Constants.Applications.Users);
+            changingPasswordModel.CurrentUsername = currentUser.Username;
+            changingPasswordModel.SavingUserId = found.Id;
+            changingPasswordModel.SavingUsername = found.Username;
+
+            Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);
 
             if (passwordChangeResult.Success)
             {
@@ -714,7 +722,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return result;
             }
 
-            foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+            foreach (string memberName in passwordChangeResult.Result.ChangeError.MemberNames)
             {
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
@@ -730,7 +738,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IActionResult PostDisableUsers([FromQuery]int[] userIds)
         {
-            var tryGetCurrentUserId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId();
+            var tryGetCurrentUserId = _backOfficeSecurityAccessor.BackOfficeSecurity.GetUserId();
             if (tryGetCurrentUserId && userIds.Contains(tryGetCurrentUserId.Result))
             {
                 return ValidationErrorResult.CreateNotificationValidationErrorResult("The current user cannot disable itself");

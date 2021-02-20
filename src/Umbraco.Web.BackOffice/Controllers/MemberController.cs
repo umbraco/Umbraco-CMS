@@ -28,11 +28,13 @@ using Umbraco.Infrastructure.Security;
 using Umbraco.Infrastructure.Services.Implement;
 using Umbraco.Web.BackOffice.Filters;
 using Umbraco.Web.BackOffice.ModelBinders;
+using Umbraco.Web.BackOffice.Security;
 using Umbraco.Web.Common.ActionsResults;
 using Umbraco.Web.Common.Attributes;
 using Umbraco.Web.Common.Authorization;
 using Umbraco.Web.Common.Filters;
 using Umbraco.Web.ContentApps;
+using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.BackOffice.Controllers
@@ -56,6 +58,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IPasswordChanger<MembersIdentityUser> _passwordChanger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberController"/> class.
@@ -73,6 +76,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="dataTypeService">The data-type service</param>
         /// <param name="backOfficeSecurityAccessor">The back office security accessor</param>
         /// <param name="jsonSerializer">The JSON serializer</param>
+        /// <param name="passwordChanger">The password changer</param>
         public MemberController(
             ICultureDictionary cultureDictionary,
             ILoggerFactory loggerFactory,
@@ -86,7 +90,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMemberManager memberManager,
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IJsonSerializer jsonSerializer)
+            IJsonSerializer jsonSerializer,
+            IPasswordChanger<MembersIdentityUser> passwordChanger)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
         {
             _propertyEditors = propertyEditors;
@@ -99,6 +104,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _jsonSerializer = jsonSerializer;
             _shortStringHelper = shortStringHelper;
+            _passwordChanger = passwordChanger;
         }
 
         /// <summary>
@@ -390,7 +396,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //TODO: do we need to resave the key?
-            //contentItem.PersistedContent.Key = contentItem.Key;
+            // contentItem.PersistedContent.Key = contentItem.Key;
 
             // now the member has been saved via identity, resave the member with mapped content properties
             _memberService.Save(member);
@@ -450,7 +456,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             MembersIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
             if (identityMember == null)
             {
-                return new ValidationErrorResult("Member was not found");
+                return new ValidationErrorResult("Identity member was not found");
             }
 
             if (contentItem.Password != null)
@@ -461,14 +467,52 @@ namespace Umbraco.Web.BackOffice.Controllers
                     return new ValidationErrorResult(validatePassword.Errors.ToErrorMessage());
                 }
 
-                string newPassword = _memberManager.HashPassword(contentItem.Password.NewPassword);
-                identityMember.PasswordHash = newPassword;
-                contentItem.PersistedContent.RawPasswordValue = identityMember.PasswordHash;
-                if (identityMember.LastPasswordChangeDateUtc != null)
+                Attempt<int> intId = identityMember.Id.TryConvertTo<int>();
+                if (intId.Success == false)
                 {
-                    contentItem.PersistedContent.LastPasswordChangeDate = DateTime.UtcNow;
+                    return new ValidationErrorResult("Member ID was not valid");
+                }
+
+                IMember foundMember = _memberService.GetById(intId.Result);
+                if (foundMember == null)
+                {
+                    return new ValidationErrorResult("Member was not found");
+                }
+
+                IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                var changingPasswordModel = new ChangingPasswordModel
+                {
+                    Id = intId.Result,
+                    OldPassword = contentItem.Password.OldPassword,
+                    NewPassword = contentItem.Password.NewPassword,
+                    CurrentUsername = currentUser.Username,
+                    SavingUserId = foundMember.Id,
+                    SavingUsername = foundMember.Username,
+                    CurrentUserHasSectionAccess = currentUser.HasSectionAccess(Constants.Applications.Members)
+            };
+
+                Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager);
+
+                if (passwordChangeResult.Success)
+                {
+                    contentItem.PersistedContent.RawPasswordValue = passwordChangeResult.Result.ResetPassword;
+                    if (identityMember.LastPasswordChangeDateUtc != null)
+                    {
+                        contentItem.PersistedContent.LastPasswordChangeDate = DateTime.UtcNow;
+                    }
+
                     identityMember.LastPasswordChangeDateUtc = contentItem.PersistedContent.LastPasswordChangeDate;
                 }
+
+                if (passwordChangeResult.Result.ChangeError?.MemberNames != null)
+                {
+                    foreach (string memberName in passwordChangeResult.Result.ChangeError?.MemberNames)
+                    {
+                        ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError?.ErrorMessage ?? string.Empty);
+                    }
+                }
+
+                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
             IdentityResult updatedResult = await _memberManager.UpdateAsync(identityMember);

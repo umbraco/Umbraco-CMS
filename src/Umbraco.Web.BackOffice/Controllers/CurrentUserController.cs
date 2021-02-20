@@ -17,6 +17,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Media;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
@@ -42,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ContentSettings _contentSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IImageUrlGenerator _imageUrlGenerator;
-        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IUserService _userService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IBackOfficeUserManager _backOfficeUserManager;
@@ -50,6 +51,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _localizedTextService;
         private readonly AppCaches _appCaches;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IPasswordChanger<BackOfficeIdentityUser> _passwordChanger;
 
         public CurrentUserController(
             IMediaFileSystem mediaFileSystem,
@@ -63,13 +65,14 @@ namespace Umbraco.Web.BackOffice.Controllers
             ILoggerFactory loggerFactory,
             ILocalizedTextService localizedTextService,
             AppCaches appCaches,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IPasswordChanger<BackOfficeIdentityUser> passwordChanger)
         {
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _imageUrlGenerator = imageUrlGenerator;
-            _backofficeSecurityAccessor = backofficeSecurityAccessor;
+            _backOfficeSecurityAccessor = backofficeSecurityAccessor;
             _userService = userService;
             _umbracoMapper = umbracoMapper;
             _backOfficeUserManager = backOfficeUserManager;
@@ -77,6 +80,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService;
             _appCaches = appCaches;
             _shortStringHelper = shortStringHelper;
+            _passwordChanger = passwordChanger;
         }
 
 
@@ -89,7 +93,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public Dictionary<int, string[]> GetPermissions(int[] nodeIds)
         {
             var permissions = _userService
-                .GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, nodeIds);
+                .GetPermissions(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser, nodeIds);
 
             var permissionsDictionary = new Dictionary<int, string[]>();
             foreach (var nodeId in nodeIds)
@@ -110,7 +114,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public bool HasPermission(string permissionToCheck, int nodeId)
         {
-            var p = _userService.GetPermissions(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, nodeId).GetAllPermissions();
+            var p = _userService.GetPermissions(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser, nodeId).GetAllPermissions();
             if (p.Contains(permissionToCheck.ToString(CultureInfo.InvariantCulture)))
             {
                 return true;
@@ -129,15 +133,15 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (status == null) throw new ArgumentNullException(nameof(status));
 
             List<UserTourStatus> userTours;
-            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData.IsNullOrWhiteSpace())
+            if (_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData.IsNullOrWhiteSpace())
             {
                 userTours = new List<UserTourStatus> { status };
-                _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
-                _userService.Save(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
+                _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
+                _userService.Save(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
                 return userTours;
             }
 
-            userTours = JsonConvert.DeserializeObject<IEnumerable<UserTourStatus>>(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData).ToList();
+            userTours = JsonConvert.DeserializeObject<IEnumerable<UserTourStatus>>(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData).ToList();
             var found = userTours.FirstOrDefault(x => x.Alias == status.Alias);
             if (found != null)
             {
@@ -145,8 +149,8 @@ namespace Umbraco.Web.BackOffice.Controllers
                 userTours.Remove(found);
             }
             userTours.Add(status);
-            _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
-            _userService.Save(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
+            _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData = JsonConvert.SerializeObject(userTours);
+            _userService.Save(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
             return userTours;
         }
 
@@ -156,10 +160,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         public IEnumerable<UserTourStatus> GetUserTours()
         {
-            if (_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData.IsNullOrWhiteSpace())
+            if (_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData.IsNullOrWhiteSpace())
                 return Enumerable.Empty<UserTourStatus>();
 
-            var userTours = JsonConvert.DeserializeObject<IEnumerable<UserTourStatus>>(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData);
+            var userTours = JsonConvert.DeserializeObject<IEnumerable<UserTourStatus>>(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.TourData);
             return userTours;
         }
 
@@ -175,7 +179,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [AllowAnonymous]
         public async Task<ActionResult<UserDetail>> PostSetInvitedUserPassword([FromBody]string newPassword)
         {
-            var user = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0).ToString());
+            var user = await _backOfficeUserManager.FindByIdAsync(_backOfficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0).ToString());
             if (user == null) throw new InvalidOperationException("Could not find user");
 
             var result = await _backOfficeUserManager.AddPasswordAsync(user, newPassword);
@@ -190,13 +194,13 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //They've successfully set their password, we can now update their user account to be approved
-            _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsApproved = true;
+            _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsApproved = true;
             //They've successfully set their password, and will now get fully logged into the back office, so the lastlogindate is set so the backoffice shows they have logged in
-            _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.LastLoginDate = DateTime.UtcNow;
-            _userService.Save(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
+            _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.LastLoginDate = DateTime.UtcNow;
+            _userService.Save(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
 
             //now we can return their full object since they are now really logged into the back office
-            var userDisplay = _umbracoMapper.Map<UserDetail>(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
+            var userDisplay = _umbracoMapper.Map<UserDetail>(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser);
 
             userDisplay.SecondsUntilTimeout = HttpContext.User.GetRemainingAuthSeconds();
             return userDisplay;
@@ -206,31 +210,38 @@ namespace Umbraco.Web.BackOffice.Controllers
         public IActionResult PostSetAvatar(IList<IFormFile> file)
         {
             //borrow the logic from the user controller
-            return UsersController.PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            return UsersController.PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backOfficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
         }
 
         /// <summary>
         /// Changes the users password
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="changingPasswordModel">The changing password model</param>
         /// <returns>
         /// If the password is being reset it will return the newly reset password, otherwise will return an empty value
         /// </returns>
-        public async Task<ActionResult<ModelWithNotifications<string>>> PostChangePassword(ChangingPasswordModel data)
+        public async Task<ActionResult<ModelWithNotifications<string>>> PostChangePassword(ChangingPasswordModel changingPasswordModel)
         {
-            // TODO: Why don't we inject this? Then we can just inject a logger
-            var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
-            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, data, _backOfficeUserManager);
+            IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            changingPasswordModel.CurrentUserHasSectionAccess = currentUser.HasSectionAccess(Constants.Applications.Users);
+
+            // the current user has access to change their password
+            changingPasswordModel.CurrentUserHasSectionAccess = true;
+            changingPasswordModel.CurrentUsername = currentUser.Username;
+            changingPasswordModel.SavingUsername = currentUser.Username;
+            changingPasswordModel.SavingUserId = currentUser.Id;
+
+            Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _backOfficeUserManager);
 
             if (passwordChangeResult.Success)
             {
-                //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
+                // even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
                 result.AddSuccessNotification(_localizedTextService.Localize("user/password"), _localizedTextService.Localize("user/passwordChanged"));
                 return result;
             }
 
-            foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+            foreach (string memberName in passwordChangeResult.Result.ChangeError.MemberNames)
             {
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
@@ -243,7 +254,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [ValidateAngularAntiForgeryToken]
         public async Task<Dictionary<string, string>> GetCurrentUserLinkedLogins()
         {
-            var identityUser = await _backOfficeUserManager.FindByIdAsync(_backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0).ToString());
+            var identityUser = await _backOfficeUserManager.FindByIdAsync(_backOfficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0).ToString());
 
             // deduplicate in case there are duplicates (there shouldn't be now since we have a unique constraint on the external logins
             // but there didn't used to be)

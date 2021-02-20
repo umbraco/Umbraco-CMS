@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Hosting;
 using Umbraco.Core.IO;
+using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Services;
 using Umbraco.Extensions;
 using Umbraco.Infrastructure.DependencyInjection;
@@ -81,6 +82,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
             builder.Services.AddUnique<PreviewAuthenticationMiddleware>();
             builder.Services.AddUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
             builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
+            builder.Services.AddUnique<IPasswordChanger<UmbracoIdentityUser>, PasswordChanger<UmbracoIdentityUser>>();
 
             return builder;
         }
