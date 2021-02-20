@@ -15,7 +15,7 @@ namespace Umbraco.Web.Services
         private readonly IGlobalSettings _globalSettings;
         private readonly IHtmlSanitizer _htmlSanitizer;
 
-        public IconService(IGlobalSettings globalSettings,IHtmlSanitizer htmlSanitizer)
+        public IconService(IGlobalSettings globalSettings, IHtmlSanitizer htmlSanitizer)
         {
             _globalSettings = globalSettings;
             _htmlSanitizer = htmlSanitizer;
