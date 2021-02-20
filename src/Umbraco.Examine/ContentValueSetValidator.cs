@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
@@ -72,8 +72,9 @@ namespace Umbraco.Examine
 
         public ContentValueSetValidator(bool publishedValuesOnly, bool supportProtectedContent,
             IPublicAccessService publicAccessService, int? parentId = null,
-            IEnumerable<string> includeItemTypes = null, IEnumerable<string> excludeItemTypes = null)
-            : base(includeItemTypes, excludeItemTypes, null, null)
+            IEnumerable<string> includeItemTypes = null, IEnumerable<string> excludeItemTypes = null,
+            IEnumerable<string> includeFields = null, IEnumerable<string> excludeFields = null)
+            : base(includeItemTypes, excludeItemTypes, includeFields, excludeFields)
         {
             PublishedValuesOnly = publishedValuesOnly;
             SupportProtectedContent = supportProtectedContent;
