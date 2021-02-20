@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Ganss.XSS;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -61,20 +60,13 @@ namespace Umbraco.Web.Services
         /// <returns></returns>
         private IconModel CreateIconModel(string iconName, string iconPath)
         {
-            var sanitizer = new HtmlSanitizer();
-            sanitizer.AllowedAttributes.UnionWith(Constants.SvgSanitizer.Attributes);
-            sanitizer.AllowedCssProperties.UnionWith(Constants.SvgSanitizer.Attributes);
-            sanitizer.AllowedTags.UnionWith(Constants.SvgSanitizer.Tags);
-
             try
             {
                 var svgContent = System.IO.File.ReadAllText(iconPath);
-                var sanitizedString = sanitizer.Sanitize(svgContent);
-
                 var svg = new IconModel
                 {
                     Name = iconName,
-                    SvgString = sanitizedString
+                    SvgString = svgContent
                 };
 
                 return svg;
