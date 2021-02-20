@@ -358,18 +358,16 @@ namespace Umbraco.Core.Packaging
                     Key = key
                 };
 
-
-            // Handle Culture Specific NodeNames
-            // https://github.com/umbraco/Umbraco.Cloud.Issues/issues/135
+            // Handle culture specific node names
             const string nodeNamePrefix = "nodeName-";
             // Get the installed culture iso names, we create a localized content node with a culture that does not exist in the project
-            // We have to use ToLowerInvariant on the iso codes, because when we get them from contentbasee in EntityXmlSerializer they're all lowercase.
-            var installedLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode.ToLowerInvariant()).ToArray();
-            foreach (var localizedNodeName in element.Attributes().Where(a => a.Name.LocalName.StartsWith(nodeNamePrefix)))
+            // We have to use Invariant comparisons, because when we get them from ContentBase in EntityXmlSerializer they're all lowercase.
+            var installedLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode).ToArray();
+            foreach (var localizedNodeName in element.Attributes().Where(a => a.Name.LocalName.InvariantStartsWith(nodeNamePrefix)))
             {
                 var newCulture = localizedNodeName.Name.LocalName.Substring(nodeNamePrefix.Length);
                 // Skip the culture if it does not exist in the current project
-                if (installedLanguages.Contains(newCulture))
+                if (installedLanguages.InvariantContains(newCulture))
                 {
                     content.SetCultureName(localizedNodeName.Value, newCulture);
                 }
@@ -397,7 +395,7 @@ namespace Umbraco.Core.Packaging
                         // set property value
                         // Skip unsupported language variation, otherwise we'll get a "not supported error"
                         // We allow null, because that's invariant
-                        if (installedLanguages.Contains(propertyLang) || propertyLang is null)
+                        if (installedLanguages.InvariantContains(propertyLang) || propertyLang is null)
                         {
                             content.SetValue(propertyTypeAlias, propertyValue, propertyLang);
                         }
@@ -407,7 +405,7 @@ namespace Umbraco.Core.Packaging
 
             foreach (var propertyLang in foundLanguages)
             {
-                if (string.IsNullOrEmpty(content.GetCultureName(propertyLang)) && installedLanguages.Contains(propertyLang))
+                if (string.IsNullOrEmpty(content.GetCultureName(propertyLang)) && installedLanguages.InvariantContains(propertyLang))
                 {
                     content.SetCultureName(nodeName, propertyLang);
                 }
