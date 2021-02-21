@@ -1,14 +1,12 @@
 ﻿using System;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Services;
-using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 
 namespace Umbraco.Web.Editors
 {
-
     public class BackOfficeModel
     {
+
         public BackOfficeModel(UmbracoFeatures features, IGlobalSettings globalSettings)
         {
             Features = features;

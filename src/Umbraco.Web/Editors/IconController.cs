@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -25,7 +26,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="iconName"></param>
         /// <returns></returns>
-        public string GetIcon(string iconName)
+        public IconModel GetIcon(string iconName)
         {
             return _iconService.GetIcon(iconName);
         }
