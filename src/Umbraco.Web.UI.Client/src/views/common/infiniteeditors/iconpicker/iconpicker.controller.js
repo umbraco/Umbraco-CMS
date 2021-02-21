@@ -10,10 +10,19 @@ function IconPickerController($scope, localizationService, iconHelper) {
 
     var vm = this;
 
+    vm.changePageNumber = changePageNumber;
     vm.selectIcon = selectIcon;
     vm.selectColor = selectColor;
     vm.submit = submit;
     vm.close = close;
+
+    vm.options = {
+        pageNumber: 1,
+        pageSize: 100,
+        totalItems: 0,
+        totalPages: 0,
+        filter: ''
+    };
 
     vm.colors = [
         { name: "Black", value: "color-black", default: true },
@@ -43,31 +52,42 @@ function IconPickerController($scope, localizationService, iconHelper) {
 
         setTitle();
 
-        iconHelper.getAllIcons()
-            .then(icons => {
-                vm.icons = icons;
-
-                // Get's legacy icons, removes duplicates then maps them to IconModel
-                iconHelper.getIcons()
-                    .then(icons => {
-                        if (icons && icons.length > 0) {
-                            let legacyIcons = icons
-                                .filter(icon => !vm.icons.find(x => x.name == icon))
-                                .map(icon => { return { name: icon, svgString: null }; });
-
-                            vm.icons = legacyIcons.concat(vm.icons);
-                        }
-
-                        vm.loading = false;
-                    });
-            });
+        loadIcons();
 
         // set a default color if nothing is passed in
         vm.color = $scope.model.color ? findColor($scope.model.color) : vm.colors.find(x => x.default);
 
-
         // if an icon is passed in - preselect it
-        vm.icon = $scope.model.icon ? $scope.model.icon : undefined;
+        vm.icon = $scope.model.icon ? $scope.model.icon : null;
+    }
+
+    function changePageNumber(pageNumber) {
+        vm.options.pageNumber = pageNumber;
+        loadIcons();
+    }
+
+    function loadIcons() {
+        iconHelper.getPagedIcons(vm.options)
+            .then(icons => {
+                vm.icons = icons;
+                console.log("loadIcons", vm.icons);
+
+                // Get's legacy icons, removes duplicates then maps them to IconModel
+                //iconHelper.getIcons()
+                //    .then(icons => {
+                //        if (icons && icons.length > 0) {
+                //            let legacyIcons = icons
+                //                .filter(icon => !vm.icons.find(x => x.name == icon))
+                //                .map(icon => { return { name: icon, svgString: null }; });
+
+                //            vm.icons = legacyIcons.concat(vm.icons);
+                //        }
+
+                //        vm.loading = false;
+                //    });
+
+                vm.loading = false;
+            });
     }
 
     function setTitle() {
@@ -96,7 +116,7 @@ function IconPickerController($scope, localizationService, iconHelper) {
     }
 
     function close() {
-        if($scope.model && $scope.model.close) {
+        if ($scope.model && $scope.model.close) {
             $scope.model.close();
         }
     }

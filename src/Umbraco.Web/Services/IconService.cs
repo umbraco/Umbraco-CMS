@@ -23,8 +23,7 @@ namespace Umbraco.Web.Services
         public IList<IconModel> GetAllIcons()
         {
             var icons = new List<IconModel>();
-            var directory = new DirectoryInfo(IOHelper.MapPath($"{_globalSettings.IconsPath}/"));
-            var iconNames = directory.GetFiles("*.svg");
+            var iconNames = GetIconNames();
 
             iconNames.OrderBy(f => f.Name).ToList().ForEach(iconInfo =>
             {
@@ -40,11 +39,48 @@ namespace Umbraco.Web.Services
         }
 
         /// <inheritdoc />
+        public IList<IconModel> GetPagedIcons(int pageIndex, int pageSize, out long totalRecords, string filter = "")
+        {
+            var icons = new List<IconModel>();
+            var iconNames = GetIconNames();
+
+            var filtered = !string.IsNullOrEmpty(filter)
+                ? iconNames.Where(x => x.Name.InvariantContains(filter))
+                : iconNames;
+
+            filtered.OrderBy(f => f.Name).Skip(pageSize * pageIndex).Take(pageSize).ToList().ForEach(iconInfo =>
+            {
+                var icon = GetIcon(iconInfo);
+
+                if (icon != null)
+                {
+                    icons.Add(icon);
+                }
+            });
+
+            totalRecords = icons.Count;
+
+            return icons;
+        }
+
+        /// <inheritdoc />
         public IconModel GetIcon(string iconName)
         {
             return string.IsNullOrWhiteSpace(iconName)
                 ? null
                 : CreateIconModel(iconName.StripFileExtension(), IOHelper.MapPath($"{_globalSettings.IconsPath}/{iconName}.svg"));
+        }
+
+        /// <summary>
+        /// Gets svg icon names from directory
+        /// </summary>
+        /// <returns></returns>
+        private FileInfo[] GetIconNames()
+        {
+            var directory = new DirectoryInfo(IOHelper.MapPath($"{_globalSettings.IconsPath}/"));
+            var iconNames = directory.GetFiles("*.svg");
+
+            return iconNames;
         }
 
         /// <summary>
