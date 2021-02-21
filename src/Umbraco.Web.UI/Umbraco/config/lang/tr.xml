@@ -561,7 +561,7 @@
     <key alias="toolsDescription">Dizini yönetmek için araçlar</key>
     <key alias="fields">alanlar</key>
     <key alias="indexCannotRead">Dizin okunamıyor ve yeniden oluşturulması gerekecek</key>
-    <key alias="processIsTakingLonger">İşlem beklenenden uzun sürüyor, bu işlem sırasında herhangi bir hata olup olmadığını görmek için umbraco günlüğünü kontrol edin</key>
+    <key alias="processIsTakingLonger">İşlem beklenenden uzun sürüyor, bu işlem sırasında herhangi bir hata olup olmadığını görmek için Umbraco günlüğünü kontrol edin</key>
     <key alias="indexCannotRebuild">Bu dizin, atanmış olmadığı için yeniden oluşturulamaz</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
   </area>
@@ -1468,7 +1468,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
       <key alias="tabs">Sekmeler</key>
       <key alias="contentTypeEnabled">Ana İçerik Türü etkinleştirildi</key>
       <key alias="contentTypeUses">Bu İçerik Türü kullanır</key>
-      Ana İçerik Türü olarak <key alias="asAContentMasterType">. Ana İçerik Türlerinden sekmeler gösterilmez ve yalnızca Ana İçerik Türünün kendisinde düzenlenebilir</key>
       <key alias="noPropertiesDefinedOnTab">Bu sekmede tanımlanmış özellik yok. Yeni bir mülk oluşturmak için üstteki "yeni mülk ekle" bağlantısını tıklayın.</key>
       <key alias="createMatchingTemplate">Eşleşen şablon oluştur</key>
       <key alias="addIcon">Simge ekle</key>

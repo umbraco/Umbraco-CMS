@@ -558,7 +558,7 @@
     <key alias="theEndHeader">Umbraco %0% är installerat och klart för användning</key>
     <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>UmbracoConfigurationStatus</strong> på slutet till <strong>%0%</strong>]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>börja omedelbart</strong> genom att klicka på "Starta Umbraco"-knappen nedan. <br />Om du är en <strong>ny Umbraco användare</strong>kan du hitta massor av resurser på våra kom igång sidor.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara Umbraco back office och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara Umbraco backoffice och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
     <key alias="Unavailable">Anslutningen till databasen misslyckades.</key>
     <key alias="watch">Se</key>
     <key alias="welcomeIntro"><![CDATA[Den här guiden kommer att guida dig genom processen med att konfigurera <strong>Umbraco %0%</strong> antingen för en ny installation eller en uppgradering från version 3.0. <br /><br /> Tryck på <strong>"next"</strong> för att börja.]]></key>
@@ -732,7 +732,6 @@
     <key alias="users">Användare</key>
   </area>
   <area alias="settings">
-    <key alias="asAContentMasterType">som huvudinnehållstyp. Tabbar från huvudinnehållstyper visas inte och kan endast redigeras på själva huvudinnehållstypen.</key>
     <key alias="contentTypeEnabled">Huvudinnehållstyp påslagen</key>
     <key alias="contentTypeUses">Denna huvudinnehållstyp använder</key>
     <key alias="defaulttemplate">Defaultmall</key>
@@ -947,7 +946,7 @@
     <key alias="changePassword">Ändra lösenord</key>
     <key alias="changePhoto">Ändra bild</key>
     <key alias="confirmNewPassword">Bekräfta det nya lösenordet</key>
-    <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco Back Office genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
+    <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco backoffice genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
     <key alias="contentChannel">Innehållskanal</key>
     <key alias="createAnotherUser">Skapa en till användare</key>
     <key alias="createUserHelp">Skapa nya användare för att ge dom åtkomst till Umbraco. När en ny användare skapas kommer ett lösenord genereras som du kan dela med användaren.</key>

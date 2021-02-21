@@ -589,7 +589,7 @@
         <key alias="toolsDescription">Offer i reoli'r mynegai</key>
         <key alias="fields">meysydd</key>
         <key alias="indexCannotRead">Ni ellir darllen yr mynegai a bydd angen ei ailadeiladu</key>
-        <key alias="processIsTakingLonger">Mae'r broses yn cymryd mwy o amser na'r disgwyl, gwiriwch y log umbraco i weld os mae wedi bod unrhyw wall yn ystod y gweithrediad hwn</key>
+        <key alias="processIsTakingLonger">Mae'r broses yn cymryd mwy o amser na'r disgwyl, gwiriwch y log Umbraco i weld os mae wedi bod unrhyw wall yn ystod y gweithrediad hwn</key>
         <key alias="indexCannotRebuild">Ni ellir ailadeiladu'r mynegai hwn oherwydd nad yw wedi'i aseinio</key>
         <key alias="iIndexPopulator">IIndexPopulator</key>
     </area>
@@ -1564,7 +1564,6 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="tabs">Tabiau</key>
         <key alias="contentTypeEnabled">Math o Gynnwys Meistr wedi'i alluogi</key>
         <key alias="contentTypeUses">Mae'r Math o Gynnwys yma yn defnyddio</key>
-        <key alias="asAContentMasterType">fel Math o Gynnwys Meistr. Nid yw tabiau o Fath o Gynnwys Meistr yn cael eu dangos a gall dim ond eu golygu ar y Math o Gynnwys Meistr ei hunan</key>
         <key alias="noPropertiesDefinedOnTab">Dim priodweddau wedi'u diffinio ar y tab yma. Cliciwch ar y ddolen "ychwanegu priodwedd newydd" ar y topi greu priodwedd newydd.</key>
         <key alias="masterDocumentType">Math o Ddogfen Feistr</key>
         <key alias="createMatchingTemplate">Creu templedi cydweddol</key>
