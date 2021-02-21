@@ -351,6 +351,7 @@ namespace Umbraco.Web.Editors
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
         }
 
+        [UmbracoAuthorize]
         [HttpGet]
         public async Task<ActionResult> ExternalLinkLoginCallback()
         {
