@@ -1,7 +1,4 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core.Models;
+﻿using System.Collections.Generic;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
@@ -28,7 +25,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="iconName"></param>
         /// <returns></returns>
-        public IconModel GetIcon(string iconName)
+        public string GetIcon(string iconName)
         {
             return _iconService.GetIcon(iconName);
         }
@@ -37,22 +34,9 @@ namespace Umbraco.Web.Editors
         /// Gets a list of all svg icons found at at the global icons path.
         /// </summary>
         /// <returns></returns>
-        public IList<IconModel> GetAllIcons()
+        public IReadOnlyDictionary<string, string> GetAllIcons()
         {
             return _iconService.GetAllIcons();
-        }
-
-        /// <summary>
-        /// Gets JSON blob containing all the known icons
-        /// </summary>
-        /// <param name="culture"></param>
-        /// <returns></returns>
-        public JsonNetResult GetIcons()
-        {
-            var dictionary = _iconService.GetAllIcons()
-                .ToDictionary(i => i.Name, i => i.SvgString);      
-
-            return new JsonNetResult { Data = dictionary, Formatting = Formatting.None };
         }
     }
 }

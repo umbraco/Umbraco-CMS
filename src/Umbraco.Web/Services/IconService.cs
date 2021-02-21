@@ -24,17 +24,17 @@ namespace Umbraco.Web.Services
 
 
         /// <inheritdoc />
-        public IList<IconModel> GetAllIcons() => GetIconModels().Values.OrderBy(i => i.Name).ToList();
+        public IReadOnlyDictionary<string, string> GetAllIcons() => GetIconDictionary();
 
         /// <inheritdoc />
-        public IconModel GetIcon(string iconName)
+        public string GetIcon(string iconName)
         {
             if (iconName.IsNullOrWhiteSpace())
             {
                 return null;
             }
 
-            var allIconModels = GetIconModels();
+            var allIconModels = GetIconDictionary();
             return allIconModels.ContainsKey(iconName)
                 ? allIconModels[iconName]
                 : null;
@@ -62,14 +62,11 @@ namespace Umbraco.Web.Services
         {
             try
             {
-                var svgContent = System.IO.File.ReadAllText(iconPath);
-                var svg = new IconModel
+                return new IconModel
                 {
                     Name = iconName,
-                    SvgString = svgContent
+                    SvgString = System.IO.File.ReadAllText(iconPath)
                 };
-
-                return svg;
             }
             catch
             {
@@ -110,13 +107,13 @@ namespace Umbraco.Web.Services
             return iconNames;
         }
 
-        private Dictionary<string, IconModel> GetIconModels() => _cache.GetCacheItem(
-            "Umbraco.Web.Services.IconService::AllIconModels",
+        private IReadOnlyDictionary<string, string> GetIconDictionary() => _cache.GetCacheItem(
+            "Umbraco.Web.Services.IconService::IconDictionary",
             () => GetAllIconNames()
                     .Select(GetIcon)
                     .Where(i => i != null)
                     .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
-                    .ToDictionary(g => g.Key, g => g.First(), StringComparer.OrdinalIgnoreCase)
+                    .ToDictionary(g => g.Key, g => g.First().SvgString, StringComparer.OrdinalIgnoreCase)
         );
     }
 }
