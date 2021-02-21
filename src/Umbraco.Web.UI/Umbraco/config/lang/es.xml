@@ -671,7 +671,7 @@
     <key alias="theEndHeader">Umbraco %0% ha sido instalado y está listo para ser usado</key>
     <key alias="theEndInstallFailed"><![CDATA[Para completar la instalación, necesitaras editar de forma manual el <strong>archivo /web.config</strong> y actualizar la clave del AppSetting <strong>UmbracoConfigurationStatus</strong> del final al valor <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Puedes <strong>empezar inmediatamente</strong> pulsando el botón "Lanzar Umbraco" de debajo. <br />Si eres <strong>nuevo con Umbraco</strong>, puedes encontrar cantidad de recursos en nuestras páginas de cómo empezar.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Lanzar Umbraco</h3> Para administrar tu sitio web, simplemente abre el back office de Umbraco y empieza a añadir contenido, a actualizar plantillas y hojas de estilo o a añadir nueva funcionalidad]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Lanzar Umbraco</h3> Para administrar tu sitio web, simplemente abre el backoffice de Umbraco y empieza a añadir contenido, a actualizar plantillas y hojas de estilo o a añadir nueva funcionalidad]]></key>
     <key alias="Unavailable">No se ha podido establecer la conexión con la base de datos</key>
     <key alias="Version3">Umbraco versión 3</key>
     <key alias="Version4">Umbraco versión 4</key>
@@ -989,7 +989,6 @@
     <key alias="tabs">Pestañas</key>
     <key alias="contentTypeEnabled">Tipo de Contenido Maestro activado</key>
     <key alias="contentTypeUses">Este Tipo de Contenido usa</key>
-    <key alias="asAContentMasterType">como Tipo de Contenido Maestro. Las pestañas para los Tipos de Contenido Maestros no se muestran y solo se pueden modificar desde el Tipo de Contenido Maestro</key>
     <key alias="noPropertiesDefinedOnTab">No existen propiedades para esta pestaña. Haz clic en el enlace "añadir nueva propiedad" para crear una nueva propiedad.</key>
     <key alias="addIcon">Añadir icono</key>
   </area>
@@ -1284,7 +1283,7 @@
 
         Este mail se ha generado automáticamente para informale que %2% has solicitado que el documento '%1%' sea traducido en '%5%'.
 
-        Para editarlo, vaya a la dirección http://%3%/translation/details.aspx?id=%4% o inicia sesión en umbraco y ve a http://%3% para ver las tareas pendientes de traducir.
+        Para editarlo, vaya a la dirección http://%3%/translation/details.aspx?id=%4% o inicia sesión en Umbraco y ve a http://%3% para ver las tareas pendientes de traducir.
 
         Espero que tenga un buen dia.
 

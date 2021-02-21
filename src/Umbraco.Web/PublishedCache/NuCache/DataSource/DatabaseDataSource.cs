@@ -303,17 +303,18 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return s;
         }
 
+        private static readonly JsonSerializerSettings NestedContentDataJsonSerializerSettings = new JsonSerializerSettings
+            {
+                Converters = new List<JsonConverter> { new ForceInt32Converter() }
+            };
+
         private static ContentNestedData DeserializeNestedData(string data)
         {
             // by default JsonConvert will deserialize our numeric values as Int64
             // which is bad, because they were Int32 in the database - take care
 
-            var settings = new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> { new ForceInt32Converter() }
-            };
 
-            return JsonConvert.DeserializeObject<ContentNestedData>(data, settings);
+            return JsonConvert.DeserializeObject<ContentNestedData>(data, NestedContentDataJsonSerializerSettings);
         }
     }
 }

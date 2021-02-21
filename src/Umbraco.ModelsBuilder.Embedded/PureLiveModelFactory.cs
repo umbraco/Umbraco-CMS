@@ -308,7 +308,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                     {
                         try
                         {
-                            _logger.Error<PureLiveModelFactory>(e,"Failed to build models.");
+                            _logger.Error<PureLiveModelFactory>(e, "Failed to build models.");
                             _logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
                             _errors.Report("Failed to build PureLive models.", e);
                         }

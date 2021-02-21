@@ -266,26 +266,6 @@ namespace Umbraco.Tests.Testing
             throw new NotImplementedException();
         }
 
-        public Task<int> InsertBatchAsync<T>(IEnumerable<T> pocos, BatchOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<int> UpdateBatchAsync<T>(IEnumerable<UpdateBatch<T>> pocos, BatchOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IAsyncUpdateQueryProvider<T> UpdateManyAsync<T>()
-        {
-            throw new NotImplementedException();
-        }
-
-        public int UpdateBatch<T>(IEnumerable<UpdateBatch<T>> pocos, BatchOptions options = null)
-        {
-            throw new NotImplementedException();
-        }
-
         public int Update(string tableName, string primaryKeyName, object poco, object primaryKeyValue)
         {
             throw new NotImplementedException();
@@ -377,11 +357,6 @@ namespace Umbraco.Tests.Testing
         }
 
         public IDeleteQueryProvider<T> DeleteMany<T>()
-        {
-            throw new NotImplementedException();
-        }
-
-        public IAsyncDeleteQueryProvider<T> DeleteManyAsync<T>()
         {
             throw new NotImplementedException();
         }
@@ -773,17 +748,8 @@ namespace Umbraco.Tests.Testing
         #endregion
 
         #region Stuff
+
         public void BuildPageQueries<T>(long skip, long take, string sql, ref object[] args, out string sqlCount, out string sqlPage)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IAsyncQueryProviderWithIncludes<T> QueryAsync<T>()
-        {
-            throw new NotImplementedException();
-        }
-
-        int IDatabase.InsertBatch<T>(IEnumerable<T> pocos, BatchOptions options)
         {
             throw new NotImplementedException();
         }

@@ -1168,7 +1168,7 @@ namespace Umbraco.Web.Editors
                     //if this item's path has already been denied or if the user doesn't have access to it, add to the deny list
                     if (denied.Any(x => c.Path.StartsWith($"{x.Path},"))
                         || (ContentPermissionsHelper.CheckPermissions(c,
-                            Security.CurrentUser, Services.UserService, Services.EntityService,
+                            Security.CurrentUser, Services.UserService, Services.EntityService, AppCaches,
                             ActionPublish.ActionLetter) == ContentPermissionsHelper.ContentAccess.Denied))
                     {
                         denied.Add(c);

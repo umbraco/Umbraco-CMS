@@ -50,7 +50,7 @@ namespace Umbraco.Web.Trees
 
         private int[] _userStartNodes;
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService));
+            => _userStartNodes ?? (_userStartNodes = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches));
 
         /// <summary>
         /// Creates a tree node for a content item based on an UmbracoEntity
@@ -101,7 +101,7 @@ namespace Umbraco.Web.Trees
 
                 // root actions
                 menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
-                menu.Items.Add<ActionSort>(Services.TextService, true);
+                menu.Items.Add<ActionSort>(Services.TextService, true, opensDialog: true);
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
             }
@@ -117,7 +117,7 @@ namespace Umbraco.Web.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!Security.CurrentUser.HasMediaPathAccess(item, Services.EntityService))
+            if (!Security.CurrentUser.HasMediaPathAccess(item, Services.EntityService, AppCaches))
             {
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
                 return menu;
@@ -141,7 +141,7 @@ namespace Umbraco.Web.Trees
                 menu.Items.Add<ActionNew>(Services.TextService, opensDialog: true);
                 menu.Items.Add<ActionMove>(Services.TextService, opensDialog: true);
                 menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
-                menu.Items.Add<ActionSort>(Services.TextService);
+                menu.Items.Add<ActionSort>(Services.TextService, opensDialog: true);
                 menu.Items.Add(new RefreshNode(Services.TextService, true));
 
                 //set the default to create

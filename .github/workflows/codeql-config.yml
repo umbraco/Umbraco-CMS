@@ -9,5 +9,6 @@ paths-ignore:
   - Umbraco.Tests.AcceptanceTest
   - Umbraco.Tests.Benchmarks
   - bin
+  - build.tmp
 paths:
   - src   
