@@ -85,7 +85,7 @@ namespace Umbraco.Web
             var cacheKey = new StringBuilder(partialViewName);
              //let's always cache by the current culture to allow variants to have different cache results
             var cultureName = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
-            if (!String.IsNullOrEmpty(cultureName))
+            if (!string.IsNullOrEmpty(cultureName))
             {
                 cacheKey.AppendFormat("{0}-", cultureName);
             }
