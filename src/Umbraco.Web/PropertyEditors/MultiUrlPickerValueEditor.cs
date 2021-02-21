@@ -121,6 +121,10 @@ namespace Umbraco.Web.PropertyEditors
             return base.ToEditor(property, dataTypeService, culture, segment);
         }
 
+        private static readonly JsonSerializerSettings LinkDisplayJsonSerializerSettings = new JsonSerializerSettings
+        {
+            NullValueHandling = NullValueHandling.Ignore
+        };
 
         public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
@@ -142,11 +146,8 @@ namespace Umbraco.Web.PropertyEditors
                         Target = link.Target,
                         Udi = link.Udi,
                         Url = link.Udi == null ? link.Url : null, // only save the URL for external links
-                    },
-                    new JsonSerializerSettings
-                    {
-                        NullValueHandling = NullValueHandling.Ignore
-                    });
+                    }, LinkDisplayJsonSerializerSettings
+                    );
             }
             catch (Exception ex)
             {
