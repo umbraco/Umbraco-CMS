@@ -20,6 +20,7 @@ namespace Umbraco.Core.Serialization
     {
         static readonly IContractResolver resolver = new NoTypeConverterContractResolver();
         private static readonly JsonSerializerSettings JsonSerializerSettings = new JsonSerializerSettings { ContractResolver = resolver };
+
         private class NoTypeConverterContractResolver : DefaultContractResolver
         {
             protected override JsonContract CreateContract(Type objectType)
