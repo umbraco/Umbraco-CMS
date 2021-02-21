@@ -173,6 +173,7 @@
     <Compile Include="Migrations\Upgrade\V_8_7_0\MissingDictionaryIndex.cs" />
     <Compile Include="Services\IInstallationService.cs" />
     <Compile Include="Services\IUpgradeService.cs" />
+    <Compile Include="Sync\ISyncBootStateAccessor.cs" />
     <Compile Include="SystemLock.cs" />
     <Compile Include="Attempt.cs" />
     <Compile Include="AttemptOfTResult.cs" />
