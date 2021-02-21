@@ -307,6 +307,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             {
                 Converters = new List<JsonConverter> { new ForceInt32Converter() }
             };
+
         private static ContentNestedData DeserializeNestedData(string data)
         {
             // by default JsonConvert will deserialize our numeric values as Int64

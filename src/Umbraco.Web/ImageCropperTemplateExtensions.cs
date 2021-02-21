@@ -258,6 +258,7 @@ namespace Umbraco.Web
             Culture = CultureInfo.InvariantCulture,
             FloatParseHandling = FloatParseHandling.Decimal
         };
+
         internal static ImageCropperValue DeserializeImageCropperValue(this string json)
         {
             ImageCropperValue imageCrops = null;
@@ -272,6 +273,7 @@ namespace Umbraco.Web
                     Current.Logger.Error(typeof(ImageCropperTemplateExtensions), ex, "Could not parse the json string: {Json}", json);
                 }
             }
+
             imageCrops = imageCrops ?? new ImageCropperValue();
             return imageCrops;
         }

@@ -30,6 +30,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             Culture = CultureInfo.InvariantCulture,
             FloatParseHandling = FloatParseHandling.Decimal
         };
+        
         /// <inheritdoc />
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {

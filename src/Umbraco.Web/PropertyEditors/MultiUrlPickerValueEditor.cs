@@ -125,6 +125,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             NullValueHandling = NullValueHandling.Ignore
         };
+
         public override object FromEditor(ContentPropertyData editorValue, object currentValue)
         {
             var value = editorValue.Value?.ToString();
