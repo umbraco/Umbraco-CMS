@@ -1696,9 +1696,11 @@ Mange hilsner fra Umbraco robotten
     <key alias="itemsSelected">elementer valgt</key>
     <key alias="invalidDate">Ugyldig dato</key>
     <key alias="invalidNumber">Ikke et tal</key>
+    <key alias="invalidNumberStepSize">Ikke en gyldig numerisk trinstørrelse</key>
     <key alias="invalidEmail">Ugyldig e-mail</key>
-    <key alias="invalidNull">Feltet er påkrævet</key>
-    <key alias="invalidEmpty">Feltet er påkrævet</key>
+    <key alias="invalidNull">Værdien kan ikke være tom</key>
+    <key alias="invalidEmpty">Værdien kan ikke være tom</key>
+    <key alias="invalidPattern">Værdien er ugyldig, som ikke matcher det korrekte format</key>
     <key alias="entriesShort"><![CDATA[Minimum %0% element(er), tilføj <strong>%1%</strong> mere.]]></key>
     <key alias="entriesExceed"><![CDATA[Maksimum %0% element(er), <strong>%1%</strong> for mange.]]></key>
   </area>

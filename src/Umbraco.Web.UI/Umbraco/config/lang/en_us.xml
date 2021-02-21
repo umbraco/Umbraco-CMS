@@ -2090,6 +2090,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="itemsSelected">items selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
+    <key alias="invalidNumberStepSize">Not a valid numeric step size</key>
     <key alias="invalidEmail">Invalid email</key>
     <key alias="invalidNull">Value cannot be null</key>
     <key alias="invalidEmpty">Value cannot be empty</key>
