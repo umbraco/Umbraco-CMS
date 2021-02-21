@@ -847,7 +847,6 @@
     <key alias="tabs">选项卡</key>
     <key alias="contentTypeEnabled">主控文档类型激活</key>
     <key alias="contentTypeUses">该文档类型使用</key>
-    <key alias="asAContentMasterType">作为主控文档类型. 主控文档类型的标签只能在主控文档类型里修改。</key>
     <key alias="noPropertiesDefinedOnTab">没有字段设置在该标签页</key>
     <key alias="addIcon">添加图标</key>
   </area>
