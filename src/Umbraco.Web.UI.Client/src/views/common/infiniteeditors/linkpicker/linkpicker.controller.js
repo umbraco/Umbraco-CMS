@@ -92,9 +92,8 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                         $scope.anchorValues = resp.anchorValues;
                         $scope.model.target.url = resp.url;
                     });
-
                 }
-            } else if ($scope.model.target.url && $scope.model.target.url.length) {
+            } else if ($scope.model.target.url && $scope.model.target.url.length && !dialogOptions.hideAnchor) {
                 // a url but no id/udi indicates an external link - trim the url to remove the anchor/qs
                 // only do the substring if there's a # or a ?
                 var indexOfAnchor = $scope.model.target.url.search(/(#|\?)/);

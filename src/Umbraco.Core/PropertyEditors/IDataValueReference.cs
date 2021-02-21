@@ -4,15 +4,17 @@ using Umbraco.Core.Models.Editors;
 namespace Umbraco.Core.PropertyEditors
 {
     /// <summary>
-    /// Resolve references from <see cref="IDataValueEditor"/> values
+    /// Resolve references from <see cref="IDataValueEditor" /> values.
     /// </summary>
     public interface IDataValueReference
     {
         /// <summary>
-        /// Returns any references contained in the value
+        /// Returns any references contained in the value.
         /// </summary>
-        /// <param name="value"></param>
-        /// <returns></returns>
-        IEnumerable<UmbracoEntityReference> GetReferences(object value);        
+        /// <param name="value">The property value.</param>
+        /// <returns>
+        /// Any references contained in the value.
+        /// </returns>
+        IEnumerable<UmbracoEntityReference> GetReferences(object value);
     }
 }

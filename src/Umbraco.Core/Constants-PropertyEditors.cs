@@ -197,7 +197,7 @@ namespace Umbraco.Core
                 public const string NestedContent = "Umbraco.NestedContent";
 
                 /// <summary>
-                /// Alias for the multi URL picker editor.
+                /// Alias for the multi URL picker.
                 /// </summary>
                 public const string MultiUrlPicker = "Umbraco.MultiUrlPicker";
             }
