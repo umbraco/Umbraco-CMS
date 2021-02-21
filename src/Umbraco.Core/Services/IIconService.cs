@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Services
 {
@@ -9,7 +10,7 @@ namespace Umbraco.Core.Services
         /// </summary>
         /// <param name="iconName"></param>
         /// <returns></returns>
-        string GetIcon(string iconName);
+        IconModel GetIcon(string iconName);
 
         /// <summary>
         /// Gets a list of all svg icons found at at the global icons path.

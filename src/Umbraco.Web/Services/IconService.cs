@@ -27,7 +27,7 @@ namespace Umbraco.Web.Services
         public IReadOnlyDictionary<string, string> GetAllIcons() => GetIconDictionary();
 
         /// <inheritdoc />
-        public string GetIcon(string iconName)
+        public IconModel GetIcon(string iconName)
         {
             if (iconName.IsNullOrWhiteSpace())
             {
@@ -35,9 +35,16 @@ namespace Umbraco.Web.Services
             }
 
             var allIconModels = GetIconDictionary();
-            return allIconModels.ContainsKey(iconName)
-                ? allIconModels[iconName]
-                : null;
+            if (allIconModels.ContainsKey(iconName))
+            {
+                return new IconModel
+                {
+                    Name = iconName,
+                    SvgString = allIconModels[iconName]
+                };
+            }
+
+            return null;
         }
 
         /// <summary>
