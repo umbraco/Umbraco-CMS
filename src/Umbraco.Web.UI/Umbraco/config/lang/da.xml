@@ -307,6 +307,7 @@
     <key alias="schedulePublishHelp">Vælg dato og klokkeslæt for at udgive og/eller afpublicere indholdet.</key>
     <key alias="createEmpty">Opret ny</key>
     <key alias="createFromClipboard">Indsæt fra udklipsmappen</key>
+    <key alias="nodeIsInTrash">Dette element er i papirkurven</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Opret en ny indholdsskabelon fra '%0%'</key>
@@ -1691,10 +1692,14 @@ Mange hilsner fra Umbraco robotten
     <key alias="maxCount">Du kan kun have</key>
     <key alias="addUpTo">Tilføj op til </key>
     <key alias="items">elementer</key>
+    <key alias="urls">URL(er)</key>
+    <key alias="urlsSelected">URL(er) valgt</key>
     <key alias="itemsSelected">elementer valgt</key>
     <key alias="invalidDate">Ugyldig dato</key>
     <key alias="invalidNumber">Ikke et tal</key>
     <key alias="invalidEmail">Ugyldig e-mail</key>
+    <key alias="invalidNull">Feltet er påkrævet</key>
+    <key alias="invalidEmpty">Feltet er påkrævet</key>
     <key alias="entriesShort"><![CDATA[Minimum %0% element(er), tilføj <strong>%1%</strong> mere.]]></key>
     <key alias="entriesExceed"><![CDATA[Maksimum %0% element(er), <strong>%1%</strong> for mange.]]></key>
   </area>
@@ -1875,6 +1880,23 @@ Mange hilsner fra Umbraco robotten
     <key alias="elementTypeDoesNotExistHeadline">Error!</key>
     <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
   </area>
+    <area alias="contentTemplatesDashboard">
+        <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
+        <key alias="whatDescription">Indholdsskabeloner er foruddefineret indhold der kan vælges når der oprettes nye indholdselementer.</key>
+        <key alias="createHeadline">Hvordan opretter jeg en Indholdsskabelon?</key>
+        <key alias="createDescription">
+            <![CDATA[
+            <p>Der er to måder at oprette Indholdsskabeloner på:</p>
+            <ul>
+                <li>Højreklik på en indholdsnode og vælg "Opret indholdsskabelon" for at oprette en ny Indholdsskabelon.</li>
+                <li>Højreklik på Indholdsskabeloner i sektionen Indstillinger og vælg den dokumenttype du vil oprette en Indholdsskabelon for.</li>
+            </ul>
+            <p>Når indholdsskabelonen har fået et navn, kan redaktører begynde at bruge indholdsskabelonen som udgangspunkt for deres nye side.</p>
+        ]]>
+        </key>
+        <key alias="manageHeadline">Hvordan vedligeholder jeg Indholdsskabeloner?</key>
+        <key alias="manageDescription">Du kan redigere og slette Indholdsskabeloner fra "Indholdsskabeloner" i sektionen Indstillinger. Fold dokumenttypen som Indholdsskabelonen er baseret på ud og klik på den for at redigere eller slette den.</key>
+    </area>
   <area alias="preview">
     <key alias="endLabel">Afslut</key>
     <key alias="endTitle">Afslut forhåndsvisning</key>
