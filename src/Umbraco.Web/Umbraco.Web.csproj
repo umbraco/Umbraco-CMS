@@ -65,9 +65,6 @@
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="Examine" Version="1.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
-    <PackageReference Include="HtmlSanitizer">
-      <Version>4.0.217</Version>
-    </PackageReference>
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
     </PackageReference>
@@ -257,6 +254,8 @@
     <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />

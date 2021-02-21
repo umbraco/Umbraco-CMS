@@ -73,12 +73,12 @@
                 <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>
             </form>
         </div>
+    </div>
 
-        <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-if="!model.creatingFolder">
-            <button class="btn btn-info" ng-click="close(true)">
-                <localize key="buttons_somethingElse">Do something else</localize>
-            </button>
-        </div>
+    <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-if="!model.creatingFolder">
+        <button type="button" class="btn btn-info" ng-click="close(true)">
+            <localize key="buttons_somethingElse">Do something else</localize>
+        </button>
 
     </div>
 </div>
