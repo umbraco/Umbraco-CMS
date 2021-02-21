@@ -138,10 +138,10 @@
 
             // We need to ensure that the property model value is an object, this is needed for modelObject to recive a reference and keep that updated.
             if (typeof newVal !== 'object' || newVal === null) {// testing if we have null or undefined value or if the value is set to another type than Object.
-                newVal = {};
+                vm.model.value = newVal = {};
             }
 
-            modelObject.update(newVal, $scope);
+            modelObject.update(vm.model.value, $scope);
             onLoaded();
         }
 
@@ -241,27 +241,30 @@
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
-            block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;// if we have content, otherwise it doesn't make sense to copy.
 
+            // If we have content, otherwise it doesn't make sense to copy.
+            block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;
+
+            // Index is set by umbblocklistblock component and kept up to date by it.
+            block.index = 0;
             block.setParentForm = function (parentForm) {
                 this._parentForm = parentForm;
-            }
+            };
             block.activate = activateBlock.bind(null, block);
             block.edit = function () {
                 var blockIndex = vm.layout.indexOf(this.layout);
                 editBlock(this, false, blockIndex, this._parentForm);
-            }
+            };
             block.editSettings = function () {
                 var blockIndex = vm.layout.indexOf(this.layout);
                 editBlock(this, true, blockIndex, this._parentForm);
-            }
+            };
             block.requestDelete = requestDeleteBlock.bind(null, block);
             block.delete = deleteBlock.bind(null, block);
             block.copy = copyBlock.bind(null, block);
 
             return block;
         }
-
 
         function addNewBlock(index, contentElementTypeKey) {
 
@@ -289,7 +292,6 @@
             vm.setBlockFocus(blockObject);
 
             return true;
-
         }
 
         function deleteBlock(block) {
@@ -313,7 +315,6 @@
             });
 
             modelObject.removeDataAndDestroyModel(block);
-
         }
 
         function deleteAllBlocks() {
@@ -406,6 +407,7 @@
         }
 
         vm.showCreateDialog = showCreateDialog;
+
         function showCreateDialog(createIndex, $event) {
 
             if (vm.blockTypePicker) {
@@ -430,12 +432,12 @@
                     if (Array.isArray(item.pasteData)) {
                         var indexIncrementor = 0;
                         item.pasteData.forEach(function (entry) {
-                            if (requestPasteFromClipboard(createIndex + indexIncrementor, entry)) {
+                            if (requestPasteFromClipboard(createIndex + indexIncrementor, entry, item.type)) {
                                 indexIncrementor++;
                             }
                         });
                     } else {
-                        requestPasteFromClipboard(createIndex, item.pasteData);
+                        requestPasteFromClipboard(createIndex, item.pasteData, item.type);
                     }
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         blockPickerModel.close();
@@ -470,6 +472,7 @@
 
             blockPickerModel.clickClearClipboard = function ($event) {
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             };
 
             blockPickerModel.clipboardItems = [];
@@ -485,10 +488,28 @@
                         icon: entry.icon
                     }
                 }
-                if(Array.isArray(pasteEntry.data) === false) {
-                    pasteEntry.blockConfigModel = modelObject.getScaffoldFromAlias(entry.alias);
-                } else {
-                    pasteEntry.blockConfigModel = {};
+                if(Array.isArray(entry.data) === false) {
+                    var scaffold = modelObject.getScaffoldFromAlias(entry.alias);
+                    if(scaffold) {
+                        pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(scaffold.contentTypeKey);
+                    }
+                }
+                blockPickerModel.clipboardItems.push(pasteEntry);
+            });
+
+            var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
+            entriesForPaste.forEach(function (entry) {
+                var pasteEntry = {
+                    type: clipboardService.TYPES.BLOCK,
+                    date: entry.date,
+                    pasteData: entry.data,
+                    elementTypeModel: {
+                        name: entry.label,
+                        icon: entry.icon
+                    }
+                }
+                if(Array.isArray(entry.data) === false) {
+                    pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(entry.data.data.contentTypeKey);
                 }
                 blockPickerModel.clipboardItems.push(pasteEntry);
             });
@@ -502,44 +523,71 @@
 
         };
 
-        var requestCopyAllBlocks = function() {
+        var requestCopyAllBlocks = function () {
 
-            var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(entry => entry.$block.content);
+            var aliases = [];
 
-            // list aliases
-            var aliases = elementTypesToCopy.map(content => content.contentTypeAlias);
+            var elementTypesToCopy = vm.layout.filter(entry => entry.$block.config.unsupported !== true).map(
+                (entry) => {
 
-            // remove dublicates
+                    aliases.push(entry.$block.content.contentTypeAlias);
+
+                    // No need to clone the data as its begin handled by the clipboardService.
+                    return { "layout": entry.$block.layout, "data": entry.$block.data, "settingsData": entry.$block.settingsData }
+                }
+            );
+
+            // remove duplicate aliases
             aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
 
-            var contentNodeName = "";
-            if(vm.umbVariantContent) {
+            var contentNodeName = "?";
+            var contentNodeIcon = null;
+            if (vm.umbVariantContent) {
                 contentNodeName = vm.umbVariantContent.editor.content.name;
+                if (vm.umbVariantContentEditors) {
+                    contentNodeIcon = vm.umbVariantContentEditors.content.icon.split(" ")[0];
+                } else if (vm.umbElementEditorContent) {
+                    contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon.split(" ")[0];
+                }
             } else if (vm.umbElementEditorContent) {
-                contentNodeName = vm.umbElementEditorContent.model.documentType.name
+                contentNodeName = vm.umbElementEditorContent.model.documentType.name;
+                contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon.split(" ")[0];
             }
 
-            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
-                clipboardService.copyArray(clipboardService.TYPES.ELEMENT_TYPE, aliases, elementTypesToCopy, localizedLabel, "icon-thumbnail-list", vm.model.id);
+            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function (localizedLabel) {
+                clipboardService.copyArray(clipboardService.TYPES.BLOCK, aliases, elementTypesToCopy, localizedLabel, contentNodeIcon || "icon-thumbnail-list", vm.model.id);
             });
-        }
+        };
+
         function copyBlock(block) {
-            clipboardService.copy(clipboardService.TYPES.ELEMENT_TYPE, block.content.contentTypeAlias, block.content, block.label);
+            clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, {"layout": block.layout, "data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
         }
-        function requestPasteFromClipboard(index, pasteEntry) {
+
+        function requestPasteFromClipboard(index, pasteEntry, pasteType) {
 
             if (pasteEntry === undefined) {
                 return false;
             }
 
-            var layoutEntry = modelObject.createFromElementType(pasteEntry);
+            var layoutEntry;
+            if (pasteType === clipboardService.TYPES.ELEMENT_TYPE) {
+                layoutEntry = modelObject.createFromElementType(pasteEntry);
+            } else if (pasteType === clipboardService.TYPES.BLOCK) {
+                layoutEntry = modelObject.createFromBlockData(pasteEntry);
+            } else {
+                // Not a supported paste type.
+                return false;
+            }
+
             if (layoutEntry === null) {
+                // Pasting did not go well.
                 return false;
             }
 
             // make block model
             var blockObject = getBlockObject(layoutEntry);
             if (blockObject === null) {
+                // Initalization of the Block Object didnt go well, therefor we will fail the paste action.
                 return false;
             }
 
@@ -552,8 +600,8 @@
             vm.currentBlockInFocus = blockObject;
 
             return true;
-
         }
+
         function requestDeleteBlock(block) {
             localizationService.localizeMany(["general_delete", "blockEditor_confirmDeleteBlockMessage", "contentTypeEditor_yesDelete"]).then(function (data) {
                 const overlay = {
@@ -572,6 +620,7 @@
                 overlayService.confirmDelete(overlay);
             });
         }
+
         function requestDeleteAllBlocks() {
             localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
                 overlayService.confirmDelete({
@@ -599,7 +648,7 @@
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
             openSettingsForBlock: openSettingsForBlock
-        }
+        };
 
         vm.sortableOptions = {
             axis: "y",
@@ -615,7 +664,6 @@
                 setDirty();
             }
         };
-
 
         function onAmountOfBlocksChanged() {
 

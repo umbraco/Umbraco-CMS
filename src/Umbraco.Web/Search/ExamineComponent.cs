@@ -269,6 +269,24 @@ namespace Umbraco.Web.Search
                         DeleteIndexForEntity(c4.Id, false);
                     }
                     break;
+                case MessageType.RefreshByPayload:
+                    var payload = (MemberCacheRefresher.JsonPayload[])args.MessageObject;
+                    foreach(var p in payload)
+                    {
+                        if (p.Removed)
+                        {
+                            DeleteIndexForEntity(p.Id, false);
+                        }
+                        else
+                        {
+                            var m = _services.MemberService.GetById(p.Id);
+                            if (m != null)
+                            {
+                                ReIndexForMember(m);
+                            }
+                        }
+                    }
+                    break;
                 case MessageType.RefreshAll:
                 case MessageType.RefreshByJson:
                 default:
@@ -746,6 +764,6 @@ namespace Umbraco.Web.Search
         }
         #endregion
 
-        
+
     }
 }

@@ -72,5 +72,10 @@
         /// Gets the location of temporary files.
         /// </summary>
         string LocalTempPath { get; }
+
+        /// <summary>
+        /// Gets the write lock timeout.
+        /// </summary>
+        int SqlWriteLockTimeOut { get; }
     }
 }

@@ -18,25 +18,30 @@ context('Templates', () => {
         cy.umbracoContextMenuAction("action-create").click();
     }
 
-
-
     it('Create template', () => {
-        const name = "Test template test";
+        const name = "Create template test";
         cy.umbracoEnsureTemplateNameNotExists(name);
 
         createTemplate();
         //Type name
         cy.umbracoEditorHeaderName(name);
-        /* Make an edit, if you don't the file will be create twice,
-        only happens in testing though, probably because the test is too fast
-        Certifiably mega wonk regardless */
-        cy.get('.ace_text-input').type("var num = 5;", {force:true} );
-
-        //Save
+        // Save
+        // We must drop focus for the auto save event to occur.
+        cy.get('.btn-success').focus();
+        // And then wait for the auto save event to finish by finding the page in the tree view.
+        // This is a bit of a roundabout way to find items in a treev view since we dont use umbracoTreeItem
+        // but we must be able to wait for the save evnent to finish, and we can't do that with umbracoTreeItem
+        cy.get('[data-element="tree-item-templates"] > :nth-child(2) > .umb-animated > .umb-tree-item__inner > .umb-tree-item__label')
+            .contains(name).should('be.visible', { timeout: 10000 });
+        // Now that the auto save event has finished we can save
+        // and there wont be any duplicates or file in use errors.
         cy.get('.btn-success').click();
 
         //Assert
         cy.umbracoSuccessNotification().should('be.visible');
+        // For some reason cy.umbracoErrorNotification tries to click the element which is not possible
+        // if it doesn't actually exist, making should('not.be.visible') impossible.
+        cy.get('.umb-notifications__notifications > .alert-error').should('not.exist');
 
         //Clean up
         cy.umbracoEnsureTemplateNameNotExists(name);

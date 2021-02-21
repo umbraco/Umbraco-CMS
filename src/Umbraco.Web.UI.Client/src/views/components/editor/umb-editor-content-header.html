@@ -40,7 +40,7 @@
                                maxlength="255" />
                     </ng-form>
 
-                    <button type="button" ng-if="vm.hasVariants === true && hideChangeVariant !== true" class="umb-variant-switcher__toggle umb-outline" ng-click="vm.dropdownOpen = !vm.dropdownOpen" ng-class="{'--error': vm.errorsOnOtherVariants}" aria-haspopup="true" aria-expanded="{{vm.dropdownOpen}}">
+                    <button type="button" ng-if="vm.hasVariants === true && hideChangeVariant !== true" class="umb-variant-switcher__toggle umb-outline" ng-click="toggleDropdown()" ng-class="{'--error': vm.errorsOnOtherVariants}" aria-haspopup="true" aria-expanded="{{vm.dropdownOpen}}">
                         <span ng-bind="editor.content.displayName"></span>
                         <umb-icon icon="{{vm.dropdownOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-variant-switcher__expand" ng-class="{'icon-navigation-down': !vm.dropdownOpen, 'icon-navigation-up': vm.dropdownOpen}">&nbsp;</umb-icon>
                     </button>
@@ -51,7 +51,7 @@
 
                     <umb-dropdown ng-if="vm.dropdownOpen" class="umb-variant-switcher" ng-class="{'--has-sub-variants': vm.hasSubVariants === true}" on-close="vm.dropdownOpen = false" umb-keyboard-list>
                         <umb-dropdown-item
-                            ng-repeat-start="entry in vm.variantMenu | orderBy:'variant.displayName' track by entry.key"
+                            ng-repeat-start="entry in vm.variantMenu track by entry.key"
                             class="umb-variant-switcher__item"
                             ng-class="{'--current': entry.variant === editor.content, '--active': entry.variant.active && vm.dropdownOpen, '--error': entry.variant.active !== true && entry.variant.hasError, '--state-notCreated':entry.variant.state==='NotCreated' && entry.variant.name == null, '--state-draft':entry.variant.state==='Draft' || (entry.variant.state==='NotCreated' && entry.variant.name != null)}"
                         >
@@ -60,7 +60,11 @@
                             </button>
                             <button type="button" class="umb-variant-switcher__name-wrapper umb-outline" ng-click="selectVariant($event, entry.variant)">
                                 <span class="umb-variant-switcher__name" ng-bind="entry.variant.displayName"></span>
-                                <umb-variant-state variant="entry.variant" class="umb-variant-switcher__state"></umb-variant-state>
+                                <span class="umb-variant-switcher__state">
+                                    <umb-variant-state variant="entry.variant"></umb-variant-state>
+                                    <span ng-if="entry.variant.language.isMandatory"> - <localize key="general_mandatory"></localize></span>
+                                    <span ng-if="entry.variant.language.isDefault"> - <localize key="general_default"></localize></span>
+                                </span>
                             </button>
                             <div ng-if="splitViewOpen !== true && !entry.variant.active" class="umb-variant-switcher__split-view umb-outline" ng-click="openInSplitView($event, entry.variant)">Open in split view</div>
                         </umb-dropdown-item>
@@ -108,7 +112,8 @@
             <umb-editor-menu
                 data-element="editor-actions"
                 current-node="menu.currentNode"
-                current-section="{{menu.currentSection}}">
+                current-section="{{menu.currentSection}}"
+                is-disabled="disableActionsMenu">
             </umb-editor-menu>
         </div>
 
