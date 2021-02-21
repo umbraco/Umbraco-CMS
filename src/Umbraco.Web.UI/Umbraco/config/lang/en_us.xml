@@ -272,6 +272,7 @@
     <key alias="statistics">Statistics</key>
     <key alias="titleOptional">Title (optional)</key>
     <key alias="altTextOptional">Alternative text (optional)</key>
+    <key alias="captionTextOptional">Caption (optional)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Unpublish</key>
     <key alias="unpublished">Draft</key>
@@ -377,6 +378,16 @@
     <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
     <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>
     <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
+    <key alias="documentTypeWithTemplate">Document Type with Template</key>
+    <key alias="documentTypeWithTemplateDescription">The data definition for a content page that can be created by editors in the content tree and is directly accessible via a URL.</key>
+    <key alias="documentType">Document Type</key>
+    <key alias="documentTypeDescription">The data definition for a content component that can be created by editors in the content tree and be picked on other pages but has no direct URL.</key>
+    <key alias="elementType">Element Type</key>
+    <key alias="elementTypeDescription">Defines the schema for a repeating set of properties, for example, in a 'Block List' or 'Nested Content' property editor.</key>
+    <key alias="composition">Composition</key>
+    <key alias="compositionDescription">Defines a re-usable set of properties that can be included in the definition of multiple other Document Types. For example, a set of 'Common Page Settings'.</key>
+    <key alias="folder">Folder</key>
+    <key alias="folderDescription">Used to organise the Document Types, Compositions and Element Types created in this Document Type tree.</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
     <key alias="newJavascriptFile">New JavaScript file</key>
@@ -805,6 +816,7 @@
     <key alias="articles">Articles</key>
     <key alias="videos">Videos</key>
     <key alias="installing">Installing</key>
+    <key alias="avatar">Avatar for</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -1715,6 +1727,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="elementCannotToggle">A document type cannot be changed to an element type once it has been used to create one or more content items.</key>
     <key alias="elementDoesNotSupport">This is not applicable for an element type</key>
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
+    <key alias="displaySettingsHeadline">Appearance</key>
+    <key alias="displaySettingsLabelOnTop">Label above (full-width)</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Add language</key>
@@ -2557,9 +2571,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="endTitle">End preview mode</key>
     <key alias="openWebsiteLabel">Preview website</key>
     <key alias="openWebsiteTitle">Open website in preview mode</key>
-    <key alias="returnToPreviewHeadline">Preview content?</key>
-    <key alias="returnToPreviewDescription">You have ended preview mode, do you want to continue previewing this content?</key>
-    <key alias="returnToPreviewButton">Preview</key>
+    <key alias="returnToPreviewHeadline">Preview website?</key>
+    <key alias="returnToPreviewDescription">You have ended preview mode, do you want to enable it again to view the latest saved version of your website?</key>
+    <key alias="returnToPreviewAcceptButton">Preview latest version</key>
+    <key alias="returnToPreviewDeclineButton">View published version</key>
     <key alias="viewPublishedContentHeadline">View published version?</key>
     <key alias="viewPublishedContentDescription">You are in Preview Mode, do you want exit in order to view the published version of your website?</key>
     <key alias="viewPublishedContentAcceptButton">View published version</key>

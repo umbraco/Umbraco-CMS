@@ -96,7 +96,7 @@ namespace Umbraco.Web.Routing
                         getPath: nodeid =>
                         {
                             var ent = entityService.Get(nodeid);
-                            return ent.Path.Split(',').Reverse();
+                            return ent.Path.Split(Constants.CharArrays.Comma).Reverse();
                         },
                         publishedContentExists: i => publishedContentQuery.Content(i) != null);
 

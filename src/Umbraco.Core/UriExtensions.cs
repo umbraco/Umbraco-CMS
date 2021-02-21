@@ -43,8 +43,8 @@ namespace Umbraco.Core
         {
             applicationPath = applicationPath ?? string.Empty;
 
-            var fullUrlPath = url.AbsolutePath.TrimStart(new[] {'/'});
-            var appPath = applicationPath.TrimStart(new[] {'/'});
+            var fullUrlPath = url.AbsolutePath.TrimStart(Constants.CharArrays.ForwardSlash);
+            var appPath = applicationPath.TrimStart(Constants.CharArrays.ForwardSlash);
             var urlPath = fullUrlPath.TrimStart(appPath).EnsureStartsWith('/');
 
             //check if this is in the umbraco back office
@@ -93,7 +93,7 @@ namespace Umbraco.Core
             // Umbraco/MYPLUGINAREA/MYCONTROLLERNAME/{action}/{id}
             // so if the path contains at a minimum 3 parts: Umbraco + MYPLUGINAREA + MYCONTROLLERNAME then we will have to assume it is a
             // plugin controller for the front-end.
-            if (urlPath.Split(new[] {'/'}, StringSplitOptions.RemoveEmptyEntries).Length >= 3)
+            if (urlPath.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries).Length >= 3)
             {
                 return false;
             }

@@ -21,8 +21,13 @@ namespace Umbraco.Core.Migrations.Install
 
         public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger logger)
         {
-            _database = database;
-            _logger = logger;
+            _database = database ?? throw new ArgumentNullException(nameof(database));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+
+            if (_database?.SqlContext?.SqlSyntax == null)
+            {
+                throw new InvalidOperationException("No SqlContext has been assigned to the database");
+            }
         }
 
         private ISqlSyntaxProvider SqlSyntax => _database.SqlContext.SqlSyntax;
@@ -143,7 +148,7 @@ namespace Umbraco.Core.Migrations.Install
 
         internal DatabaseSchemaResult ValidateSchema(IEnumerable<Type> orderedTables)
         {
-            var result = new DatabaseSchemaResult(SqlSyntax);
+            var result = new DatabaseSchemaResult();
 
             result.IndexDefinitions.AddRange(SqlSyntax.GetDefinedIndexes(_database)
                 .Select(x => new DbIndexDefinition(x)));
