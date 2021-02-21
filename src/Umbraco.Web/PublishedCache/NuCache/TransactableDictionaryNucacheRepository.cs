@@ -45,6 +45,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public bool IsReadOnly => _transactableDictionary.IsReadOnly;
 
+        public bool IsCountEnabled => _transactableDictionary.IsCountEnabled;
+
         public void Add(int key, ContentNodeKit value)
         {
             _transactableDictionary.Add(key, value);
@@ -126,7 +128,37 @@ namespace Umbraco.Web.PublishedCache.NuCache
             return ((IEnumerable)_transactableDictionary).GetEnumerator();
         }
 
-       
+        public int AddRange(IEnumerable<KeyValuePair<int, ContentNodeKit>> unorderedItems, bool allowUpdates)
+        {
+            return _transactableDictionary.AddRange(unorderedItems, allowUpdates);
+        }
+
+        public int AddRangeSorted(IEnumerable<KeyValuePair<int, ContentNodeKit>> items, bool allowUpdates = false)
+        {
+            return _transactableDictionary.AddRangeSorted(items, allowUpdates);
+        }
+
+        public IEnumerable<KeyValuePair<int, ContentNodeKit>> EnumerateFrom(int start)
+        {
+            return _transactableDictionary.EnumerateFrom(start);
+        }
+
+        public IEnumerable<KeyValuePair<int, ContentNodeKit>> EnumerateRange(int start, int end)
+        {
+            return _transactableDictionary.EnumerateRange(start,end);
+        }
+
+        public bool TryGetFirst(out KeyValuePair<int, ContentNodeKit> item)
+        {
+            return _transactableDictionary.TryGetFirst(out item);
+        }
+
+        public bool TryGetLast(out KeyValuePair<int, ContentNodeKit> item)
+        {
+            return _transactableDictionary.TryGetLast(out item);
+        }
+
+
 
         #endregion
     }

@@ -27,20 +27,20 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _folderName = "NuCache";
         }
 
-        public ITransactableDictionary<TKey, TValue> Get(string name, IComparer<TKey> keyComparer = null, bool isReadOnly = false)
+        public ITransactableDictionary<TKey, TValue> Get(string name, IComparer<TKey> keyComparer = null, bool isReadOnly = false, bool enableCount = false)
         {
             var localContentDbPath = GetDbPath(name);
             var localContentCacheFilesExist = File.Exists(localContentDbPath);
             var keySerializer = new TransactableDictionaryBPlusTreeSerializerAdapter<TKey>(_keySerializer);
             var valueSerializer = new TransactableDictionaryBPlusTreeSerializerAdapter<TValue>(_serializer);
-            var bplusTree = GetTree(localContentDbPath, localContentCacheFilesExist, keySerializer,valueSerializer, keyComparer, isReadOnly);
-            return new BPlusTreeTransactableDictionary<TKey, TValue>(bplusTree, localContentDbPath, localContentCacheFilesExist);
+            var bplusTree = GetTree(localContentDbPath, localContentCacheFilesExist, keySerializer,valueSerializer, keyComparer, isReadOnly, enableCount);
+            return new BPlusTreeTransactableDictionary<TKey, TValue>(bplusTree, localContentDbPath, localContentCacheFilesExist,enableCount);
         }
         public void Drop(string name)
         {
             var localContentDbPath = GetDbPath(name);
             var localContentCacheFilesExist = File.Exists(localContentDbPath);
-            var dictDoc = new BPlusTreeTransactableDictionary<TKey, TValue>(null, localContentDbPath, localContentCacheFilesExist);
+            var dictDoc = new BPlusTreeTransactableDictionary<TKey, TValue>(null, localContentDbPath, localContentCacheFilesExist, false);
             dictDoc.Drop();
         }
         protected virtual string GetDbPath(string name)
@@ -75,7 +75,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         protected virtual BPlusTree<TKey, TValue> GetTree(string filepath, bool exists, ISerializer<TKey> keySerializer,
             ISerializer<TValue> valueSerializer,
-            IComparer<TKey> keyComparer = null, bool isReadOnly = false)
+            IComparer<TKey> keyComparer = null, bool isReadOnly = false, bool enableCount = false)
         {
            
             var options = new BPlusTree<TKey, TValue>.OptionsV2(keySerializer, valueSerializer)
@@ -89,7 +89,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 // default is 4096, min 2^9 = 512, max 2^16 = 64K
                 FileBlockSize = GetBlockSize(),
                 // other options?
-                ReadOnly = isReadOnly
+                ReadOnly = isReadOnly,
+               
 
             };
             if(keyComparer != null)
@@ -101,7 +102,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             // anything?
             //btree.
-
+            if (enableCount)
+            {
+                tree.EnableCount();
+            }
             return tree;
         }
 

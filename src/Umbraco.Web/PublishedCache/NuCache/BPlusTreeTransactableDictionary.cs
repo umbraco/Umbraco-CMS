@@ -14,13 +14,47 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private bool _disposedValue;
         private readonly string _filePath;
         private bool _isPopulated;
+        private readonly bool _isCountEnabled;
 
-        public BPlusTreeTransactableDictionary(BPlusTree<TKey, TValue> bplusTree, string filePath, bool localDbCacheFileExists)
+        public BPlusTreeTransactableDictionary(BPlusTree<TKey, TValue> bplusTree, string filePath, bool localDbCacheFileExists,bool isCountEnabled)
         {
             _bplusTree = bplusTree;
             _filePath = filePath;
             _isPopulated = localDbCacheFileExists;
+            _isCountEnabled = isCountEnabled;
         }
+
+        #region ITransactableDictionary
+        public int AddRange(IEnumerable<KeyValuePair<TKey,TValue>> unorderedItems, bool allowUpdates = false)
+        {
+            return _bplusTree.AddRange(unorderedItems, allowUpdates);
+        }
+        public int AddRangeSorted(IEnumerable<KeyValuePair<TKey, TValue>> items, bool allowUpdates = false)
+        {
+            return _bplusTree.AddRangeSorted(items, allowUpdates);
+        }
+
+        public IEnumerable<KeyValuePair<TKey, TValue>> EnumerateRange(TKey start, TKey end)
+        {
+            return _bplusTree.EnumerateRange(start, end);
+        }
+
+        public IEnumerable<KeyValuePair<TKey, TValue>> EnumerateFrom(TKey start)
+        {
+            return _bplusTree.EnumerateFrom(start);
+        }
+        public bool TryGetFirst(out KeyValuePair<TKey, TValue> item)
+        {
+            return _bplusTree.TryGetFirst(out item);
+        }
+
+        public bool TryGetLast(out KeyValuePair<TKey, TValue> item)
+        {
+            return _bplusTree.TryGetLast(out item);
+        }
+
+        public bool IsCountEnabled => _isCountEnabled;
+        #endregion
 
         #region IDictionary
         public TValue this[TKey key] { get => _bplusTree[key]; set => _bplusTree[key] = value; }
@@ -50,6 +84,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public int Count => _bplusTree.Count();
 
         public bool IsReadOnly => _bplusTree.IsReadOnly;
+
 
         public void Clear()
         {
@@ -156,5 +191,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             
         }
+
+     
     }
 }

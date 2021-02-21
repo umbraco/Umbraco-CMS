@@ -14,8 +14,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// <param name="name">Dictionary name</param>
         /// <param name="keyComparer">Optional comparer for ordering</param>
         /// <param name="isReadOnly">Whether to open as readonly</param>
+        /// <param name="enableCount">Whether Count is updated. (Expensive if true)</param>
         /// <returns></returns>
-        ITransactableDictionary<TKey, TValue> Get(string name, IComparer<TKey> keyComparer = null, bool isReadOnly = false);
+        ITransactableDictionary<TKey, TValue> Get(string name, IComparer<TKey> keyComparer = null, bool isReadOnly = false, bool enableCount = false);
         /// <summary>
         /// Clear out all records
         /// </summary>
