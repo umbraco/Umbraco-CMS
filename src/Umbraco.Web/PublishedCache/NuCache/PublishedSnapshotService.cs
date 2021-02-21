@@ -47,7 +47,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private readonly object _storesLock = new object();
         private readonly object _elementsLock = new object();
 
-        private INucacheDocumentRepository _documentRepository;
+        private INucacheContentRepository _documentRepository;
         private INucacheMediaRepository _mediaRepository;
 
         // define constant - determines whether to use cache when previewing
@@ -68,7 +68,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
             INucacheMediaRepository nucacheMediaRepository,
-            INucacheDocumentRepository nucacheContentRepository)
+            INucacheContentRepository nucacheContentRepository)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)

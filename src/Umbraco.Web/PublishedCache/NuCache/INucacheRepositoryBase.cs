@@ -9,8 +9,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
     /// <summary>
     /// Repository For Nucache
     /// </summary>
-    /// <typeparam name="TKey"></typeparam>
-    /// <typeparam name="TValue"></typeparam>
+    /// <typeparam name="TKey">Key Type</typeparam>
+    /// <typeparam name="TValue">Value Type</typeparam>
+    ///  /// <remarks>Ensure the repository is responsible for queries. The underlying storage may support more efficent queries</remarks>
     public interface INucacheRepositoryBase<TKey, TValue> : ITransactableDictionary<TKey, TValue>
     {
         /// <summary>

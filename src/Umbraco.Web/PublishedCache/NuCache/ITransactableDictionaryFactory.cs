@@ -6,10 +6,21 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    public interface ITransactableDictionaryFactory
+    public interface ITransactableDictionaryFactory<TKey, TValue>
     {
-        ITransactableDictionary<int, ContentNodeKit> Get(ContentCacheEntityType entityType);
-        void Drop(ContentCacheEntityType entityType);
+        /// <summary>
+        /// Gets an instance of ITransactableDictionary
+        /// </summary>
+        /// <param name="name">Dictionary name</param>
+        /// <param name="keyComparer">Optional comparer for ordering</param>
+        /// <param name="isReadOnly">Whether to open as readonly</param>
+        /// <returns></returns>
+        ITransactableDictionary<TKey, TValue> Get(string name, IComparer<TKey> keyComparer = null, bool isReadOnly = false);
+        /// <summary>
+        /// Clear out all records
+        /// </summary>
+        /// <param name="name">Dictionary name</param>
+        void Drop(string name);
         /// <summary>
         /// Ensures that the ITransactableDictionaryFactory has the proper environment to run.
         /// </summary>

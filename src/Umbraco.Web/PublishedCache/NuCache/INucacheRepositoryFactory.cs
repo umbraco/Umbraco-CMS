@@ -15,7 +15,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// Get an instance of the NuCache document repository
         /// </summary>
         /// <returns></returns>
-        INucacheDocumentRepository GetDocumentRepository();
+        INucacheContentRepository GetContentRepository();
         /// <summary>
         /// Get an instance of the NuCache media repository
         /// </summary>

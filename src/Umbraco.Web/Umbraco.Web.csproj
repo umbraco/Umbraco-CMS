@@ -268,10 +268,11 @@
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
+    <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionarySerializerAdapter.cs" />
+    <Compile Include="PublishedCache\NuCache\TransactableDictionaryBPlusTreeSerializerAdapter.cs" />
     <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionary.cs" />
     <Compile Include="PublishedCache\NuCache\BPlusTreeTransactableDictionaryFactory.cs" />
     <Compile Include="PublishedCache\NuCache\BPlusTreeTransactionScope.cs" />
-    <Compile Include="PublishedCache\NuCache\ContentCacheEntityType.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializationResult.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializerEntityType.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\IContentCacheDataSerializer.cs" />
@@ -289,11 +290,12 @@
     <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializerFactory.cs" />
-    <Compile Include="PublishedCache\NuCache\INucacheDocumentRepository.cs" />
+    <Compile Include="PublishedCache\NuCache\INucacheContentRepository.cs" />
     <Compile Include="PublishedCache\NuCache\INucacheMediaRepository.cs" />
     <Compile Include="PublishedCache\NuCache\INucacheRepositoryFactory.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactableDictionary.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactableDictionaryFactory.cs" />
+    <Compile Include="PublishedCache\NuCache\ITransactableDictionarySerializer.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactionScope.cs" />
     <Compile Include="PublishedCache\NuCache\INucacheRepositoryBase.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />

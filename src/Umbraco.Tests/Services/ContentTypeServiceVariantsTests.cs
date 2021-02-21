@@ -55,14 +55,17 @@ namespace Umbraco.Tests.Services
             var memberRepository = Mock.Of<IMemberRepository>();
 
             var globalSettings = Factory.GetInstance<IGlobalSettings>();
-            ISerializer<IDictionary<string, PropertyData[]>> dictionaryPropertySerializer = new DictionaryOfPropertyDataSerializer();
-            ISerializer<IReadOnlyDictionary<string, CultureVariation>> dictionaryCultureSerializer = new DictionaryOfCultureVariationSerializer();
-            ISerializer<ContentData> contentDataSerializer = new ContentDataSerializer(dictionaryPropertySerializer, dictionaryCultureSerializer);
-            ISerializer<ContentNodeKit> contentNodeKitSerializer = new ContentNodeKitSerializer(contentDataSerializer);
-            ITransactableDictionaryFactory transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory(globalSettings, contentNodeKitSerializer);
+
+            var dictionaryPropertySerializer = new DictionaryOfPropertyDataSerializer();
+            var dictionaryCultureSerializer = new DictionaryOfCultureVariationSerializer();
+            var contentDataSerializer = new ContentDataSerializer(dictionaryPropertySerializer, dictionaryCultureSerializer);
+            var contentNodeKitSerializer = new ContentNodeKitSerializer(contentDataSerializer);
+            var intSerializer = new PrimitiveSerializer();
+            var keySerializer = new BPlusTreeTransactableDictionarySerializerAdapter<int>(intSerializer);
+            var valueSerializer = new BPlusTreeTransactableDictionarySerializerAdapter<ContentNodeKit>(contentNodeKitSerializer);
+            var transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory<int, ContentNodeKit>(globalSettings, valueSerializer, keySerializer);
             INucacheRepositoryFactory nucacheRepositoryFactory = new TransactableDictionaryNucacheRepositoryFactory(transactableDictionaryFactory);
             var nestedContentDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
-
             return new PublishedSnapshotService(
                 options,
                 null,
@@ -81,7 +84,7 @@ namespace Umbraco.Tests.Services
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 nucacheRepositoryFactory.GetMediaRepository(),
-                nucacheRepositoryFactory.GetDocumentRepository());
+                nucacheRepositoryFactory.GetContentRepository());
         }
 
         public class LocalServerMessenger : ServerMessengerBase

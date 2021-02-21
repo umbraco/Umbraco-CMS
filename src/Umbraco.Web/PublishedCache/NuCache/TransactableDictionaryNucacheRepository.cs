@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Umbraco.Web.PublishedCache.NuCache
 {
-    public class TransactableDictionaryNucacheRepository : INucacheRepositoryBase<int,ContentNodeKit>,INucacheMediaRepository,INucacheDocumentRepository
+    public class TransactableDictionaryNucacheRepository : INucacheRepositoryBase<int,ContentNodeKit>,INucacheMediaRepository,INucacheContentRepository
     {
         private readonly ITransactableDictionary<int, ContentNodeKit> _transactableDictionary;
 
