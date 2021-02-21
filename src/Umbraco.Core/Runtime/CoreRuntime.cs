@@ -13,6 +13,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Sync;
@@ -189,6 +190,16 @@ namespace Umbraco.Core.Runtime
                 // create the factory
                 _factory = Current.Factory = composition.CreateFactory();
 
+                // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
+                if (_state.Reason == RuntimeLevelReason.UpgradeMigrations && _state.Level == RuntimeLevel.Run)
+                {
+                    // do the upgrade
+                    DoUnattendedUpgrade(_factory.GetInstance<DatabaseBuilder>());
+
+                    // upgrade is done, set reason to Run
+                    _state.Reason = RuntimeLevelReason.Run;
+                }
+
                 // create & initialize the components
                 _components = _factory.GetInstance<ComponentCollection>();
                 _components.Initialize();
@@ -285,6 +296,17 @@ namespace Umbraco.Core.Runtime
                         "The database configuration failed with the following message: " + ex.Message
                         + "\n Please check log file for additional information (can be found in '/App_Data/Logs/')");
                 }
+            }
+        }
+
+        private void DoUnattendedUpgrade(DatabaseBuilder databaseBuilder)
+        {
+            var plan = new UmbracoPlan();
+            using (ProfilingLogger.TraceDuration<CoreRuntime>("Starting unattended upgrade.", "Unattended upgrade completed."))
+            {
+                var result = databaseBuilder.UpgradeSchemaAndData(plan);
+                if (result.Success == false)
+                    throw new UnattendedInstallException("An error occurred while running the unattended upgrade.\n" + result.Message);
             }
         }
 
