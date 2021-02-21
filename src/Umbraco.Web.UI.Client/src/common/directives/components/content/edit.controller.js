@@ -223,7 +223,6 @@
             //we are editing so get the content item from the server
             return $scope.getMethod()($scope.contentId)
                 .then(function (data) {
-
                     $scope.content = data;
 
                     appendRuntimeData();
