@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a simplified view of a content type.

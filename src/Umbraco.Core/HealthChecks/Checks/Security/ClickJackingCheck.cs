@@ -1,10 +1,10 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.HealthChecks.Checks.Security
+namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
 {
     /// <summary>
     /// Health check for the recommended production setup regarding the X-Frame-Options header.

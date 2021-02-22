@@ -1,7 +1,6 @@
-﻿using System;
-using Umbraco.Core.Models.Entities;
+﻿using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     public interface IKeyValue : IEntity
     {

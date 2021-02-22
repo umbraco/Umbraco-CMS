@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class LanguageDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.Language;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.Language;
 
         /// <summary>
         /// Gets or sets the identifier of the language.

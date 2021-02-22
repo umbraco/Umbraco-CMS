@@ -1,26 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net;
 using System.Net.Mime;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Extensions;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Models.ContentEditing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// Am abstract API controller providing functionality used for dealing with content and media types
@@ -347,7 +347,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                     var responseEx = CreateInvalidCompositionResponseException<TContentTypeDisplay, TContentTypeSave, TPropertyType>(ex, contentTypeSave, ct, ctId);
                     if (responseEx is null)
                         throw ex;
-                    
+
                     return new ValidationErrorResult(responseEx);
                 }
 

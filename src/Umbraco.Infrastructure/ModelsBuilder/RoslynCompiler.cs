@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Text;
 
-namespace Umbraco.Infrastructure.ModelsBuilder
+namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 {
     public class RoslynCompiler
     {

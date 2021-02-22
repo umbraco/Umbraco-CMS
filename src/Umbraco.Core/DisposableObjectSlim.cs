@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Abstract implementation of managed IDisposable.

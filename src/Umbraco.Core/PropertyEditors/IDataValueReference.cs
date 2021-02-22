@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Editors;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Resolve references from <see cref="IDataValueEditor"/> values

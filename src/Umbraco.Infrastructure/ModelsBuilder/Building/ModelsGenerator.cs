@@ -1,11 +1,11 @@
 using System.IO;
 using System.Text;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.ModelsBuilder.Building
+namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
 {
     public class ModelsGenerator
     {

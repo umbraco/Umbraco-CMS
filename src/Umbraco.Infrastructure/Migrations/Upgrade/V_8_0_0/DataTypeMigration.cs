@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -20,14 +22,14 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         private static readonly ISet<string> LegacyAliases = new HashSet<string>()
         {
-            Constants.PropertyEditors.Legacy.Aliases.Date,
-            Constants.PropertyEditors.Legacy.Aliases.Textbox,
-            Constants.PropertyEditors.Legacy.Aliases.ContentPicker2,
-            Constants.PropertyEditors.Legacy.Aliases.MediaPicker2,
-            Constants.PropertyEditors.Legacy.Aliases.MemberPicker2,
-            Constants.PropertyEditors.Legacy.Aliases.RelatedLinks2,
-            Constants.PropertyEditors.Legacy.Aliases.TextboxMultiple,
-            Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2,
+            Cms.Core.Constants.PropertyEditors.Legacy.Aliases.Date,
+            Cms.Core.Constants.PropertyEditors.Legacy.Aliases.Textbox,
+            Cms.Core.Constants.PropertyEditors.Legacy.Aliases.ContentPicker2,
+            Cms.Core.Constants.PropertyEditors.Legacy.Aliases.MediaPicker2,
+            Cms.Core.Constants.PropertyEditors.Legacy.Aliases.MemberPicker2,
+            Cms.Core.Constants.PropertyEditors.Legacy.Aliases.RelatedLinks2,
+            Cms.Core.Constants.PropertyEditors.Legacy.Aliases.TextboxMultiple,
+            Cms.Core.Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2,
         };
 
         public DataTypeMigration(IMigrationContext context,
@@ -49,10 +51,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             Delete.Column("pk").FromTable("cmsDataType").Do();
 
             // rename the table
-            Rename.Table("cmsDataType").To(Constants.DatabaseSchema.Tables.DataType).Do();
+            Rename.Table("cmsDataType").To(Cms.Core.Constants.DatabaseSchema.Tables.DataType).Do();
 
             // create column
-            AddColumn<DataTypeDto>(Constants.DatabaseSchema.Tables.DataType, "config");
+            AddColumn<DataTypeDto>(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "config");
             Execute.Sql(Sql().Update<DataTypeDto>(u => u.Set(x => x.Configuration, string.Empty))).Do();
 
             // renames

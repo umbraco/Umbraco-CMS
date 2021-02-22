@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     public interface IRepositoryCachePolicy<TEntity, TId>
         where TEntity : class, IEntity

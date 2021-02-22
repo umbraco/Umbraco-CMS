@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using System;
+﻿using System;
 using System.Security.Claims;
-using Umbraco.Core.Security;
+using Microsoft.AspNetCore.Authentication;
+using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
 
     /// <summary>
@@ -19,7 +19,7 @@ namespace Umbraco.Web.BackOffice.Security
             _loginTimeoutMinutes = loginTimeoutMinutes;
             _ticketDataFormat = ticketDataFormat ?? throw new ArgumentNullException(nameof(ticketDataFormat));
         }
-        
+
         public string Protect(AuthenticationTicket data, string purpose)
         {
             // create a new ticket based on the passed in tickets details, however, we'll adjust the expires utc based on the specified timeout mins
@@ -38,7 +38,7 @@ namespace Umbraco.Web.BackOffice.Security
 
         public string Protect(AuthenticationTicket data) => Protect(data, string.Empty);
 
-        
+
         public AuthenticationTicket Unprotect(string protectedText) => Unprotect(protectedText, string.Empty);
 
         /// <summary>

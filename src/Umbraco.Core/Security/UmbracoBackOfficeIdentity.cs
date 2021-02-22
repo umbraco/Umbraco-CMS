@@ -2,8 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
 
     /// <summary>
@@ -14,7 +15,7 @@ namespace Umbraco.Core.Security
     {
         // TODO: Ideally we remove this class and only deal with ClaimsIdentity as a best practice. All things relevant to our own
         // identity are part of claims. This class would essentially become extension methods on a ClaimsIdentity for resolving
-        // values from it. 
+        // values from it.
         public static bool FromClaimsIdentity(ClaimsIdentity identity, out UmbracoBackOfficeIdentity backOfficeIdentity)
         {
             // validate that all claims exist

@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Sync

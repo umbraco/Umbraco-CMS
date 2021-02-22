@@ -1,7 +1,7 @@
 ﻿using NUnit.Framework;
 using Umbraco.Core.Migrations.Install;
 
-namespace Umbraco.Tests.Persistence
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence
 {
     [TestFixture]
     public class DatabaseContextTests

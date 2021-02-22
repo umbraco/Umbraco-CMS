@@ -1,13 +1,14 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Web.Mvc;
 using System.Web.Routing;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
+using Umbraco.Extensions;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
+using ExpressionHelper = Umbraco.Cms.Core.ExpressionHelper;
 
 namespace Umbraco.Web
 {
@@ -33,7 +34,7 @@ namespace Umbraco.Web
         public static string GetUmbracoApiServiceBaseUrl<T>(this UrlHelper url, Expression<Func<T, object>> methodSelector)
             where T : UmbracoApiController
         {
-            var method = Core.ExpressionHelper.GetMethodInfo(methodSelector);
+            var method = ExpressionHelper.GetMethodInfo(methodSelector);
             if (method == null)
             {
                 throw new MissingMethodException("Could not find the method " + methodSelector + " on type " + typeof(T) + " or the result ");
@@ -44,12 +45,12 @@ namespace Umbraco.Web
         public static string GetUmbracoApiService<T>(this UrlHelper url, Expression<Func<T, object>> methodSelector)
             where T : UmbracoApiController
         {
-            var method = Core.ExpressionHelper.GetMethodInfo(methodSelector);
+            var method = ExpressionHelper.GetMethodInfo(methodSelector);
             if (method == null)
             {
                 throw new MissingMethodException("Could not find the method " + methodSelector + " on type " + typeof(T) + " or the result ");
             }
-            var parameters = Core.ExpressionHelper.GetMethodParams(methodSelector);
+            var parameters = ExpressionHelper.GetMethodParams(methodSelector);
             var routeVals = new RouteValueDictionary(parameters);
             return url.GetUmbracoApiService<T>(method.Name, routeVals);
         }

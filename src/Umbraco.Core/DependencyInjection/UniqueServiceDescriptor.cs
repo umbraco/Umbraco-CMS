@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Cms.Core.DependencyInjection
 {
     /// <summary>
     /// A custom <see cref="ServiceDescriptor"/> that supports unique checking

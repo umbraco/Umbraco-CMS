@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Routing;
 
-namespace Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Web.Common.Routing
 {
     /// <summary>
     /// Used to create routes for a route area

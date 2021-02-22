@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.DependencyInjection
+namespace Umbraco.Cms.Web.Common.DependencyInjection
 {
     /// <summary>
     /// A <see cref="IStartupFilter"/> registered early in DI so that it executes before any user IStartupFilters

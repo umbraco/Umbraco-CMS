@@ -1,6 +1,4 @@
-﻿using Umbraco.Web.Models;
-
-namespace Umbraco.Core.Models
+﻿namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// These are options that are passed to the IImageUrlGenerator implementation to determine

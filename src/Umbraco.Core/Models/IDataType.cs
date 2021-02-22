@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Models.Entities;
-using Umbraco.Core.PropertyEditors;
+﻿using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a data type.

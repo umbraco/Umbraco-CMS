@@ -5,9 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.HealthChecks.Checks
+namespace Umbraco.Cms.Core.HealthChecks.Checks
 {
     /// <summary>
     /// Provides a base class for health checks of configuration values.

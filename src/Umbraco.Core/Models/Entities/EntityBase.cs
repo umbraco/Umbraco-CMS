@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Models.Entities
+namespace Umbraco.Cms.Core.Models.Entities
 {
     /// <summary>
     /// Provides a base class for entities.
@@ -80,7 +80,7 @@ namespace Umbraco.Core.Models.Entities
             _id = default;
             _key = Guid.Empty;
             _hasIdentity = false;
-        }     
+        }
 
         public virtual bool Equals(EntityBase other)
         {

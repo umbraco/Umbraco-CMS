@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Models.Blocks
+namespace Umbraco.Cms.Core.Models.Blocks
 {
     public struct ContentAndSettingsReference : IEquatable<ContentAndSettingsReference>
     {

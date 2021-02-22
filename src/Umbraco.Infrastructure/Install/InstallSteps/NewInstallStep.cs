@@ -5,14 +5,16 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Security;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Web.Install.Models;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

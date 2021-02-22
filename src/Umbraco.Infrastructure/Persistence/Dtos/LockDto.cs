@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Lock)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.Lock)]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class LockDto

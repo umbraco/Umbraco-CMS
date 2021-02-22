@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Tour
+namespace Umbraco.Cms.Core.Tour
 {
     /// <summary>
     /// Builds a collection of <see cref="BackOfficeTourFilter"/> items.

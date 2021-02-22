@@ -1,5 +1,8 @@
-﻿using Lucene.Net.Store;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
+using Lucene.Net.Store;
 
 namespace Umbraco.Examine
 {

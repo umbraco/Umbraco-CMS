@@ -1,15 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models;
-using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     internal class PublishedContent : PublishedContentBase
     {

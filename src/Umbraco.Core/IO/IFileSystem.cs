@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     /// <summary>
     /// Provides methods allowing the manipulation of files.

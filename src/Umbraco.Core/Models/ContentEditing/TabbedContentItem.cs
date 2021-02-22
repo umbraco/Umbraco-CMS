@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     public abstract class TabbedContentItem<T> : ContentItemBasic<T>, ITabbedContent<T> where T : ContentPropertyBasic
     {

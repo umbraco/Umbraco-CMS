@@ -1,6 +1,6 @@
 ﻿using Examine;
 using System.Collections.Generic;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
 
 namespace Umbraco.Examine
 {

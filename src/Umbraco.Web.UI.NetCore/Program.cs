@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Composing;
 
-namespace Umbraco.Web.UI.NetCore
+namespace Umbraco.Cms.Web.UI.NetCore
 {
     public class Program
     {

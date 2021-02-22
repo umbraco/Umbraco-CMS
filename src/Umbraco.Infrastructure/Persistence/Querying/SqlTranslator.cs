@@ -1,5 +1,6 @@
 ﻿using System;
 using NPoco;
+using Umbraco.Cms.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.Querying
 {

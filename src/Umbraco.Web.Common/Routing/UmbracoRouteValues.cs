@@ -1,11 +1,9 @@
 using System;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Extensions;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.Controllers;
 
-namespace Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Web.Common.Routing
 {
     /// <summary>
     /// Represents the data required to route to a specific controller/action during an Umbraco request

@@ -2,13 +2,13 @@
 // See LICENSE for more details.
 
 using System;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders.Extensions;
-using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class PropertyTypeBuilder : PropertyTypeBuilder<NullPropertyTypeBuilderParent>
     {

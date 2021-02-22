@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Services;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Packaging;
 using Umbraco.Core.Security;
-using Umbraco.Web.Install.Models;
-using Umbraco.Web.Security;
-using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents an abstract class for composition specific ContentType properties and methods

@@ -2,9 +2,9 @@
 using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Core.HealthChecks.NotificationMethods
+namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
 {
     public abstract class NotificationMethodBase : IHealthCheckNotificationMethod
     {

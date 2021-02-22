@@ -1,4 +1,4 @@
-﻿namespace Umbraco. Core.Models.PublishedContent
+﻿namespace Umbraco.Cms.Core.Models.PublishedContent
 {
 
     /// <summary>

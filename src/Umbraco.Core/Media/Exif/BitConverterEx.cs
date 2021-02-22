@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// An endian-aware converter for converting between base data types

@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using Examine.LuceneEngine.Providers;
-using Umbraco.Core;
 using Lucene.Net.Store;
-using Umbraco.Core.IO;
-using System.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Hosting;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
 namespace Umbraco.Examine
 {

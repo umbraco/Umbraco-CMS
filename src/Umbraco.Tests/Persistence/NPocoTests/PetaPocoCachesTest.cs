@@ -1,16 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
-using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Extensions;
 using Umbraco.Tests.Services;
-using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 

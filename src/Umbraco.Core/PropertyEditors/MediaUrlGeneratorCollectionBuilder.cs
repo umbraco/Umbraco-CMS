@@ -1,6 +1,7 @@
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     public class MediaUrlGeneratorCollectionBuilder : LazyCollectionBuilderBase<MediaUrlGeneratorCollectionBuilder, MediaUrlGeneratorCollection, IMediaUrlGenerator>
     {

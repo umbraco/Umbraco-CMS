@@ -1,7 +1,4 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
-
-namespace Umbraco.Web.PropertyEditors
+﻿namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the rich text value editor.
@@ -15,7 +12,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("hideLabel", "Hide Label", "boolean")]
         public bool HideLabel { get; set; }
 
-        [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
+        [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
         public bool IgnoreUserStartNodes { get; set; }

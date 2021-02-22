@@ -3,9 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Macros;
+using Umbraco.Cms.Core.Macros;
 
-namespace Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for content settings.

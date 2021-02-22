@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class UserLoginDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.UserLogin;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.UserLogin;
 
         [Column("sessionId")]
         [PrimaryKeyColumn(AutoIncrement = false)]

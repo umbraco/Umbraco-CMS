@@ -1,11 +1,11 @@
 ﻿using System.Text.RegularExpressions;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
 
-namespace Umbraco.Web.Templates
+namespace Umbraco.Cms.Core.Templates
 {
     public sealed class HtmlUrlParser
     {

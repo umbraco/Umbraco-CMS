@@ -4,11 +4,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Umbraco.Core.Exceptions;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Infrastructure.PublishedCache.Snap;
 using Umbraco.Core.Scoping;
-using Umbraco.Web.PublishedCache.NuCache.Snap;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     internal class SnapDictionary<TKey, TValue>
         where TValue : class
@@ -90,7 +90,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             private readonly WriteLockInfo _lockinfo = new WriteLockInfo();
             private readonly SnapDictionary<TKey, TValue> _dictionary;
-            
+
             public ScopedWriteLock(SnapDictionary<TKey, TValue> dictionary, bool scoped)
             {
                 _dictionary = dictionary;
@@ -167,7 +167,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                         _liveGen -= 1;
                     }
                 }
-                
+
                 foreach (var item in _items)
                 {
                     var link = item.Value;

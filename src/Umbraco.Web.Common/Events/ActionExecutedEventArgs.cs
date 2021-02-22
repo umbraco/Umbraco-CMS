@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Web.Common.Events
+namespace Umbraco.Cms.Web.Common.Events
 {
     public class ActionExecutedEventArgs : EventArgs
     {

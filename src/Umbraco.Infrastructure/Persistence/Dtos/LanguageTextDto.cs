@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.DictionaryValue)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.DictionaryValue)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
     internal class LanguageTextDto

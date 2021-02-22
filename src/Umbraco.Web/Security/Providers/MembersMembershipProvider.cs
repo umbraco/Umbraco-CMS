@@ -1,16 +1,17 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Web.Security;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Web.Composing;
-using System;
-using Umbraco.Net;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Security.Providers
 {

@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.Routing;
 
-namespace Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Web.Website.Routing
 {
     /// <summary>
     /// Used to create <see cref="UmbracoRouteValues"/>

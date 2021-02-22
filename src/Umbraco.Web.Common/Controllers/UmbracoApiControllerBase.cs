@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Features;
+using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 
-namespace Umbraco.Web.Common.Controllers
+namespace Umbraco.Cms.Web.Common.Controllers
 {
     /// <summary>
     /// Provides a base class for Umbraco API controllers.

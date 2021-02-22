@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.ModelsBuilder.Building
+namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
 {
     public class TypeModelHasher
     {

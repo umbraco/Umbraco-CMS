@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Concurrent;
 using System.Threading;
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// Represents ambient data that is local to a given asynchronous control flow, such as an asynchronous method.
@@ -20,7 +19,7 @@ namespace Umbraco.Core.Scoping
         /// <param name="name">The name with which to associate the new item in the call context.</param>
         /// <param name="data">The object to store in the call context.</param>
         public static void SetData(string name, T data) => _state.GetOrAdd(name, _ => new AsyncLocal<T>()).Value = data;
-       
+
         //Replace the SetData with the following when you need to debug AsyncLocal. The args.ThreadContextChanged can be usefull
         //public static void SetData(string name, T data) => _state.GetOrAdd(name, _ => new AsyncLocal<T>(OnValueChanged)).Value = data;
         // public static void OnValueChanged(AsyncLocalValueChangedArgs<T> args)
@@ -28,7 +27,7 @@ namespace Umbraco.Core.Scoping
         //     var typeName = typeof(T).ToString();
         //     Console.WriteLine($"OnValueChanged!, Type: {typeName} Prev: #{args.PreviousValue} Current: #{args.CurrentValue}");
         // }
-        
+
         /// <summary>
         /// Retrieves an object with the specified name from the <see cref="CallContext{T}"/>.
         /// </summary>
@@ -40,7 +39,7 @@ namespace Umbraco.Core.Scoping
         // NOTE: If you have used the old CallContext in the past you might be thinking you need to clean this up but that is not the case.
         // With CallContext you had to call FreeNamedDataSlot to prevent leaks but with AsyncLocal this is not the case, there is no way to clean this up.
         // The above dictionary is sort of a trick because sure, there is always going to be a string key that will exist in the collection but the values
-        // themselves are managed per ExecutionContext so they don't build up. 
+        // themselves are managed per ExecutionContext so they don't build up.
         // There's an SO article relating to this here https://stackoverflow.com/questions/36511243/safety-of-asynclocal-in-asp-net-core
 
     }

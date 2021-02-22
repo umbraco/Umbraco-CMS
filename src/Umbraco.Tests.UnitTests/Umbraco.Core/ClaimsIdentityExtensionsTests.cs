@@ -5,9 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Security.Claims;
 using NUnit.Framework;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 {
     public class ClaimsIdentityExtensionsTests
     {

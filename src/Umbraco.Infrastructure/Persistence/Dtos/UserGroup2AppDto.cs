@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.UserGroup2App)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2App)]
     [ExplicitColumns]
     public class UserGroup2AppDto
     {

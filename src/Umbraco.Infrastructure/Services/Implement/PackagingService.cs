@@ -4,12 +4,14 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
-using Semver;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Packaging;
-using Umbraco.Core.Packaging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Packaging;
+using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Services.Implement
 {
@@ -46,7 +48,7 @@ namespace Umbraco.Core.Services.Implement
         public async Task<FileInfo> FetchPackageFileAsync(Guid packageId, Version umbracoVersion, int userId)
         {
             //includeHidden = true because we don't care if it's hidden we want to get the file regardless
-            var url = $"{Constants.PackageRepository.RestApiBaseUrl}/{packageId}?version={umbracoVersion.ToString(3)}&includeHidden=true&asFile=true";
+            var url = $"{Cms.Core.Constants.PackageRepository.RestApiBaseUrl}/{packageId}?version={umbracoVersion.ToString(3)}&includeHidden=true&asFile=true";
             byte[] bytes;
             try
             {
@@ -64,7 +66,7 @@ namespace Umbraco.Core.Services.Implement
             //successful
             if (bytes.Length > 0)
             {
-                var packagePath = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages);
+                var packagePath = _hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.Packages);
 
                 // Check for package directory
                 if (Directory.Exists(packagePath) == false)
@@ -79,7 +81,7 @@ namespace Umbraco.Core.Services.Implement
                 }
             }
 
-            _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package {packageId} fetched from {Constants.PackageRepository.DefaultRepositoryId}");
+            _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package {packageId} fetched from {Cms.Core.Constants.PackageRepository.DefaultRepositoryId}");
             return null;
         }
 
@@ -89,7 +91,7 @@ namespace Umbraco.Core.Services.Implement
 
         public CompiledPackage GetCompiledPackageInfo(FileInfo packageFile) => _packageInstallation.ReadPackage(packageFile);
 
-        public IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Constants.Security.SuperUserId)
+        public IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
             if (packageDefinition.Id == default) throw new ArgumentException("The package definition has not been persisted");
@@ -107,7 +109,7 @@ namespace Umbraco.Core.Services.Implement
             return files;
         }
 
-        public InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Constants.Security.SuperUserId)
+        public InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
             if (packageDefinition.Id == default) throw new ArgumentException("The package definition has not been persisted");
@@ -130,7 +132,7 @@ namespace Umbraco.Core.Services.Implement
             return summary;
         }
 
-        public UninstallationSummary UninstallPackage(string packageName, int userId = Constants.Security.SuperUserId)
+        public UninstallationSummary UninstallPackage(string packageName, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             //this is ordered by descending version
             var allPackageVersions = GetInstalledPackageByName(packageName)?.ToList();
@@ -176,7 +178,7 @@ namespace Umbraco.Core.Services.Implement
 
         #region Created/Installed Package Repositories
 
-        public void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId)
+        public void DeleteCreatedPackage(int id, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var package = GetCreatedPackageById(id);
             if (package == null) return;
@@ -225,7 +227,7 @@ namespace Umbraco.Core.Services.Implement
 
         public bool SaveInstalledPackage(PackageDefinition definition) => _installedPackages.SavePackage(definition);
 
-        public void DeleteInstalledPackage(int packageId, int userId = Constants.Security.SuperUserId)
+        public void DeleteInstalledPackage(int packageId, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var package = GetInstalledPackageById(packageId);
             if (package == null) return;

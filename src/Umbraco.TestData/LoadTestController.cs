@@ -8,11 +8,13 @@ using System.Web;
 using System.Web.Hosting;
 using System.Web.Routing;
 using System.Diagnostics;
-using Umbraco.Core.Composing;
 using System.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Strings;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 
 // see https://github.com/Shazwazza/UmbracoScripts/tree/master/src/LoadTesting
 

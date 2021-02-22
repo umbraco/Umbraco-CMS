@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Tests
+namespace Umbraco.Cms.Tests.Common.TestHelpers
 {
     public static class StringNewLineExtensions
     {

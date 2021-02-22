@@ -5,15 +5,19 @@ using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Cache;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -120,24 +124,24 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override string GetBaseWhereClause()
         {
-            return Constants.DatabaseSchema.Tables.Node + ".id = @id";
+            return Cms.Core.Constants.DatabaseSchema.Tables.Node + ".id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
             {
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
-                "UPDATE " + Constants.DatabaseSchema.Tables.DocumentVersion + " SET templateId = NULL WHERE templateId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentType + " WHERE templateNodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Template + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
+                "UPDATE " + Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion + " SET templateId = NULL WHERE templateId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.DocumentType + " WHERE templateNodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Template + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
             };
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Template;
+        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.Template;
 
         protected override void PersistNewItem(ITemplate entity)
         {
@@ -587,7 +591,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var path = template.VirtualPath;
 
             // get valid paths
-            var validDirs = new[] { Constants.SystemDirectories.MvcViews };
+            var validDirs = new[] { Cms.Core.Constants.SystemDirectories.MvcViews };
 
             // get valid extensions
             var validExts = new List<string>();

@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models.Sections;
-using Umbraco.Core.Services;
-using Umbraco.Web.Sections;
+using Umbraco.Cms.Core.Sections;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Cms.Core.Services
 {
     public class SectionService : ISectionService
     {

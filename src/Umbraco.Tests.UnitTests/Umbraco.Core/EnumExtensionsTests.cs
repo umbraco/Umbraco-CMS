@@ -3,10 +3,10 @@
 
 using System;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Web.Trees;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class EnumExtensionsTests

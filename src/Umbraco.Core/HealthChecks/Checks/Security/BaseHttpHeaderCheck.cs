@@ -8,10 +8,11 @@ using System.Linq;
 using System.Net.Http;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.HealthChecks.Checks.Security
+namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
 {
     /// <summary>
     /// Provides a base class for health checks of http header values.

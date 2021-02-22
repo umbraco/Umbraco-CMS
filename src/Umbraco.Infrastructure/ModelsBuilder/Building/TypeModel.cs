@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Infrastructure.ModelsBuilder.Building
+namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
 {
     /// <summary>
     /// Represents a model.

@@ -1,6 +1,6 @@
 using System.Text;
 
-namespace Umbraco.Infrastructure.ModelsBuilder.Building
+namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
 {
     internal static class TextHeaderWriter
     {

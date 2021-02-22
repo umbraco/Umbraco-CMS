@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Web.Models;
 
-namespace Umbraco.Core.Models.Security
+namespace Umbraco.Cms.Core.Models.Security
 {
     public class RegisterModel : PostRedirectModel
     {

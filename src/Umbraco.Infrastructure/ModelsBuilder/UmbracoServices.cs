@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.ModelsBuilder
+namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 {
 
     public sealed class UmbracoServices

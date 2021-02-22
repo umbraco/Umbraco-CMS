@@ -1,11 +1,12 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
-using Umbraco.Web.Website.Models;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Website.Models;
 
-namespace Umbraco.Web.Website.Controllers
+namespace Umbraco.Cms.Web.Website.Controllers
 {
     public class RenderNoContentController : Controller
     {

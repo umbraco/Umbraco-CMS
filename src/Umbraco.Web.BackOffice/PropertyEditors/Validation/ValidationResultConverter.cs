@@ -1,15 +1,15 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
-using System;
+﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Core;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
+using Umbraco.Cms.Core.PropertyEditors.Validation;
+using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Extensions;
-using Umbraco.Web.PropertyEditors.Validation;
 
-namespace Umbraco.Web.BackOffice.PropertyEditors.Validation
+namespace Umbraco.Cms.Web.BackOffice.PropertyEditors.Validation
 {
     /// <summary>
     /// Custom json converter for <see cref="ValidationResult"/> and <see cref="ContentPropertyValidationResult"/>

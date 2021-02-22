@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Services;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Web;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
     [TestFixture]
     public class ScheduledPublishingTests

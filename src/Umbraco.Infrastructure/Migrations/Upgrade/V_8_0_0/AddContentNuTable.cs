@@ -1,7 +1,5 @@
-﻿using System.Data;
-using System.Linq;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.Dtos;
+﻿using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 {

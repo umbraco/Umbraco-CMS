@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class GenericCollectionBuilder<TBuilder, T>
         : ChildBuilderBase<TBuilder, IEnumerable<T>>

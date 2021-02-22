@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Mapping;
-using Umbraco.Web.BackOffice.Mapping;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Web.BackOffice.Mapping;
 
 namespace Umbraco.Extensions
 {

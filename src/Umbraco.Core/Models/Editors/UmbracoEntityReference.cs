@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Models.Editors
+namespace Umbraco.Cms.Core.Models.Editors
 {
     /// <summary>
     /// Used to track reference to other entities in a property value

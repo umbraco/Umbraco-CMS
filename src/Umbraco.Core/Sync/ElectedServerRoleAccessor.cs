@@ -1,7 +1,7 @@
 using System;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Core.Sync
 {
     /// <summary>
     /// Gets the current server's <see cref="ServerRole"/> based on active servers registered with <see cref="IServerRegistrationService"/>

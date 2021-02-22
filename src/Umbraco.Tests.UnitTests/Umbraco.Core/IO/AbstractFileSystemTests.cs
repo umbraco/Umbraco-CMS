@@ -8,9 +8,9 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.IO;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.IO
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.IO
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]

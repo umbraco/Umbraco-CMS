@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Macro Property
@@ -57,7 +57,7 @@ namespace Umbraco.Core.Models
         private int _sortOrder;
         private int _id;
         private string _editorAlias;
-        
+
         /// <summary>
         /// Gets or sets the Key of the Property
         /// </summary>

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Moq;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Membership;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {

@@ -1,12 +1,11 @@
 using System;
-using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static class UdiEntityTypeHelper
     {
-        
+
 
         public static string FromUmbracoObjectType(UmbracoObjectTypes umbracoObjectType)
         {

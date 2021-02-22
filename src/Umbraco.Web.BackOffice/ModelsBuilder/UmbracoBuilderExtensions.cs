@@ -1,5 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
+using Umbraco.Extensions;
 using Umbraco.Web.Common.ModelsBuilder;
 
 namespace Umbraco.Web.BackOffice.ModelsBuilder

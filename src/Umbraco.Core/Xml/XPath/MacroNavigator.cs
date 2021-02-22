@@ -5,7 +5,7 @@ using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
 
-namespace Umbraco.Core.Xml.XPath
+namespace Umbraco.Cms.Core.Xml.XPath
 {
     /// <summary>
     /// Provides a cursor model for navigating {macro /} as if it were XML.

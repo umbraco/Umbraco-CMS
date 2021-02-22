@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
+﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core
 {
     public class HybridEventMessagesAccessor : HybridAccessorBase<EventMessages>, IEventMessagesAccessor
     {

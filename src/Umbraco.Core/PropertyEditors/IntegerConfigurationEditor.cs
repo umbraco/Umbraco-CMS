@@ -1,7 +1,6 @@
-﻿using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.Validators;
+﻿using Umbraco.Cms.Core.PropertyEditors.Validators;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// A custom pre-value editor class to deal with the legacy way that the pre-value data is stored.

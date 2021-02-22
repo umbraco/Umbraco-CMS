@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 
 /*
  * OVERVIEW:
- * 
+ *
  * The CSharpCompiler is responsible for the actual compilation of razor at runtime.
  * It creates a CSharpCompilation instance to do the compilation. This is where DLL references
  * are applied. However, the way this works is not flexible for dynamic assemblies since the references
@@ -16,31 +16,31 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
  * RazorReferenceManager. Unfortunately this is also internal and cannot be replaced, though it can be extended
  * using MvcRazorRuntimeCompilationOptions, except this is the place where references are only loaded once which
  * is done with a LazyInitializer. See https://github.com/dotnet/aspnetcore/blob/master/src/Mvc/Mvc.Razor.RuntimeCompilation/src/RazorReferenceManager.cs#L35.
- * 
+ *
  * The way that RazorReferenceManager works is by resolving references from the ApplicationPartsManager - either by
  * an application part that is specifically an ICompilationReferencesProvider or an AssemblyPart. So to fulfill this
  * requirement, we add the MB assembly to the assembly parts manager within the PureLiveModelFactory when the assembly
  * is (re)generated. But due to the above restrictions, when re-generating, this will have no effect since the references
  * have already been resolved with the LazyInitializer in the RazorReferenceManager.
- * 
+ *
  * The services that can be replaced are: IViewCompilerProvider (default is the internal RuntimeViewCompilerProvider) and
  * IViewCompiler (default is the internal RuntimeViewCompiler). There is one specific public extension point that I was
  * hoping would solve all of the problems which was IMetadataReferenceFeature (implemented by LazyMetadataReferenceFeature
  * which uses RazorReferencesManager) which is a razor feature that you can add
  * to the RazorProjectEngine. It is used to resolve roslyn references and by default is backed by RazorReferencesManager.
  * Unfortunately, this service is not used by the CSharpCompiler, it seems to only be used by some tag helper compilations.
- * 
+ *
  * There are caches at several levels, all of which are not publicly accessible APIs (apart from RazorViewEngine.ViewLookupCache
  * which is possible to clear by casting and then calling cache.Compact(100); but that doesn't get us far enough).
- * 
+ *
  * For this to work, several caches must be cleared:
  * - RazorViewEngine.ViewLookupCache
  * - RazorReferencesManager._compilationReferences
  * - RazorPageActivator._activationInfo (though this one may be optional)
  * - RuntimeViewCompiler._cache
- * 
+ *
  * What are our options?
- * 
+ *
  * a) We can copy a ton of code into our application: CSharpCompiler, RuntimeViewCompilerProvider, RuntimeViewCompiler and
  *    RazorReferenceManager (probably more depending on the extent of Internal references).
  * b) We can use reflection to try to access all of the above resources and try to forcefully clear caches and reset initialization flags.
@@ -49,7 +49,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
  *    services from scratch which means there is no caches.
  *
  * ... Option C works, we will use that but need to verify how this affects memory since ideally the old services will be GC'd.
- * 
+ *
  * Option C, how its done:
  * - Before we add our custom razor services to the container, we make a copy of the services collection which is the snapshot of registered services
  *   with razor defaults before ours are added.
@@ -60,7 +60,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
  *   graph includes all of the above mentioned services, all the way up to the RazorProjectEngine and it's LazyMetadataReferenceFeature.
  */
 
-namespace Umbraco.Web.Common.ModelsBuilder
+namespace Umbraco.Cms.Web.Common.ModelsBuilder
 {
     /// <summary>
     /// Custom <see cref="IRazorViewEngine"/> that wraps aspnetcore's default implementation

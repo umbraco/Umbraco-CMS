@@ -1,25 +1,16 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Html;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.AspNetCore.Routing;
-using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.WebAssets;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Features;
-using Umbraco.Web.Models;
-using Umbraco.Web.WebApi;
+using Microsoft.AspNetCore.Html;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Newtonsoft.Json;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Extensions;
 using Umbraco.Web.WebAssets;
-using Umbraco.Core;
-using Umbraco.Core.Security;
-using Umbraco.Web.BackOffice.Security;
 
 namespace Umbraco.Extensions
 {

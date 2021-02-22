@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using System;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
 
-namespace Umbraco.Tests.Testing
+namespace Umbraco.Cms.Tests.Common.Testing
 {
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, /*AllowMultiple = false,*/ Inherited = false)]
     public class UmbracoTestAttribute : TestOptionAttributeBase

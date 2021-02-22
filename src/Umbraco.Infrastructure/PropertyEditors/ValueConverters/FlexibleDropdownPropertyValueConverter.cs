@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
 {

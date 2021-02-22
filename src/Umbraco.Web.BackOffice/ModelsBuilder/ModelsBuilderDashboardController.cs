@@ -3,15 +3,15 @@ using System.Runtime.Serialization;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
-using Umbraco.Configuration;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Infrastructure.ModelsBuilder;
-using Umbraco.Infrastructure.ModelsBuilder.Building;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Common.Authorization;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Infrastructure.ModelsBuilder;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.ModelsBuilder
+namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
 {
     /// <summary>
     /// API controller for use in the Umbraco back office with Angular resources

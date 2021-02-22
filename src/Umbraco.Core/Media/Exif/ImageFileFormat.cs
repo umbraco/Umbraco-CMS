@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Media.Exif
+﻿namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Represents the format of the <see cref="ImageFile"/>.

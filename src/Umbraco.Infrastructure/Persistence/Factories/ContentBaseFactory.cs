@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Repositories;
@@ -39,8 +42,8 @@ namespace Umbraco.Core.Persistence.Factories
                 content.SortOrder = nodeDto.SortOrder;
                 content.Trashed = nodeDto.Trashed;
 
-                content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
-                content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
+                content.CreatorId = nodeDto.UserId ?? Cms.Core.Constants.Security.UnknownUserId;
+                content.WriterId = contentVersionDto.UserId ?? Cms.Core.Constants.Security.UnknownUserId;
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
@@ -72,12 +75,12 @@ namespace Umbraco.Core.Persistence.Factories
         /// <summary>
         /// Builds an IMedia item from a dto and content type.
         /// </summary>
-        public static Models.Media BuildEntity(ContentDto dto, IMediaType contentType)
+        public static Media BuildEntity(ContentDto dto, IMediaType contentType)
         {
             var nodeDto = dto.NodeDto;
             var contentVersionDto = dto.ContentVersionDto;
 
-            var content = new Models.Media(nodeDto.Text, nodeDto.ParentId, contentType);
+            var content = new Media(nodeDto.Text, nodeDto.ParentId, contentType);
 
             try
             {
@@ -95,8 +98,8 @@ namespace Umbraco.Core.Persistence.Factories
                 content.SortOrder = nodeDto.SortOrder;
                 content.Trashed = nodeDto.Trashed;
 
-                content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
-                content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
+                content.CreatorId = nodeDto.UserId ?? Cms.Core.Constants.Security.UnknownUserId;
+                content.WriterId = contentVersionDto.UserId ?? Cms.Core.Constants.Security.UnknownUserId;
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
@@ -136,8 +139,8 @@ namespace Umbraco.Core.Persistence.Factories
                 content.SortOrder = nodeDto.SortOrder;
                 content.Trashed = nodeDto.Trashed;
 
-                content.CreatorId = nodeDto.UserId ?? Constants.Security.UnknownUserId;
-                content.WriterId = contentVersionDto.UserId ?? Constants.Security.UnknownUserId;
+                content.CreatorId = nodeDto.UserId ?? Cms.Core.Constants.Security.UnknownUserId;
+                content.WriterId = contentVersionDto.UserId ?? Cms.Core.Constants.Security.UnknownUserId;
                 content.CreateDate = nodeDto.CreateDate;
                 content.UpdateDate = contentVersionDto.VersionDate;
 
@@ -187,7 +190,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// </summary>
         public static MediaDto BuildDto(MediaUrlGeneratorCollection mediaUrlGenerators, IMedia entity)
         {
-            var contentDto = BuildContentDto(entity, Constants.ObjectTypes.Media);
+            var contentDto = BuildContentDto(entity, Cms.Core.Constants.ObjectTypes.Media);
 
             var dto = new MediaDto
             {
@@ -204,7 +207,7 @@ namespace Umbraco.Core.Persistence.Factories
         /// </summary>
         public static MemberDto BuildDto(IMember entity)
         {
-            var contentDto = BuildContentDto(entity, Constants.ObjectTypes.Member);
+            var contentDto = BuildContentDto(entity, Cms.Core.Constants.ObjectTypes.Member);
 
             var dto = new MemberDto
             {
@@ -294,7 +297,7 @@ namespace Umbraco.Core.Persistence.Factories
 
             string path = null;
 
-            if (entity.Properties.TryGetValue(Constants.Conventions.Media.File, out var property)
+            if (entity.Properties.TryGetValue(Cms.Core.Constants.Conventions.Media.File, out var property)
                 && mediaUrlGenerators.TryGetMediaPath(property.PropertyType.PropertyEditorAlias, property.GetValue(), out var mediaPath))
             {
                 path = mediaPath;

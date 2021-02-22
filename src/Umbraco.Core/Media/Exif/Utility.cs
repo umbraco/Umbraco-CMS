@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Contains utility functions.

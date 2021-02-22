@@ -8,7 +8,7 @@
 
         public override void Migrate()
         {
-            Rename.Table("umbracoDomains").To(Constants.DatabaseSchema.Tables.Domain).Do();
+            Rename.Table("umbracoDomains").To(Cms.Core.Constants.DatabaseSchema.Tables.Domain).Do();
         }
     }
 }

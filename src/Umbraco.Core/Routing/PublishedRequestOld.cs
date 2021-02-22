@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Threading;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     // TODO: Kill this, but we need to port all of it's functionality
     public class PublishedRequestOld // : IPublishedRequest

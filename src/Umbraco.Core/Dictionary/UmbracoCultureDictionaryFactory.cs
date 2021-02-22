@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Cache;
-using Umbraco.Core.Services;
+﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Dictionary
+namespace Umbraco.Cms.Core.Dictionary
 {
     /// <summary>
     /// A culture dictionary factory used to create an Umbraco.Core.Dictionary.ICultureDictionary.

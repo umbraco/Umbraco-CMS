@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Contains extended Math functions.

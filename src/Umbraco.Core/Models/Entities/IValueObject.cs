@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models.Entities
+﻿namespace Umbraco.Cms.Core.Models.Entities
 {
     /// <summary>
     /// Marker interface for value object, eg. objects without

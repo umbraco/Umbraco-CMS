@@ -12,16 +12,18 @@ using System.Threading;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Infrastructure.ModelsBuilder;
-using Umbraco.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Infrastructure.ModelsBuilder;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Extensions;
+using File = System.IO.File;
 
-namespace Umbraco.Web.Common.ModelsBuilder
+namespace Umbraco.Cms.Web.Common.ModelsBuilder
 {
     internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
     {

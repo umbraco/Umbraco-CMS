@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Core.Cache;
 
 namespace Umbraco.Core.Sync
@@ -64,7 +66,7 @@ namespace Umbraco.Core.Sync
         /// <param name="json"></param>
         /// <param name="idCount">
         /// When the refresh method is <see cref="RefreshMethodType.RefreshByIds"/> we know how many Ids are being refreshed so we know the instruction
-        /// count which will be taken into account when we store this count in the database. 
+        /// count which will be taken into account when we store this count in the database.
         /// </param>
         private RefreshInstruction(ICacheRefresher refresher, RefreshMethodType refreshType, string json, int idCount = 1)
             : this(refresher, refreshType)

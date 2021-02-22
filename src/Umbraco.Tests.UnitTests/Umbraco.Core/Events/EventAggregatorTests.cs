@@ -7,11 +7,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Events;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Events
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Events
 {
     [TestFixture]
     public class EventAggregatorTests

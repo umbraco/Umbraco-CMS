@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Cms.Core.Migrations;
 
 namespace Umbraco.Core.Migrations
 {

@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Tests.Common.Builders.Interfaces
+namespace Umbraco.Cms.Tests.Common.Builders.Interfaces
 {
     public interface IWithIsApprovedBuilder
     {

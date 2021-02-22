@@ -2,9 +2,10 @@
 using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// A group of property types, which corresponds to the properties grouped under a Tab.
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Models
                 {
                     _propertyTypes.ClearCollectionChangedEvents();
                 }
-                    
+
                 _propertyTypes = value;
 
                 // since we're adding this collection to this group,

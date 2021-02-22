@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Models.Entities;
+﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Cache

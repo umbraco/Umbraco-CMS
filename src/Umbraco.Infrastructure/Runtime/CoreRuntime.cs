@@ -2,12 +2,18 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Infrastructure.Runtime
 {
@@ -76,7 +82,7 @@ namespace Umbraco.Infrastructure.Runtime
                 _logger.LogError(exception, msg);
             };
 
-            AppDomain.CurrentDomain.SetData("DataDirectory", _hostingEnvironment?.MapPathContentRoot(Core.Constants.SystemDirectories.Data));
+            AppDomain.CurrentDomain.SetData("DataDirectory", _hostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 
             DoUnattendedInstall();
             DetermineRuntimeLevel();

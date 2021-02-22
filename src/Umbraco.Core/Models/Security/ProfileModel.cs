@@ -2,9 +2,8 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Web.Models;
 
-namespace Umbraco.Core.Models.Security
+namespace Umbraco.Cms.Core.Models.Security
 {
     /// <summary>
     /// A readonly member profile model

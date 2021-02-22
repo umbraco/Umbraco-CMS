@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.MemberPropertyType)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.MemberPropertyType)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
     internal class MemberPropertyTypeDto

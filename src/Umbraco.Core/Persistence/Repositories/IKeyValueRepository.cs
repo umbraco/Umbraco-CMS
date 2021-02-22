@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IKeyValueRepository : IReadRepository<string, IKeyValue>, IWriteRepository<IKeyValue>
     {

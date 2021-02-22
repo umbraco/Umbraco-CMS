@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Macro)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.Macro)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class MacroDto

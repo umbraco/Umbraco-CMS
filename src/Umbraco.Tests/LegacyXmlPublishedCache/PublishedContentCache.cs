@@ -4,15 +4,16 @@ using System.Globalization;
 using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Xml;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Xml;
+using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {

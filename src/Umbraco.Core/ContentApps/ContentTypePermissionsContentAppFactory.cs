@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
+﻿using System.Collections.Generic;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
 
-namespace Umbraco.Web.ContentApps
+namespace Umbraco.Cms.Core.ContentApps
 {
     public class ContentTypePermissionsContentAppFactory : IContentAppFactory
     {

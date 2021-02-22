@@ -1,8 +1,8 @@
 using System;
 using System.Reflection;
-using Semver;
+using Umbraco.Cms.Core.Semver;
 
-namespace Umbraco.Infrastructure.ModelsBuilder
+namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 {
     /// <summary>
     /// Manages API version handshake between client and server.
