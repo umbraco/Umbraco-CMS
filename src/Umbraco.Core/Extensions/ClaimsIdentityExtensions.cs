@@ -93,8 +93,6 @@ namespace Umbraco.Extensions
             Constants.Security.SecurityStampClaimType
         };
 
-        public const string Issuer = Constants.Security.BackOfficeAuthenticationType;
-
         /// <summary>
         /// Verify that a ClaimsIdentity has all the required claim types
         /// </summary>
@@ -138,18 +136,35 @@ namespace Umbraco.Extensions
             //This is the id that 'identity' uses to check for the user id
             if (identity.HasClaim(x => x.Type == ClaimTypes.NameIdentifier) == false)
             {
-                identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, userId, ClaimValueTypes.String,
-                    Issuer, Issuer, identity));
+                identity.AddClaim(new Claim(
+                    ClaimTypes.NameIdentifier,
+                    userId,
+                    ClaimValueTypes.String,
+                    Constants.Security.BackOfficeAuthenticationType,
+                    Constants.Security.BackOfficeAuthenticationType,
+                    identity));
             }
 
             if (identity.HasClaim(x => x.Type == ClaimTypes.Name) == false)
             {
-                identity.AddClaim(new Claim(ClaimTypes.Name, username, ClaimValueTypes.String, Issuer, Issuer, identity));
+                identity.AddClaim(new Claim(
+                    ClaimTypes.Name,
+                    username,
+                    ClaimValueTypes.String,
+                    Constants.Security.BackOfficeAuthenticationType,
+                    Constants.Security.BackOfficeAuthenticationType,
+                    identity));
             }
 
             if (identity.HasClaim(x => x.Type == ClaimTypes.GivenName) == false)
             {
-                identity.AddClaim(new Claim(ClaimTypes.GivenName, realName, ClaimValueTypes.String, Issuer, Issuer, identity));
+                identity.AddClaim(new Claim(
+                    ClaimTypes.GivenName,
+                    realName,
+                    ClaimValueTypes.String,
+                    Constants.Security.BackOfficeAuthenticationType,
+                    Constants.Security.BackOfficeAuthenticationType,
+                    identity));
             }
 
             if (identity.HasClaim(x => x.Type == Constants.Security.StartContentNodeIdClaimType) == false &&
@@ -157,7 +172,13 @@ namespace Umbraco.Extensions
             {
                 foreach (var startContentNode in startContentNodes)
                 {
-                    identity.AddClaim(new Claim(Constants.Security.StartContentNodeIdClaimType, startContentNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, identity));
+                    identity.AddClaim(new Claim(
+                        Constants.Security.StartContentNodeIdClaimType,
+                        startContentNode.ToInvariantString(),
+                        ClaimValueTypes.Integer32,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        identity));
                 }
             }
 
@@ -166,19 +187,37 @@ namespace Umbraco.Extensions
             {
                 foreach (var startMediaNode in startMediaNodes)
                 {
-                    identity.AddClaim(new Claim(Constants.Security.StartMediaNodeIdClaimType, startMediaNode.ToInvariantString(), ClaimValueTypes.Integer32, Issuer, Issuer, identity));
+                    identity.AddClaim(new Claim(
+                        Constants.Security.StartMediaNodeIdClaimType,
+                        startMediaNode.ToInvariantString(),
+                        ClaimValueTypes.Integer32,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        identity));
                 }
             }
 
             if (identity.HasClaim(x => x.Type == ClaimTypes.Locality) == false)
             {
-                identity.AddClaim(new Claim(ClaimTypes.Locality, culture, ClaimValueTypes.String, Issuer, Issuer, identity));
+                identity.AddClaim(new Claim(
+                    ClaimTypes.Locality,
+                    culture,
+                    ClaimValueTypes.String,
+                    Constants.Security.BackOfficeAuthenticationType,
+                    Constants.Security.BackOfficeAuthenticationType,
+                    identity));
             }
 
             // The security stamp claim is also required
             if (identity.HasClaim(x => x.Type == Constants.Security.SecurityStampClaimType) == false)
             {
-                identity.AddClaim(new Claim(Constants.Security.SecurityStampClaimType, securityStamp, ClaimValueTypes.String, Issuer, Issuer, identity));
+                identity.AddClaim(new Claim(
+                    Constants.Security.SecurityStampClaimType,
+                    securityStamp,
+                    ClaimValueTypes.String,
+                    Constants.Security.BackOfficeAuthenticationType,
+                    Constants.Security.BackOfficeAuthenticationType,
+                    identity));
             }
 
             // Add each app as a separate claim
@@ -187,7 +226,13 @@ namespace Umbraco.Extensions
             {
                 foreach (var application in allowedApps)
                 {
-                    identity.AddClaim(new Claim(Constants.Security.AllowedApplicationsClaimType, application, ClaimValueTypes.String, Issuer, Issuer, identity));
+                    identity.AddClaim(new Claim(
+                        Constants.Security.AllowedApplicationsClaimType,
+                        application,
+                        ClaimValueTypes.String,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        identity));
                 }
             }
 
@@ -198,7 +243,13 @@ namespace Umbraco.Extensions
                 // Manually add them
                 foreach (var roleName in roles)
                 {
-                    identity.AddClaim(new Claim(identity.RoleClaimType, roleName, ClaimValueTypes.String, Issuer, Issuer, identity));
+                    identity.AddClaim(new Claim(
+                        identity.RoleClaimType,
+                        roleName,
+                        ClaimValueTypes.String,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        identity));
                 }
             }
         }

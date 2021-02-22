@@ -15,7 +15,6 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using ClaimsIdentityExtensions = Umbraco.Extensions.ClaimsIdentityExtensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
@@ -155,8 +154,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                         Constants.Security.TicketExpiresClaimType,
                         ctx.Properties.ExpiresUtc.Value.ToString("o"),
                         ClaimValueTypes.DateTime,
-                        ClaimsIdentityExtensions.Issuer,
-                        ClaimsIdentityExtensions.Issuer,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        Constants.Security.BackOfficeAuthenticationType,
                         backOfficeIdentity));
 
                 },
@@ -173,10 +172,10 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                             : Guid.NewGuid();
 
                         // add our session claim
-                        backOfficeIdentity.AddClaim(new Claim(Constants.Security.SessionIdClaimType, session.ToString(), ClaimValueTypes.String, ClaimsIdentityExtensions.Issuer, ClaimsIdentityExtensions.Issuer, backOfficeIdentity));
+                        backOfficeIdentity.AddClaim(new Claim(Constants.Security.SessionIdClaimType, session.ToString(), ClaimValueTypes.String, Constants.Security.BackOfficeAuthenticationType, Constants.Security.BackOfficeAuthenticationType, backOfficeIdentity));
 
                         // since it is a cookie-based authentication add that claim
-                        backOfficeIdentity.AddClaim(new Claim(ClaimTypes.CookiePath, "/", ClaimValueTypes.String, ClaimsIdentityExtensions.Issuer, ClaimsIdentityExtensions.Issuer, backOfficeIdentity));
+                        backOfficeIdentity.AddClaim(new Claim(ClaimTypes.CookiePath, "/", ClaimValueTypes.String, Constants.Security.BackOfficeAuthenticationType, Constants.Security.BackOfficeAuthenticationType, backOfficeIdentity));
                     }
 
                     return Task.CompletedTask;

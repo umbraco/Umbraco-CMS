@@ -43,8 +43,6 @@ namespace Umbraco.Core.Security
                 baseIdentity.AddClaim(new Claim(claim.ClaimType, claim.ClaimValue));
             }
 
-            // TODO: We want to remove UmbracoBackOfficeIdentity and only rely on ClaimsIdentity, once
-            // that is done then we'll create a ClaimsIdentity with all of the requirements here instead
             baseIdentity.AddRequiredClaims(
                 user.Id,
                 user.UserName,

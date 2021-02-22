@@ -8,7 +8,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
-using ClaimsIdentityExtensions = Umbraco.Extensions.ClaimsIdentityExtensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions
 {
@@ -43,8 +42,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions
                         Constants.Security.TicketExpiresClaimType,
                         expires,
                         ClaimValueTypes.DateTime,
-                        ClaimsIdentityExtensions.Issuer,
-                        ClaimsIdentityExtensions.Issuer,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        Constants.Security.BackOfficeAuthenticationType,
                         backOfficeIdentity));
 
             var ticketRemainingSeconds = principal.GetRemainingAuthSeconds(then);
