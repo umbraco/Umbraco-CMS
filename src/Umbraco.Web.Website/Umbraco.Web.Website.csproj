@@ -22,7 +22,6 @@
     <ItemGroup>
         <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
         <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
-        <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj" />
         <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
     </ItemGroup>
 

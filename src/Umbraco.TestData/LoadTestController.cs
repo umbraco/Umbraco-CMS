@@ -61,7 +61,7 @@ namespace Umbraco.TestData
 </html>";
 
         private static readonly string _containerTemplateText = @"
-@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     Layout = null;
     var container = Umbraco.ContentAtRoot().OfTypes(""" + _containerAlias + @""").FirstOrDefault();

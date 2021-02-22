@@ -1,5 +1,5 @@
 /// <reference types="Cypress" />
-import { TemplateBuilder } from 'umbraco-cypress-testhelpers';
+import {TemplateBuilder} from 'umbraco-cypress-testhelpers';
 
 context('Templates', () => {
 
@@ -54,7 +54,7 @@ context('Templates', () => {
 
         const template = new TemplateBuilder()
             .withName(name)
-            .withContent('@inherits Umbraco.Web.Mvc.UmbracoViewPage\n')
+            .withContent('@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n')
             .build();
 
         cy.saveTemplate(template);
@@ -87,7 +87,7 @@ context('Templates', () => {
 
         const template = new TemplateBuilder()
             .withName(name)
-            .withContent('@inherits Umbraco.Web.Mvc.UmbracoViewPage\n')
+            .withContent('@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n')
             .build();
 
         cy.saveTemplate(template);

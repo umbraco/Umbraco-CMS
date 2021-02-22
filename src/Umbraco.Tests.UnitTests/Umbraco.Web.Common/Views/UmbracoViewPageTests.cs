@@ -10,8 +10,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.ModelBinders;
+using Umbraco.Cms.Web.Common.Views;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
 {
