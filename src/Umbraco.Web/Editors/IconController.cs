@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
 using Umbraco.Core.Models;
 using Umbraco.Core.Services;
 using Umbraco.Web.Mvc;
@@ -35,9 +37,22 @@ namespace Umbraco.Web.Editors
         /// Gets a list of all svg icons found at at the global icons path.
         /// </summary>
         /// <returns></returns>
-        public IReadOnlyDictionary<string, string> GetAllIcons()
+        [Obsolete("This method should not be used - use GetIcons instead")]
+        public IList<IconModel> GetAllIcons()
         {
             return _iconService.GetAllIcons();
+        }
+
+        /// <summary>
+        /// Gets a list of all svg icons found at at the global icons path.
+        /// </summary>
+        /// <returns></returns>
+        public JsonNetResult GetIcons()
+        {
+            return new JsonNetResult(JsonNetResult.DefaultJsonSerializerSettings) {
+                Data = _iconService.GetIcons(),
+                Formatting = Formatting.None
+            };
         }
     }
 }

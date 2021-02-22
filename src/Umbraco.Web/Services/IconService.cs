@@ -22,9 +22,14 @@ namespace Umbraco.Web.Services
             _cache = appCaches.RuntimeCache;
         }
 
+        /// <inheritdoc />
+        public IReadOnlyDictionary<string, string> GetIcons() => GetIconDictionary();
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, string> GetAllIcons() => GetIconDictionary();
+        public IList<IconModel> GetAllIcons() =>
+            GetIconDictionary()
+                .Select(x => new IconModel { Name = x.Key, SvgString = x.Value })
+                .ToList();
 
         /// <inheritdoc />
         public IconModel GetIcon(string iconName)
