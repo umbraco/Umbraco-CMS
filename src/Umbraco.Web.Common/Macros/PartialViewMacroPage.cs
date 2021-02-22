@@ -1,5 +1,5 @@
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Views;
 
 namespace Umbraco.Cms.Web.Common.Macros
 {

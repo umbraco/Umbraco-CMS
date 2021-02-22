@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.IO
             // @inherits Umbraco.Web.Mvc.UmbracoViewPage
             // @inherits Umbraco.Web.Mvc.UmbracoViewPage<ModelClass>
             content.AppendLine("@using Umbraco.Cms.Web.Common.PublishedModels;");
-            content.Append("@inherits Umbraco.Cms.Web.Common.AspNetCore.UmbracoViewPage");
+            content.Append("@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage");
             if (modelClassName.IsNullOrWhiteSpace() == false)
             {
                 content.Append("<");

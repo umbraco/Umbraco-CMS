@@ -189,17 +189,17 @@
       <website>http://www.creativefounds.co.uk</website>
     </author>
     <readme>
-      <![CDATA[The Standard Website MVC package installs a complete website that can be adapted to most standard website designs. It can also be useful as a prototype or starting point for further development. It contains: 
+      <![CDATA[The Standard Website MVC package installs a complete website that can be adapted to most standard website designs. It can also be useful as a prototype or starting point for further development. It contains:
 
-Homepage - Rotating images with 3 feature panels 
-Standard Page - Left hand navigation and right hand content panels 
+Homepage - Rotating images with 3 feature panels
+Standard Page - Left hand navigation and right hand content panels
 Content Panel Library - create content panels or adverts to user throughout your site.
-Article List - Create news or event lists 
-Contact Us - With email form and Google Maps integration 
-Sitemap - Updates to reflect the current site structure 
-Client Area - Supports multiple clients and projects. Contains a Login Form. 
-Search - based on Examine with search highlighting 
-Google Maps - A map macro that you can use within Rich Text Areas 
+Article List - Create news or event lists
+Contact Us - With email form and Google Maps integration
+Sitemap - Updates to reflect the current site structure
+Client Area - Supports multiple clients and projects. Contains a Login Form.
+Search - based on Examine with search highlighting
+Google Maps - A map macro that you can use within Rich Text Areas
 ]]>
     </readme>
   </info>
@@ -1099,7 +1099,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <Alias>Articles</Alias>
       <Master>SW_Master</Master>
       <Design>
-        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
+        <![CDATA[@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     Layout = "SW_Master.cshtml";
     int pageSize = 2; // How many items per page
@@ -1131,18 +1131,18 @@ Google Maps - A map macro that you can use within Rich Text Areas
     }
 
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
 }
 
 
@@ -1154,10 +1154,10 @@ Google Maps - A map macro that you can use within Rich Text Areas
       </div>
 
        <div id="content">
-       
+
             @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
 
-           
+
                <ul id="newsList">
     @foreach (var item in nodes.Skip((page - 1) * pageSize).Take(pageSize))
     {
@@ -1172,9 +1172,9 @@ Google Maps - A map macro that you can use within Rich Text Areas
             </p>
             <p>
                 @item.GetPropertyValue("articleSummary")
-              
+
             </p>
-        </li>   
+        </li>
     }
 </ul>
 
@@ -1185,7 +1185,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
     @for (int p = 1; p < totalPages + 1; p++)
     {
         //string selected = (p == page) ? "selected" : String.Empty;
-        //<li class="@selected"><a href="?page=@p" title="Go to page @p of results">@p</a></li> 
+        //<li class="@selected"><a href="?page=@p" title="Go to page @p of results">@p</a></li>
         <a href="?page=@p" title="Go to page @p of results">@p</a>
         if (p < totalPages)
         {
@@ -1197,7 +1197,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
 
 
        </div>
-     
+
         @Html.Partial("ContentPanels",@Model.Content)
     </div>]]>
       </Design>
@@ -1207,13 +1207,13 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <Alias>ClientAreas</Alias>
       <Master>SW_Master</Master>
       <Design>
-        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage
+        <![CDATA[@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
       Layout = "SW_Master.cshtml";
       var pages = Model.Content.Children.Where(x => x.IsVisible() && x.TemplateId > 0 && Umbraco.MemberHasAccess(x.Id, x.Path));
 }
  <div id="mainContent" class="fc">
-      
+
       <div class="navigation">
         @Html.Partial("LeftNavigation",@Model.Content)
       &nbsp;
@@ -1226,10 +1226,10 @@ Google Maps - A map macro that you can use within Rich Text Areas
              {
                  <h3><a href="@page.NiceUrl()">@page.Name</a></h3>
              }
-             
+
        </div>
-     
-        
+
+
     </div>]]>
       </Design>
     </Template>
@@ -1243,7 +1243,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
     Layout = "SW_Master.cshtml";
 }
  <div id="mainContent" class="fc">
-     
+
       <div class="navigation">
         @Html.Partial("LeftNavigation",@Model.Content)
           &nbsp;
@@ -1251,7 +1251,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
 
        <div id="content">
             @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
-           
+
             @Html.Partial("ContactForm",new Koiak.StandardWebsite.ContactFormModel())
        </div>
 </div>]]>
@@ -1266,9 +1266,9 @@ Google Maps - A map macro that you can use within Rich Text Areas
 @{
     Layout = "SW_Master.cshtml";
 }
- 
+
     <div id="slideshow">
-    <ul> 
+    <ul>
             @{
         var nodeIds = Model.Content.GetPropertyValue("slideshow").ToString().Split(',');
         List<IPublishedContent> slides = new List<IPublishedContent>();
@@ -1313,7 +1313,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
       </ul>
 
     </div>
- 
+
     <div class="fc">
         <div class="feature fl">
                     @Html.Raw(Model.Content.GetPropertyValue("panelContent1").ToString())
@@ -1345,7 +1345,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
     }
 }
  <div id="mainContent" class="fc">
-     
+
       <div class="navigation">
         @Html.Partial("LeftNavigation",@Model.Content)
           &nbsp;
@@ -1353,7 +1353,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
 
        <div id="content">
             @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
-           
+
             @Html.Partial("LoginForm",new Koiak.StandardWebsite.LoginModel())
        </div>
 </div>]]>
@@ -1420,13 +1420,13 @@ Google Maps - A map macro that you can use within Rich Text Areas
             page = 1;
         }
     }
-    
+
 }
 <div id="mainContent" class="fc">
     <div class="navigation">
         @Html.Partial("LeftNavigation", @Model.Content)
         &nbsp;
-     
+
     </div>
 
     <div id="content">
@@ -1470,14 +1470,14 @@ Google Maps - A map macro that you can use within Rich Text Areas
                         <p>@Html.Raw(searchHiglight)</p>
 
                         <!--<dl>
-                      
+
                   @foreach (var field in item.Fields)
                   {
                       <dt>@field.Key</dt>
                       <dd>@field.Value</dd>
                   }
                       </dl>-->
-                    </li>   
+                    </li>
                 }
             </ul>
         }
@@ -1489,7 +1489,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
                 @for (int p = 1; p < totalPages + 1; p++)
                 {
                     //string selected = (p == page) ? "selected" : String.Empty;
-                    //<li class="@selected"><a href="?page=@p" title="Go to page @p of results">@p</a></li> 
+                    //<li class="@selected"><a href="?page=@p" title="Go to page @p of results">@p</a></li>
                     <a href="?search=@searchTerm&amp;page=@p" title="Go to page @p of results">@p</a>
                     if (p < totalPages)
                     {
@@ -1514,7 +1514,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
     Layout = "SW_Master.cshtml";
 }
  <div id="mainContent" class="fc">
-      
+
       <div class="navigation">
         @Html.Partial("LeftNavigation",@Model.Content)
       &nbsp;
@@ -1522,19 +1522,19 @@ Google Maps - A map macro that you can use within Rich Text Areas
 
        <div id="content">
             @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
-           
+
     <div id="sitemap">
             @traverse(Model.Content.AncestorOrSelf(1))
         </div>
 
        </div>
-     
+
         @Html.Partial("ContentPanels",@Model.Content)
     </div>
 
 @helper traverse(IPublishedContent node)
 {
- var cc = node.Children.Where(x=>x.IsVisible() && x.TemplateId > 0);                        
+ var cc = node.Children.Where(x=>x.IsVisible() && x.TemplateId > 0);
  if (cc.Count()>0)
  {
   <ul>
@@ -1560,7 +1560,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
     Layout = "SW_Master.cshtml";
 }
  <div id="mainContent" class="fc">
-      
+
       <div class="navigation">
         @Html.Partial("LeftNavigation",@Model.Content)
       &nbsp;
@@ -1569,7 +1569,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
        <div id="content">
             @Html.Raw(Model.Content.GetPropertyValue<string>("bodyText"))
        </div>
-     
+
         @Html.Partial("ContentPanels",@Model.Content)
     </div>]]>
       </Design>
@@ -1590,27 +1590,27 @@ Google Maps - A map macro that you can use within Rich Text Areas
       <title>@Model.Content.GetPropertyValue("title")</title>
         <meta name="keywords" content="@Model.Content.GetPropertyValue("keywords")" />
         <meta name="description" content="@Model.Content.GetPropertyValue("description")" />
-        
-  
+
+
        <meta http-equiv="Content-Language" content="en" />
       <meta name="language" content="en" />
       <meta name="robots" content="all, follow" />
       <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
       <meta name="MSSmartTagsPreventParsing" content="TRUE" />
-  
+
       <link rel="stylesheet" href="/css/base-min.css" type="text/css" media="screen, projection" />
       <link rel="stylesheet" href="/css/default.css" type="text/css" media="screen, projection" />
         <link href="http://fonts.googleapis.com/css?family=Open+Sans:400" rel="stylesheet" type="text/css">
       <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico" />
-        
+
 
     </head>
     <body>
         <div id="header">
             <div class="page-width fc">
-                
+
                 <a href="/" id="logo"><img src="/images/logo.png" alt="Koiak Basic Site" /></a>
-				
+
                 @if (homepage.HasProperty("headerNavigation"))
                 {
                     <ul  class="navigation fc">
@@ -1623,16 +1623,16 @@ Google Maps - A map macro that you can use within Rich Text Areas
                     }
                     </ul>
                 }
-                
-                
+
+
                 @if(Umbraco.MemberIsLoggedOn())
                 {
                 <p class="fr" id="loggedIn">
       Welcome @Context.User.Identity.Name, <a href="/login.aspx?signout=true">logout</a>
-                    
+
     </p>
                 }
-                
+
                 <form action="/search" id="searchForm" method="get">
                 <fieldset>
                   <label for="search" class="remove">Search Site</label>
@@ -1661,7 +1661,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
             <div id="body" class="page-width">
                 @RenderBody()
             </div>
-            
+
             <div id="footer" class="fc">
                 <div class="page-width">
                     @Html.Partial("Affiliations",homepage)
@@ -1672,7 +1672,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
 
         <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
         <script type="text/javascript" src="/scripts/jquery.timers.js"></script>
-        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>  
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
         <script type="text/javascript" src="/scripts/default.js"></script>
     </body>
 </html>]]>
@@ -1727,10 +1727,10 @@ body{margin:10px;}h1{font-size:138.5%;}h2{font-size:123.1%;}h3{font-size:108%;}h
 .inline{display:inline;}.remove{display:none;}.hideLegend legend{display:none;}.hide, #skipNav {position:absolute;top:0;left:-200em;width:20em;}.fr{float:right;}.fl{float:left;}.tar{text-align:right;}.tac{text-align:center;}.tal{text-align:left;}.cl {clear:left;}.cr {clear:right;}.cb {clear:both;}ul, ul li { margin: 0; list-style-type :none;}address{line-height: 1.3em;}
 /* FULL CLEAR - forces a container to surround all children - regardless of floating */
 .fc:after, .formRow:after{
-    content: "."; 
-    display: block; 
-    height: 0; 
-    clear: both; 
+    content: ".";
+    display: block;
+    height: 0;
+    clear: both;
     visibility: hidden;
 }
 .fc, .formRow{ display: inline-block;}
@@ -1796,7 +1796,7 @@ div.page-width {
 	position:relative;
 }
 
-div#body 
+div#body
 {
 	padding: 0px 64px;
 }
@@ -1866,16 +1866,16 @@ div#body
 	font-weight: normal;
 }
 
-#mainContent #content 
-{ 
+#mainContent #content
+{
 	float:left;
 	width: 425px;
 	margin: 0px 20px;
 }
 
 
-#mainContent #rightPanel 
-{ 
+#mainContent #rightPanel
+{
 	float:left;
 	width:190px;
 }
@@ -1906,7 +1906,7 @@ div#footer ul li
 	padding: 0 10px;
 }
 /* HEADER */
-div#header 
+div#header
 {
 	position: relative;
 }
@@ -1941,7 +1941,7 @@ div#header div.navigation ul.navigation li a
 	font-size:14px;
 	padding:13px 22px;
 	text-decoration: none;
-	
+
 }
 
 div#header div.navigation ul.navigation li a:hover,
@@ -1973,7 +1973,7 @@ div#header p#telephone span
 	font-size:16px;
 }
 
-div#header div.page-width ul.navigation 
+div#header div.page-width ul.navigation
 {
 	float:right;
 	clear:right;
@@ -1984,7 +1984,7 @@ div#header div.page-width ul.navigation
 
 div#header div.page-width ul.navigation li
 {
-	display: inline;	
+	display: inline;
 	padding-right:6px;
 	margin-right:6px;
 }
@@ -1999,7 +1999,7 @@ div#header #logo{float:left}
 
 
 /* Homepage */
-div#slideshow 
+div#slideshow
 {
 	padding: 30px 0px;
 	position:relative;
@@ -2008,7 +2008,7 @@ div#slideshow
 
 div#slideshow div
 {
-	
+
 }
 
 div#slideshow li
@@ -2031,7 +2031,7 @@ div#slideshow ul li ul {
 	padding:8px 24px;
 }
 
-div#slideshow ul li ul 
+div#slideshow ul li ul
 {
 	position: relative;
 }
@@ -2047,7 +2047,7 @@ div#slideshow ul li ul li
 	width:auto;
 }
 
-div#slideshow h3 
+div#slideshow h3
 {
 	font-size: 24px;
 }
@@ -2139,7 +2139,7 @@ div.feature p
 	background: url("/images/li_bg.gif") no-repeat left 5px transparent;
 }
 
-#rightPanel li 
+#rightPanel li
 {
 	padding-bottom: 11px;
 }
@@ -2216,11 +2216,11 @@ table th, td {border: 0px solid #fff;}
 .buttonRow input {padding:5px 10px; border:1px solid #CDCDCD; background-color:#EFEFEF;}
 
 /* List */
-#mainContent #content ul#newsList 
+#mainContent #content ul#newsList
 {
 	border-top:1px solid #CDCDCD;
 }
-#mainContent #content ul#newsList li 
+#mainContent #content ul#newsList li
 {
 	border-bottom:1px solid #CDCDCD;
 	margin-bottom: 20px;
