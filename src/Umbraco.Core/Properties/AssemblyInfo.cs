@@ -8,7 +8,6 @@ using System.Runtime.InteropServices;
 // Umbraco Cms
 [assembly: InternalsVisibleTo("Umbraco.Web")]
 [assembly: InternalsVisibleTo("Umbraco.Web.UI")]
-[assembly: InternalsVisibleTo("Umbraco.ModelsBuilder.Embedded")]
 
 [assembly: InternalsVisibleTo("Umbraco.Tests")]
 [assembly: InternalsVisibleTo("Umbraco.Tests.Benchmarks")]

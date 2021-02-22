@@ -1,5 +1,5 @@
 /// <reference types="Cypress" />
-import { PartialViewBuilder } from "umbraco-cypress-testhelpers";
+import {PartialViewBuilder} from "umbraco-cypress-testhelpers";
 
 context('Partial Views', () => {
 
@@ -95,7 +95,7 @@ context('Partial Views', () => {
         // Build and save partial view
         const partialView = new PartialViewBuilder()
             .withName(name)
-            .withContent("@inherits Umbraco.Web.Mvc.UmbracoViewPage")
+            .withContent("@inherits UUmbraco.Cms.Web.Common.Views.UmbracoViewPage")
             .build();
 
         cy.savePartialView(partialView);
@@ -123,7 +123,7 @@ context('Partial Views', () => {
 
         const partialView = new PartialViewBuilder()
             .withName(name)
-            .withContent("@inherits Umbraco.Web.Mvc.UmbracoViewPage\n")
+            .withContent("@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\n")
             .build();
 
         cy.savePartialView(partialView);

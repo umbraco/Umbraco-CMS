@@ -9,8 +9,8 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Semver;
-using Umbraco.Cms.ModelsBuilder.Embedded;
-using Umbraco.Cms.ModelsBuilder.Embedded.Building;
+using Umbraco.Cms.Infrastructure.ModelsBuilder;
+using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
 {
@@ -62,7 +62,7 @@ using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.ModelsBuilder.Embedded;
+using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Core;
 using Umbraco.Core;
 using Umbraco.Extensions;
@@ -170,7 +170,7 @@ using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.ModelsBuilder.Embedded;
+using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Core;
 using Umbraco.Core;
 using Umbraco.Extensions;

@@ -1,5 +1,6 @@
 /// <reference types="Cypress" />
-import { DocumentTypeBuilder, ContentBuilder, AliasHelper } from 'umbraco-cypress-testhelpers';
+import {AliasHelper, ContentBuilder, DocumentTypeBuilder} from 'umbraco-cypress-testhelpers';
+
 context('Content', () => {
 
     beforeEach(() => {
@@ -558,7 +559,7 @@ context('Content', () => {
         cy.saveDocumentType(pickerDocType);
 
         // Edit it the template to allow us to verify the rendered view.
-        cy.editTemplate(pickerDocTypeName, `@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.ContentPickerDocType>
+        cy.editTemplate(pickerDocTypeName, `@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.ContentPickerDocType>
         @using ContentModels = Umbraco.Web.PublishedModels;
         @{
             Layout = null;
