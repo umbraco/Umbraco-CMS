@@ -25,12 +25,21 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then groupmod --g
 
 
 # [Optional] Uncomment this section to install additional OS packages.
-# RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-#     && apt-get -y install --no-install-recommends <your-package-list-here>
+# Following added by Warren...
+# Needed to add as Gifsicle used by gulp-imagemin does not ship a Linux binary and has to be compiled from source
+# And this Linux package is needed in order to build it
+# https://github.com/imagemin/imagemin-gifsicle/issues/40#issuecomment-616487214
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends dh-autoreconf
 
 # [Optional] Uncomment this line to install global node packages.
 # RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
 
+# Following added by Warren...
 # Sets the global user for npm as 'root' due to some permission errors for gulp-imagemin creating binaries
 # https://stackoverflow.com/a/45505787
-RUN npm -g config set user root
+#
+# Needing to set unsafe-perm as root is the user setup
+# https://docs.npmjs.com/cli/v6/using-npm/config#unsafe-perm
+# Default: false if running as root, true otherwise (we are ROOT)
+RUN npm -g config set user vscode && npm -g config set unsafe-perm
