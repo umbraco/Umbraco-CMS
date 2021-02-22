@@ -1,3 +1,4 @@
+using System.Linq;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
@@ -125,7 +126,11 @@ namespace Umbraco.Extensions
                 }
             });
 
-            builder.Services.AddUnique<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
+
+            if (!builder.Services.Any(x=>x.ServiceType == typeof(IModelsBuilderDashboardProvider)))
+            {
+                builder.Services.AddUnique<IModelsBuilderDashboardProvider, NoopModelsBuilderDashboardProvider>();
+            }
 
             return builder;
         }

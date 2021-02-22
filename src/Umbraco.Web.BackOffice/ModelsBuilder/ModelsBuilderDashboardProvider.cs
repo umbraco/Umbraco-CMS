@@ -1,9 +1,8 @@
 using Microsoft.AspNetCore.Routing;
-using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 using Umbraco.Extensions;
 using Umbraco.Web.Common.ModelsBuilder;
 
-namespace Umbraco.Web.BackOffice.ModelsBuilder
+namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
 {
     public class ModelsBuilderDashboardProvider: IModelsBuilderDashboardProvider
     {

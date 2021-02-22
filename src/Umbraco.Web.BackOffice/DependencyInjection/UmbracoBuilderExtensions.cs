@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.Middleware;
+using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
@@ -43,7 +44,8 @@ namespace Umbraco.Extensions
                 .AddWebServer()
                 .AddPreviewSupport()
                 .AddHostedServices()
-                .AddDistributedCache();
+                .AddDistributedCache()
+                .AddModelsBuilderDashboard();
 
         /// <summary>
         /// Adds Umbraco back office authentication requirements
