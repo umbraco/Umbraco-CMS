@@ -1,0 +1,21 @@
+# variables can be set by env vars: https://artillery.io/docs/guides/guides/test-script-reference.html#Using-dynamic-values-in-config
+
+config:
+  variables:
+    backOfficeApiPath: "/umbraco/backoffice/UmbracoApi"
+  processor: "./umbraco-flow.js"
+  phases:
+    - duration: 1
+      arrivalRate: 1
+scenarios:
+  - name: "Create document type"
+    beforeScenario: "beforeScenario"
+    afterScenario: "afterScenario"
+    beforeRequest: "beforeRequest"
+    afterResponse: "afterResponse"
+    flow:
+    - post:
+        url: "{{ backOfficeApiPath }}/ContentType/PostSave"
+        body: '{"compositeContentTypes":[],"isContainer":false,"allowAsRoot":true,"allowedTemplates":["benchmarkTest__NEW_DT_GUID__"],"allowedContentTypes":[],"alias":"benchmarkTest__NEW_DT_GUID__","description":null,"thumbnail":"folder.png","name":"benchmarkTest__NEW_DT_GUID__","id":0,"icon":"icon-document","trashed":false,"key":"__NEW_DT_GUID__","parentId":-1,"path":null,"allowCultureVariant":false,"allowSegmentVariant":false,"isElement":false,"defaultTemplate":"benchmarkTest__NEW_DT_GUID__","groups":[{"sortOrder":0,"name":"Group1","properties":[{"alias":"email","validation":{"mandatory":true,"mandatoryMessage":null,"pattern":"[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+.[a-zA-Z0-9-.]+","patternMessage":null},"label":"Email","sortOrder":0,"dataTypeId":-88,"allowCultureVariant":false,"labelOnTop":false},{"alias":"description","validation":{"mandatory":false,"mandatoryMessage":null,"pattern":null,"patternMessage":null},"label":"Description","sortOrder":1,"dataTypeId":-89,"allowCultureVariant":false,"labelOnTop":false}]},{"sortOrder":1,"name":"Group2","properties":[{"alias":"publishedDate","validation":{"mandatory":false,"mandatoryMessage":null,"pattern":null,"patternMessage":null},"label":"Published Date","sortOrder":0,"dataTypeId":-41,"allowCultureVariant":false,"labelOnTop":false}]}]}'
+        headers:
+          content-type: "application/json"

@@ -9,7 +9,7 @@ config:
       arrivalRate: 1
 scenarios:
   - name: "Login and default back office load"
-    beforeScenario: "loginAndLoad"
+    beforeScenario: "beforeScenario"
     afterScenario: "afterScenario"
     beforeRequest: "beforeRequest"
     afterResponse: "afterResponse"
