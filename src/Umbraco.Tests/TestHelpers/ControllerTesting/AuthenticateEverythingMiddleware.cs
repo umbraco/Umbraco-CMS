@@ -32,7 +32,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
 
                 var identity = new ClaimsIdentity();
                 identity.AddRequiredClaims(
-                    Core.Constants.Security.SuperUserIdAsString,
+                    Cms.Core.Constants.Security.SuperUserIdAsString,
                     "admin",
                     "Admin",
                     new[] { -1 },
