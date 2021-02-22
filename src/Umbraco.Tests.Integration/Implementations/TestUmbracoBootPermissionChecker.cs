@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Core.Runtime;
+using Umbraco.Cms.Core.Runtime;
 
-namespace Umbraco.Tests.Integration.Implementations
+namespace Umbraco.Cms.Tests.Integration.Implementations
 {
     public class TestUmbracoBootPermissionChecker : IUmbracoBootPermissionChecker
     {

@@ -1,15 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     public abstract class IOHelper : IIOHelper
     {

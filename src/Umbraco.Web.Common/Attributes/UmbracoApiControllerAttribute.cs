@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Web.Common.ApplicationModels;
+using Umbraco.Cms.Web.Common.ApplicationModels;
 
-namespace Umbraco.Web.Common.Attributes
+namespace Umbraco.Cms.Web.Common.Attributes
 {
     /// <summary>
     /// When present on a controller then <see cref="UmbracoApiBehaviorApplicationModelProvider"/> conventions will apply

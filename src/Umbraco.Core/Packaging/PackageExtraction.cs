@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.IO.Compression;
+using System.Linq;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     public class PackageExtraction
     {
@@ -45,7 +46,7 @@ namespace Umbraco.Core.Packaging
         private static void CheckPackageExists(FileInfo packageFile)
         {
             if (packageFile == null) throw new ArgumentNullException(nameof(packageFile));
-            
+
             if (!packageFile.Exists)
                 throw new ArgumentException($"Package file: {packageFile} could not be found");
 

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.Install.Models
+namespace Umbraco.Cms.Core.Install.Models
 {
     [Flags]
     public enum InstallationType

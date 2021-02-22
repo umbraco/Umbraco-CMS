@@ -4,16 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.Security;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// This inspects the result of the action that returns a collection of content and removes

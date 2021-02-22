@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     [DataContract(Name = "propertyType")]
     public class PropertyTypeDisplay : PropertyTypeBasic

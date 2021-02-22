@@ -3,10 +3,9 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// Logs any unhandled exception.

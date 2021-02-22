@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Runtime;
 using Umbraco.Infrastructure.HostedServices;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
     [TestFixture]
     public class TempFileCleanupTests

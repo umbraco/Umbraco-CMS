@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// A model representing the tours a user has taken/completed

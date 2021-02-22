@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Logging
+namespace Umbraco.Cms.Core.Logging
 {
 
     public interface ILoggingConfiguration

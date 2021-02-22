@@ -4,14 +4,13 @@
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
-using Umbraco.Web.Services;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.Integration.Umbraco.Core.Services
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Services
 {
     /// <summary>
     /// Tests covering the SectionService

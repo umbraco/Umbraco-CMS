@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.ExceptionServices;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     public static class SafeLazy
     {

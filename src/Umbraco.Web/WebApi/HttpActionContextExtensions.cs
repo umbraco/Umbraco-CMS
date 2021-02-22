@@ -8,7 +8,6 @@ using System.Web.Http.Controllers;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Hosting;
 
 namespace Umbraco.Web.WebApi
 {

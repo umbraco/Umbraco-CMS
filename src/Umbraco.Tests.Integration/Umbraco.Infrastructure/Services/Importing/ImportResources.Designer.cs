@@ -39,8 +39,8 @@ namespace Umbraco.Tests.Services.Importing {
         internal static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Umbraco.Tests.Integration.Umbraco.Infrastructure.Services.Importing.ImportResourc" +
-                            "es", typeof(ImportResources).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing.ImportRes" +
+                            "ources", typeof(ImportResources).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;

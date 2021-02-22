@@ -8,23 +8,24 @@ using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Packaging;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Packaging;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.Integration.Testing;
+using Umbraco.Extensions;
 using Umbraco.Tests.Services.Importing;
-using Umbraco.Tests.Testing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Packaging
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
 {
     [TestFixture]
     [Category("Slow")]
@@ -353,7 +354,7 @@ namespace Umbraco.Tests.Packaging
         public void Can_Import_Media_Package_Xml()
         {
             // Arrange
-            Core.Services.Implement.MediaTypeService.ClearScopeEvents();
+            global::Umbraco.Core.Services.Implement.MediaTypeService.ClearScopeEvents();
             string strXml = ImportResources.MediaTypesAndMedia_Package_xml;
             var xml = XElement.Parse(strXml);
             XElement mediaTypesElement = xml.Descendants("MediaTypes").First();
@@ -398,7 +399,7 @@ namespace Umbraco.Tests.Packaging
                                 select doc).Count();
 
             string configuration;
-            using (Core.Scoping.IScope scope = ScopeProvider.CreateScope())
+            using (global::Umbraco.Core.Scoping.IScope scope = ScopeProvider.CreateScope())
             {
                 List<DataTypeDto> dtos = scope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
                 configuration = dtos.Single().Configuration;
@@ -741,8 +742,8 @@ namespace Umbraco.Tests.Packaging
         private void AddLanguages()
         {
             var globalSettings = new GlobalSettings();
-            var norwegian = new Core.Models.Language(globalSettings, "nb-NO");
-            var english = new Core.Models.Language(globalSettings, "en-GB");
+            var norwegian = new Language(globalSettings, "nb-NO");
+            var english = new Language(globalSettings, "en-GB");
             LocalizationService.Save(norwegian, 0);
             LocalizationService.Save(english, 0);
         }

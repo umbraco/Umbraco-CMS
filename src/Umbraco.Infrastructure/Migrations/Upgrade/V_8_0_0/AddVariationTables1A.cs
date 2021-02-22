@@ -23,10 +23,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             // but we need to take care of ppl caught into the state
 
             // was not used
-            Delete.Column("available").FromTable(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation).Do();
+            Delete.Column("available").FromTable(Cms.Core.Constants.DatabaseSchema.Tables.ContentVersionCultureVariation).Do();
 
             // was not used
-            Delete.Column("availableDate").FromTable(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation).Do();
+            Delete.Column("availableDate").FromTable(Cms.Core.Constants.DatabaseSchema.Tables.ContentVersionCultureVariation).Do();
 
             //special trick to add the column without constraints and return the sql to add them later
             AddColumn<ContentVersionCultureVariationDto>("date", out var sqls);
@@ -36,8 +36,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             foreach (var sql in sqls) Execute.Sql(sql).Do();
 
             // name, languageId are now non-nullable
-            AlterColumn<ContentVersionCultureVariationDto>(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "name");
-            AlterColumn<ContentVersionCultureVariationDto>(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "languageId");
+            AlterColumn<ContentVersionCultureVariationDto>(Cms.Core.Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "name");
+            AlterColumn<ContentVersionCultureVariationDto>(Cms.Core.Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "languageId");
 
             Create.Table<DocumentCultureVariationDto>().Do();
         }

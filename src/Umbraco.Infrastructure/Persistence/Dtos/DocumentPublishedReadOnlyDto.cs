@@ -3,7 +3,7 @@ using NPoco;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Document)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.Document)]
     [PrimaryKey("versionId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class DocumentPublishedReadOnlyDto

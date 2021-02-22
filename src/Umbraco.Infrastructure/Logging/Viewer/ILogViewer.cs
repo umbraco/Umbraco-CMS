@@ -1,4 +1,6 @@
 ﻿using System.Collections.Generic;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Logging.Viewer

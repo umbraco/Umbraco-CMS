@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     public class ViewHelper
     {
@@ -69,8 +70,8 @@ namespace Umbraco.Core.IO
             // either
             // @inherits Umbraco.Web.Mvc.UmbracoViewPage
             // @inherits Umbraco.Web.Mvc.UmbracoViewPage<ModelClass>
-            content.AppendLine("@using Umbraco.Web.PublishedModels;");
-            content.Append("@inherits Umbraco.Web.Common.AspNetCore.UmbracoViewPage");
+            content.AppendLine("@using Umbraco.Cms.Web.Common.PublishedModels;");
+            content.Append("@inherits Umbraco.Cms.Web.Common.AspNetCore.UmbracoViewPage");
             if (modelClassName.IsNullOrWhiteSpace() == false)
             {
                 content.Append("<");

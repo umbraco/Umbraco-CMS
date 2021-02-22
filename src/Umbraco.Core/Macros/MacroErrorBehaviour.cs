@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Macros
+﻿namespace Umbraco.Cms.Core.Macros
 {
     public enum MacroErrorBehaviour
     {

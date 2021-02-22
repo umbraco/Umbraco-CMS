@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core.Deploy;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Deploy;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static class UdiParserServiceConnectors
     {

@@ -13,19 +13,18 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Web;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Mvc;
-using Umbraco.Web.Common.Security;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.Website.Collections;
-using Umbraco.Web.Website.Controllers;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.Web.Mvc;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Mvc;
+using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Web.Website.Collections;
+using Umbraco.Cms.Web.Website.Controllers;
 
 namespace Umbraco.Extensions
 {

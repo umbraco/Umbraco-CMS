@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Core.Migrations;
+using Umbraco.Cms.Core.Migrations;
 
-namespace Umbraco.Tests.Migrations.Stubs
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs
 {
     /// <summary>
     /// This is just a dummy class that is used to ensure that implementations

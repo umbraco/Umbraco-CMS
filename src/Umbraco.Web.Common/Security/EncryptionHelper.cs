@@ -6,10 +6,11 @@ using System.Net;
 using System.Web;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Web.Common.Constants;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Web.Common.Constants;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Security
+namespace Umbraco.Cms.Web.Common.Security
 {
     public class EncryptionHelper
     {

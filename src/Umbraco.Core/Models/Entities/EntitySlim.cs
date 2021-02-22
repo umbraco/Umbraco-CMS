@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Exceptions;
 
-namespace Umbraco.Core.Models.Entities
+namespace Umbraco.Cms.Core.Models.Entities
 {
     /// <summary>
     /// Implementation of <see cref="IEntitySlim"/> for internal use.

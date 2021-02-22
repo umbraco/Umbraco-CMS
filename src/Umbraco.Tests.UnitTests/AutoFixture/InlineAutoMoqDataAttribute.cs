@@ -4,7 +4,7 @@
 using System;
 using AutoFixture.NUnit3;
 
-namespace Umbraco.Tests.UnitTests.AutoFixture
+namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor, AllowMultiple = true)]
     public class InlineAutoMoqDataAttribute : InlineAutoDataAttribute

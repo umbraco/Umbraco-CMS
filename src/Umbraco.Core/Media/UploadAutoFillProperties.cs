@@ -1,13 +1,12 @@
 ﻿using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Media
+namespace Umbraco.Cms.Core.Media
 {
     /// <summary>
     /// Provides methods to manage auto-fill properties for upload fields.

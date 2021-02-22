@@ -2,6 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
@@ -104,7 +110,7 @@ namespace Umbraco.Core.Services.Implement
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            if (entityId == Constants.System.Root || entityId <= 0)
+            if (entityId == Cms.Core.Constants.System.Root || entityId <= 0)
             {
                 totalRecords = 0;
                 return Enumerable.Empty<IAuditItem>();
@@ -141,7 +147,7 @@ namespace Umbraco.Core.Services.Implement
             if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
             if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
 
-            if (userId < Constants.Security.SuperUserId)
+            if (userId < Cms.Core.Constants.Security.SuperUserId)
             {
                 totalRecords = 0;
                 return Enumerable.Empty<IAuditItem>();
@@ -158,7 +164,7 @@ namespace Umbraco.Core.Services.Implement
         /// <inheritdoc />
         public IAuditEntry Write(int performingUserId, string perfomingDetails, string performingIp, DateTime eventDateUtc, int affectedUserId, string affectedDetails, string eventType, string eventDetails)
         {
-            if (performingUserId < 0 && performingUserId != Constants.Security.SuperUserId) throw new ArgumentOutOfRangeException(nameof(performingUserId));
+            if (performingUserId < 0 && performingUserId != Cms.Core.Constants.Security.SuperUserId) throw new ArgumentOutOfRangeException(nameof(performingUserId));
             if (string.IsNullOrWhiteSpace(perfomingDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(perfomingDetails));
             if (string.IsNullOrWhiteSpace(eventType)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventType));
             if (string.IsNullOrWhiteSpace(eventDetails)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(eventDetails));

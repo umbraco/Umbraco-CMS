@@ -3,23 +3,21 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.Sections;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Services;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Sections;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class UserMapDefinition : IMapDefinition
     {

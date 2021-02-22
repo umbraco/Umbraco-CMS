@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Provides a default implementation for <see ref="IPropertyIndexValueFactory">, returning a single field to index containing the property value.

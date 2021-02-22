@@ -1,8 +1,10 @@
 ﻿using System;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Compose
 {
@@ -24,7 +26,7 @@ namespace Umbraco.Web.Compose
             MemberGroupService.Saved -= MemberGroupService_Saved;
         }
 
-        private void MemberGroupService_Saved(IMemberGroupService sender, Core.Events.SaveEventArgs<Core.Models.IMemberGroup> e)
+        private void MemberGroupService_Saved(IMemberGroupService sender, SaveEventArgs<IMemberGroup> e)
         {
             foreach (var grp in e.SavedEntities)
             {

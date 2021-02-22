@@ -13,13 +13,13 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Macros;
+using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Extensions;
-using Umbraco.Web.Macros;
-using static Umbraco.Core.Constants.Web.Routing;
+using static Umbraco.Cms.Core.Constants.Web.Routing;
 
-namespace Umbraco.Web.Common.Macros
+namespace Umbraco.Cms.Web.Common.Macros
 {
     /// <summary>
     /// A macro engine using MVC Partial Views to execute.
@@ -92,7 +92,7 @@ namespace Umbraco.Web.Common.Macros
             routeVals.Values.Add(ActionToken, "Index");
 
             //TODO: Was required for UmbracoViewPage need to figure out if we still need that, i really don't think this is necessary
-            //routeVals.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx); 
+            //routeVals.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
             var modelMetadataProvider = httpContext.RequestServices.GetRequiredService<IModelMetadataProvider>();
             var tempDataProvider = httpContext.RequestServices.GetRequiredService<ITempDataProvider>();

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// A runtime hash this is always different on each app startup

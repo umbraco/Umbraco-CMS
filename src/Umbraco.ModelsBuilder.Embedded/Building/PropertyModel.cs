@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Umbraco.ModelsBuilder.Embedded.Building
+namespace Umbraco.Cms.ModelsBuilder.Embedded.Building
 {
     /// <summary>
     /// Represents a model property.

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Routing
+﻿namespace Umbraco.Cms.Core.Routing
 {
     public enum UmbracoRouteResult
     {

@@ -1,5 +1,5 @@
-﻿using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Strings;
+﻿using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {

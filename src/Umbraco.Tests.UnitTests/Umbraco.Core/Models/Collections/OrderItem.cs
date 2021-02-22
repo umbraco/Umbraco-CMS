@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models.Collections
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models.Collections
 {
     public class OrderItem : Item
     {

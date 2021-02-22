@@ -1,7 +1,7 @@
 ﻿using System.Runtime.Serialization;
-using Umbraco.Core.Models.Sections;
+using Umbraco.Cms.Core.Sections;
 
-namespace Umbraco.Core.Manifest
+namespace Umbraco.Cms.Core.Manifest
 {
     [DataContract(Name = "section", Namespace = "")]
     public class ManifestSection : ISection

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// A generic model supporting notifications, this is useful for returning any model type to include notifications from api controllers

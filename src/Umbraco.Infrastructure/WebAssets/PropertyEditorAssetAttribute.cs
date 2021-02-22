@@ -1,5 +1,5 @@
 ﻿using System;
-using Umbraco.Core.WebAssets;
+using Umbraco.Cms.Core.WebAssets;
 
 namespace Umbraco.Web.WebAssets
 {

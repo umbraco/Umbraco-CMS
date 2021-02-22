@@ -1,10 +1,9 @@
 ﻿using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public class InstallationRepository : IInstallationRepository
     {

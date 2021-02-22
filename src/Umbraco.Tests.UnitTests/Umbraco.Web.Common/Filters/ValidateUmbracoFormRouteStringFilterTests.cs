@@ -3,11 +3,11 @@
 
 using Microsoft.AspNetCore.DataProtection;
 using NUnit.Framework;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Common.Security;
+using Umbraco.Cms.Web.Common.Exceptions;
+using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Cms.Web.Common.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Filters
 {
     [TestFixture]
     public class ValidateUmbracoFormRouteStringFilterTests

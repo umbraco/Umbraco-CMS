@@ -1,11 +1,14 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors.Validators
+namespace Umbraco.Cms.Core.PropertyEditors.Validators
 {
     /// <summary>
     /// A validator that validates that the value against a regular expression.

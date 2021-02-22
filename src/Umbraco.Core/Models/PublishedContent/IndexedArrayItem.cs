@@ -1,7 +1,7 @@
 ﻿using System.Net;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Represents an item in an array that stores its own index and the total count.

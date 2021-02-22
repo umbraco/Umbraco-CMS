@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     public class BackOfficeExternalLoginProviderErrors
     {

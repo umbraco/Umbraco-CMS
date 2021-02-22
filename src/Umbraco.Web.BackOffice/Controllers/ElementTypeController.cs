@@ -1,10 +1,14 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController("UmbracoApi")]
     public class ElementTypeController : UmbracoAuthorizedJsonController

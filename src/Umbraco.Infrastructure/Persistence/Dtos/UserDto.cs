@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class UserDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.User;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.User;
 
         public UserDto()
         {

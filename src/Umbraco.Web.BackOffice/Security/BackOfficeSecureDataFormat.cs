@@ -1,11 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using System;
+﻿using System;
 using System.Security.Claims;
-using MimeKit.Cryptography;
-using Umbraco.Core.Security;
 using Umbraco.Extensions;
+using Microsoft.AspNetCore.Authentication;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
 
     /// <summary>

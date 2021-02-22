@@ -5,8 +5,9 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Runtime;
 using Umbraco.Core;
-using Umbraco.Core.IO;
 
 namespace Umbraco.Infrastructure.HostedServices
 {

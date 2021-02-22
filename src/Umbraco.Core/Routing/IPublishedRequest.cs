@@ -1,10 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     /// <summary>
     /// The result of Umbraco routing built with the <see cref="IPublishedRequestBuilder"/>

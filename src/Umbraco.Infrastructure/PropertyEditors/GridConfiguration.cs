@@ -1,6 +1,9 @@
 ﻿using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -17,7 +20,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration", HideLabel = true)]
         public JObject Rte { get; set; }
 
-        [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
+        [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
         public bool IgnoreUserStartNodes { get; set; }

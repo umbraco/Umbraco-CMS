@@ -1,7 +1,7 @@
-﻿using System;
-using Umbraco.Core.Models.PublishedContent;
+using System;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents the model for the current Umbraco view.
@@ -11,12 +11,7 @@ namespace Umbraco.Web.Models
         /// <summary>
         /// Initializes a new instance of the <see cref="ContentModel"/> class with a content.
         /// </summary>
-        /// <param name="content"></param>
-        public ContentModel(IPublishedContent content)
-        {
-            if (content == null) throw new ArgumentNullException(nameof(content));
-            Content = content;
-        }
+        public ContentModel(IPublishedContent content) => Content = content ?? throw new ArgumentNullException(nameof(content));
 
         /// <summary>
         /// Gets the content.

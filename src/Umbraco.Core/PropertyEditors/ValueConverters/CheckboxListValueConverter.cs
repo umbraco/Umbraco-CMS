@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
     public class CheckboxListValueConverter : PropertyValueConverterBase

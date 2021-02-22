@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services.Changes
+namespace Umbraco.Cms.Core.Services.Changes
 {
     public class ContentTypeChange<TItem>
         where TItem : class, IContentTypeComposition

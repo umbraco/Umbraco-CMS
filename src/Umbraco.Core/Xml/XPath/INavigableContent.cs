@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.Xml.XPath
+namespace Umbraco.Cms.Core.Xml.XPath
 {
     /// <summary>
     /// Represents a content that can be navigated via XPath.

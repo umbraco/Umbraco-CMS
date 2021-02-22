@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Models.Identity
+namespace Umbraco.Cms.Core.Models.Identity
 {
     /// <summary>
     /// Used to persist external login data for a user

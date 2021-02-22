@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Sync;
+﻿using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// A base class for "typed" cache refreshers.

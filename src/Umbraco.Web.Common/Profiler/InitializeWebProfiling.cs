@@ -2,10 +2,10 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Logging;
 
-namespace Umbraco.Web.Common.Profiler
+namespace Umbraco.Cms.Web.Common.Profiler
 {
     /// <summary>
     /// Initialized the web profiling. Ensures the boot process profiling is stopped.

@@ -3,11 +3,11 @@
 
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
     [TestFixture]
     public class CmsHelperCasingTests

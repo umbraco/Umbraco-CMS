@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Provides a common base interface for <see cref="IContentTypeBase"/>.

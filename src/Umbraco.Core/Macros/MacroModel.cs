@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Web.Macros
+namespace Umbraco.Cms.Core.Macros
 {
     public class MacroModel
     {

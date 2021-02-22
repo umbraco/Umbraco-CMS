@@ -1,5 +1,6 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
 

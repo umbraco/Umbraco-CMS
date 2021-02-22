@@ -8,7 +8,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     /// <content>
     /// Contains types and methods that allow publishing general notifications.

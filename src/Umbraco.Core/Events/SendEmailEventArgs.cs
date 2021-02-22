@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     public class SendEmailEventArgs : EventArgs
     {

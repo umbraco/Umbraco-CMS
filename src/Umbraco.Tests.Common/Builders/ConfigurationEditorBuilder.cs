@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class ConfigurationEditorBuilder<TParent> : ChildBuilderBase<TParent, IConfigurationEditor>
     {

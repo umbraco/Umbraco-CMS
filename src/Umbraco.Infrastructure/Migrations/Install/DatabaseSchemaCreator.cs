@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Migrations.Install
 {

@@ -3,7 +3,7 @@
 
 using System.Runtime.InteropServices;
 
-namespace Umbraco.Tests.Common.TestHelpers
+namespace Umbraco.Cms.Tests.Common.TestHelpers
 {
     public static class TestEnvironment
     {

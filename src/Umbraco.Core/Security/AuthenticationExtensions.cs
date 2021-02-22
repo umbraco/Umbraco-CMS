@@ -1,10 +1,12 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Globalization;
 using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
-using Umbraco.Extensions;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Extensions
 {
     public static class AuthenticationExtensions
     {

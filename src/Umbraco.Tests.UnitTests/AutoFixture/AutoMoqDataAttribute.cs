@@ -10,18 +10,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Routing;
+using Umbraco.Cms.Web.Common.Install;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Core.Security;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Routing;
-using Umbraco.Web.Common.Install;
-using Umbraco.Web.Common.Security;
-using Umbraco.Web.WebApi;
 
-namespace Umbraco.Tests.UnitTests.AutoFixture
+namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor)]
     public class AutoMoqDataAttribute : AutoDataAttribute

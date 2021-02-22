@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace Umbraco.Core.Models.Entities
+﻿namespace Umbraco.Cms.Core.Models.Entities
 {
 
     /// <summary>

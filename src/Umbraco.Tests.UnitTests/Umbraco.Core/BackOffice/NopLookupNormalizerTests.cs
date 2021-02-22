@@ -5,7 +5,7 @@ using System;
 using NUnit.Framework;
 using Umbraco.Core.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.BackOffice
 {
     public class NopLookupNormalizerTests
     {

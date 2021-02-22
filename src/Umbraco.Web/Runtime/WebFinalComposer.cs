@@ -1,6 +1,5 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Dictionary;
+﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Runtime
 {

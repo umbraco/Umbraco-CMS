@@ -1,7 +1,8 @@
 using System;
 using System.Linq;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     public class WebPath
     {

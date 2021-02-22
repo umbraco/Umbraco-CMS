@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 
-namespace Umbraco.Web.Common.Attributes
+namespace Umbraco.Cms.Web.Common.Attributes
 {
     /// <summary>
     /// When applied to an api controller it will be routed to the /Umbraco/BackOffice prefix route so we can determine if it
@@ -9,6 +8,6 @@ namespace Umbraco.Web.Common.Attributes
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
     public sealed class IsBackOfficeAttribute : Attribute
-    {        
+    {
     }
 }

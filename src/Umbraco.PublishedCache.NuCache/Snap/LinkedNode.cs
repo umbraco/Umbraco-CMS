@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.PublishedCache.NuCache.Snap
+﻿namespace Umbraco.Cms.Infrastructure.PublishedCache.Snap
 {
     //NOTE: This cannot be struct because it references itself
 

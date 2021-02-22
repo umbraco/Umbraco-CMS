@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Web.PublishedCache
+namespace Umbraco.Cms.Core.PublishedCache
 {
     // notes:
     // a published element does NOT manage any tree-like elements, neither the

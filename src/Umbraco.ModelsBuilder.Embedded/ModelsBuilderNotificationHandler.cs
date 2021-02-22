@@ -3,22 +3,21 @@ using System.Collections.Generic;
 using System.Reflection;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.ModelsBuilder.Embedded.BackOffice;
+using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Core.Strings;
 using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded.BackOffice;
-using Umbraco.Web.Common.ModelBinders;
 using Umbraco.Web.WebAssets;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Cms.ModelsBuilder.Embedded
 {
-
     /// <summary>
     /// Handles <see cref="UmbracoApplicationStarting"/> and <see cref="ServerVariablesParsing"/> notifications to initialize MB
     /// </summary>

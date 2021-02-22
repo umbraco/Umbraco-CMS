@@ -3,16 +3,20 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
-
-using Umbraco.Net;
 
 namespace Umbraco.Core.Compose
 {
@@ -63,7 +67,7 @@ namespace Umbraco.Core.Compose
             MemberService.Exported -= OnMemberExported;
         }
 
-        public static IUser UnknownUser(GlobalSettings globalSettings) => new User(globalSettings) { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
+        public static IUser UnknownUser(GlobalSettings globalSettings) => new User(globalSettings) { Id = Cms.Core.Constants.Security.UnknownUserId, Name = Cms.Core.Constants.Security.UnknownUserName, Email = "" };
 
         private IUser CurrentPerformingUser
         {

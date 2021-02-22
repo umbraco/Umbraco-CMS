@@ -1,7 +1,7 @@
 using System;
 using System.Data.Common;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Cms.Core.Configuration
 {
     public class ConfigConnectionString
     {
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Configuration
             {
                 if (dataSource.EndsWith(".sdf"))
                 {
-                    return Constants.DbProviderNames.SqlCe;
+                    return Umbraco.Cms.Core.Constants.DbProviderNames.SqlCe;
                 }
             }
 
@@ -44,17 +44,17 @@ namespace Umbraco.Core.Configuration
             {
                 if (builder.TryGetValue("Database", out var db) && db is string database && !string.IsNullOrEmpty(database))
                 {
-                    return Constants.DbProviderNames.SqlServer;
+                    return Umbraco.Cms.Core.Constants.DbProviderNames.SqlServer;
                 }
 
                 if (builder.TryGetValue("AttachDbFileName", out var a) && a is string attachDbFileName && !string.IsNullOrEmpty(attachDbFileName))
                 {
-                    return Constants.DbProviderNames.SqlServer;
+                    return Umbraco.Cms.Core.Constants.DbProviderNames.SqlServer;
                 }
 
                 if (builder.TryGetValue("Initial Catalog", out var i) && i is string initialCatalog && !string.IsNullOrEmpty(initialCatalog))
                 {
-                    return Constants.DbProviderNames.SqlServer;
+                    return Umbraco.Cms.Core.Constants.DbProviderNames.SqlServer;
                 }
             }
 

@@ -1,11 +1,12 @@
 ﻿using System;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core;
-using Umbraco.Core.Security;
-using Umbraco.Web.Editors;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// Used to emit outgoing editor model events
@@ -54,7 +55,7 @@ namespace Umbraco.Web.BackOffice.Filters
                     }
                 }
             }
-            
+
             public void OnActionExecuting(ActionExecutingContext context)
             {
             }

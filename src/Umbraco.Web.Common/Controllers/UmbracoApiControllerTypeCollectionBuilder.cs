@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Composing;
-using Umbraco.Web.WebApi;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Common.Controllers
+namespace Umbraco.Cms.Web.Common.Controllers
 {
     public class UmbracoApiControllerTypeCollectionBuilder : TypeCollectionBuilderBase<UmbracoApiControllerTypeCollectionBuilder, UmbracoApiControllerTypeCollection, UmbracoApiController>
     {

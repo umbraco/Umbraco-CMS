@@ -1,7 +1,7 @@
 ﻿using Serilog.Core;
 using Serilog.Events;
 using System;
-using Umbraco.Net;
+using Umbraco.Cms.Core.Net;
 
 namespace Umbraco.Core.Logging.Serilog.Enrichers
 {

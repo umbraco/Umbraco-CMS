@@ -4,7 +4,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Umbraco.Core.Configuration.Models.Validation
+namespace Umbraco.Cms.Core.Configuration.Models.Validation
 {
     /// <summary>
     /// Provides a base class for configuration models that can be validated based on data annotations.

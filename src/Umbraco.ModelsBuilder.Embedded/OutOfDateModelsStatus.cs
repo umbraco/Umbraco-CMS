@@ -1,12 +1,12 @@
 using System.IO;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
-using Umbraco.Web.Cache;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Cms.ModelsBuilder.Embedded
 {
     /// <summary>
     /// Used to track if ModelsBuilder models are out of date/stale

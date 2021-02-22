@@ -5,31 +5,29 @@ using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Umbraco.Core;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.TemplateQuery;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Core.Xml;
+using Umbraco.Cms.Web.BackOffice.ModelBinders;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Core.Trees;
-using Umbraco.Core.Xml;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.Models.TemplateQuery;
-using Umbraco.Web.Routing;
+using Umbraco.Web;
 using Umbraco.Web.Search;
-using Umbraco.Web.Services;
-using Umbraco.Web.Trees;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used for getting entity objects, basic name, icon, id representation of umbraco objects that are based on CMSNode

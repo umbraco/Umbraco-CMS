@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using System;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Tests.Common
+namespace Umbraco.Cms.Tests.Common
 {
     public class TestClone : IDeepCloneable, IEquatable<TestClone>
     {

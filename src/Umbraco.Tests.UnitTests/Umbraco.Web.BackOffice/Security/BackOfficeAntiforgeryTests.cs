@@ -12,11 +12,10 @@ using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using NUnit.Framework;
 using Umbraco.Core;
-using Umbraco.Core.Security;
 using Umbraco.Extensions;
 using Umbraco.Web.BackOffice.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Security
 {
     [TestFixture]
     public class BackOfficeAntiforgeryTests

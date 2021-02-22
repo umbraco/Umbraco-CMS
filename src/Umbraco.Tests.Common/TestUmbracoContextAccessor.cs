@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Web;
+using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Tests.Common
+namespace Umbraco.Cms.Tests.Common
 {
     public class TestUmbracoContextAccessor : IUmbracoContextAccessor
     {

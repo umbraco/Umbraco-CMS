@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Provides a default implementation for <see cref="IPublishedValueFallback"/>.

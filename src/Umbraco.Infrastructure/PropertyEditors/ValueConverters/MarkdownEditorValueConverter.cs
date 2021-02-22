@@ -1,8 +1,9 @@
 ﻿using System;
 using HeyRed.MarkdownSharp;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Templates;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Templates;
 
 namespace Umbraco.Core.PropertyEditors.ValueConverters
 {
@@ -19,7 +20,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(IPublishedPropertyType propertyType)
-            => Constants.PropertyEditors.Aliases.MarkdownEditor.Equals(propertyType.EditorAlias);
+            => Cms.Core.Constants.PropertyEditors.Aliases.MarkdownEditor.Equals(propertyType.EditorAlias);
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof (IHtmlEncodedString);

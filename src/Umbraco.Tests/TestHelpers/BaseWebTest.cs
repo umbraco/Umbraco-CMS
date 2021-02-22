@@ -6,24 +6,23 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.Common;
+using Umbraco.Extensions;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Web;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Models.PublishedContent;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.TestHelpers
 {

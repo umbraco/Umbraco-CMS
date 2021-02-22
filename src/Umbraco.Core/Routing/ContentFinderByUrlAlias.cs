@@ -1,13 +1,12 @@
 using System;
-using System.Text;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Xml;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     /// <summary>
     /// Provides an implementation of <see cref="IContentFinder"/> that handles page aliases.

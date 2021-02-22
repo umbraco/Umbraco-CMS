@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Models.TemplateQuery;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.TemplateQuery;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Extensions;
+using Umbraco.Web;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used for building content queries within the template

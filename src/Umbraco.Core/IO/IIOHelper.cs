@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Umbraco.Core.Hosting;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     public interface IIOHelper
     {

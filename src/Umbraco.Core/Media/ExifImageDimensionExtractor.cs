@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
-using Umbraco.Web.Media.Exif;
+using Umbraco.Cms.Core.Media.Exif;
 
-namespace Umbraco.Core.Media
+namespace Umbraco.Cms.Core.Media
 {
     public static class ExifImageDimensionExtractor
     {
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Media
                 height = Convert.ToInt32(jpgInfo.Properties[ExifTag.PixelYDimension].Value);
                 width = Convert.ToInt32(jpgInfo.Properties[ExifTag.PixelXDimension].Value);
             }
-            
+
             return height > 0 && width > 0;
         }
     }

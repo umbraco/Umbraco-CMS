@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     public interface IPackageActionRunner
     {

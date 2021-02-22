@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class MacroMapDefinition : IMapDefinition
     {

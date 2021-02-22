@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Server)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.Server)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class ServerRegistrationDto

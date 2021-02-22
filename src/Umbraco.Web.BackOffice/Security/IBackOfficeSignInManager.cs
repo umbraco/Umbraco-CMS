@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Authentication;
-using Microsoft.AspNetCore.Identity;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Identity;
 using Umbraco.Core.Security;
 
-namespace Umbraco.Web.Common.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     /// <summary>
     /// A <see cref="SignInManager{BackOfficeIdentityUser}"/> for the back office with a <seealso cref="BackOfficeIdentityUser"/>

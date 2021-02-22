@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Install.Models
+namespace Umbraco.Cms.Core.Install.Models
 {
     /// <summary>
     /// Model to give to the front-end to collect the information for each step
@@ -82,6 +82,6 @@ namespace Umbraco.Web.Install.Models
         /// </summary>
         [IgnoreDataMember]
         public abstract Type StepType { get; }
-        
+
     }
 }

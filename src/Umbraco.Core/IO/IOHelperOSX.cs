@@ -1,10 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
 
-
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     public class IOHelperOSX : IOHelper
     {

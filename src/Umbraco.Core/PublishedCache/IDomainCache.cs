@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Routing;
+﻿using System.Collections.Generic;
+using Umbraco.Cms.Core.Routing;
 
-namespace Umbraco.Web.PublishedCache
+namespace Umbraco.Cms.Core.PublishedCache
 {
     public interface IDomainCache
     {

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     [SupersedeEvent(typeof(SaveEventArgs<>))]
     [SupersedeEvent(typeof(PublishEventArgs<>))]

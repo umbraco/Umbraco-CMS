@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.PropertyType)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class PropertyTypeDto

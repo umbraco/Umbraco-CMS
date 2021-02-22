@@ -1,6 +1,4 @@
-using Umbraco.Core.PropertyEditors;
-
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
 
     public class MultiUrlPickerConfiguration : IIgnoreUserStartNodesConfig
@@ -11,7 +9,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("maxNumber", "Maximum number of items", "number")]
         public int MaxNumber { get; set; }
 
-        [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
+        [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
         public bool IgnoreUserStartNodes { get; set; }

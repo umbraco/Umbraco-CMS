@@ -4,8 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.HealthChecks
+namespace Umbraco.Cms.Core.HealthChecks
 {
     public class HealthCheckResults
     {

@@ -3,12 +3,13 @@
 
 using System;
 using Moq;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class DataValueEditorBuilder<TParent> : ChildBuilderBase<TParent, IDataValueEditor>
     {

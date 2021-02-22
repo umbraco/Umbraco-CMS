@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.AccessRule)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.AccessRule)]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class AccessRuleDto

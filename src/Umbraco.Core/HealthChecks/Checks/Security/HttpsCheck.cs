@@ -9,11 +9,12 @@ using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.HealthChecks.Checks.Security
+namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
 {
     /// <summary>
     /// Health checks for the recommended production setup regarding https.

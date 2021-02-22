@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public abstract class ChildBuilderBase<TParent, TType> : BuilderBase<TType>
     {

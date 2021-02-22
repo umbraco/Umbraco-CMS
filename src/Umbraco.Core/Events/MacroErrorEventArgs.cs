@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Macros;
+using Umbraco.Cms.Core.Macros;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     // Provides information on the macro that caused an error
     public class MacroErrorEventArgs : EventArgs

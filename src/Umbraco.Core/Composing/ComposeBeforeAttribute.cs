@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Indicates that a component is required by another composer.

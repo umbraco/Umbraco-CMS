@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Web.Common.ActionsResults
+namespace Umbraco.Cms.Web.Common.ActionsResults
 {
     public class UmbracoProblemResult : ObjectResult
     {

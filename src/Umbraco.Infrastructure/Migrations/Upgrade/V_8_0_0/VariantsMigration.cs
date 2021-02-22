@@ -25,20 +25,20 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             MigrateContent();
             MigrateVersions();
 
-            if (Database.Fetch<dynamic>($@"SELECT {Constants.DatabaseSchema.Tables.ContentVersion}.nodeId, COUNT({Constants.DatabaseSchema.Tables.ContentVersion}.id)
-FROM {Constants.DatabaseSchema.Tables.ContentVersion}
-JOIN {Constants.DatabaseSchema.Tables.DocumentVersion} ON {Constants.DatabaseSchema.Tables.ContentVersion}.id={Constants.DatabaseSchema.Tables.DocumentVersion}.id
-WHERE {Constants.DatabaseSchema.Tables.DocumentVersion}.published=1
-GROUP BY {Constants.DatabaseSchema.Tables.ContentVersion}.nodeId
-HAVING COUNT({Constants.DatabaseSchema.Tables.ContentVersion}.id) > 1").Any())
+            if (Database.Fetch<dynamic>($@"SELECT {Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion}.nodeId, COUNT({Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion}.id)
+FROM {Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion}
+JOIN {Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion} ON {Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion}.id={Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion}.id
+WHERE {Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion}.published=1
+GROUP BY {Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion}.nodeId
+HAVING COUNT({Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion}.id) > 1").Any())
             {
                 Debugger.Break();
                 throw new Exception("Migration failed: duplicate 'published' document versions.");
             }
 
             if (Database.Fetch<dynamic>($@"SELECT v1.nodeId, v1.id, COUNT(v2.id)
-FROM {Constants.DatabaseSchema.Tables.ContentVersion} v1
-LEFT JOIN {Constants.DatabaseSchema.Tables.ContentVersion} v2 ON v1.nodeId=v2.nodeId AND v2.[current]=1
+FROM {Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion} v1
+LEFT JOIN {Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion} v2 ON v1.nodeId=v2.nodeId AND v2.[current]=1
 GROUP BY v1.nodeId, v1.id
 HAVING COUNT(v2.id) <> 1").Any())
             {
@@ -50,7 +50,7 @@ HAVING COUNT(v2.id) <> 1").Any())
         private void MigratePropertyData()
         {
             // if the table has already been renamed, we're done
-            if (TableExists(Constants.DatabaseSchema.Tables.PropertyData))
+            if (TableExists(Cms.Core.Constants.DatabaseSchema.Tables.PropertyData))
                 return;
 
             // add columns
@@ -99,7 +99,7 @@ INNER JOIN {PreTables.PropertyData} ON {PreTables.ContentVersion}.versionId = {P
                 Delete.Column("contentNodeId").FromTable(PreTables.PropertyData).Do();
 
             // rename table
-            Rename.Table(PreTables.PropertyData).To(Constants.DatabaseSchema.Tables.PropertyData).Do();
+            Rename.Table(PreTables.PropertyData).To(Cms.Core.Constants.DatabaseSchema.Tables.PropertyData).Do();
         }
 
         private void CreatePropertyDataIndexes()
@@ -115,7 +115,7 @@ INNER JOIN {PreTables.PropertyData} ON {PreTables.ContentVersion}.versionId = {P
                 .OnColumn("propertyTypeId").Ascending()
                 .OnColumn("languageId").Ascending()
                 .OnColumn("segment").Ascending()
-                .Do();                
+                .Do();
         }
 
         private void MigrateContentAndPropertyTypes()
@@ -129,7 +129,7 @@ INNER JOIN {PreTables.PropertyData} ON {PreTables.ContentVersion}.versionId = {P
         private void MigrateContent()
         {
             // if the table has already been renamed, we're done
-            if (TableExists(Constants.DatabaseSchema.Tables.Content))
+            if (TableExists(Cms.Core.Constants.DatabaseSchema.Tables.Content))
                 return;
 
             // rename columns
@@ -141,21 +141,21 @@ INNER JOIN {PreTables.PropertyData} ON {PreTables.ContentVersion}.versionId = {P
                 Delete.Column("pk").FromTable(PreTables.Content).Do();
 
             // rename table
-            Rename.Table(PreTables.Content).To(Constants.DatabaseSchema.Tables.Content).Do();
+            Rename.Table(PreTables.Content).To(Cms.Core.Constants.DatabaseSchema.Tables.Content).Do();
         }
 
         private void MigrateVersions()
         {
             // if the table has already been renamed, we're done
-            if (TableExists(Constants.DatabaseSchema.Tables.ContentVersion))
+            if (TableExists(Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion))
                 return;
 
             // if the table already exists, we're done
-            if (TableExists(Constants.DatabaseSchema.Tables.DocumentVersion))
+            if (TableExists(Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion))
                 return;
 
             // if the table has already been renamed, we're done
-            if (TableExists(Constants.DatabaseSchema.Tables.Document))
+            if (TableExists(Cms.Core.Constants.DatabaseSchema.Tables.Document))
                 return;
 
             // do it all at once
@@ -201,7 +201,7 @@ FROM {PreTables.ContentVersion} v INNER JOIN {PreTables.Document} d ON d.version
                 // SQLCE does not support UPDATE...FROM
                 var otherContent = Database.Fetch<dynamic>($@"SELECT cver.versionId, n.text
 FROM {PreTables.ContentVersion} cver
-JOIN {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Node)} n ON cver.nodeId=n.id
+JOIN {SqlSyntax.GetQuotedTableName(Cms.Core.Constants.DatabaseSchema.Tables.Node)} n ON cver.nodeId=n.id
 WHERE cver.versionId NOT IN (SELECT versionId FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)})");
 
                 foreach (var t in otherContent)
@@ -212,7 +212,7 @@ WHERE cver.versionId NOT IN (SELECT versionId FROM {SqlSyntax.GetQuotedTableName
             {
                 Database.Execute($@"UPDATE {PreTables.ContentVersion} SET text=n.text, {SqlSyntax.GetQuotedColumnName("current")}=1, userId=0
 FROM {PreTables.ContentVersion} cver
-JOIN {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.Node)} n ON cver.nodeId=n.id
+JOIN {SqlSyntax.GetQuotedTableName(Cms.Core.Constants.DatabaseSchema.Tables.Node)} n ON cver.nodeId=n.id
 WHERE cver.versionId NOT IN (SELECT versionId FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)})");
             }
 
@@ -220,7 +220,7 @@ WHERE cver.versionId NOT IN (SELECT versionId FROM {SqlSyntax.GetQuotedTableName
             Create.Table<DocumentVersionDto>(withoutKeysAndIndexes: true).Do();
 
             // every document row becomes a document version
-            Database.Execute($@"INSERT INTO {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DocumentVersion)} (id, templateId, published)
+            Database.Execute($@"INSERT INTO {SqlSyntax.GetQuotedTableName(Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion)} (id, templateId, published)
 SELECT cver.id, doc.templateId, doc.published
 FROM {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver
 JOIN {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc ON doc.nodeId=cver.nodeId AND doc.versionId=cver.versionId");
@@ -237,7 +237,7 @@ JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cver ON doc.nodeId
 WHERE doc.newest=1 AND doc.published=1");
 
             Database.Execute($@"
-INSERT INTO {SqlSyntax.GetQuotedTableName(Constants.DatabaseSchema.Tables.DocumentVersion)} (id, templateId, published)
+INSERT INTO {SqlSyntax.GetQuotedTableName(Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion)} (id, templateId, published)
 SELECT cverNew.id, doc.templateId, 0
 FROM {SqlSyntax.GetQuotedTableName(PreTables.Document)} doc
 JOIN {SqlSyntax.GetQuotedTableName(PreTables.ContentVersion)} cverNew ON doc.nodeId = cverNew.nodeId
@@ -259,7 +259,7 @@ WHERE versionId NOT IN (SELECT (versionId) FROM {PreTables.ContentVersion} WHERE
 
             // ensure that documents with a published version are marked as published
             Database.Execute($@"UPDATE {PreTables.Document} SET published=1 WHERE nodeId IN (
-SELECT nodeId FROM {PreTables.ContentVersion} cv INNER JOIN {Constants.DatabaseSchema.Tables.DocumentVersion} dv ON dv.id = cv.id WHERE dv.published=1)");
+SELECT nodeId FROM {PreTables.ContentVersion} cv INNER JOIN {Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion} dv ON dv.id = cv.id WHERE dv.published=1)");
 
             // drop some document columns
             Delete.Column("text").FromTable(PreTables.Document).Do();
@@ -286,12 +286,12 @@ SELECT nodeId FROM {PreTables.ContentVersion} cv INNER JOIN {Constants.DatabaseS
             var temp = Database.Fetch<dynamic>($@"SELECT n.id,
 v1.intValue intValue1, v1.decimalValue decimalValue1, v1.dateValue dateValue1, v1.varcharValue varcharValue1, v1.textValue textValue1,
 v2.intValue intValue2, v2.decimalValue decimalValue2, v2.dateValue dateValue2, v2.varcharValue varcharValue2, v2.textValue textValue2
-FROM {Constants.DatabaseSchema.Tables.Node} n
+FROM {Cms.Core.Constants.DatabaseSchema.Tables.Node} n
 JOIN {PreTables.ContentVersion} cv1 ON n.id=cv1.nodeId AND cv1.{SqlSyntax.GetQuotedColumnName("current")}=1
-JOIN {Constants.DatabaseSchema.Tables.PropertyData} v1 ON cv1.id=v1.versionId
+JOIN {Cms.Core.Constants.DatabaseSchema.Tables.PropertyData} v1 ON cv1.id=v1.versionId
 JOIN {PreTables.ContentVersion} cv2 ON n.id=cv2.nodeId
-JOIN {Constants.DatabaseSchema.Tables.DocumentVersion} dv ON cv2.id=dv.id AND dv.published=1
-JOIN {Constants.DatabaseSchema.Tables.PropertyData} v2 ON cv2.id=v2.versionId
+JOIN {Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion} dv ON cv2.id=dv.id AND dv.published=1
+JOIN {Cms.Core.Constants.DatabaseSchema.Tables.PropertyData} v2 ON cv2.id=v2.versionId
 WHERE v1.propertyTypeId=v2.propertyTypeId
 AND (v1.languageId=v2.languageId OR (v1.languageId IS NULL AND v2.languageId IS NULL))
 AND (v1.segment=v2.segment OR (v1.segment IS NULL AND v2.segment IS NULL))");
@@ -306,8 +306,8 @@ AND (v1.segment=v2.segment OR (v1.segment IS NULL AND v2.segment IS NULL))");
             Delete.Column("versionId").FromTable(PreTables.ContentVersion).Do();
 
             // rename tables
-            Rename.Table(PreTables.ContentVersion).To(Constants.DatabaseSchema.Tables.ContentVersion).Do();
-            Rename.Table(PreTables.Document).To(Constants.DatabaseSchema.Tables.Document).Do();
+            Rename.Table(PreTables.ContentVersion).To(Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion).Do();
+            Rename.Table(PreTables.Document).To(Cms.Core.Constants.DatabaseSchema.Tables.Document).Do();
         }
 
         private static class PreTables

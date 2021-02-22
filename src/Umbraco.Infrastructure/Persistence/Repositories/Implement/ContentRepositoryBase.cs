@@ -3,22 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using NPoco;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Editors;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.SqlExtensionsStatics;
+using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -92,7 +94,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // gets all version ids, current first
         public virtual IEnumerable<int> GetVersionIds(int nodeId, int maxRows)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetVersionIds, tsql =>
+            var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.VersionableRepository.GetVersionIds, tsql =>
                 tsql.Select<ContentVersionDto>(x => x.Id)
                     .From<ContentVersionDto>()
                     .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId"))
@@ -108,7 +110,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // TODO: test object node type?
 
             // get the version we want to delete
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetVersion, tsql =>
+            var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.VersionableRepository.GetVersion, tsql =>
                 tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId"))
             );
             var versionDto = Database.Fetch<ContentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
@@ -130,7 +132,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // TODO: test object node type?
 
             // get the versions we want to delete, excluding the current one
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetVersions, tsql =>
+            var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.VersionableRepository.GetVersions, tsql =>
                 tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
             );
             var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
@@ -461,7 +463,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // create the outer join complete sql fragment
             var outerJoinTempTable = $@"LEFT OUTER JOIN ({innerSqlString}) AS customPropData
-                ON customPropData.customPropNodeId = {Constants.DatabaseSchema.Tables.Node}.id "; // trailing space is important!
+                ON customPropData.customPropNodeId = {Cms.Core.Constants.DatabaseSchema.Tables.Node}.id "; // trailing space is important!
 
             // insert this just above the first WHERE
             var newSql = InsertBefore(sql.SQL, "WHERE", outerJoinTempTable);
@@ -498,7 +500,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var nodesToRebuild = new Dictionary<int, List<NodeDto>>();
             var validNodes = new Dictionary<int, NodeDto>();
-            var rootIds = new[] {Constants.System.Root, Constants.System.RecycleBinContent, Constants.System.RecycleBinMedia};
+            var rootIds = new[] {Cms.Core.Constants.System.Root, Cms.Core.Constants.System.RecycleBinContent, Cms.Core.Constants.System.RecycleBinMedia};
             var currentParentIds = new HashSet<int>(rootIds);
             var prevParentIds = currentParentIds;
             var lastLevel = -1;
@@ -944,7 +946,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName, tsql => tsql
+            var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName, tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId"))
@@ -958,7 +960,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual int GetNewChildSortOrder(int parentId, int first)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetSortOrder, tsql => tsql
+            var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.VersionableRepository.GetSortOrder, tsql => tsql
                 .Select("MAX(sortOrder)")
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId"))
@@ -972,7 +974,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual NodeDto GetParentNodeDto(int parentId)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetParentNode, tsql => tsql
+            var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.VersionableRepository.GetParentNode, tsql => tsql
                 .Select<NodeDto>()
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
@@ -986,10 +988,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual int GetReservedId(Guid uniqueId)
         {
-            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetReservedId, tsql => tsql
+            var template = SqlContext.Templates.Get(Cms.Core.Constants.SqlTemplates.VersionableRepository.GetReservedId, tsql => tsql
                 .Select<NodeDto>(x => x.NodeId)
                 .From<NodeDto>()
-                .Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
+                .Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Cms.Core.Constants.ObjectTypes.IdReservation)
             );
 
             var sql = template.Sql(new { uniqueId });
@@ -1019,7 +1021,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             trackedRelations.AddRange(_dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors));
 
             //First delete all auto-relations for this entity
-            RelationRepository.DeleteByParent(entity.Id, Constants.Conventions.RelationTypes.AutomaticRelationTypes);
+            RelationRepository.DeleteByParent(entity.Id, Cms.Core.Constants.Conventions.RelationTypes.AutomaticRelationTypes);
 
             if (trackedRelations.Count == 0) return;
 

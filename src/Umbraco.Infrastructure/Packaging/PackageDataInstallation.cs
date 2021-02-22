@@ -7,16 +7,19 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Collections;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Packaging;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Packaging;
+using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Packaging
 {
@@ -481,11 +484,11 @@ namespace Umbraco.Core.Packaging
                 case IMediaType m:
                     if (parent is null)
                     {
-                        return new Umbraco.Core.Models.Media(name, parentId, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
+                        return new Media(name, parentId, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
                     }
                     else
                     {
-                        return new Umbraco.Core.Models.Media(name, (IMedia)parent, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
+                        return new Media(name, (IMedia)parent, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
                     }
 
                 default:
@@ -923,7 +926,7 @@ namespace Umbraco.Core.Packaging
                         property.Element("Name").Value, dataTypeDefinitionId, property.Element("Type").Value.Trim());
 
                     //convert to a label!
-                    dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.Label).FirstOrDefault();
+                    dataTypeDefinition = _dataTypeService.GetByEditorAlias(Cms.Core.Constants.PropertyEditors.Aliases.Label).FirstOrDefault();
                     //if for some odd reason this isn't there then ignore
                     if (dataTypeDefinition == null) continue;
                 }
@@ -1482,7 +1485,7 @@ namespace Umbraco.Core.Packaging
 
         private string ViewPath(string alias)
         {
-            return Constants.SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
+            return Cms.Core.Constants.SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
         }
 
         #endregion

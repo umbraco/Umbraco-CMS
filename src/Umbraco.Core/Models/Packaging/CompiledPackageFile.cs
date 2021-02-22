@@ -1,7 +1,7 @@
 using System;
 using System.Xml.Linq;
 
-namespace Umbraco.Core.Models.Packaging
+namespace Umbraco.Cms.Core.Models.Packaging
 {
     public class CompiledPackageFile
     {

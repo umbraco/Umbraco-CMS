@@ -1,17 +1,17 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Services
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Services
 {
     [TestFixture]
     public class ContentTypeServiceExtensionsTests

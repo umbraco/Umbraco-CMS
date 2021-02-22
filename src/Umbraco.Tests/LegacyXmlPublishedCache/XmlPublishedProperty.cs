@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Xml;
 using System.Xml.Serialization;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Xml;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Xml;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {

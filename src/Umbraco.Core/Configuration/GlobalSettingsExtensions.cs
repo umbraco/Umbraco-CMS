@@ -1,8 +1,8 @@
 ﻿using System;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Extensions
 {
     public static class GlobalSettingsExtensions
     {

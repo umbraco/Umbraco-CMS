@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Sync
+﻿namespace Umbraco.Cms.Core.Sync
 {
     /// <summary>
     /// Provides the address of a server.

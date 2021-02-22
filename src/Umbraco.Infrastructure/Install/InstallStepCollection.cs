@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Install.InstallSteps;
+using Umbraco.Cms.Core.Install.InstallSteps;
+using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Web.Install.InstallSteps;
-using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install
 {

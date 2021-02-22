@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Cms.ModelsBuilder.Embedded
 {
     /// <summary>
     /// Indicates that a property implements a given property alias.

@@ -13,15 +13,15 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Templates;
 
-namespace Umbraco.Web.Common.Templates
+namespace Umbraco.Cms.Web.Common.Templates
 {
     /// <summary>
     /// This is used purely for the RenderTemplate functionality in Umbraco

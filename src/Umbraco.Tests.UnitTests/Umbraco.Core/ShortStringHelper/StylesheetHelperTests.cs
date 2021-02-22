@@ -4,10 +4,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Strings.Css;
+using Umbraco.Cms.Core.Strings.Css;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
     [TestFixture]
     public class StylesheetHelperTests

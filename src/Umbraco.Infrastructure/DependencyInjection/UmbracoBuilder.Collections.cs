@@ -1,12 +1,8 @@
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Core.Cache;
-using Umbraco.Core.DependencyInjection;
 using Umbraco.Core.Manifest;
-using Umbraco.Core.PackageActions;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Strings;
-using Umbraco.Core.Trees;
-using Umbraco.Web.Media.EmbedProviders;
 
 namespace Umbraco.Infrastructure.DependencyInjection
 {

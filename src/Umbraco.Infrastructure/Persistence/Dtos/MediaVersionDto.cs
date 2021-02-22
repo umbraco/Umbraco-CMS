@@ -8,7 +8,7 @@ namespace Umbraco.Core.Persistence.Dtos
     [ExplicitColumns]
     internal class MediaVersionDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.MediaVersion;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.MediaVersion;
 
         [Column("id")]
         [PrimaryKeyColumn(AutoIncrement = false)]

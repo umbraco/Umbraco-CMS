@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     public interface IPropertyCollection : IEnumerable<IProperty>, IDeepCloneable, INotifyCollectionChanged
     {

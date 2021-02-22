@@ -5,7 +5,6 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin;
-using Umbraco.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
@@ -32,7 +31,8 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 var securityStamp = Guid.NewGuid().ToString();
 
                 var identity = new ClaimsIdentity();
-                identity.AddRequiredClaims(Core.Constants.Security.SuperUserIdAsString,
+                identity.AddRequiredClaims(
+                    Core.Constants.Security.SuperUserIdAsString,
                     "admin",
                     "Admin",
                     new[] { -1 },

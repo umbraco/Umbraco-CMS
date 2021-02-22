@@ -1,5 +1,5 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Compose
 {

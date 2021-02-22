@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Scoping
+﻿using Umbraco.Cms.Core;
+
+namespace Umbraco.Core.Scoping
 {
     /// <summary>
     /// References a scope.

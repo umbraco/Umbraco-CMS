@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Core.Configuration.UmbracoSettings
+namespace Umbraco.Cms.Core.Configuration.UmbracoSettings
 {
     public interface ITypeFinderConfig
     {

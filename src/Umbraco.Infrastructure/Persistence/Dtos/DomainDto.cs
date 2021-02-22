@@ -3,7 +3,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Domain)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.Domain)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class DomainDto

@@ -4,12 +4,12 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.Security;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Web.BackOffice.DependencyInjection;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.Integration.Umbraco.Web.BackOffice
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice
 {
     [TestFixture]
     public class UmbracoBackOfficeServiceCollectionExtensionsTests : UmbracoIntegrationTest

@@ -4,17 +4,19 @@
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Routing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Security;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Backoffice.Security
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Security
 {
     [TestFixture]
     public class BackOfficeCookieManagerTests

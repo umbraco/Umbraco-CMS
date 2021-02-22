@@ -1,11 +1,14 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Security
 {
@@ -78,7 +81,7 @@ namespace Umbraco.Core.Security
 
         private static string GetPasswordHash(string storedPass)
         {
-            return storedPass.StartsWith(Constants.Security.EmptyPasswordPrefix) ? null : storedPass;
+            return storedPass.StartsWith(Cms.Core.Constants.Security.EmptyPasswordPrefix) ? null : storedPass;
         }
     }
 }

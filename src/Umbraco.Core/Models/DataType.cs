@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Implements <see cref="IDataType"/>.

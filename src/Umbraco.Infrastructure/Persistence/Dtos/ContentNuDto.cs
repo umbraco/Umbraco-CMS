@@ -4,7 +4,7 @@ using Umbraco.Core.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.NodeData)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.NodeData)]
     [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
     public class ContentNuDto

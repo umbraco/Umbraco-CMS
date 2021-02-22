@@ -7,11 +7,12 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Tests.Common.TestHelpers;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreThings
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreThings
 {
     [TestFixture]
     public class ObjectExtensionsTests

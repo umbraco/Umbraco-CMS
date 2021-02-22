@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Xml.XPath;
+using Umbraco.Cms.Core.Xml.XPath;
 
-namespace Umbraco.Web.PublishedCache.NuCache.Navigable
+namespace Umbraco.Cms.Infrastructure.PublishedCache.Navigable
 {
     internal class RootContent : INavigableContent
     {

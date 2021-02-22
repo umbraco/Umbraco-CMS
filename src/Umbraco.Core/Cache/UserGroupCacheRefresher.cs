@@ -1,10 +1,8 @@
 ﻿using System;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Repositories;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Handles User group cache invalidation/refreshing

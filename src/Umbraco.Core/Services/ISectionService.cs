@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Sections;
+using Umbraco.Cms.Core.Sections;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Cms.Core.Services
 {
     public interface ISectionService
     {

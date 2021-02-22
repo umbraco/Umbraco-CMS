@@ -1,6 +1,4 @@
-﻿using Umbraco.Core;
-
-namespace Umbraco.Web.Models
+﻿namespace Umbraco.Cms.Core.Models
 {
     public class Link
     {

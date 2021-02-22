@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class StylesheetBuilder
         : BuilderBase<Stylesheet>

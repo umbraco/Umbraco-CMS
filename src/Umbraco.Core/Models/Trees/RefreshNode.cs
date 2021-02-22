@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Services;
+﻿using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Models.Trees
+namespace Umbraco.Cms.Core.Models.Trees
 {
     /// <inheritdoc />
     /// <summary>

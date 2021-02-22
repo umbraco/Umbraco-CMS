@@ -5,12 +5,12 @@ using System;
 using System.Linq;
 using System.Reflection;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
 {
     [TestFixture]
     public class MacroTests

@@ -8,25 +8,28 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Diagnostics;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Diagnostics;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Strings;
-using Umbraco.Net;
-using Umbraco.Tests.Common.TestHelpers;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Common
+namespace Umbraco.Cms.Tests.Common
 {
     /// <summary>
     /// Common helper properties and methods useful to testing
@@ -41,7 +44,7 @@ namespace Umbraco.Tests.Common
         protected TestHelperBase(Assembly entryAssembly)
         {
             MainDom = new SimpleMainDom();
-            _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly), new VaryingRuntimeHash());
+            _typeFinder = new TypeFinder(NullLoggerFactory.Instance.CreateLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(entryAssembly, NullLoggerFactory.Instance), new VaryingRuntimeHash());
         }
 
         public ITypeFinder GetTypeFinder() => _typeFinder;

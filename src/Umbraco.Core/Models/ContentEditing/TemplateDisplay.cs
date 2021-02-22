@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     [DataContract(Name = "template", Namespace = "")]
     public class TemplateDisplay : INotificationModel

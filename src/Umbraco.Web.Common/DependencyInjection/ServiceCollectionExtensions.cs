@@ -8,9 +8,9 @@ using SixLabors.ImageSharp.Web.Commands;
 using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Web.Common.DependencyInjection
+namespace Umbraco.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -19,7 +19,7 @@ namespace Umbraco.Web.Common.DependencyInjection
         /// </summary>
         public static IServiceCollection AddUmbracoImageSharp(this IServiceCollection services, IConfiguration configuration)
         {
-            var imagingSettings = configuration.GetSection(Core.Constants.Configuration.ConfigImaging)
+            var imagingSettings = configuration.GetSection(Cms.Core.Constants.Configuration.ConfigImaging)
                 .Get<ImagingSettings>() ?? new ImagingSettings();
 
             services.AddImageSharp(options =>

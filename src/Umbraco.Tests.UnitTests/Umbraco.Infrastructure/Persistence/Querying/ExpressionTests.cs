@@ -8,19 +8,19 @@ using System.Linq.Expressions;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
 {
     [TestFixture]
     public class ExpressionTests : BaseUsingSqlSyntax

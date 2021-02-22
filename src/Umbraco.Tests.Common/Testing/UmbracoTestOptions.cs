@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Tests.Testing
+namespace Umbraco.Cms.Tests.Common.Testing
 {
     public static class UmbracoTestOptions
     {
