@@ -11,13 +11,13 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Tests.UnitTests.AutoFixture;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Common.Install;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Tests.UnitTests.AutoFixture;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Install;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
 {
     [TestFixture]
     internal class FileNameTests

@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
 {
     public static class StringExtensions
     {

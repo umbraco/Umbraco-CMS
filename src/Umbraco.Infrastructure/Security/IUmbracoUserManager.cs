@@ -4,11 +4,11 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Core.Security
 {
 
     /// <summary>

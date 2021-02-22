@@ -4,12 +4,12 @@
 using AutoFixture.NUnit3;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Tests.UnitTests.AutoFixture;
-using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Tests.UnitTests.AutoFixture;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
 {
     [TestFixture]
     public class GlobalSettingsTests

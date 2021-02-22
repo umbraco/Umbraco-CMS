@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Text.RegularExpressions;
 using static Umbraco.Core.Persistence.Repositories.Implement.SimilarNodeName;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -196,7 +197,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     Text = name;
                 }
-            }    
+            }
 
             internal bool IsEmptyName()
             {

@@ -1,7 +1,5 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Core.Security;
-using Umbraco.Infrastructure.Security;
 
 namespace Umbraco.Core.Security
 {

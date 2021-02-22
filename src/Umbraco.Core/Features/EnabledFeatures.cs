@@ -1,4 +1,4 @@
-namespace Umbraco.Web.Features
+namespace Umbraco.Cms.Core.Features
 {
     /// <summary>
     /// Represents enabled features.

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.TestHelpers.Entities

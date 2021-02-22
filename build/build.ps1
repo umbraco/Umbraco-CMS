@@ -51,12 +51,12 @@
   {
     param ( $semver )
 
-    $release = "" + $semver.Major + "." + $semver.Minor + "." + $semver.Patch
-
-    Write-Host "Update IIS Express port in csproj"
-    $updater = New-Object "Umbraco.Build.ExpressPortUpdater"
-    $csproj = "$($this.SolutionRoot)\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
-    $updater.Update($csproj, $release)
+    $port = "" + $semver.Major + $semver.Minor + ("" + $semver.Patch).PadLeft(2, '0')
+    Write-Host "Update port in launchSettings.json to $port"
+    $filePath = "$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Properties\launchSettings.json"
+    $this.ReplaceFileText($filePath, `
+      "http://localhost:(\d+)?", `
+      "http://localhost:$port")
   })
 
   $ubuild.DefineMethod("SandboxNode",
@@ -478,7 +478,7 @@
   {
     $this.VerifyNuGetConsistency(
       ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Web"),
-      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI.NetCore", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.ModelsBuilder.Embedded", "Umbraco.Persistence.SqlCe"))
+      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI.NetCore", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Persistence.SqlCe"))
     if ($this.OnError()) { return }
   })
 

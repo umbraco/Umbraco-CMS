@@ -1,6 +1,7 @@
 using System;
+using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Represents a reference to an <see cref="UmbracoContext"/> instance.

@@ -8,24 +8,25 @@ using System.Web.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Logging.Serilog.Enrichers;
-using Umbraco.Net;
+using Umbraco.Extensions;
 using Umbraco.Web.Hosting;
-using ConnectionStrings = Umbraco.Core.Configuration.Models.ConnectionStrings;
+using ConnectionStrings = Umbraco.Cms.Core.Configuration.Models.ConnectionStrings;
 using Current = Umbraco.Web.Composing.Current;
-using GlobalSettings = Umbraco.Core.Configuration.Models.GlobalSettings;
+using GlobalSettings = Umbraco.Cms.Core.Configuration.Models.GlobalSettings;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Web
@@ -119,7 +120,7 @@ namespace Umbraco.Web
                 // assembly we can get and we can only get that if we put this code into the WebRuntime since the executing assembly is the 'current' one.
                 // For this purpose, it doesn't matter if it's Umbraco.Web or Umbraco.Infrastructure since all assemblies are in that same path and we are
                 // getting rid of netframework.
-                Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly()), runtimeHash);
+                Assembly.GetEntryAssembly() ?? Assembly.GetExecutingAssembly(), _loggerFactory), runtimeHash);
         }
 
         /// <summary>

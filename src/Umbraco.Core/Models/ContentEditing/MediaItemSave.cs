@@ -1,7 +1,6 @@
 ﻿using System.Runtime.Serialization;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// A model representing a media item to be saved

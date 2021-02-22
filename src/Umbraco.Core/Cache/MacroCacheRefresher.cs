@@ -1,11 +1,10 @@
 ﻿using System;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
 using System.Linq;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     public sealed class MacroCacheRefresher : PayloadCacheRefresherBase<MacroCacheRefresher, MacroCacheRefresher.JsonPayload>
     {

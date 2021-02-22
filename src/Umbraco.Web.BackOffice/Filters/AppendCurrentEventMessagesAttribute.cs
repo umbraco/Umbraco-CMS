@@ -2,10 +2,11 @@
 using System.Net.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core.Events;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
 
     /// <summary>

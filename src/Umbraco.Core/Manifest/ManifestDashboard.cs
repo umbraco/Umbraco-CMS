@@ -1,9 +1,8 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Runtime.Serialization;
-using Umbraco.Core.Dashboards;
+using Umbraco.Cms.Core.Dashboards;
 
-namespace Umbraco.Core.Manifest
+namespace Umbraco.Cms.Core.Manifest
 {
     [DataContract]
     public class ManifestDashboard : IDashboard

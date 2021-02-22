@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Xml.Linq;
 
-namespace Umbraco.Web.Media.TypeDetector
+namespace Umbraco.Cms.Core.Media.TypeDetector
 {
     public class SvgDetector
     {

@@ -1,6 +1,7 @@
 ﻿using Newtonsoft.Json.Linq;
 using System.Linq;
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Models.Blocks;
 
 namespace Umbraco.Core.Models.Blocks
 {
@@ -9,7 +10,7 @@ namespace Umbraco.Core.Models.Blocks
     /// </summary>
     public class BlockListEditorDataConverter : BlockEditorDataConverter
     {
-        public BlockListEditorDataConverter() : base(Constants.PropertyEditors.Aliases.BlockList)
+        public BlockListEditorDataConverter() : base(Cms.Core.Constants.PropertyEditors.Aliases.BlockList)
         {
         }
 

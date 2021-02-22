@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Services
+﻿namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Manages the simplified key/value store.

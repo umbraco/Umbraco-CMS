@@ -11,20 +11,21 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Website.Controllers;
+using Umbraco.Cms.Web.Website.Routing;
 using Umbraco.Extensions;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Website.Controllers;
-using Umbraco.Web.Website.Routing;
-using static Umbraco.Core.Constants.Web.Routing;
+using static Umbraco.Cms.Core.Constants.Web.Routing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
 {
     [TestFixture]
     public class UmbracoRouteValueTransformerTests
@@ -188,7 +189,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Website.Routing
 
         private class TestController : RenderController
         {
-            public TestController(ILogger<RenderController> logger, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
+            public TestController(ILogger<TestController> logger, ICompositeViewEngine compositeViewEngine, IUmbracoContextAccessor umbracoContextAccessor)
                 : base(logger, compositeViewEngine, umbracoContextAccessor)
             {
             }

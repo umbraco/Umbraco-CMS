@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Core.Serialization
 {

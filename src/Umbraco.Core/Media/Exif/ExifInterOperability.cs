@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Media.Exif
+﻿namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Represents interoperability data for an exif tag in the platform byte order.

@@ -2,8 +2,9 @@
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
-        <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
+        <RootNamespace>Umbraco.Cms.Web.UI.NetCore</RootNamespace>
         <LangVersion>latest</LangVersion>
+        <RootNamespace>Umbraco.Web.UI.NetCore</RootNamespace>
     </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
@@ -12,7 +13,6 @@
     <CopyRazorGenerateFilesToPublishDirectory>true</CopyRazorGenerateFilesToPublishDirectory>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Umbraco.ModelsBuilder.Embedded\Umbraco.ModelsBuilder.Embedded.csproj" />
     <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
     <ProjectReference Include="..\Umbraco.Web.BackOffice\Umbraco.Web.BackOffice.csproj" />
     <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />

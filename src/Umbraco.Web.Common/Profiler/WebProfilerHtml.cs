@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using StackExchange.Profiling;
 using StackExchange.Profiling.Internal;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core.Logging;
 
-namespace Umbraco.Web.Common.Profiler
+namespace Umbraco.Cms.Web.Common.Profiler
 {
     public class WebProfilerHtml : IProfilerHtml
     {

@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
+using System.Linq;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     public class ContentScheduleCollection : INotifyCollectionChanged, IDeepCloneable, IEquatable<ContentScheduleCollection>
     {

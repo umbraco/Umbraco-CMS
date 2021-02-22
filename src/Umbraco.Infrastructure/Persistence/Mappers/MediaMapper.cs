@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Infrastructure.Persistence.Mappers;
@@ -7,11 +8,11 @@ using Umbraco.Infrastructure.Persistence.Mappers;
 namespace Umbraco.Core.Persistence.Mappers
 {
     /// <summary>
-    /// Represents a <see cref="Models.Media"/> to DTO mapper used to translate the properties of the public api
+    /// Represents a <see cref="Media"/> to DTO mapper used to translate the properties of the public api
     /// implementation to that of the database's DTO as sql: [tableName].[columnName].
     /// </summary>
     [MapperFor(typeof(IMedia))]
-    [MapperFor(typeof(Umbraco.Core.Models.Media))]
+    [MapperFor(typeof(Media))]
     public sealed class MediaMapper : BaseMapper
     {
         public MediaMapper(Lazy<ISqlContext> sqlContext, MapperConfigurationStore maps)
@@ -20,21 +21,21 @@ namespace Umbraco.Core.Persistence.Mappers
 
         protected override void DefineMaps()
         {
-            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Id), nameof(NodeDto.NodeId));
-            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Key), nameof(NodeDto.UniqueId));
+            DefineMap<Media, NodeDto>(nameof(Media.Id), nameof(NodeDto.NodeId));
+            DefineMap<Media, NodeDto>(nameof(Media.Key), nameof(NodeDto.UniqueId));
 
             DefineMap<Content, ContentVersionDto>(nameof(Content.VersionId), nameof(ContentVersionDto.Id));
 
-            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.CreateDate), nameof(NodeDto.CreateDate));
-            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Level), nameof(NodeDto.Level));
-            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.ParentId), nameof(NodeDto.ParentId));
-            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Path), nameof(NodeDto.Path));
-            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.SortOrder), nameof(NodeDto.SortOrder));
-            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Name), nameof(NodeDto.Text));
-            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.Trashed), nameof(NodeDto.Trashed));
-            DefineMap<Models.Media, NodeDto>(nameof(Models.Media.CreatorId), nameof(NodeDto.UserId));
-            DefineMap<Models.Media, ContentDto>(nameof(Models.Media.ContentTypeId), nameof(ContentDto.ContentTypeId));
-            DefineMap<Models.Media, ContentVersionDto>(nameof(Models.Media.UpdateDate), nameof(ContentVersionDto.VersionDate));
+            DefineMap<Media, NodeDto>(nameof(Media.CreateDate), nameof(NodeDto.CreateDate));
+            DefineMap<Media, NodeDto>(nameof(Media.Level), nameof(NodeDto.Level));
+            DefineMap<Media, NodeDto>(nameof(Media.ParentId), nameof(NodeDto.ParentId));
+            DefineMap<Media, NodeDto>(nameof(Media.Path), nameof(NodeDto.Path));
+            DefineMap<Media, NodeDto>(nameof(Media.SortOrder), nameof(NodeDto.SortOrder));
+            DefineMap<Media, NodeDto>(nameof(Media.Name), nameof(NodeDto.Text));
+            DefineMap<Media, NodeDto>(nameof(Media.Trashed), nameof(NodeDto.Trashed));
+            DefineMap<Media, NodeDto>(nameof(Media.CreatorId), nameof(NodeDto.UserId));
+            DefineMap<Media, ContentDto>(nameof(Media.ContentTypeId), nameof(ContentDto.ContentTypeId));
+            DefineMap<Media, ContentVersionDto>(nameof(Media.UpdateDate), nameof(ContentVersionDto.VersionDate));
         }
     }
 }

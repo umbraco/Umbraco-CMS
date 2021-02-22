@@ -1,5 +1,5 @@
-﻿using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
+﻿using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
 
 namespace Umbraco.Core.Events
 {

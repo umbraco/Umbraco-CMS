@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Dtos;
 
@@ -11,7 +12,7 @@ namespace Umbraco.Core.Persistence.Factories
 
          static MemberGroupFactory()
         {
-            _nodeObjectTypeId = Constants.ObjectTypes.MemberGroup;
+            _nodeObjectTypeId = Cms.Core.Constants.ObjectTypes.MemberGroup;
         }
 
         #region Implementation of IEntityFactory<ITemplate,TemplateDto>

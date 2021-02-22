@@ -1,9 +1,9 @@
 ﻿using System;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// A base class for cache refreshers that handles events.

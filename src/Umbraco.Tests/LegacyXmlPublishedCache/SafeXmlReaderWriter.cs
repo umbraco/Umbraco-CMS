@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Xml;
+using Umbraco.Cms.Core;
 using Umbraco.Core;
 using Umbraco.Core.Scoping;
 

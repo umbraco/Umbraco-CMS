@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Web.Services;
-using Umbraco.Web.Trees;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     public class SearchableTreeCollection : BuilderCollectionBase<ISearchableTree>
     {

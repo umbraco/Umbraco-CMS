@@ -1,8 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     public sealed class PublicAccessCacheRefresher : CacheRefresherBase<PublicAccessCacheRefresher>
     {

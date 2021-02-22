@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Manifest
+namespace Umbraco.Cms.Core.Manifest
 {
     // contentApps: [
     //   {

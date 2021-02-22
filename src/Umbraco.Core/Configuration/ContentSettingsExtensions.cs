@@ -1,8 +1,7 @@
 ﻿using System.Linq;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Extensions
 {
     public static class ContentSettingsExtensions
     {

@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Runtime
+namespace Umbraco.Cms.Core.Runtime
 {
     public interface IUmbracoBootPermissionChecker
     {

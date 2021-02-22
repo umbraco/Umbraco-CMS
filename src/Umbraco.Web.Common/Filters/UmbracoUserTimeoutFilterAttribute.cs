@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
     /// <summary>
     /// This will check if the user making the request is authenticated and if there's an auth ticket tied to the user

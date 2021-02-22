@@ -1,7 +1,8 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web
 {

@@ -1,10 +1,10 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Tests.Common.Builders.Interfaces;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class ContentPropertyBasicBuilder<TParent> : ChildBuilderBase<TParent, ContentPropertyBasic>,
         IWithIdBuilder, IWithAliasBuilder

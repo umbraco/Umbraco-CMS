@@ -8,13 +8,12 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Security;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     /// <summary>
     /// Used to validate a cookie against a user's session id

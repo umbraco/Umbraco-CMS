@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Configuration;
+﻿using System.Configuration;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Web.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 using Umbraco.Web.Mvc;
 
 namespace Umbraco.TestData

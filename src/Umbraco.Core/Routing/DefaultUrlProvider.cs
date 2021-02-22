@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.PublishedContent;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     /// <summary>
     /// Provides urls.

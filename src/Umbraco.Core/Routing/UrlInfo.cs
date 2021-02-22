@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     /// <summary>
     /// Represents infos for a URL.
@@ -51,7 +51,7 @@ namespace Umbraco.Web.Routing
         public string Text { get; }
 
         /// <summary>
-        /// Checks equality 
+        /// Checks equality
         /// </summary>
         /// <param name="other"></param>
         /// <returns></returns>

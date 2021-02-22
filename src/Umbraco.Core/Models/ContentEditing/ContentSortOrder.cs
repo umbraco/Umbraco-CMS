@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
-using System.Text;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// A model representing a new sort order for a content/media item

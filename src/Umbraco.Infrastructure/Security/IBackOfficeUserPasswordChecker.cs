@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Core.Security
 {
     /// <summary>
     /// Used by the BackOfficeUserManager to check the username/password which allows for developers to more easily

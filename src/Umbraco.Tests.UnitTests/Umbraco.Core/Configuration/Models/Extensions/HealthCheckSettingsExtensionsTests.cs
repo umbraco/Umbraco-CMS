@@ -3,11 +3,12 @@
 
 using System;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Extensions;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Configuration.Models.Extensions
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Extensions
 {
     [TestFixture]
     public class HealthCheckSettingsExtensionsTests

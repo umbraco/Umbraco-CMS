@@ -1,17 +1,15 @@
 using System;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Core;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models.Editors;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Models.ContentEditing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.ModelBinders
+namespace Umbraco.Cms.Web.BackOffice.ModelBinders
 {
     /// <summary>
     /// Helper methods to bind media/member models
@@ -92,7 +90,7 @@ namespace Umbraco.Web.BackOffice.ModelBinders
 
                 var fileName = formFile.FileName.Trim('\"');
 
-                var tempFileUploadFolder = hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempFileUploads);
+                var tempFileUploadFolder = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
                 Directory.CreateDirectory(tempFileUploadFolder);
                 var tempFilePath = Path.Combine(tempFileUploadFolder, Guid.NewGuid().ToString());
 

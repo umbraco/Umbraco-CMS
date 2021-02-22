@@ -1,13 +1,17 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Core.Security
 {
     public class IdentityMapDefinition : IMapDefinition
     {

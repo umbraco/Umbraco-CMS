@@ -5,14 +5,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Net;
-using Umbraco.Web.Models.ContentEditing;
 
 
 namespace Umbraco.Web.Common.Security
@@ -41,7 +40,7 @@ namespace Umbraco.Web.Common.Security
         private string GetCurrentUserId(IPrincipal currentUser)
         {
             UmbracoBackOfficeIdentity umbIdentity = currentUser?.GetUmbracoIdentity();
-            var currentUserId = umbIdentity?.GetUserId<string>() ?? Core.Constants.Security.SuperUserIdAsString;
+            var currentUserId = umbIdentity?.GetUserId<string>() ?? Cms.Core.Constants.Security.SuperUserIdAsString;
             return currentUserId;
         }
 

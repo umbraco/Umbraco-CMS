@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.AuditEntry)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.AuditEntry)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class AuditEntryDto

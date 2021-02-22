@@ -1,9 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Mapping;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Core.Models.Mapping;
 using Umbraco.Core.Security;
-using Umbraco.Infrastructure.Security;
+using Umbraco.Extensions;
 using Umbraco.Web.Models.Mapping;
 
 namespace Umbraco.Infrastructure.DependencyInjection

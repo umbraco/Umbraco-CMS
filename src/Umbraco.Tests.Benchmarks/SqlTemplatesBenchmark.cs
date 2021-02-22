@@ -2,9 +2,9 @@
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using NPoco;
+using Umbraco.Cms.Persistence.SqlCe;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Persistence.SqlCe;
 
 namespace Umbraco.Tests.Benchmarks
 {

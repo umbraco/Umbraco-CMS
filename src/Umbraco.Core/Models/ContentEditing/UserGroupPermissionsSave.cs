@@ -2,9 +2,9 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// Used to assign user group permissions to a content node

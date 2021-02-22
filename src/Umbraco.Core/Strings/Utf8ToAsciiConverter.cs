@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Strings
+namespace Umbraco.Cms.Core.Strings
 {
     /// <summary>
     /// Provides methods to convert Utf8 text to Ascii.

@@ -3,7 +3,7 @@
 
 using Umbraco.Core.Migrations;
 
-namespace Umbraco.Tests.Migrations.Stubs
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations.Stubs
 {
     public class SixZeroMigration1 : MigrationBase
     {

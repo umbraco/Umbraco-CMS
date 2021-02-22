@@ -1,6 +1,6 @@
-using Umbraco.Core.Configuration;
+using Umbraco.Cms.Core.Configuration;
 
-namespace Umbraco.Configuration
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extensions for the <see cref="ModelsMode"/> enumeration.

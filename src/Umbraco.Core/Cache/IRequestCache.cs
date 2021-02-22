@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     public interface IRequestCache : IAppCache, IEnumerable<KeyValuePair<string, object>>
     {

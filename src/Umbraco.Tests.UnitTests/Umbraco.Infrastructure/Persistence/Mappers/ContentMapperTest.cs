@@ -2,12 +2,12 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Tests.TestHelpers;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
 {
     [TestFixture]
     public class ContentMapperTest

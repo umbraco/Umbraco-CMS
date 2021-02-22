@@ -1,8 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Dashboards;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Dashboards
+namespace Umbraco.Cms.Core.Dashboards
 {
     [Weight(20)]
     public class ExamineDashboard : IDashboard

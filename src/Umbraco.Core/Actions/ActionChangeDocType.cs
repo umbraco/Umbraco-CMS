@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Actions
+﻿namespace Umbraco.Cms.Core.Actions
 {
     // TODO: Add this back in when we support this functionality again
     ///// <summary>

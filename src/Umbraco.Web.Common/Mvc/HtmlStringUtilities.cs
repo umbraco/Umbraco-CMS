@@ -7,7 +7,7 @@ using System.Web;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Html;
 
-namespace Umbraco.Web.Common.Mvc
+namespace Umbraco.Cms.Web.Common.Mvc
 {
     /// <summary>
     /// Provides utility methods for UmbracoHelper for working with strings and HTML in views.

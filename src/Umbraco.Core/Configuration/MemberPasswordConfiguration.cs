@@ -1,6 +1,4 @@
-﻿using Umbraco.Core.Configuration.UmbracoSettings;
-
-namespace Umbraco.Core.Configuration
+﻿namespace Umbraco.Cms.Core.Configuration
 {
     /// <summary>
     /// The password configuration for members

@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Tests.Common
+namespace Umbraco.Cms.Tests.Common
 {
     /// <summary>
     /// Provides an implementation of <see cref="IVariationContextAccessor"/> for tests.

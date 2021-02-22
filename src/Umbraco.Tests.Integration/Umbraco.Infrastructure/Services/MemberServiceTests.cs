@@ -7,24 +7,26 @@ using System.Linq;
 using System.Threading;
 using NPoco;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Common;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
-using Umbraco.Web.PublishedCache.NuCache;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     [Category("Slow")]

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Strings;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.Factories
 {

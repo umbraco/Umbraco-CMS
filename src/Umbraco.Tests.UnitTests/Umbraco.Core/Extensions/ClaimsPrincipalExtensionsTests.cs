@@ -5,11 +5,11 @@ using System;
 using System.Linq;
 using System.Security.Claims;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions
 {
     [TestFixture]
     public class ClaimsPrincipalExtensionsTests

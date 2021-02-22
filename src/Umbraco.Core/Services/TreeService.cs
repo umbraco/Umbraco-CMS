@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Web.Trees;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Implements <see cref="ITreeService"/>.

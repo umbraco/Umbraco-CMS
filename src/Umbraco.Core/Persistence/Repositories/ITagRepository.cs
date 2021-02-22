@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface ITagRepository : IReadWriteQueryRepository<int, ITag>
     {
@@ -35,7 +35,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="contentId">The identifier of the content item.</param>
         void RemoveAll(int contentId);
-        
+
         /// <summary>
         /// Removes all assigned tags from a content property.
         /// </summary>

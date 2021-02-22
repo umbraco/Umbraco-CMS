@@ -1,6 +1,10 @@
-﻿using System.Runtime.InteropServices;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Composing;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Runtime.InteropServices;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Extensions;
 
 namespace Umbraco.Examine
 {

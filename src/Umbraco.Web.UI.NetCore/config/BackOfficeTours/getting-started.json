@@ -191,7 +191,9 @@
                 "element": "[ng-controller*='Umbraco.Editors.DataTypePickerController'] [data-element='editor-data-type-picker']",
                 "elementPreventClick": true,
                 "title": "Editor picker",
-                "content": "<p>In the editor picker dialog we can pick one of the many built-in editors.</p>"
+                "content": "<p>In the editor picker dialog we can pick one of the many built-in editors.</p>",
+
+
             },
             {
                 "element": "[data-element~='editor-data-type-picker'] [data-element='datatype-Textarea']",

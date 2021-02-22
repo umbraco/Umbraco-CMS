@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using CSharpTest.Net.Serialization;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.PublishedCache.NuCache.DataSource
+namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
     internal class DictionaryOfCultureVariationSerializer : SerializerBase, ISerializer<IReadOnlyDictionary<string, CultureVariation>>
     {

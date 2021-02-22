@@ -1,5 +1,7 @@
 using System;
-namespace Umbraco.Web.PublishedCache
+using Umbraco.Cms.Core.Web;
+
+namespace Umbraco.Cms.Core.PublishedCache
 {
     // TODO: This is a mess. This is a circular reference:
     // IPublishedSnapshotAccessor -> PublishedSnapshotService -> UmbracoContext -> PublishedSnapshotService -> IPublishedSnapshotAccessor

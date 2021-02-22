@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     internal enum Compression : ushort
     {

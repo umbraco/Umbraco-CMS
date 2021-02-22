@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Core.Security
 {
 
     /// <summary>

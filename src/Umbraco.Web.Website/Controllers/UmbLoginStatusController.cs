@@ -1,16 +1,17 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models.Security;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models.Security;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Routing;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Website.Controllers
+namespace Umbraco.Cms.Web.Website.Controllers
 {
     [UmbracoMemberAuthorize]
     public class UmbLoginStatusController : SurfaceController

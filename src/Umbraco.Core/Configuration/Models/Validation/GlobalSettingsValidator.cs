@@ -3,7 +3,7 @@
 
 using Microsoft.Extensions.Options;
 
-namespace Umbraco.Core.Configuration.Models.Validation
+namespace Umbraco.Cms.Core.Configuration.Models.Validation
 {
     /// <summary>
     /// Validator for configuration representated as <see cref="GlobalSettings"/>.

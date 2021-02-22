@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.HealthChecks
+namespace Umbraco.Cms.Core.HealthChecks
 {
     /// <summary>
     /// The status returned for a health check when it performs it check

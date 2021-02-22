@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// The configuration object for the Block List editor

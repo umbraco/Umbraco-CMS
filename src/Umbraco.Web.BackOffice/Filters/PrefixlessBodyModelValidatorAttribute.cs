@@ -2,7 +2,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// Applying this attribute to any controller will ensure that the parameter name (prefix) is not part of the validation error keys.

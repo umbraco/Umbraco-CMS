@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Mail;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.HealthChecks.NotificationMethods
+namespace Umbraco.Cms.Core.HealthChecks.NotificationMethods
 {
     [HealthCheckNotificationMethod("email")]
     public class EmailNotificationMethod : NotificationMethodBase

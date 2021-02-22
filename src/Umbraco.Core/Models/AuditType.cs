@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models
+﻿namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Defines audit types.
@@ -47,7 +47,7 @@
 
         /// <summary>
         /// Variant(s) being sent to publishing.
-        /// </summary>        
+        /// </summary>
         SendToPublishVariant,
 
         /// <summary>
@@ -109,7 +109,7 @@
         /// Package being uninstalled.
         /// </summary>
         PackagerUninstall,
-        
+
         /// <summary>
         /// Custom audit message.
         /// </summary>

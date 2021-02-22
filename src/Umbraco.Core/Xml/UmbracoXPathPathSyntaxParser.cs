@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Core.Xml
+namespace Umbraco.Cms.Core.Xml
 {
     /// <summary>
     /// This is used to parse our customize Umbraco XPath expressions (i.e. that include special tokens like $site) into

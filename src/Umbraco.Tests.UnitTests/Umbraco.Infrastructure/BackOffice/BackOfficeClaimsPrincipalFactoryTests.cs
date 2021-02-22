@@ -9,14 +9,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Security;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.BackOffice
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.BackOffice
 {
     [TestFixture]
     public class BackOfficeClaimsPrincipalFactoryTests

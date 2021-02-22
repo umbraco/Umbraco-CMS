@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Cache;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -87,7 +93,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Repository Base
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Document;
+        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.Document;
 
         protected override IContent PerformGet(int id)
         {
@@ -215,35 +221,35 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // ah maybe not, that what's used for eg Exists in base repo
         protected override string GetBaseWhereClause()
         {
-            return $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+            return $"{Cms.Core.Constants.DatabaseSchema.Tables.Node}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
             {
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentSchedule + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.RedirectUrl + " WHERE contentKey IN (SELECT uniqueId FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id)",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
-                "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup + " SET startContentId = NULL WHERE startContentId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE parentId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Domain + " WHERE domainRootStructureID = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentVersion + " WHERE id IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.AccessRule + " WHERE accessId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id OR loginNodeId = @id OR noAccessNodeId = @id)",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE loginNodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Access + " WHERE noAccessNodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentSchedule + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.RedirectUrl + " WHERE contentKey IN (SELECT uniqueId FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Node + " WHERE id = @id)",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
+                "UPDATE " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup + " SET startContentId = NULL WHERE startContentId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Relation + " WHERE parentId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Domain + " WHERE domainRootStructureID = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion + " WHERE id IN (SELECT id FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE versionId IN (SELECT id FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.AccessRule + " WHERE accessId IN (SELECT id FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id OR loginNodeId = @id OR noAccessNodeId = @id)",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Access + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Access + " WHERE loginNodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Access + " WHERE noAccessNodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
             };
             return list;
         }
@@ -929,7 +935,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Recycle Bin
 
-        public override int RecycleBinId => Constants.System.RecycleBinContent;
+        public override int RecycleBinId => Cms.Core.Constants.System.RecycleBinContent;
 
         #endregion
 

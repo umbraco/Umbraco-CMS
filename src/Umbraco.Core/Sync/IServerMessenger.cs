@@ -1,7 +1,7 @@
 using System;
-using Umbraco.Core.Cache;
+using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Core.Sync
 {
     /// <summary>
     /// Transmits distributed cache notifications for all servers of a load balanced environment.

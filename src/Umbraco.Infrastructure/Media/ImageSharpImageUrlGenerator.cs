@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Text;
-using Umbraco.Core;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models;
-using Umbraco.Web.Models;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Infrastructure.Media
 {

@@ -4,17 +4,16 @@ using System.IO;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Models;
-using Umbraco.Web.Security;
-using Umbraco.Web.Tour;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Tour;
+using Umbraco.Cms.Web.Common.Attributes;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class TourController : UmbracoAuthorizedJsonController
@@ -58,7 +57,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             var nonPluginFilters = _filters.Where(x => x.PluginName == null).ToList();
 
             //add core tour files
-            var coreToursPath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.Config), "BackOfficeTours");
+            var coreToursPath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Config), "BackOfficeTours");
             if (Directory.Exists(coreToursPath))
             {
                 foreach (var tourFile in Directory.EnumerateFiles(coreToursPath, "*.json"))
@@ -68,7 +67,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             //collect all tour files in packages
-            var appPlugins = _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.AppPlugins);
+            var appPlugins = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins);
             if (Directory.Exists(appPlugins))
             {
                 foreach (var plugin in Directory.EnumerateDirectories(appPlugins))

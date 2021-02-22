@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Website.Collections
+namespace Umbraco.Cms.Web.Website.Collections
 {
     public class SurfaceControllerTypeCollection : BuilderCollectionBase<Type>
     {

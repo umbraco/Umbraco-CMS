@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Models.Security
+namespace Umbraco.Cms.Core.Models.Security
 {
     public class LoginModel : PostRedirectModel
     {

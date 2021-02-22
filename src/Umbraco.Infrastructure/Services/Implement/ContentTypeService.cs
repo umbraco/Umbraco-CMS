@@ -2,6 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
@@ -24,12 +28,12 @@ namespace Umbraco.Core.Services.Implement
         protected override IContentTypeService This => this;
 
         // beware! order is important to avoid deadlocks
-        protected override int[] ReadLockIds { get; } = { Constants.Locks.ContentTypes };
-        protected override int[] WriteLockIds { get; } = { Constants.Locks.ContentTree, Constants.Locks.ContentTypes };
+        protected override int[] ReadLockIds { get; } = { Cms.Core.Constants.Locks.ContentTypes };
+        protected override int[] WriteLockIds { get; } = { Cms.Core.Constants.Locks.ContentTree, Cms.Core.Constants.Locks.ContentTypes };
 
         private IContentService ContentService { get; }
 
-        protected override Guid ContainedObjectType => Constants.ObjectTypes.DocumentType;
+        protected override Guid ContainedObjectType => Cms.Core.Constants.ObjectTypes.DocumentType;
 
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {
@@ -52,7 +56,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // that one is special because it works across content, media and member types
-                scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+                scope.ReadLock(Cms.Core.Constants.Locks.ContentTypes, Cms.Core.Constants.Locks.MediaTypes, Cms.Core.Constants.Locks.MemberTypes);
                 return Repository.GetAllPropertyTypeAliases();
             }
         }
@@ -68,7 +72,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // that one is special because it works across content, media and member types
-                scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+                scope.ReadLock(Cms.Core.Constants.Locks.ContentTypes, Cms.Core.Constants.Locks.MediaTypes, Cms.Core.Constants.Locks.MemberTypes);
                 return Repository.GetAllContentTypeAliases(guids);
             }
         }
@@ -84,7 +88,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // that one is special because it works across content, media and member types
-                scope.ReadLock(Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes);
+                scope.ReadLock(Cms.Core.Constants.Locks.ContentTypes, Cms.Core.Constants.Locks.MediaTypes, Cms.Core.Constants.Locks.MemberTypes);
                 return Repository.GetAllContentTypeIds(aliases);
             }
         }

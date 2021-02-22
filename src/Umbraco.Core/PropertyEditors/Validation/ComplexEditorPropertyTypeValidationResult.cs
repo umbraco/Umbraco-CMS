@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 
-namespace Umbraco.Web.PropertyEditors.Validation
+namespace Umbraco.Cms.Core.PropertyEditors.Validation
 {
     /// <summary>
     /// A collection of <see cref="ValidationResult"/> for a property type within a complex editor represented by an Element Type
     /// </summary>
     /// <remarks>
-    /// For a more indepth explanation of how server side validation works with the angular app, see this GitHub PR: 
+    /// For a more indepth explanation of how server side validation works with the angular app, see this GitHub PR:
     /// https://github.com/umbraco/Umbraco-CMS/pull/8339
     /// </remarks>
     public class ComplexEditorPropertyTypeValidationResult : ValidationResult

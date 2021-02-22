@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Http;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     public class TreeRenderingEventArgs : EventArgs
     {

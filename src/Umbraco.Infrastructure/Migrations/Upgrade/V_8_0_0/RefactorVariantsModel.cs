@@ -11,8 +11,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            if (ColumnExists(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "edited"))
-                Delete.Column("edited").FromTable(Constants.DatabaseSchema.Tables.ContentVersionCultureVariation).Do();
+            if (ColumnExists(Cms.Core.Constants.DatabaseSchema.Tables.ContentVersionCultureVariation, "edited"))
+                Delete.Column("edited").FromTable(Cms.Core.Constants.DatabaseSchema.Tables.ContentVersionCultureVariation).Do();
 
 
             // add available column

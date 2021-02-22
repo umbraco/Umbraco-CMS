@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     /// <summary>
     /// An external login (OAuth) provider for the back office

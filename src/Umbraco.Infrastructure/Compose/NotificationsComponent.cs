@@ -1,20 +1,25 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Services.Implement;
-using Umbraco.Web.Actions;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Compose
 {
@@ -72,40 +77,40 @@ namespace Umbraco.Web.Compose
             UserService.UserGroupPermissionsAssigned -= UserService_UserGroupPermissionsAssigned;
         }
 
-        private void UserService_UserGroupPermissionsAssigned(IUserService sender, Core.Events.SaveEventArgs<EntityPermission> args)
+        private void UserService_UserGroupPermissionsAssigned(IUserService sender, SaveEventArgs<EntityPermission> args)
             => UserServiceUserGroupPermissionsAssigned(args, _contentService);
 
-        private void PublicAccessService_Saved(IPublicAccessService sender, Core.Events.SaveEventArgs<PublicAccessEntry> args)
+        private void PublicAccessService_Saved(IPublicAccessService sender, SaveEventArgs<PublicAccessEntry> args)
             => PublicAccessServiceSaved(args, _contentService);
 
-        private void ContentService_RolledBack(IContentService sender, Core.Events.RollbackEventArgs<IContent> args)
+        private void ContentService_RolledBack(IContentService sender, RollbackEventArgs<IContent> args)
             => _notifier.Notify(_actions.GetAction<ActionRollback>(), args.Entity);
 
-        private void ContentService_Copied(IContentService sender, Core.Events.CopyEventArgs<IContent> args)
+        private void ContentService_Copied(IContentService sender, CopyEventArgs<IContent> args)
             => _notifier.Notify(_actions.GetAction<ActionCopy>(), args.Original);
 
-        private void ContentService_Trashed(IContentService sender, Core.Events.MoveEventArgs<IContent> args)
+        private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> args)
             => _notifier.Notify(_actions.GetAction<ActionDelete>(), args.MoveInfoCollection.Select(m => m.Entity).ToArray());
 
-        private void ContentService_Moved(IContentService sender, Core.Events.MoveEventArgs<IContent> args)
+        private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> args)
             => ContentServiceMoved(args);
 
-        private void ContentService_Unpublished(IContentService sender, Core.Events.PublishEventArgs<IContent> args)
+        private void ContentService_Unpublished(IContentService sender, PublishEventArgs<IContent> args)
             => _notifier.Notify(_actions.GetAction<ActionUnpublish>(), args.PublishedEntities.ToArray());
 
-        private void ContentService_Saved(IContentService sender, Core.Events.ContentSavedEventArgs args)
+        private void ContentService_Saved(IContentService sender, ContentSavedEventArgs args)
             => ContentServiceSaved(args);
 
-        private void ContentService_Sorted(IContentService sender, Core.Events.SaveEventArgs<IContent> args)
+        private void ContentService_Sorted(IContentService sender, SaveEventArgs<IContent> args)
             => ContentServiceSorted(sender, args);
 
-        private void ContentService_Published(IContentService sender, Core.Events.ContentPublishedEventArgs args)
+        private void ContentService_Published(IContentService sender, ContentPublishedEventArgs args)
             => _notifier.Notify(_actions.GetAction<ActionPublish>(), args.PublishedEntities.ToArray());
 
-        private void ContentService_SentToPublish(IContentService sender, Core.Events.SendToPublishEventArgs<IContent> args)
+        private void ContentService_SentToPublish(IContentService sender, SendToPublishEventArgs<IContent> args)
             => _notifier.Notify(_actions.GetAction<ActionToPublish>(), args.Entity);
 
-        private void ContentServiceSorted(IContentService sender, Core.Events.SaveEventArgs<IContent> args)
+        private void ContentServiceSorted(IContentService sender, SaveEventArgs<IContent> args)
         {
             var parentId = args.SavedEntities.Select(x => x.ParentId).Distinct().ToList();
             if (parentId.Count != 1) return; // this shouldn't happen, for sorting all entities will have the same parent id
@@ -120,7 +125,7 @@ namespace Umbraco.Web.Compose
             _notifier.Notify(_actions.GetAction<ActionSort>(), new[] { parent });
         }
 
-        private void ContentServiceSaved(Core.Events.SaveEventArgs<IContent> args)
+        private void ContentServiceSaved(SaveEventArgs<IContent> args)
         {
             var newEntities = new List<IContent>();
             var updatedEntities = new List<IContent>();
@@ -144,7 +149,7 @@ namespace Umbraco.Web.Compose
             _notifier.Notify(_actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
         }
 
-        private void UserServiceUserGroupPermissionsAssigned(Core.Events.SaveEventArgs<EntityPermission> args, IContentService contentService)
+        private void UserServiceUserGroupPermissionsAssigned(SaveEventArgs<EntityPermission> args, IContentService contentService)
         {
             var entities = contentService.GetByIds(args.SavedEntities.Select(e => e.EntityId)).ToArray();
             if (entities.Any() == false)
@@ -154,7 +159,7 @@ namespace Umbraco.Web.Compose
             _notifier.Notify(_actions.GetAction<ActionRights>(), entities);
         }
 
-        private void ContentServiceMoved(Core.Events.MoveEventArgs<IContent> args)
+        private void ContentServiceMoved(MoveEventArgs<IContent> args)
         {
             // notify about the move for all moved items
             _notifier.Notify(_actions.GetAction<ActionMove>(), args.MoveInfoCollection.Select(m => m.Entity).ToArray());
@@ -170,7 +175,7 @@ namespace Umbraco.Web.Compose
             }
         }
 
-        private void PublicAccessServiceSaved(Core.Events.SaveEventArgs<PublicAccessEntry> args, IContentService contentService)
+        private void PublicAccessServiceSaved(SaveEventArgs<PublicAccessEntry> args, IContentService contentService)
         {
             var entities = contentService.GetByIds(args.SavedEntities.Select(e => e.ProtectedNodeId)).ToArray();
             if (entities.Any() == false)

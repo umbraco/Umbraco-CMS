@@ -5,7 +5,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.ExternalLogin)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.ExternalLogin)]
     [ExplicitColumns]
     [PrimaryKey("Id")]
     internal class ExternalLoginDto

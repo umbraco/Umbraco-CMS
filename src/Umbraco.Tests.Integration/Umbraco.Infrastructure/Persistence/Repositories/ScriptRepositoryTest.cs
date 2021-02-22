@@ -9,17 +9,17 @@ using System.Text;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.None)]

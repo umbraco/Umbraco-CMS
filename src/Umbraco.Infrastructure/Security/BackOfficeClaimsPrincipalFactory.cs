@@ -4,9 +4,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Core.Security
 {
     /// <summary>
     /// A <see cref="UserClaimsPrincipalFactory{TUser}" for the back office/>

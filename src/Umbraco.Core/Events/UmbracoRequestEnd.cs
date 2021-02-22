@@ -1,9 +1,9 @@
 ﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Web;
+using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     /// <summary>
     /// Notification raised on each request end.

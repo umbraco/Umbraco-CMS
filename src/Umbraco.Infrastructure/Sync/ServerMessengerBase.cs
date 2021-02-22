@@ -4,6 +4,9 @@ using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Core.Cache;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Core.Sync
 {

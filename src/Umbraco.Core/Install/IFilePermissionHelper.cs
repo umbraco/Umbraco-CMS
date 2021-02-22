@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Install
+namespace Umbraco.Cms.Core.Install
 {
     /// <summary>
     /// Helper to test File and folder permissions

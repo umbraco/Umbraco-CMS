@@ -3,18 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Factories;
 using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.SqlExtensionsStatics;
+using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
@@ -54,7 +60,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Repository Base
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Member;
+        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.Member;
 
         protected override IMember PerformGet(int id)
         {
@@ -200,11 +206,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 "DELETE FROM umbracoRelation WHERE parentId = @id",
                 "DELETE FROM umbracoRelation WHERE childId = @id",
                 "DELETE FROM cmsTagRelationship WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
                 "DELETE FROM cmsMember2MemberGroup WHERE Member = @id",
                 "DELETE FROM cmsMember WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
                 "DELETE FROM umbracoNode WHERE id = @id"
             };
             return list;
@@ -317,7 +323,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (entity.RawPasswordValue.IsNullOrWhiteSpace())
             {
 
-                dto.Password = Constants.Security.EmptyPasswordPrefix + _passwordHasher.HashPassword(Guid.NewGuid().ToString("N"));
+                dto.Password = Cms.Core.Constants.Security.EmptyPasswordPrefix + _passwordHasher.HashPassword(Guid.NewGuid().ToString("N"));
                 entity.RawPasswordValue = dto.Password;
             }
 
@@ -528,7 +534,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Where<PropertyTypeDto>(x => x.Alias == SqlTemplate.Arg<string>("propertyTypeAlias"))
                 .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username"))
                 .ForUpdate());
-            var sqlSelectProperty = sqlSelectTemplateProperty.Sql(Constants.ObjectTypes.Member, Constants.Conventions.Member.LastLoginDate, username);
+            var sqlSelectProperty = sqlSelectTemplateProperty.Sql(Cms.Core.Constants.ObjectTypes.Member, Cms.Core.Constants.Conventions.Member.LastLoginDate, username);
 
             var update = Sql()
                 .Update<PropertyDataDto>(u => u
@@ -546,7 +552,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
                .Where<MemberDto>(x => x.LoginName == SqlTemplate.Arg<string>("username")));
-            var sqlSelectVersion = sqlSelectTemplateVersion.Sql(Constants.ObjectTypes.Member, username);
+            var sqlSelectVersion = sqlSelectTemplateVersion.Sql(Cms.Core.Constants.ObjectTypes.Member, username);
 
             Database.Execute(Sql()
                 .Update<ContentVersionDto>(u => u

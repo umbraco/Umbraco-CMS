@@ -16,9 +16,9 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         {
             // Any user group which had access to the Developer section should have access to Packages
             Database.Execute($@"
-                insert into {Constants.DatabaseSchema.Tables.UserGroup2App}
-                select userGroupId, '{Constants.Applications.Packages}'
-                from {Constants.DatabaseSchema.Tables.UserGroup2App}
+                insert into {Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2App}
+                select userGroupId, '{Cms.Core.Constants.Applications.Packages}'
+                from {Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2App}
                 where app='developer'");
         }
     }

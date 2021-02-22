@@ -7,16 +7,18 @@ using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Persistence.SqlCe;
+using Umbraco.Cms.Tests.Common;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
-using Umbraco.Persistence.SqlCe;
-using Umbraco.Tests.Common;
+using Umbraco.Extensions;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.TestHelpers
 {

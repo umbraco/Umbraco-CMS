@@ -3,18 +3,19 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     /// <summary>
     /// The content blueprint tree controller

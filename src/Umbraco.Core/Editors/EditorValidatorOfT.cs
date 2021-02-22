@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Cms.Core.Editors
 {
     /// <summary>
     /// Provides a base class for <see cref="IEditorValidator"/> implementations.

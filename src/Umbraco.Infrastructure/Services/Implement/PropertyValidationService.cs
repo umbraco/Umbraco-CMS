@@ -1,10 +1,12 @@
-﻿using System.Linq;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
+using System.Linq;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Services
 {

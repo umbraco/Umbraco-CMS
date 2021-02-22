@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     public class MediaUrlProviderCollectionBuilder : OrderedCollectionBuilderBase<MediaUrlProviderCollectionBuilder, MediaUrlProviderCollection, IMediaUrlProvider>
     {

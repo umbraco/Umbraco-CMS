@@ -1,6 +1,4 @@
-﻿using Umbraco.Core;
-
-namespace Umbraco.Web.Actions
+﻿namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is invoked when rights are changed on a document

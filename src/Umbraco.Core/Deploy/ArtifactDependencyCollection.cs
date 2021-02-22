@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Deploy
+namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
     /// Represents a collection of distinct <see cref="ArtifactDependency"/>.

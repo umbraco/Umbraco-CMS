@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Install;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install.InstallSteps
 {

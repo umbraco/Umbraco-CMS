@@ -1,7 +1,6 @@
-﻿using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
+﻿using Umbraco.Cms.Core.Mapping;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class TagMapDefinition : IMapDefinition
     {

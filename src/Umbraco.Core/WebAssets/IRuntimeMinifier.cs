@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace Umbraco.Core.WebAssets
+namespace Umbraco.Cms.Core.WebAssets
 {
     /// <summary>
     /// Used for bundling and minifying web assets at runtime

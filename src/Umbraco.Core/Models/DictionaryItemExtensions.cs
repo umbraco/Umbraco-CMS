@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Extensions
 {
     public static class DictionaryItemExtensions
     {

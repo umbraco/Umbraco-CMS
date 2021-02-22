@@ -1,7 +1,8 @@
-﻿using NPoco;
-using System;
+﻿using System;
+using NPoco;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models
 {
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models
     [ExplicitColumns]
     internal class PropertyDataDto80
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.PropertyData;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.PropertyData;
         public const int VarcharLength = 512;
         public const int SegmentLength = 256;
 

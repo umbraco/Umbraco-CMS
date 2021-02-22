@@ -1,33 +1,31 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Events;
-using Umbraco.Core.HealthChecks;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.HealthChecks;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Sync;
-using Umbraco.Core.Templates;
-using Umbraco.Core.WebAssets;
-using Umbraco.Net;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Cache;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Mvc;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 using Umbraco.Web.Security;
-using Umbraco.Web.Services;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+
 
 namespace Umbraco.Web.Composing
 {
@@ -142,7 +140,7 @@ namespace Umbraco.Web.Composing
 
         #endregion
 
-        
+
         #region Core Getters
 
         // proxy Core for convenience

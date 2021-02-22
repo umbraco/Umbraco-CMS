@@ -1,4 +1,4 @@
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Core.Security
 {
     /// <summary>
     /// The user manager for the back office

@@ -1,14 +1,14 @@
 using System;
-using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Core.Xml;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Xml;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Routing
 {
@@ -77,7 +77,7 @@ namespace Umbraco.Web.Routing
                         nodeContextId: null,
                         getPath: nodeid =>
                         {
-                            Core.Models.Entities.IEntitySlim ent = entityService.Get(nodeid);
+                            IEntitySlim ent = entityService.Get(nodeid);
                             return ent.Path.Split(',').Reverse();
                         },
                         publishedContentExists: i => publishedContentQuery.Content(i) != null);

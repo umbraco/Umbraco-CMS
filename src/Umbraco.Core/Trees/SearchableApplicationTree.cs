@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     public class SearchableApplicationTree
     {

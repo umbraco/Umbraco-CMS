@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions
 {
     [TestFixture]
     public class UriExtensionsTests

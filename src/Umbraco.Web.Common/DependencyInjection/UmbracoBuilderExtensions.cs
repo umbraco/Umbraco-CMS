@@ -16,47 +16,49 @@ using Microsoft.Extensions.Logging;
 using Serilog;
 using Smidge;
 using Smidge.Nuglify;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Diagnostics;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Diagnostics;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Macros;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common;
+using Umbraco.Cms.Web.Common.ApplicationModels;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Cms.Web.Common.Install;
+using Umbraco.Cms.Web.Common.Localization;
+using Umbraco.Cms.Web.Common.Macros;
+using Umbraco.Cms.Web.Common.Middleware;
+using Umbraco.Cms.Web.Common.ModelBinders;
+using Umbraco.Cms.Web.Common.Mvc;
+using Umbraco.Cms.Web.Common.Profiler;
+using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Web.Common.Templates;
+using Umbraco.Cms.Web.Common.UmbracoContext;
 using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Security;
-using Umbraco.Extensions;
 using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Infrastructure.HostedServices;
 using Umbraco.Infrastructure.HostedServices.ServerRegistration;
-using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
-using Umbraco.Net;
-using Umbraco.Web.Common.ApplicationModels;
-using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Install;
-using Umbraco.Web.Common.Localization;
-using Umbraco.Web.Common.Macros;
-using Umbraco.Web.Common.Middleware;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Common.Mvc;
-using Umbraco.Web.Common.Profiler;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Common.Security;
-using Umbraco.Web.Common.Templates;
-using Umbraco.Web.Macros;
-using Umbraco.Web.Security;
 using Umbraco.Web.Telemetry;
-using Umbraco.Web.Templates;
-using Umbraco.Web.Website;
-using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Web.Common.DependencyInjection
+namespace Umbraco.Extensions
 {
+
     // TODO: We could add parameters to configure each of these for flexibility
 
     /// <summary>
@@ -84,7 +86,7 @@ namespace Umbraco.Web.Common.DependencyInjection
 
             IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 
-            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.LogFiles);
+            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles);
             var loggingConfig = new LoggingConfiguration(loggingDir);
 
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
@@ -101,6 +103,10 @@ namespace Umbraco.Web.Common.DependencyInjection
 
             ILoggerFactory loggerFactory = LoggerFactory.Create(cfg => cfg.AddSerilog(Log.Logger, false));
             TypeLoader typeLoader = services.AddTypeLoader(Assembly.GetEntryAssembly(), webHostEnvironment, tempHostingEnvironment, loggerFactory, appCaches, config, profiler);
+
+            // adds the umbraco startup filter which will call UseUmbraco early on before
+            // other start filters are applied (depending on the ordering of IStartupFilters in DI).
+            services.AddTransient<IStartupFilter, UmbracoStartupFilter>();
 
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory);
         }
@@ -204,7 +210,7 @@ namespace Umbraco.Web.Common.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddRuntimeMinifier(this IUmbracoBuilder builder)
         {
-            builder.Services.AddSmidge(builder.Config.GetSection(Core.Constants.Configuration.ConfigRuntimeMinification));
+            builder.Services.AddSmidge(builder.Config.GetSection(Cms.Core.Constants.Configuration.ConfigRuntimeMinification));
             builder.Services.AddSmidgeNuglify();
 
             return builder;
@@ -228,6 +234,7 @@ namespace Umbraco.Web.Common.DependencyInjection
             builder.Services.ConfigureOptions<UmbracoRequestLocalizationOptions>();
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
+            builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, VirtualPageApplicationModelProvider>());
             builder.Services.AddUmbracoImageSharp(builder.Config);
 
             // AspNetCore specific services
@@ -315,9 +322,9 @@ namespace Umbraco.Web.Common.DependencyInjection
                     var dllPath = Path.Combine(binFolder, "Umbraco.Persistence.SqlCe.dll");
                     var umbSqlCeAssembly = Assembly.LoadFrom(dllPath);
 
-                    var sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Persistence.SqlCe.SqlCeSyntaxProvider");
-                    var sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Persistence.SqlCe.SqlCeBulkSqlInsertProvider");
-                    var sqlCeEmbeddedDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Persistence.SqlCe.SqlCeEmbeddedDatabaseCreator");
+                    var sqlCeSyntaxProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeSyntaxProvider");
+                    var sqlCeBulkSqlInsertProviderType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeBulkSqlInsertProvider");
+                    var sqlCeEmbeddedDatabaseCreatorType = umbSqlCeAssembly.GetType("Umbraco.Cms.Persistence.SqlCe.SqlCeEmbeddedDatabaseCreator");
 
                     if (!(sqlCeSyntaxProviderType is null || sqlCeBulkSqlInsertProviderType is null || sqlCeEmbeddedDatabaseCreatorType is null))
                     {
@@ -331,7 +338,7 @@ namespace Umbraco.Web.Common.DependencyInjection
                     var sqlCe = sqlCeAssembly.GetType("System.Data.SqlServerCe.SqlCeProviderFactory");
                     if (!(sqlCe is null))
                     {
-                        DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlCe, sqlCe);
+                        DbProviderFactories.RegisterFactory(Cms.Core.Constants.DbProviderNames.SqlCe, sqlCe);
                     }
                 }
             }
@@ -348,7 +355,7 @@ namespace Umbraco.Web.Common.DependencyInjection
         /// </summary>
         private static IUmbracoBuilder AddUmbracoSqlServerSupport(this IUmbracoBuilder builder)
         {
-            DbProviderFactories.RegisterFactory(Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
+            DbProviderFactories.RegisterFactory(Cms.Core.Constants.DbProviderNames.SqlServer, SqlClientFactory.Instance);
 
             builder.Services.AddSingleton<ISqlSyntaxProvider, SqlServerSyntaxProvider>();
             builder.Services.AddSingleton<IBulkSqlInsertProvider, SqlServerBulkSqlInsertProvider>();
@@ -359,7 +366,7 @@ namespace Umbraco.Web.Common.DependencyInjection
 
         private static IProfiler GetWebProfiler(IConfiguration config)
         {
-            var isDebug = config.GetValue<bool>($"{Core.Constants.Configuration.ConfigHosting}:Debug");
+            var isDebug = config.GetValue<bool>($"{Cms.Core.Constants.Configuration.ConfigHosting}:Debug");
             // create and start asap to profile boot
             if (!isDebug)
             {
@@ -381,8 +388,8 @@ namespace Umbraco.Web.Common.DependencyInjection
         /// </summary>
         private static IHostingEnvironment GetTemporaryHostingEnvironment(IWebHostEnvironment webHostEnvironment, IConfiguration config)
         {
-            var hostingSettings = config.GetSection(Core.Constants.Configuration.ConfigHosting).Get<HostingSettings>() ?? new HostingSettings();
-            var webRoutingSettings = config.GetSection(Core.Constants.Configuration.ConfigWebRouting).Get<WebRoutingSettings>() ?? new WebRoutingSettings();
+            var hostingSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigHosting).Get<HostingSettings>() ?? new HostingSettings();
+            var webRoutingSettings = config.GetSection(Cms.Core.Constants.Configuration.ConfigWebRouting).Get<WebRoutingSettings>() ?? new WebRoutingSettings();
             var wrappedHostingSettings = new OptionsMonitorAdapter<HostingSettings>(hostingSettings);
             var wrappedWebRoutingSettings = new OptionsMonitorAdapter<WebRoutingSettings>(webRoutingSettings);
 

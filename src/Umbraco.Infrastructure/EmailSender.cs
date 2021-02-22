@@ -5,9 +5,11 @@ using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Core.Events;
-using Umbraco.Core.Mail;
 using Umbraco.Core.Models;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 

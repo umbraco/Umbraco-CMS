@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Strings
+namespace Umbraco.Cms.Core.Strings
 {
     /// <summary>
     /// Represents an HTML-encoded string that should not be encoded again.

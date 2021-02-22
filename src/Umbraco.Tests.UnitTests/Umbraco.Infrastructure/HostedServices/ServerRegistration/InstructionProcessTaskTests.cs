@@ -6,12 +6,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Infrastructure.HostedServices.ServerRegistration;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRegistration
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRegistration
 {
     [TestFixture]
     public class InstructionProcessTaskTests

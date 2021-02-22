@@ -3,9 +3,9 @@
 
 using System;
 using NUnit.Framework;
-using Umbraco.Infrastructure.Security;
+using Umbraco.Core.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 {
     public class NoopLookupNormalizerTests
     {

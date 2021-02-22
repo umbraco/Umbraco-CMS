@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.Macros
+namespace Umbraco.Cms.Core.Macros
 {
     // represents the content of a macro
     public class MacroContent

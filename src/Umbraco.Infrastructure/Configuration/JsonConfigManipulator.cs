@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Core.Configuration
 {
@@ -17,7 +18,7 @@ namespace Umbraco.Core.Configuration
             _configuration = configuration;
         }
 
-        public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{ Constants.System.UmbracoConnectionName}";
+        public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{ Cms.Core.Constants.System.UmbracoConnectionName}";
         public void RemoveConnectionString()
         {
             var provider = GetJsonConfigurationProvider(UmbracoConnectionPath);
@@ -142,7 +143,7 @@ namespace Umbraco.Core.Configuration
             writer.WriteStartObject();
             writer.WritePropertyName("ConnectionStrings");
             writer.WriteStartObject();
-            writer.WritePropertyName(Constants.System.UmbracoConnectionName);
+            writer.WritePropertyName(Cms.Core.Constants.System.UmbracoConnectionName);
             writer.WriteValue(connectionString);
             writer.WriteEndObject();
             writer.WriteEndObject();

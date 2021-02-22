@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Web.BackOffice.Security;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// An attribute/filter to set the csrf cookie token based on angular conventions

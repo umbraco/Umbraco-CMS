@@ -4,8 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Events;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Cache
 {

@@ -1,9 +1,8 @@
-﻿using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Models.ContentEditing;
+﻿using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class TemplateMapDefinition : IMapDefinition
     {

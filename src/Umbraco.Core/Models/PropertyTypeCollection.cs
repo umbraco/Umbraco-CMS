@@ -6,7 +6,7 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Threading;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
 
     //public interface IPropertyTypeCollection: IEnumerable<IPropertyType>
@@ -84,7 +84,7 @@ namespace Umbraco.Core.Models
         }
 
         // 'new' keyword is required! we can explicitly implement ICollection<IPropertyType>.Add BUT since normally a concrete PropertyType type
-        // is passed in, the explicit implementation doesn't get called, this ensures it does get called. 
+        // is passed in, the explicit implementation doesn't get called, this ensures it does get called.
         public new void Add(IPropertyType item)
         {
             item.SupportsPublishing = SupportsPublishing;
@@ -165,7 +165,7 @@ namespace Umbraco.Core.Models
         }
 
         public event NotifyCollectionChangedEventHandler CollectionChanged;
-        
+
         /// <summary>
         /// Clears all <see cref="CollectionChanged"/> event handlers
         /// </summary>

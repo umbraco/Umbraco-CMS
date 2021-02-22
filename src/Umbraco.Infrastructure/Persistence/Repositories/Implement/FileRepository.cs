@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Text;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence;
+using Umbraco.Extensions;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {

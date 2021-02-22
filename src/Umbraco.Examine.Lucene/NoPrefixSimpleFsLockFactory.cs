@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.IO;
 using Lucene.Net.Store;
 
@@ -21,6 +24,5 @@ namespace Umbraco.Examine
             get => base.LockPrefix;
             set => base.LockPrefix = null; //always set to null
         }
-        
     }
 }

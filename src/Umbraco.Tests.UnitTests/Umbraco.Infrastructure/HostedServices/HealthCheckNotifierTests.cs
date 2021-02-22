@@ -9,17 +9,19 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.HealthChecks;
-using Umbraco.Core.HealthChecks.NotificationMethods;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.HealthChecks;
+using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Sync;
 using Umbraco.Infrastructure.HostedServices;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
     [TestFixture]
     public class HealthCheckNotifierTests

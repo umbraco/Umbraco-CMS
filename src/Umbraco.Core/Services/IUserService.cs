@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Defines the UserService, which is an easy access to operations involving <see cref="IProfile"/> and eventually Users.

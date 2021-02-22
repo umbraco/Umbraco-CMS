@@ -7,14 +7,16 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Core;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
+using Umbraco.Core.Security;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Core.Security
 {
     /// <summary>
     /// A custom user store that uses Umbraco member data

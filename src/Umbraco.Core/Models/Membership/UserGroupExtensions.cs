@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Core.Models.Membership
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Membership;
+
+namespace Umbraco.Extensions
 {
     public static class UserGroupExtensions
     {

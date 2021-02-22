@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-using Umbraco.Core;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Web.Templates
+namespace Umbraco.Cms.Core.Templates
 {
     /// <summary>
     /// Utility class used to parse internal links

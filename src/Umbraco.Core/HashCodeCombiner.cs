@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.IO;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Used to create a .NET HashCode from multiple objects.

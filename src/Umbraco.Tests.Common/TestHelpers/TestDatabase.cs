@@ -16,7 +16,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 
-namespace Umbraco.Tests.Testing
+namespace Umbraco.Cms.Tests.Common.TestHelpers
 {
     /// <summary>
     /// An implementation of <see cref="IUmbracoDatabase"/> for tests.

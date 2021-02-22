@@ -6,7 +6,7 @@ using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
 namespace Umbraco.Core.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.PropertyTypeGroup)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup)]
     [PrimaryKey("id", AutoIncrement = true)]
     [ExplicitColumns]
     internal class PropertyTypeGroupDto

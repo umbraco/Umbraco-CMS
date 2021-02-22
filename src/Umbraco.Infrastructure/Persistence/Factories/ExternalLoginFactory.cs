@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Core.Models.Identity;
 using Umbraco.Core.Persistence.Dtos;
 

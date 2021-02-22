@@ -5,10 +5,14 @@ using NUnit.Framework;
 using Microsoft.Extensions.Logging;
 using Umbraco.Core;
 using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.Routing;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Routing;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.Routing
 {

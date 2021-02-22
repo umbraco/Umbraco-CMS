@@ -1,8 +1,7 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
 
-namespace Umbraco.Web.BackOffice.SignalR
+namespace Umbraco.Cms.Web.BackOffice.SignalR
 {
     public class PreviewHubComposer : ComponentComposer<PreviewHubComponent>, ICoreComposer
     {

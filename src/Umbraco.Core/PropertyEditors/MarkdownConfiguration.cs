@@ -1,6 +1,4 @@
-﻿using Umbraco.Core.PropertyEditors;
-
-namespace Umbraco.Web.PropertyEditors
+﻿namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the markdown value editor.

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Trees
+﻿namespace Umbraco.Cms.Core.Trees
 {
     /// <summary>
     /// Specifies the action to take for a menu item when a URL is specified

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     [DataContract(Name = "contentTypeImportModel")]
     public class ContentTypeImportModel : INotificationModel

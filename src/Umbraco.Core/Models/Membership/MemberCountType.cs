@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models.Membership
+﻿namespace Umbraco.Cms.Core.Models.Membership
 {
     /// <summary>
     /// The types of members to count

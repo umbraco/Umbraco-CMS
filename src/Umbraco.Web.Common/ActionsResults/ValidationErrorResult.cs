@@ -1,9 +1,9 @@
-﻿using System.Net;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.ActionsResults
+namespace Umbraco.Cms.Web.Common.ActionsResults
 {
     /// <summary>
     /// Custom result to return a validation error message with required headers

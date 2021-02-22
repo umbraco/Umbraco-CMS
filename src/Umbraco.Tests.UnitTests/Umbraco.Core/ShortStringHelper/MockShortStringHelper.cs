@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
     internal class MockShortStringHelper : IShortStringHelper
     {

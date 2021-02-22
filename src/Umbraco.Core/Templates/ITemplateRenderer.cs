@@ -1,7 +1,7 @@
 using System.IO;
 using System.Threading.Tasks;
 
-namespace Umbraco.Web.Templates
+namespace Umbraco.Cms.Core.Templates
 {
     /// <summary>
     /// This is used purely for the RenderTemplate functionality in Umbraco

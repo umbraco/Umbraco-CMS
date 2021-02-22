@@ -3,7 +3,7 @@ using System.Reflection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Core.Security
 {
     public class MembersIdentityBuilder : IdentityBuilder
     {

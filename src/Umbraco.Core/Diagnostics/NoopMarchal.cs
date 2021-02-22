@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Diagnostics
+namespace Umbraco.Cms.Core.Diagnostics
 {
     internal class NoopMarchal : IMarchal
     {

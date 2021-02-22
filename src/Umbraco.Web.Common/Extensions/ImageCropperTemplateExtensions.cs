@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Globalization;
-using Newtonsoft.Json;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors.ValueConverters;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using Umbraco.Cms.Core;
+using Umbraco.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Extensions
 {
