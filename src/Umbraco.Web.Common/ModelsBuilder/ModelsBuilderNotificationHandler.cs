@@ -13,7 +13,6 @@ using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.Common.ModelBinders;
-using Umbraco.Web.Common.ModelsBuilder;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder
 {
