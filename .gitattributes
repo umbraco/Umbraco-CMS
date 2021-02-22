@@ -1,9 +1,3 @@
-# These first three lines are to help sort out line endings beteween linux/docker/codespace and Windows
-# https://code.visualstudio.com/docs/remote/troubleshooting#_resolving-git-line-ending-issues-in-containers-resulting-in-many-modified-files
-* text=auto eol=lf
-*.{cmd,[cC][mM][dD]} text eol=crlf
-*.{bat,[bB][aA][tT]} text eol=crlf
-
 *.doc  diff=astextplain
 *.DOC	diff=astextplain
 *.docx	diff=astextplain
