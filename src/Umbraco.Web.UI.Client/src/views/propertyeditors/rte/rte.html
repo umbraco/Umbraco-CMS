@@ -2,7 +2,7 @@
     <umb-load-indicator ng-if="isLoading"></umb-load-indicator>
 
     <div class="umb-rte-editor-con">
-        <input type="text" id="{{model.alias}}" ng-focus="focus()" style="position:absolute;top:0;width:0;height:0;" />
+        <input type="text" id="property-{{model.alias}}" ng-focus="focus()" style="position:absolute;top:0;width:0;height:0;" />
         <div disable-hotkeys id="{{textAreaHtmlId}}" class="umb-rte-editor" ng-style="{ width: containerWidth, height: containerHeight, overflow: containerOverflow}"></div>
     </div>
 </div>

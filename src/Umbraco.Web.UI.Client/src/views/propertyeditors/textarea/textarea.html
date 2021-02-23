@@ -1,7 +1,7 @@
 <div ng-controller="Umbraco.PropertyEditors.textAreaController">
     <ng-form name="textareaFieldForm">
         <textarea ng-model="model.value"
-            id="{{model.alias}}"
+            id="property-{{model.alias}}"
             name="textarea"
             rows="{{model.config.rows || 10}}"
             class="umb-property-editor umb-textarea textstring"
