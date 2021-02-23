@@ -26,13 +26,12 @@ namespace Umbraco.Cms.Web.Common.Security
             IPasswordHasher<BackOfficeIdentityUser> passwordHasher,
             IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
             IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
-            BackOfficeLookupNormalizer keyNormalizer,
             BackOfficeIdentityErrorDescriber errors,
             IServiceProvider services,
             IHttpContextAccessor httpContextAccessor,
             ILogger<UserManager<BackOfficeIdentityUser>> logger,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration)
-            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger, passwordConfiguration)
+            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors, services, logger, passwordConfiguration)
         {
             _httpContextAccessor = httpContextAccessor;
         }
@@ -136,7 +135,7 @@ namespace Umbraco.Cms.Web.Common.Security
 
             return result;
         }
-
+        
         /// <inheritdoc/>
         public override async Task<IdentityResult> SetLockoutEndDateAsync(BackOfficeIdentityUser user, DateTimeOffset? lockoutEnd)
         {

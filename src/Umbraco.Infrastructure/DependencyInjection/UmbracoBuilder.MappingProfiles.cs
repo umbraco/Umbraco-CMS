@@ -31,6 +31,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .Add<TagMapDefinition>()
                 .Add<TemplateMapDefinition>()
                 .Add<UserMapDefinition>()
+                .Add<MemberMapDefinition>()
                 .Add<LanguageMapDefinition>()
                 .Add<IdentityMapDefinition>();
 

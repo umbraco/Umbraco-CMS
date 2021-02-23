@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Web.Security;
@@ -15,6 +15,8 @@ using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Security.Providers
 {
+    //TODO: Delete: should not be used
+    [Obsolete("We are now using ASP.NET Core Identity instead of membership providers")]
     /// <summary>
     /// Custom Membership Provider for Umbraco Members (User authentication for Frontend applications NOT umbraco CMS)
     /// </summary>
@@ -121,6 +123,7 @@ namespace Umbraco.Web.Security.Providers
         public override LegacyPasswordSecurity PasswordSecurity => _passwordSecurity.Value;
         public IPasswordConfiguration PasswordConfiguration => _passwordConfig.Value;
 
+        [Obsolete("We are now using ASP.NET Core Identity instead of membership providers")]
         private class MembershipProviderPasswordConfiguration : IPasswordConfiguration
         {
             public MembershipProviderPasswordConfiguration(int requiredLength, bool requireNonLetterOrDigit, bool requireDigit, bool requireLowercase, bool requireUppercase, bool useLegacyEncoding, string hashAlgorithmType, int maxFailedAccessAttemptsBeforeLockout)

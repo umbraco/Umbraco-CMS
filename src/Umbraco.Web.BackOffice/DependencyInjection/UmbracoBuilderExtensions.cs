@@ -39,6 +39,7 @@ namespace Umbraco.Extensions
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
+                .AddMembersIdentity()
                 .AddBackOfficeAuthorizationPolicies()
                 .AddUmbracoProfiler()
                 .AddMvcAndRazor()
@@ -91,6 +92,16 @@ namespace Umbraco.Extensions
         public static IUmbracoBuilder AddBackOfficeIdentity(this IUmbracoBuilder builder)
         {
             builder.Services.AddUmbracoBackOfficeIdentity();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds Identity support for Umbraco members
+        /// </summary>
+        public static IUmbracoBuilder AddMembersIdentity(this IUmbracoBuilder builder)
+        {
+            builder.Services.AddMembersIdentity();
 
             return builder;
         }

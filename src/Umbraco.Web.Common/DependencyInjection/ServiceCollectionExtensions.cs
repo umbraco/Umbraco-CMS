@@ -1,7 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.Commands;
@@ -9,6 +11,8 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Core.Security;
+using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Extensions
 {
@@ -53,6 +57,25 @@ namespace Umbraco.Extensions
                 .AddProcessor<BackgroundColorWebProcessor>();
 
             return services;
+        }
+
+        /// <summary>
+        /// Adds the services required for using Members Identity
+        /// </summary>
+        public static void AddMembersIdentity(this IServiceCollection services) =>
+            services.BuildMembersIdentity()
+                .AddDefaultTokenProviders()
+                .AddUserStore<MembersUserStore>()
+                .AddMembersManager<IMemberManager, MemberManager>();
+
+
+        private static MembersIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
+        {
+            // Services used by Umbraco members identity
+            services.TryAddScoped<IUserValidator<MembersIdentityUser>, UserValidator<MembersIdentityUser>>();
+            services.TryAddScoped<IPasswordValidator<MembersIdentityUser>, PasswordValidator<MembersIdentityUser>>();
+            services.TryAddScoped<IPasswordHasher<MembersIdentityUser>, PasswordHasher<MembersIdentityUser>>();
+            return new MembersIdentityBuilder(services);
         }
 
         private static void RemoveIntParamenterIfValueGreatherThen(IDictionary<string, string> commands, string parameter, int maxValue)

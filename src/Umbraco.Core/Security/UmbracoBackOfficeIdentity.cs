@@ -6,7 +6,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
 {
-
     /// <summary>
     /// A custom user identity for the Umbraco backoffice
     /// </summary>

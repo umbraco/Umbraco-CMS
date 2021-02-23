@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
@@ -17,6 +17,8 @@ using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Security.Providers
 {
+    //TODO: Delete - should not be used
+    [Obsolete("We are now using ASP.NET Core Identity instead of membership providers")]
     /// <summary>
     /// Abstract Membership Provider that users any implementation of IMembershipMemberService{TEntity} service
     /// </summary>
@@ -30,7 +32,7 @@ namespace Umbraco.Web.Security.Providers
         protected IMembershipMemberService<TEntity> MemberService { get; private set; }
 
         protected UmbracoMembershipProvider(IMembershipMemberService<TEntity> memberService, IUmbracoVersion umbracoVersion, IHostingEnvironment hostingEnvironment, IIpResolver ipResolver)
-        :base(hostingEnvironment)
+        : base(hostingEnvironment)
         {
             _umbracoVersion = umbracoVersion;
             _ipResolver = ipResolver;
@@ -53,9 +55,11 @@ namespace Umbraco.Web.Security.Providers
         /// <exception cref="T:System.ArgumentException">The name of the provider has a length of zero.</exception>
         public override void Initialize(string name, NameValueCollection config)
         {
-            if (config == null) { throw new ArgumentNullException("config"); }
+            if (config == null)
+            { throw new ArgumentNullException("config"); }
 
-            if (string.IsNullOrEmpty(name)) name = ProviderName;
+            if (string.IsNullOrEmpty(name))
+                name = ProviderName;
 
             // Initialize base provider class
             base.Initialize(name, config);
@@ -78,7 +82,8 @@ namespace Umbraco.Web.Security.Providers
 
             // in order to support updating passwords from the umbraco core, we can't validate the old password
             var m = MemberService.GetByUsername(username);
-            if (m == null) return false;
+            if (m == null)
+                return false;
 
             string salt;
             var encodedPassword = PasswordSecurity.HashNewPassword(Membership.HashAlgorithmType, newPassword, out salt);
@@ -172,7 +177,8 @@ namespace Umbraco.Web.Security.Providers
         public override bool DeleteUser(string username, bool deleteAllRelatedData)
         {
             var member = MemberService.GetByUsername(username);
-            if (member == null) return false;
+            if (member == null)
+                return false;
 
             MemberService.Delete(member);
             return true;
@@ -421,7 +427,8 @@ namespace Umbraco.Web.Security.Providers
             }
 
             // Non need to update
-            if (member.IsLockedOut == false) return true;
+            if (member.IsLockedOut == false)
+                return true;
 
             member.IsLockedOut = false;
             member.FailedPasswordAttempts = 0;
