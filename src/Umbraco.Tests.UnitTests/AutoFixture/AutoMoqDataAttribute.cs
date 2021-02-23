@@ -20,6 +20,7 @@ using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.Common.Install;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Core.Security;
+using Umbraco.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
 {
@@ -51,8 +52,10 @@ namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
                         .Customize(new ConstructorCustomization(typeof(UsersController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(InstallController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(PreviewController), new GreedyConstructorQuery()))
+                        .Customize(new ConstructorCustomization(typeof(MemberController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(BackOfficeController), new GreedyConstructorQuery()))
-                        .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()));
+                        .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
+                        .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()));
 
                     fixture.Customize(new AutoMoqCustomization());
 

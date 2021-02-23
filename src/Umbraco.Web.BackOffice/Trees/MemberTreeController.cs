@@ -54,12 +54,14 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// <summary>
         /// Gets an individual tree node
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <returns></returns>
-        public ActionResult<TreeNode> GetTreeNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public ActionResult<TreeNode> GetTreeNode([FromRoute]string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
-            var node = GetSingleTreeNode(id, queryStrings);
+            ActionResult<TreeNode> node = GetSingleTreeNode(id, queryStrings);
+
+            if (!(node.Result is null))
+            {
+                return node.Result;
+            }
 
             //add the tree alias to the node since it is standalone (has no root for which this normally belongs)
             node.Value.AdditionalData["treeAlias"] = TreeAlias;

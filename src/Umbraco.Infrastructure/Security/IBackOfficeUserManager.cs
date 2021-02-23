@@ -1,5 +1,3 @@
-using Umbraco.Core.Security;
-
 namespace Umbraco.Core.Security
 {
     /// <summary>

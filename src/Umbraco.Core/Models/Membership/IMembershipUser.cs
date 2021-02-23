@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models.Membership
@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Core.Models.Membership
     {
         string Username { get; set; }
         string Email { get; set; }
+        DateTime? EmailConfirmedDate { get; set; }
 
         /// <summary>
         /// Gets or sets the raw password value
@@ -37,6 +38,11 @@ namespace Umbraco.Cms.Core.Models.Membership
         /// Part of the standard properties collection.
         /// </remarks>
         int FailedPasswordAttempts { get; set; }
+
+        /// <summary>
+        /// Gets or sets the security stamp used by ASP.NET Identity
+        /// </summary>
+        string SecurityStamp { get; set; }
 
         //object ProfileId { get; set; }
         //IEnumerable<object> Groups { get; set; }

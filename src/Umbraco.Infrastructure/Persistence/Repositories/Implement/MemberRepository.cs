@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -353,7 +353,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // if parent has changed, get path, level and sort order
             if (entity.IsPropertyDirty("ParentId"))
             {
-                var parent = GetParentNodeDto(entity.ParentId);
+                NodeDto parent = GetParentNodeDto(entity.ParentId);
 
                 entity.Path = string.Concat(parent.Path, ",", entity.Id);
                 entity.Level = parent.Level + 1;
@@ -361,10 +361,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // create the dto
-            var dto = ContentBaseFactory.BuildDto(entity);
+            MemberDto dto = ContentBaseFactory.BuildDto(entity);
 
             // update the node dto
-            var nodeDto = dto.ContentDto.NodeDto;
+            NodeDto nodeDto = dto.ContentDto.NodeDto;
             Database.Update(nodeDto);
 
             // update the content dto
@@ -415,7 +415,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             //get the group id
             var grpQry = Query<IMemberGroup>().Where(group => group.Name.Equals(roleName));
             var memberGroup = _memberGroupRepository.Get(grpQry).FirstOrDefault();
-            if (memberGroup == null) return Enumerable.Empty<IMember>();
+            if (memberGroup == null)
+                return Enumerable.Empty<IMember>();
 
             // get the members by username
             var query = Query<IMember>();
@@ -470,7 +471,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var grpQry = Query<IMemberGroup>().Where(group => group.Name.Equals(groupName));
             var memberGroup = _memberGroupRepository.Get(grpQry).FirstOrDefault();
-            if (memberGroup == null) return Enumerable.Empty<IMember>();
+            if (memberGroup == null)
+                return Enumerable.Empty<IMember>();
 
             var subQuery = Sql().Select("Member").From<Member2MemberGroupDto>().Where<Member2MemberGroupDto>(dto => dto.MemberGroup == memberGroup.Id);
 
@@ -620,7 +622,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var cached = IsolatedCache.GetCacheItem<IMember>(RepositoryCacheKeys.GetKey<IMember>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
-                        content[i] = (Member) cached;
+                        content[i] = (Member)cached;
                         continue;
                     }
                 }
@@ -662,7 +664,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // get properties - indexed by version id
             var versionId = dto.ContentVersionDto.Id;
-            var temp = new TempContent<Member>(dto.ContentDto.NodeId,versionId, 0, memberType);
+            var temp = new TempContent<Member>(dto.ContentDto.NodeId, versionId, 0, memberType);
             var properties = GetPropertyCollections(new List<TempContent<Member>> { temp });
             member.Properties = properties[versionId];
 

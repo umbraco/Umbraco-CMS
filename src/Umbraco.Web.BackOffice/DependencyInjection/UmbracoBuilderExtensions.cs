@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.Middleware;
+using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
@@ -37,13 +38,15 @@ namespace Umbraco.Extensions
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
+                .AddMembersIdentity()
                 .AddBackOfficeAuthorizationPolicies()
                 .AddUmbracoProfiler()
                 .AddMvcAndRazor()
                 .AddWebServer()
                 .AddPreviewSupport()
                 .AddHostedServices()
-                .AddDistributedCache();
+                .AddDistributedCache()
+                .AddModelsBuilderDashboard();
 
         /// <summary>
         /// Adds Umbraco back office authentication requirements
@@ -88,6 +91,16 @@ namespace Umbraco.Extensions
         public static IUmbracoBuilder AddBackOfficeIdentity(this IUmbracoBuilder builder)
         {
             builder.Services.AddUmbracoBackOfficeIdentity();
+
+            return builder;
+        }
+
+        /// <summary>
+        /// Adds Identity support for Umbraco members
+        /// </summary>
+        public static IUmbracoBuilder AddMembersIdentity(this IUmbracoBuilder builder)
+        {
+            builder.Services.AddMembersIdentity();
 
             return builder;
         }

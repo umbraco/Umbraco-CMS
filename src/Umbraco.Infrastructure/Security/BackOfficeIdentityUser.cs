@@ -94,7 +94,9 @@ namespace Umbraco.Core.Security
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
 
-
+        /// <summary>
+        /// Gets or sets the password config
+        /// </summary>
         public string PasswordConfig
         {
             get => _passwordConfig;
@@ -187,13 +189,13 @@ namespace Umbraco.Core.Security
         {
             get
             {
-                var isLocked = LockoutEnd.HasValue && LockoutEnd.Value.ToLocalTime() >= DateTime.Now;
+                bool isLocked = LockoutEnd.HasValue && LockoutEnd.Value.ToLocalTime() >= DateTime.Now;
                 return isLocked;
             }
         }
 
         /// <summary>
-        /// Gets or sets a value indicating the IUser IsApproved
+        /// Gets or sets a value indicating whether the IUser IsApproved
         /// </summary>
         public bool IsApproved { get; set; }
 

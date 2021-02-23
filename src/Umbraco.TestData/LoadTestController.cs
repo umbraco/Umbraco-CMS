@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Threading;
+using System.Configuration;
+using System.Diagnostics;
 using System.Linq;
-using System.Web.Mvc;
-using Umbraco.Core.Services;
-using Umbraco.Core.Models;
+using System.Threading;
 using System.Web;
 using System.Web.Hosting;
+using System.Web.Mvc;
 using System.Web.Routing;
-using System.Diagnostics;
-using System.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -63,7 +61,7 @@ namespace Umbraco.TestData
 </html>";
 
         private static readonly string _containerTemplateText = @"
-@inherits Umbraco.Web.Mvc.UmbracoViewPage
+@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
     Layout = null;
     var container = Umbraco.ContentAtRoot().OfTypes(""" + _containerAlias + @""").FirstOrDefault();

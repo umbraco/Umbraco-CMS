@@ -216,6 +216,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 .AddRuntimeMinifier()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
+                .AddMembersIdentity()
                 .AddTestServices(TestHelper, GetAppCaches());
 
             if (TestOptions.Mapper)

@@ -18,7 +18,7 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.Views
 {
     public abstract class UmbracoViewPage : UmbracoViewPage<IPublishedContent>
     {
