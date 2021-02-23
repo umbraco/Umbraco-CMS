@@ -10,9 +10,6 @@
         public virtual string OldName { get; set; }
         public virtual string NewName { get; set; }
 
-        public override string Process(IMigrationContext context)
-            => GetSql();
-
         /// <inheritdoc />
         protected override string GetSql()
         {

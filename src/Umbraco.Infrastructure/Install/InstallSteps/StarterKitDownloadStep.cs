@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -67,7 +67,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
         private async Task<(string packageFile, int packageId)> DownloadPackageFilesAsync(Guid kitGuid)
         {
             //Go get the package file from the package repo
-            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, _umbracoVersion.Current, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, _umbracoVersion.Version, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
             if (packageFile == null) throw new InvalidOperationException("Could not fetch package file " + kitGuid);
 
             //add an entry to the installedPackages.config

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.Packaging
                 new XAttribute("name", def.Name ?? string.Empty),
                 new XAttribute("packagePath", def.PackagePath ?? string.Empty),
                 new XAttribute("iconUrl", def.IconUrl ?? string.Empty),
-                new XAttribute("umbVersion", def.UmbracoVersion ?? _umbracoVersion.Current),
+                new XAttribute("umbVersion", def.UmbracoVersion ?? _umbracoVersion.Version),
                 new XAttribute("packageGuid", def.PackageId),
                 new XAttribute("view", def.PackageView ?? string.Empty),
 

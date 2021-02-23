@@ -62,7 +62,7 @@ namespace Umbraco.Tests.TestHelpers
 
             services.AddUnique<ISqlContext>(_ => SqlContext);
 
-            var factory = Current.Factory = composition.CreateServiceProvider();
+            var factory = Current.Factory = TestHelper.CreateServiceProvider(composition);
 
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init());

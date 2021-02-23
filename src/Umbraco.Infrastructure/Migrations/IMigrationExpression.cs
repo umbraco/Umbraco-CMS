@@ -5,7 +5,6 @@
     /// </summary>
     public interface IMigrationExpression
     {
-        string Process(IMigrationContext context); // TODO: remove that one?
         void Execute();
     }
 }

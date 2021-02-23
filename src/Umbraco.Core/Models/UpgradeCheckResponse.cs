@@ -1,4 +1,4 @@
-﻿using System.Net;
+using System.Net;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Configuration;
 
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Models
         {
             Type = upgradeType;
             Comment = upgradeComment;
-            Url = upgradeUrl + "?version=" + WebUtility.UrlEncode(umbracoVersion.Current.ToString(3));
+            Url = upgradeUrl + "?version=" + WebUtility.UrlEncode(umbracoVersion.Version.ToString(3));
         }
     }
 }

@@ -37,19 +37,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
             Assert.AreEqual(result, first.ToGuid() == second.ToGuid());
         }
 
-        [TestCase("alert('hello');", false)]
-        [TestCase("~/Test.js", true)]
-        [TestCase("../Test.js", true)]
-        [TestCase("/Test.js", true)]
-        [TestCase("Test.js", true)]
-        [TestCase("Test.js==", false)]
-        [TestCase("/Test.js function(){return true;}", false)]
-        public void Detect_Is_JavaScript_Path(string input, bool result)
-        {
-            Attempt<string> output = input.DetectIsJavaScriptPath(Mock.Of<IIOHelper>());
-            Assert.AreEqual(result, output.Success);
-        }
-
         [TestCase("hello.txt", "hello")]
         [TestCase("this.is.a.Txt", "this.is.a")]
         [TestCase("this.is.not.a. Txt", "this.is.not.a. Txt")]
