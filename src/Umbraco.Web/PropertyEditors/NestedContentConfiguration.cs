@@ -21,6 +21,9 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("confirmDeletes", "Confirm Deletes", "boolean", Description = "Requires editor confirmation for delete actions.")]
         public bool ConfirmDeletes { get; set; } = true;
 
+        [ConfigurationField("disableOpenOnLoad", "Disable Open on Load", "boolean", Description = "Disables opening when there is one max item available")]
+        public bool DisableOpenOnLoad { get; set; } = false;
+
         [ConfigurationField("showIcons", "Show Icons", "boolean", Description = "Show the Element Type icons.")]
         public bool ShowIcons { get; set; } = true;
 
