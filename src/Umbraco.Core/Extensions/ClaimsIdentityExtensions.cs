@@ -324,5 +324,22 @@ namespace Umbraco.Extensions
         /// <returns>Array of roles</returns>
         public static string[] GetRoles(this ClaimsIdentity identity) => identity
             .FindAll(x => x.Type == ClaimsIdentity.DefaultRoleClaimType).Select(role => role.Value).ToArray();
+
+
+        /// <summary>
+        /// Adds or updates and existing claim.
+        /// </summary>
+        public static void AddOrUpdateClaim(this ClaimsIdentity identity, Claim claim)
+        {
+            if (identity == null)
+            {
+                throw new ArgumentNullException(nameof(identity));
+            }
+
+            Claim existingClaim = identity.Claims.FirstOrDefault(x => x.Type == claim.Type);
+            identity.TryRemoveClaim(existingClaim);
+
+            identity.AddClaim(claim);
+        }
     }
 }

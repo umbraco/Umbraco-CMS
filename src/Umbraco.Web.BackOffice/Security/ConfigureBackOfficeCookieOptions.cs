@@ -15,7 +15,6 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
 {
@@ -149,8 +148,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     await securityStampValidator.ValidateAsync(ctx);
                     EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
 
-                    // add a claim to track when the cookie expires, we use this to track time remaining
-                    backOfficeIdentity.AddClaim(new Claim(
+                    // add or update a claim to track when the cookie expires, we use this to track time remaining
+                    backOfficeIdentity.AddOrUpdateClaim(new Claim(
                         Constants.Security.TicketExpiresClaimType,
                         ctx.Properties.ExpiresUtc.Value.ToString("o"),
                         ClaimValueTypes.DateTime,
