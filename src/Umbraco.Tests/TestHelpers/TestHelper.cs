@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -18,6 +18,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Diagnostics;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -345,5 +346,11 @@ namespace Umbraco.Tests.TestHelpers
         }
 
         public static IPublishedUrlProvider GetPublishedUrlProvider() => _testHelperInternal.GetPublishedUrlProvider();
+
+        public static IServiceProvider CreateServiceProvider(IUmbracoBuilder builder)
+        {
+            builder.Build();
+            return builder.Services.BuildServiceProvider();
+        }
     }
 }

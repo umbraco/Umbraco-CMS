@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Routing;
@@ -11,13 +11,6 @@ namespace Umbraco.Web
     /// </summary>
     public static class UmbracoBuilderExtensions
     {
-        [Obsolete("This extension method exists only to ease migration, please refactor")]
-        public static IServiceProvider CreateServiceProvider(this IUmbracoBuilder builder)
-        {
-            builder.Build();
-            return builder.Services.BuildServiceProvider();
-        }
-
         #region Uniques
 
         /// <summary>
