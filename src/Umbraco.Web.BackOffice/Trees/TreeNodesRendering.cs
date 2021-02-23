@@ -12,14 +12,20 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     /// </remarks>
     public class TreeNodesRendering : INotification
     {
+        /// <summary>
+        /// The tree nodes being rendered
+        /// </summary>
         public TreeNodeCollection Nodes { get; }
 
-        public FormCollection QueryStrings { get; }
+        /// <summary>
+        /// The query string of the current request
+        /// </summary>
+        public FormCollection QueryString { get; }
 
-        public TreeNodesRendering(TreeNodeCollection nodes, FormCollection queryStrings)
+        public TreeNodesRendering(TreeNodeCollection nodes, FormCollection queryString)
         {
             Nodes = nodes;
-            QueryStrings = queryStrings;
+            QueryString = queryString;
         }
     }
 }

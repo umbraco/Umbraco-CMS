@@ -12,13 +12,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     /// </remarks>
     public class MenuRendering : INotification
     {
-        public MenuRendering(string nodeId, MenuItemCollection menu, FormCollection queryStrings)
-        {
-            NodeId = nodeId;
-            Menu = menu;
-            QueryStrings = queryStrings;
-        }
-
         /// <summary>
         /// The tree node id that the menu is rendering for
         /// </summary>
@@ -29,8 +22,16 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         public MenuItemCollection Menu { get; }
 
-        public FormCollection QueryStrings { get; }
+        /// <summary>
+        /// The query string of the current request
+        /// </summary>
+        public FormCollection QueryString { get; }
 
-
+        public MenuRendering(string nodeId, MenuItemCollection menu, FormCollection queryString)
+        {
+            NodeId = nodeId;
+            Menu = menu;
+            QueryString = queryString;
+        }
     }
 }
