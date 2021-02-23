@@ -49,6 +49,14 @@ namespace Umbraco.Core.Services
         IRedirectUrl GetMostRecentRedirectUrl(string url);
 
         /// <summary>
+        /// Gets the most recent redirect URLs corresponding to an Umbraco redirect URL route.
+        /// </summary>
+        /// <param name="url">The Umbraco redirect URL route.</param>
+        /// <param name="culture">The culture of the request.</param>
+        /// <returns>The most recent redirect URLs corresponding to the route.</returns>
+        IRedirectUrl GetMostRecentRedirectUrl(string url, string culture);
+
+        /// <summary>
         /// Gets all redirect URLs for a content item.
         /// </summary>
         /// <param name="contentKey">The content unique key.</param>

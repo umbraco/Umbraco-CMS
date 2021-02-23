@@ -53,11 +53,11 @@ angular.module("umbraco")
             if ($scope.onlyImages) {
                 vm.acceptedFileTypes = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
             } else {
-                // Use whitelist of allowed file types if provided
+                // Use list of allowed file types if provided
                 if (allowedUploadFiles !== '') {
                     vm.acceptedFileTypes = allowedUploadFiles;
                 } else {
-                    // If no whitelist, we pass in a blacklist by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
+                    // If no allowed list, we pass in a disallowed list by adding ! to the file extensions, allowing everything EXCEPT for disallowedUploadFiles
                     vm.acceptedFileTypes = !mediaHelper.formatFileTypes(umbracoSettings.disallowedUploadFiles);
                 }
             }
@@ -327,10 +327,10 @@ angular.module("umbraco")
                 gotoFolder($scope.currentFolder).then(function () {
                     $timeout(function () {
                         if ($scope.multiPicker) {
-                            var images = _.rest($scope.images, $scope.images.length - files.length);
+                            var images = _.rest(_.sortBy($scope.images, 'id'), $scope.images.length - files.length);
                             images.forEach(image => selectMedia(image));
                         } else {
-                            var image = $scope.images[$scope.images.length - 1];
+                            var image = _.sortBy($scope.images, 'id')[$scope.images.length - 1];
                             clickHandler(image);
                         }
                     });
@@ -373,12 +373,11 @@ angular.module("umbraco")
             function openDetailsDialog() {
 
                 const dialog = {
-                    view: "views/common/infiniteeditors/mediapicker/overlays/mediacropdetails.html",
                     size: "small",
                     cropSize: $scope.cropSize,
                     target: $scope.target,
                     disableFocalPoint: $scope.disableFocalPoint,
-                    submit: function (model) {
+                    submit: function () {
 
                         $scope.model.selection.push($scope.target);
                         $scope.model.submit($scope.model);
@@ -392,7 +391,7 @@ angular.module("umbraco")
 
                 localizationService.localize("defaultdialogs_editSelectedMedia").then(value => {
                     dialog.title = value;
-                    editorService.open(dialog);
+                    editorService.mediaCropDetails(dialog);
                 });
             };
 
