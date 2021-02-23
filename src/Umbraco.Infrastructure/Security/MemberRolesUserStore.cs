@@ -5,10 +5,10 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Scoping;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// A custom user store that uses Umbraco member data

@@ -1,8 +1,7 @@
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
-namespace Umbraco.Core.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     /// <inheritdoc />
     public class MemberMapDefinition : IMapDefinition

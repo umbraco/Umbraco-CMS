@@ -26,13 +26,8 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
@@ -40,6 +35,7 @@ using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Mapping;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
+using MemberMapDefinition = Umbraco.Cms.Web.BackOffice.Mapping.MemberMapDefinition;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 {
@@ -380,7 +376,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 
             var map = new MapDefinitionCollection(new List<IMapDefinition>()
             {
-                new global::Umbraco.Core.Models.Mapping.MemberMapDefinition(),
+                new global::Umbraco.Cms.Core.Models.Mapping.MemberMapDefinition(),
                 memberMapDefinition,
                 new ContentTypeMapDefinition(
                     commonMapper,

@@ -11,8 +11,8 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Core.Security;
-using Umbraco.Web.Common.Security;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Extensions
 {

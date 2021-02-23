@@ -7,16 +7,14 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Security;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// A custom user store that uses Umbraco member data
@@ -525,7 +523,7 @@ namespace Umbraco.Core.Security
         {
             if (user != null)
             {
-                //TODO: when to 
+                //TODO: when to
                 //user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetAll(UserIdToInt(user.Id))));
             }
 

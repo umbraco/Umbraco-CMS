@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -12,7 +12,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
-using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Cms.Infrastructure.Services.Implement
 {
