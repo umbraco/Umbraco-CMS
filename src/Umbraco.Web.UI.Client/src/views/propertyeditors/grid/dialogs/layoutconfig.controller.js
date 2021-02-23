@@ -5,8 +5,28 @@ angular.module("umbraco")
             var vm = this;
 
             vm.labels = {};
+            vm.layout = {
+                sections: []
+            };
         
             function init() {
+
+                $scope.currentLayout = $scope.model.currentLayout;
+                $scope.columns = $scope.model.columns;
+                $scope.rows = $scope.model.rows;
+                $scope.currentSection = null;
+
+                // Setup copy of rows on sections
+                if ($scope.currentLayout && $scope.currentLayout.sections) {
+                    $scope.currentLayout.sections.forEach(section => {
+                        section.rows = Utilities.copy($scope.rows);
+
+                        // Check if rows are selected
+                        section.rows.forEach(row => {
+                            row.selected = section.allowed && section.allowed.includes(row.name);
+                        });
+                    });
+                }
 
                 var labelKeys = [
                     "grid_addGridLayout",
@@ -28,15 +48,10 @@ angular.module("umbraco")
                 }
             }
 
-    		$scope.currentLayout = $scope.model.currentLayout;
-    		$scope.columns = $scope.model.columns;
-    		$scope.rows = $scope.model.rows;
-            $scope.currentSection = null;
-
     		$scope.scaleUp = function(section, max, overflow){
     		   var add = 1;
     		   if (overflow !== true){
-    		        add = (max > 1) ? 1 : max;
+    		       add = (max > 1) ? 1 : max;
     		   }
     		   //var add = (max > 1) ? 1 : max;
     		   section.grid = section.grid+add;
@@ -58,16 +73,24 @@ angular.module("umbraco")
     		    if (section === null || section === undefined) {
     		        var space = ($scope.availableLayoutSpace > 4) ? 4 : $scope.availableLayoutSpace;
     		        section = {
-    		            grid: space
+                        grid: space,
+                        rows: []
     		        };
     		        template.sections.push(section);
                 }
-    		    
-    		    $scope.currentSection = section;
-    		    $scope.currentSection.allowAll = section.allowAll || !section.allowed || !section.allowed.length;
+
+                console.log("section 1", section);
+
+                if (section.allowAll && (!section.allowed || !section.allowed.length)) {
+                    section.allowAll = true;
+                }
+
+                console.log("section 2", section);
+
+                $scope.currentSection = section;
     		};
 
-            $scope.toggleAllowed = function (section) {
+            vm.toggleAllowed = function (section) {
                 section.allowAll = !section.allowAll;
 
                 if (section.allowed) {
@@ -80,17 +103,18 @@ angular.module("umbraco")
 
     		$scope.deleteSection = function(section, template) {
     			if ($scope.currentSection === section) {
-    				$scope.currentSection = undefined;
+    				$scope.currentSection = null;
     			}
     			var index = template.sections.indexOf(section)
     			template.sections.splice(index, 1);
     		};
 
             $scope.selectRow = function (section, row) {
+
                 section.allowed = section.allowed || [];
 
                 var index = section.allowed.indexOf(row.name);
-                if (row.allowed === true) {
+                if (row.selected === true) {
                     if (index === -1) {
                         section.allowed.push(row.name); 
                     }
@@ -108,6 +132,12 @@ angular.module("umbraco")
 
             $scope.submit = function () {
                 if ($scope.model.submit) {
+
+                    // Delete temporary rows configurated in init.
+                    if ($scope.currentLayout.rows) {
+                        delete $scope.currentLayout.rows;
+                    }
+
                     $scope.model.submit($scope.currentLayout);
                 }
             };

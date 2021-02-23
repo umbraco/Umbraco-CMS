@@ -34,7 +34,7 @@
                                     <div class="tr">
 
                                         <button type="button" class="btn-reset td uSky-templates-column"
-                                           ng-class="{last:$last, selected:section==currentSection}"
+                                           ng-class="{last: $last, selected: section == currentSection}"
                                            ng-repeat="section in currentLayout.sections"
                                            ng-click="configureSection(section, currentLayout)"
                                            ng-style="{width: percentage(section.grid) +'%'}">
@@ -44,7 +44,7 @@
                                         </button>
 
                                         <button type="button" class="btn-reset td uSky-templates-column add" ng-if="availableLayoutSpace > 0"
-                                           ng-click="configureSection(undefined, currentLayout)"
+                                           ng-click="configureSection(null, currentLayout)"
                                            ng-style="{width: percentage(availableLayoutSpace) + '%'}">
                                             <i class="icon icon-add" aria-hidden="true"></i>
                                             <span class="sr-only">
@@ -82,10 +82,12 @@
 
                                 <umb-control-group hide-label="true">
 
+                                    {{currentSection.allowAll}}
+
                                     <umb-toggle
                                         class="umb-toggle-group-item__toggle"
                                         checked="currentSection.allowAll"
-                                        on-click="toggleAllowed(currentSection)"
+                                        on-click="vm.toggleAllowed(currentSection)"
                                         show-labels="true"
                                         label-position="right"
                                         label-off="Allow all row configurations"
@@ -93,31 +95,33 @@
                                         style="margin-left: 18px">
                                     </umb-toggle>
 
+                                    {{currentSection | json}}
+
                                     <div ng-if="currentSection.allowAll === false">
                                         <hr/>
 
                                         <div class="control-group uSky-templates-rows">
                                             <ul class="unstyled">
 
-                                                <li ng-repeat="row in rows track by $id(row)">
+                                                <li ng-repeat="row in currentSection.rows track by $id(row)">
 
                                                     <div class="flex">
 
-                                                        <umb-checkbox model="row.allowed"
+                                                        <umb-checkbox model="row.selected"
                                                                       input-id="rowconfig-{{$index}}"
                                                                       on-change="selectRow(currentSection, row)">
                                                         </umb-checkbox>
 
                                                         <button type="button"
                                                                 class="btn-reset flex flex-auto tl"
-                                                                ng-click="row.allowed = !row.allowed; selectRow(currentSection, row)">
+                                                                ng-click="row.selected = !row.selected; selectRow(currentSection, row)">
 
                                                             <span class="preview-rows columns" style="margin-top: auto;">
                                                                 <span class="preview-row">
                                                                     <span class="preview-col"
-                                                                         ng-class="{last:$last}"
-                                                                         ng-repeat="area in row.areas"
-                                                                         ng-style="{width: percentage(area.grid) + '%'}">
+                                                                          ng-class="{last:$last}"
+                                                                          ng-repeat="area in row.areas"
+                                                                          ng-style="{width: percentage(area.grid) + '%'}">
 
                                                                         <span class="preview-cell"></span>
                                                                     </span>
@@ -125,7 +129,7 @@
                                                             </span>
 
                                                             <span>
-                                                                {{row.name}}<br/>
+                                                                {{row.name}}<br />
                                                                 <small>{{row.areas.length}} cells</small>
                                                             </span>
                                                         </button>

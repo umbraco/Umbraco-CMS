@@ -80,7 +80,7 @@ function RowConfigController($scope, localizationService) {
         }
     };
 
-    $scope.toggleAllowed = function (cell) {
+    vm.toggleAllowed = function (cell) {
         cell.allowAll = !cell.allowAll;
 
         if (cell.allowed) {
