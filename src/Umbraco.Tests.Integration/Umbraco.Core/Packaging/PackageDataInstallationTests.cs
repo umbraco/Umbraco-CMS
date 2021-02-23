@@ -354,7 +354,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         public void Can_Import_Media_Package_Xml()
         {
             // Arrange
-            global::Umbraco.Cms.Infrastructure.Services.Implement.MediaTypeService.ClearScopeEvents();
+            global::Umbraco.Cms.Core.Services.Implement.MediaTypeService.ClearScopeEvents();
             string strXml = ImportResources.MediaTypesAndMedia_Package_xml;
             var xml = XElement.Parse(strXml);
             XElement mediaTypesElement = xml.Descendants("MediaTypes").First();

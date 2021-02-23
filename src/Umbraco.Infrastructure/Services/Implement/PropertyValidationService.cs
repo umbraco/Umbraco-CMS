@@ -4,10 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     public class PropertyValidationService : IPropertyValidationService
     {

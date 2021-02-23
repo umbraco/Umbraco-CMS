@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             CreateTestData();
 
             // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            global::Umbraco.Cms.Infrastructure.Services.Implement.ContentTypeService.ClearScopeEvents();
+            global::Umbraco.Cms.Core.Services.Implement.ContentTypeService.ClearScopeEvents();
 
             ContentRepositoryBase.ThrowOnWarning = true;
         }

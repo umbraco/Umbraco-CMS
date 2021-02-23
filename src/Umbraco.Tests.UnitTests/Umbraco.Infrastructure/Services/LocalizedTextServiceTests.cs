@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using NUnit.Framework;
-using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Core.Services.Implement;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
 {

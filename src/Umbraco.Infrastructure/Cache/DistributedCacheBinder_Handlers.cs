@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache

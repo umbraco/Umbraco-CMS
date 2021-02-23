@@ -2,9 +2,8 @@
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Infrastructure.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     internal class KeyValueService : IKeyValueService
     {

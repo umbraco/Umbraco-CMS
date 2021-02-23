@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
-using Umbraco.Cms.Infrastructure.Services.Implement;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             _globalSettings = new GlobalSettings();
 
             // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            global::Umbraco.Cms.Infrastructure.Services.Implement.ContentTypeService.ClearScopeEvents();
+            global::Umbraco.Cms.Core.Services.Implement.ContentTypeService.ClearScopeEvents();
             CreateTestData();
         }
 

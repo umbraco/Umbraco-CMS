@@ -2,13 +2,12 @@
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Serialization;
-using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.Services;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
 
 namespace Umbraco.Tests.Persistence.NPocoTests
 {

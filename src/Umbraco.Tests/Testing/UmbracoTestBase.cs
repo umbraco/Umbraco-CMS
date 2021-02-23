@@ -44,6 +44,7 @@ using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
@@ -57,10 +58,8 @@ using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Serialization;
-using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -69,7 +68,6 @@ using Umbraco.Web.Composing;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Security;
 using Umbraco.Web.Security.Providers;
-using FileSystems = Umbraco.Cms.Core.IO.FileSystems;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Testing

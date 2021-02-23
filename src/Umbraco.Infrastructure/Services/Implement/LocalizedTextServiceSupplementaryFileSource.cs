@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace Umbraco.Cms.Infrastructure.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     public class LocalizedTextServiceSupplementaryFileSource
     {

@@ -1,10 +1,10 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Infrastructure.Services.Implement;
-using Constants = Umbraco.Cms.Core.Constants;
+using Umbraco.Cms.Core.Services.Implement;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
 {

@@ -2,12 +2,10 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Infrastructure.Services
+namespace Umbraco.Cms.Core.Services
 {
     public class IdKeyMap : IIdKeyMap
     {
