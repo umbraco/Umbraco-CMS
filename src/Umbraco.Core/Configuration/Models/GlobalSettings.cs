@@ -25,15 +25,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public string ReservedPaths { get; set; } = StaticReservedPaths;
 
         /// <summary>
-        /// Gets or sets a value for the configuration status.
-        /// </summary>
-        /// <remarks>
-        /// TODO: https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
-        /// TODO: previously this would throw on set, but presumably we can't do that if we do still want this in config.
-        /// </remarks>
-        public string ConfigurationStatus { get; set; }
-
-        /// <summary>
         /// Gets or sets a value for the timeout in minutes.
         /// </summary>
         public int TimeOutInMinutes { get; set; } = 20;
