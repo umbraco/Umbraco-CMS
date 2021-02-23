@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
@@ -98,8 +98,8 @@ namespace Umbraco.Web.Install
                 }
 
                 var installLog = new InstallLog(installId: installId, isUpgrade: IsBrandNewInstall == false,
-                    installCompleted: isCompleted, timestamp: DateTime.Now, versionMajor: _umbracoVersion.Current.Major,
-                    versionMinor: _umbracoVersion.Current.Minor, versionPatch: _umbracoVersion.Current.Build,
+                    installCompleted: isCompleted, timestamp: DateTime.Now, versionMajor: _umbracoVersion.Version.Major,
+                    versionMinor: _umbracoVersion.Version.Minor, versionPatch: _umbracoVersion.Version.Build,
                     versionComment: _umbracoVersion.Comment, error: errorMsg, userAgent: userAgent,
                     dbProvider: dbProvider);
 
@@ -145,7 +145,7 @@ namespace Umbraco.Web.Install
             var packages = new List<Package>();
             try
             {
-                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={_umbracoVersion.Current}";
+                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={_umbracoVersion.Version}";
 
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 {
