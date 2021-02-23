@@ -41,10 +41,10 @@
                                 <div class="tr">
 
                                     <button type="button" class="btn-reset td uSky-templates-column"
-                                        ng-class="{last:$last, selected:cell==currentCell}"
-                                        ng-repeat="cell in currentRow.areas"
-                                        ng-click="configureCell(cell, currentRow)"
-                                        ng-style="{width: percentage(cell.grid) + '%'}">
+                                            ng-class="{last: $last, selected: cell == currentCell}"
+                                            ng-repeat="cell in currentRow.areas"
+                                            ng-click="vm.configureCell(cell, currentRow)"
+                                            ng-style="{width: vm.percentage(cell.grid) + '%'}">
                                         <span class="sr-only">
                                             <span class="sr-only">
                                                 <localize key="grid_editRowConfiguration">Edit row configuration</localize>
@@ -53,8 +53,8 @@
                                     </button>
 
                                     <button type="button" class="btn-reset td uSky-templates-column add"
-                                       ng-click="configureCell(null, currentRow)"
-                                       ng-style="{width: percentage(availableRowSpace) + '%'}">
+                                            ng-click="vm.configureCell(null, currentRow)"
+                                            ng-style="{width: vm.percentage(availableRowSpace) + '%'}">
                                         <i class="icon icon-add" aria-hidden="true"></i>
                                         <span class="sr-only">
                                             <localize key="grid_addRowConfiguration">Add row configuration</localize>
@@ -68,11 +68,11 @@
 
                             <umb-control-group label="@general_width">
                                 <div class="grid-size-scaler">
-                                    <button type="button" class="btn-link" ng-click="scaleDown(currentCell)">
+                                    <button type="button" class="btn-link" ng-click="vm.scaleDown(currentCell)">
                                         <i class="icon icon-remove" aria-hidden="true"></i>
                                     </button>
                                     <span>{{currentCell.grid}}</span>
-                                    <button type="button" class="btn-link" ng-click="scaleUp(currentCell, availableRowSpace, true)">
+                                    <button type="button" class="btn-link" ng-click="vm.scaleUp(currentCell, availableRowSpace, true)">
                                         <i class="icon icon-add" aria-hidden="true"></i>
                                     </button>
                                 </div>
@@ -84,7 +84,7 @@
 
                             <umb-control-group hide-label="true">
 	  		                    <i class="icon-delete red" aria-hidden="true"></i>
-	  		                    <button type="button" class="btn btn-small btn-link" ng-click="deleteArea(currentCell, currentRow)">
+	  		                    <button type="button" class="btn btn-small btn-link" ng-click="vm.deleteArea(currentCell, currentRow)">
 	  			                    <localize key="general_delete" class="ng-isolate-scope ng-scope">Delete</localize>
 	  		                    </button>
 	  	                    </umb-control-group>
@@ -108,7 +108,7 @@
 
                                             <umb-checkbox model="editor.allowed"
                                                           input-id="editorconfig-{{$index}}"
-                                                          on-change="selectEditor(currentCell, editor)">
+                                                          on-change="vm.selectEditor(currentCell, editor)">
                                                 <i class="icon {{editor.icon}}" aria-hidden="true"></i> {{editor.name}}
                                                 <small class="input-label--small">({{editor.alias}})</small>
                                             </umb-checkbox>
@@ -132,13 +132,13 @@
                         button-style="link"
                         label-key="general_close"
                         shortcut="esc"
-                        action="close()">
+                        action="vm.close()">
                     </umb-button>
                     <umb-button
                         type="button"
                         button-style="success"
                         label-key="general_submit"
-                        action="submit()">
+                        action="vm.submit()">
                     </umb-button>
                 </umb-editor-footer-content-right>
             </umb-editor-footer>

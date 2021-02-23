@@ -2,10 +2,25 @@ function RowConfigController($scope, localizationService) {
 
     var vm = this;
 
+    vm.configureCell = configureCell;
+    vm.closeArea = closeArea;
+    vm.deleteArea = deleteArea;
+    vm.selectEditor = selectEditor;
+    vm.toggleAllowed = toggleAllowed;
+    vm.percentage = percentage;
+    vm.scaleUp = scaleUp;
+    vm.scaleDown = scaleDown;
+    vm.close = close;
+    vm.submit = submit;
+
     vm.labels = {};
     
     function init() {
-        
+
+        $scope.currentRow = $scope.model.currentRow;
+        $scope.columns = $scope.model.columns;
+        $scope.editors = $scope.model.editors;
+
         var labelKeys = [
             "grid_addRowConfiguration",
             "grid_allowAllEditors"
@@ -25,12 +40,8 @@ function RowConfigController($scope, localizationService) {
             $scope.model.title = value;
         }
     }
-    
-    $scope.currentRow = $scope.model.currentRow;
-    $scope.columns = $scope.model.columns;
-    $scope.editors = $scope.model.editors;
 
-    $scope.scaleUp = function(section, max, overflow) {
+    function scaleUp(section, max, overflow) {
         var add = 1;
         if (overflow !== true) {
             add = (max > 1) ? 1 : max;
@@ -39,19 +50,19 @@ function RowConfigController($scope, localizationService) {
         section.grid = section.grid + add;
     };
 
-    $scope.scaleDown = function(section) {
+    function scaleDown(section) {
         var remove = (section.grid > 1) ? 1 : 0;
         section.grid = section.grid - remove;
-    };
+    }
 
-    $scope.percentage = function(spans) {
+    function percentage(spans) {
         return ((spans / $scope.columns) * 100).toFixed(8);
-    };
+    }
 
     /****************
         area
     *****************/
-    $scope.configureCell = function(cell, row) {
+    function configureCell(cell, row) {
         if ($scope.currentCell && $scope.currentCell === cell) {
             delete $scope.currentCell;
         }
@@ -78,9 +89,9 @@ function RowConfigController($scope, localizationService) {
             $scope.currentCell = cell;
             $scope.currentCell.allowAll = cell.allowAll || !cell.allowed || !cell.allowed.length;
         }
-    };
+    }
 
-    vm.toggleAllowed = function (cell) {
+    function toggleAllowed(cell) {
         cell.allowAll = !cell.allowAll;
 
         if (cell.allowed) {
@@ -89,21 +100,22 @@ function RowConfigController($scope, localizationService) {
         else {
             cell.allowed = [];
         }
-    };
+    }
 
-    $scope.deleteArea = function (cell, row) {
+    function deleteArea(cell, row) {
     	if ($scope.currentCell === cell) {
     		$scope.currentCell = null;
     	}
     	var index = row.areas.indexOf(cell)
     	row.areas.splice(index, 1);
-    };
+    }
 
-    $scope.closeArea = function() {
+    // This doesn't seem to be used?
+    function closeArea() {
         $scope.currentCell = null;
-    };
+    }
 
-    $scope.selectEditor = function (cell, editor) {
+    function selectEditor(cell, editor) {
         cell.allowed = cell.allowed || [];
 
         var index = cell.allowed.indexOf(editor.alias);
@@ -115,19 +127,19 @@ function RowConfigController($scope, localizationService) {
         else {
             cell.allowed.splice(index, 1);
         }
-    };
+    }
     
-    $scope.close = function () {
+    function close () {
         if ($scope.model.close) {
             $scope.model.close();
         }
-    };
+    }
 
-    $scope.submit = function () {
+    function submit() {
         if ($scope.model.submit) {
             $scope.model.submit($scope.currentRow);
         }
-    };
+    }
 
     $scope.nameChanged = false;
     var originalName = $scope.currentRow.name;
