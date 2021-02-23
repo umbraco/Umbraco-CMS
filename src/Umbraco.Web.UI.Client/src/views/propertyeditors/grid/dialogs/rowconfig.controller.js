@@ -20,6 +20,7 @@ function RowConfigController($scope, localizationService) {
         $scope.currentRow = $scope.model.currentRow;
         $scope.columns = $scope.model.columns;
         $scope.editors = $scope.model.editors;
+        $scope.nameChanged = false;
 
         var labelKeys = [
             "grid_addRowConfiguration",
@@ -141,8 +142,6 @@ function RowConfigController($scope, localizationService) {
         }
     }
 
-    $scope.nameChanged = false;
-    var originalName = $scope.currentRow.name;
     $scope.$watch("currentRow", function(row) {
         if (row) {
 
@@ -153,6 +152,7 @@ function RowConfigController($scope, localizationService) {
 
             $scope.availableRowSpace = $scope.columns - total;
 
+            var originalName = $scope.currentRow.name;
             if (originalName) {
                 if (originalName != row.name) {
                     $scope.nameChanged = true;
