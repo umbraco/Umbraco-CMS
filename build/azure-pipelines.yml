@@ -275,3 +275,32 @@ stages:
               PathtoPublish: '$(build.artifactstagingdirectory)'
               ArtifactName: logs
           condition: succeededOrFailed()
+
+
+  - job: Generate_Docs
+    timeoutInMinutes: 30
+    condition: ne(variables['Umbraco.IsReleaseBuild'], 'false')
+    displayName: 'Generate Code Documentation'
+    pool:
+        vmImage: 'windows-latest'
+    steps:
+        - task: PowerShell@2
+          displayName: 'Prep build tool, build C# & JS Docs'
+          inputs:
+              targetType: 'inline'
+              script: |
+                  $uenv=./build.ps1 -get -doc
+                  $uenv.SandboxNode()
+                  $uenv.CompileBelle()
+                  $uenv.PrepareAngularDocs()
+                  $nugetsourceUmbraco = "https://api.nuget.org/v3/index.json"
+                  $uenv.PrepareCSharpDocs()
+                  $uenv.RestoreNode()
+              errorActionPreference: 'continue'
+              workingDirectory: 'build'
+
+        - task: PublishPipelineArtifact@1
+          inputs:
+              targetPath: '$(Build.Repository.LocalPath)\build.out\'
+              artifact: 'docs'
+              publishLocation: 'pipeline'

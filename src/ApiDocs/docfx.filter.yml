@@ -1,10 +1,20 @@
 apiRules:
   - include:
-      uidRegex: ^Umbraco\.Core
-  - exclude:
-      uidRegex: ^umbraco\.Web\.org
+      uidRegex: ^Umbraco\.Cms\.Core
   - include:
-      uidRegex: ^Umbraco\.Web
+      uidRegex: ^Umbraco\.Cms\.Examine\.Lucene
+  - include:
+      uidRegex: ^Umbraco\.Cms\.Infrastructure
+  - include:
+      uidRegex: ^Umbraco\.Cms\.Persistence\.SqlCe
+  - include:
+      uidRegex: ^Umbraco\.Cms\.PublsishedCache\.NuCache
+  - include:
+      uidRegex: ^Umbraco\.Cms\.Web\.BackOffice
+  - include:
+      uidRegex: ^Umbraco\.Cms\.Web\.Common
+  - include:
+      uidRegex: ^Umbraco\.Cms\.Web\.Website
   - exclude:
       hasAttribute:
       uid: System.ComponentModel.EditorBrowsableAttribute
@@ -13,6 +23,6 @@ apiRules:
   - exclude:
       uidRegex: ^umbraco\.
   - exclude:
-      uidRegex: ^CookComputing\.	  
+      uidRegex: ^CookComputing\.
   - exclude:
       uidRegex: ^.*$

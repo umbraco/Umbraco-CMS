@@ -1,5 +1,20 @@
-
+- name: Umbraco.Extensions Documentation
+  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Extensions.html
 - name: Umbraco.Core Documentation
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Core.html
-- name: Umbraco.Web Documentation
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Web.html
+  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Core.html
+- name: Umbraco.Infrastructure Documentation
+  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Infrastructure.html
+- name: Umbraco.Examine.Lucene Documentation
+  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Examine.Lucene.html
+- name: Umbraco.Persistence.SqlCe Documentation
+  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Persistence.SqlCe.html
+- name: Umbraco.PublishedCache.NuCache Documentation
+  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.PublishedCache.NuCache.html
+- name: Umbraco.Web.Common Documentation
+  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Web.Common.html
+- name: Umbraco.Web.BackOffice Documentation
+  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Web.BackOffice.html
+- name: Umbraco.Web.Website Documentation
+  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Web.Website.html
+
+

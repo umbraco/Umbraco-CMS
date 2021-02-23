@@ -2,11 +2,17 @@
   "metadata": [
     {
       "src": [
-        { 
+        {
           "src": "../",
           "files": [
             "Umbraco.Core/Umbraco.Core.csproj",
-            "Umbraco.Web/Umbraco.Web.csproj"
+            "Umbraco.Examine.Lucene/Umbraco.Examine.Lucene.csproj",
+            "Umbraco.Infrastructure/Umbraco.Infrastructure.csproj",
+            "Umbraco.Persistence.SqlCe/Umbraco.Persistence.SqlCe.csproj",
+            "Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj",
+            "Umbraco.Web.BackOffice/Umbraco.Web.BackOffice.csproj",
+            "Umbraco.Web.Common/Umbraco.Web.Common.csproj",
+            "Umbraco.Web.Website/Umbraco.Web.Website.csproj"
           ],
           "exclude": [
             "**/obj/**",
