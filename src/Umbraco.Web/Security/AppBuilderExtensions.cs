@@ -175,7 +175,7 @@ namespace Umbraco.Web.Security
 
                     return SecurityStampValidator
                         .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
-                        TimeSpan.FromMinutes(3),
+                        TimeSpan.FromMinutes(30),
                         async (manager, user) =>
                         {
                             var regenerated = await manager.GenerateUserIdentityAsync(user);
