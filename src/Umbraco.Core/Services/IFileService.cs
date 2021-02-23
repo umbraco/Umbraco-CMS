@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Umbraco.Cms.Core.Models;
@@ -53,13 +53,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="path">Name incl. extension of the Stylesheet to delete</param>
         /// <param name="userId">Optional id of the user deleting the stylesheet</param>
         void DeleteStylesheet(string path, int userId = Constants.Security.SuperUserId);
-
-        /// <summary>
-        /// Validates a <see cref="IStylesheet"/>
-        /// </summary>
-        /// <param name="stylesheet"><see cref="IStylesheet"/> to validate</param>
-        /// <returns>True if Stylesheet is valid, otherwise false</returns>
-        bool ValidateStylesheet(IStylesheet stylesheet);
 
         /// <summary>
         /// Gets a list of all <see cref="IScript"/> objects
@@ -243,27 +236,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filepath">The filesystem path to the template.</param>
         /// <returns>The size of the template.</returns>
         long GetTemplateFileSize(string filepath);
-
-        /// <summary>
-        /// Gets the content of a stylesheet as a stream.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the stylesheet.</param>
-        /// <returns>The content of the stylesheet.</returns>
-        Stream GetStylesheetFileContentStream(string filepath);
-
-        /// <summary>
-        /// Sets the content of a stylesheet.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the stylesheet.</param>
-        /// <param name="content">The content of the stylesheet.</param>
-        void SetStylesheetFileContent(string filepath, Stream content);
-
-        /// <summary>
-        /// Gets the size of a stylesheet.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the stylesheet.</param>
-        /// <returns>The size of the stylesheet.</returns>
-        long GetStylesheetFileSize(string filepath);
 
         /// <summary>
         /// Gets the content of a script file as a stream.

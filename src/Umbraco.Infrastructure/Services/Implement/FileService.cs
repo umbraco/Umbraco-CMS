@@ -123,15 +123,6 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <inheritdoc />
-        public bool ValidateStylesheet(IStylesheet stylesheet)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _stylesheetRepository.ValidateStylesheet(stylesheet);
-            }
-        }
-
         public void CreateStyleSheetFolder(string folderPath)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -147,31 +138,6 @@ namespace Umbraco.Core.Services.Implement
             {
                 _stylesheetRepository.DeleteFolder(folderPath);
                 scope.Complete();
-            }
-        }
-
-        public Stream GetStylesheetFileContentStream(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _stylesheetRepository.GetFileContentStream(filepath);
-            }
-        }
-
-        public void SetStylesheetFileContent(string filepath, Stream content)
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                _stylesheetRepository.SetFileContent(filepath, content);
-                scope.Complete();
-            }
-        }
-
-        public long GetStylesheetFileSize(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _stylesheetRepository.GetFileSize(filepath);
             }
         }
 
