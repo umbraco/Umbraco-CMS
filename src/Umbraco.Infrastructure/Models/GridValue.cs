@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     // TODO: Make a property value converter for this!
 

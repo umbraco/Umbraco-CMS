@@ -2,9 +2,9 @@
 using Serilog.Core;
 using Serilog.Events;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Core.Cache;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Logging.Serilog.Enrichers
+namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
 {
     /// <summary>
     /// Enrich log events with a HttpRequestId GUID.

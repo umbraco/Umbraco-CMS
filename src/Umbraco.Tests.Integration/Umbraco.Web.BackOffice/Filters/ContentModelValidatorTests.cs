@@ -26,7 +26,6 @@ using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Extensions;
-using Umbraco.Web.PropertyEditors;
 using DataType = Umbraco.Cms.Core.Models.DataType;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters

@@ -1,6 +1,6 @@
 ﻿using NPoco;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     internal static class NPocoDatabaseTypeExtensions
     {

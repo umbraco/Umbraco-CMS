@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Migrations.Install;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Install;
 
-namespace Umbraco.Core.Migrations.Upgrade.Common
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common
 {
     public class CreateKeysAndIndexes : MigrationBase
     {

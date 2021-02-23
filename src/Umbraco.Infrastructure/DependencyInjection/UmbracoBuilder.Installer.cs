@@ -2,11 +2,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Install.InstallSteps;
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Infrastructure.Install.InstallSteps;
 using Umbraco.Extensions;
-using Umbraco.Web.Install;
-using Umbraco.Web.Install.InstallSteps;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     public static partial class UmbracoBuilderExtensions
     {

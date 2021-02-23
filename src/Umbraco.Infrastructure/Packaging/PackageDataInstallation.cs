@@ -7,21 +7,19 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Packaging;
-using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     public class PackageDataInstallation
     {
@@ -484,11 +482,11 @@ namespace Umbraco.Core.Packaging
                 case IMediaType m:
                     if (parent is null)
                     {
-                        return new Media(name, parentId, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
+                        return new Models.Media(name, parentId, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
                     }
                     else
                     {
-                        return new Media(name, (IMedia)parent, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
+                        return new Models.Media(name, (IMedia)parent, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
                     }
 
                 default:

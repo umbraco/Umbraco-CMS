@@ -4,9 +4,9 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using NPoco;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods to NPoco Database class.

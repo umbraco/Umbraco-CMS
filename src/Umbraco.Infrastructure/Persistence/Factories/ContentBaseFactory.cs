@@ -4,12 +4,9 @@ using System.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Factories
+namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     internal class ContentBaseFactory
     {
@@ -75,12 +72,12 @@ namespace Umbraco.Core.Persistence.Factories
         /// <summary>
         /// Builds an IMedia item from a dto and content type.
         /// </summary>
-        public static Media BuildEntity(ContentDto dto, IMediaType contentType)
+        public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType contentType)
         {
             var nodeDto = dto.NodeDto;
             var contentVersionDto = dto.ContentVersionDto;
 
-            var content = new Media(nodeDto.Text, nodeDto.ParentId, contentType);
+            var content = new Core.Models.Media(nodeDto.Text, nodeDto.ParentId, contentType);
 
             try
             {

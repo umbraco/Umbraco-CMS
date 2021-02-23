@@ -1,11 +1,11 @@
 using System;
 using System.Data.Common;
 using System.Data.SqlServerCe;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Persistence.SqlCe;
 using Umbraco.Core;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web

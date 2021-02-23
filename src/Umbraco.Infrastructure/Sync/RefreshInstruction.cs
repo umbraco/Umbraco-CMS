@@ -4,9 +4,8 @@ using System.Linq;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Cache;
 
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Infrastructure.Sync
 {
     [Serializable]
     public class RefreshInstruction

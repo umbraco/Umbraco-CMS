@@ -12,7 +12,7 @@ using Lucene.Net.QueryParsers;
 using Lucene.Net.Search;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Examine;
+using Umbraco.Cms.Infrastructure.Examine;
 using Version = Lucene.Net.Util.Version;
 
 namespace Umbraco.Extensions

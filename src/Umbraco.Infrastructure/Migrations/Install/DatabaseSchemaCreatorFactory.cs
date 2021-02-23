@@ -1,8 +1,8 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Core.Migrations.Install
+namespace Umbraco.Cms.Infrastructure.Migrations.Install
 {
     /// <summary>
     /// Creates the initial database schema during install.

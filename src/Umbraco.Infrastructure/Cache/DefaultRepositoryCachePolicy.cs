@@ -1,12 +1,14 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Represents the default cache policy.

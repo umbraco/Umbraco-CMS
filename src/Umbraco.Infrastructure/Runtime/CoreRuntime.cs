@@ -9,13 +9,10 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Infrastructure.Runtime
+namespace Umbraco.Cms.Infrastructure.Runtime
 {
     public class CoreRuntime : IRuntime
     {

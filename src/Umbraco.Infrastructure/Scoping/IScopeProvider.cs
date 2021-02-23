@@ -1,15 +1,12 @@
-using System;
 using System.Data;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Events;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 #if DEBUG_SCOPES
 using System.Collections.Generic;
 #endif
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// Provides scopes.

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Data.Common;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     public class SqlServerDbProviderFactoryCreator : IDbProviderFactoryCreator
     {

@@ -1,13 +1,10 @@
-using System;
+﻿using System;
 using System.Configuration.Provider;
 using System.Linq;
 using System.Web.Security;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Security.Providers

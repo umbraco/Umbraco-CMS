@@ -3,10 +3,10 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Compose
+namespace Umbraco.Cms.Core.Compose
 {
     public sealed class PublicAccessComponent : IComponent
     {

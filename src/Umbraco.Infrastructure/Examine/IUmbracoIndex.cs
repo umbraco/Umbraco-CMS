@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Examine;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// A Marker interface for defining an Umbraco indexer

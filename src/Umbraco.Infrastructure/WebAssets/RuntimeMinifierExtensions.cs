@@ -4,8 +4,9 @@ using System.Threading.Tasks;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.WebAssets;
 
-namespace Umbraco.Web.WebAssets
+namespace Umbraco.Extensions
 {
     public static class RuntimeMinifierExtensions
     {

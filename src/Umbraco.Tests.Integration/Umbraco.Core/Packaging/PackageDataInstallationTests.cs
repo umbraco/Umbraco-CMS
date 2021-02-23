@@ -12,15 +12,15 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Packaging;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 using Umbraco.Tests.Services.Importing;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -354,7 +354,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         public void Can_Import_Media_Package_Xml()
         {
             // Arrange
-            global::Umbraco.Core.Services.Implement.MediaTypeService.ClearScopeEvents();
+            global::Umbraco.Cms.Core.Services.Implement.MediaTypeService.ClearScopeEvents();
             string strXml = ImportResources.MediaTypesAndMedia_Package_xml;
             var xml = XElement.Parse(strXml);
             XElement mediaTypesElement = xml.Descendants("MediaTypes").First();
@@ -399,7 +399,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
                                 select doc).Count();
 
             string configuration;
-            using (global::Umbraco.Core.Scoping.IScope scope = ScopeProvider.CreateScope())
+            using (global::Umbraco.Cms.Core.Scoping.IScope scope = ScopeProvider.CreateScope())
             {
                 List<DataTypeDto> dtos = scope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
                 configuration = dtos.Single().Configuration;

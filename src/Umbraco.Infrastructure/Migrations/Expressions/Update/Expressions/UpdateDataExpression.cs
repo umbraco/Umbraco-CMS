@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using NPoco;
 using System.Linq;
 
-namespace Umbraco.Core.Migrations.Expressions.Update.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update.Expressions
 {
     public class UpdateDataExpression : MigrationExpressionBase
     {

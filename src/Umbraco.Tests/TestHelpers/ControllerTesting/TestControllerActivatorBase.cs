@@ -16,14 +16,10 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
-using Umbraco.Core.Services;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.WebApi;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Core.Security;
 using Umbraco.Extensions;
+using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Web;
+using Umbraco.Web.WebApi;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {

@@ -1,9 +1,8 @@
 using System;
 using Umbraco.Cms.Core.Models.Identity;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Factories
+namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     internal static class ExternalLoginFactory
     {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
 {
     class ContentPickerPreValueMigrator : DefaultPreValueMigrator
     {

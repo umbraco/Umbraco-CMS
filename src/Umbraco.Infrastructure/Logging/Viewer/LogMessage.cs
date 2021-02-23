@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 
 // ReSharper disable UnusedAutoPropertyAccessor.Global
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     public class LogMessage
     {

@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
-using System.Threading.Tasks;
 using Examine;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Core.Logging;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
 
     /// <summary>

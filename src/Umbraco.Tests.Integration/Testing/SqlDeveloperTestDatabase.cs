@@ -7,7 +7,7 @@ using System.Data.SqlClient;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 // ReSharper disable ConvertToUsingDeclaration
 namespace Umbraco.Cms.Tests.Integration.Testing

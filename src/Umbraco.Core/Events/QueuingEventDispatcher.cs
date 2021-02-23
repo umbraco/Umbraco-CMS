@@ -1,7 +1,9 @@
-﻿using Umbraco.Cms.Core.Events;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using Umbraco.Cms.Core.IO;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     /// <summary>
     /// An IEventDispatcher that queues events, and raise them when the scope

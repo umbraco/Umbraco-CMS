@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     internal class ScopeContext : IScopeContext, IInstanceIdentifiable
     {

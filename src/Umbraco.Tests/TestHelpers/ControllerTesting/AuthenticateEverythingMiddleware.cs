@@ -6,6 +6,8 @@ using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin;
 using Umbraco.Extensions;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {

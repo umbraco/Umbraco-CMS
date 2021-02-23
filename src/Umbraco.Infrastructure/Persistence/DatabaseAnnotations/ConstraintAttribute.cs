@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Persistence.DatabaseAnnotations
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations
 {
     /// <summary>
     /// Attribute that represents a db constraint

@@ -1,10 +1,12 @@
-﻿using System.Linq;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Linq;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for <see cref="DistributedCache"/>.

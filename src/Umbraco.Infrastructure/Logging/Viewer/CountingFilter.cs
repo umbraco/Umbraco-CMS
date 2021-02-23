@@ -1,7 +1,7 @@
 ﻿using System;
 using Serilog.Events;
 
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     internal class CountingFilter : ILogFilter
     {

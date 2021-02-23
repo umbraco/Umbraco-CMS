@@ -7,10 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
@@ -25,13 +23,11 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PropertyEditors;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.PublishedContent

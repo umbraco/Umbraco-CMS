@@ -8,9 +8,9 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Integration.TestServerTest;
 using Umbraco.Cms.Web.Website.Controllers;
-using Umbraco.Core.Persistence;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing
 {

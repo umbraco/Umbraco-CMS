@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
 
-namespace Umbraco.Core.Migrations.Expressions.Delete.DefaultConstraint
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.DefaultConstraint
 {
     /// <summary>
     /// Implements <see cref="IDeleteDefaultConstraintOnTableBuilder"/>, <see cref="IDeleteDefaultConstraintOnColumnBuilder"/>.

@@ -9,13 +9,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Security;
-using Umbraco.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
 {
-
     using Constants = Core.Constants;
 
     public class BackOfficeSignInManager : SignInManager<BackOfficeIdentityUser>, IBackOfficeSignInManager

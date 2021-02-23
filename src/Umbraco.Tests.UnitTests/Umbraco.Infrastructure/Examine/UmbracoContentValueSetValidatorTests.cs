@@ -10,7 +10,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Examine;
+using Umbraco.Cms.Infrastructure.Examine;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Examine
 {

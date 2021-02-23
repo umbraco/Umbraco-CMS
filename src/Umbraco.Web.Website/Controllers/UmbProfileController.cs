@@ -8,8 +8,8 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.Filters;
-using Umbraco.Core.Persistence;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Controllers

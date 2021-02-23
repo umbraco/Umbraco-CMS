@@ -6,22 +6,20 @@ using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMedia"/>
@@ -507,9 +505,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<IMedia> MapDtosToContent(List<ContentDto> dtos, bool withCache = false)
         {
-            var temps = new List<TempContent<Media>>();
+            var temps = new List<TempContent<Core.Models.Media>>();
             var contentTypes = new Dictionary<int, IMediaType>();
-            var content = new Media[dtos.Count];
+            var content = new Core.Models.Media[dtos.Count];
 
             for (var i = 0; i < dtos.Count; i++)
             {
@@ -521,7 +519,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
-                        content[i] = (Media) cached;
+                        content[i] = (Core.Models.Media) cached;
                         continue;
                     }
                 }
@@ -538,7 +536,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // need properties
                 var versionId = dto.ContentVersionDto.Id;
-                temps.Add(new TempContent<Media>(dto.NodeId, versionId, 0, contentType, c));
+                temps.Add(new TempContent<Core.Models.Media>(dto.NodeId, versionId, 0, contentType, c));
             }
 
             // load all properties for all documents from database in 1 query - indexed by version id
@@ -563,8 +561,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // get properties - indexed by version id
             var versionId = dto.ContentVersionDto.Id;
-            var temp = new TempContent<Media>(dto.NodeId, versionId, 0, contentType);
-            var properties = GetPropertyCollections(new List<TempContent<Media>> { temp });
+            var temp = new TempContent<Core.Models.Media>(dto.NodeId, versionId, 0, contentType);
+            var properties = GetPropertyCollections(new List<TempContent<Core.Models.Media>> { temp });
             media.Properties = properties[versionId];
 
             // reset dirty initial properties (U4-1946)

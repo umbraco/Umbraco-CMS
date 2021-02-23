@@ -2,12 +2,12 @@
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Compose
+namespace Umbraco.Cms.Core.Compose
 {
     public sealed class RelateOnTrashComponent : IComponent
     {

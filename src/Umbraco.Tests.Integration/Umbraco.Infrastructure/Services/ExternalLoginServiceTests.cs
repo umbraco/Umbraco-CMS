@@ -9,9 +9,9 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             DateTime latest = DateTime.Now.AddDays(-1);
             DateTime oldest = DateTime.Now.AddDays(-10);
 
-            using (global::Umbraco.Core.Scoping.IScope scope = ScopeProvider.CreateScope())
+            using (global::Umbraco.Cms.Core.Scoping.IScope scope = ScopeProvider.CreateScope())
             {
                 // insert duplicates manuall
                 scope.Database.Insert(new ExternalLoginDto

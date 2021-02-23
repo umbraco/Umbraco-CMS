@@ -3,7 +3,7 @@ using Serilog.Events;
 using System;
 using Umbraco.Cms.Core.Net;
 
-namespace Umbraco.Core.Logging.Serilog.Enrichers
+namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
 {
     /// <summary>
     /// Enrich log events with the HttpSessionId property.

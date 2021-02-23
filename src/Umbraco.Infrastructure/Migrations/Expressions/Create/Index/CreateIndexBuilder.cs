@@ -1,9 +1,9 @@
 ﻿using Umbraco.Cms.Core;
-using Umbraco.Core.Migrations.Expressions.Common.Expressions;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Create.Index
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index
 {
     public class CreateIndexBuilder : ExpressionBuilderBase<CreateIndexExpression>,
         ICreateIndexForTableBuilder,

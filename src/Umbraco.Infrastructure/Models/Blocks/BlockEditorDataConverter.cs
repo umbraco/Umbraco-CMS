@@ -1,12 +1,10 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Generic;
-using Umbraco.Cms.Core.Models.Blocks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 
-namespace Umbraco.Core.Models.Blocks
+namespace Umbraco.Cms.Core.Models.Blocks
 {
-
     /// <summary>
     /// Converts the block json data into objects
     /// </summary>

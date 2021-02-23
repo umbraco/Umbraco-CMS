@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods to <see cref="ISqlContext"/>.

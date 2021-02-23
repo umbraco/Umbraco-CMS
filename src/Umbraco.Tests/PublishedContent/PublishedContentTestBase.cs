@@ -15,16 +15,8 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {

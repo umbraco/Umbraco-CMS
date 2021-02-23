@@ -1,9 +1,9 @@
-﻿using NPoco;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using NPoco;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Persistence.SqlSyntax
+namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
     internal static class SqlSyntaxProviderExtensions
     {

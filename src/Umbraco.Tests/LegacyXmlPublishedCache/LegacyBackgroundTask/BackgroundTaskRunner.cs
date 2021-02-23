@@ -6,8 +6,6 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Core;
-using Umbraco.Core.Events;
 
 namespace Umbraco.Web.Scheduling
 {

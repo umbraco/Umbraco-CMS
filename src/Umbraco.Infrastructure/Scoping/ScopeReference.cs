@@ -1,6 +1,7 @@
-﻿using Umbraco.Cms.Core;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// References a scope.

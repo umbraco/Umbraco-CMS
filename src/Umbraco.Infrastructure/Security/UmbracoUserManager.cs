@@ -7,13 +7,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Net;
-using Umbraco.Cms.Core.Security;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// Abstract class for Umbraco User Managers for back office users or front-end members
@@ -51,7 +48,7 @@ namespace Umbraco.Core.Security
 
         /// <inheritdoc />
         public override bool SupportsQueryableUsers => false; // It would be nice to support this but we don't need to currently and that would require IQueryable support for our user service/repository
-        
+
         /// <summary>
         /// Developers will need to override this to support custom 2 factor auth
         /// </summary>

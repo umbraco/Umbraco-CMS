@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// Provides a base class for scope contextual objects.

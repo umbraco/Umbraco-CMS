@@ -29,11 +29,9 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             "System",
             "System.Linq.Expressions",
             "Umbraco.Cms.Core.Models.PublishedContent",
-            "Umbraco.Web.PublishedCache", // Todo: Remove/Edit this once namespaces has been aligned.
             "Umbraco.Cms.Core.PublishedCache",
             "Umbraco.Cms.Infrastructure.ModelsBuilder",
             "Umbraco.Cms.Core",
-            "Umbraco.Core", // TODO: Remove once namespace is gone, after which BuilderTests needs to be adjusted.
             "Umbraco.Extensions"
         };
 

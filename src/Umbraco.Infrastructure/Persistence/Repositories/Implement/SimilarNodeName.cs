@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using static Umbraco.Core.Persistence.Repositories.Implement.SimilarNodeName;
 using Umbraco.Extensions;
+using static Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement.SimilarNodeName;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     internal class SimilarNodeName
     {

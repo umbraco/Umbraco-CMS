@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
 using Formatting = Newtonsoft.Json.Formatting;
 
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     public class LogViewerConfig : ILogViewerConfig
     {

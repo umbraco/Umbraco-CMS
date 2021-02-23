@@ -15,7 +15,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public class BackOfficeExamineSearcher : IBackOfficeExamineSearcher
     {

@@ -6,13 +6,11 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Cache;
-using Umbraco.Web.Cache;
-using Umbraco.Web.Search;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IUmbracoBuilder"/> class.

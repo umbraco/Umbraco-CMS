@@ -8,12 +8,11 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
+using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.Common.ModelBinders;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Web.Common.ModelsBuilder;
-using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder
 {

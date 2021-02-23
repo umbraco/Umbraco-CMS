@@ -10,10 +10,9 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
+using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.ModelsBuilder;
-using Umbraco.Web.Common.ModelsBuilder;
-using Umbraco.Web.WebAssets;
 
 /*
  * OVERVIEW:

@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
+namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
 {
     /// <summary>
     /// Implements periodic server "touching" (to mark as active/deactive) as a hosted service.

@@ -6,14 +6,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// A <see cref="UserClaimsPrincipalFactory{TUser}" for the back office/>
     /// </summary>
     public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackOfficeIdentityUser>
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeClaimsPrincipalFactory"/> class.
         /// </summary>

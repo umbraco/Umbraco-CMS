@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 
-namespace Umbraco.Infrastructure.HealthChecks
+namespace Umbraco.Cms.Infrastructure.HealthChecks
 {
     public class MarkdownToHtmlConverter : IMarkdownToHtmlConverter
     {
