@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Security.Claims;
+using Umbraco.Extensions;
 using Microsoft.AspNetCore.Authentication;
-using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
 {
 
     /// <summary>
-    /// Custom secure format that ensures the Identity in the ticket is <see cref="UmbracoBackOfficeIdentity"/> and not just a ClaimsIdentity
+    /// Custom secure format that ensures the Identity in the ticket is verified <see cref="ClaimsIdentity"/>
     /// </summary>
     internal class BackOfficeSecureDataFormat : ISecureDataFormat<AuthenticationTicket>
     {
@@ -59,11 +59,14 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 return null;
             }
 
-            if (!UmbracoBackOfficeIdentity.FromClaimsIdentity((ClaimsIdentity)decrypt.Principal.Identity, out var identity))
+            var identity = (ClaimsIdentity)decrypt.Principal.Identity;
+            if (!identity.VerifyBackOfficeIdentity(out ClaimsIdentity verifiedIdentity))
+            {
                 return null;
+            }
 
             //return the ticket with a UmbracoBackOfficeIdentity
-            var ticket = new AuthenticationTicket(new ClaimsPrincipal(identity), decrypt.Properties, decrypt.AuthenticationScheme);
+            var ticket = new AuthenticationTicket(new ClaimsPrincipal(verifiedIdentity), decrypt.Properties, decrypt.AuthenticationScheme);
 
             return ticket;
         }

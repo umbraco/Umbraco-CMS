@@ -12,10 +12,8 @@ using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Security
 {
@@ -24,18 +22,21 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Security
     {
         private HttpContext GetHttpContext()
         {
+            var identity = new ClaimsIdentity();
+            identity.AddRequiredClaims(
+                Constants.Security.SuperUserIdAsString,
+                "test",
+                "test",
+                Enumerable.Empty<int>(),
+                Enumerable.Empty<int>(),
+                "en-US",
+                Guid.NewGuid().ToString(),
+                Enumerable.Empty<string>(),
+                Enumerable.Empty<string>());
+
             var httpContext = new DefaultHttpContext()
             {
-                User = new ClaimsPrincipal(new UmbracoBackOfficeIdentity(
-                    Constants.Security.SuperUserIdAsString,
-                    "test",
-                    "test",
-                    Enumerable.Empty<int>(),
-                    Enumerable.Empty<int>(),
-                    "en-US",
-                    Guid.NewGuid().ToString(),
-                    Enumerable.Empty<string>(),
-                    Enumerable.Empty<string>()))
+                User = new ClaimsPrincipal(identity)
             };
             httpContext.Request.IsHttps = true;
             return httpContext;

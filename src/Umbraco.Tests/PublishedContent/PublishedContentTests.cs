@@ -584,7 +584,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(3, result.Length);
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1174, 1173, 1046 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1174, 1173, 1046 }));
         }
 
         [Test]
@@ -597,7 +597,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(2, result.Length);
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1046 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1173, 1046 }));
         }
 
         [Test]
@@ -710,7 +710,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(10, result.Count());
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
         }
 
         [Test]
@@ -723,7 +723,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(9, result.Count());
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
         }
 
         [Test]

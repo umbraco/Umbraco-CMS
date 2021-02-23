@@ -39,24 +39,24 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim(Constants.Security.SecurityStampClaimType, securityStamp, ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
-            if (!UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out UmbracoBackOfficeIdentity backofficeIdentity))
+            if (!claimsIdentity.VerifyBackOfficeIdentity(out ClaimsIdentity verifiedIdentity))
             {
                 Assert.Fail();
             }
 
-            Assert.IsNull(backofficeIdentity.Actor);
-            Assert.AreEqual(1234, backofficeIdentity.Id);
+            Assert.IsNull(verifiedIdentity.Actor);
+            Assert.AreEqual(1234, verifiedIdentity.GetId());
             //// Assert.AreEqual(sessionId, backofficeIdentity.SessionId);
-            Assert.AreEqual(securityStamp, backofficeIdentity.SecurityStamp);
-            Assert.AreEqual("testing", backofficeIdentity.Username);
-            Assert.AreEqual("hello world", backofficeIdentity.RealName);
-            Assert.AreEqual(1, backofficeIdentity.StartContentNodes.Length);
-            Assert.IsTrue(backofficeIdentity.StartMediaNodes.UnsortedSequenceEqual(new[] { 5543, 5555 }));
-            Assert.IsTrue(new[] { "content", "media" }.SequenceEqual(backofficeIdentity.AllowedApplications));
-            Assert.AreEqual("en-us", backofficeIdentity.Culture);
-            Assert.IsTrue(new[] { "admin" }.SequenceEqual(backofficeIdentity.Roles));
+            Assert.AreEqual(securityStamp, verifiedIdentity.GetSecurityStamp());
+            Assert.AreEqual("testing", verifiedIdentity.GetUsername());
+            Assert.AreEqual("hello world", verifiedIdentity.GetRealName());
+            Assert.AreEqual(1, verifiedIdentity.GetStartContentNodes().Length);
+            Assert.IsTrue(verifiedIdentity.GetStartMediaNodes().UnsortedSequenceEqual(new[] { 5543, 5555 }));
+            Assert.IsTrue(new[] { "content", "media" }.SequenceEqual(verifiedIdentity.GetAllowedApplications()));
+            Assert.AreEqual("en-us", verifiedIdentity.GetCultureString());
+            Assert.IsTrue(new[] { "admin" }.SequenceEqual(verifiedIdentity.GetRoles()));
 
-            Assert.AreEqual(11, backofficeIdentity.Claims.Count());
+            Assert.AreEqual(11, verifiedIdentity.Claims.Count());
         }
 
         [Test]
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim(ClaimTypes.Name, "testing", ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
-            if (UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out _))
+            if (claimsIdentity.VerifyBackOfficeIdentity(out _))
             {
                 Assert.Fail();
             }
@@ -93,7 +93,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim(ClaimsIdentity.DefaultRoleClaimType, "admin", ClaimValueTypes.String, TestIssuer, TestIssuer),
             });
 
-            if (UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out _))
+            if (claimsIdentity.VerifyBackOfficeIdentity(out _))
             {
                 Assert.Fail();
             }
@@ -112,8 +112,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.BackOffice
                 new Claim("TestClaim1", "test", ClaimValueTypes.Integer32, TestIssuer, TestIssuer)
             });
 
-            var identity = new UmbracoBackOfficeIdentity(
-                claimsIdentity,
+            claimsIdentity.AddRequiredClaims(
                 "1234",
                 "testing",
                 "hello world",
@@ -124,25 +123,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.BackOffice
                 new[] { "content", "media" },
                 new[] { "admin" });
 
-            Assert.AreEqual(12, identity.Claims.Count());
-            Assert.IsNull(identity.Actor);
-        }
-
-        [Test]
-        public void Clone()
-        {
-            var securityStamp = Guid.NewGuid().ToString();
-
-            var identity = new UmbracoBackOfficeIdentity(
-                "1234", "testing", "hello world", new[] { 654 }, new[] { 654 }, "en-us", securityStamp, new[] { "content", "media" }, new[] { "admin" });
-
-            // this will be filtered out during cloning
-            identity.AddClaim(new Claim(Constants.Security.TicketExpiresClaimType, "test"));
-
-            ClaimsIdentity cloned = identity.Clone();
-            Assert.IsNull(cloned.Actor);
-
-            Assert.AreEqual(10, cloned.Claims.Count());
+            Assert.AreEqual(12, claimsIdentity.Claims.Count());
+            Assert.IsNull(claimsIdentity.Actor);
         }
     }
 }
