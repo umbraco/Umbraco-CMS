@@ -180,15 +180,6 @@ namespace Umbraco.Core.Services.Implement
         #region Scripts
 
         /// <inheritdoc />
-        public IEnumerable<IScript> GetScripts(params string[] names)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _scriptRepository.GetMany(names);
-            }
-        }
-
-        /// <inheritdoc />
         public IScript GetScriptByName(string name)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
@@ -246,15 +237,6 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <inheritdoc />
-        public bool ValidateScript(IScript script)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _scriptRepository.ValidateScript(script);
-            }
-        }
-
         public void CreateScriptFolder(string folderPath)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -270,31 +252,6 @@ namespace Umbraco.Core.Services.Implement
             {
                 _scriptRepository.DeleteFolder(folderPath);
                 scope.Complete();
-            }
-        }
-
-        public Stream GetScriptFileContentStream(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _scriptRepository.GetFileContentStream(filepath);
-            }
-        }
-
-        public void SetScriptFileContent(string filepath, Stream content)
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                _scriptRepository.SetFileContent(filepath, content);
-                scope.Complete();
-            }
-        }
-
-        public long GetScriptFileSize(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _scriptRepository.GetFileSize(filepath);
             }
         }
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Umbraco.Cms.Core.Models;
@@ -62,12 +62,6 @@ namespace Umbraco.Cms.Core.Services
         bool ValidateStylesheet(IStylesheet stylesheet);
 
         /// <summary>
-        /// Gets a list of all <see cref="IScript"/> objects
-        /// </summary>
-        /// <returns>An enumerable list of <see cref="IScript"/> objects</returns>
-        IEnumerable<IScript> GetScripts(params string[] names);
-
-        /// <summary>
         /// Gets a <see cref="IScript"/> object by its name
         /// </summary>
         /// <param name="name">Name of the script incl. extension</param>
@@ -87,13 +81,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="path">Name incl. extension of the Script to delete</param>
         /// <param name="userId">Optional id of the user deleting the script</param>
         void DeleteScript(string path, int userId = Constants.Security.SuperUserId);
-
-        /// <summary>
-        /// Validates a <see cref="IScript"/>
-        /// </summary>
-        /// <param name="script"><see cref="IScript"/> to validate</param>
-        /// <returns>True if Script is valid, otherwise false</returns>
-        bool ValidateScript(IScript script);
 
         /// <summary>
         /// Creates a folder for scripts
@@ -264,27 +251,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filepath">The filesystem path to the stylesheet.</param>
         /// <returns>The size of the stylesheet.</returns>
         long GetStylesheetFileSize(string filepath);
-
-        /// <summary>
-        /// Gets the content of a script file as a stream.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the script.</param>
-        /// <returns>The content of the script file.</returns>
-        Stream GetScriptFileContentStream(string filepath);
-
-        /// <summary>
-        /// Sets the content of a script file.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the script.</param>
-        /// <param name="content">The content of the script file.</param>
-        void SetScriptFileContent(string filepath, Stream content);
-
-        /// <summary>
-        /// Gets the size of a script file.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the script file.</param>
-        /// <returns>The size of the script file.</returns>
-        long GetScriptFileSize(string filepath);
 
         /// <summary>
         /// Gets the content of a macro partial view as a stream.
