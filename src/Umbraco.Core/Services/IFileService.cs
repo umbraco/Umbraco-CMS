@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Umbraco.Cms.Core.Models;
@@ -17,15 +17,12 @@ namespace Umbraco.Cms.Core.Services
         void DeletePartialViewMacroFolder(string folderPath);
         IPartialView GetPartialView(string path);
         IPartialView GetPartialViewMacro(string path);
-        IEnumerable<IPartialView> GetPartialViewMacros(params string[] names);
         Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId);
         Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId);
         bool DeletePartialView(string path, int userId = Constants.Security.SuperUserId);
         bool DeletePartialViewMacro(string path, int userId = Constants.Security.SuperUserId);
         Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId);
         Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId);
-        bool ValidatePartialView(IPartialView partialView);
-        bool ValidatePartialViewMacro(IPartialView partialView);
 
         /// <summary>
         /// Gets a list of all <see cref="IStylesheet"/> objects
@@ -285,48 +282,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="filepath">The filesystem path to the script file.</param>
         /// <returns>The size of the script file.</returns>
         long GetScriptFileSize(string filepath);
-
-        /// <summary>
-        /// Gets the content of a macro partial view as a stream.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the macro partial view.</param>
-        /// <returns>The content of the macro partial view.</returns>
-        Stream GetPartialViewMacroFileContentStream(string filepath);
-
-        /// <summary>
-        /// Sets the content of a macro partial view.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the macro partial view.</param>
-        /// <param name="content">The content of the macro partial view.</param>
-        void SetPartialViewMacroFileContent(string filepath, Stream content);
-
-        /// <summary>
-        /// Gets the size of a macro partial view.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the macro partial view.</param>
-        /// <returns>The size of the macro partial view.</returns>
-        long GetPartialViewMacroFileSize(string filepath);
-
-        /// <summary>
-        /// Gets the content of a partial view as a stream.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the partial view.</param>
-        /// <returns>The content of the partial view.</returns>
-        Stream GetPartialViewFileContentStream(string filepath);
-
-        /// <summary>
-        /// Sets the content of a partial view.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the partial view.</param>
-        /// <param name="content">The content of the partial view.</param>
-        void SetPartialViewFileContent(string filepath, Stream content);
-
-        /// <summary>
-        /// Gets the size of a partial view.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the partial view.</param>
-        /// <returns>The size of the partial view.</returns>
-        long GetPartialViewFileSize(string filepath);
 
         /// <summary>
         /// Gets the content of a macro partial view snippet as a string
