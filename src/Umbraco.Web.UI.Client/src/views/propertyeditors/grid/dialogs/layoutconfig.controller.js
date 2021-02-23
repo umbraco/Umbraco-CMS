@@ -31,7 +31,7 @@ angular.module("umbraco")
     		$scope.currentLayout = $scope.model.currentLayout;
     		$scope.columns = $scope.model.columns;
     		$scope.rows = $scope.model.rows;
-            $scope.currentSection = undefined;
+            $scope.currentSection = null;
 
     		$scope.scaleUp = function(section, max, overflow){
     		   var add = 1;
@@ -55,13 +55,13 @@ angular.module("umbraco")
     		    Section
     		*****************/
     		$scope.configureSection = function(section, template){
-    		   if(section === undefined){
+    		    if (section === null || section === undefined) {
     		        var space = ($scope.availableLayoutSpace > 4) ? 4 : $scope.availableLayoutSpace;
     		        section = {
     		            grid: space
     		        };
     		        template.sections.push(section);
-    		    }
+                }
     		    
     		    $scope.currentSection = section;
     		    $scope.currentSection.allowAll = section.allowAll || !section.allowed || !section.allowed.length;
