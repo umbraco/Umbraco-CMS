@@ -1,9 +1,7 @@
 using Umbraco.Cms.Core.Security;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Core.Security
 {
-
     /// <summary>
     /// Event args used when signing out
     /// </summary>

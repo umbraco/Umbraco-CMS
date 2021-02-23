@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Core.Security;
+using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Core.Security
 {
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Security
     /// </summary>
     /// <typeparam name="TUser">The type of user</typeparam>
     public interface IUmbracoUserManager<TUser> : IDisposable
-        where TUser : BackOfficeIdentityUser
+        where TUser : UmbracoIdentityUser
     {
         /// <summary>
         /// Gets the user id of a user
@@ -224,10 +224,62 @@ namespace Umbraco.Core.Security
         Task<IdentityResult> CreateAsync(TUser user);
 
         /// <summary>
+        /// Gets a list of role names the specified user belongs to.
+        /// </summary>
+        /// <param name="user">The user whose role names to retrieve.</param>
+        /// <returns>The Task that represents the asynchronous operation, containing a list of role names.</returns>
+        Task<IList<string>> GetRolesAsync(TUser user);
+
+        /// <summary>
+        /// Removes the specified user from the named roles.
+        /// </summary>
+        /// <param name="user">The user to remove from the named roles.</param>
+        /// <param name="roles">The name of the roles to remove the user from.</param>
+        /// <returns>The Task that represents the asynchronous operation, containing the IdentityResult of the operation.</returns>
+        Task<IdentityResult> RemoveFromRolesAsync(TUser user, IEnumerable<string> roles);
+
+        /// <summary>
+        /// Add the specified user to the named roles
+        /// </summary>
+        /// <param name="user">The user to add to the named roles</param>
+        /// <param name="roles">The name of the roles to add the user to.</param>
+        /// <returns>The Task that represents the asynchronous operation, containing the IdentityResult of the operation</returns>
+        Task<IdentityResult> AddToRolesAsync(TUser user, IEnumerable<string> roles);
+
+        /// <summary>
+        /// Creates the specified <paramref name="user"/> in the backing store with a password,
+        /// as an asynchronous operation.
+        /// </summary>
+        /// <param name="user">The user to create.</param>
+        /// <param name="password">The password to add to the user.</param>
+        /// <returns>
+        /// The <see cref="Task"/> that represents the asynchronous operation, containing the <see cref="IdentityResult"/>
+        /// of the operation.
+        /// </returns>
+        Task<IdentityResult> CreateAsync(TUser user, string password);
+        
+        /// <summary>
         /// Generate a password for a user based on the current password validator
         /// </summary>
         /// <returns>A generated password</returns>
         string GeneratePassword();
+
+        /// <summary>
+        /// Hashes a password for a null user based on the default password hasher
+        /// </summary>
+        /// <param name="password">The password to hash</param>
+        /// <returns>The hashed password</returns>
+        string HashPassword(string password);
+
+        /// <summary>
+        /// Used to validate the password without an identity user
+        /// Validation code is based on the default ValidatePasswordAsync code
+        /// Should return <see cref="IdentityResult.Success"/> if validation is successful
+        /// </summary>
+        /// <param name="password">The password.</param>
+        /// <returns>A <see cref="IdentityResult"/> representing whether validation was successful.</returns>
+
+        Task<IdentityResult> ValidatePasswordAsync(string password);
 
         /// <summary>
         /// Generates an email confirmation token for the specified user.

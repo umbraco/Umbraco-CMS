@@ -156,6 +156,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
+                .AddMembersIdentity()
                 .AddBackOfficeAuthorizationPolicies(TestAuthHandler.TestAuthenticationScheme)
                 .AddPreviewSupport()
                 .AddMvcAndRazor(mvcBuilding: mvcBuilder =>

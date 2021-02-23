@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
