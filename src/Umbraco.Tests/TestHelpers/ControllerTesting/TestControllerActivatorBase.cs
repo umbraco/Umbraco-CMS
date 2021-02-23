@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Net.Http;
+using System.Security.Claims;
 using System.Web;
 using System.Web.Http;
 using System.Web.Http.Controllers;
@@ -15,6 +16,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common;
+using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Web;
 using Umbraco.Web.WebApi;
@@ -93,29 +95,29 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             //chuck it into the props since this is what MS does when hosted and it's needed there
             request.Properties["MS_HttpContext"] = httpContext;
 
-            var backofficeIdentity = (UmbracoBackOfficeIdentity) owinContext.Authentication.User.Identity;
+            var backofficeIdentity = (ClaimsIdentity) owinContext.Authentication.User.Identity;
 
             var backofficeSecurity = new Mock<IBackOfficeSecurity>();
 
             //mock CurrentUser
             var groups = new List<ReadOnlyUserGroup>();
-            for (var index = 0; index < backofficeIdentity.Roles.Length; index++)
+            for (var index = 0; index < backofficeIdentity.GetRoles().Length; index++)
             {
-                var role = backofficeIdentity.Roles[index];
+                var role = backofficeIdentity.GetRoles()[index];
                 groups.Add(new ReadOnlyUserGroup(index + 1, role, "icon-user", null, null, role, new string[0], new string[0]));
             }
             var mockUser = MockedUser.GetUserMock();
             mockUser.Setup(x => x.IsApproved).Returns(true);
             mockUser.Setup(x => x.IsLockedOut).Returns(false);
-            mockUser.Setup(x => x.AllowedSections).Returns(backofficeIdentity.AllowedApplications);
+            mockUser.Setup(x => x.AllowedSections).Returns(backofficeIdentity.GetAllowedApplications());
             mockUser.Setup(x => x.Groups).Returns(groups);
             mockUser.Setup(x => x.Email).Returns("admin@admin.com");
-            mockUser.Setup(x => x.Id).Returns((int)backofficeIdentity.Id);
+            mockUser.Setup(x => x.Id).Returns((int)backofficeIdentity.GetId());
             mockUser.Setup(x => x.Language).Returns("en");
-            mockUser.Setup(x => x.Name).Returns(backofficeIdentity.RealName);
-            mockUser.Setup(x => x.StartContentIds).Returns(backofficeIdentity.StartContentNodes);
-            mockUser.Setup(x => x.StartMediaIds).Returns(backofficeIdentity.StartMediaNodes);
-            mockUser.Setup(x => x.Username).Returns(backofficeIdentity.Username);
+            mockUser.Setup(x => x.Name).Returns(backofficeIdentity.GetRealName());
+            mockUser.Setup(x => x.StartContentIds).Returns(backofficeIdentity.GetStartContentNodes());
+            mockUser.Setup(x => x.StartMediaIds).Returns(backofficeIdentity.GetStartMediaNodes());
+            mockUser.Setup(x => x.Username).Returns(backofficeIdentity.GetUsername());
             backofficeSecurity.Setup(x => x.CurrentUser)
                 .Returns(mockUser.Object);
 

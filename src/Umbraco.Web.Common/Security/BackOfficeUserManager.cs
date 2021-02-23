@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -175,8 +176,8 @@ namespace Umbraco.Cms.Web.Common.Security
 
         private string GetCurrentUserId(IPrincipal currentUser)
         {
-            UmbracoBackOfficeIdentity umbIdentity = currentUser?.GetUmbracoIdentity();
-            var currentUserId = umbIdentity?.GetUserId<string>() ?? Cms.Core.Constants.Security.SuperUserIdAsString;
+            ClaimsIdentity umbIdentity = currentUser?.GetUmbracoIdentity();
+            var currentUserId = umbIdentity?.GetUserId<string>() ?? Core.Constants.Security.SuperUserIdAsString;
             return currentUserId;
         }
 

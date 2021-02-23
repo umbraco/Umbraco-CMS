@@ -1,7 +1,6 @@
 using System;
 using System.Linq;
 using System.Text;
-using System.Threading;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -9,6 +8,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Services.Implement;
 using Umbraco.Extensions;
@@ -21,14 +21,22 @@ namespace Umbraco.Cms.Core.Compose
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly IIpResolver _ipResolver;
+        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly GlobalSettings _globalSettings;
 
-        public AuditEventsComponent(IAuditService auditService, IUserService userService, IEntityService entityService, IIpResolver ipResolver, IOptions<GlobalSettings> globalSettings)
+        public AuditEventsComponent(
+            IAuditService auditService,
+            IUserService userService,
+            IEntityService entityService,
+            IIpResolver ipResolver,
+            IOptions<GlobalSettings> globalSettings,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
             _auditService = auditService;
             _userService = userService;
             _entityService = entityService;
             _ipResolver = ipResolver;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _globalSettings = globalSettings.Value;
         }
 
@@ -68,7 +76,7 @@ namespace Umbraco.Cms.Core.Compose
         {
             get
             {
-                var identity = Thread.CurrentPrincipal?.GetUmbracoIdentity();
+                var identity = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
                 var user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.Id));
                 return user ?? UnknownUser(_globalSettings);
             }
