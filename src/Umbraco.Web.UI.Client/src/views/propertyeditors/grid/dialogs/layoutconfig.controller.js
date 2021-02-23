@@ -79,13 +79,9 @@ angular.module("umbraco")
     		        template.sections.push(section);
                 }
 
-                console.log("section 1", section);
-
                 if (section.allowAll && (!section.allowed || !section.allowed.length)) {
                     section.allowAll = true;
                 }
-
-                console.log("section 2", section);
 
                 $scope.currentSection = section;
     		};

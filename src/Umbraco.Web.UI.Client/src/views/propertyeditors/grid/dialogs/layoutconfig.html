@@ -82,8 +82,6 @@
 
                                 <umb-control-group hide-label="true">
 
-                                    {{currentSection.allowAll}}
-
                                     <umb-toggle
                                         class="umb-toggle-group-item__toggle"
                                         checked="currentSection.allowAll"
@@ -94,8 +92,6 @@
                                         label-on="Allow all row configurations"
                                         style="margin-left: 18px">
                                     </umb-toggle>
-
-                                    {{currentSection | json}}
 
                                     <div ng-if="currentSection.allowAll === false">
                                         <hr/>
