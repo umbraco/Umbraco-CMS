@@ -15,9 +15,6 @@ angular.module("umbraco")
             vm.submit = submit;
 
             vm.labels = {};
-            vm.layout = {
-                sections: []
-            };
         
             function init() {
 
