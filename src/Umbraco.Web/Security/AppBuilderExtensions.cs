@@ -171,10 +171,17 @@ namespace Umbraco.Web.Security
                 // change a password or add an external login to your account.
                 OnValidateIdentity = context =>
                 {
+                    // capture the current ticket for the request
                     var identity = context.Identity;
 
                     return SecurityStampValidator
                         .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
+                        // This will re-verify the security stamp at a throttled 30 mins
+                        // (the standard/default set in aspnet identity).
+                        // This ensures that if the security stamp has changed - i.e. passwords,
+                        // external logins, or other security profile data changed behind the
+                        // scenes while being logged in, that they are logged out and have
+                        // to re-verify their identity.
                         TimeSpan.FromMinutes(30),
                         async (manager, user) =>
                         {
