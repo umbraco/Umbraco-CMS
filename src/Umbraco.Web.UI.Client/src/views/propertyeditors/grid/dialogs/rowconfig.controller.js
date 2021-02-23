@@ -87,9 +87,7 @@ function RowConfigController($scope, localizationService) {
 
             $scope.editors.forEach(function (e) { e.allowed = cell.allowed.indexOf(e.alias) !== -1 });
 
-            if (cell.allowAll && (!cell.allowed || !cell.allowed.length)) {
-                cell.allowAll = true;
-            }
+            cell.allowAll = cell.allowAll || !cell.allowed || !cell.allowed.length;
 
             $scope.currentCell = cell;
         }
