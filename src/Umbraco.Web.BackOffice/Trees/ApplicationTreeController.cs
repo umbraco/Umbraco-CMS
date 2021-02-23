@@ -265,7 +265,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
 
             var controller = (TreeControllerBase)result.Value;
-            var rootNodeResult = controller.GetRootNode(querystring);
+            var rootNodeResult = await controller.GetRootNode(querystring);
             if (!(rootNodeResult.Result is null))
             {
                 return rootNodeResult.Result;
@@ -305,7 +305,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
 
             var controller = (TreeControllerBase)controllerResult.Value;
-            return controller.GetNodes(id.ToInvariantString(), querystring);
+            return await controller.GetNodes(id.ToInvariantString(), querystring);
         }
 
         /// <summary>

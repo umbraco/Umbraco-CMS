@@ -9,6 +9,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
@@ -58,8 +59,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             IOptions<GlobalSettings> globalSettings,
             IContentService contentService,
             IPublicAccessService publicAccessService,
-            ILocalizationService localizationService)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService)
+            ILocalizationService localizationService,
+            IEventAggregator eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService, eventAggregator)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
