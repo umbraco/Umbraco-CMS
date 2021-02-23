@@ -294,11 +294,11 @@ namespace Umbraco.Core.Migrations
             if (migrationBuilder == null) throw new ArgumentNullException(nameof(migrationBuilder));
             if (logger == null) throw new ArgumentNullException(nameof(logger));
 
-            logger.Info<MigrationPlan>("Starting '{MigrationName}'...", Name);
+            logger.Info<MigrationPlan, string>("Starting '{MigrationName}'...", Name);
 
             var origState = fromState ?? string.Empty;
 
-            logger.Info<MigrationPlan>("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
+            logger.Info<MigrationPlan, string>("At {OrigState}", string.IsNullOrWhiteSpace(origState) ? "origin": origState);
 
             if (!_transitions.TryGetValue(origState, out var transition))
                 ThrowOnUnknownInitialState(origState);
@@ -308,7 +308,7 @@ namespace Umbraco.Core.Migrations
 
             while (transition != null)
             {
-                logger.Info<MigrationPlan>("Execute {MigrationType}", transition.MigrationType.Name);
+                logger.Info<MigrationPlan, string>("Execute {MigrationType}", transition.MigrationType.Name);
 
                 var migration = migrationBuilder.Build(transition.MigrationType, context);
                 migration.Migrate();
@@ -316,7 +316,7 @@ namespace Umbraco.Core.Migrations
                 var nextState = transition.TargetState;
                 origState = nextState;
 
-                logger.Info<MigrationPlan>("At {OrigState}", origState);
+                logger.Info<MigrationPlan, string>("At {OrigState}", origState);
 
                 // throw a raw exception here: this should never happen as the plan has
                 // been validated - this is just a paranoid safety test

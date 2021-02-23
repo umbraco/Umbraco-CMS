@@ -1,6 +1,5 @@
 using Umbraco.Core.Logging;
 using Umbraco.Core;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Models.PublishedContent;
 using System.Globalization;
@@ -49,7 +48,7 @@ namespace Umbraco.Web.Routing
 
                 if (nodeId > 0)
                 {
-                    _logger.Debug<ContentFinderByIdPath>("Id={NodeId}", nodeId);
+                    _logger.Debug<ContentFinderByIdPath,int>("Id={NodeId}", nodeId);
                     node = frequest.UmbracoContext.Content.GetById(nodeId);
 
                     if (node != null)
@@ -86,9 +85,10 @@ namespace Umbraco.Web.Routing
                         
                         frequest.PublishedContent = node;
 
+
                         frequest.UmbracoContext.VariationContextAccessor.VariationContext = new VariationContext(culture, segment);
 
-                        _logger.Debug<ContentFinderByIdPath>("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
+                        _logger.Debug<ContentFinderByIdPath,int>("Found node with id={PublishedContentId}", frequest.PublishedContent.Id);
                     }
                     else
                     {
