@@ -108,9 +108,9 @@
                                                                       on-change="selectRow(currentSection, row)">
                                                         </umb-checkbox>
 
-                                                        <button
-                                                            ng-click="row.allowed = !row.allowed; selectRow(currentSection, row)"
-                                                            class="btn-reset flex flex-auto">
+                                                        <button type="button"
+                                                                class="btn-reset flex flex-auto"
+                                                                ng-click="row.allowed = !row.allowed; selectRow(currentSection, row)">
 
                                                             <span class="preview-rows columns" style="margin-top: auto;">
                                                                 <span class="preview-row">
