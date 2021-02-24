@@ -506,55 +506,47 @@ namespace Umbraco.Web.Routing
 
             // don't try to find a redirect if the property doesn't exist
             if (request.PublishedContent.HasProperty(Constants.Conventions.Content.InternalRedirectId) == false)
+            {
                 return false;
+            }
 
-            var redirect = false;
-            var valid = false;
+            var internalRedirectId = request.PublishedContent.Value(Constants.Conventions.Content.InternalRedirectId)?.ToString();
+
+            if (internalRedirectId == null)
+            {
+                // no value stored, just return, no need to log
+                return false;
+            }
+
+            if (int.TryParse(internalRedirectId, out var internalRedirectIdAsInt) && internalRedirectIdAsInt == request.PublishedContent.Id)
+            {
+                // redirect to self
+                _logger.Debug<PublishedRouter>("FollowInternalRedirects: Redirecting to self, ignore");
+                return false;
+            }
+
             IPublishedContent internalRedirectNode = null;
-            var internalRedirectId = request.PublishedContent.Value(Constants.Conventions.Content.InternalRedirectId, defaultValue: -1);
-
-            if (internalRedirectId > 0)
+            if (internalRedirectIdAsInt > 0)
             {
                 // try and get the redirect node from a legacy integer ID
-                valid = true;
-                internalRedirectNode = request.UmbracoContext.Content.GetById(internalRedirectId);
+                internalRedirectNode = request.UmbracoContext.Content.GetById(internalRedirectIdAsInt);
             }
-            else
+            else if (GuidUdi.TryParse(internalRedirectId, out var internalRedirectIdAsUdi))
             {
-                var udiInternalRedirectId = request.PublishedContent.Value<GuidUdi>(Constants.Conventions.Content.InternalRedirectId);
-                if (udiInternalRedirectId != null)
-                {
-                    // try and get the redirect node from a UDI Guid
-                    valid = true;
-                    internalRedirectNode = request.UmbracoContext.Content.GetById(udiInternalRedirectId.Guid);
-                }
-            }
-
-            if (valid == false)
-            {
-                // bad redirect - log and display the current page (legacy behavior)
-                _logger.Debug<PublishedRouter>("FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: value is not an int nor a GuidUdi.",
-                    request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue());
+                // try and get the redirect node from a UDI Guid
+                internalRedirectNode = request.UmbracoContext.Content.GetById(internalRedirectIdAsUdi.Guid);
             }
 
             if (internalRedirectNode == null)
             {
                 _logger.Debug<PublishedRouter>("FollowInternalRedirects: Failed to redirect to id={InternalRedirectId}: no such published document.",
                     request.PublishedContent.GetProperty(Constants.Conventions.Content.InternalRedirectId).GetSourceValue());
-            }
-            else if (internalRedirectId == request.PublishedContent.Id)
-            {
-                // redirect to self
-                _logger.Debug<PublishedRouter>("FollowInternalRedirects: Redirecting to self, ignore");
-            }
-            else
-            {
-                request.SetInternalRedirectPublishedContent(internalRedirectNode); // don't use .PublishedContent here
-                redirect = true;
-                _logger.Debug<PublishedRouter>("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectId);
+                return false;
             }
 
-            return redirect;
+            request.SetInternalRedirectPublishedContent(internalRedirectNode); // don't use .PublishedContent here
+            _logger.Debug<PublishedRouter>("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectId);
+            return true;
         }
 
         /// <summary>
