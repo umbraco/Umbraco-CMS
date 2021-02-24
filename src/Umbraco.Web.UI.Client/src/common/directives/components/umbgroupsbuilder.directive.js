@@ -387,6 +387,81 @@
 
             };
 
+            /* ---------- TABS ---------- */
+
+            scope.model.hasTabs = true;
+            scope.openTabIndex = 0;
+
+            scope.changeTab = function (index) {
+                scope.openTabIndex = index;
+            };
+
+            scope.addTab = function (tab) {
+                scope.addGroup(tab);
+                scope.openTabIndex = scope.model.groups.length - 2;
+            };
+
+            scope.addFieldset = function () {
+                const activeTab = scope.model.groups[scope.openTabIndex];
+
+                if (!activeTab) {
+                    return
+                }
+
+                if (!scope.model.fieldsets) {
+                    scope.model.fieldsets = [];
+                }
+
+                const fieldset = {
+                    groupId: activeTab.id,
+                    id: scope.model.fieldsets.length + 1, // temp id
+                    name: ""
+                };
+
+                scope.model.fieldsets = [...scope.model.fieldsets, fieldset];
+            };
+
+            scope.addNewProperty = function (group, fieldset) {
+                let newProperty = {
+                    label: null,
+                    alias: null,
+                    propertyState: "init",
+                    validation: {
+                        mandatory: false,
+                        mandatoryMessage: null,
+                        pattern: null,
+                        patternMessage: null
+                    },
+                    labelOnTop: false
+                };
+
+                const propertySettings = {
+                    title: "Property settings",
+                    property: newProperty,
+                    contentType: scope.contentType,
+                    contentTypeName: scope.model.name,
+                    contentTypeAllowCultureVariant: scope.model.allowCultureVariant,
+                    contentTypeAllowSegmentVariant: scope.model.allowSegmentVariant,
+                    view: "views/common/infiniteeditors/propertysettings/propertysettings.html",
+                    size: "small",
+                    submit: function (model) {
+                        
+                        newProperty = {...model.property};
+                        newProperty.fieldsetId = fieldset ? fieldset.id : null;
+                        newProperty.propertyState = "active";
+
+                        group.properties.push(newProperty);
+
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+
+                editorService.open(propertySettings);
+            };
+
             /* ---------- GROUPS ---------- */
 
             scope.addGroup = function (group) {

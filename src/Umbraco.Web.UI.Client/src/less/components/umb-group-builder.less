@@ -1,3 +1,98 @@
+/* ---------- TABS ----------  */
+
+.umb-group-builder__tabs {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  background-color: @white;
+  height: 70px;
+  border-bottom: 1px solid @gray-9;
+  margin-bottom: 20px;
+
+  li {
+    height: 100%;
+  }
+}
+
+.umb-group-builder__tab {
+  position: relative;
+  padding: 0 50px 0 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  border-right: 1px solid @gray-9;
+
+  &:hover {
+    cursor: pointer;
+
+    .umb-group-builder__tab-remove {
+      display: block;
+    }
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    height: 0px;
+    left: 10px;
+    right: 10px;
+    background-color: @ui-light-active-border;
+    bottom: 0;
+    border-radius: @baseBorderRadius @baseBorderRadius 0 0;
+    opacity: 0;
+    transition: all .2s linear;
+  }
+
+  &.is-active {
+    color: @ui-light-active-type !important;
+
+    .umb-group-builder__tab-remove {
+      display: block;
+    }
+
+    &::before {
+      opacity: 1;
+      height: 4px;
+    }
+  }
+
+  &.is-inherited {
+    .umb-group-builder__group-title-input {
+      padding: 0;
+    }
+  }
+}
+
+.umb-group-builder__tab-remove {
+  position: absolute;
+  right: 20px;
+  display: none;
+}
+
+.umb-group-builder__tab-name {
+  font-weight: bold;
+}
+
+.umb-group-builder__tab--placeholder {
+  border: 1px dashed @gray-7;
+  border-bottom: none;
+  border-top: none;
+  padding-right: 20px;
+}
+
+.umb-group-builder__tab-inherited-label {
+  font-size: 12px;
+  color: @gray-6;
+
+  button {
+    font-size: 12px;
+    color: @gray-6;
+  }
+}
+
 /* ---------- GROUPS ----------  */
 
 .umb-group-builder__groups {
@@ -14,6 +109,7 @@
   background-color: @white;
   position: relative;
   box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
+  margin-bottom: 20px;
 }
 
 .umb-group-builder__group.-inherited {
@@ -137,12 +233,9 @@ input.umb-group-builder__group-title-input:disabled:hover {
 }
 
 .umb-group-builder__group-add-property {
-    
-    width: calc(100% - 315px);
-    margin-left: 270px;
+    width: 100%;
     min-height: 46px;
-    border-radius: 3px;
-    
+    border-radius: @baseBorderRadius;
     display: flex;
     justify-content: center;
     align-items: center;
