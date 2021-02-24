@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     /// <remarks>
     /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
     /// </remarks>
-    public class TreeNodesRendering : INotification
+    public class TreeNodesRenderingNotification : INotification
     {
         /// <summary>
         /// The tree nodes being rendered
@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         public FormCollection QueryString { get; }
 
-        public TreeNodesRendering(TreeNodeCollection nodes, FormCollection queryString)
+        public TreeNodesRenderingNotification(TreeNodeCollection nodes, FormCollection queryString)
         {
             Nodes = nodes;
             QueryString = queryString;

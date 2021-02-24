@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     /// <summary>
     /// A notification that allows developer to modify the root tree node that is being rendered
     /// </summary>
-    public class RootNodeRendering : INotification
+    public class RootNodeRenderingNotification : INotification
     {
         /// <summary>
         /// The root node being rendered
@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         public FormCollection QueryString { get; }
 
-        public RootNodeRendering(TreeNode node, FormCollection queryString)
+        public RootNodeRenderingNotification(TreeNode node, FormCollection queryString)
         {
             Node = node;
             QueryString = queryString;

@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     /// <remarks>
     /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
     /// </remarks>
-    public class MenuRendering : INotification
+    public class MenuRenderingNotification : INotification
     {
         /// <summary>
         /// The tree node id that the menu is rendering for
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         public FormCollection QueryString { get; }
 
-        public MenuRendering(string nodeId, MenuItemCollection menu, FormCollection queryString)
+        public MenuRenderingNotification(string nodeId, MenuItemCollection menu, FormCollection queryString)
         {
             NodeId = nodeId;
             Menu = menu;

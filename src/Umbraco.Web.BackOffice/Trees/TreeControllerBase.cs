@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             if (IsDialog(queryStrings))
                 node.RoutePath = "#";
 
-            await _eventAggregator.PublishAsync(new RootNodeRendering(node, queryStrings));
+            await _eventAggregator.PublishAsync(new RootNodeRenderingNotification(node, queryStrings));
 
             return node;
         }
@@ -150,7 +150,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                     node.RoutePath = "#";
 
             //raise the event
-            await _eventAggregator.PublishAsync(new TreeNodesRendering(nodes, queryStrings));
+            await _eventAggregator.PublishAsync(new TreeNodesRenderingNotification(nodes, queryStrings));
 
             return nodes;
         }
@@ -172,7 +172,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             var menu = menuResult.Value;
             //raise the event
-            await _eventAggregator.PublishAsync(new MenuRendering(id, menu, queryStrings));
+            await _eventAggregator.PublishAsync(new MenuRenderingNotification(id, menu, queryStrings));
             return menu;
         }
 
