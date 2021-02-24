@@ -1,7 +1,11 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Cms.Core.Dashboards;
 using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
@@ -25,14 +29,18 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
+            private readonly IEventAggregator _eventAggregator;
+
             public OutgoingEditorModelEventFilter(
                 IUmbracoContextAccessor umbracoContextAccessor,
-                IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+                IBackOfficeSecurityAccessor backOfficeSecurityAccessor, IEventAggregator eventAggregator)
             {
                 _umbracoContextAccessor = umbracoContextAccessor
                                           ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor
                                               ?? throw new ArgumentNullException(nameof(backOfficeSecurityAccessor));
+                _eventAggregator = eventAggregator
+                                   ?? throw new ArgumentNullException(nameof(eventAggregator));
             }
 
             public void OnActionExecuted(ActionExecutedContext context)
@@ -40,18 +48,32 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 if (context.Result == null) return;
 
                 var umbracoContext = _umbracoContextAccessor.GetRequiredUmbracoContext();
-                var user = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-                if (user == null) return;
+                var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                if (currentUser == null) return;
 
                 if (context.Result is ObjectResult objectContent)
                 {
                     var model = objectContent.Value;
 
-                    if (model != null)
+                    if (model is ContentItemDisplay content)
                     {
-                        var args = new EditorModelEventArgs(model, umbracoContext);
-                        EditorModelEventManager.EmitEvent(context, args);
-                        objectContent.Value = args.Model;
+                        _eventAggregator.Publish(new SendingContentNotification(content, umbracoContext));
+                    }
+                    else if (model is MediaItemDisplay media)
+                    {
+                        _eventAggregator.Publish(new SendingMediaNotification(media, umbracoContext));
+                    }
+                    else if (model is MemberDisplay member)
+                    {
+                        _eventAggregator.Publish(new SendingMemberNotification(member, umbracoContext));
+                    }
+                    else if (model is UserDisplay user)
+                    {
+                        _eventAggregator.Publish(new SendingUserNotification(user, umbracoContext));
+                    }
+                    else if (model is IEnumerable<Tab<IDashboardSlim>> dashboards)
+                    {
+                        _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
                     }
                 }
             }
