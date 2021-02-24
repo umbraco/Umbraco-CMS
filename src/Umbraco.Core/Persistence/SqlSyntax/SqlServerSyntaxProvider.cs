@@ -281,7 +281,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         private static void ObtainWriteLock(IDatabase db, TimeSpan timeout, int lockId)
         {
-            db.Execute("SET LOCK_TIMEOUT" + timeout.TotalMilliseconds + ";");
+            db.Execute("SET LOCK_TIMEOUT " + timeout.TotalMilliseconds + ";");
             var i = db.Execute(
                 @"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id",
                 new {id = lockId});
