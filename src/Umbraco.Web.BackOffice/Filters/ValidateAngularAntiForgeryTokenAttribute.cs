@@ -44,15 +44,6 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
-                if (context.Controller is ControllerBase controller && controller.User.Identity is ClaimsIdentity userIdentity)
-                {
-                    // if there is not CookiePath claim, then exit
-                    if (userIdentity.HasClaim(x => x.Type == ClaimTypes.CookiePath) == false)
-                    {
-                        await next();
-                    }
-                }
-
                 var cookieToken = _cookieManager.GetCookieValue(Constants.Web.CsrfValidationCookieName);
                 var httpContext = context.HttpContext;
 
