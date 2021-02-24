@@ -591,7 +591,7 @@
                 }
 
                 // If there is only one item, set it as current node
-                if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
+                if (vm.singleMode || (!model.config.disableOpenOnLoad && vm.nodes.length === 1 && vm.maxItems === 1)) {
                     setCurrentNode(vm.nodes[0]);
                 }
 
