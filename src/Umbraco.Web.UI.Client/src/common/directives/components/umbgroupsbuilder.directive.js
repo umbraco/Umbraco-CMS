@@ -668,12 +668,14 @@
                             // close the editor
                             editorService.close();
 
+                            /*
                             // push new init property to group
                             addInitProperty(group);
 
                             // set focus on init property
                             var numberOfProperties = group.properties.length;
                             group.properties[numberOfProperties - 1].focus = true;
+                            */
 
                             notifyChanged();
                         },
@@ -716,11 +718,9 @@
                 }
             };
 
-            scope.deleteProperty = function (tab, propertyIndex) {
-
-                // remove property
-                tab.properties.splice(propertyIndex, 1);
-
+            scope.deleteProperty = function (properties, { id }) {
+                const index = properties.map(property => property.id).findIndex(propertyId => propertyId === id);
+                properties.splice(index, 1);
                 notifyChanged();
             };
 

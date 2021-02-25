@@ -1,10 +1,10 @@
-<div class="umb-group-builder__property" ng-class="{'-active': vm.dialogIsOpen, '-active': vm.property.propertyState=='active', '-inherited': vm.property.inherited, '-locked': vm.property.locked, 'umb-group-builder__property-handle -sortable': vm.compact && !vm.property.inherited, '-sortable-locked': vm.compact && vm.property.inherited}">
+<div class="umb-group-builder__property" ng-class="{'-active': vm.dialogIsOpen, '-active': vm.property.propertyState=='active', '-inherited': vm.property.inherited, '-locked': vm.property.locked, 'umb-group-builder__property-handle -sortable': vm.sortable && !vm.property.inherited, '-sortable-locked': vm.sortable && vm.property.inherited}">
 
   <!-- property meta text -->
-  <div class="umb-group-builder__property-meta" ng-class="{'-full-width': vm.compact}">
+  <div class="umb-group-builder__property-meta" ng-class="{'-full-width': vm.sortable}">
 
       <ng-form name="propertyTypeForm">
-          <div class="control-group -no-margin" ng-if="!vm.compact">
+          <div class="control-group -no-margin" ng-if="!vm.sortable">
 
               <div class="umb-group-builder__property-meta-alias umb-locked-field__text cursor-not-allowed" style="padding-left: 1px" ng-if="vm.property.inherited || vm.property.locked">{{ vm.property.alias }}</div>
               <umb-locked-field
@@ -45,7 +45,7 @@
           </div>
       </ng-form>
 
-      <div ng-if="vm.compact" class="flex items-center">
+      <div ng-if="vm.sortable" class="flex items-center">
           <i class="icon icon-navigation" ng-if="!vm.property.inherited" style="margin-right: 10px;"></i>
           <span class="umb-group-builder__property-meta-label">{{ vm.property.label }}</span>
           <span class="umb-group-builder__property-meta-alias" style="margin-bottom: 0; margin-left: 5px; margin-top: 1px;">({{ vm.property.alias }})</span>
@@ -55,7 +55,7 @@
   </div>
 
 
-  <div tabindex="-1" class="umb-group-builder__property-preview" ng-if="!vm.compact" ng-class="{'-not-clickable': !vm.compact && (vm.property.inherited || vm.property.locked)}">
+  <div tabindex="-1" class="umb-group-builder__property-preview" ng-if="!vm.sortable" ng-class="{'-not-clickable': !vm.sortable && (vm.property.inherited || vm.property.locked)}">
 
       <div class="umb-group-builder__property-tags">
 
@@ -111,7 +111,7 @@
 
       </div>
 
-      <ng-form inert class="umb-group-builder__property-preview-form" name="propertyEditorPreviewForm" umb-disable-form-validation ng-click="editPropertyTypeSettings(property, tab)" tabindex="-1">
+      <ng-form inert class="umb-group-builder__property-preview-form" name="propertyEditorPreviewForm" umb-disable-form-validation ng-click="vm.edit()" tabindex="-1">
           <umb-property-editor
               ng-if="vm.property.view !== undefined"
               model="vm.property"
@@ -119,32 +119,32 @@
           </umb-property-editor>
       </ng-form>
 
-      <button aria-label="Open settings" class="umb-group-builder__open-settings" ng-if="!vm.property.inherited && !vm.property.locked" ng-click="editPropertyTypeSettings(property, tab)"></button>
+      <button aria-label="Open settings" class="umb-group-builder__open-settings" ng-if="!vm.property.inherited && !vm.property.locked" ng-click="vm.edit()"></button>
 
   </div>
 
   <!-- row tools -->
-  <div class="umb-group-builder__property-actions" ng-if="!vm.compact">
+  <div class="umb-group-builder__property-actions" ng-if="!vm.sortable">
 
       <div ng-if="!vm.property.inherited">
 
           <!-- settings for property -->
           <div class="umb-group-builder__property-action">
-              <button aria-label="Open settings" class="btn-icon" ng-click="editPropertyTypeSettings(property, tab)" localize="title" title="@general_edit">
+              <button aria-label="Open settings" class="btn-icon" ng-click="vm.edit()" localize="title" title="@general_edit">
                   <umb-icon icon="icon-settings" class="icon-settings"></umb-icon>
               </button>
           </div>
 
           <!-- delete property -->
           <div ng-if="!vm.property.locked" class="umb-group-builder__property-action">
-              <button aria-label="Delete property" class="btn-icon" ng-click="togglePrompt(property)">
+              <button aria-label="Delete property" class="btn-icon" ng-click="vm.togglePrompt()">
                   <umb-icon icon="icon-trash" class="icon-trash"></umb-icon>
               </button>
               <umb-confirm-action
-                  ng-if="vm.property.deletePrompt"
+                  ng-if="vm.removePromptIsVisible"
                   direction="left"
-                  on-confirm="deleteProperty(tab, $index)"
-                  on-cancel="hidePrompt(property)">
+                  on-confirm="vm.remove()"
+                  on-cancel="vm.hidePrompt()">
               </umb-confirm-action>
           </div>
 

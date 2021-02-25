@@ -101,7 +101,9 @@
                     <umb-content-type-property
                         ng-if="property.propertyState !== 'init'"
                         property="property"
-                        compact="sortingMode">
+                        sortable="sortingMode"
+                        on-edit="editPropertyTypeSettings(property)"
+                        on-remove="deleteProperty(model.groups[openTabIndex].properties, property)">
                     </umb-content-type-property>
 
                     <umb-content-type-property-placeholder
@@ -126,7 +128,9 @@
                     <li ng-repeat="property in model.groups[openTabIndex].properties | filter:propertiesInFieldset(fieldset.id)" data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
                         <umb-content-type-property
                             property="property"
-                            compact="sortingMode">
+                            sortable="sortingMode"
+                            on-edit="editPropertyTypeSettings(property)"
+                            on-remove="deleteProperty(model.groups[openTabIndex].properties, property)">
                         </umb-content-type-property>
                     </li>
                     <li>
@@ -379,7 +383,7 @@
                                         <umb-confirm-action
                                             ng-if="property.deletePrompt"
                                             direction="left"
-                                            on-confirm="deleteProperty(tab, $index)"
+                                            on-confirm="deleteProperty(tab.properties, property)"
                                             on-cancel="hidePrompt(property)">
                                         </umb-confirm-action>
                                     </div>
