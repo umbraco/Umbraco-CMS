@@ -67,6 +67,9 @@ angular.module('umbraco.services')
 
         // loads the language resource file from the server
         initLocalizedResources: function () {
+
+            // TODO: This promise handling is super ugly, we should just be returnning the promise from $http and returning inner values. 
+
             var deferred = $q.defer();
 
             if (resourceFileLoadStatus === "loaded") {
@@ -179,7 +182,7 @@ angular.module('umbraco.services')
          */
         localize: function (value, tokens, fallbackValue) {
             return service.initLocalizedResources().then(function (dic) {
-                return _lookup(value, tokens, dic, fallbackValue);
+                    return _lookup(value, tokens, dic, fallbackValue);
             });
         },
 
@@ -327,6 +330,7 @@ angular.module('umbraco.services')
         resourceFileLoadStatus = "none";
         resourceLoadingPromise = [];
     });
+    
 
     // return the local instance when called
     return service;

@@ -50,6 +50,19 @@ button.umb-variant-switcher__toggle {
             font-weight: bold;
             background-color: @errorBackground;
             color: @errorText;
+
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-name: umb-variant-switcher__toggle--badge-bounce;
+            animation-timing-function: ease;
+            @keyframes umb-variant-switcher__toggle--badge-bounce {
+                0%   { transform: translateY(0); }
+                20%  { transform: translateY(-6px); }
+                40%  { transform: translateY(0); }
+                55%  { transform: translateY(-3px); }
+                70%  { transform: translateY(0); }
+                100% { transform: translateY(0); }
+            }
         }
     }
 }
@@ -77,6 +90,7 @@ button.umb-variant-switcher__toggle {
 	align-items: center;
 	border-bottom: 1px solid @gray-9;
     position: relative;
+
     .umb-variant-switcher__name-wrapper:hover {
         .umb-variant-switcher__name {
             color: @blueMid;
@@ -86,6 +100,11 @@ button.umb-variant-switcher__toggle {
         }
     }
 }
+
+.umb-variant-switcher__item.--not-allowed:not(.--current) .umb-variant-switcher__name-wrapper:hover {
+    cursor: default;
+}
+
 .umb-variant-switcher__item.--state-notCreated:not(.--active) {
     .umb-variant-switcher__name-wrapper::before {
         content: "+";
@@ -93,38 +112,44 @@ button.umb-variant-switcher__toggle {
         float: left;
         font-size: 15px;
         font-weight: 900;
-        padding: 8px 16px 8px 6px;
+        padding: 8px 12px 8px 0;
         color: @gray-5;
     }
+
     .umb-variant-switcher__item-expand-button + .umb-variant-switcher__name-wrapper::before {
         padding: 8px 16px 8px 20px;
     }
+
     .umb-variant-switcher__name {
         color: @gray-5;
     }
+
     .umb-variant-switcher__state {
         color: @gray-6;
     }
+
     .umb-variant-switcher__name-wrapper::after {
         content: "";
         position: absolute;
         z-index: 1;
-        border: 1px dashed @gray-9;
-        top: 7px;
-        bottom: 7px;
-        left: 7px;
-        right: 7px;
-        border-radius: 3px;
+        border: 2px dashed @gray-9;
+        margin: 2px;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
         pointer-events: none;
     }
-    
+
     .umb-variant-switcher__name-wrapper:hover {
         &::before {
             color: @blueMid;
         }
+
         .umb-variant-switcher__name {
             color: @blueMid;
         }
+
         .umb-variant-switcher__state {
             color: @blueMid;
         }
@@ -170,8 +195,7 @@ button.umb-variant-switcher__toggle {
 }
 
 .umb-variant-switcher__item.--current {
-    //color: @ui-light-active-type;
-    //background-color: @pinkExtraLight;
+    color: @ui-light-active-type;
     .umb-variant-switcher__name {
         //color: @ui-light-active-type;
         font-weight: 700;
@@ -203,7 +227,7 @@ button.umb-variant-switcher__toggle {
 .umb-variant-switcher__item:focus-within .umb-variant-switcher__split-view,
 .umb-variant-switcher__item:hover .umb-variant-switcher__split-view,
 .umb-variant-switcher__split-view:focus {
-	display: block;
+	display: flex;
 	cursor: pointer;
 }
 
@@ -226,6 +250,19 @@ button.umb-variant-switcher__toggle {
             font-weight: bold;
             background-color: @errorBackground;
             color: @errorText;
+            
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-name: umb-variant-switcher__name--badge-bounce;
+            animation-timing-function: ease;
+            @keyframes umb-variant-switcher__name--badge-bounce {
+                0%   { transform: translateY(0); }
+                20%  { transform: translateY(-6px); }
+                40%  { transform: translateY(0); }
+                55%  { transform: translateY(-3px); }
+                70%  { transform: translateY(0); }
+                100% { transform: translateY(0); }
+            }
         }
     }
 }
@@ -237,7 +274,10 @@ button.umb-variant-switcher__toggle {
 	cursor: pointer;
     background-color: transparent;
     border: none;
+	padding-top: 6px !important;
+    padding-bottom: 6px !important;
 }
+
 .dropdown-menu>li {
     > .umb-variant-switcher__name-wrapper {
         padding-top: 10px;
@@ -264,7 +304,7 @@ button.umb-variant-switcher__toggle {
 .umb-variant-switcher__split-view {
     font-size: 12px;
     display: none;
-    padding: 20px 20px;
+    padding: 16px 20px;
     position: absolute;
     right: 0;
     top: 0;
@@ -276,7 +316,6 @@ button.umb-variant-switcher__toggle {
         color: @ui-option-type-hover;
     }
 }
-
 
 .umb-variant-switcher__sub-variants {
 

@@ -160,7 +160,7 @@
         function onChanges(changes) {
             if (changes.center && !changes.center.isFirstChange()
                 && changes.center.currentValue
-                && !angular.equals(changes.center.currentValue, changes.center.previousValue)) {
+                && !Utilities.equals(changes.center.currentValue, changes.center.previousValue)) {
                 //when center changes update the dimensions
                 setDimensions();
             }

@@ -318,25 +318,26 @@ angular.module("umbraco")
             // Add items overlay menu
             // *********************************************
             $scope.openEditorOverlay = function (event, area, index, key) {
-                var title = "";
-                localizationService.localize("grid_insertControl").then(function (value) {
-                    title = value;
-                    overlayService.open({
-                        view: "itempicker",
-                        filter: area.$allowedEditors.length > 15,
-                        title: title,
-                        availableItems: area.$allowedEditors,
-                        event: event,
-                        submit: function (model) {
-                            if (model.selectedItem) {
-                                $scope.addControl(model.selectedItem, area, index);
-                                overlayService.close();
-                            }
-                        },
-                        close: function () {
+
+                const dialog = {
+                    view: "itempicker",
+                    filter: area.$allowedEditors.length > 15,
+                    availableItems: area.$allowedEditors,
+                    event: event,
+                    submit: function (model) {
+                        if (model.selectedItem) {
+                            $scope.addControl(model.selectedItem, area, index);
                             overlayService.close();
                         }
-                    });
+                    },
+                    close: function () {
+                        overlayService.close();
+                    }
+                };
+
+                localizationService.localize("grid_insertControl").then(value => {
+                    dialog.title = value;
+                    overlayService.open(dialog);
                 });
             };
 
@@ -404,14 +405,16 @@ angular.module("umbraco")
 
                 eventsService.emit("grid.rowAdded", { scope: $scope, element: $element, row: row });
 
-                // TODO: find a nicer way to do this without relying on setTimeout
-                setTimeout(function () {
-                    var newRowEl = $element.find("[data-rowid='" + row.$uniqueId + "']");
+                if (!isInit) {
+                    // TODO: find a nicer way to do this without relying on setTimeout
+                    setTimeout(function () {
+                        var newRowEl = $element.find("[data-rowid='" + row.$uniqueId + "']");
 
-                    if (newRowEl !== null) {
-                        newRowEl.focus();
-                    }
-                }, 0);
+                        if (newRowEl !== null) {
+                            newRowEl.focus();
+                        }
+                    }, 0);
+                }
 
             };
 
@@ -624,21 +627,8 @@ angular.module("umbraco")
 
             }
 
-
-            var guid = (function () {
-                function s4() {
-                    return Math.floor((1 + Math.random()) * 0x10000)
-                        .toString(16)
-                        .substring(1);
-                }
-                return function () {
-                    return s4() + s4() + "-" + s4() + "-" + s4() + "-" +
-                        s4() + "-" + s4() + s4() + s4();
-                };
-            })();
-
-            $scope.setUniqueId = function (cell, index) {
-                return guid();
+            $scope.setUniqueId = function () {
+                return String.CreateGuid();
             };
 
             $scope.addControl = function (editor, cell, index, initialize) {
@@ -952,7 +942,7 @@ angular.module("umbraco")
                 $scope.availableEditors = response.data;
 
                 //Localize the grid editor names
-                angular.forEach($scope.availableEditors, function (value, key) {
+                $scope.availableEditors.forEach(function (value) {
                     //If no translation is provided, keep using the editor name from the manifest
                     localizationService.localize("grid_" + value.alias, undefined, value.name).then(function (v) {
                         value.name = v;

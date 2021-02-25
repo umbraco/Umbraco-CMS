@@ -39,6 +39,8 @@ namespace Umbraco.Web.Models.Mapping
             target.Udi = Udi.Create(Constants.UdiEntityType.RelationType, source.Key);
             target.Path = "-1," + source.Id;
 
+            target.IsSystemRelationType = source.IsSystemRelationType();
+
             // Set the "friendly" and entity names for the parent and child object types
             if (source.ParentObjectType.HasValue)
             {

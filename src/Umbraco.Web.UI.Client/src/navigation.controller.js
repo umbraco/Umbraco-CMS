@@ -495,7 +495,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             //execute them sequentially
 
             // set selected language to active
-            $scope.languages.forEach(language => {
+            Utilities.forEach($scope.languages, language => {
                 language.active = false;
             });
 

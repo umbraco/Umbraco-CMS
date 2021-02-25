@@ -447,15 +447,10 @@ namespace Umbraco.Core.Services.Implement
         /// <returns><see cref="IMember"/></returns>
         public IMember GetByUsername(string username)
         {
-            // TODO: Somewhere in here, whether at this level or the repository level, we need to add
-            // a caching mechanism since this method is used by all the membership providers and could be
-            // called quite a bit when dealing with members.
-
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Constants.Locks.MemberTree);
-                var query = Query<IMember>().Where(x => x.Username.Equals(username));
-                return _memberRepository.Get(query).FirstOrDefault();
+                scope.ReadLock(Constants.Locks.MemberTree);                
+                return _memberRepository.GetByUsername(username);
             }
         }
 
@@ -806,12 +801,17 @@ namespace Umbraco.Core.Services.Implement
 
         #region Save
 
-        /// <summary>
-        /// Saves an <see cref="IMember"/>
-        /// </summary>
-        /// <param name="member"><see cref="IMember"/> to Save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
+        /// <inheritdoc />
+        public void SetLastLogin(string username, DateTime date)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {   
+                _memberRepository.SetLastLogin(username, date);
+                scope.Complete();
+            }
+        }
+
+        /// <inheritdoc />
         public void Save(IMember member, bool raiseEvents = true)
         {
             //trimming username and email to make sure we have no trailing space
@@ -847,12 +847,7 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        /// <summary>
-        /// Saves a list of <see cref="IMember"/> objects
-        /// </summary>
-        /// <param name="members"><see cref="IEnumerable{IMember}"/> to save</param>
-        /// <param name="raiseEvents">Optional parameter to raise events.
-        /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
+        /// <inheritdoc />
         public void Save(IEnumerable<IMember> members, bool raiseEvents = true)
         {
             var membersA = members.ToArray();

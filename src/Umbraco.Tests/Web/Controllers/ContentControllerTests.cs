@@ -489,7 +489,7 @@ namespace Umbraco.Tests.Web.Controllers
             var display = JsonConvert.DeserializeObject<ContentItemDisplay>(response.Item2);
             Assert.AreEqual(2, display.Errors.Count());
             Assert.IsTrue(display.Errors.ContainsKey("Variants[0].Name"));
-            Assert.IsTrue(display.Errors.ContainsKey("_content_variant_en-US_"));
+            Assert.IsTrue(display.Errors.ContainsKey("_content_variant_en-US_null_"));
         }
 
         // TODO: There are SOOOOO many more tests we should write - a lot of them to do with validation

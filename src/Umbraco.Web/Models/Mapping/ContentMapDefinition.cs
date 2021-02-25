@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -29,14 +31,25 @@ namespace Umbraco.Web.Models.Mapping
         private readonly ILogger _logger;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
+        private readonly AppCaches _appCaches;
         private readonly TabsAndPropertiesMapper<IContent> _tabsAndPropertiesMapper;
         private readonly ContentSavedStateMapper<ContentPropertyDisplay> _stateMapper;
         private readonly ContentBasicSavedStateMapper<ContentPropertyBasic> _basicStateMapper;
         private readonly ContentVariantMapper _contentVariantMapper;
 
-        public ContentMapDefinition(CommonMapper commonMapper, ILocalizedTextService localizedTextService, IContentService contentService, IContentTypeService contentTypeService,
-            IFileService fileService, IUmbracoContextAccessor umbracoContextAccessor, IPublishedRouter publishedRouter, ILocalizationService localizationService, ILogger logger,
-            IUserService userService, IEntityService entityService)
+        public ContentMapDefinition(
+            CommonMapper commonMapper,
+            ILocalizedTextService localizedTextService,
+            IContentService contentService,
+            IContentTypeService contentTypeService,
+            IFileService fileService,
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IPublishedRouter publishedRouter,
+            ILocalizationService localizationService,
+            ILogger logger,
+            IUserService userService,
+            IEntityService entityService,
+            AppCaches appCaches)
         {
             _commonMapper = commonMapper;
             _localizedTextService = localizedTextService;
@@ -49,6 +62,7 @@ namespace Umbraco.Web.Models.Mapping
             _logger = logger;
             _userService = userService;
             _entityService = entityService;
+            _appCaches = appCaches;
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(localizedTextService);
             _stateMapper = new ContentSavedStateMapper<ContentPropertyDisplay>();
             _basicStateMapper = new ContentBasicSavedStateMapper<ContentPropertyBasic>();
@@ -76,6 +90,7 @@ namespace Umbraco.Web.Models.Mapping
             target.AllowedTemplates = GetAllowedTemplates(source);
             target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentTypeId = source.ContentType.Id;
+            target.ContentTypeKey = source.ContentType.Key;
             target.ContentTypeAlias = source.ContentType.Alias;
             target.ContentTypeName = _localizedTextService.UmbracoDictionaryTranslate(source.ContentType.Name);
             target.DocumentType = _commonMapper.GetContentType(source, context);
@@ -172,7 +187,7 @@ namespace Umbraco.Web.Models.Mapping
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
             var urls = umbracoContext == null
-                ? new[] { UrlInfo.Message("Cannot generate urls without a current Umbraco Context") }
+                ? new[] { UrlInfo.Message("Cannot generate URLs without a current Umbraco Context") }
                 : source.GetContentUrls(_publishedRouter, umbracoContext, _localizationService, _localizedTextService, _contentService, _logger).ToArray();
 
             return urls;
@@ -237,7 +252,7 @@ namespace Umbraco.Web.Models.Mapping
             // false here.
             if (context.HasItems && context.Items.TryGetValue("CurrentUser", out var usr) && usr is IUser currentUser)
             {
-                userStartNodes = currentUser.CalculateContentStartNodeIds(_entityService);
+                userStartNodes = currentUser.CalculateContentStartNodeIds(_entityService, _appCaches);
                 if (!userStartNodes.Contains(Constants.System.Root))
                 {
                     // return false if this is the user's actual start node, the node will be rendered in the tree
@@ -252,7 +267,7 @@ namespace Umbraco.Web.Models.Mapping
             if (parent == null)
                 return false;
 
-            var pathParts = parent.Path.Split(',').Select(x => int.TryParse(x, out var i) ? i : 0).ToList();
+            var pathParts = parent.Path.Split(Constants.CharArrays.Comma).Select(x => int.TryParse(x, out var i) ? i : 0).ToList();
 
             // reduce the path parts so we exclude top level content items that
             // are higher up than a user's start nodes

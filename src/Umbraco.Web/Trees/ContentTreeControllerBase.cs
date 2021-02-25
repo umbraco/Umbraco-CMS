@@ -126,12 +126,12 @@ namespace Umbraco.Web.Trees
             switch (RecycleBinId)
             {
                 case Constants.System.RecycleBinMedia:
-                    startNodeIds = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                    startNodePaths = Security.CurrentUser.GetMediaStartNodePaths(Services.EntityService);
+                    startNodeIds = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches);
+                    startNodePaths = Security.CurrentUser.GetMediaStartNodePaths(Services.EntityService, AppCaches);
                     break;
                 case Constants.System.RecycleBinContent:
-                    startNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                    startNodePaths = Security.CurrentUser.GetContentStartNodePaths(Services.EntityService);
+                    startNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService, AppCaches);
+                    startNodePaths = Security.CurrentUser.GetContentStartNodePaths(Services.EntityService, AppCaches);
                     break;
                 default:
                     throw new NotSupportedException("Path access is only determined on content or media");
@@ -291,8 +291,8 @@ namespace Umbraco.Web.Trees
         {
             if (entity == null) return false;
             return RecycleBinId == Constants.System.RecycleBinContent
-                ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService)
-                : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService);
+                ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService, AppCaches)
+                : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService, AppCaches);
         }
 
         /// <summary>
@@ -322,8 +322,10 @@ namespace Umbraco.Web.Trees
 
                 var nodes = GetTreeNodesInternal(id, queryStrings);
 
-                //only render the recycle bin if we are not in dialog and the start id id still the root
-                if (IsDialog(queryStrings) == false && id == Constants.System.RootString)
+                //only render the recycle bin if we are not in dialog and the start id is still the root
+                //we need to check for the "application" key in the queryString because its value is required here,
+                //and for some reason when there are no dashboards, this parameter is missing  
+                if (IsDialog(queryStrings) == false && id == Constants.System.RootString && queryStrings.HasKey("application"))
                 {
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),
@@ -367,7 +369,7 @@ namespace Umbraco.Web.Trees
 
                 if (startNodes.Any(x =>
                 {
-                    var pathParts = x.Path.Split(',');
+                    var pathParts = x.Path.Split(Constants.CharArrays.Comma);
                     return pathParts.Contains(e.Id.ToInvariantString());
                 }))
                 {

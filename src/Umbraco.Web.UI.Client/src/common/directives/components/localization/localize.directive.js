@@ -64,7 +64,7 @@ angular.module("umbraco.directives")
                 //Support one or more attribute properties to update
                 var keys = attrs.localize.split(',');
 
-                keys.forEach((value, key) => {
+                Utilities.forEach(keys, (value, key) => {
                     var attr = element.attr(value);
 
                     if (attr) {

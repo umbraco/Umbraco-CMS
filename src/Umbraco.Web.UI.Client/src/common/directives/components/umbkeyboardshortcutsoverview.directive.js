@@ -158,9 +158,9 @@ When this combination is hit an overview is opened with shortcuts based on the m
             };
 
             function onInit() {
-                scope.model.forEach(shortcutGroup => {
+                Utilities.forEach(scope.model, shortcutGroup => {
 
-                    shortcutGroup.shortcuts.forEach(shortcut => {
+                    Utilities.forEach(shortcutGroup.shortcuts, shortcut => {
                         shortcut.platformKeys = [];
 
                         // get shortcut keys for mac

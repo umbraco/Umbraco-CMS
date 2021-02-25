@@ -205,7 +205,7 @@ namespace Umbraco.Web.Trees
         {
             if (tree == null) throw new ArgumentNullException(nameof(tree));
 
-            var controller = (TreeController) await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring);
+            var controller = (TreeControllerBase) await GetApiControllerProxy(tree.TreeControllerType, "GetRootNode", querystring);
             var rootNode = controller.GetRootNode(querystring);
             if (rootNode == null)
                 throw new InvalidOperationException($"Failed to get root node for tree \"{tree.TreeAlias}\".");
@@ -226,7 +226,7 @@ namespace Umbraco.Web.Trees
             d["id"] = null;
             var proxyQuerystring = new FormDataCollection(d);
 
-            var controller = (TreeController) await GetApiControllerProxy(tree.TreeControllerType, "GetNodes", proxyQuerystring);
+            var controller = (TreeControllerBase) await GetApiControllerProxy(tree.TreeControllerType, "GetNodes", proxyQuerystring);
             return controller.GetNodes(id.ToInvariantString(), querystring);
         }
 

@@ -188,6 +188,7 @@ Use this directive to construct a header inside the main editor window.
 </ul>
 
 @param {string} name The content name.
+@param {boolean=} nameRequired Require name to be defined. (True by default)
 @param {array=} tabs Array of tabs. See example above.
 @param {array=} navigation Array of sub views. See example above.
 @param {boolean=} nameLocked Set to <code>true</code> to lock the name.
@@ -198,16 +199,17 @@ Use this directive to construct a header inside the main editor window.
 @param {boolean=} aliasLocked Set to <code>true</code> to lock the alias.
 @param {boolean=} hideAlias Set to <code>true</code> to hide alias.
 @param {string=} description Add a description to the content.
+@param {boolean=} descriptionLocked Set to <code>true</code> to lock the description.
 @param {boolean=} hideDescription Set to <code>true</code> to hide description.
-@param {boolean=} setpagetitle If true the page title will be set to reflect the type of data the header is working with 
+@param {boolean=} setpagetitle If true the page title will be set to reflect the type of data the header is working with
 @param {string=} editorfor The localization to use to aid accessibility on the edit and create screen
 **/
 
 (function () {
     'use strict';
 
-    function EditorHeaderDirective(editorService, localizationService, editorState) {
-        
+    function EditorHeaderDirective(editorService, localizationService, editorState, $rootScope) {
+
         function link(scope, $injector) {
 
             scope.vm = {};
@@ -224,27 +226,12 @@ Use this directive to construct a header inside the main editor window.
             if (editorState.current) {
                 //to do make work for user create/edit
                 // to do make it work for user group create/ edit
-                // to do make it work for language edit/create
-                // to do make it work for log viewer
-                scope.isNew = editorState.current.id === 0 ||
-                    editorState.current.id === "0" ||
-                    editorState.current.id === -1 ||
-                    editorState.current.id === 0 ||
-                    editorState.current.id === "-1";
-
-                var localizeVars = [
-                    scope.isNew ? "visuallyHiddenTexts_createItem" : "visuallyHiddenTexts_edit",
-                    "visuallyHiddenTexts_name",
-                    scope.isNew ? "general_new" : "general_edit"
-                ];
-
-                if (scope.editorfor) {
-                    localizeVars.push(scope.editorfor);
-                }
-                localizationService.localizeMany(localizeVars).then(function(data) {
-                    setAccessibilityForEditor(data);
-                    scope.loading = false;
-                });
+                // to make it work for language edit/create
+                setAccessibilityForEditorState();
+                scope.loading = false;
+            } else if (scope.name) {
+                setAccessibilityForName();
+                scope.loading = false;
             } else {
                 scope.loading = false;
             }
@@ -283,58 +270,102 @@ Use this directive to construct a header inside the main editor window.
                 editorService.iconPicker(iconPicker);
             };
 
-            function setAccessibilityForEditor(data) {
-                
-               if (editorState.current) {
-                   if (scope.nameLocked) {
-                       scope.accessibility.a11yName = scope.name;
-                       SetPageTitle(scope.name);
-                   } else {
-                      
-                       scope.accessibility.a11yMessage = data[0];
-                       scope.accessibility.a11yName = data[1];
-                           var title = data[2] + ":";
-                           if (!scope.isNew) {
-                               scope.accessibility.a11yMessage += " " + scope.name;
-                               title += " " + scope.name;
-                           } else {
-                               var name = "";
-                               if (editorState.current.contentTypeName) {
-                                   name = editorState.current.contentTypeName;
-                               } else if (scope.editorfor) {
-                                   name = data[3];
-                               }
-                               if (name !== "") {
-                                   scope.accessibility.a11yMessage += " " + name;
-                                   scope.accessibility.a11yName = name + " " + scope.accessibility.a11yName;
-                                   title += " " + name;
-                               }
-                           }
-                           if (title !== data[2] + ":") {
-                               SetPageTitle(title);
-                           }
-                     
-                   }
-                   scope.accessibility.a11yMessageVisible = !isEmptyOrSpaces(scope.accessibility.a11yMessage);
-                   scope.accessibility.a11yNameVisible = !isEmptyOrSpaces(scope.accessibility.a11yName);
+            function setAccessibilityForName() {
+                var setTitle = false;
+                if (scope.setpagetitle !== undefined) {
+                    setTitle = scope.setpagetitle;
                 }
-               
+                if (setTitle) {
+                    setAccessibilityHeaderDirective(false, scope.editorfor, scope.nameLocked, scope.name, "", true);
+                }
             }
+            function setAccessibilityForEditorState() {
+                var isNew = editorState.current.id === 0 ||
+                    editorState.current.id === "0" ||
+                    editorState.current.id === -1 ||
+                    editorState.current.id === 0 ||
+                    editorState.current.id === "-1";
+
+                var contentTypeName = "";
+                if (editorState.current.contentTypeName) {
+                    contentTypeName = editorState.current.contentTypeName;
+                }
+
+                var setTitle = false;
+                if (scope.setpagetitle !== undefined) {
+                    setTitle = scope.setpagetitle;
+                }
+                setAccessibilityHeaderDirective(isNew, scope.editorfor, scope.nameLocked, scope.name, contentTypeName, setTitle);
+            }
+
+            function setAccessibilityHeaderDirective(isNew, editorFor, nameLocked, entityName, contentTypeName, setTitle) {
+
+                var localizeVars = [
+                    isNew ? "visuallyHiddenTexts_createItem" : "visuallyHiddenTexts_edit",
+                    "visuallyHiddenTexts_name",
+                    isNew ? "general_new" : "general_edit"
+                ];
+
+                if (editorFor) {
+                    localizeVars.push(editorFor);
+                }
+                localizationService.localizeMany(localizeVars).then(function(data) {
+                    if (nameLocked) {
+                        scope.accessibility.a11yName = entityName;
+                        if (setTitle) {
+                            SetPageTitle(entityName);
+                        }
+                    } else {
+
+                        scope.accessibility.a11yMessage = data[0];
+                        scope.accessibility.a11yName = data[1];
+                        var title = data[2] + ":";
+                        if (!isNew) {
+                            scope.accessibility.a11yMessage += " " + entityName;
+                            title += " " + entityName;
+                        } else {
+                            var name = "";
+                            if (contentTypeName) {
+                                name = editorState.current.contentTypeName;
+                            } else if (editorFor) {
+                                name = data[3];
+                            }
+                            if (name !== "") {
+                                scope.accessibility.a11yMessage += " " + name;
+                                scope.accessibility.a11yName = name + " " + scope.accessibility.a11yName;
+                                title += " " + name;
+                            }
+                        }
+                        if (setTitle && title !== data[2] + ":") {
+                            SetPageTitle(title);
+                        }
+
+                    }
+                    scope.accessibility.a11yMessageVisible = !isEmptyOrSpaces(scope.accessibility.a11yMessage);
+                    scope.accessibility.a11yNameVisible = !isEmptyOrSpaces(scope.accessibility.a11yName);
+
+                });
+            }
+
+
 
            function isEmptyOrSpaces(str) {
                return str === null || str===undefined || str.trim ==='';
             }
 
             function SetPageTitle(title) {
-                var setTitle = false;
-                if (scope.setpagetitle !== undefined) {
-                    setTitle = scope.setpagetitle;
-                }
-                if (setTitle) {
                     scope.$emit("$changeTitle", title);
-                }
             }
+
+            var unbindEventHandler = $rootScope.$on('$setAccessibleHeader', function (event, isNew, editorFor, nameLocked, name, contentTypeName, setTitle) {
+                setAccessibilityHeaderDirective(isNew, editorFor, nameLocked, name, contentTypeName, setTitle);
+            });
+            scope.$on('$destroy', function () {
+                unbindEventHandler();
+            });
         }
+
+
 
         var directive = {
             transclude: true,
@@ -344,6 +375,7 @@ Use this directive to construct a header inside the main editor window.
             scope: {
                 name: "=",
                 nameLocked: "=",
+                nameRequired: "=?",
                 menu: "=",
                 hideActionsMenu: "<?",
                 icon: "=",

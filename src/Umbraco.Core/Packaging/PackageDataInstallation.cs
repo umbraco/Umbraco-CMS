@@ -358,12 +358,28 @@ namespace Umbraco.Core.Packaging
                     Key = key
                 };
 
+            // Handle culture specific node names
+            const string nodeNamePrefix = "nodeName-";
+            // Get the installed culture iso names, we create a localized content node with a culture that does not exist in the project
+            // We have to use Invariant comparisons, because when we get them from ContentBase in EntityXmlSerializer they're all lowercase.
+            var installedLanguages = _localizationService.GetAllLanguages().Select(l => l.IsoCode).ToArray();
+            foreach (var localizedNodeName in element.Attributes().Where(a => a.Name.LocalName.InvariantStartsWith(nodeNamePrefix)))
+            {
+                var newCulture = localizedNodeName.Name.LocalName.Substring(nodeNamePrefix.Length);
+                // Skip the culture if it does not exist in the current project
+                if (installedLanguages.InvariantContains(newCulture))
+                {
+                    content.SetCultureName(localizedNodeName.Value, newCulture);
+                }
+            }
+
             //Here we make sure that we take composition properties in account as well
             //otherwise we would skip them and end up losing content
             var propTypes = contentType.CompositionPropertyTypes.Any()
                 ? contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x)
                 : contentType.PropertyTypes.ToDictionary(x => x.Alias, x => x);
 
+            var foundLanguages = new HashSet<string>();
             foreach (var property in properties)
             {
                 string propertyTypeAlias = property.Name.LocalName;
@@ -371,11 +387,27 @@ namespace Umbraco.Core.Packaging
                 {
                     var propertyValue = property.Value;
 
+                    // Handle properties language attributes
+                    var propertyLang = property.Attribute(XName.Get("lang"))?.Value;
+                    foundLanguages.Add(propertyLang);
                     if (propTypes.TryGetValue(propertyTypeAlias, out var propertyType))
                     {
-                        //set property value
-                        content.SetValue(propertyTypeAlias, propertyValue);
+                        // set property value
+                        // Skip unsupported language variation, otherwise we'll get a "not supported error"
+                        // We allow null, because that's invariant
+                        if (installedLanguages.InvariantContains(propertyLang) || propertyLang is null)
+                        {
+                            content.SetValue(propertyTypeAlias, propertyValue, propertyLang);
+                        }
                     }
+                }
+            }
+
+            foreach (var propertyLang in foundLanguages)
+            {
+                if (string.IsNullOrEmpty(content.GetCultureName(propertyLang)) && installedLanguages.InvariantContains(propertyLang))
+                {
+                    content.SetCultureName(nodeName, propertyLang);
                 }
             }
 
@@ -522,7 +554,7 @@ namespace Umbraco.Core.Packaging
                     && ((string)infoElement.Element("Master")).IsNullOrWhiteSpace())
                 {
                     var alias = documentType.Element("Info").Element("Alias").Value;
-                    var folders = foldersAttribute.Value.Split('/');
+                    var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
                     var rootFolder = HttpUtility.UrlDecode(folders[0]);
                     //level 1 = root level folders, there can only be one with the same name
                     var current = _contentTypeService.GetContainers(rootFolder, 1).FirstOrDefault();
@@ -604,6 +636,8 @@ namespace Umbraco.Core.Packaging
             var defaultTemplateElement = infoElement.Element("DefaultTemplate");
 
             contentType.Name = infoElement.Element("Name").Value;
+            if (infoElement.Element("Key") != null)
+                contentType.Key = new Guid(infoElement.Element("Key").Value);
             contentType.Icon = infoElement.Element("Icon").Value;
             contentType.Thumbnail = infoElement.Element("Thumbnail").Value;
             contentType.Description = infoElement.Element("Description").Value;
@@ -798,8 +832,13 @@ namespace Umbraco.Core.Packaging
                     SortOrder = sortOrder,
                     Variations = property.Element("Variations") != null
                         ? (ContentVariation)Enum.Parse(typeof(ContentVariation), property.Element("Variations").Value)
-                        : ContentVariation.Nothing
+                        : ContentVariation.Nothing,
+                    LabelOnTop = property.Element("LabelOnTop") != null
+                        ? property.Element("LabelOnTop").Value.ToLowerInvariant().Equals("true")
+                        : false
                 };
+                if (property.Element("Key") != null)
+                    propertyType.Key = new Guid(property.Element("Key").Value);
 
                 var tab = (string)property.Element("Tab");
                 if (string.IsNullOrEmpty(tab))
@@ -935,7 +974,7 @@ namespace Umbraco.Core.Packaging
                 if (foldersAttribute != null)
                 {
                     var name = datatypeElement.Attribute("Name").Value;
-                    var folders = foldersAttribute.Value.Split('/');
+                    var folders = foldersAttribute.Value.Split(Constants.CharArrays.ForwardSlash);
                     var rootFolder = HttpUtility.UrlDecode(folders[0]);
                     //there will only be a single result by name for level 1 (root) containers
                     var current = _dataTypeService.GetContainers(rootFolder, 1).FirstOrDefault();

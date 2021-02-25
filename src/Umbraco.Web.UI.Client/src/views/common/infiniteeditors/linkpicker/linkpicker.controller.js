@@ -147,7 +147,7 @@ angular.module("umbraco").controller("Umbraco.Editors.LinkPickerController",
                 });
             }
 
-            if (!angular.isUndefined($scope.model.target.isMedia)) {
+            if (!Utilities.isUndefined($scope.model.target.isMedia)) {
                 delete $scope.model.target.isMedia;
             }
         }

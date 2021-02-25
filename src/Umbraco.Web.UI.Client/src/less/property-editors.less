@@ -104,6 +104,20 @@
 // --------------------------------------------------
 
 /* pre-value editor */
+.umb-prevalues-multivalues.umb-colors {
+    max-width: 600px;
+    width: 100%;
+    min-width: 66.6%;
+
+    @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px) {
+        max-width: none;
+    }
+
+    .umb-overlay__form & {
+        width: 100%;
+    }
+}
+
 .control-group.color-picker-preval {
     .thumbnail {
         width: 34px;
@@ -131,7 +145,7 @@
 
         pre {
             display: inline-flex;
-            font-family: monospace;
+            font-family: @monoFontFamily;
             margin-left: 15px;
             margin-right: 15px;
             white-space: nowrap;
@@ -160,15 +174,10 @@
         width: auto;
     }
 
-    .sp-replacer {
-        display: inline-flex;
-        margin-right: 18px;
-    }
-
     label {
         border: 1px solid @white;
         padding: 6px 10px;
-        font-family: monospace;
+        font-family: @monoFontFamily;
         border: 1px solid @gray-8;
         background: @gray-11;
         margin: 0 15px 0 3px;
@@ -320,6 +329,11 @@
   box-shadow:none !important;
 }
 
+.umb-sortable-thumbnails-container {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: @white;
+}
 
 .umb-sortable-thumbnails {
     list-style-type: none;
@@ -707,8 +721,9 @@
             margin-top: 0;
         }
     }
+
 //
-// folder-browser
+// Folder browser
 // --------------------------------------------------
 .umb-folderbrowser .add-link {
   display: inline-block;
@@ -724,6 +739,7 @@
 // --------------------------------------------------
 .umb-fileupload {
     display: flex;
+    flex-direction: column;
 }
 
 .umb-fileupload .preview {
@@ -806,54 +822,17 @@
 
 
 //
+// Slider
+// --------------------------------------------------
+.umb-slider {
+    .umb-property-editor--limit-width();
+}
+
+//
 // Tags
 // --------------------------------------------------
 .umb-tags {
-    border: @inputBorder solid 1px;
-    padding: 5px;
-    min-height: 54px;
-    font-size: 13px;
-    text-shadow: none;
-    box-sizing: border-box;
     .umb-property-editor--limit-width();
-
-    .tag {
-        cursor: default;
-        margin: 10px;
-        padding: 10px 15px;
-        background: @blueExtraDark;
-        position: relative;
-        user-select: all;
-
-        .icon-trash {
-            position: relative;
-            cursor: pointer;
-            padding-left: 2px;
-            font-size: 15px;
-            right: -5px;
-            bottom: -1px;
-        }
-
-        .umb_confirm-action__overlay.-left{
-            top: 6px;
-            left: auto;
-            right: 15px;
-        }
-    }
-
-    input {
-        border: none;
-        background: @white;
-    }
-
-    .twitter-typeahead {
-        margin: 10px;
-        margin-top: 16px;
-        vertical-align: top;
-        input {
-            padding-left: 0;
-        }
-    }
 }
 
 //
@@ -863,11 +842,11 @@
 .bootstrap-datetimepicker-widget .picker-switch .btn{ background: none; border: none;}
 .umb-datepicker .input-append .add-on{cursor: pointer;}
 .umb-datepicker .input-append .on-top {
+    border: 0 none;
     position: absolute;
     margin-left: -31px;
     margin-top: 1px;
     display: inline-block;
-    height: 22px;
     padding: 5px 6px 3px 6px;
     font-size: @baseFontSize;
     font-weight: normal;

@@ -17,6 +17,11 @@
         public string Culture { get; set; }
 
         /// <summary>
+        /// When dealing with content variants, this is the segment for the variant
+        /// </summary>
+        public string Segment { get; set; }
+
+        /// <summary>
         /// An array of metadata that is parsed out from the file info posted to the server which is set on the client. 
         /// </summary>
         /// <remarks>

@@ -15,12 +15,11 @@
                     <localize key="content_noMediaLink"></localize>
                 </umb-empty-state>
 
-                <ul ng-if="nodeUrl" class="nav nav-stacked" style="margin-bottom: 0;">
+                <ul ng-if="nodeUrl" class="nav nav-stacked mb0">
                     <li>
-                        <a ng-attr-href="{{node.extension !== 'svg' ? nodeUrl : undefined}}" ng-click="node.extension === 'svg' && openSVG()" target="_blank">
-                            <i class="icon icon-out"></i>
+                        <a href="" ng-attr-href="{{node.extension !== 'svg' ? nodeUrl : undefined}}" ng-click="node.extension === 'svg' && openSVG()" target="_blank" rel="noopener" class="umb-outline">
+                            <i class="icon icon-out" aria-hidden="true"></i>
                             <span>{{nodeFileName}}</span>
-
                         </a>
                     </li>
                 </ul>

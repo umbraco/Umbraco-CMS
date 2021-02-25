@@ -610,17 +610,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     Database.Insert(documentVersionDto);
                 }
 
-                // replace the property data (rather than updating)
+            // replace the property data (rather than updating)
                 // only need to delete for the version that existed, the new version (if any) has no property data yet
-                var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
-                var deletePropertyDataSql = Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionToDelete);
-                Database.Execute(deletePropertyDataSql);
-
-                // insert property data
-                var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishing ? entity.PublishedVersionId : 0,
-                    entity.Properties, LanguageRepository, out var edited, out var editedCultures);
-                foreach (var propertyDataDto in propertyDataDtos)
-                    Database.Insert(propertyDataDto);
+            var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
+            // insert property data
+            ReplacePropertyValues(entity, versionToDelete, publishing ? entity.PublishedVersionId : 0, out var edited, out var editedCultures);
 
                 // if !publishing, we may have a new name != current publish name,
                 // also impacts 'edited'
@@ -900,7 +894,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.ParentId == -1)
                 return content.Published;
 
-            var ids = content.Path.Split(',').Skip(1).Select(int.Parse);
+            var ids = content.Path.Split(Constants.CharArrays.Comma).Skip(1).Select(int.Parse);
 
             var sql = SqlContext.Sql()
                 .SelectCount<NodeDto>(x => x.NodeId)
@@ -1015,6 +1009,37 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var sql = Sql().Delete<ContentScheduleDto>().Where<ContentScheduleDto>(x => x.Date <= date);
             Database.Execute(sql);
+        }
+
+        /// <inheritdoc />
+        public void ClearSchedule(DateTime date, ContentScheduleAction action)
+        {
+            var a = action.ToString();
+            var sql = Sql().Delete<ContentScheduleDto>().Where<ContentScheduleDto>(x => x.Date <= date && x.Action == a);
+            Database.Execute(sql);
+        }
+
+        private Sql GetSqlForHasScheduling(ContentScheduleAction action, DateTime date)
+        {
+            var template = SqlContext.Templates.Get("Umbraco.Core.DocumentRepository.GetSqlForHasScheduling", tsql => tsql
+                .SelectCount()
+                    .From<ContentScheduleDto>()
+                    .Where<ContentScheduleDto>(x => x.Action == SqlTemplate.Arg<string>("action") && x.Date <= SqlTemplate.Arg<DateTime>("date")));
+
+            var sql = template.Sql(action.ToString(), date);
+            return sql;
+        }
+
+        public bool HasContentForExpiration(DateTime date)
+        {
+            var sql = GetSqlForHasScheduling(ContentScheduleAction.Expire, date);
+            return Database.ExecuteScalar<int>(sql) > 0;
+        }
+
+        public bool HasContentForRelease(DateTime date)
+        {
+            var sql = GetSqlForHasScheduling(ContentScheduleAction.Release, date);
+            return Database.ExecuteScalar<int>(sql) > 0;
         }
 
         /// <inheritdoc />
