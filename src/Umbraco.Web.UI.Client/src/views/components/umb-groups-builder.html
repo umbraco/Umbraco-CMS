@@ -129,7 +129,8 @@
                 group="fieldset"
                 allow-remove="!sortingMode"
                 on-remove="removeFieldset(group)"
-                sorting="sortingMode && !fieldset.inherited">
+                sorting="sortingMode && !fieldset.inherited"
+                group-val-server-field="{{'Fieldsets[' + model.fieldsets.indexOf(fieldset) + '].Name'}}">
                 
                 <ul class="umb-group-builder__properties">
                     <li ng-repeat="property in model.groups[openTabIndex].properties | filter:propertiesInFieldset(fieldset.id)" data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">

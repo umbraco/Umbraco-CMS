@@ -15,6 +15,7 @@
     vm.removeGroup = removeGroup;
     vm.togglePrompt = togglePrompt;
     vm.hidePrompt = hidePrompt;
+    vm.whenNameFocus = whenNameFocus;
 
     function togglePrompt () {
       vm.removePromptIsVisible = !vm.removePromptIsVisible;
@@ -36,6 +37,12 @@
         vm.removePromptIsVisible = false;
       }
     }
+
+    function whenNameFocus () {
+      if (vm.onNameFocus) {
+        vm.onNameFocus();
+      }
+    }
   }
 
   const umbContentTypeGroupComponent = {
@@ -43,12 +50,14 @@
     controllerAs: 'vm',
     transclude: true,
     bindings: {
-      group: "<",
-      allowName: "<",
-      onUpdateName: "&",
-      allowRemove: "<",
-      onRemove: "&",
-      sorting: "<"
+      group: '<',
+      allowName: '<',
+      onUpdateName: '&',
+      allowRemove: '<',
+      onRemove: '&',
+      sorting: '<',
+      groupValServerField: '@',
+      onNameFocus: '&'
     },
     controller: umbContentTypeGroupController
   };
