@@ -22,6 +22,7 @@
   const umbContentTypeGroupPlaceholderComponent = {
       templateUrl: 'views/components/contenttype/umb-content-type-group-placeholder.html',
       controllerAs: 'vm',
+      transclude: true,
       bindings: {
         onClick: '&'
       },
