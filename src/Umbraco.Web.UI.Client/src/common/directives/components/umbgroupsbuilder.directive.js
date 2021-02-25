@@ -462,6 +462,11 @@
                 editorService.open(propertySettings);
             };
 
+            /* ---------- FIELDSETS ---------- */
+            scope.fieldsetsInGroup = (groupId) => (fieldset) => fieldset && fieldset.groupId === groupId;
+
+            scope.propertiesInFieldset = (fieldsetId) => (property) => property && property.fieldsetId === fieldsetId;
+
             /* ---------- GROUPS ---------- */
 
             scope.addGroup = function (group) {
