@@ -68,7 +68,7 @@
                             name="groupName"
                             ng-model="tab.name"
                             ng-class="{'-placeholder': tab.name == ''}"
-                            ng-disabled="tab.inherited"
+                            ng-disabled="$index !== openTabIndex"
                             umb-auto-focus
                             umb-auto-resize
                             ng-focus="activateGroup(tab)"
