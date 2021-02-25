@@ -146,13 +146,14 @@
 
                     //check if the app domain is restarted ever 2 seconds
                     var count = 0;
+                    var maxCount = 5;
 
                     function checkRestart() {
                         $timeout(function () {
                             packageResource.checkRestart(pack).then(function (d) {
                                 count++;
                                 //if there is an id it means it's not restarted yet but we'll limit it to only check 10 times
-                                if (d.isRestarting && count < 10) {
+                                if (d.isRestarting && count < maxCount) {
                                     checkRestart();
                                 }
                                 else {
@@ -160,9 +161,16 @@
                                     deferred.resolve(d);
                                 }
                             },
-                                installError);
+                                function(){
+                                  if(count >= maxCount){
+                                    installError();
+                                  }
+                                  else {
+                                    checkRestart();
+                                  }
+                                });
                         },
-                            2000);
+                            2000*(count+1));
                     }
 
                     checkRestart();
