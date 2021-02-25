@@ -525,12 +525,6 @@
                 scope.model.groups.splice(groupIndex, 1);
             };
 
-            scope.updateGroupTitle = function (group) {
-                if (group.properties.length === 0) {
-                    addInitProperty(group);
-                }
-            };
-
             scope.changeSortOrderValue = function (group) {
 
                 if (group.sortOrder !== undefined) {
@@ -540,8 +534,6 @@
             };
 
             function addInitGroup(groups) {
-
-                // check i init tab already exists
                 var addGroup = true;
 
                 angular.forEach(groups, function (group) {
@@ -551,13 +543,16 @@
                 });
 
                 if (addGroup) {
-                    groups.push({
+                    let group = {
                         properties: [],
                         parentTabContentTypes: [],
                         parentTabContentTypeNames: [],
                         name: "",
                         tabState: "init"
-                    });
+                    };
+
+                    group = addInitProperty(group);
+                    groups.push(group);
                 }
 
                 return groups;

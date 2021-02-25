@@ -68,7 +68,6 @@
                             name="groupName"
                             ng-model="tab.name"
                             ng-class="{'-placeholder': tab.name == ''}"
-                            ng-change="updateGroupTitle(tab)"
                             ng-disabled="tab.inherited"
                             umb-auto-focus
                             umb-auto-resize
@@ -176,7 +175,6 @@
                                    name="groupName"
                                    ng-model="tab.name"
                                    ng-class="{'-placeholder': tab.name == ''}"
-                                   ng-change="updateGroupTitle(tab)"
                                    ng-disabled="tab.inherited"
                                    umb-auto-focus
                                    umb-auto-resize
