@@ -10,6 +10,7 @@
       const vm = this;
 
       vm.click = click;
+      vm.whenFocus = whenFocus;
 
       function click ($event) {
         if (vm.onClick) {
@@ -17,12 +18,19 @@
         }
       }
 
+      function whenFocus () {
+        if (vm.onFocus) {
+          vm.onFocus()
+        }
+      }
   }
 
   const umbContentTypePropertyPlaceholderComponent = {
       templateUrl: 'views/components/contenttype/umb-content-type-property-placeholder.html',
       bindings: {
-          onClick: "&"
+          onClick: "&",
+          onFocus: "&",
+          focus: "<"
       },
       controllerAs: 'vm',
       controller: umbContentTypePropertyPlaceholderController
