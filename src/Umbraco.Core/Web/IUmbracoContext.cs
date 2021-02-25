@@ -1,10 +1,9 @@
 using System;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Security;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core.Web
 {
     public interface IUmbracoContext : IDisposable
     {

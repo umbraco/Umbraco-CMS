@@ -1,17 +1,17 @@
 using System;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
-using Umbraco.Core;
-using Umbraco.Core.Strings;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Features;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Website.Controllers;
 
-namespace Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Web.Website.Routing
 {
-
     /// <summary>
     /// Used to create <see cref="UmbracoRouteValues"/>
     /// </summary>
@@ -20,9 +20,10 @@ namespace Umbraco.Web.Website.Routing
         private readonly IUmbracoRenderingDefaults _renderingDefaults;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly UmbracoFeatures _umbracoFeatures;
-        private readonly HijackedRouteEvaluator _hijackedRouteEvaluator;
+        private readonly IControllerActionSearcher _controllerActionSearcher;
         private readonly IPublishedRouter _publishedRouter;
         private readonly Lazy<string> _defaultControllerName;
+        private readonly Lazy<ControllerActionDescriptor> _defaultControllerDescriptor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValuesFactory"/> class.
@@ -31,15 +32,29 @@ namespace Umbraco.Web.Website.Routing
             IUmbracoRenderingDefaults renderingDefaults,
             IShortStringHelper shortStringHelper,
             UmbracoFeatures umbracoFeatures,
-            HijackedRouteEvaluator hijackedRouteEvaluator,
+            IControllerActionSearcher controllerActionSearcher,
             IPublishedRouter publishedRouter)
         {
             _renderingDefaults = renderingDefaults;
             _shortStringHelper = shortStringHelper;
             _umbracoFeatures = umbracoFeatures;
-            _hijackedRouteEvaluator = hijackedRouteEvaluator;
+            _controllerActionSearcher = controllerActionSearcher;
             _publishedRouter = publishedRouter;
             _defaultControllerName = new Lazy<string>(() => ControllerExtensions.GetControllerName(_renderingDefaults.DefaultControllerType));
+            _defaultControllerDescriptor = new Lazy<ControllerActionDescriptor>(() =>
+            {
+                ControllerActionDescriptor descriptor = _controllerActionSearcher.Find<IRenderController>(
+                    new DefaultHttpContext(), // this actually makes no difference for this method
+                    DefaultControllerName,
+                    UmbracoRouteValues.DefaultActionName);
+
+                if (descriptor == null)
+                {
+                    throw new InvalidOperationException($"No controller/action found by name {DefaultControllerName}.{UmbracoRouteValues.DefaultActionName}");
+                }
+
+                return descriptor;
+            });
         }
 
         /// <summary>
@@ -48,24 +63,17 @@ namespace Umbraco.Web.Website.Routing
         protected string DefaultControllerName => _defaultControllerName.Value;
 
         /// <inheritdoc/>
-        public UmbracoRouteValues Create(HttpContext httpContext, RouteValueDictionary values, IPublishedRequest request)
+        public UmbracoRouteValues Create(HttpContext httpContext, IPublishedRequest request)
         {
             if (httpContext is null)
             {
                 throw new ArgumentNullException(nameof(httpContext));
             }
 
-            if (values is null)
-            {
-                throw new ArgumentNullException(nameof(values));
-            }
-
             if (request is null)
             {
                 throw new ArgumentNullException(nameof(request));
             }
-
-            Type defaultControllerType = _renderingDefaults.DefaultControllerType;
 
             string customActionName = null;
 
@@ -79,19 +87,15 @@ namespace Umbraco.Web.Website.Routing
                 customActionName = request.GetTemplateAlias()?.Split('.')[0].ToSafeAlias(_shortStringHelper);
             }
 
-            // creates the default route definition which maps to the 'UmbracoController' controller
+            // The default values for the default controller/action
             var def = new UmbracoRouteValues(
                 request,
-                DefaultControllerName,
-                defaultControllerType,
+                _defaultControllerDescriptor.Value,
                 templateName: customActionName);
 
-            def = CheckHijackedRoute(def);
+            def = CheckHijackedRoute(httpContext, def, out bool hasHijackedRoute);
 
-            def = CheckNoTemplate(def);
-
-            // store the route definition
-            values.TryAdd(Constants.Web.UmbracoRouteDefinitionDataToken, def);
+            def = CheckNoTemplate(httpContext, def, hasHijackedRoute);
 
             return def;
         }
@@ -99,33 +103,33 @@ namespace Umbraco.Web.Website.Routing
         /// <summary>
         /// Check if the route is hijacked and return new route values
         /// </summary>
-        private UmbracoRouteValues CheckHijackedRoute(UmbracoRouteValues def)
+        private UmbracoRouteValues CheckHijackedRoute(HttpContext httpContext, UmbracoRouteValues def, out bool hasHijackedRoute)
         {
             IPublishedRequest request = def.PublishedRequest;
 
             var customControllerName = request.PublishedContent?.ContentType?.Alias;
             if (customControllerName != null)
             {
-                HijackedRouteResult hijackedResult = _hijackedRouteEvaluator.Evaluate(customControllerName, def.TemplateName);
-                if (hijackedResult.Success)
+                ControllerActionDescriptor descriptor = _controllerActionSearcher.Find<IRenderController>(httpContext, customControllerName, def.TemplateName);
+                if (descriptor != null)
                 {
+                    hasHijackedRoute = true;
+
                     return new UmbracoRouteValues(
                         request,
-                        hijackedResult.ControllerName,
-                        hijackedResult.ControllerType,
-                        hijackedResult.ActionName,
-                        def.TemplateName,
-                        true);
+                        descriptor,
+                        def.TemplateName);
                 }
             }
 
+            hasHijackedRoute = false;
             return def;
         }
 
         /// <summary>
         /// Special check for when no template or hijacked route is done which needs to re-run through the routing pipeline again for last chance finders
         /// </summary>
-        private UmbracoRouteValues CheckNoTemplate(UmbracoRouteValues def)
+        private UmbracoRouteValues CheckNoTemplate(HttpContext httpContext, UmbracoRouteValues def, bool hasHijackedRoute)
         {
             IPublishedRequest request = def.PublishedRequest;
 
@@ -136,9 +140,9 @@ namespace Umbraco.Web.Website.Routing
             if (request.HasPublishedContent()
                 && !request.HasTemplate()
                 && !_umbracoFeatures.Disabled.DisableTemplates
-                && !def.HasHijackedRoute)
+                && !hasHijackedRoute)
             {
-                Core.Models.PublishedContent.IPublishedContent content = request.PublishedContent;
+                IPublishedContent content = request.PublishedContent;
 
                 // This is basically a 404 even if there is content found.
                 // We then need to re-run this through the pipeline for the last
@@ -154,15 +158,13 @@ namespace Umbraco.Web.Website.Routing
 
                 def = new UmbracoRouteValues(
                         request,
-                        def.ControllerName,
-                        def.ControllerType,
-                        def.ActionName,
+                        def.ControllerActionDescriptor,
                         def.TemplateName);
 
                 // if the content has changed, we must then again check for hijacked routes
                 if (content != request.PublishedContent)
                 {
-                    def = CheckHijackedRoute(def);
+                    def = CheckHijackedRoute(httpContext, def, out _);
                 }
             }
 

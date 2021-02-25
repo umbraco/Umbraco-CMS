@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using CSharpTest.Net.Serialization;
 
-namespace Umbraco.Web.PublishedCache.NuCache.DataSource
+namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
     internal class ContentNodeKitSerializer : ISerializer<ContentNodeKit>
     {

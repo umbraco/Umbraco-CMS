@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using Umbraco.Core.PropertyEditors;
-
-namespace Umbraco.Core.Manifest
+namespace Umbraco.Cms.Core.Manifest
 {
     public interface IManifestParser
     {

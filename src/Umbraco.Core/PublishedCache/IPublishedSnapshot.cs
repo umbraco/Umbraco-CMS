@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Cache;
+using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Web.PublishedCache
+namespace Umbraco.Cms.Core.PublishedCache
 {
     /// <summary>
     /// Specifies a published snapshot.

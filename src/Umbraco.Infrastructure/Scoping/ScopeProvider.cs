@@ -2,19 +2,18 @@ using System;
 using System.Data;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Events;
-using Umbraco.Core.IO;
-using Umbraco.Core.Persistence;
-using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Infrastructure.Persistence;
+using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
 
 #if DEBUG_SCOPES
 using System.Linq;
 using System.Text;
 #endif
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// Implements <see cref="IScopeProvider"/>.

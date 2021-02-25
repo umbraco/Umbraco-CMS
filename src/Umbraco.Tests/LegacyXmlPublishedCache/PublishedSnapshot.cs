@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.PublishedCache;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Persistence
+﻿namespace Umbraco.Cms.Infrastructure.Persistence
 {
     public enum RecordPersistenceType
     {

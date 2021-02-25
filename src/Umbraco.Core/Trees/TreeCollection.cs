@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     /// <summary>
     /// Represents the collection of section trees.

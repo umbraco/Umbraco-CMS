@@ -3,12 +3,11 @@
 
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Routing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 {
     [TestFixture]
     public class SiteDomainHelperTests

@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Core.Mapping
+namespace Umbraco.Cms.Core.Mapping
 {
     /// <summary>
     /// Represents a mapper context.

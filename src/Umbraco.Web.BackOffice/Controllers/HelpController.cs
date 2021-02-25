@@ -1,14 +1,13 @@
-﻿using Newtonsoft.Json;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Editors;
+using Newtonsoft.Json;
+using Umbraco.Cms.Web.Common.Attributes;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class HelpController : UmbracoAuthorizedJsonController

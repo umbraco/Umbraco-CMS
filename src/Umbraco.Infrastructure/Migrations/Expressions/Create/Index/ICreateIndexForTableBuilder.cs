@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Create.Index
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index
 {
     public interface ICreateIndexForTableBuilder : IFluentBuilder
     {

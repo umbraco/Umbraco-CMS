@@ -1,39 +1,34 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
-using Umbraco.Core;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
         /// <summary>
-        /// This will return the current back office identity if the IPrincipal is the correct type
+        /// This will return the current back office identity if the IPrincipal is the correct type and authenticated.
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        public static UmbracoBackOfficeIdentity GetUmbracoIdentity(this IPrincipal user)
+        public static ClaimsIdentity GetUmbracoIdentity(this IPrincipal user)
         {
-            // TODO: It would be nice to get rid of this and only rely on Claims, not a strongly typed identity instance
-
-            //If it's already a UmbracoBackOfficeIdentity
-            if (user.Identity is UmbracoBackOfficeIdentity backOfficeIdentity) return backOfficeIdentity;
-
-            //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
-            if (user is ClaimsPrincipal claimsPrincipal)
-            {
-                backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
-                if (backOfficeIdentity != null) return backOfficeIdentity;
-            }
-
-            //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd
+            // Check if the identity is a ClaimsIdentity, and that's it's authenticated and has all required claims.
             if (user.Identity is ClaimsIdentity claimsIdentity
                 && claimsIdentity.IsAuthenticated
-                && UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out var umbracoIdentity))
+                && claimsIdentity.VerifyBackOfficeIdentity(out ClaimsIdentity umbracoIdentity))
             {
+                if (claimsIdentity.AuthenticationType == Constants.Security.BackOfficeAuthenticationType)
+                {
+                    return claimsIdentity;
+                }
                 return umbracoIdentity;
             }
 

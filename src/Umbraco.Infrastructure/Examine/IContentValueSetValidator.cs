@@ -1,6 +1,6 @@
 ﻿using Examine;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// An extended <see cref="IValueSetValidator"/> for content indexes

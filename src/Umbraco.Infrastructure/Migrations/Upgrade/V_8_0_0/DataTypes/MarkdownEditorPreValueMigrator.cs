@@ -1,12 +1,9 @@
-﻿using System.Collections.Generic;
-using Newtonsoft.Json;
-
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
 {
     class MarkdownEditorPreValueMigrator : DefaultPreValueMigrator //PreValueMigratorBase
     {
         public override bool CanMigrate(string editorAlias)
-            => editorAlias == Constants.PropertyEditors.Aliases.MarkdownEditor;
+            => editorAlias == Cms.Core.Constants.PropertyEditors.Aliases.MarkdownEditor;
 
         protected override object GetPreValueValue(PreValueDto preValue)
         {

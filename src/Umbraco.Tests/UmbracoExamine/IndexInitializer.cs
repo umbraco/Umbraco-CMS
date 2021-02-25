@@ -2,29 +2,25 @@
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
 using Moq;
-using Umbraco.Core;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Examine;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Tests.TestHelpers;
-using IContentService = Umbraco.Core.Services.IContentService;
-using IMediaService = Umbraco.Core.Services.IMediaService;
+using IContentService = Umbraco.Cms.Core.Services.IContentService;
+using IMediaService = Umbraco.Cms.Core.Services.IMediaService;
 using Version = Lucene.Net.Util.Version;
 
 namespace Umbraco.Tests.UmbracoExamine
@@ -47,10 +43,10 @@ namespace Umbraco.Tests.UmbracoExamine
             return contentValueSetBuilder;
         }
 
-        public static ContentIndexPopulator GetContentIndexRebuilder(PropertyEditorCollection propertyEditors, IContentService contentService, IScopeProvider scopeProvider, bool publishedValuesOnly)
+        public static ContentIndexPopulator GetContentIndexRebuilder(PropertyEditorCollection propertyEditors, IContentService contentService, IScopeProvider scopeProvider, IUmbracoDatabaseFactory umbracoDatabaseFactory, bool publishedValuesOnly)
         {
             var contentValueSetBuilder = GetContentValueSetBuilder(propertyEditors, scopeProvider, publishedValuesOnly);
-            var contentIndexDataSource = new ContentIndexPopulator(publishedValuesOnly, null, contentService, scopeProvider.SqlContext, contentValueSetBuilder);
+            var contentIndexDataSource = new ContentIndexPopulator(publishedValuesOnly, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder);
             return contentIndexDataSource;
         }
 

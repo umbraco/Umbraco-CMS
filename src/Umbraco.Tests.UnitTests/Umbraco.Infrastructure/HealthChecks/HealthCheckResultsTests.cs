@@ -3,11 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using NUnit.Framework;
-using Umbraco.Core.HealthCheck;
-using Umbraco.Infrastructure.HealthCheck;
+using Umbraco.Cms.Core.HealthChecks;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
 {
     [TestFixture]
     public class HealthCheckResultsTests
@@ -26,7 +26,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
 
             public override HealthCheckStatus ExecuteAction(HealthCheckAction action) => throw new NotImplementedException();
 
-            public override IEnumerable<HealthCheckStatus> GetStatus() =>
+            public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() =>
                 new List<HealthCheckStatus>
                 {
                     new HealthCheckStatus(_message)
@@ -62,18 +62,18 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
             {
             }
 
-            public override IEnumerable<HealthCheckStatus> GetStatus() => throw new Exception("Check threw exception");
+            public override async Task<IEnumerable<HealthCheckStatus>> GetStatus() => throw new Exception("Check threw exception");
         }
 
         [Test]
-        public void HealthCheckResults_WithSuccessfulChecks_ReturnsCorrectResultDescription()
+        public async Task HealthCheckResults_WithSuccessfulChecks_ReturnsCorrectResultDescription()
         {
             var checks = new List<HealthCheck>
             {
                 new StubHealthCheck1(StatusResultType.Success, "First check was successful"),
                 new StubHealthCheck2(StatusResultType.Success, "Second check was successful"),
             };
-            var results = new HealthCheckResults(checks);
+            var results = await HealthCheckResults.Create(checks);
 
             Assert.IsTrue(results.AllChecksSuccessful);
 
@@ -83,14 +83,14 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
         }
 
         [Test]
-        public void HealthCheckResults_WithFailingChecks_ReturnsCorrectResultDescription()
+        public async Task HealthCheckResults_WithFailingChecks_ReturnsCorrectResultDescription()
         {
             var checks = new List<HealthCheck>
             {
                 new StubHealthCheck1(StatusResultType.Success, "First check was successful"),
                 new StubHealthCheck2(StatusResultType.Error, "Second check was not successful"),
             };
-            var results = new HealthCheckResults(checks);
+            var results = await HealthCheckResults.Create(checks);
 
             Assert.IsFalse(results.AllChecksSuccessful);
 
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
         }
 
         [Test]
-        public void HealthCheckResults_WithErroringCheck_ReturnsCorrectResultDescription()
+        public async Task HealthCheckResults_WithErroringCheck_ReturnsCorrectResultDescription()
         {
             var checks = new List<HealthCheck>
             {
@@ -108,7 +108,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
                 new StubHealthCheck3(StatusResultType.Error, "Third check was not successful"),
                 new StubHealthCheck2(StatusResultType.Error, "Second check was not successful"),
             };
-            var results = new HealthCheckResults(checks);
+            var results = await HealthCheckResults.Create(checks);
 
             Assert.IsFalse(results.AllChecksSuccessful);
 
@@ -119,28 +119,28 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.HealthChecks
         }
 
         [Test]
-        public void HealthCheckResults_WithSummaryVerbosity_ReturnsCorrectResultDescription()
+        public async Task HealthCheckResults_WithSummaryVerbosity_ReturnsCorrectResultDescription()
         {
             var checks = new List<HealthCheck>
             {
                 new StubHealthCheck1(StatusResultType.Success, "First check was successful"),
                 new StubHealthCheck2(StatusResultType.Success, "Second check was successful"),
             };
-            var results = new HealthCheckResults(checks);
+            var results = await HealthCheckResults.Create(checks);
 
             var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Summary);
             Assert.IsTrue(resultAsMarkdown.IndexOf("Result: 'Success'" + Environment.NewLine) > -1);
         }
 
         [Test]
-        public void HealthCheckResults_WithDetailedVerbosity_ReturnsCorrectResultDescription()
+        public async Task HealthCheckResults_WithDetailedVerbosity_ReturnsCorrectResultDescription()
         {
             var checks = new List<HealthCheck>
             {
                 new StubHealthCheck1(StatusResultType.Success, "First check was successful"),
                 new StubHealthCheck2(StatusResultType.Success, "Second check was successful"),
             };
-            var results = new HealthCheckResults(checks);
+            var results = await HealthCheckResults.Create(checks);
 
             var resultAsMarkdown = results.ResultsAsMarkDown(HealthCheckNotificationVerbosity.Detailed);
             Assert.IsFalse(resultAsMarkdown.IndexOf("Result: 'Success'" + Environment.NewLine) > -1);

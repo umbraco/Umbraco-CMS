@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     /// <summary>
     /// Represents event data for the Published event.
@@ -25,6 +25,6 @@ namespace Umbraco.Core.Events
         /// Determines whether a culture has been unpublished, during a Published event.
         /// </summary>
         public bool HasUnpublishedCulture(IContent content, string culture)
-            => content.WasPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + culture); 
+            => content.WasPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + culture);
     }
 }

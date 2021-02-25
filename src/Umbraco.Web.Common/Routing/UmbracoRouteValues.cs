@@ -1,10 +1,9 @@
 using System;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Extensions;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Routing;
+using Microsoft.AspNetCore.Mvc.Controllers;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.Controllers;
 
-namespace Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Web.Common.Routing
 {
     /// <summary>
     /// Represents the data required to route to a specific controller/action during an Umbraco request
@@ -21,29 +20,23 @@ namespace Umbraco.Web.Common.Routing
         /// </summary>
         public UmbracoRouteValues(
             IPublishedRequest publishedRequest,
-            string controllerName = null,
-            Type controllerType = null,
-            string actionName = DefaultActionName,
-            string templateName = null,
-            bool hasHijackedRoute = false)
+            ControllerActionDescriptor controllerActionDescriptor,
+            string templateName = null)
         {
-            ControllerName = controllerName ?? ControllerExtensions.GetControllerName<RenderController>();
-            ControllerType = controllerType ?? typeof(RenderController);
             PublishedRequest = publishedRequest;
-            HasHijackedRoute = hasHijackedRoute;
-            ActionName = actionName;
+            ControllerActionDescriptor = controllerActionDescriptor;
             TemplateName = templateName;
         }
 
         /// <summary>
         /// Gets the controller name
         /// </summary>
-        public string ControllerName { get; }
+        public string ControllerName => ControllerActionDescriptor.ControllerName;
 
         /// <summary>
         /// Gets the action name
         /// </summary>
-        public string ActionName { get; }
+        public string ActionName => ControllerActionDescriptor.ActionName;
 
         /// <summary>
         /// Gets the template name
@@ -51,18 +44,18 @@ namespace Umbraco.Web.Common.Routing
         public string TemplateName { get; }
 
         /// <summary>
-        /// Gets the Controller type found for routing to
+        /// Gets the controller type
         /// </summary>
-        public Type ControllerType { get; }
+        public Type ControllerType => ControllerActionDescriptor.ControllerTypeInfo;
+
+        /// <summary>
+        /// Gets the Controller descriptor found for routing to
+        /// </summary>
+        public ControllerActionDescriptor ControllerActionDescriptor { get; }
 
         /// <summary>
         /// Gets the <see cref="IPublishedRequest"/>
         /// </summary>
         public IPublishedRequest PublishedRequest { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the current request has a hijacked route/user controller routed for it
-        /// </summary>
-        public bool HasHijackedRoute { get; }
     }
 }

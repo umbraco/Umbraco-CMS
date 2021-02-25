@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Core.Migrations.Expressions.Create.Constraint
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Constraint
 {
     public interface ICreateConstraintColumnsBuilder : IFluentBuilder
     {

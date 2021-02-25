@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Security;
-using Umbraco.Infrastructure.Security;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions
 {
@@ -21,19 +20,6 @@ namespace Umbraco.Extensions
             where TUserManager : UserManager<BackOfficeIdentityUser>, TInterface
         {
             identityBuilder.AddUserManager<TUserManager>();
-            identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TUserManager));
-            return identityBuilder;
-        }
-
-        /// <summary>
-        /// Adds a <see cref="UserManager{TUser}"/> for the <seealso cref="MembersIdentityUser"/>.
-        /// </summary>
-        /// <typeparam name="TInterface">The usermanager interface</typeparam>
-        /// <typeparam name="TUserManager">The usermanager type</typeparam>
-        /// <returns>The current <see cref="IdentityBuilder"/> instance.</returns>
-        public static IdentityBuilder AddMembersUserManager<TInterface, TUserManager>(this IdentityBuilder identityBuilder)
-            where TUserManager : UserManager<MembersIdentityUser>, TInterface
-        {
             identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TUserManager));
             return identityBuilder;
         }

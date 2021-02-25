@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Common.Exceptions
+namespace Umbraco.Cms.Web.Common.Exceptions
 {
     /// <summary>
     /// Exception that occurs when an Umbraco form route string is invalid

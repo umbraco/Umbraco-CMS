@@ -51,12 +51,12 @@
   {
     param ( $semver )
 
-    $release = "" + $semver.Major + "." + $semver.Minor + "." + $semver.Patch
-
-    Write-Host "Update IIS Express port in csproj"
-    $updater = New-Object "Umbraco.Build.ExpressPortUpdater"
-    $csproj = "$($this.SolutionRoot)\src\Umbraco.Web.UI\Umbraco.Web.UI.csproj"
-    $updater.Update($csproj, $release)
+    $port = "" + $semver.Major + $semver.Minor + ("" + $semver.Patch).PadLeft(2, '0')
+    Write-Host "Update port in launchSettings.json to $port"
+    $filePath = "$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Properties\launchSettings.json"
+    $this.ReplaceFileText($filePath, `
+      "http://localhost:(\d+)?", `
+      "http://localhost:$port")
   })
 
   $ubuild.DefineMethod("SandboxNode",
@@ -355,11 +355,12 @@
     Write-Host "Copy template files"
     $this.CopyFiles("$templates", "*", "$tmp\Templates")
 
-    Write-Host "Copy program.cs and startup.cs for templates"
+    Write-Host "Copy files for dotnet templates"
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Program.cs", "$tmp\Templates\UmbracoSolution")
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\UmbracoSolution")
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.json", "$tmp\Templates\UmbracoSolution")
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.Development.json", "$tmp\Templates\UmbracoSolution")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\Views", "*", "$tmp\Templates\UmbracoSolution\Views")
 
   $this.RemoveDirectory("$tmp\Templates\UmbracoSolution\bin")
   })
@@ -477,7 +478,7 @@
   {
     $this.VerifyNuGetConsistency(
       ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Web"),
-      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI.NetCore", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.ModelsBuilder.Embedded", "Umbraco.Persistence.SqlCe"))
+      ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI.NetCore", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Persistence.SqlCe"))
     if ($this.OnError()) { return }
   })
 

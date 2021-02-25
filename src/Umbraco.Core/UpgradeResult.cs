@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models
+﻿namespace Umbraco.Cms.Core
 {
     public class UpgradeResult
     {

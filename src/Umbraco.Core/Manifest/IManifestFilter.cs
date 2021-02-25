@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 
-
-namespace Umbraco.Core.Manifest
+namespace Umbraco.Cms.Core.Manifest
 {
     /// <summary>
     /// Provides filtering for package manifests.

@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Actions
+namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// Defines a back office action that can be permission assigned or subscribed to for notifications

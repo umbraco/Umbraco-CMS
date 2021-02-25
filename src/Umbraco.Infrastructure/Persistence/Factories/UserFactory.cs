@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Factories
+namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     internal static class UserFactory
     {
@@ -65,7 +65,7 @@ namespace Umbraco.Core.Persistence.Factories
                 Login = entity.Username,
                 NoConsole = entity.IsLockedOut,
                 Password = entity.RawPasswordValue,
-                PasswordConfig = entity.PasswordConfiguration,                
+                PasswordConfig = entity.PasswordConfiguration,
                 UserLanguage = entity.Language,
                 UserName = entity.Name,
                 SecurityStampToken = entity.SecurityStamp,

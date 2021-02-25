@@ -2,12 +2,12 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.Install.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Install.InstallSteps
+namespace Umbraco.Cms.Core.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall,
         "StarterKitInstall", 31, "",

@@ -9,42 +9,44 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Events;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.Validation;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.ContentApps;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.BackOffice.ActionResults;
+using Umbraco.Cms.Web.BackOffice.Authorization;
+using Umbraco.Cms.Web.BackOffice.Extensions;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.ModelBinders;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Umbraco.Web.Actions;
-using Umbraco.Web.BackOffice.ActionResults;
-using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.Routing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used for editing content
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessDocuments)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
+    [ParameterSwapControllerActionSelector(nameof(GetNiceUrl), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class ContentController : ContentControllerBase
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -269,7 +271,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public ActionResult<ContentItemDisplay> GetRecycleBin()
         {
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "content", Core.Constants.DataTypes.DefaultMembersListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "content", Constants.DataTypes.DefaultMembersListView));
             apps[0].Active = true;
             var display = new ContentItemDisplay
             {
@@ -332,7 +334,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<ContentItemDisplay> GetById(int id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
@@ -351,7 +352,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<ContentItemDisplay> GetById(Guid id)
         {
             var foundContent = GetObjectFromRequest(() => _contentService.GetById(id));
@@ -371,7 +371,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <returns></returns>
         [OutgoingEditorModelEvent]
         [Authorize(Policy = AuthorizationPolicies.ContentPermissionBrowseById)]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<ContentItemDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;
@@ -389,7 +388,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
         [OutgoingEditorModelEvent]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<ContentItemDisplay> GetEmpty(string contentTypeAlias, int parentId)
         {
             var contentType = _contentTypeService.Get(contentTypeAlias);
@@ -398,7 +396,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            return GetEmpty(contentType, parentId);
+            return GetEmptyInner(contentType, parentId);
         }
 
 
@@ -416,10 +414,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            return GetEmpty(contentType, parentId);
+            return GetEmptyInner(contentType, parentId);
         }
 
-        private ContentItemDisplay GetEmpty(IContentType contentType, int parentId)
+        private ContentItemDisplay GetEmptyInner(IContentType contentType, int parentId)
         {
             var emptyContent = _contentService.Create("", parentId, contentType.Alias, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
@@ -436,8 +434,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [OutgoingEditorModelEvent]
-        [DetermineAmbiguousActionByPassingParameters]
-        public ActionResult<ContentItemDisplay> GetEmpty(int blueprintId, int parentId)
+        public ActionResult<ContentItemDisplay> GetEmptyBlueprint(int blueprintId, int parentId)
         {
             var blueprint = _contentService.GetBlueprintById(blueprintId);
             if (blueprint == null)
@@ -462,7 +459,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public IActionResult GetNiceUrl(int id)
         {
             var url = _publishedUrlProvider.GetUrl(id);
@@ -474,7 +470,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public IActionResult GetNiceUrl(Guid id)
         {
             var url = _publishedUrlProvider.GetUrl(id);
@@ -486,7 +481,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public IActionResult GetNiceUrl(Udi id)
         {
             var guidUdi = id as GuidUdi;
@@ -504,7 +498,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemBasic<ContentPropertyBasic>>), "Items")]
-        [DetermineAmbiguousActionByPassingParameters]
         public PagedResult<ContentItemBasic<ContentPropertyBasic>> GetChildren(
                 int id,
                 string includeProperties,
@@ -1641,7 +1634,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var toMoveResult = ValidateMoveOrCopy(move);
-            if (!(toMoveResult is null))
+            if (!(toMoveResult.Result is null))
             {
                 return toMoveResult.Result;
             }
@@ -1668,7 +1661,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
 
             var toCopyResult = ValidateMoveOrCopy(copy);
-            if ((toCopyResult.Result is null))
+            if (!(toCopyResult.Result is null))
             {
                 return toCopyResult.Result;
             }

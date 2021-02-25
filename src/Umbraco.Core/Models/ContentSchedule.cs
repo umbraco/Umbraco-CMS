@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a scheduled action for a document.

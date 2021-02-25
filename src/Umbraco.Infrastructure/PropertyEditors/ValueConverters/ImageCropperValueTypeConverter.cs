@@ -1,11 +1,14 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// Converts <see cref="ImageCropperValue"/> to string or JObject (why?).

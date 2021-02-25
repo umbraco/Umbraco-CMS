@@ -2,20 +2,18 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Umbraco.Core;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Extensions;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Net;
-using Umbraco.Web.Actions;
-using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Security;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Web.BackOffice.Authorization;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Security;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.DependencyInjection
+namespace Umbraco.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -38,15 +36,6 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
             services.ConfigureOptions<ConfigureBackOfficeSecurityStampValidatorOptions>();
         }
 
-        /// <summary>
-        /// Adds the services required for using Members Identity
-        /// </summary>
-        public static void AddMembersIdentity(this IServiceCollection services) =>
-            services.BuildMembersIdentity()
-                .AddDefaultTokenProviders()
-                .AddUserStore<MembersUserStore>()
-                .AddMembersUserManager<IMembersUserManager, MembersUserManager>();
-
         private static BackOfficeIdentityBuilder BuildUmbracoBackOfficeIdentity(this IServiceCollection services)
         {
             // Borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/IdentityServiceCollectionExtensions.cs#L33
@@ -67,7 +56,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
             // CUSTOM:
-            services.TryAddScoped<NoOpLookupNormalizer>();
+            services.TryAddScoped<NoopLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
             services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
             services.TryAddSingleton<IBackOfficeExternalLoginProviders, BackOfficeExternalLoginProviders>();
@@ -79,19 +68,10 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
              * To validate the container the following registrations are required (dependencies of UserManager<T>)
              * Perhaps we shouldn't be registering UserManager<T> at all and only registering/depending the UmbracoBackOffice prefixed types.
              */
-            services.TryAddScoped<ILookupNormalizer, NoOpLookupNormalizer>();
+            services.TryAddScoped<ILookupNormalizer, NoopLookupNormalizer>();
             services.TryAddScoped<IdentityErrorDescriber, BackOfficeIdentityErrorDescriber>();
 
             return new BackOfficeIdentityBuilder(services);
-        }
-
-        private static MembersIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
-        {
-            // Services used by Umbraco members identity
-            services.TryAddScoped<IUserValidator<MembersIdentityUser>, UserValidator<MembersIdentityUser>>();
-            services.TryAddScoped<IPasswordValidator<MembersIdentityUser>, PasswordValidator<MembersIdentityUser>>();
-            services.TryAddScoped<IPasswordHasher<MembersIdentityUser>, PasswordHasher<MembersIdentityUser>>();
-            return new MembersIdentityBuilder(services);
         }
 
         /// <summary>

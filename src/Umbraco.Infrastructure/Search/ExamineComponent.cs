@@ -4,22 +4,22 @@ using System.Globalization;
 using System.Linq;
 using Examine;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Changes;
-using Umbraco.Core.Sync;
-using Umbraco.Examine;
-using Umbraco.Web.Cache;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Cms.Infrastructure.Search
 {
-
-
-    public sealed class ExamineComponent : Umbraco.Core.Composing.IComponent
+    public sealed class ExamineComponent : IComponent
     {
         private readonly IExamineManager _examineManager;
         private readonly IContentValueSetBuilder _contentValueSetBuilder;

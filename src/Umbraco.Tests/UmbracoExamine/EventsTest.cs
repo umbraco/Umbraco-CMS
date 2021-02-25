@@ -1,7 +1,8 @@
 ﻿using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Tests.Testing;
-using Umbraco.Examine;
 
 namespace Umbraco.Tests.UmbracoExamine
 {

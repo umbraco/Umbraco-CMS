@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Migrations.PostMigrations;
+﻿using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_1
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1
 {
     public class ChangeNuCacheJsonFormat : MigrationBase
     {

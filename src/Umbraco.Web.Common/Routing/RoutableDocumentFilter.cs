@@ -7,12 +7,11 @@ using System.Threading;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.Routing.Template;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Web.Common.Routing
 {
     /// <summary>
     /// Utility class used to check if the current request is for a front-end request
@@ -71,7 +70,7 @@ namespace Umbraco.Web.Common.Routing
             // /foo/bar/nil/
             // where /foo is not a reserved path
 
-            // if the path contains an extension 
+            // if the path contains an extension
             // then it cannot be a document request
             var extension = Path.GetExtension(absPath);
             if (maybeDoc && !extension.IsNullOrWhiteSpace())
@@ -178,7 +177,19 @@ namespace Umbraco.Web.Common.Routing
                     // We don't want to include dynamic endpoints in this check since we would have no idea if that
                     // matches since they will probably match everything.
                     bool isDynamic = x.Metadata.OfType<IDynamicEndpointMetadata>().Any(x => x.IsDynamic);
-                    return !isDynamic;
+                    if (isDynamic)
+                    {
+                        return false;
+                    }
+
+                    // filter out matched endpoints that are suppressed
+                    var isSuppressed = x.Metadata.OfType<ISuppressMatchingMetadata>().FirstOrDefault()?.SuppressMatching == true;
+                    if (isSuppressed)
+                    {
+                        return false;
+                    }
+
+                    return true;
                 });
 
             var routeValues = new RouteValueDictionary();

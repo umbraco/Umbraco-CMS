@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Web.Install.InstallSteps;
-using Umbraco.Web.Install.Models;
+using Umbraco.Cms.Core.Install.InstallSteps;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
-namespace Umbraco.Web.Install
+namespace Umbraco.Cms.Infrastructure.Install
 {
     public sealed class InstallStepCollection
     {

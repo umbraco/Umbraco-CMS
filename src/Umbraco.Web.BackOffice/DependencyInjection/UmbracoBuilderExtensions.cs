@@ -3,25 +3,25 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Services;
-using Umbraco.Extensions;
-using Umbraco.Infrastructure.DependencyInjection;
-using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Middleware;
-using Umbraco.Web.BackOffice.Routing;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.BackOffice.Services;
-using Umbraco.Web.BackOffice.Trees;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.DependencyInjection;
-using Umbraco.Web.WebAssets;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Infrastructure.WebAssets;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.Middleware;
+using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
+using Umbraco.Cms.Web.BackOffice.Routing;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.BackOffice.Services;
+using Umbraco.Cms.Web.BackOffice.Trees;
+using Umbraco.Cms.Web.Common.Authorization;
 
-namespace Umbraco.Web.BackOffice.DependencyInjection
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the Umbraco back office
@@ -46,7 +46,8 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
                 .AddWebServer()
                 .AddPreviewSupport()
                 .AddHostedServices()
-                .AddDistributedCache();
+                .AddDistributedCache()
+                .AddModelsBuilderDashboard();
 
         /// <summary>
         /// Adds Umbraco back office authentication requirements
@@ -61,18 +62,18 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
                 .AddAuthentication()
 
                 // Add our custom schemes which are cookie handlers
-                .AddCookie(Core.Constants.Security.BackOfficeAuthenticationType)
-                .AddCookie(Core.Constants.Security.BackOfficeExternalAuthenticationType, o =>
+                .AddCookie(Constants.Security.BackOfficeAuthenticationType)
+                .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
                 {
-                    o.Cookie.Name = Core.Constants.Security.BackOfficeExternalAuthenticationType;
+                    o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
                     o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                 })
 
                 // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
                 // they don't have to worry about manually adding this scheme or modifying the sign in manager
-                .AddCookie(Core.Constants.Security.BackOfficeTwoFactorAuthenticationType, o =>
+                .AddCookie(Constants.Security.BackOfficeTwoFactorAuthenticationType, o =>
                 {
-                    o.Cookie.Name = Core.Constants.Security.BackOfficeTwoFactorAuthenticationType;
+                    o.Cookie.Name = Constants.Security.BackOfficeTwoFactorAuthenticationType;
                     o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                 });
 
@@ -108,7 +109,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
         /// <summary>
         /// Adds Umbraco back office authorization policies
         /// </summary>
-        public static IUmbracoBuilder AddBackOfficeAuthorizationPolicies(this IUmbracoBuilder builder, string backOfficeAuthenticationScheme = Core.Constants.Security.BackOfficeAuthenticationType)
+        public static IUmbracoBuilder AddBackOfficeAuthorizationPolicies(this IUmbracoBuilder builder, string backOfficeAuthenticationScheme = Constants.Security.BackOfficeAuthenticationType)
         {
             builder.Services.AddBackOfficeAuthorizationPolicies(backOfficeAuthenticationScheme);
 

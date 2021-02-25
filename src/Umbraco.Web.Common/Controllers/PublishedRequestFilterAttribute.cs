@@ -2,10 +2,10 @@ using System;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.Routing;
 
-namespace Umbraco.Web.Common.Controllers
+namespace Umbraco.Cms.Web.Common.Controllers
 {
     /// <summary>
     /// Deals with custom headers for the umbraco request
@@ -17,12 +17,13 @@ namespace Umbraco.Web.Common.Controllers
         /// </summary>
         protected UmbracoRouteValues GetUmbracoRouteValues(ResultExecutingContext context)
         {
-            if (!context.RouteData.Values.TryGetValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken, out var def))
+            UmbracoRouteValues routeVals = context.HttpContext.Features.Get<UmbracoRouteValues>();
+            if (routeVals == null)
             {
-                throw new InvalidOperationException($"No route value found with key {Core.Constants.Web.UmbracoRouteDefinitionDataToken}");
+                throw new InvalidOperationException($"No {nameof(UmbracoRouteValues)} feature was found in the HttpContext");
             }
 
-            return (UmbracoRouteValues)def;
+            return routeVals;
         }
 
         /// <summary>

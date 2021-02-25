@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// Exposes an instance unique identifier.

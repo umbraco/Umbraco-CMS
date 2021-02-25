@@ -4,14 +4,12 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Models.Membership;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Core.Security
 {
-
     /// <summary>
     /// A user manager for Umbraco (either back office users or front-end members)
     /// </summary>
@@ -224,6 +222,28 @@ namespace Umbraco.Infrastructure.Security
         /// </returns>
         Task<IdentityResult> CreateAsync(TUser user);
 
+        /// <summary>
+        /// Gets a list of role names the specified user belongs to.
+        /// </summary>
+        /// <param name="user">The user whose role names to retrieve.</param>
+        /// <returns>The Task that represents the asynchronous operation, containing a list of role names.</returns>
+        Task<IList<string>> GetRolesAsync(TUser user);
+
+        /// <summary>
+        /// Removes the specified user from the named roles.
+        /// </summary>
+        /// <param name="user">The user to remove from the named roles.</param>
+        /// <param name="roles">The name of the roles to remove the user from.</param>
+        /// <returns>The Task that represents the asynchronous operation, containing the IdentityResult of the operation.</returns>
+        Task<IdentityResult> RemoveFromRolesAsync(TUser user, IEnumerable<string> roles);
+
+        /// <summary>
+        /// Add the specified user to the named roles
+        /// </summary>
+        /// <param name="user">The user to add to the named roles</param>
+        /// <param name="roles">The name of the roles to add the user to.</param>
+        /// <returns>The Task that represents the asynchronous operation, containing the IdentityResult of the operation</returns>
+        Task<IdentityResult> AddToRolesAsync(TUser user, IEnumerable<string> roles);
 
         /// <summary>
         /// Creates the specified <paramref name="user"/> in the backing store with a password,

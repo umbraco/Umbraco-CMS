@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Data;
 using System.Data.Common;
-using NPoco;
 using Transaction = System.Transactions.Transaction;
 
-namespace Umbraco.Core.Persistence.FaultHandling
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
 {
     class RetryDbConnection : DbConnection
     {

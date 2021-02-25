@@ -3,25 +3,29 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
+    [ParameterSwapControllerActionSelector(nameof(GetAllowedChildren), "contentId", typeof(int), typeof(Guid), typeof(Udi))]
     public class MediaTypeController : ContentTypeControllerBase<IMediaType>
     {
         // TODO: Split this controller apart so that authz is consistent, currently we need to authz each action individually.
@@ -74,7 +78,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
         public ActionResult<MediaTypeDisplay> GetById(int id)
         {
@@ -93,7 +96,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
         public ActionResult<MediaTypeDisplay> GetById(Guid id)
         {
@@ -112,7 +114,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
         public ActionResult<MediaTypeDisplay> GetById(Udi id)
         {
@@ -338,7 +339,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentId"></param>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
-        [DetermineAmbiguousActionByPassingParameters]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)
@@ -385,7 +385,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentId"></param>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<IEnumerable<ContentTypeBasic>> GetAllowedChildren(Guid contentId)
         {
             var entity = _entityService.Get(contentId);
@@ -402,7 +401,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentId"></param>
         [Authorize(Policy = AuthorizationPolicies.TreeAccessMediaOrMediaTypes)]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<IEnumerable<ContentTypeBasic>> GetAllowedChildren(Udi contentId)
         {
             var guidUdi = contentId as GuidUdi;

@@ -86,7 +86,7 @@
       <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
     <PackageReference Include="HtmlAgilityPack">
-      <Version>1.11.24</Version>
+      <Version>1.11.30</Version>
     </PackageReference>
     <PackageReference Include="Lucene.Net.Contrib" Version="3.0.3" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
@@ -198,8 +198,6 @@
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
     <Compile Include="Web\PublishedContentQueryTests.cs" />
-    <Compile Include="Web\Mvc\SurfaceControllerTests.cs" />
-    <Compile Include="Web\Mvc\MergeParentContextViewDataAttributeTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
@@ -217,12 +215,10 @@
     <Compile Include="Routing\ContentFinderByAliasWithDomainsTests.cs" />
     <Compile Include="Routing\DomainsAndCulturesTests.cs" />
     <Compile Include="Routing\UrlsWithNestedDomains.cs" />
-    <Compile Include="Web\Controllers\PluginControllerAreaTests.cs" />
     <Compile Include="TestHelpers\TestWithDatabaseBase.cs" />
     <Compile Include="Routing\ContentFinderByAliasTests.cs" />
     <Compile Include="Routing\ContentFinderByIdTests.cs" />
     <Compile Include="Routing\ContentFinderByPageIdQueryTests.cs" />
-    <Compile Include="Routing\RenderRouteHandlerTests.cs" />
     <Compile Include="Routing\RouteTestExtensions.cs" />
     <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseUsingSqlCeSyntax.cs" />
@@ -243,7 +239,6 @@
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TestHelpers\FakeHttpContextFactory.cs" />
-    <Compile Include="Routing\UmbracoModuleTests.cs" />
     <Compile Include="LegacyXmlPublishedCache\DictionaryPublishedContent.cs" />
     <Compile Include="LegacyXmlPublishedCache\DomainCache.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewContent.cs" />
@@ -317,7 +312,7 @@
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Persistence\SyntaxProvider" />
+    <Folder Include="Persistence\SyntaxProvider\" />
   </ItemGroup>
   <!-- get NuGet packages directory -->
   <PropertyGroup>

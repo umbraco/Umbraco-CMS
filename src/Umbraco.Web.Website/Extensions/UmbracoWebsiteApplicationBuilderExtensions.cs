@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Web.Website.Routing;
+using Umbraco.Cms.Web.Website.Routing;
 
 namespace Umbraco.Extensions
 {
@@ -37,6 +37,9 @@ namespace Umbraco.Extensions
         {
             app.UseEndpoints(endpoints =>
             {
+                FrontEndRoutes surfaceRoutes = app.ApplicationServices.GetRequiredService<FrontEndRoutes>();
+                surfaceRoutes.CreateRoutes(endpoints);
+
                 endpoints.MapDynamicControllerRoute<UmbracoRouteValueTransformer>("/{**slug}");
             });
 

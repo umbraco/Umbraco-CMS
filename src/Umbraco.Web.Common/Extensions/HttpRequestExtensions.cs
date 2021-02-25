@@ -1,11 +1,10 @@
-using System.IO;
+﻿using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core;
-using Umbraco.Core.Routing;
+using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Extensions
 {
@@ -18,7 +17,7 @@ namespace Umbraco.Extensions
         /// Check if a preview cookie exist
         /// </summary>
         public static bool HasPreviewCookie(this HttpRequest request)
-            => request.Cookies.TryGetValue(Constants.Web.PreviewCookieName, out var cookieVal) && !cookieVal.IsNullOrWhiteSpace();
+            => request.Cookies.TryGetValue(Cms.Core.Constants.Web.PreviewCookieName, out var cookieVal) && !cookieVal.IsNullOrWhiteSpace();
 
         /// <summary>
         /// Returns true if the request is a back office request
@@ -74,24 +73,37 @@ namespace Umbraco.Extensions
 
         public static string GetRawBodyString(this HttpRequest request, Encoding encoding = null)
         {
-            request.Body.Seek(0, SeekOrigin.Begin);
+            if (request.Body.CanSeek)
+            {
+                request.Body.Seek(0, SeekOrigin.Begin);
+            }
 
             using (var reader = new StreamReader(request.Body, encoding ?? Encoding.UTF8, leaveOpen: true))
             {
                 var result = reader.ReadToEnd();
-                request.Body.Seek(0, SeekOrigin.Begin);
+                if (request.Body.CanSeek)
+                {
+                    request.Body.Seek(0, SeekOrigin.Begin);
+                }
+
                 return result;
             }
         }
 
         public static async Task<string> GetRawBodyStringAsync(this HttpRequest request, Encoding encoding = null)
         {
+            if (!request.Body.CanSeek)
+            {
+                request.EnableBuffering();
+            }
+
             request.Body.Seek(0, SeekOrigin.Begin);
 
             using (var reader = new StreamReader(request.Body, encoding ?? Encoding.UTF8, leaveOpen: true))
             {
                 var result = await reader.ReadToEndAsync();
                 request.Body.Seek(0, SeekOrigin.Begin);
+
                 return result;
             }
         }

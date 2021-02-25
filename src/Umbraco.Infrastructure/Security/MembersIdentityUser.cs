@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Core;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// The identity user used for the member
@@ -56,7 +56,7 @@ namespace Umbraco.Infrastructure.Security
             user.EnableChangeTracking();
             return user;
         }
-        
+
         /// <summary>
         /// Gets or sets the member's real name
         /// </summary>
@@ -89,7 +89,7 @@ namespace Umbraco.Infrastructure.Security
                 foreach (IdentityUserRole<string> identityUserRole in _groups.Select(x => new IdentityUserRole<string>
                 {
                     RoleId = x.Alias,
-                    UserId = Id?.ToString()
+                    UserId = Id
                 }))
                 {
                     roles.Add(identityUserRole);

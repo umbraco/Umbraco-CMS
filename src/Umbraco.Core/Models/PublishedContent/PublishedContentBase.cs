@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Provide an abstract base class for <c>IPublishedContent</c> implementations.

@@ -1,13 +1,17 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Core.Security
 {
     public class IdentityMapDefinition : IMapDefinition
     {
@@ -96,13 +100,13 @@ namespace Umbraco.Infrastructure.Security
             target.UserName = source.Username;
             target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
             target.LastLoginDateUtc = source.LastLoginDate.ToUniversalTime();
-            //target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
+            target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
             target.Name = source.Name;
             target.AccessFailedCount = source.FailedPasswordAttempts;
             target.PasswordHash = GetPasswordHash(source.RawPasswordValue);
             target.PasswordConfig = source.PasswordConfiguration;
             target.IsApproved = source.IsApproved;
-            //target.SecurityStamp = source.SecurityStamp;
+            target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
 
             // NB: same comments re AutoMapper as per BackOfficeUser

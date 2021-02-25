@@ -1,14 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     /// <summary>
     /// A provider that just generates insert commands
     /// </summary>
     public class BasicBulkSqlInsertProvider : IBulkSqlInsertProvider
     {
-        public string ProviderName => Constants.DatabaseProviders.SqlServer;
+        public string ProviderName => Cms.Core.Constants.DatabaseProviders.SqlServer;
 
         public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
         {

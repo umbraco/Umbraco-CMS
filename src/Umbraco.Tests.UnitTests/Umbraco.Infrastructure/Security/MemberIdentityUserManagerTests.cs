@@ -9,13 +9,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Security;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Net;
-using Umbraco.Web.Common.Security;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.Common.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 {
     [TestFixture]
     public class MemberIdentityUserManagerTests
@@ -31,7 +30,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
         private Mock<ILogger<UserManager<MembersIdentityUser>>> _mockLogger;
         private Mock<IOptions<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
 
-        public MembersUserManager CreateSut()
+        public MemberManager CreateSut()
         {
             _mockMemberStore = new Mock<IUserStore<MembersIdentityUser>>();
             _mockIdentityOptions = new Mock<IOptions<MembersIdentityOptions>>();
@@ -54,7 +53,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
             _mockPasswordConfiguration.Setup(x => x.Value).Returns(() =>
                 new MemberPasswordConfigurationSettings()
                 {
-                    
+
                 });
 
             var pwdValidators = new List<PasswordValidator<MembersIdentityUser>>
@@ -62,7 +61,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
                 new PasswordValidator<MembersIdentityUser>()
             };
 
-            var userManager = new MembersUserManager(
+            var userManager = new MemberManager(
                 new Mock<IIpResolver>().Object,
                 _mockMemberStore.Object,
                 _mockIdentityOptions.Object,
@@ -87,7 +86,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenICreateUser_AndTheIdentityResultFailed_ThenIShouldGetAFailedResultAsync()
         {
             //arrange
-            MembersUserManager sut = CreateSut();
+            MemberManager sut = CreateSut();
             MembersIdentityUser fakeUser = new MembersIdentityUser()
             {
                 PasswordConfig = "testConfig"
@@ -120,7 +119,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
         {
             //arrange
-            MembersUserManager sut = CreateSut();
+            MemberManager sut = CreateSut();
             CancellationToken fakeCancellationToken = new CancellationToken() { };
             IdentityError[] identityErrors =
             {
@@ -148,7 +147,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenICreateANewUser_AndTheUserIsPopulatedCorrectly_ThenIShouldGetASuccessResultAsync()
         {
             //arrange
-            MembersUserManager sut = CreateSut();
+            MemberManager sut = CreateSut();
             MembersIdentityUser fakeUser = new MembersIdentityUser()
             {
                 PasswordConfig = "testConfig"

@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.Migrations
+namespace Umbraco.Cms.Core.Migrations
 {
     /// <summary>
     /// Represents a migration.

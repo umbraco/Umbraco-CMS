@@ -1,6 +1,4 @@
-using Umbraco.Web.Models.Trees;
-
-namespace Umbraco.Web.Trees
+namespace Umbraco.Cms.Core.Trees
 {
 
     /// <summary>

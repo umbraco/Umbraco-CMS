@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Models.TemplateQuery
+﻿namespace Umbraco.Cms.Core.Models.TemplateQuery
 {
     public class SourceModel
     {

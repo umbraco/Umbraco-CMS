@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models
+﻿namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Enum representing the taggable object types

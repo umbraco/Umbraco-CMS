@@ -4,12 +4,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using Moq;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders.Extensions;
-using Umbraco.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class UserGroupBuilder : UserGroupBuilder<object>
     {

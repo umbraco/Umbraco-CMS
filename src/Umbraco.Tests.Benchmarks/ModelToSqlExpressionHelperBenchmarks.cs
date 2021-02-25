@@ -2,13 +2,12 @@
 using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
 using Moq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Infrastructure.Persistence.Mappers;
-using Umbraco.Persistence.SqlCe;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Persistence.SqlCe;
 
 namespace Umbraco.Tests.Benchmarks
 {

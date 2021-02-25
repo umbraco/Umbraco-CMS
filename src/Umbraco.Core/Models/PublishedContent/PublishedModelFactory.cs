@@ -1,9 +1,9 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Implements a strongly typed content model factory
@@ -17,8 +17,11 @@ namespace Umbraco.Core.Models.PublishedContent
         private class ModelInfo
         {
             public Type ParameterType { get; set; }
+
             public Func<object, IPublishedValueFallback, object> Ctor { get; set; }
+
             public Type ModelType { get; set; }
+
             public Func<IList> ListCtor { get; set; }
         }
 
@@ -36,8 +39,7 @@ namespace Umbraco.Core.Models.PublishedContent
         /// PublishedContentModelFactoryResolver.Current.SetFactory(factory);
         /// </code>
         /// </remarks>
-        public PublishedModelFactory(IEnumerable<Type> types,
-            IPublishedValueFallback publishedValueFallback)
+        public PublishedModelFactory(IEnumerable<Type> types, IPublishedValueFallback publishedValueFallback)
         {
             var modelInfos = new Dictionary<string, ModelInfo>(StringComparer.InvariantCultureIgnoreCase);
             var modelTypeMap = new Dictionary<string, Type>(StringComparer.InvariantCultureIgnoreCase);

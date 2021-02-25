@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -11,19 +11,20 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Web;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Mvc;
-using Umbraco.Web.Common.Security;
-using Umbraco.Web.Website.Collections;
-using Umbraco.Web.Website.Controllers;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.Web.Mvc;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Mvc;
+using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Web.Website.Collections;
+using Umbraco.Cms.Web.Website.Controllers;
 
 namespace Umbraco.Extensions
 {
@@ -32,35 +33,21 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class HtmlHelperRenderExtensions
     {
-       private static T GetRequiredService<T>(IHtmlHelper htmlHelper)
-       {
-           return GetRequiredService<T>(htmlHelper.ViewContext);
-       }
+        private static T GetRequiredService<T>(IHtmlHelper htmlHelper)
+            => GetRequiredService<T>(htmlHelper.ViewContext);
 
         private static T GetRequiredService<T>(ViewContext viewContext)
-       {
-           return viewContext.HttpContext.RequestServices.GetRequiredService<T>();
-       }
+            => viewContext.HttpContext.RequestServices.GetRequiredService<T>();
 
         /// <summary>
         /// Renders the markup for the profiler
         /// </summary>
-        /// <param name="helper"></param>
-        /// <returns></returns>
         public static IHtmlContent RenderProfiler(this IHtmlHelper helper)
-        {
-            return new HtmlString(GetRequiredService<IProfilerHtml>(helper).Render());
-        }
+            => new HtmlString(GetRequiredService<IProfilerHtml>(helper).Render());
 
         /// <summary>
         /// Renders a partial view that is found in the specified area
         /// </summary>
-        /// <param name="helper"></param>
-        /// <param name="partial"></param>
-        /// <param name="area"></param>
-        /// <param name="model"></param>
-        /// <param name="viewData"></param>
-        /// <returns></returns>
         public static IHtmlContent AreaPartial(this IHtmlHelper helper, string partial, string area, object model = null, ViewDataDictionary viewData = null)
         {
             var originalArea = helper.ViewContext.RouteData.DataTokens["area"];
@@ -74,8 +61,6 @@ namespace Umbraco.Extensions
         /// Will render the preview badge when in preview mode which is not required ever unless the MVC page you are
         /// using does not inherit from UmbracoViewPage
         /// </summary>
-        /// <param name="helper"></param>
-        /// <returns></returns>
         /// <remarks>
         /// See: http://issues.umbraco.org/issue/U4-1614
         /// </remarks>
@@ -85,13 +70,15 @@ namespace Umbraco.Extensions
             if (umbrcoContext.InPreviewMode)
             {
                 var htmlBadge =
-                    String.Format(contentSettings.PreviewBadge,
-                                ioHelper.ResolveUrl(globalSettings.UmbracoPath),
-                                  WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
-                                umbrcoContext.PublishedRequest.PublishedContent.Id);
+                    string.Format(
+                        contentSettings.PreviewBadge,
+                        ioHelper.ResolveUrl(globalSettings.UmbracoPath),
+                        WebUtility.UrlEncode(httpContextAccessor.GetRequiredHttpContext().Request.Path),
+                        umbrcoContext.PublishedRequest.PublishedContent.Id);
                 return new HtmlString(htmlBadge);
             }
-            return new HtmlString("");
+
+            return HtmlString.Empty;
 
         }
 
@@ -106,9 +93,9 @@ namespace Umbraco.Extensions
             Func<object, ViewDataDictionary, string> contextualKeyBuilder = null)
         {
             var cacheKey = new StringBuilder(partialViewName);
-             //let's always cache by the current culture to allow variants to have different cache results
+            // let's always cache by the current culture to allow variants to have different cache results
             var cultureName = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
-            if (!String.IsNullOrEmpty(cultureName))
+            if (!string.IsNullOrEmpty(cultureName))
             {
                 cacheKey.AppendFormat("{0}-", cultureName);
             }
@@ -120,16 +107,19 @@ namespace Umbraco.Extensions
                 {
                     throw new InvalidOperationException("Cannot cache by page if the UmbracoContext has not been initialized, this parameter can only be used in the context of an Umbraco request");
                 }
+
                 cacheKey.AppendFormat("{0}-", umbracoContext.PublishedRequest?.PublishedContent?.Id ?? 0);
             }
+
             if (cacheByMember)
             {
-                //TODO reintroduce when members are migrated
+                // TODO reintroduce when members are migrated
                 throw new NotImplementedException("Reintroduce when members are migrated");
-                    // var helper = Current.MembershipHelper;
+                // var helper = Current.MembershipHelper;
                 // var currentMember = helper.GetCurrentMember();
                 // cacheKey.AppendFormat("m{0}-", currentMember?.Id ?? 0);
             }
+
             if (contextualKeyBuilder != null)
             {
                 var contextualKey = contextualKeyBuilder(model, viewData);
@@ -163,34 +153,29 @@ namespace Umbraco.Extensions
         /// A validation summary that lets you pass in a prefix so that the summary only displays for elements
         /// containing the prefix. This allows you to have more than on validation summary on a page.
         /// </summary>
-        /// <param name="htmlHelper"></param>
-        /// <param name="prefix"></param>
-        /// <param name="excludePropertyErrors"></param>
-        /// <param name="message"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <returns></returns>
-        public static IHtmlContent ValidationSummary(this IHtmlHelper htmlHelper,
-                                                     string prefix = "",
-                                                     bool excludePropertyErrors = false,
-                                                     string message = "",
-                                                     object htmlAttributes = null)
+        public static IHtmlContent ValidationSummary(
+            this IHtmlHelper htmlHelper,
+            string prefix = "",
+            bool excludePropertyErrors = false,
+            string message = "",
+            object htmlAttributes = null)
         {
             if (prefix.IsNullOrWhiteSpace())
             {
                 return htmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
             }
 
-
-
-
             var htmlGenerator = GetRequiredService<IHtmlGenerator>(htmlHelper);
 
             var viewContext = htmlHelper.ViewContext.Clone();
-            foreach (var key in viewContext.ViewData.Keys.ToArray()){
-                 if(!key.StartsWith(prefix)){
+            foreach (var key in viewContext.ViewData.Keys.ToArray())
+            {
+                if (!key.StartsWith(prefix))
+                {
                     viewContext.ViewData.Remove(key);
-                 }
-             }
+                }
+            }
+
             var tagBuilder = htmlGenerator.GenerateValidationSummary(
                 viewContext,
                 excludePropertyErrors,
@@ -205,75 +190,112 @@ namespace Umbraco.Extensions
             return tagBuilder;
         }
 
-// TODO what to do here? This will be view components right?
-        // /// <summary>
-        // /// Returns the result of a child action of a strongly typed SurfaceController
-        // /// </summary>
-        // /// <typeparam name="T"></typeparam>
-        // /// <param name="htmlHelper"></param>
-        // /// <param name="actionName"></param>
-        // /// <returns></returns>
-        // public static IHtmlContent Action<T>(this IHtmlHelper htmlHelper, string actionName)
-        //     where T : SurfaceController
-        // {
-        //     return htmlHelper.Action(actionName, typeof(T));
-        // }
-        //
+        /// <summary>
+        /// Returns the result of a child action of a strongly typed SurfaceController
+        /// </summary>
+        /// <typeparam name="T">The <see cref="SurfaceController"/></typeparam>
+        public static IHtmlContent ActionLink<T>(this IHtmlHelper htmlHelper, string actionName)
+            where T : SurfaceController => htmlHelper.ActionLink(actionName, typeof(T));
 
-// TODO what to do here? This will be view components right?
-        // /// <summary>
-        // /// Returns the result of a child action of a SurfaceController
-        // /// </summary>
-        // /// <typeparam name="T"></typeparam>
-        // /// <param name="htmlHelper"></param>
-        // /// <param name="actionName"></param>
-        // /// <param name="surfaceType"></param>
-        // /// <returns></returns>
-        // public static IHtmlContent Action(this IHtmlHelper htmlHelper, string actionName, Type surfaceType)
-        // {
-        //     if (actionName == null) throw new ArgumentNullException(nameof(actionName));
-        //     if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
-        //     if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
-        //
-        //     var routeVals = new RouteValueDictionary(new {area = ""});
-        //
-        //     var surfaceControllerTypeCollection = GetRequiredService<SurfaceControllerTypeCollection>(htmlHelper);
-        //     var surfaceController = surfaceControllerTypeCollection.SingleOrDefault(x => x == surfaceType);
-        //     if (surfaceController == null)
-        //         throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
-        //     var metaData = PluginController.GetMetadata(surfaceController);
-        //     if (!metaData.AreaName.IsNullOrWhiteSpace())
-        //     {
-        //         //set the area to the plugin area
-        //         if (routeVals.ContainsKey("area"))
-        //         {
-        //             routeVals["area"] = metaData.AreaName;
-        //         }
-        //         else
-        //         {
-        //             routeVals.Add("area", metaData.AreaName);
-        //         }
-        //     }
-        //
-        //     return htmlHelper.Action(actionName, metaData.ControllerName, routeVals);
-        // }
+        /// <summary>
+        /// Returns the result of a child action of a SurfaceController
+        /// </summary>
+        public static IHtmlContent ActionLink(this IHtmlHelper htmlHelper, string actionName, Type surfaceType)
+        {
+            if (actionName == null)
+            {
+                throw new ArgumentNullException(nameof(actionName));
+            }
 
-        #region BeginUmbracoForm
+            if (string.IsNullOrWhiteSpace(actionName))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
+            }
+
+            if (surfaceType == null)
+            {
+                throw new ArgumentNullException(nameof(surfaceType));
+            }
+
+            SurfaceControllerTypeCollection surfaceControllerTypeCollection = GetRequiredService<SurfaceControllerTypeCollection>(htmlHelper);
+            Type surfaceController = surfaceControllerTypeCollection.SingleOrDefault(x => x == surfaceType);
+            if (surfaceController == null)
+            {
+                throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
+            }
+
+            var routeVals = new RouteValueDictionary(new { area = "" });
+
+            PluginControllerMetadata metaData = PluginController.GetMetadata(surfaceController);
+            if (!metaData.AreaName.IsNullOrWhiteSpace())
+            {
+                // set the area to the plugin area
+                if (routeVals.ContainsKey("area"))
+                {
+                    routeVals["area"] = metaData.AreaName;
+                }
+                else
+                {
+                    routeVals.Add("area", metaData.AreaName);
+                }
+            }
+
+            return htmlHelper.ActionLink(actionName, metaData.ControllerName, routeVals);
+        }
+
+        /// <summary>
+        /// Outputs the hidden html input field for Surface Controller route information
+        /// </summary>
+        /// <typeparam name="TSurface">The <see cref="SurfaceController"/> type</typeparam>
+        /// <remarks>
+        /// Typically not used directly because BeginUmbracoForm automatically outputs this value when routing
+        /// for surface controllers. But this could be used in case a form tag is manually created.
+        /// </remarks>
+        public static IHtmlContent SurfaceControllerHiddenInput<TSurface>(
+            this IHtmlHelper htmlHelper,
+            string controllerAction,
+            string area,
+            object additionalRouteVals = null)
+            where TSurface : SurfaceController
+        {
+            var inputField = GetSurfaceControllerHiddenInput(
+                GetRequiredService<IDataProtectionProvider>(htmlHelper),
+                ControllerExtensions.GetControllerName<TSurface>(),
+                controllerAction,
+                area,
+                additionalRouteVals);
+
+            return new HtmlString(inputField);
+        }
+
+        private static string GetSurfaceControllerHiddenInput(
+            IDataProtectionProvider dataProtectionProvider,
+            string controllerName,
+            string controllerAction,
+            string area,
+            object additionalRouteVals = null)
+        {
+            var encryptedString = EncryptionHelper.CreateEncryptedRouteString(
+                dataProtectionProvider,
+                controllerName,
+                controllerAction,
+                area,
+                additionalRouteVals);
+
+            return "<input name=\"ufprt\" type=\"hidden\" value=\"" + encryptedString + "\" />";
+        }
 
         /// <summary>
         /// Used for rendering out the Form for BeginUmbracoForm
         /// </summary>
         internal class UmbracoForm : MvcForm
         {
+            private readonly ViewContext _viewContext;
+            private readonly string _surfaceControllerInput;
+
             /// <summary>
-            /// Creates an UmbracoForm
+            /// Initializes a new instance of the <see cref="UmbracoForm"/> class.
             /// </summary>
-            /// <param name="viewContext"></param>
-            /// <param name="htmlEncoder"></param>
-            /// <param name="controllerName"></param>
-            /// <param name="controllerAction"></param>
-            /// <param name="area"></param>
-            /// <param name="additionalRouteVals"></param>
             public UmbracoForm(
                 ViewContext viewContext,
                 HtmlEncoder htmlEncoder,
@@ -284,35 +306,25 @@ namespace Umbraco.Extensions
                 : base(viewContext, htmlEncoder)
             {
                 _viewContext = viewContext;
-                _controllerName = controllerName;
-                _encryptedString = EncryptionHelper.CreateEncryptedRouteString(GetRequiredService<IDataProtectionProvider>(viewContext), controllerName, controllerAction, area, additionalRouteVals);
+                _surfaceControllerInput = GetSurfaceControllerHiddenInput(
+                    GetRequiredService<IDataProtectionProvider>(viewContext),
+                    controllerName,
+                    controllerAction,
+                    area,
+                    additionalRouteVals);
             }
 
-            private readonly ViewContext _viewContext;
-            private bool _disposed;
-            private readonly string _encryptedString;
-            private readonly string _controllerName;
-
-            protected new void Dispose()
+            protected override void GenerateEndForm()
             {
-                if (this._disposed)
-                    return;
-                this._disposed = true;
-                //Detect if the call is targeting UmbRegisterController/UmbProfileController/UmbLoginStatusController/UmbLoginController and if it is we automatically output a AntiForgeryToken()
-                // We have a controllerName and area so we can match
-                if (_controllerName == "UmbRegister"
-                    || _controllerName == "UmbProfile"
-                    || _controllerName == "UmbLoginStatus"
-                    || _controllerName == "UmbLogin")
-                {
-                     var antiforgery = _viewContext.HttpContext.RequestServices.GetRequiredService<IAntiforgery>();
-                    _viewContext.Writer.Write(antiforgery.GetHtml(_viewContext.HttpContext).ToString());
-                }
+                // Always output an anti-forgery token
+                IAntiforgery antiforgery = _viewContext.HttpContext.RequestServices.GetRequiredService<IAntiforgery>();
+                IHtmlContent antiforgeryHtml = antiforgery.GetHtml(_viewContext.HttpContext);
+                _viewContext.Writer.Write(antiforgeryHtml.ToHtmlString());
 
-                //write out the hidden surface form routes
-                _viewContext.Writer.Write("<input name=\"ufprt\" type=\"hidden\" value=\"" + _encryptedString + "\" />");
+                // write out the hidden surface form routes
+                _viewContext.Writer.Write(_surfaceControllerInput);
 
-                base.Dispose();
+                base.GenerateEndForm();
             }
         }
 
@@ -323,104 +335,79 @@ namespace Umbraco.Extensions
         /// <param name="action">Name of the action.</param>
         /// <param name="controllerName">Name of the controller.</param>
         /// <param name="method">The method.</param>
-        /// <returns></returns>
+        /// <returns>the <see cref="MvcForm"/></returns>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, FormMethod method)
-        {
-            return html.BeginUmbracoForm(action, controllerName, null, new Dictionary<string, object>(), method);
-        }
+            => html.BeginUmbracoForm(action, controllerName, null, new Dictionary<string, object>(), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName)
-        {
-            return html.BeginUmbracoForm(action, controllerName, null, new Dictionary<string, object>());
-        }
+            => html.BeginUmbracoForm(action, controllerName, null, new Dictionary<string, object>());
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, object additionalRouteVals, FormMethod method)
-        {
-            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object>(), method);
-        }
+            => html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object>(), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, object additionalRouteVals)
-        {
-            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object>());
-        }
+            => html.BeginUmbracoForm(action, controllerName, additionalRouteVals, new Dictionary<string, object>());
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName,
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            string controllerName,
             object additionalRouteVals,
             object htmlAttributes,
-            FormMethod method)
-        {
-            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes), method);
-        }
+            FormMethod method) => html.BeginUmbracoForm(action, controllerName, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName,
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            string controllerName,
             object additionalRouteVals,
-            object htmlAttributes)
-        {
-            return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
-        }
+            object htmlAttributes) => html.BeginUmbracoForm(action, controllerName, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName,
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            string controllerName,
             object additionalRouteVals,
             IDictionary<string, object> htmlAttributes,
             FormMethod method)
         {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
-            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
-            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            if (string.IsNullOrWhiteSpace(action))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
+            }
+
+            if (controllerName == null)
+            {
+                throw new ArgumentNullException(nameof(controllerName));
+            }
+
+            if (string.IsNullOrWhiteSpace(controllerName))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
+            }
 
             return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes, method);
         }
@@ -428,228 +415,172 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName,
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            string controllerName,
             object additionalRouteVals,
             IDictionary<string, object> htmlAttributes)
         {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
-            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
-            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
 
-            return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes);
+            if (string.IsNullOrWhiteSpace(action))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
+            }
+
+            if (controllerName == null)
+            {
+                throw new ArgumentNullException(nameof(controllerName));
+            }
+
+            if (string.IsNullOrWhiteSpace(controllerName))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
+            }
+
+            return html.BeginUmbracoForm(action, controllerName, string.Empty, additionalRouteVals, htmlAttributes);
         }
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="surfaceType">The surface controller to route to</param>
-        /// <param name="method"></param>
-        /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, Type surfaceType, FormMethod method)
-        {
-            return html.BeginUmbracoForm(action, surfaceType, null, new Dictionary<string, object>(), method);
-        }
+            => html.BeginUmbracoForm(action, surfaceType, null, new Dictionary<string, object>(), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="surfaceType">The surface controller to route to</param>
-        /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, Type surfaceType)
-        {
-            return html.BeginUmbracoForm(action, surfaceType, null, new Dictionary<string, object>());
-        }
+            => html.BeginUmbracoForm(action, surfaceType, null, new Dictionary<string, object>());
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The <see cref="SurfaceController"/> type</typeparam>
         public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action, FormMethod method)
-            where T : SurfaceController
-        {
-            return html.BeginUmbracoForm(action, typeof(T), method);
-        }
+            where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The <see cref="SurfaceController"/> type</typeparam>
         public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action)
-            where T : SurfaceController
-        {
-            return html.BeginUmbracoForm(action, typeof(T));
-        }
+            where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T));
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="surfaceType">The surface controller to route to</param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, Type surfaceType,
-                                               object additionalRouteVals, FormMethod method)
-        {
-            return html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, new Dictionary<string, object>(), method);
-        }
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            Type surfaceType,
+            object additionalRouteVals,
+            FormMethod method) => html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, new Dictionary<string, object>(), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="surfaceType">The surface controller to route to</param>
-        /// <param name="additionalRouteVals"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, Type surfaceType,
-                                               object additionalRouteVals)
-        {
-            return html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, new Dictionary<string, object>());
-        }
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            Type surfaceType,
+            object additionalRouteVals) => html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, new Dictionary<string, object>());
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The <see cref="SurfaceController"/> type</typeparam>
         public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action, object additionalRouteVals, FormMethod method)
-            where T : SurfaceController
-        {
-            return html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, method);
-        }
+            where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">The <see cref="SurfaceController"/> type</typeparam>
         public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action, object additionalRouteVals)
-            where T : SurfaceController
-        {
-            return html.BeginUmbracoForm(action, typeof(T), additionalRouteVals);
-        }
+            where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="surfaceType">The surface controller to route to</param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, Type surfaceType,
-                                               object additionalRouteVals,
-                                               object htmlAttributes,
-                                               FormMethod method)
-        {
-            return html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes), method);
-        }
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            Type surfaceType,
+            object additionalRouteVals,
+            object htmlAttributes,
+            FormMethod method) => html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="surfaceType">The surface controller to route to</param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, Type surfaceType,
-                                               object additionalRouteVals,
-                                               object htmlAttributes)
-        {
-            return html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
-        }
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            Type surfaceType,
+            object additionalRouteVals,
+            object htmlAttributes) => html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action,
-                                                  object additionalRouteVals,
-                                                  object htmlAttributes,
-                                                  FormMethod method)
-            where T : SurfaceController
-        {
-            return html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes, method);
-        }
+        /// <typeparam name="T">The <see cref="SurfaceController"/> type</typeparam>
+        public static MvcForm BeginUmbracoForm<T>(
+            this IHtmlHelper html,
+            string action,
+            object additionalRouteVals,
+            object htmlAttributes,
+            FormMethod method)
+            where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes, method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action,
-                                               object additionalRouteVals,
-                                               object htmlAttributes)
-            where T : SurfaceController
-        {
-            return html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes);
-        }
+        public static MvcForm BeginUmbracoForm<T>(
+            this IHtmlHelper html,
+            string action,
+            object additionalRouteVals,
+            object htmlAttributes)
+            where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="surfaceType">The surface controller to route to</param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, Type surfaceType,
-                                               object additionalRouteVals,
-                                               IDictionary<string, object> htmlAttributes,
-                                               FormMethod method)
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            Type surfaceType,
+            object additionalRouteVals,
+            IDictionary<string, object> htmlAttributes,
+            FormMethod method)
         {
 
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
-            if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
+
+            if (string.IsNullOrWhiteSpace(action))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
+            }
+
+            if (surfaceType == null)
+            {
+                throw new ArgumentNullException(nameof(surfaceType));
+            }
 
             var surfaceControllerTypeCollection = GetRequiredService<SurfaceControllerTypeCollection>(html);
             var surfaceController = surfaceControllerTypeCollection.SingleOrDefault(x => x == surfaceType);
             if (surfaceController == null)
+            {
                 throw new InvalidOperationException("Could not find the surface controller of type " + surfaceType.FullName);
+            }
+
             var metaData = PluginController.GetMetadata(surfaceController);
 
             var area = string.Empty;
@@ -665,104 +596,82 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="surfaceType">The surface controller to route to</param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, Type surfaceType,
-                                               object additionalRouteVals,
-                                               IDictionary<string, object> htmlAttributes)
-        {
-            return html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, htmlAttributes, FormMethod.Post);
-        }
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            Type surfaceType,
+            object additionalRouteVals,
+            IDictionary<string, object> htmlAttributes)
+            => html.BeginUmbracoForm(action, surfaceType, additionalRouteVals, htmlAttributes, FormMethod.Post);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action,
-                                                  object additionalRouteVals,
-                                                  IDictionary<string, object> htmlAttributes,
-                                                  FormMethod method)
-            where T : SurfaceController
-        {
-            return html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes, method);
-        }
+        /// <typeparam name="T">The <see cref="SurfaceController"/> type</typeparam>
+        public static MvcForm BeginUmbracoForm<T>(
+            this IHtmlHelper html,
+            string action,
+            object additionalRouteVals,
+            IDictionary<string, object> htmlAttributes,
+            FormMethod method)
+            where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes, method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm<T>(this IHtmlHelper html, string action,
-                                               object additionalRouteVals,
-                                               IDictionary<string, object> htmlAttributes)
-            where T : SurfaceController
-        {
-            return html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes);
-        }
+        /// <typeparam name="T">The <see cref="SurfaceController"/> type</typeparam>
+        public static MvcForm BeginUmbracoForm<T>(
+            this IHtmlHelper html,
+            string action,
+            object additionalRouteVals,
+            IDictionary<string, object> htmlAttributes)
+            where T : SurfaceController => html.BeginUmbracoForm(action, typeof(T), additionalRouteVals, htmlAttributes);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="area"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, string area, FormMethod method)
-        {
-            return html.BeginUmbracoForm(action, controllerName, area, null, new Dictionary<string, object>(), method);
-        }
+            => html.BeginUmbracoForm(action, controllerName, area, null, new Dictionary<string, object>(), method);
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="area"></param>
-        /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, string area)
-        {
-            return html.BeginUmbracoForm(action, controllerName, area, null, new Dictionary<string, object>());
-        }
+            => html.BeginUmbracoForm(action, controllerName, area, null, new Dictionary<string, object>());
 
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="area"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <param name="method"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, string area,
-                                               object additionalRouteVals,
-                                               IDictionary<string, object> htmlAttributes,
-                                               FormMethod method)
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            string controllerName,
+            string area,
+            object additionalRouteVals,
+            IDictionary<string, object> htmlAttributes,
+            FormMethod method)
         {
-            if (action == null) throw new ArgumentNullException(nameof(action));
-            if (string.IsNullOrEmpty(action)) throw new ArgumentException("Value can't be empty.", nameof(action));
-            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
-            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
+            if (action == null)
+            {
+                throw new ArgumentNullException(nameof(action));
+            }
 
-            var umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(html);
+            if (string.IsNullOrEmpty(action))
+            {
+                throw new ArgumentException("Value can't be empty.", nameof(action));
+            }
+
+            if (controllerName == null)
+            {
+                throw new ArgumentNullException(nameof(controllerName));
+            }
+
+            if (string.IsNullOrWhiteSpace(controllerName))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
+            }
+
+            IUmbracoContextAccessor umbracoContextAccessor = GetRequiredService<IUmbracoContextAccessor>(html);
             var formAction = umbracoContextAccessor.UmbracoContext.OriginalRequestUrl.PathAndQuery;
             return html.RenderForm(formAction, method, htmlAttributes, controllerName, action, area, additionalRouteVals);
         }
@@ -770,46 +679,31 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Helper method to create a new form to execute in the Umbraco request pipeline to a surface controller plugin
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="area"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <returns></returns>
-        public static MvcForm BeginUmbracoForm(this IHtmlHelper html, string action, string controllerName, string area,
-                                               object additionalRouteVals,
-                                               IDictionary<string, object> htmlAttributes)
-        {
-            return html.BeginUmbracoForm(action, controllerName, area, additionalRouteVals, htmlAttributes, FormMethod.Post);
-        }
+        public static MvcForm BeginUmbracoForm(
+            this IHtmlHelper html,
+            string action,
+            string controllerName,
+            string area,
+            object additionalRouteVals,
+            IDictionary<string, object> htmlAttributes) => html.BeginUmbracoForm(action, controllerName, area, additionalRouteVals, htmlAttributes, FormMethod.Post);
 
         /// <summary>
         /// This renders out the form for us
         /// </summary>
-        /// <param name="htmlHelper"></param>
-        /// <param name="formAction"></param>
-        /// <param name="method"></param>
-        /// <param name="htmlAttributes"></param>
-        /// <param name="surfaceController"></param>
-        /// <param name="surfaceAction"></param>
-        /// <param name="area"></param>
-        /// <param name="additionalRouteVals"></param>
-        /// <returns></returns>
         /// <remarks>
         /// This code is pretty much the same as the underlying MVC code that writes out the form
         /// </remarks>
-        private static MvcForm RenderForm(this IHtmlHelper htmlHelper,
-                                          string formAction,
-                                          FormMethod method,
-                                          IDictionary<string, object> htmlAttributes,
-                                          string surfaceController,
-                                          string surfaceAction,
-                                          string area,
-                                          object additionalRouteVals = null)
+        private static MvcForm RenderForm(
+            this IHtmlHelper htmlHelper,
+            string formAction,
+            FormMethod method,
+            IDictionary<string, object> htmlAttributes,
+            string surfaceController,
+            string surfaceAction,
+            string area,
+            object additionalRouteVals = null)
         {
-
-            //ensure that the multipart/form-data is added to the HTML attributes
+            // ensure that the multipart/form-data is added to the HTML attributes
             if (htmlAttributes.ContainsKey("enctype") == false)
             {
                 htmlAttributes.Add("enctype", "multipart/form-data");
@@ -817,21 +711,24 @@ namespace Umbraco.Extensions
 
             var tagBuilder = new TagBuilder("form");
             tagBuilder.MergeAttributes(htmlAttributes);
+
             // action is implicitly generated, so htmlAttributes take precedence.
             tagBuilder.MergeAttribute("action", formAction);
+
             // method is an explicit parameter, so it takes precedence over the htmlAttributes.
             tagBuilder.MergeAttribute("method", HtmlHelper.GetFormMethodString(method), true);
             var traditionalJavascriptEnabled = htmlHelper.ViewContext.ClientValidationEnabled;
             if (traditionalJavascriptEnabled)
             {
                 // forms must have an ID for client validation
-                tagBuilder.GenerateId("form" + Guid.NewGuid().ToString("N"),  string.Empty);
+                tagBuilder.GenerateId("form" + Guid.NewGuid().ToString("N"), string.Empty);
             }
 
             htmlHelper.ViewContext.Writer.Write(tagBuilder.RenderStartTag());
 
             var htmlEncoder = GetRequiredService<HtmlEncoder>(htmlHelper);
-            //new UmbracoForm:
+
+            // new UmbracoForm:
             var theForm = new UmbracoForm(htmlHelper.ViewContext, htmlEncoder, surfaceController, surfaceAction, area, additionalRouteVals);
 
             if (traditionalJavascriptEnabled)
@@ -842,7 +739,6 @@ namespace Umbraco.Extensions
             return theForm;
         }
 
-        #endregion
 
         #region If
 
@@ -856,9 +752,7 @@ namespace Umbraco.Extensions
         /// The HTML encoded value.
         /// </returns>
         public static IHtmlContent If(this IHtmlHelper html, bool test, string valueIfTrue)
-        {
-            return If(html, test, valueIfTrue, string.Empty);
-        }
+            => If(html, test, valueIfTrue, string.Empty);
 
         /// <summary>
         /// If <paramref name="test" /> is <c>true</c>, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <paramref name="valueIfFalse" />.
@@ -871,9 +765,7 @@ namespace Umbraco.Extensions
         /// The HTML encoded value.
         /// </returns>
         public static IHtmlContent If(this IHtmlHelper html, bool test, string valueIfTrue, string valueIfFalse)
-        {
-            return new HtmlString(HttpUtility.HtmlEncode(test ? valueIfTrue : valueIfFalse));
-        }
+            => new HtmlString(HttpUtility.HtmlEncode(test ? valueIfTrue : valueIfFalse));
 
         #endregion
 
@@ -890,113 +782,82 @@ namespace Umbraco.Extensions
         /// The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
         /// </returns>
         public static IHtmlContent ReplaceLineBreaks(this IHtmlHelper helper, string text)
-        {
-            return StringUtilities.ReplaceLineBreaks(text);
-        }
+            => StringUtilities.ReplaceLineBreaks(text);
 
         /// <summary>
         /// Generates a hash based on the text string passed in.  This method will detect the
         /// security requirements (is FIPS enabled) and return an appropriate hash.
         /// </summary>
-        /// <param name="helper"></param>
+        /// <param name="helper">The <see cref="IHtmlHelper"/></param>
         /// <param name="text">The text to create a hash from</param>
         /// <returns>Hash of the text string</returns>
-        public static string CreateHash(this IHtmlHelper helper, string text)
-        {
-            return text.GenerateHash();
-        }
+        public static string CreateHash(this IHtmlHelper helper, string text) => text.GenerateHash();
 
         /// <summary>
         /// Strips all HTML tags from a given string, all contents of the tags will remain.
         /// </summary>
         public static IHtmlContent StripHtml(this HtmlHelper helper, IHtmlContent html, params string[] tags)
-        {
-            return helper.StripHtml(html.ToHtmlString(), tags);
-        }
-
-
+            => helper.StripHtml(html.ToHtmlString(), tags);
 
         /// <summary>
         /// Strips all HTML tags from a given string, all contents of the tags will remain.
         /// </summary>
         public static IHtmlContent StripHtml(this HtmlHelper helper, string html, params string[] tags)
-        {
-            return StringUtilities.StripHtmlTags(html, tags);
-        }
+            => StringUtilities.StripHtmlTags(html, tags);
 
         /// <summary>
         /// Will take the first non-null value in the collection and return the value of it.
         /// </summary>
         public static string Coalesce(this HtmlHelper helper, params object[] args)
-        {
-            return StringUtilities.Coalesce(args);
-        }
+            => StringUtilities.Coalesce(args);
 
         /// <summary>
         /// Joins any number of int/string/objects into one string
         /// </summary>
         public static string Concatenate(this HtmlHelper helper, params object[] args)
-        {
-            return StringUtilities.Concatenate(args);
-        }
+            => StringUtilities.Concatenate(args);
 
         /// <summary>
         /// Joins any number of int/string/objects into one string and separates them with the string separator parameter.
         /// </summary>
         public static string Join(this HtmlHelper helper, string separator, params object[] args)
-        {
-            return StringUtilities.Join(separator, args);
-        }
+            => StringUtilities.Join(separator, args);
 
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public static IHtmlContent Truncate(this HtmlHelper helper, IHtmlContent html, int length)
-        {
-            return helper.Truncate(html.ToHtmlString(), length, true, false);
-        }
+            => helper.Truncate(html.ToHtmlString(), length, true, false);
 
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public static IHtmlContent Truncate(this HtmlHelper helper, IHtmlContent html, int length, bool addElipsis)
-        {
-            return helper.Truncate(html.ToHtmlString(), length, addElipsis, false);
-        }
+            => helper.Truncate(html.ToHtmlString(), length, addElipsis, false);
 
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public static IHtmlContent Truncate(this HtmlHelper helper, IHtmlContent html, int length, bool addElipsis, bool treatTagsAsContent)
-        {
-            return helper.Truncate(html.ToHtmlString(), length, addElipsis, treatTagsAsContent);
-        }
+            => helper.Truncate(html.ToHtmlString(), length, addElipsis, treatTagsAsContent);
 
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public static IHtmlContent Truncate(this HtmlHelper helper, string html, int length)
-        {
-            return helper.Truncate(html, length, true, false);
-        }
+            => helper.Truncate(html, length, true, false);
 
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public static IHtmlContent Truncate(this HtmlHelper helper, string html, int length, bool addElipsis)
-        {
-            return helper.Truncate(html, length, addElipsis, false);
-        }
+            => helper.Truncate(html, length, addElipsis, false);
 
         /// <summary>
         /// Truncates a string to a given length, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
         /// </summary>
         public static IHtmlContent Truncate(this HtmlHelper helper, string html, int length, bool addElipsis, bool treatTagsAsContent)
-        {
-            return StringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
-        }
-
-        #region Truncate by Words
+            => StringUtilities.Truncate(html, length, addElipsis, treatTagsAsContent);
 
         /// <summary>
         /// Truncates a string to a given amount of words, can add a ellipsis at the end (...). Method checks for open HTML tags, and makes sure to close them
@@ -1038,7 +899,6 @@ namespace Umbraco.Extensions
             return helper.Truncate(html, length, addElipsis, false);
         }
 
-        #endregion
 
         #endregion
     }

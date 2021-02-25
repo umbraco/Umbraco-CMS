@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Umbraco.Web.Media
+namespace Umbraco.Cms.Core.Media
 {
     public interface IImageDimensionExtractor
     {

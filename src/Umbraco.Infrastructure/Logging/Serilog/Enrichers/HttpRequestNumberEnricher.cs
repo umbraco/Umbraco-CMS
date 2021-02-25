@@ -2,10 +2,9 @@
 using System.Threading;
 using Serilog.Core;
 using Serilog.Events;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Core.Logging.Serilog.Enrichers
+namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
 {
     /// <summary>
     /// Enrich log events with a HttpRequestNumber unique within the current

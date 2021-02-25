@@ -5,13 +5,14 @@ using System;
 using System.Diagnostics;
 using System.Linq;
 using NUnit.Framework;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Collections;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Tests.Common;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Tests.Common;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache
 {
     [TestFixture]
     public class DeepCloneAppCacheTests : RuntimeAppCacheTests

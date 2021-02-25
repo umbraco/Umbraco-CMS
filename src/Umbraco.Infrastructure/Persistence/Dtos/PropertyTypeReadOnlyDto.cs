@@ -1,9 +1,9 @@
 ﻿using System;
 using NPoco;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.PropertyType)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class PropertyTypeReadOnlyDto

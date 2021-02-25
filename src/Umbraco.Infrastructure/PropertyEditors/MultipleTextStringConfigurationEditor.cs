@@ -1,10 +1,12 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.Validators;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Web.PropertyEditors
+using System.Collections.Generic;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration editor for a multiple textstring value editor.

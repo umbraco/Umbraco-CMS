@@ -11,7 +11,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Extensions
 {
     [TestFixture]
     public class HtmlHelperExtensionMethodsTests

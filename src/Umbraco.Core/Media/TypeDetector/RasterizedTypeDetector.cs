@@ -1,6 +1,6 @@
 ﻿using System.IO;
 
-namespace Umbraco.Web.Media.TypeDetector
+namespace Umbraco.Cms.Core.Media.TypeDetector
 {
     public abstract class RasterizedTypeDetector
     {

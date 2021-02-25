@@ -1,5 +1,5 @@
 using System;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Web.Mvc
 {

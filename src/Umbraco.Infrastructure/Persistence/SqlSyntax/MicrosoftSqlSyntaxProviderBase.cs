@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 
-namespace Umbraco.Core.Persistence.SqlSyntax
+namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
     /// <summary>
     /// Abstract class for defining MS sql implementations

@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
 using Examine;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Extensions;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
-
     /// <inheritdoc />
     public abstract class BaseValueSetBuilder<TContent> : IValueSetBuilder<TContent>
         where TContent : IContentBase

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Umbraco.Core.IO
+﻿namespace Umbraco.Cms.Core.IO
 {
     // shadow filesystems is definitively ... too convoluted
 

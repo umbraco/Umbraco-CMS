@@ -14,24 +14,21 @@ using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.DependencyInjection;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
-using Umbraco.Tests.Integration.DependencyInjection;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
-using Umbraco.Web;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.DependencyInjection;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.DependencyInjection;
-using Umbraco.Web.Website.Controllers;
-using Umbraco.Web.Website.DependencyInjection;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Integration.TestServerTest
+namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console, Boot = true)]
@@ -84,11 +81,32 @@ namespace Umbraco.Tests.Integration.TestServerTest
         /// This returns the url but also sets the HttpContext.request into to use this url.
         /// </summary>
         /// <returns>The string URL of the controller action.</returns>
-        protected string PrepareUrl<T>(Expression<Func<T, object>> methodSelector)
+        protected string PrepareApiControllerUrl<T>(Expression<Func<T, object>> methodSelector)
             where T : UmbracoApiController
         {
-            string url = LinkGenerator.GetUmbracoApiService<T>(methodSelector);
+            string url = LinkGenerator.GetUmbracoApiService(methodSelector);
+            return PrepareUrl(url);
+        }
 
+        /// <summary>
+        /// Prepare a url before using <see cref="Client"/>.
+        /// This returns the url but also sets the HttpContext.request into to use this url.
+        /// </summary>
+        /// <returns>The string URL of the controller action.</returns>
+        protected string PrepareSurfaceControllerUrl<T>(Expression<Func<T, object>> methodSelector)
+            where T : SurfaceController
+        {
+            string url = LinkGenerator.GetUmbracoSurfaceUrl(methodSelector);
+            return PrepareUrl(url);
+        }
+
+        /// <summary>
+        /// Prepare a url before using <see cref="Client"/>.
+        /// This returns the url but also sets the HttpContext.request into to use this url.
+        /// </summary>
+        /// <returns>The string URL of the controller action.</returns>
+        protected string PrepareUrl(string url)
+        {
             IBackOfficeSecurityFactory backofficeSecurityFactory = GetRequiredService<IBackOfficeSecurityFactory>();
             IUmbracoContextFactory umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
             IHttpContextAccessor httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
@@ -151,6 +169,9 @@ namespace Umbraco.Tests.Integration.TestServerTest
 
                     // Adds Umbraco.Web.Website
                     mvcBuilder.AddApplicationPart(typeof(SurfaceController).Assembly);
+
+                    // Adds Umbraco.Tests.Integration
+                    mvcBuilder.AddApplicationPart(typeof(UmbracoTestServerTestBase).Assembly);
                 })
                 .AddWebServer()
                 .AddWebsite()

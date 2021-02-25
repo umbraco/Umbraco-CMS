@@ -5,13 +5,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Localization;
-using Microsoft.AspNetCore.Routing;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.Routing;
 
-namespace Umbraco.Web.Common.Localization
+namespace Umbraco.Cms.Web.Common.Localization
 {
     /// <summary>
     /// Sets the request culture to the culture of the <see cref="IPublishedRequest"/> if one is found in the request
@@ -29,7 +27,8 @@ namespace Umbraco.Web.Common.Localization
         /// <inheritdoc/>
         public override Task<ProviderCultureResult> DetermineProviderCultureResult(HttpContext httpContext)
         {
-            if (httpContext.GetRouteValue(Core.Constants.Web.UmbracoRouteDefinitionDataToken) is UmbracoRouteValues routeValues)
+            UmbracoRouteValues routeValues = httpContext.Features.Get<UmbracoRouteValues>();
+            if (routeValues != null)
             {
                 string culture = routeValues.PublishedRequest?.Culture;
                 if (culture != null)

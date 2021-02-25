@@ -1,17 +1,17 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
 using NPoco;
-using Microsoft.Extensions.Logging;
-using Umbraco.Core.Migrations.Expressions.Alter;
-using Umbraco.Core.Migrations.Expressions.Create;
-using Umbraco.Core.Migrations.Expressions.Delete;
-using Umbraco.Core.Migrations.Expressions.Execute;
-using Umbraco.Core.Migrations.Expressions.Insert;
-using Umbraco.Core.Migrations.Expressions.Rename;
-using Umbraco.Core.Migrations.Expressions.Update;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Update;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations
 {
     /// <summary>
     /// Provides a base class to all migrations.

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Exceptions;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Content object
@@ -131,12 +131,12 @@ namespace Umbraco.Core.Models
                 {
                     _schedule.ClearCollectionChangedEvents();
                 }
-                    
+
                 SetPropertyValueAndDetectChanges(value, ref _schedule, nameof(ContentSchedule));
                 if (_schedule != null)
                 {
                     _schedule.CollectionChanged += ScheduleCollectionChanged;
-                }   
+                }
             }
         }
 
@@ -267,7 +267,7 @@ namespace Umbraco.Core.Models
                 if (_publishInfos != null)
                 {
                     _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
-                }   
+                }
             }
         }
 

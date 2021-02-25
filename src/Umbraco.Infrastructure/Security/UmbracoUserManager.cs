@@ -6,12 +6,11 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
-using Umbraco.Net;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Net;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// Abstract class for Umbraco User Managers for back office users or front-end members
@@ -38,7 +37,7 @@ namespace Umbraco.Infrastructure.Security
             IServiceProvider services,
             ILogger<UserManager<TUser>> logger,
             IOptions<TPasswordConfig> passwordConfiguration)
-            : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, new NoOpLookupNormalizer(), errors, services, logger)
+            : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, new NoopLookupNormalizer(), errors, services, logger)
         {
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
             PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
@@ -49,7 +48,7 @@ namespace Umbraco.Infrastructure.Security
 
         /// <inheritdoc />
         public override bool SupportsQueryableUsers => false; // It would be nice to support this but we don't need to currently and that would require IQueryable support for our user service/repository
-        
+
         /// <summary>
         /// Developers will need to override this to support custom 2 factor auth
         /// </summary>
@@ -90,24 +89,14 @@ namespace Umbraco.Infrastructure.Security
         }
 
         /// <summary>
-        /// This will determine which password hasher to use based on what is defined in config
-        /// </summary>
-        /// <param name="passwordConfiguration">The <see cref="IPasswordConfiguration"/></param>
-        /// <returns>An <see cref="IPasswordHasher{T}"/></returns>
-        protected virtual IPasswordHasher<TUser> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration) => new PasswordHasher<TUser>();
-
-        /// <summary>
         /// Helper method to generate a password for a user based on the current password validator
         /// </summary>
         /// <returns>The generated password</returns>
         public string GeneratePassword()
         {
-            if (_passwordGenerator == null)
-            {
-                _passwordGenerator = new PasswordGenerator(PasswordConfiguration);
-            }
+            _passwordGenerator ??= new PasswordGenerator(PasswordConfiguration);
 
-            var password = _passwordGenerator.GeneratePassword();
+            string password = _passwordGenerator.GeneratePassword();
             return password;
         }
 
@@ -119,9 +108,7 @@ namespace Umbraco.Infrastructure.Security
         /// <returns>The hashed password</returns>
         public string HashPassword(string password)
         {
-            IPasswordHasher<TUser> passwordHasher = GetDefaultPasswordHasher(PasswordConfiguration);
-
-            string hashedPassword = passwordHasher.HashPassword(null, password);
+            string hashedPassword = PasswordHasher.HashPassword(null, password);
             return hashedPassword;
         }
 

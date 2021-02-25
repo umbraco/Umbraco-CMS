@@ -1,9 +1,8 @@
-﻿using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Routing;
+﻿using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Routing;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class RedirectUrlMapDefinition : IMapDefinition
     {

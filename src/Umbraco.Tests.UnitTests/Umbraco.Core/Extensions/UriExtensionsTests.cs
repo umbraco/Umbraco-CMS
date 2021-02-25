@@ -6,11 +6,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Extensions
 {
     [TestFixture]
     public class UriExtensionsTests
@@ -28,8 +28,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Extensions
         private AspNetCoreHostingEnvironment CreateHostingEnvironment(string virtualPath = "")
         {
             var hostingSettings = new HostingSettings { ApplicationVirtualPath = virtualPath };
+            var webRoutingSettings = new WebRoutingSettings();
             var mockedOptionsMonitorOfHostingSettings = Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
-            return new AspNetCoreHostingEnvironment(mockedOptionsMonitorOfHostingSettings, _hostEnvironment);
+            var mockedOptionsMonitorOfWebRoutingSettings = Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == webRoutingSettings);
+            return new AspNetCoreHostingEnvironment(mockedOptionsMonitorOfHostingSettings, mockedOptionsMonitorOfWebRoutingSettings, _hostEnvironment);
         }
 
         [TestCase("http://www.domain.com/foo/bar", "/", "http://www.domain.com/")]

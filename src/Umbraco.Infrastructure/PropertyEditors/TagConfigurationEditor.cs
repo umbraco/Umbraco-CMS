@@ -1,12 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.Validators;
-using Umbraco.Core.Services;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Web.PropertyEditors
+using System;
+using System.Collections.Generic;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors.Validators;
+using Umbraco.Cms.Core.Services;
+
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration editor for the tag value editor.

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Models
+﻿namespace Umbraco.Cms.Core.Models
 {
     public enum ImageCropRatioMode
     {

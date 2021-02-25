@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     [Serializable]
     [DataContract(Name = "validatePasswordReset", Namespace = "")]

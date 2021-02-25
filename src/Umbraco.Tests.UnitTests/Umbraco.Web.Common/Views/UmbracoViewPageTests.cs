@@ -4,15 +4,16 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Web.Common.ModelBinders;
+using Umbraco.Cms.Web.Common.Views;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
 {
     [TestFixture]
     public class UmbracoViewPageTests
@@ -311,7 +312,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
 
         public class TestPage<TModel> : UmbracoViewPage<TModel>
         {
-            private readonly ContentModelBinder _modelBinder = new ContentModelBinder();
+            private readonly ContentModelBinder _modelBinder = new ContentModelBinder(Mock.Of<IEventAggregator>());
 
             public override Task ExecuteAsync() => throw new NotImplementedException();
 

@@ -2,15 +2,14 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Web.Models;
-using IUser = Umbraco.Core.Models.Membership.IUser;
+using Constants = Umbraco.Cms.Core.Constants;
+using IUser = Umbraco.Cms.Core.Models.Membership.IUser;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     internal class PasswordChanger
     {
@@ -60,7 +59,7 @@ namespace Umbraco.Web.BackOffice.Security
                 }
 
                 //if the current user has access to reset/manually change the password
-                if (currentUser.HasSectionAccess(Umbraco.Core.Constants.Applications.Users) == false)
+                if (currentUser.HasSectionAccess(Constants.Applications.Users) == false)
                 {
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user is not authorized", new[] { "value" }) });
                 }

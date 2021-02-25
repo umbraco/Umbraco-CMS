@@ -10,15 +10,15 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Routing;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Models;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.ModelBinders;
+using Umbraco.Cms.Web.Common.Routing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
 {
     [TestFixture]
     public class ContentModelBinderTests
@@ -26,7 +26,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         private ContentModelBinder _contentModelBinder;
 
         [SetUp]
-        public void SetUp() => _contentModelBinder = new ContentModelBinder();
+        public void SetUp() => _contentModelBinder = new ContentModelBinder(Mock.Of<IEventAggregator>());
 
         [Test]
         [TestCase(typeof(IPublishedContent), false)]
@@ -59,22 +59,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
             // Arrange
             IPublishedContent pc = CreatePublishedContent();
             ModelBindingContext bindingContext = CreateBindingContextForUmbracoRequest(typeof(ContentModel), pc);
-            bindingContext.ActionContext.RouteData.Values.Remove(Constants.Web.UmbracoRouteDefinitionDataToken);
-
-            // Act
-            await _contentModelBinder.BindModelAsync(bindingContext);
-
-            // Assert
-            Assert.False(bindingContext.Result.IsModelSet);
-        }
-
-        [Test]
-        public async Task Does_Not_Bind_Model_When_UmbracoToken_Has_Incorrect_Model()
-        {
-            // Arrange
-            IPublishedContent pc = CreatePublishedContent();
-            ModelBindingContext bindingContext = CreateBindingContextForUmbracoRequest(typeof(ContentModel), pc);
-            bindingContext.ActionContext.RouteData.Values[Constants.Web.UmbracoRouteDefinitionDataToken] = new NonContentModel();
+            bindingContext.ActionContext.HttpContext.Features.Set<UmbracoRouteValues>(null);
 
             // Act
             await _contentModelBinder.BindModelAsync(bindingContext);
@@ -219,9 +204,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
 
             var httpContext = new DefaultHttpContext();
             var routeData = new RouteData();
-            routeData.Values.Add(Constants.Web.UmbracoRouteDefinitionDataToken, new UmbracoRouteValues(publishedRequest));
-            {
-            }
+            httpContext.Features.Set(new UmbracoRouteValues(publishedRequest, null));
 
             var actionContext = new ActionContext(httpContext, routeData, new ActionDescriptor());
             var metadataProvider = new EmptyModelMetadataProvider();

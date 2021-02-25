@@ -1,26 +1,27 @@
-using Umbraco.Core.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Models.ContentEditing;
-using Constants = Umbraco.Core.Constants;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Core;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Security;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Authorization;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
 
     /// <summary>
@@ -28,6 +29,7 @@ namespace Umbraco.Web.BackOffice.Controllers
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.TreeAccessMacros)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class MacrosController : BackOfficeNotificationsController
     {
         private readonly ParameterEditorCollection _parameterEditorCollection;
@@ -109,7 +111,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<MacroDisplay> GetById(int id)
         {
             var macro = _macroService.GetById(id);
@@ -125,7 +126,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<MacroDisplay> GetById(Guid id)
         {
             var macro = _macroService.GetById(id);
@@ -141,7 +141,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [HttpGet]
-        [DetermineAmbiguousActionByPassingParameters]
         public ActionResult<MacroDisplay> GetById(Udi id)
         {
             var guidUdi = id as GuidUdi;

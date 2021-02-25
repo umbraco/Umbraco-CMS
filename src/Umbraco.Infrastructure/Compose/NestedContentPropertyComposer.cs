@@ -1,7 +1,6 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Compose
+namespace Umbraco.Cms.Core.Compose
 {
     /// <summary>
     /// A composer for nested content to run a component

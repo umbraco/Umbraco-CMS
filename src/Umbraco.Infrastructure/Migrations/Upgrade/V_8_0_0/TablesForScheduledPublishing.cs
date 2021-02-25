@@ -1,9 +1,9 @@
-﻿using NPoco;
-using System;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+﻿using System;
+using NPoco;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class TablesForScheduledPublishing : MigrationBase
     {
@@ -52,7 +52,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
                 Insert.IntoTable(ContentScheduleDto.TableName)
                     .Row(new { id = Guid.NewGuid(), nodeId = s.Key, date = date, action = action })
                     .Do();
-            }            
+            }
         }
     }
 }

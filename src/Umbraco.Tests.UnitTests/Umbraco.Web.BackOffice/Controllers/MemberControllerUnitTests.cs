@@ -12,36 +12,32 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Events;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.Validators;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.UnitTests.AutoFixture;
-using Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
-using Umbraco.Web;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Mapping;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.PropertyEditors;
-using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.ContentApps;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Mapping;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.UnitTests.AutoFixture;
+using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Mapping;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
+using MemberMapDefinition = Umbraco.Cms.Web.BackOffice.Mapping.MemberMapDefinition;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 {
     [TestFixture]
     public class MemberControllerUnitTests
@@ -64,7 +60,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public void PostSaveMember_WhenModelStateIsNotValid_ExpectFailureResponse(
-            [Frozen] IMembersUserManager umbracoMembersUserManager,
+            [Frozen] IMemberManager umbracoMembersUserManager,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberGroupService memberGroupService,
@@ -96,11 +92,10 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Assert.AreEqual(StatusCodes.Status400BadRequest, validation?.StatusCode);
         }
 
-
         [Test]
         [AutoMoqData]
-        public async Task PostSaveMember_SaveNew_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
-            [Frozen] IMembersUserManager umbracoMembersUserManager,
+        public async Task PostSaveMember_SaveNew_NoCustomField_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
+            [Frozen] IMemberManager umbracoMembersUserManager,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberGroupService memberGroupService,
@@ -137,8 +132,47 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 
         [Test]
         [AutoMoqData]
+        public async Task PostSaveMember_SaveNew_CustomField_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
+        [Frozen] IMemberManager umbracoMembersUserManager,
+        IMemberService memberService,
+        IMemberTypeService memberTypeService,
+        IMemberGroupService memberGroupService,
+        IDataTypeService dataTypeService,
+        IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+        IBackOfficeSecurity backOfficeSecurity)
+        {
+            // arrange
+            Member member = SetupMemberTestData(out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<string>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
+            Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
+            Mock.Get(memberService).SetupSequence(
+                x => x.GetByEmail(It.IsAny<string>()))
+                .Returns(() => null)
+                .Returns(() => member);
+            Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
+
+            MemberController sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager, dataTypeService, backOfficeSecurityAccessor);
+
+            // act
+            ActionResult<MemberDisplay> result = await sut.PostSave(fakeMemberData);
+
+            // assert
+            Assert.IsNull(result.Result);
+            Assert.IsNotNull(result.Value);
+            AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
+        }
+
+
+        [Test]
+        [AutoMoqData]
         public async Task PostSaveMember_SaveExisting_WhenAllIsSetupCorrectly_ExpectSuccessResponse(
-            [Frozen] IMembersUserManager umbracoMembersUserManager,
+            [Frozen] IMemberManager umbracoMembersUserManager,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberGroupService memberGroupService,
@@ -184,7 +218,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public void PostSaveMember_SaveNew_WhenMemberEmailAlreadyExists_ExpectFailResponse(
-            [Frozen] IMembersUserManager umbracoMembersUserManager,
+            [Frozen] IMemberManager umbracoMembersUserManager,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberGroupService memberGroupService,
@@ -220,6 +254,64 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Assert.AreEqual(StatusCodes.Status400BadRequest, validation?.StatusCode);
         }
 
+        [Test]
+        [AutoMoqData]
+        public async Task PostSaveMember_SaveExistingMember_WithNoRoles_Add1Role_ExpectSuccessResponse(
+           [Frozen] IMemberManager umbracoMembersUserManager,
+           IMemberService memberService,
+           IMemberTypeService memberTypeService,
+           IMemberGroupService memberGroupService,
+           IDataTypeService dataTypeService,
+           IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+           IBackOfficeSecurity backOfficeSecurity)
+        {
+            // arrange
+            string password = "fakepassword9aw89rnyco3938cyr^%&*()i8Y";
+            var roleName = "anyrole";
+            IMember member = SetupMemberTestData(out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.Save);
+            fakeMemberData.Groups = new List<string>()
+            {
+                roleName
+            };
+            var membersIdentityUser = new MembersIdentityUser();
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
+                .ReturnsAsync(() => membersIdentityUser);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.HashPassword(It.IsAny<string>()))
+                .Returns(password);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.UpdateAsync(It.IsAny<MembersIdentityUser>()))
+                .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
+            Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
+            Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
+
+            Mock.Get(memberService).SetupSequence(
+                    x => x.GetByEmail(It.IsAny<string>()))
+                .Returns(() => null)
+                .Returns(() => member);
+            Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
+            MemberController sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager, dataTypeService, backOfficeSecurityAccessor);
+
+            // act
+            ActionResult<MemberDisplay> result = await sut.PostSave(fakeMemberData);
+
+            // assert
+            Assert.IsNull(result.Result);
+            Assert.IsNotNull(result.Value);
+            Mock.Get(umbracoMembersUserManager)
+                .Verify(u => u.GetRolesAsync(membersIdentityUser));
+             Mock.Get(umbracoMembersUserManager)
+                .Verify(u => u.AddToRolesAsync(membersIdentityUser, new[] { roleName }));
+            Mock.Get(memberService)
+                .Verify(m => m.Save(It.IsAny<Member>(), true));
+            AssertMemberDisplayPropertiesAreEqual(memberDisplay, result.Value);
+        }
+
         /// <summary>
         /// Create member controller to test
         /// </summary>
@@ -234,7 +326,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberGroupService memberGroupService,
-            IMembersUserManager membersUserManager,
+            IMemberManager membersUserManager,
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
@@ -284,7 +376,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 
             var map = new MapDefinitionCollection(new List<IMapDefinition>()
             {
-                new global::Umbraco.Core.Models.Mapping.MemberMapDefinition(),
+                new global::Umbraco.Cms.Core.Models.Mapping.MemberMapDefinition(),
                 memberMapDefinition,
                 new ContentTypeMapDefinition(
                     commonMapper,
@@ -354,11 +446,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 PersistedContent = member,
                 PropertyCollectionDto = new ContentPropertyCollectionDto()
                 {
-                    Properties = new List<ContentPropertyDto>()
-                    {
-                        new ContentPropertyDto(),
-                        new ContentPropertyDto()
-                    }
                 },
                 Groups = new List<string>(),
                 //Alias = "fakeAlias",
@@ -387,7 +474,41 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 {
                     new Tab<ContentPropertyDisplay>()
                     {
-                        Alias = "test"
+                        Alias = "test",
+                        Id = 77,
+                        Properties = new List<ContentPropertyDisplay>()
+                        {
+                            new ContentPropertyDisplay()
+                            {
+                                Alias = "_umb_id",
+                                View = "idwithguid",
+                                Value = new []
+                                {
+                                    "123",
+                                    "guid"
+                                }
+                            },
+                            new ContentPropertyDisplay()
+                            {
+                                Alias = "_umb_doctype"
+                            },
+                            new ContentPropertyDisplay()
+                            {
+                                Alias = "_umb_login"
+                            },
+                            new ContentPropertyDisplay()
+                            {
+                                Alias= "_umb_email"
+                            },
+                            new ContentPropertyDisplay()
+                            {
+                                Alias = "_umb_password"
+                            },
+                            new ContentPropertyDisplay()
+                            {
+                                Alias = "_umb_membergroup"
+                            }
+                        }
                     }
                 }
             };
@@ -421,19 +542,19 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Assert.AreEqual(memberDisplay.SortOrder, resultValue.SortOrder);
             Assert.AreEqual(memberDisplay.Trashed, resultValue.Trashed);
             Assert.AreEqual(memberDisplay.TreeNodeUrl, resultValue.TreeNodeUrl);
-            Assert.AreNotSame(memberDisplay.Properties, resultValue.Properties);
 
             //TODO: can we check create/update dates when saving?
             //Assert.AreEqual(memberDisplay.CreateDate, resultValue.CreateDate);
             //Assert.AreEqual(memberDisplay.UpdateDate, resultValue.UpdateDate);
 
             //TODO: check all properties
-            //Assert.AreEqual(memberDisplay.Properties.Count(), resultValue.Properties.Count());
-            //for (var index = 0; index < resultValue.Properties.Count(); index++)
-            //{
-            //    Assert.AreNotSame(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
-            //    Assert.AreEqual(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
-            //}
+            Assert.AreEqual(memberDisplay.Properties.Count(), resultValue.Properties.Count());
+            Assert.AreNotSame(memberDisplay.Properties, resultValue.Properties);
+            for (var index = 0; index < resultValue.Properties.Count(); index++)
+            {
+                Assert.AreNotSame(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
+                //Assert.AreEqual(memberDisplay.Properties.GetItemByIndex(index), resultValue.Properties.GetItemByIndex(index));
+            }
         }
     }
 }

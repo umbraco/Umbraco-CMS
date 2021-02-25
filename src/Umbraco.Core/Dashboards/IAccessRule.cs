@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Dashboards
+﻿namespace Umbraco.Cms.Core.Dashboards
 {
     /// <summary>
     /// Represents an access rule.

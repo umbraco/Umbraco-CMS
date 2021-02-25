@@ -1,6 +1,6 @@
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// The dictionary translation save model
@@ -11,7 +11,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// <summary>
         /// Gets or sets the ISO code.
         /// </summary>
-        [DataMember(Name = "isoCode")]        
+        [DataMember(Name = "isoCode")]
         public string IsoCode { get; set; }
 
         /// <summary>
@@ -19,7 +19,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "translation")]
         public string Translation { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the language id.
         /// </summary>

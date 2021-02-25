@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Core.Migrations.Expressions.Alter.Table
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table
 {
     public interface IAlterTableColumnTypeBuilder : IColumnTypeBuilder<IAlterTableColumnOptionBuilder>
     { }

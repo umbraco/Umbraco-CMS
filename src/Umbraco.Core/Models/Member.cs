@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
+using Umbraco.Extensions;
 
-
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Member object
@@ -19,8 +19,11 @@ namespace Umbraco.Core.Models
         private string _email;
         private string _rawPasswordValue;
         private string _passwordConfig;
+        private DateTime? _emailConfirmedDate;
+        private string _securityStamp;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Member"/> class.
         /// Constructor for creating an empty Member object
         /// </summary>
         /// <param name="contentType">ContentType for the current Content object</param>
@@ -29,13 +32,14 @@ namespace Umbraco.Core.Models
         {
             IsApproved = true;
 
-            //this cannot be null but can be empty
+            // this cannot be null but can be empty
             _rawPasswordValue = "";
             _email = "";
             _username = "";
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Member"/> class.
         /// Constructor for creating a Member object
         /// </summary>
         /// <param name="name">Name of the content</param>
@@ -43,18 +47,21 @@ namespace Umbraco.Core.Models
         public Member(string name, IMemberType contentType)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
 
             IsApproved = true;
 
-            //this cannot be null but can be empty
+            // this cannot be null but can be empty
             _rawPasswordValue = "";
             _email = "";
             _username = "";
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Member"/> class.
         /// Constructor for creating a Member object
         /// </summary>
         /// <param name="name"></param>
@@ -64,22 +71,29 @@ namespace Umbraco.Core.Models
         public Member(string name, string email, string username, IMemberType contentType, bool isApproved = true)
             : base(name, -1, contentType, new PropertyCollection())
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
-            if (email == null) throw new ArgumentNullException(nameof(email));
-            if (string.IsNullOrWhiteSpace(email)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(email));
-            if (username == null) throw new ArgumentNullException(nameof(username));
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(username));
+            if (name == null)
+                throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            if (email == null)
+                throw new ArgumentNullException(nameof(email));
+            if (string.IsNullOrWhiteSpace(email))
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(email));
+            if (username == null)
+                throw new ArgumentNullException(nameof(username));
+            if (string.IsNullOrWhiteSpace(username))
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(username));
 
             _email = email;
             _username = username;
             IsApproved = isApproved;
 
-            //this cannot be null but can be empty
+            // this cannot be null but can be empty
             _rawPasswordValue = "";
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Member"/> class.
         /// Constructor for creating a Member object
         /// </summary>
         /// <param name="name"></param>
@@ -127,6 +141,7 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="Member"/> class.
         /// Constructor for creating a Member object
         /// </summary>
         /// <param name="name"></param>
@@ -188,6 +203,13 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _email, nameof(Email));
         }
 
+        [DataMember]
+        public DateTime? EmailConfirmedDate
+        {
+            get => _emailConfirmedDate;
+            set => SetPropertyValueAndDetectChanges(value, ref _emailConfirmedDate, nameof(EmailConfirmedDate));
+        }
+
         /// <summary>
         /// Gets or sets the raw password value
         /// </summary>
@@ -240,7 +262,8 @@ namespace Umbraco.Core.Models
             get
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.Comments, nameof(Comments), default(string));
-                if (a.Success == false) return a.Result;
+                if (a.Success == false)
+                    return a.Result;
 
                 return Properties[Constants.Conventions.Member.Comments].GetValue() == null
                     ? string.Empty
@@ -250,7 +273,8 @@ namespace Umbraco.Core.Models
             {
                 if (WarnIfPropertyTypeNotFoundOnSet(
                     Constants.Conventions.Member.Comments,
-                    nameof(Comments)) == false) return;
+                    nameof(Comments)) == false)
+                    return;
 
                 Properties[Constants.Conventions.Member.Comments].SetValue(value);
             }
@@ -271,8 +295,10 @@ namespace Umbraco.Core.Models
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsApproved, nameof(IsApproved),
                     //This is the default value if the prop is not found
                     true);
-                if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.IsApproved].GetValue() == null) return true;
+                if (a.Success == false)
+                    return a.Result;
+                if (Properties[Constants.Conventions.Member.IsApproved].GetValue() == null)
+                    return true;
                 var tryConvert = Properties[Constants.Conventions.Member.IsApproved].GetValue().TryConvertTo<bool>();
                 if (tryConvert.Success)
                 {
@@ -285,7 +311,8 @@ namespace Umbraco.Core.Models
             {
                 if (WarnIfPropertyTypeNotFoundOnSet(
                     Constants.Conventions.Member.IsApproved,
-                    nameof(IsApproved)) == false) return;
+                    nameof(IsApproved)) == false)
+                    return;
 
                 Properties[Constants.Conventions.Member.IsApproved].SetValue(value);
             }
@@ -304,8 +331,10 @@ namespace Umbraco.Core.Models
             get
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.IsLockedOut, nameof(IsLockedOut), false);
-                if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.IsLockedOut].GetValue() == null) return false;
+                if (a.Success == false)
+                    return a.Result;
+                if (Properties[Constants.Conventions.Member.IsLockedOut].GetValue() == null)
+                    return false;
                 var tryConvert = Properties[Constants.Conventions.Member.IsLockedOut].GetValue().TryConvertTo<bool>();
                 if (tryConvert.Success)
                 {
@@ -318,7 +347,8 @@ namespace Umbraco.Core.Models
             {
                 if (WarnIfPropertyTypeNotFoundOnSet(
                     Constants.Conventions.Member.IsLockedOut,
-                    nameof(IsLockedOut)) == false) return;
+                    nameof(IsLockedOut)) == false)
+                    return;
 
                 Properties[Constants.Conventions.Member.IsLockedOut].SetValue(value);
             }
@@ -337,8 +367,10 @@ namespace Umbraco.Core.Models
             get
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLoginDate, nameof(LastLoginDate), default(DateTime));
-                if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.LastLoginDate].GetValue() == null) return default(DateTime);
+                if (a.Success == false)
+                    return a.Result;
+                if (Properties[Constants.Conventions.Member.LastLoginDate].GetValue() == null)
+                    return default(DateTime);
                 var tryConvert = Properties[Constants.Conventions.Member.LastLoginDate].GetValue().TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
@@ -351,7 +383,8 @@ namespace Umbraco.Core.Models
             {
                 if (WarnIfPropertyTypeNotFoundOnSet(
                     Constants.Conventions.Member.LastLoginDate,
-                    nameof(LastLoginDate)) == false) return;
+                    nameof(LastLoginDate)) == false)
+                    return;
 
                 Properties[Constants.Conventions.Member.LastLoginDate].SetValue(value);
             }
@@ -370,8 +403,10 @@ namespace Umbraco.Core.Models
             get
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastPasswordChangeDate, nameof(LastPasswordChangeDate), default(DateTime));
-                if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].GetValue() == null) return default(DateTime);
+                if (a.Success == false)
+                    return a.Result;
+                if (Properties[Constants.Conventions.Member.LastPasswordChangeDate].GetValue() == null)
+                    return default(DateTime);
                 var tryConvert = Properties[Constants.Conventions.Member.LastPasswordChangeDate].GetValue().TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
@@ -384,7 +419,8 @@ namespace Umbraco.Core.Models
             {
                 if (WarnIfPropertyTypeNotFoundOnSet(
                     Constants.Conventions.Member.LastPasswordChangeDate,
-                    nameof(LastPasswordChangeDate)) == false) return;
+                    nameof(LastPasswordChangeDate)) == false)
+                    return;
 
                 Properties[Constants.Conventions.Member.LastPasswordChangeDate].SetValue(value);
             }
@@ -403,8 +439,10 @@ namespace Umbraco.Core.Models
             get
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.LastLockoutDate, nameof(LastLockoutDate), default(DateTime));
-                if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.LastLockoutDate].GetValue() == null) return default(DateTime);
+                if (a.Success == false)
+                    return a.Result;
+                if (Properties[Constants.Conventions.Member.LastLockoutDate].GetValue() == null)
+                    return default(DateTime);
                 var tryConvert = Properties[Constants.Conventions.Member.LastLockoutDate].GetValue().TryConvertTo<DateTime>();
                 if (tryConvert.Success)
                 {
@@ -417,7 +455,8 @@ namespace Umbraco.Core.Models
             {
                 if (WarnIfPropertyTypeNotFoundOnSet(
                     Constants.Conventions.Member.LastLockoutDate,
-                    nameof(LastLockoutDate)) == false) return;
+                    nameof(LastLockoutDate)) == false)
+                    return;
 
                 Properties[Constants.Conventions.Member.LastLockoutDate].SetValue(value);
             }
@@ -437,8 +476,10 @@ namespace Umbraco.Core.Models
             get
             {
                 var a = WarnIfPropertyTypeNotFoundOnGet(Constants.Conventions.Member.FailedPasswordAttempts, nameof(FailedPasswordAttempts), 0);
-                if (a.Success == false) return a.Result;
-                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].GetValue() == null) return default(int);
+                if (a.Success == false)
+                    return a.Result;
+                if (Properties[Constants.Conventions.Member.FailedPasswordAttempts].GetValue() == null)
+                    return default(int);
                 var tryConvert = Properties[Constants.Conventions.Member.FailedPasswordAttempts].GetValue().TryConvertTo<int>();
                 if (tryConvert.Success)
                 {
@@ -451,7 +492,8 @@ namespace Umbraco.Core.Models
             {
                 if (WarnIfPropertyTypeNotFoundOnSet(
                     Constants.Conventions.Member.FailedPasswordAttempts,
-                    nameof(FailedPasswordAttempts)) == false) return;
+                    nameof(FailedPasswordAttempts)) == false)
+                    return;
 
                 Properties[Constants.Conventions.Member.FailedPasswordAttempts].SetValue(value);
             }
@@ -462,6 +504,17 @@ namespace Umbraco.Core.Models
         /// </summary>
         [DataMember]
         public virtual string ContentTypeAlias => ContentType.Alias;
+
+        /// <summary>
+        /// The security stamp used by ASP.Net identity
+        /// </summary>
+        [IgnoreDataMember]
+        public string SecurityStamp
+        {
+            get => _securityStamp;
+            set => SetPropertyValueAndDetectChanges(value, ref _securityStamp, nameof(SecurityStamp));
+        }
+
 
         /// <summary>
         /// Internal/Experimental - only used for mapping queries.

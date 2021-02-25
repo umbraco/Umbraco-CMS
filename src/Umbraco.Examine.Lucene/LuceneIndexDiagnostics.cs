@@ -1,14 +1,15 @@
-﻿using System.Collections.Generic;
-using Microsoft.Extensions.Logging;
-using Examine.LuceneEngine.Providers;
-using Umbraco.Core;
-using Lucene.Net.Store;
-using Umbraco.Core.IO;
-using System.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Hosting;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Examine
+using System.Collections.Generic;
+using Examine.LuceneEngine.Providers;
+using Lucene.Net.Store;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public class LuceneIndexDiagnostics : IIndexDiagnostics
     {

@@ -1,13 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations
 {
     /// <summary>
     /// Provides a base class for migration expressions.
@@ -33,11 +34,6 @@ namespace Umbraco.Core.Migrations
         public DatabaseType DatabaseType => Context.Database.DatabaseType;
 
         public List<IMigrationExpression> Expressions => _expressions ?? (_expressions = new List<IMigrationExpression>());
-
-        public virtual string Process(IMigrationContext context)
-        {
-            return ToString();
-        }
 
         protected virtual string GetSql()
         {

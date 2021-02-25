@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// A read only relation. Can be used to bulk save witch performs better than the normal save operation,

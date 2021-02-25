@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// The configuration object for the Block List editor
@@ -50,6 +49,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of blocks")]
         public NumberRange ValidationLimit { get; set; } = new NumberRange();
 
+        [DataContract]
         public class NumberRange
         {
             [DataMember(Name ="min")]

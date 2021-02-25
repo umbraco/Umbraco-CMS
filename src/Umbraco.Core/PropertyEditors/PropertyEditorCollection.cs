@@ -1,8 +1,8 @@
 using System.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Manifest;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Manifest;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     public class PropertyEditorCollection : BuilderCollectionBase<IDataEditor>
     {

@@ -1,11 +1,10 @@
 ﻿using System;
 using Microsoft.AspNetCore.SignalR;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Sync;
-using Umbraco.Web.Cache;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Web.BackOffice.SignalR
+namespace Umbraco.Cms.Web.BackOffice.SignalR
 {
     public class PreviewHubComponent : IComponent
     {

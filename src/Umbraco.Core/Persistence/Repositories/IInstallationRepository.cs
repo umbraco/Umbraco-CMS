@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
-using Umbraco.Core.Models;
+﻿using System.Threading.Tasks;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IInstallationRepository
     {

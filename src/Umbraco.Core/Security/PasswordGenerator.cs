@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Linq;
 using System.Security.Cryptography;
-using Umbraco.Core.Configuration;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// Generates a password
@@ -119,13 +120,13 @@ namespace Umbraco.Core.Security
                 for (var i = 0; ;)
                 {
 
-                    // Look for the start of one of our patterns 
+                    // Look for the start of one of our patterns
                     var n = s.IndexOfAny(StartingChars, i);
 
                     // If not found, the string is safe
                     if (n < 0) return false;
 
-                    // If it's the last char, it's safe 
+                    // If it's the last char, it's safe
                     if (n == s.Length - 1) return false;
 
                     matchIndex = n;
@@ -137,7 +138,7 @@ namespace Umbraco.Core.Security
                             if (IsAtoZ(s[n + 1]) || s[n + 1] == '!' || s[n + 1] == '/' || s[n + 1] == '?') return true;
                             break;
                         case '&':
-                            // If the & is followed by a #, it's unsafe (e.g. &#83;) 
+                            // If the & is followed by a #, it's unsafe (e.g. &#83;)
                             if (s[n + 1] == '#') return true;
                             break;
                     }

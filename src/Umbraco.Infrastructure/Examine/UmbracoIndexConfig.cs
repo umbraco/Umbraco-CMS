@@ -1,7 +1,7 @@
 using Examine;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public class UmbracoIndexConfig : IUmbracoIndexConfig
     {

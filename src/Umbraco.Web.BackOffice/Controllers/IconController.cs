@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Attributes;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController("UmbracoApi")]
     public class IconController : UmbracoAuthorizedApiController
@@ -20,7 +20,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="iconName"></param>
         /// <returns></returns>
-        [DetermineAmbiguousActionByPassingParameters]
         public IconModel GetIcon(string iconName)
         {
             return _iconService.GetIcon(iconName);

@@ -1,15 +1,12 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
-using Umbraco.Web.WebApi.Filters;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
-using Umbraco.Web.Security;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Security;
-using Umbraco.Web.Routing;
+﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Web.WebApi
 {

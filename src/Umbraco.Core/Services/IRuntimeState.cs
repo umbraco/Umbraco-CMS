@@ -1,9 +1,8 @@
 ﻿using System;
-using Semver;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Semver;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Represents the state of the Umbraco runtime.

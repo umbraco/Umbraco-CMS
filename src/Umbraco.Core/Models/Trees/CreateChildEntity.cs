@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
+﻿using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Models.Trees
+namespace Umbraco.Cms.Core.Models.Trees
 {
     /// <summary>
     /// Represents the refresh node menu item

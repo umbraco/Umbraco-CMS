@@ -4,9 +4,9 @@
 using System;
 using StackExchange.Profiling;
 using StackExchange.Profiling.SqlFormatters;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core.Logging;
 
-namespace Umbraco.Tests.TestHelpers.Stubs
+namespace Umbraco.Cms.Tests.Common.TestHelpers.Stubs
 {
     public class TestProfiler : IProfiler
     {

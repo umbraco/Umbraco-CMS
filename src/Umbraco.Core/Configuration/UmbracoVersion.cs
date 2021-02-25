@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Reflection;
-using Semver;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Cms.Core.Configuration
 {
     /// <summary>
     /// Represents the version of the executing code.
@@ -24,14 +25,13 @@ namespace Umbraco.Core.Configuration
             SemanticVersion = SemVersion.Parse(umbracoCoreAssembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion);
 
             // gets the non-semantic version
-            Current = SemanticVersion.GetVersion(3);
+            Version = SemanticVersion.GetVersion(3);
         }
 
         /// <summary>
         /// Gets the non-semantic version of the Umbraco code.
         /// </summary>
-        // TODO: rename to Version
-        public Version Current { get; }
+        public Version Version { get; }
 
         /// <summary>
         /// Gets the semantic version comments of the Umbraco code.

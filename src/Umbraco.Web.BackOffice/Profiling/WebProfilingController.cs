@@ -1,13 +1,11 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Hosting;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Controllers;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Profiling
+namespace Umbraco.Cms.Web.BackOffice.Profiling
 {
     /// <summary>
     /// The API controller used to display the state of the web profiler

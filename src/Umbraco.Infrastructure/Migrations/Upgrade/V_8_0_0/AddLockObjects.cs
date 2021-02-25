@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
+﻿using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class AddLockObjects : MigrationBase
     {
@@ -12,14 +12,14 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         public override void Migrate()
         {
             // some may already exist, just ensure everything we need is here
-            EnsureLockObject(Constants.Locks.Servers, "Servers");
-            EnsureLockObject(Constants.Locks.ContentTypes, "ContentTypes");
-            EnsureLockObject(Constants.Locks.ContentTree, "ContentTree");
-            EnsureLockObject(Constants.Locks.MediaTree, "MediaTree");
-            EnsureLockObject(Constants.Locks.MemberTree, "MemberTree");
-            EnsureLockObject(Constants.Locks.MediaTypes, "MediaTypes");
-            EnsureLockObject(Constants.Locks.MemberTypes, "MemberTypes");
-            EnsureLockObject(Constants.Locks.Domains, "Domains");
+            EnsureLockObject(Cms.Core.Constants.Locks.Servers, "Servers");
+            EnsureLockObject(Cms.Core.Constants.Locks.ContentTypes, "ContentTypes");
+            EnsureLockObject(Cms.Core.Constants.Locks.ContentTree, "ContentTree");
+            EnsureLockObject(Cms.Core.Constants.Locks.MediaTree, "MediaTree");
+            EnsureLockObject(Cms.Core.Constants.Locks.MemberTree, "MemberTree");
+            EnsureLockObject(Cms.Core.Constants.Locks.MediaTypes, "MediaTypes");
+            EnsureLockObject(Cms.Core.Constants.Locks.MemberTypes, "MemberTypes");
+            EnsureLockObject(Cms.Core.Constants.Locks.Domains, "Domains");
         }
 
         private void EnsureLockObject(int id, string name)

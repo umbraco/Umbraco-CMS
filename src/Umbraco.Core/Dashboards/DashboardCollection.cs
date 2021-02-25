@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Dashboards;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Dashboards
+namespace Umbraco.Cms.Core.Dashboards
 {
     public class DashboardCollection : BuilderCollectionBase<IDashboard>
     {

@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Common
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Common
 {
     public interface IColumnOptionBuilder<out TNext, out TNextFk> : IFluentBuilder
         where TNext : IFluentBuilder

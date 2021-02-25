@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Serialization
+﻿namespace Umbraco.Cms.Core.Serialization
 {
     public interface IJsonSerializer
     {

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Linq;
 using NPoco;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using MapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.MapperCollection;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     /// <summary>
     /// Implements <see cref="ISqlContext"/>.
@@ -22,7 +24,7 @@ namespace Umbraco.Core.Persistence
         /// <param name="databaseType">The database type.</param>
         /// <param name="mappers">The mappers.</param>
         public SqlContext(ISqlSyntaxProvider sqlSyntax, DatabaseType databaseType, IPocoDataFactory pocoDataFactory, IMapperCollection mappers = null)
-            : this(sqlSyntax, databaseType, pocoDataFactory, new Lazy<IMapperCollection>(() => mappers ?? new Mappers.MapperCollection(Enumerable.Empty<BaseMapper>())))
+            : this(sqlSyntax, databaseType, pocoDataFactory, new Lazy<IMapperCollection>(() => mappers ?? new MapperCollection(Enumerable.Empty<BaseMapper>())))
         { }
 
         /// <summary>

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Serilog.Events;
 
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     internal class MessageTemplateFilter : ILogFilter
     {

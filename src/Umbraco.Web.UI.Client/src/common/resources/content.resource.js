@@ -547,7 +547,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
-                        "GetEmpty",
+                        "GetEmptyBlueprint",
                         { blueprintId: blueprintId, parentId: parentId })),
                 'Failed to retrieve blueprint for id ' + blueprintId)
                 .then(function (result) {
@@ -639,7 +639,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
             else if (options.orderDirection === "desc") {
                 options.orderDirection = "Descending";
             }
-            
+
             //converts the value to a js bool
             function toBool(v) {
                 if (Utilities.isNumber(v)) {

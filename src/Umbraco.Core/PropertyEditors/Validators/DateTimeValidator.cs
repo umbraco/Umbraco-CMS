@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors.Validators
 {
     /// <summary>
     /// Used to validate if the value is a valid date/time

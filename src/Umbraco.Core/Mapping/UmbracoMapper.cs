@@ -3,9 +3,10 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Exceptions;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Mapping
+namespace Umbraco.Cms.Core.Mapping
 {
     // notes:
     // AutoMapper maps null to empty arrays, lists, etc

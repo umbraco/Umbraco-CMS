@@ -5,12 +5,11 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Extensions;
-using Constants = Umbraco.Core.Constants;
+using static Umbraco.Cms.Core.Constants.Web.Routing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
 {
     [TestFixture]
     public class EndpointRouteBuilderExtensionsTests
@@ -67,7 +66,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 
             if (!area.IsNullOrWhiteSpace())
             {
-                Assert.AreEqual(area, endpoint.RoutePattern.Defaults["area"]);
+                Assert.AreEqual(area, endpoint.RoutePattern.Defaults[AreaToken]);
             }
 
             if (!defaultAction.IsNullOrWhiteSpace())
@@ -75,7 +74,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
                 Assert.AreEqual(defaultAction, endpoint.RoutePattern.Defaults["action"]);
             }
 
-            Assert.AreEqual(controllerName, endpoint.RoutePattern.Defaults["controller"]);
+            Assert.AreEqual(controllerName, endpoint.RoutePattern.Defaults[ControllerToken]);
         }
 
         [TestCase("umbraco", Constants.Web.Mvc.BackOfficeApiArea, true, null)]
@@ -123,7 +122,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
 
             if (!area.IsNullOrWhiteSpace())
             {
-                Assert.AreEqual(area, endpoint.RoutePattern.Defaults["area"]);
+                Assert.AreEqual(area, endpoint.RoutePattern.Defaults[AreaToken]);
             }
 
             if (!defaultAction.IsNullOrWhiteSpace())
@@ -131,7 +130,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
                 Assert.AreEqual(defaultAction, endpoint.RoutePattern.Defaults["action"]);
             }
 
-            Assert.AreEqual(controllerName, endpoint.RoutePattern.Defaults["controller"]);
+            Assert.AreEqual(controllerName, endpoint.RoutePattern.Defaults[ControllerToken]);
         }
 
         private class Testing1Controller : ControllerBase

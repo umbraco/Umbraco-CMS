@@ -7,30 +7,28 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
-using Umbraco.Web;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Models.PublishedContent;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Templates;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -582,7 +580,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(3, result.Length);
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1174, 1173, 1046 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1174, 1173, 1046 }));
         }
 
         [Test]
@@ -595,7 +593,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(2, result.Length);
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1046 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1173, 1046 }));
         }
 
         [Test]
@@ -708,7 +706,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(10, result.Count());
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
         }
 
         [Test]
@@ -721,7 +719,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(9, result.Count());
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
         }
 
         [Test]

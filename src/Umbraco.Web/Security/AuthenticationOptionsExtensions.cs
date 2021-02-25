@@ -1,14 +1,4 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
-using Microsoft.Owin;
-using Microsoft.Owin.Security;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Security;
-using Current = Umbraco.Web.Composing.Current;
-
-
-namespace Umbraco.Web.Security
+﻿namespace Umbraco.Web.Security
 {
     public static class AuthenticationOptionsExtensions
     {

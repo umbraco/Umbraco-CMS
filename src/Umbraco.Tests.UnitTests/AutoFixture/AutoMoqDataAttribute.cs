@@ -10,19 +10,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Security;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Routing;
-using Umbraco.Web.Common.Install;
-using Umbraco.Web.Common.Security;
-using Umbraco.Web.WebApi;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Routing;
+using Umbraco.Cms.Web.Common.Install;
+using Umbraco.Cms.Web.Common.Security;
 
-namespace Umbraco.Tests.UnitTests.AutoFixture
+namespace Umbraco.Cms.Tests.UnitTests.AutoFixture
 {
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Constructor)]
     public class AutoMoqDataAttribute : AutoDataAttribute
@@ -54,7 +53,8 @@ namespace Umbraco.Tests.UnitTests.AutoFixture
                         .Customize(new ConstructorCustomization(typeof(PreviewController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(MemberController), new GreedyConstructorQuery()))
                         .Customize(new ConstructorCustomization(typeof(BackOfficeController), new GreedyConstructorQuery()))
-                        .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()));
+                        .Customize(new ConstructorCustomization(typeof(BackOfficeUserManager), new GreedyConstructorQuery()))
+                        .Customize(new ConstructorCustomization(typeof(MemberManager), new GreedyConstructorQuery()));
 
                     fixture.Customize(new AutoMoqCustomization());
 

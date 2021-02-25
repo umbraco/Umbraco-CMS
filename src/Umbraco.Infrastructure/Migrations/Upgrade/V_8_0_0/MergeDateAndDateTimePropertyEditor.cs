@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.IO;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class MergeDateAndDateTimePropertyEditor : MigrationBase
     {
@@ -23,7 +23,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            var dataTypes = GetDataTypes(Constants.PropertyEditors.Legacy.Aliases.Date);
+            var dataTypes = GetDataTypes(Cms.Core.Constants.PropertyEditors.Legacy.Aliases.Date);
 
             foreach (var dataType in dataTypes)
             {
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
                 config.OffsetTime = false;
 
-                dataType.EditorAlias = Constants.PropertyEditors.Aliases.DateTime;
+                dataType.EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.DateTime;
                 dataType.Configuration = ConfigurationEditor.ToDatabase(config, _configurationEditorJsonSerializer);
 
                 Database.Update(dataType);

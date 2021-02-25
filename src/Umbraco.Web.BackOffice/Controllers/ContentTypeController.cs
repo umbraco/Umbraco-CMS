@@ -10,30 +10,32 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Packaging;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
-using ContentType = Umbraco.Core.Models.ContentType;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
+using ContentType = Umbraco.Cms.Core.Models.ContentType;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// An API controller used for dealing with content types
     /// </summary>
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
+    [ParameterSwapControllerActionSelector(nameof(GetById), "id", typeof(int), typeof(Guid), typeof(Udi))]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         // TODO: Split this controller apart so that authz is consistent, currently we need to authz each action individually.
@@ -113,7 +115,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given id
         /// </summary>
-        [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public ActionResult<DocumentTypeDisplay> GetById(int id)
         {
@@ -130,7 +131,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given guid
         /// </summary>
-        [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public ActionResult<DocumentTypeDisplay> GetById(Guid id)
         {
@@ -147,7 +147,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         /// <summary>
         /// Gets the document type a given udi
         /// </summary>
-        [DetermineAmbiguousActionByPassingParameters]
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public ActionResult<DocumentTypeDisplay> GetById(Udi id)
         {

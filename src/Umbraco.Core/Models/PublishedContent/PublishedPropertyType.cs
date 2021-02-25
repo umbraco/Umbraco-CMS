@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Xml.Linq;
 using System.Xml.XPath;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Represents a published property type.

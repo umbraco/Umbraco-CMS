@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.IO;
-using System.Xml.Linq;
-using Umbraco.Core.Models.Packaging;
+using Umbraco.Cms.Core.Models.Packaging;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     public interface IPackageInstallation
     {

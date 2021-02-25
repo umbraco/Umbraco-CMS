@@ -11,31 +11,30 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Events;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.ContentApps;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.BackOffice.Extensions;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.ModelBinders;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Infrastructure.Services.Implement;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Models.ContentEditing;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <remarks>
     /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
@@ -50,11 +49,12 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UmbracoMapper _umbracoMapper;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
-        private readonly IMembersUserManager _memberManager;
+        private readonly IMemberManager _memberManager;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly IShortStringHelper _shortStringHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberController"/> class.
@@ -82,7 +82,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             UmbracoMapper umbracoMapper,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
-            IMembersUserManager memberManager,
+            IMemberManager memberManager,
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IJsonSerializer jsonSerializer)
@@ -97,6 +97,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _jsonSerializer = jsonSerializer;
+            _shortStringHelper = shortStringHelper;
         }
 
         /// <summary>
@@ -154,17 +155,10 @@ namespace Umbraco.Web.BackOffice.Controllers
         public MemberListDisplay GetListNodeDisplay(string listName)
         {
             IMemberType foundType = _memberTypeService.Get(listName);
-            var name = foundType != null ? foundType.Name : listName;
+            string name = foundType != null ? foundType.Name : listName;
 
-            var apps = new List<ContentApp>
-            {
-                ListViewContentAppFactory.CreateContentApp(
-                    _dataTypeService,
-                    _propertyEditors,
-                    listName,
-                    Constants.Security.DefaultMemberTypeAlias.ToLower(),
-                    Constants.DataTypes.DefaultMembersListView)
-            };
+            var apps = new List<ContentApp>();
+            apps.Add(ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, listName, "member", Core.Constants.DataTypes.DefaultMembersListView));
             apps[0].Active = true;
 
             var display = new MemberListDisplay
@@ -266,10 +260,20 @@ namespace Umbraco.Web.BackOffice.Controllers
             switch (contentItem.Action)
             {
                 case ContentSaveAction.Save:
-                    Task<ActionResult<bool>> updateSuccessful = UpdateMemberAsync(contentItem);
+                    ActionResult<bool> updateSuccessful = await UpdateMemberAsync(contentItem);
+                    if (!(updateSuccessful.Result is null))
+                    {
+                        return updateSuccessful.Result;
+                    }
+
                     break;
                 case ContentSaveAction.SaveNew:
-                    Task<ActionResult<bool>> createSuccessful = CreateMemberAsync(contentItem);
+                    ActionResult<bool> createSuccessful = await CreateMemberAsync(contentItem);
+                    if (!(createSuccessful.Result is null))
+                    {
+                        return createSuccessful.Result;
+                    }
+
                     break;
                 default:
                     // we don't support anything else for members
@@ -332,7 +336,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         /// <summary>
         /// Create a member from the supplied member content data
-        /// 
+        ///
         /// All member password processing and creation is done via the identity manager
         /// </summary>
         /// <param name="contentItem">Member content data</param>
@@ -358,20 +362,33 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return new ValidationErrorResult(created.Errors.ToErrorMessage());
             }
 
-            // now re-look the member back up which will now exist
+            // now re-look up the member, which will now exist
             IMember member = _memberService.GetByEmail(contentItem.Email);
+
+            // map the save info over onto the user
+            member = _umbracoMapper.Map<MemberSave, IMember>(contentItem, member);
 
             int creatorId = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Id;
             member.CreatorId = creatorId;
 
-            // map the save info over onto the user
-            member = _umbracoMapper.Map<MemberSave, IMember>(contentItem, member);
+            // assign the mapped property values that are not part of the identity properties
+            string[] builtInAliases = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper).Select(x => x.Key).ToArray();
+            foreach (ContentPropertyBasic property in contentItem.Properties)
+            {
+                if (builtInAliases.Contains(property.Alias) == false)
+                {
+                    member.Properties[property.Alias].SetValue(property.Value);
+                }
+            }
+
+            //TODO: do we need to resave the key?
+            //contentItem.PersistedContent.Key = contentItem.Key;
 
             // now the member has been saved via identity, resave the member with mapped content properties
             _memberService.Save(member);
             contentItem.PersistedContent = member;
 
-            AddOrUpdateRoles(contentItem);
+            await AddOrUpdateRoles(contentItem, identityMember);
             return true;
         }
 
@@ -455,7 +472,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             _memberService.Save(contentItem.PersistedContent);
 
-            AddOrUpdateRoles(contentItem);
+            await AddOrUpdateRoles(contentItem, identityMember);
             return true;
         }
 
@@ -479,7 +496,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                        $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}password");
                     return false;
                 }
-            }   
+            }
 
             IMember byUsername = _memberService.GetByUsername(contentItem.Username);
             if (byUsername != null && byUsername.Key != contentItem.Key)
@@ -516,16 +533,17 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         /// <summary>
-        /// TODO: refactor using identity roles
+        /// Add or update the identity roles
         /// </summary>
-        /// <param name="contentItem"></param>
-        private void AddOrUpdateRoles(MemberSave contentItem)
+        /// <param name="contentItem">The member content item</param>
+        /// <param name="identityMember">The member as an identity user</param>
+        private async Task AddOrUpdateRoles(MemberSave contentItem, MembersIdentityUser identityMember)
         {
             // We're gonna look up the current roles now because the below code can cause
             // events to be raised and developers could be manually adding roles to members in
             // their handlers. If we don't look this up now there's a chance we'll just end up
             // removing the roles they've assigned.
-            IEnumerable<string> currentRoles = _memberService.GetAllRoles(contentItem.PersistedContent.Username);
+            IEnumerable<string> currentRoles = await _memberManager.GetRolesAsync(identityMember);
 
             // find the ones to remove and remove them
             IEnumerable<string> roles = currentRoles.ToList();
@@ -535,7 +553,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             // if we are changing the username, it must be persisted before looking up the member roles).
             if (rolesToRemove.Any())
             {
-                _memberService.DissociateRoles(new[] { contentItem.PersistedContent.Username }, rolesToRemove);
+                IdentityResult rolesIdentityResult = await _memberManager.RemoveFromRolesAsync(identityMember, rolesToRemove);
             }
 
             // find the ones to add and add them
@@ -543,7 +561,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (toAdd.Any())
             {
                 // add the ones submitted
-                _memberService.AssignRoles(new[] { contentItem.PersistedContent.Username }, toAdd);
+                IdentityResult identityResult = await _memberManager.AddToRolesAsync(identityMember, toAdd);
             }
         }
 
@@ -556,6 +574,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult DeleteByKey(Guid key)
         {
+            //TODO: move to MembersUserStore
             IMember foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {

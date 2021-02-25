@@ -7,23 +7,22 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.Security;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
-    /// 
+    ///
     /// </summary>
     internal sealed class CheckIfUserTicketDataIsStaleAttribute : TypeFilterAttribute
     {
@@ -42,6 +41,7 @@ namespace Umbraco.Web.BackOffice.Filters
             private readonly IOptions<GlobalSettings> _globalSettings;
             private readonly IBackOfficeSignInManager _backOfficeSignInManager;
             private readonly IBackOfficeAntiforgery _backOfficeAntiforgery;
+            private readonly IScopeProvider _scopeProvider;
 
             public CheckIfUserTicketDataIsStaleFilter(
                 IRequestCache requestCache,
@@ -51,7 +51,8 @@ namespace Umbraco.Web.BackOffice.Filters
                 ILocalizedTextService localizedTextService,
                 IOptions<GlobalSettings> globalSettings,
                 IBackOfficeSignInManager backOfficeSignInManager,
-                IBackOfficeAntiforgery backOfficeAntiforgery)
+                IBackOfficeAntiforgery backOfficeAntiforgery,
+                IScopeProvider scopeProvider)
             {
                 _requestCache = requestCache;
                 _umbracoMapper = umbracoMapper;
@@ -61,6 +62,7 @@ namespace Umbraco.Web.BackOffice.Filters
                 _globalSettings = globalSettings;
                 _backOfficeSignInManager = backOfficeSignInManager;
                 _backOfficeAntiforgery = backOfficeAntiforgery;
+                _scopeProvider = scopeProvider;
             }
 
 
@@ -96,61 +98,64 @@ namespace Umbraco.Web.BackOffice.Filters
 
             private async Task CheckStaleData(ActionExecutingContext actionContext)
             {
-                if (actionContext?.HttpContext.Request == null || actionContext.HttpContext.User?.Identity == null)
+                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
                 {
-                    return;
-                }
-
-                // don't execute if it's already been done
-                if (!(_requestCache.Get(nameof(CheckIfUserTicketDataIsStaleFilter)) is null))
-                {
-                    return;
-                }
-
-                var identity = actionContext.HttpContext.User.Identity as UmbracoBackOfficeIdentity;
-                if (identity == null)
-                {
-                    return;
-                }
-
-                Attempt<int> userId = identity.Id.TryConvertTo<int>();
-                if (userId == false)
-                {
-                    return;
-                }
-
-                IUser user = _userService.GetUserById(userId.Result);
-                if (user == null)
-                {
-                    return;
-                }
-
-                // a list of checks to execute, if any of them pass then we resync
-                var checks = new Func<bool>[]
-                {
-                    () => user.Username != identity.Username,
-                    () =>
+                    if (actionContext?.HttpContext.Request == null || actionContext.HttpContext.User?.Identity == null)
                     {
-                        CultureInfo culture = user.GetUserCulture(_localizedTextService, _globalSettings.Value);
-                        return culture != null && culture.ToString() != identity.Culture;
-                    },
-                    () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,
-                    () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false,
-                    () =>
-                    {
-                        var startContentIds = user.CalculateContentStartNodeIds(_entityService);
-                        return startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false;
-                    },
-                    () =>
-                    {
-                        var startMediaIds = user.CalculateMediaStartNodeIds(_entityService);
-                        return startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false;
+                        return;
                     }
-                };
 
-                if (checks.Any(check => check()))
-                {
-                    await ReSync(user, actionContext);
+                    // don't execute if it's already been done
+                    if (!(_requestCache.Get(nameof(CheckIfUserTicketDataIsStaleFilter)) is null))
+                    {
+                        return;
+                    }
+
+                    var identity = actionContext.HttpContext.User.Identity as ClaimsIdentity;
+                    if (identity == null)
+                    {
+                        return;
+                    }
+
+                    Attempt<int> userId = identity.GetId().TryConvertTo<int>();
+                    if (userId == false)
+                    {
+                        return;
+                    }
+
+                    IUser user = _userService.GetUserById(userId.Result);
+                    if (user == null)
+                    {
+                        return;
+                    }
+
+                    // a list of checks to execute, if any of them pass then we resync
+                    var checks = new Func<bool>[]
+                    {
+                        () => user.Username != identity.GetUsername(),
+                        () =>
+                        {
+                            CultureInfo culture = user.GetUserCulture(_localizedTextService, _globalSettings.Value);
+                            return culture != null && culture.ToString() != identity.GetCultureString();
+                        },
+                        () => user.AllowedSections.UnsortedSequenceEqual(identity.GetAllowedApplications()) == false,
+                        () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.GetRoles()) == false,
+                        () =>
+                        {
+                            var startContentIds = user.CalculateContentStartNodeIds(_entityService);
+                            return startContentIds.UnsortedSequenceEqual(identity.GetStartContentNodes()) == false;
+                        },
+                        () =>
+                        {
+                            var startMediaIds = user.CalculateMediaStartNodeIds(_entityService);
+                            return startMediaIds.UnsortedSequenceEqual(identity.GetStartMediaNodes()) == false;
+                        }
+                    };
+
+                    if (checks.Any(check => check()))
+                    {
+                        await ReSync(user, actionContext);
+                    }
                 }
             }
 

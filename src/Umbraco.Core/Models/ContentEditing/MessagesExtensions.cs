@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using Umbraco.Core;
+using Umbraco.Cms.Core.Models.ContentEditing;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Extensions
 {
     public static class MessagesExtensions
     {

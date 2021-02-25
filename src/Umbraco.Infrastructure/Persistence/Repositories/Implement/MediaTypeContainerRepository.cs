@@ -1,13 +1,14 @@
 ﻿using Microsoft.Extensions.Logging;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     class MediaTypeContainerRepository : EntityContainerRepository, IMediaTypeContainerRepository
     {
         public MediaTypeContainerRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MediaTypeContainerRepository> logger)
-            : base(scopeAccessor, cache, logger, Constants.ObjectTypes.MediaTypeContainer)
+            : base(scopeAccessor, cache, logger, Cms.Core.Constants.ObjectTypes.MediaTypeContainer)
         { }
     }
 }

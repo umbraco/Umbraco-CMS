@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Extensions
 {
@@ -12,7 +12,7 @@ namespace Umbraco.Extensions
             var asString = property.GetValue() as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new HtmlString(string.Empty);
 
-            var view = "Grid/" + framework;
+            var view = "grid/" + framework;
             return html.Partial(view, property.GetValue());
         }
 
@@ -34,7 +34,7 @@ namespace Umbraco.Extensions
             if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
             if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyAlias));
 
-            var view = "Grid/" + framework;
+            var view = "grid/" + framework;
             var prop = contentItem.GetProperty(propertyAlias);
             if (prop == null) throw new InvalidOperationException("No property type found with alias " + propertyAlias);
             var model = prop.GetValue();
@@ -63,7 +63,7 @@ namespace Umbraco.Extensions
             if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
             if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyAlias));
 
-            var view = "Grid/" + framework;
+            var view = "grid/" + framework;
             var prop = contentItem.GetProperty(propertyAlias);
             if (prop == null) throw new InvalidOperationException("No property type found with alias " + propertyAlias);
             var model = prop.GetValue();
@@ -78,7 +78,7 @@ namespace Umbraco.Extensions
             var asString = property.GetValue() as string;
             if (asString != null && string.IsNullOrEmpty(asString)) return new HtmlString(string.Empty);
 
-            var view = "Grid/" + framework;
+            var view = "grid/" + framework;
             return html.Partial(view, property.GetValue());
         }
 
@@ -100,7 +100,7 @@ namespace Umbraco.Extensions
             if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
             if (string.IsNullOrWhiteSpace(propertyAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(propertyAlias));
 
-            var view = "Grid/" + framework;
+            var view = "grid/" + framework;
             var prop = contentItem.GetProperty(propertyAlias);
             if (prop == null) throw new InvalidOperationException("No property type found with alias " + propertyAlias);
             var model = prop.GetValue();

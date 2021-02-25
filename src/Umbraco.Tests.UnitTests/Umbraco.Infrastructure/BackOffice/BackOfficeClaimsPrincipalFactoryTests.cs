@@ -9,14 +9,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Security;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.BackOffice
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.BackOffice
 {
     [TestFixture]
     public class BackOfficeClaimsPrincipalFactoryTests
@@ -57,13 +56,13 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.BackOffice
         }
 
         [Test]
-        public async Task CreateAsync_Should_Create_Principal_With_Umbraco_Identity()
+        public async Task CreateAsync_Should_Create_Principal_With_Claims_Identity()
         {
             BackOfficeClaimsPrincipalFactory sut = CreateSut();
 
             ClaimsPrincipal claimsPrincipal = await sut.CreateAsync(_testUser);
 
-            var umbracoBackOfficeIdentity = claimsPrincipal.Identity as UmbracoBackOfficeIdentity;
+            var umbracoBackOfficeIdentity = claimsPrincipal.Identity as ClaimsIdentity;
             Assert.IsNotNull(umbracoBackOfficeIdentity);
         }
 

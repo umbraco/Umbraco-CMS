@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Deploy
+﻿namespace Umbraco.Cms.Core.Deploy
 {
     /// <summary>
     /// Represents an artifact dependency.

@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Media.EmbedProviders
+namespace Umbraco.Cms.Core.Media.EmbedProviders
 {
     /// <summary>
     /// Wrapper class for OEmbed response
@@ -9,10 +9,13 @@ namespace Umbraco.Web.Media.EmbedProviders
     [DataContract]
     public class OEmbedResponse
     {
+        [DataMember(Name ="type")]
         public string Type { get; set; }
 
+        [DataMember(Name ="version")]
         public string Version { get; set; }
 
+        [DataMember(Name ="title")]
         public string Title { get; set; }
 
         [DataMember(Name ="author_name")]
@@ -36,12 +39,16 @@ namespace Umbraco.Web.Media.EmbedProviders
         [DataMember(Name ="thumbnail_width")]
         public double? ThumbnailWidth { get; set; }
 
+        [DataMember(Name ="html")]
         public string Html { get; set; }
 
+        [DataMember(Name ="url")]
         public string Url { get; set; }
 
+        [DataMember(Name ="height")]
         public double? Height { get; set; }
 
+        [DataMember(Name ="width")]
         public double? Width { get; set; }
 
         /// <summary>

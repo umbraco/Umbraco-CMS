@@ -5,13 +5,14 @@ using System;
 using System.IO;
 using System.Text;
 using NUnit.Framework;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.IO.MediaPathSchemes;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.IO.MediaPathSchemes;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.IO
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
 {
     [TestFixture]
     [UmbracoTest]

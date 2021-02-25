@@ -1,9 +1,9 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Umbraco.Core;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Common.Security
+namespace Umbraco.Cms.Web.Common.Security
 {
     // TODO: This is only for the back office, does it need to be in common?
 

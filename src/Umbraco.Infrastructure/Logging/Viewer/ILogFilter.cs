@@ -1,6 +1,6 @@
 ﻿using Serilog.Events;
 
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     public interface ILogFilter
     {

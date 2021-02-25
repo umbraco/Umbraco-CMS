@@ -1,51 +1,55 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore
 {
-    public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBegin>,  INotificationHandler<UmbracoRequestEnd>
+    public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBegin>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly WebRoutingSettings _webRoutingSettings;
         private readonly ISet<string> _applicationUrls = new HashSet<string>();
         private Uri _currentApplicationUrl;
+        private object _initLocker = new object();
+        private bool _hasAppUrl = false;
+        private bool _isInit = false;
 
-        public AspNetCoreRequestAccessor(IHttpContextAccessor httpContextAccessor,
-            IUmbracoContextAccessor umbracoContextAccessor,
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AspNetCoreRequestAccessor"/> class.
+        /// </summary>
+        public AspNetCoreRequestAccessor(
+            IHttpContextAccessor httpContextAccessor,
             IOptions<WebRoutingSettings> webRoutingSettings)
         {
             _httpContextAccessor = httpContextAccessor;
-            _umbracoContextAccessor = umbracoContextAccessor;
             _webRoutingSettings = webRoutingSettings.Value;
 
         }
 
-
+        /// <inheritdoc/>
         public string GetRequestValue(string name) => GetFormValue(name) ?? GetQueryStringValue(name);
 
-        public string GetFormValue(string name)
+        private string GetFormValue(string name)
         {
             var request = _httpContextAccessor.GetRequiredHttpContext().Request;
             if (!request.HasFormContentType) return null;
             return request.Form[name];
         }
 
+        /// <inheritdoc/>
         public string GetQueryStringValue(string name) => _httpContextAccessor.GetRequiredHttpContext().Request.Query[name];
 
-        public event EventHandler<UmbracoRequestEventArgs> EndRequest;
-
-        public event EventHandler<RoutableAttemptEventArgs> RouteAttempt;
-
+        /// <inheritdoc/>
         public Uri GetRequestUrl() => _httpContextAccessor.HttpContext != null ? new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl()) : null;
 
+        /// <inheritdoc/>
         public Uri GetApplicationUrl()
         {
             // Fixme: This causes problems with site swap on azure because azure pre-warms a site by calling into `localhost` and when it does that
@@ -80,17 +84,16 @@ namespace Umbraco.Web.Common.AspNetCore
             return _currentApplicationUrl;
         }
 
+        /// <summary>
+        /// This just initializes the application URL on first request attempt
+        /// TODO: This doesn't belong here, the GetApplicationUrl doesn't belong to IRequestAccessor
+        /// this should be part of middleware not a lazy init based on an INotification
+        /// </summary>
         public void Handle(UmbracoRequestBegin notification)
-        {
-            var reason = EnsureRoutableOutcome.IsRoutable; //TODO get the correct value here like in UmbracoInjectedModule
-            RouteAttempt?.Invoke(this, new RoutableAttemptEventArgs(reason, _umbracoContextAccessor.UmbracoContext));
-        }
-
-        public void Handle(UmbracoRequestEnd notification)
-        {
-            EndRequest?.Invoke(this, new UmbracoRequestEventArgs(_umbracoContextAccessor.UmbracoContext));
-        }
-
-
+            => LazyInitializer.EnsureInitialized(ref _hasAppUrl, ref _isInit, ref _initLocker, () =>
+            {
+                GetApplicationUrl();
+                return true;
+            });
     }
 }

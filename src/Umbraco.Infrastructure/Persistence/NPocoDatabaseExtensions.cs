@@ -5,10 +5,11 @@ using System.Data.SqlClient;
 using System.Text.RegularExpressions;
 using NPoco;
 using StackExchange.Profiling.Data;
-using Umbraco.Core.Persistence.FaultHandling;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods to NPoco Database class.

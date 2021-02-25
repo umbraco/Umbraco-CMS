@@ -6,12 +6,13 @@ using System.Text;
 using System.Threading;
 using NPoco;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Persistence
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 {
     [TestFixture]
     [Timeout(60000)]

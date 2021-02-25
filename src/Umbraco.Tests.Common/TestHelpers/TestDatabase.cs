@@ -12,11 +12,11 @@ using Moq;
 using NPoco;
 using NPoco.DatabaseTypes;
 using NPoco.Linq;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-namespace Umbraco.Tests.Testing
+namespace Umbraco.Cms.Tests.Common.TestHelpers
 {
     /// <summary>
     /// An implementation of <see cref="IUmbracoDatabase"/> for tests.

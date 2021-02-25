@@ -1,8 +1,7 @@
 ﻿using System;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     internal static class CacheKeys
     {

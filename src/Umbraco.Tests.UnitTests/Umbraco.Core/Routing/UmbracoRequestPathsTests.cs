@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Routing;
-using Umbraco.Web.Common.AspNetCore;
-using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 {
     [TestFixture]
     public class UmbracoRequestPathsTests
@@ -25,9 +25,12 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
 
         private AspNetCoreHostingEnvironment CreateHostingEnvironment(string virtualPath = "")
         {
+
             var hostingSettings = new HostingSettings { ApplicationVirtualPath = virtualPath };
+            var webRoutingSettings = new WebRoutingSettings();
             var mockedOptionsMonitorOfHostingSettings = Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
-            return new AspNetCoreHostingEnvironment(mockedOptionsMonitorOfHostingSettings, _hostEnvironment);
+            var mockedOptionsMonitorOfWebRoutingSettings = Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == webRoutingSettings);
+            return new AspNetCoreHostingEnvironment(mockedOptionsMonitorOfHostingSettings, mockedOptionsMonitorOfWebRoutingSettings, _hostEnvironment);
         }
 
         [TestCase("/favicon.ico", true)]
@@ -65,7 +68,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
         [TestCase("http://www.domain.com/Umbraco/", "", true)]
         [TestCase("http://www.domain.com/umbraco/default.aspx", "", true)]
         [TestCase("http://www.domain.com/umbraco/test/test", "", false)]
-        [TestCase("http://www.domain.com/umbraco/test/test/test", "", false)]        
+        [TestCase("http://www.domain.com/umbraco/test/test/test", "", false)]
         [TestCase("http://www.domain.com/umbrac", "", false)]
         [TestCase("http://www.domain.com/test", "", false)]
         [TestCase("http://www.domain.com/test/umbraco", "", false)]
@@ -84,7 +87,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Routing
             var umbracoRequestPaths = new UmbracoRequestPaths(Options.Create(_globalSettings), hostingEnvironment);
             Assert.AreEqual(expected, umbracoRequestPaths.IsBackOfficeRequest(source.AbsolutePath));
         }
-        
+
         [TestCase("http://www.domain.com/install", true)]
         [TestCase("http://www.domain.com/Install/", true)]
         [TestCase("http://www.domain.com/install/default.aspx", true)]

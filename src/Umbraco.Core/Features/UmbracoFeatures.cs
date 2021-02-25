@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Web.Features
+namespace Umbraco.Cms.Core.Features
 {
     /// <summary>
     /// Represents the Umbraco features.

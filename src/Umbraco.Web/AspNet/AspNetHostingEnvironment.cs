@@ -4,10 +4,12 @@ using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Hosting
 {
@@ -17,6 +19,7 @@ namespace Umbraco.Web.Hosting
 
         private readonly HostingSettings _hostingSettings;
         private string _localTempPath;
+        private Uri _applicationMainUrl;
 
 
         public AspNetHostingEnvironment(IOptions<HostingSettings> hostingSettings)
@@ -29,7 +32,6 @@ namespace Umbraco.Web.Hosting
             ApplicationVirtualPath = _hostingSettings.ApplicationVirtualPath?.EnsureStartsWith('/')
                                      ?? HostingEnvironment.ApplicationVirtualPath?.EnsureStartsWith("/")
                                      ?? "/";
-            IISVersion = HttpRuntime.IISVersion;
         }
 
         public string SiteName { get; }
@@ -42,7 +44,11 @@ namespace Umbraco.Web.Hosting
         /// <inheritdoc/>
         public bool IsHosted => (HttpContext.Current != null || HostingEnvironment.IsHosted);
 
-        public Version IISVersion { get; }
+        public Uri ApplicationMainUrl
+        {
+            get => _applicationMainUrl;
+            set => _applicationMainUrl = value;
+        }
 
         public string MapPathWebRoot(string path)
         {
@@ -57,6 +63,7 @@ namespace Umbraco.Web.Hosting
         public string MapPathContentRoot(string path) => MapPathWebRoot(path);
 
         public string ToAbsolute(string virtualPath) => VirtualPathUtility.ToAbsolute(virtualPath, ApplicationVirtualPath);
+        public void EnsureApplicationMainUrl(Uri currentApplicationUrl) => throw new NotImplementedException();
 
 
         public string LocalTempPath

@@ -1,8 +1,8 @@
 ﻿using System.Data;
-using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Migrations.Expressions.Common.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
 
-namespace Umbraco.Core.Migrations.Expressions.Create.ForeignKey
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ForeignKey
 {
     public class CreateForeignKeyBuilder : ExpressionBuilderBase<CreateForeignKeyExpression>,
         ICreateForeignKeyFromTableBuilder,

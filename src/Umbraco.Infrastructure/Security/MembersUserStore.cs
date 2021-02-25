@@ -7,14 +7,14 @@ using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Core;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// A custom user store that uses Umbraco member data
@@ -32,13 +32,12 @@ namespace Umbraco.Infrastructure.Security
         /// <param name="mapper">The mapper for properties</param>
         /// <param name="scopeProvider">The scope provider</param>
         /// <param name="describer">The error describer</param>
-        /// 
         public MembersUserStore(IMemberService memberService, UmbracoMapper mapper, IScopeProvider scopeProvider, IdentityErrorDescriber describer)
         : base(describer)
         {
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
-            _mapper = mapper;
-            _scopeProvider = scopeProvider;
+            _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
+            _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
         }
 
         /// <summary>
@@ -55,7 +54,7 @@ namespace Umbraco.Infrastructure.Security
         public override Task SetNormalizedUserNameAsync(MembersIdentityUser user, string normalizedName, CancellationToken cancellationToken) => SetUserNameAsync(user, normalizedName, cancellationToken);
 
         /// <inheritdoc />
-        public override Task<IdentityResult> CreateAsync(MembersIdentityUser user, CancellationToken cancellationToken)
+        public override Task<IdentityResult> CreateAsync(MembersIdentityUser user, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -70,7 +69,6 @@ namespace Umbraco.Infrastructure.Security
                 user.Email,
                 user.Name.IsNullOrWhiteSpace() ? user.UserName : user.Name,
                 user.MemberTypeAlias.IsNullOrWhiteSpace() ? Constants.Security.DefaultMemberTypeAlias : user.MemberTypeAlias);
-
 
             UpdateMemberProperties(memberEntity, user);
 
@@ -97,8 +95,6 @@ namespace Umbraco.Infrastructure.Security
             //            x.ProviderKey,
             //            x.UserData)));
             //}
-
-            // TODO: confirm re roles implementations
 
             return Task.FromResult(IdentityResult.Success);
         }
@@ -305,7 +301,7 @@ namespace Umbraco.Infrastructure.Security
 
             return Task.FromResult((IList<UserLoginInfo>)user.Logins.Select(l => new UserLoginInfo(l.LoginProvider, l.ProviderKey, l.LoginProvider)).ToList());
         }
-        
+
         /// <inheritdoc />
         protected override async Task<IdentityUserLogin<string>> FindUserLoginAsync(string userId, string loginProvider, string providerKey, CancellationToken cancellationToken)
         {
@@ -340,8 +336,10 @@ namespace Umbraco.Infrastructure.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
 
+            var logins = new List<IIdentityUserLogin>();
+
             // TODO: external login needed?
-            var logins = new List<IIdentityUserLogin>(); //_externalLoginService.Find(loginProvider, providerKey).ToList();
+            //_externalLoginService.Find(loginProvider, providerKey).ToList();
             if (logins.Count == 0)
             {
                 return Task.FromResult((IdentityUserLogin<string>)null);
@@ -357,10 +355,8 @@ namespace Umbraco.Infrastructure.Security
             });
         }
 
-        /// <summary>
-        /// Adds a user to a role (user group)
-        /// </summary>
-        public override Task AddToRoleAsync(MembersIdentityUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
+        /// <inheritdoc />
+        public override Task AddToRoleAsync(MembersIdentityUser user, string role, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -369,30 +365,29 @@ namespace Umbraco.Infrastructure.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            if (normalizedRoleName == null)
+            if (role == null)
             {
-                throw new ArgumentNullException(nameof(normalizedRoleName));
+                throw new ArgumentNullException(nameof(role));
             }
 
-            if (string.IsNullOrWhiteSpace(normalizedRoleName))
+            if (string.IsNullOrWhiteSpace(role))
             {
-                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(normalizedRoleName));
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(role));
             }
 
-            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == normalizedRoleName);
+            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == role);
 
             if (userRole == null)
             {
-                user.AddRole(normalizedRoleName);
+                _memberService.AssignRole(user.UserName, role);
+                user.AddRole(role);
             }
 
             return Task.CompletedTask;
         }
 
-        /// <summary>
-        /// Removes the role (user group) for the user
-        /// </summary>
-        public override Task RemoveFromRoleAsync(MembersIdentityUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
+        /// <inheritdoc/>
+        public override Task RemoveFromRoleAsync(MembersIdentityUser user, string role, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
 
@@ -401,20 +396,21 @@ namespace Umbraco.Infrastructure.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            if (normalizedRoleName == null)
+            if (role == null)
             {
-                throw new ArgumentNullException(nameof(normalizedRoleName));
+                throw new ArgumentNullException(nameof(role));
             }
 
-            if (string.IsNullOrWhiteSpace(normalizedRoleName))
+            if (string.IsNullOrWhiteSpace(role))
             {
-                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(normalizedRoleName));
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(role));
             }
 
-            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == normalizedRoleName);
+            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == role);
 
             if (userRole != null)
             {
+                _memberService.DissociateRole(user.UserName, userRole.RoleId);
                 user.Roles.Remove(userRole);
             }
 
@@ -422,7 +418,7 @@ namespace Umbraco.Infrastructure.Security
         }
 
         /// <summary>
-        /// Returns the roles (user groups) for this user
+        /// Gets a list of role names the specified user belongs to.
         /// </summary>
         public override Task<IList<string>> GetRolesAsync(MembersIdentityUser user, CancellationToken cancellationToken = default)
         {
@@ -433,6 +429,14 @@ namespace Umbraco.Infrastructure.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
+            IEnumerable<string> currentRoles = _memberService.GetAllRoles(user.UserName);
+            ICollection<IdentityUserRole<string>> roles = currentRoles.Select(role => new IdentityUserRole<string>
+            {
+                RoleId = role,
+                UserId = user.Id
+            }).ToList();
+
+            user.Roles = roles;
             return Task.FromResult((IList<string>)user.Roles.Select(x => x.RoleId).ToList());
         }
 
@@ -519,7 +523,7 @@ namespace Umbraco.Infrastructure.Security
         {
             if (user != null)
             {
-                //TODO: when to 
+                //TODO: when to
                 //user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetAll(UserIdToInt(user.Id))));
             }
 
@@ -550,13 +554,13 @@ namespace Umbraco.Infrastructure.Security
                 member.LastPasswordChangeDate = identityUserMember.LastPasswordChangeDateUtc.Value.ToLocalTime();
             }
 
-            //if (identityUser.IsPropertyDirty(nameof(MembersIdentityUser.EmailConfirmed))
-            //    || (user.EmailConfirmedDate.HasValue && user.EmailConfirmedDate.Value != default && identityUser.EmailConfirmed == false)
-            //    || ((user.EmailConfirmedDate.HasValue == false || user.EmailConfirmedDate.Value == default) && identityUser.EmailConfirmed))
-            //{
-            //    anythingChanged = true;
-            //    user.EmailConfirmedDate = identityUser.EmailConfirmed ? (DateTime?)DateTime.Now : null;
-            //}
+            if (identityUserMember.IsPropertyDirty(nameof(MembersIdentityUser.EmailConfirmed))
+                || (member.EmailConfirmedDate.HasValue && member.EmailConfirmedDate.Value != default && identityUserMember.EmailConfirmed == false)
+                || ((member.EmailConfirmedDate.HasValue == false || member.EmailConfirmedDate.Value == default) && identityUserMember.EmailConfirmed))
+            {
+                anythingChanged = true;
+                member.EmailConfirmedDate = identityUserMember.EmailConfirmed ? (DateTime?)DateTime.Now : null;
+            }
 
             if (identityUserMember.IsPropertyDirty(nameof(MembersIdentityUser.Name))
                 && member.Name != identityUserMember.Name && identityUserMember.Name.IsNullOrWhiteSpace() == false)
@@ -606,11 +610,11 @@ namespace Umbraco.Infrastructure.Security
                 member.PasswordConfiguration = identityUserMember.PasswordConfig;
             }
 
-            //if (user.SecurityStamp != identityUser.SecurityStamp)
-            //{
-            //    anythingChanged = true;
-            //    user.SecurityStamp = identityUser.SecurityStamp;
-            //}
+            if (member.SecurityStamp != identityUserMember.SecurityStamp)
+            {
+                anythingChanged = true;
+                member.SecurityStamp = identityUserMember.SecurityStamp;
+            }
 
             // TODO: Fix this for Groups too (as per backoffice comment)
             if (identityUserMember.IsPropertyDirty(nameof(MembersIdentityUser.Roles)) || identityUserMember.IsPropertyDirty(nameof(MembersIdentityUser.Groups)))

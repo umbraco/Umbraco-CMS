@@ -4,10 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Packaging;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Packaging;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     /// <summary>
     /// Parses the xml document contained in a compiled (zip) Umbraco package

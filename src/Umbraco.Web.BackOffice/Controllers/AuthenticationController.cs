@@ -10,30 +10,30 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Mail;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Models.Security;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Security;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Extensions;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Net;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Common.Security;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     // See
     // for a bigger example of this type of controller implementation in netcore:
@@ -64,8 +64,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly UserPasswordConfigurationSettings _passwordConfiguration;
         private readonly IEmailSender _emailSender;
         private readonly ISmsSender _smsSender;
-        private readonly Core.Hosting.IHostingEnvironment _hostingEnvironment;
-        private readonly IRequestAccessor _requestAccessor;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly LinkGenerator _linkGenerator;
         private readonly IBackOfficeExternalLoginProviders _externalAuthenticationOptions;
         private readonly IBackOfficeTwoFactorOptions _backOfficeTwoFactorOptions;
@@ -86,8 +85,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
             IEmailSender emailSender,
             ISmsSender smsSender,
-            Core.Hosting.IHostingEnvironment hostingEnvironment,
-            IRequestAccessor requestAccessor,
+            IHostingEnvironment hostingEnvironment,
             LinkGenerator linkGenerator,
             IBackOfficeExternalLoginProviders externalAuthenticationOptions,
             IBackOfficeTwoFactorOptions backOfficeTwoFactorOptions)
@@ -106,7 +104,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             _emailSender = emailSender;
             _smsSender = smsSender;
             _hostingEnvironment = hostingEnvironment;
-            _requestAccessor = requestAccessor;
             _linkGenerator = linkGenerator;
             _externalAuthenticationOptions = externalAuthenticationOptions;
             _backOfficeTwoFactorOptions = backOfficeTwoFactorOptions;
@@ -625,7 +622,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 });
 
             // Construct full URL using configured application URL (which will fall back to request)
-            var applicationUri = _requestAccessor.GetApplicationUrl();
+            var applicationUri = _hostingEnvironment.ApplicationMainUrl;
             var callbackUri = new Uri(applicationUri, action);
             return callbackUri.ToString();
         }

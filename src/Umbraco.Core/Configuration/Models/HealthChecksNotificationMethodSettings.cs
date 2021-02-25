@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
-using Umbraco.Core.HealthCheck;
+using Umbraco.Cms.Core.HealthChecks;
 
-namespace Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for healthcheck notification method settings.

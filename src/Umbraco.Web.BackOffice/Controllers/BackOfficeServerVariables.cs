@@ -6,25 +6,28 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Media;
-using Umbraco.Core.WebAssets;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure;
+using Umbraco.Cms.Web.BackOffice.HealthChecks;
+using Umbraco.Cms.Web.BackOffice.Profiling;
+using Umbraco.Cms.Web.BackOffice.PropertyEditors;
+using Umbraco.Cms.Web.BackOffice.Routing;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.BackOffice.Trees;
+using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.HealthCheck;
-using Umbraco.Web.BackOffice.Profiling;
-using Umbraco.Web.BackOffice.PropertyEditors;
-using Umbraco.Web.BackOffice.Routing;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.BackOffice.Trees;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Features;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Trees;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// Used to collect the server variables for use in the back office angular app

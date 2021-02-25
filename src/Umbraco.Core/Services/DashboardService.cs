@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Dashboards;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-using Umbraco.Web.Dashboards;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// A utility class for determine dashboard security

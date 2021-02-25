@@ -1,10 +1,12 @@
-﻿using Examine;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Examine;
 using Examine.LuceneEngine.Providers;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Implementation of <see cref="IIndexDiagnosticsFactory"/> which returns <see cref="LuceneIndexDiagnostics"/>

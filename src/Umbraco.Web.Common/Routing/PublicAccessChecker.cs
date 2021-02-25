@@ -1,6 +1,6 @@
-﻿using Umbraco.Web.Security;
+﻿using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Web.Common.Routing
 {
     public class PublicAccessChecker : IPublicAccessChecker
     {

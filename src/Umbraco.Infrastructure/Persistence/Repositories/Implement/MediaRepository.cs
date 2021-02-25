@@ -4,20 +4,22 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using static Umbraco.Core.Persistence.SqlExtensionsStatics;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMedia"/>
@@ -59,7 +61,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Repository Base
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.Media;
+        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.Media;
 
         protected override IMedia PerformGet(int id)
         {
@@ -150,26 +152,26 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // ah maybe not, that what's used for eg Exists in base repo
         protected override string GetBaseWhereClause()
         {
-            return $"{Constants.DatabaseSchema.Tables.Node}.id = @id";
+            return $"{Cms.Core.Constants.DatabaseSchema.Tables.Node}.id = @id";
         }
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
             var list = new List<string>
             {
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
-                "UPDATE " + Constants.DatabaseSchema.Tables.UserGroup + " SET startContentId = NULL WHERE startContentId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE parentId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.MediaVersion + " WHERE id IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
-                "DELETE FROM " + Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.User2NodeNotify + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2NodePermission + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.UserStartNode + " WHERE startNode = @id",
+                "UPDATE " + Cms.Core.Constants.DatabaseSchema.Tables.UserGroup + " SET startContentId = NULL WHERE startContentId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Relation + " WHERE parentId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Relation + " WHERE childId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.TagRelationship + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Document + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.MediaVersion + " WHERE id IN (SELECT id FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyData + " WHERE versionId IN (SELECT id FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id)",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Content + " WHERE nodeId = @id",
+                "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Node + " WHERE id = @id"
             };
             return list;
         }
@@ -384,7 +386,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         #region Recycle Bin
 
-        public override int RecycleBinId => Constants.System.RecycleBinMedia;
+        public override int RecycleBinId => Cms.Core.Constants.System.RecycleBinMedia;
 
         #endregion
 
@@ -503,9 +505,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private IEnumerable<IMedia> MapDtosToContent(List<ContentDto> dtos, bool withCache = false)
         {
-            var temps = new List<TempContent<Models.Media>>();
+            var temps = new List<TempContent<Core.Models.Media>>();
             var contentTypes = new Dictionary<int, IMediaType>();
-            var content = new Models.Media[dtos.Count];
+            var content = new Core.Models.Media[dtos.Count];
 
             for (var i = 0; i < dtos.Count; i++)
             {
@@ -517,7 +519,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
-                        content[i] = (Models.Media) cached;
+                        content[i] = (Core.Models.Media) cached;
                         continue;
                     }
                 }
@@ -534,7 +536,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 // need properties
                 var versionId = dto.ContentVersionDto.Id;
-                temps.Add(new TempContent<Models.Media>(dto.NodeId, versionId, 0, contentType, c));
+                temps.Add(new TempContent<Core.Models.Media>(dto.NodeId, versionId, 0, contentType, c));
             }
 
             // load all properties for all documents from database in 1 query - indexed by version id
@@ -559,8 +561,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // get properties - indexed by version id
             var versionId = dto.ContentVersionDto.Id;
-            var temp = new TempContent<Models.Media>(dto.NodeId, versionId, 0, contentType);
-            var properties = GetPropertyCollections(new List<TempContent<Models.Media>> { temp });
+            var temp = new TempContent<Core.Models.Media>(dto.NodeId, versionId, 0, contentType);
+            var properties = GetPropertyCollections(new List<TempContent<Core.Models.Media>> { temp });
             media.Properties = properties[versionId];
 
             // reset dirty initial properties (U4-1946)

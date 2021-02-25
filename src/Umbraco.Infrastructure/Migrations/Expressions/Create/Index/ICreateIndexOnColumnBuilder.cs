@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Core.Migrations.Expressions.Create.Index
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index
 {
     public interface ICreateIndexOnColumnBuilder : IFluentBuilder, IExecutableBuilder
     {

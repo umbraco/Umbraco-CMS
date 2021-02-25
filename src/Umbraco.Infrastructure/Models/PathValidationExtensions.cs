@@ -1,10 +1,12 @@
 ﻿using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Provides extension methods for path validation.

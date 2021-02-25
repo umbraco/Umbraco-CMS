@@ -6,13 +6,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Scoping;
-using Umbraco.Web.PublishedCache.NuCache.Snap;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.PublishedCache.Snap;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     /// <summary>
     /// Stores content in memory and persists it back to disk

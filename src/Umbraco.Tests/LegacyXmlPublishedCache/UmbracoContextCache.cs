@@ -1,5 +1,6 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Web;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache

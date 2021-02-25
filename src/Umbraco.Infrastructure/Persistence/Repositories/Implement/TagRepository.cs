@@ -4,16 +4,18 @@ using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
-using static Umbraco.Core.Persistence.SqlExtensionsStatics;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     internal class TagRepository : EntityRepositoryBase<int, ITag>, ITagRepository
     {
@@ -517,11 +519,11 @@ WHERE r.tagId IS NULL";
             switch (type)
             {
                 case TaggableObjectTypes.Content:
-                    return Constants.ObjectTypes.Document;
+                    return Cms.Core.Constants.ObjectTypes.Document;
                 case TaggableObjectTypes.Media:
-                    return Constants.ObjectTypes.Media;
+                    return Cms.Core.Constants.ObjectTypes.Media;
                 case TaggableObjectTypes.Member:
-                    return Constants.ObjectTypes.Member;
+                    return Cms.Core.Constants.ObjectTypes.Member;
                 default:
                     throw new ArgumentOutOfRangeException(nameof(type));
             }

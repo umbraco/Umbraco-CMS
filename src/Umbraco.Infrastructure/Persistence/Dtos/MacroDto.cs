@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Macro)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.Macro)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class MacroDto

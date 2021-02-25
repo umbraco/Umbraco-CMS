@@ -8,11 +8,11 @@ using AutoFixture.NUnit3;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Tests.Common.TestHelpers;
-using Umbraco.Tests.UnitTests.AutoFixture;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Tests.Common.TestHelpers;
+using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
     public class TaskHelperTests

@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Data.Common;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     public class SqlServerDbProviderFactoryCreator : IDbProviderFactoryCreator
     {
@@ -24,8 +24,8 @@ namespace Umbraco.Core.Persistence
         {
             return providerName switch
             {
-                Constants.DbProviderNames.SqlCe => throw new NotSupportedException("SqlCe is not supported"),
-                Constants.DbProviderNames.SqlServer => new SqlServerSyntaxProvider(),
+                Cms.Core.Constants.DbProviderNames.SqlCe => throw new NotSupportedException("SqlCe is not supported"),
+                Cms.Core.Constants.DbProviderNames.SqlServer => new SqlServerSyntaxProvider(),
                 _ => throw new InvalidOperationException($"Unknown provider name \"{providerName}\""),
             };
         }
@@ -34,9 +34,9 @@ namespace Umbraco.Core.Persistence
         {
             switch (providerName)
             {
-                case Constants.DbProviderNames.SqlCe:
+                case Cms.Core.Constants.DbProviderNames.SqlCe:
                     throw new NotSupportedException("SqlCe is not supported");
-                case Constants.DbProviderNames.SqlServer:
+                case Cms.Core.Constants.DbProviderNames.SqlServer:
                     return new SqlServerBulkSqlInsertProvider();
                 default:
                     return new BasicBulkSqlInsertProvider();

@@ -7,10 +7,10 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Services;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Extensions
 {
     [TestFixture]
     public class ModelStateExtensionsTests

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     /// <summary>
     /// Indicates that a tree is a core tree and should not be treated as a plugin tree.
