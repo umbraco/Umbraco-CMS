@@ -199,12 +199,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (parentId > 0 && parent == null)
                 throw new ArgumentException("No content with that id.", nameof(parentId));
 
-            var content = new Content(name, parentId, contentType);
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                CreateContent(scope, content, userId, false);
-                scope.Complete();
-            }
+            var content = new Content(name, parentId, contentType, userId);
 
             return content;
         }
@@ -227,20 +222,13 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                // not locking since not saving anything
+            var contentType = GetContentType(contentTypeAlias);
+            if (contentType == null)
+                throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
 
-                var contentType = GetContentType(contentTypeAlias);
-                if (contentType == null)
-                    throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
+            var content = new Content(name, parent, contentType, userId);
 
-                var content = new Content(name, parent, contentType);
-                CreateContent(scope, content, userId, false);
-
-                scope.Complete();
-                return content;
-            }
+            return content;
         }
 
         /// <summary>
@@ -256,7 +244,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             // TODO: what about culture?
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope(autoComplete:true))
             {
                 // locking the content tree secures content types too
                 scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
@@ -269,10 +257,10 @@ namespace Umbraco.Cms.Core.Services.Implement
                 if (parentId > 0 && parent == null)
                     throw new ArgumentException("No content with that id.", nameof(parentId)); // causes rollback
 
-                var content = parentId > 0 ? new Content(name, parent, contentType) : new Content(name, parentId, contentType);
-                CreateContent(scope, content, userId, true);
+                var content = parentId > 0 ? new Content(name, parent, contentType, userId) : new Content(name, parentId, contentType, userId);
 
-                scope.Complete();
+                Save(content, userId);
+
                 return content;
             }
         }
@@ -292,7 +280,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope(autoComplete:true))
             {
                 // locking the content tree secures content types too
                 scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
@@ -301,38 +289,12 @@ namespace Umbraco.Cms.Core.Services.Implement
                 if (contentType == null)
                     throw new ArgumentException("No content type with that alias.", nameof(contentTypeAlias)); // causes rollback
 
-                var content = new Content(name, parent, contentType);
-                CreateContent(scope, content, userId, true);
+                var content = new Content(name, parent, contentType, userId);
 
-                scope.Complete();
+                Save(content, userId);
+
                 return content;
             }
-        }
-
-        private void CreateContent(IScope scope, IContent content, int userId, bool withIdentity)
-        {
-            content.CreatorId = userId;
-            content.WriterId = userId;
-
-            if (withIdentity)
-            {
-                var evtMsgs = EventMessagesFactory.Get();
-
-                // if saving is cancelled, content remains without an identity
-                var saveEventArgs = new ContentSavingEventArgs(content, evtMsgs);
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
-                    return;
-
-                _documentRepository.Save(content);
-
-                scope.Events.Dispatch(Saved, this, saveEventArgs.ToContentSavedEventArgs(), nameof(Saved));
-                scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs());
-            }
-
-            if (withIdentity == false)
-                return;
-
-            Audit(AuditType.New, content.CreatorId, content.Id, $"Content '{content.Name}' was created with Id {content.Id}");
         }
 
         #endregion
