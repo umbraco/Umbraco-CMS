@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
@@ -45,6 +45,21 @@ namespace Umbraco.Cms.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
+        /// <param name="userId">The identifier of the user creating the Content object</param>
+        /// <param name="culture">An optional culture.</param>
+        public Content(string name, IContent parent, IContentType contentType, int userId, string culture = null)
+            : this(name, parent, contentType, new PropertyCollection(), culture)
+        {
+            CreatorId = userId;
+            WriterId = userId;
+        }
+
+        /// <summary>
+        /// Constructor for creating a Content object
+        /// </summary>
+        /// <param name="name">Name of the content</param>
+        /// <param name="parent">Parent <see cref="IContent"/> object</param>
+        /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
         /// <param name="culture">An optional culture.</param>
         public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
@@ -65,6 +80,21 @@ namespace Umbraco.Cms.Core.Models
         public Content(string name, int parentId, IContentType contentType, string culture = null)
             : this(name, parentId, contentType, new PropertyCollection(), culture)
         { }
+
+        /// <summary>
+        /// Constructor for creating a Content object
+        /// </summary>
+        /// <param name="name">Name of the content</param>
+        /// <param name="parentId">Id of the Parent content</param>
+        /// <param name="contentType">ContentType for the current Content object</param>
+        /// <param name="userId">The identifier of the user creating the Content object</param>
+        /// <param name="culture">An optional culture.</param>
+        public Content(string name, int parentId, IContentType contentType, int userId, string culture = null)
+            : this(name, parentId, contentType, new PropertyCollection(), culture)
+        {
+            CreatorId = userId;
+            WriterId = userId;
+        }
 
         /// <summary>
         /// Constructor for creating a Content object
