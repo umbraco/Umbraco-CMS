@@ -9,7 +9,20 @@
 
       const vm = this;
 
+      vm.removePromptIsVisible = false;
+
       vm.updateName = updateName;
+      vm.removeGroup = removeGroup;
+      vm.togglePrompt = togglePrompt;
+      vm.hidePrompt = hidePrompt;
+
+      function togglePrompt () {
+        vm.removePromptIsVisible = !vm.removePromptIsVisible;
+      }
+
+      function hidePrompt () {
+        vm.removePromptIsVisible = false;
+      }
 
       function updateName (group) {
         if (vm.onUpdateName) {
@@ -17,6 +30,12 @@
         }
       }
 
+      function removeGroup () {
+        if (vm.onRemove) {
+          vm.onRemove({ group: vm.group });
+          vm.removePromptIsVisible = false;
+        }
+      }
   }
 
   const umbContentTypeGroupComponent = {
@@ -26,7 +45,10 @@
       bindings: {
         group: "<",
         allowName: "<",
-        onUpdateName: "&"
+        onUpdateName: "&",
+        allowRemove: "<",
+        onRemove: "&",
+        sorting: "<"
       },
       controller: umbContentTypeGroupController
   };
