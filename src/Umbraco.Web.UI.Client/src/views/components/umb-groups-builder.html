@@ -119,7 +119,7 @@
                 ng-repeat="fieldset in model.fieldsets | filter:fieldsetsInGroup(model.groups[openTabIndex].id)"
                 group="fieldset"
                 allow-remove="!sortingMode"
-                on-remove="removeFieldset(fieldset)"
+                on-remove="removeFieldset(group)"
                 sorting="sortingMode && !fieldset.inherited">
                 
                 <ul class="umb-group-builder__properties">

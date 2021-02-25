@@ -467,6 +467,18 @@
 
             scope.propertiesInFieldset = (fieldsetId) => (property) => property && property.fieldsetId === fieldsetId;
 
+            scope.removeFieldset = function ({ id }) {
+                if (!id) {
+                    return;
+                }
+
+                // remove all properties related to the fieldset
+                scope.model.groups[scope.openTabIndex].properties = scope.model.groups[scope.openTabIndex].properties.filter(property => property.fieldsetId !== id);
+
+                // remove fieldset
+                scope.model.fieldsets = scope.model.fieldsets.filter(fieldset => fieldset.id !== id);
+            };
+
             /* ---------- GROUPS ---------- */
 
             scope.addGroup = function (group) {
