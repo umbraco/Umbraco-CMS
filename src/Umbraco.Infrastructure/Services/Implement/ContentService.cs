@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -242,7 +242,7 @@ namespace Umbraco.Core.Services.Implement
         {
             // TODO: what about culture?
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope(autoComplete:true))
             {
                 // locking the content tree secures content types too
                 scope.WriteLock(Constants.Locks.ContentTree);
@@ -256,21 +256,9 @@ namespace Umbraco.Core.Services.Implement
                     throw new ArgumentException("No content with that id.", nameof(parentId)); // causes rollback
 
                 var content = parentId > 0 ? new Content(name, parent, contentType, userId) : new Content(name, parentId, contentType, userId);
-                var evtMsgs = EventMessagesFactory.Get();
 
-                // if saving is cancelled, content remains without an identity
-                var saveEventArgs = new ContentSavingEventArgs(content, evtMsgs);
-                if (!scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
-                {
-                    _documentRepository.Save(content);
+                Save(content, userId);
 
-                    scope.Events.Dispatch(Saved, this, saveEventArgs.ToContentSavedEventArgs(), nameof(Saved));
-                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs());
-
-                    Audit(AuditType.New, content.CreatorId, content.Id, $"Content '{content.Name}' was created with Id {content.Id}");
-                }
-
-                scope.Complete();
                 return content;
             }
         }
@@ -290,7 +278,7 @@ namespace Umbraco.Core.Services.Implement
 
             if (parent == null) throw new ArgumentNullException(nameof(parent));
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope(autoComplete:true))
             {
                 // locking the content tree secures content types too
                 scope.WriteLock(Constants.Locks.ContentTree);
@@ -301,21 +289,8 @@ namespace Umbraco.Core.Services.Implement
 
                 var content = new Content(name, parent, contentType, userId);
 
-                var evtMsgs = EventMessagesFactory.Get();
+                Save(content, userId);
 
-                // if saving is cancelled, content remains without an identity
-                var saveEventArgs = new ContentSavingEventArgs(content, evtMsgs);
-                if (!scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
-                {
-                    _documentRepository.Save(content);
-
-                    scope.Events.Dispatch(Saved, this, saveEventArgs.ToContentSavedEventArgs(), nameof(Saved));
-                    scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshNode).ToEventArgs());
-
-                    Audit(AuditType.New, content.CreatorId, content.Id, $"Content '{content.Name}' was created with Id {content.Id}");
-                }
-
-                scope.Complete();
                 return content;
             }
         }

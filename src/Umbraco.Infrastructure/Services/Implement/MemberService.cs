@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -219,18 +219,7 @@ namespace Umbraco.Infrastructure.Services.Implement
 
                 var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
 
-                var saveEventArgs = new SaveEventArgs<IMember>(member);
-                if (!scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
-                {
-                    _memberRepository.Save(member);
-
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
-
-                    Audit(AuditType.New, member.CreatorId, member.Id, $"Member '{member.Name}' was created with Id {member.Id}");
-                }
-
-                scope.Complete();
+                Save(member);
                 return member;
             }
         }
@@ -301,18 +290,7 @@ namespace Umbraco.Infrastructure.Services.Implement
                     throw new ArgumentException($"Member type with alias {memberType.Alias} does not exist or is a different member type."); // causes rollback
                 var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
 
-                var saveEventArgs = new SaveEventArgs<IMember>(member);
-                if (!scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
-                {
-                    _memberRepository.Save(member);
-
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
-
-                    Audit(AuditType.New, member.CreatorId, member.Id, $"Member '{member.Name}' was created with Id {member.Id}");
-                }
-
-                scope.Complete();
+                Save(member);
                 return member;
             }
         }
@@ -428,7 +406,7 @@ namespace Umbraco.Infrastructure.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Constants.Locks.MemberTree);                
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.GetByUsername(username);
             }
         }
@@ -783,7 +761,7 @@ namespace Umbraco.Infrastructure.Services.Implement
         public void SetLastLogin(string username, DateTime date)
         {
             using (var scope = ScopeProvider.CreateScope())
-            {   
+            {
                 _memberRepository.SetLastLogin(username, date);
                 scope.Complete();
             }
