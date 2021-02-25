@@ -534,6 +534,7 @@
             };
 
             function addInitGroup(groups) {
+
                 var addGroup = true;
 
                 angular.forEach(groups, function (group) {
@@ -663,14 +664,14 @@
                             // close the editor
                             editorService.close();
 
-                            /*
-                            // push new init property to group
-                            addInitProperty(group);
+                            if (group) {
+                                // push new init property to group
+                                addInitProperty(group);
 
-                            // set focus on init property
-                            var numberOfProperties = group.properties.length;
-                            group.properties[numberOfProperties - 1].focus = true;
-                            */
+                                // set focus on init property
+                                var numberOfProperties = group.properties.length;
+                                group.properties[numberOfProperties - 1].focus = true;
+                            }
 
                             notifyChanged();
                         },
