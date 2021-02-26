@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IHostingEnvironment _hostingEnvironment;
 
         private const string PartialViewHeader = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage";
-        private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage";
+        private const string PartialViewMacroHeader = "@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage";
 
         public FileService(IScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IStylesheetRepository stylesheetRepository, IScriptRepository scriptRepository, ITemplateRepository templateRepository,
