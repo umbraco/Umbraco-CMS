@@ -17,7 +17,10 @@
           "exclude": [
             "**/obj/**",
             "**/bin/**"
-          ]
+          ],
+          "properties": {
+            "TargetFramework": "net5.0"
+          }
         }
       ],
       "dest": "api",
