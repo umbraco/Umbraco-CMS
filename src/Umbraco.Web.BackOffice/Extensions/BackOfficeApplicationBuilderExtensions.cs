@@ -20,8 +20,6 @@ namespace Umbraco.Extensions
                 throw new ArgumentNullException(nameof(app));
             }
 
-            app.UseBackOfficeUserManagerAuditing();
-
             if (!app.UmbracoCanBoot())
             {
                 return app;
@@ -53,13 +51,6 @@ namespace Umbraco.Extensions
                 previewRoutes.CreateRoutes(endpoints);
             });
 
-            return app;
-        }
-
-        private static IApplicationBuilder UseBackOfficeUserManagerAuditing(this IApplicationBuilder app)
-        {
-            var auditer = app.ApplicationServices.GetRequiredService<BackOfficeUserManagerAuditer>();
-            auditer.Start();
             return app;
         }
     }

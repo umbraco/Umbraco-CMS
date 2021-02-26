@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         private const string UmbracoSignInMgrXsrfKey = "XsrfId";
 
-        private BackOfficeUserManager _userManager;
+        private readonly BackOfficeUserManager _userManager;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly GlobalSettings _globalSettings;
 
@@ -429,17 +429,17 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 Logger.LogInformation("User: {UserName} logged in from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
                 if (user != null)
                 {
-                    _userManager.RaiseLoginSuccessEvent(Context.User, user.Id);
+                    _userManager.NotifyLoginSuccess(Context.User, user.Id);
                 }
             }
             else if (result.IsLockedOut)
             {
-                _userManager.RaiseAccountLockedEvent(Context.User, user.Id);
+                _userManager.NotifyAccountLocked(Context.User, user.Id);
                 Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}, the user is locked", username, Context.Connection.RemoteIpAddress);
             }
             else if (result.RequiresTwoFactor)
             {
-                _userManager.RaiseLoginRequiresVerificationEvent(Context.User, user.Id);
+                _userManager.NotifyLoginRequiresVerification(Context.User, user.Id);
                 Logger.LogInformation("Login attempt requires verification for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
             }
             else if (!result.Succeeded || result.IsNotAllowed)

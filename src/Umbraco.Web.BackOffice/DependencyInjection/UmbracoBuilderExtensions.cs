@@ -20,6 +20,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Extensions
 {
@@ -82,6 +83,11 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<PreviewAuthenticationMiddleware>();
             builder.Services.AddUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
             builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
+
+            builder.AddNotificationHandler<UserLoginSuccessNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserLoginFailedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserForgotPasswordRequestedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserForgotPasswordChangedNotification, BackOfficeUserManagerAuditer>();
 
             return builder;
         }
