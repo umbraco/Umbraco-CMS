@@ -289,7 +289,7 @@ stages:
           inputs:
               version: 5.x
         - task: PowerShell@2
-          displayName: 'Prep build tool, build C# & JS Docs'
+          displayName: 'Prep build tool - JS Docs'
           inputs:
               targetType: 'inline'
               script: |
@@ -297,9 +297,18 @@ stages:
                   $uenv.SandboxNode()
                   $uenv.CompileBelle()
                   $uenv.PrepareAngularDocs()
+                  $uenv.RestoreNode()
+              errorActionPreference: 'continue'
+              workingDirectory: 'build'
+
+        - task: PowerShell@2
+          displayName: 'Prep build tool -  C# Docs'
+          inputs:
+              targetType: 'inline'
+              script: |
+                  $uenv=./build.ps1 -get -doc
                   $nugetsourceUmbraco = "https://api.nuget.org/v3/index.json"
                   $uenv.PrepareCSharpDocs()
-                  $uenv.RestoreNode()
               errorActionPreference: 'continue'
               workingDirectory: 'build'
 
