@@ -2,11 +2,10 @@
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
-using Semver;
-using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public class UpgradeCheckRepository : IUpgradeCheckRepository
     {

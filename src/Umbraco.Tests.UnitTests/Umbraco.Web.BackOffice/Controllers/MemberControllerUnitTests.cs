@@ -12,37 +12,33 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Events;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.UnitTests.AutoFixture;
-using Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
-using Umbraco.Web;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Mapping;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.PropertyEditors;
-using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.ContentApps;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Mapping;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.UnitTests.AutoFixture;
+using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Mapping;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
+using MemberMapDefinition = Umbraco.Cms.Web.BackOffice.Mapping.MemberMapDefinition;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 {
     [TestFixture]
     public class MemberControllerUnitTests
@@ -388,7 +384,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
 
             var map = new MapDefinitionCollection(new List<IMapDefinition>()
             {
-                new global::Umbraco.Core.Models.Mapping.MemberMapDefinition(),
+                new global::Umbraco.Cms.Core.Models.Mapping.MemberMapDefinition(),
                 memberMapDefinition,
                 new ContentTypeMapDefinition(
                     commonMapper,

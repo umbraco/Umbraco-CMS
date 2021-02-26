@@ -3,10 +3,10 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Umbraco.Core.Hosting;
-using Umbraco.Web.Install.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Install.Models;
 
-namespace Umbraco.Web.Install.InstallSteps
+namespace Umbraco.Cms.Core.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall,
         "StarterKitCleanup", 32, "Almost done")]
@@ -33,7 +33,7 @@ namespace Umbraco.Web.Install.InstallSteps
 
         private void CleanupInstallation(int packageId, string packageFile)
         {
-            var zipFile = new FileInfo(Path.Combine(_hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.Packages), WebUtility.UrlDecode(packageFile)));
+            var zipFile = new FileInfo(Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages), WebUtility.UrlDecode(packageFile)));
 
             if (zipFile.Exists)
                 zipFile.Delete();

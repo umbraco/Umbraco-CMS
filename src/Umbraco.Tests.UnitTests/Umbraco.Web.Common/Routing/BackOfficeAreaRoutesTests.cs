@@ -7,19 +7,19 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Routing;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Routing;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.WebApi;
-using Constants = Umbraco.Core.Constants;
-using static Umbraco.Core.Constants.Web.Routing;
+using Constants = Umbraco.Cms.Core.Constants;
+using static Umbraco.Cms.Core.Constants.Web.Routing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
 {
     [TestFixture]
     public class BackOfficeAreaRoutesTests

@@ -1,16 +1,18 @@
-﻿using System;
+using System;
 using System.Threading;
-using Semver;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Migrations.Upgrade;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Represents the state of the Umbraco runtime.
@@ -51,7 +53,7 @@ namespace Umbraco.Core
 
 
         /// <inheritdoc />
-        public Version Version => _umbracoVersion.Current;
+        public Version Version => _umbracoVersion.Version;
 
         /// <inheritdoc />
         public string VersionComment => _umbracoVersion.Comment;

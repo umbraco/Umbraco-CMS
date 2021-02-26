@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Event args for cache refresher updates

@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.IO;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Web.ContentApps
+namespace Umbraco.Cms.Core.ContentApps
 {
     public class ContentAppFactoryCollectionBuilder : OrderedCollectionBuilderBase<ContentAppFactoryCollectionBuilder, ContentAppFactoryCollection, IContentAppFactory>
     {

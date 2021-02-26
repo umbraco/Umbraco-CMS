@@ -1,8 +1,7 @@
 using System;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
 
-
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core.Runtime
 {
     /// <summary>
     /// Represents the main AppDomain running for a given application.

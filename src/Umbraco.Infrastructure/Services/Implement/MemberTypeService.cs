@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, IMemberType, IMemberTypeService>, IMemberTypeService
     {
@@ -23,12 +24,12 @@ namespace Umbraco.Core.Services.Implement
         protected override IMemberTypeService This => this;
 
         // beware! order is important to avoid deadlocks
-        protected override int[] ReadLockIds { get; } = { Constants.Locks.MemberTypes };
-        protected override int[] WriteLockIds { get; } = { Constants.Locks.MemberTree, Constants.Locks.MemberTypes };
+        protected override int[] ReadLockIds { get; } = { Cms.Core.Constants.Locks.MemberTypes };
+        protected override int[] WriteLockIds { get; } = { Cms.Core.Constants.Locks.MemberTree, Cms.Core.Constants.Locks.MemberTypes };
 
         private IMemberService MemberService { get; }
 
-        protected override Guid ContainedObjectType => Constants.ObjectTypes.MemberType;
+        protected override Guid ContainedObjectType => Cms.Core.Constants.ObjectTypes.MemberType;
 
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {

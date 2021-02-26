@@ -1,14 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Models;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Infrastructure.PublishedCache.Persistence;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.PublishedCache.NuCache;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 
-namespace Umbraco.Infrastructure.PublishedCache.DependencyInjection
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the Umbraco's NuCache

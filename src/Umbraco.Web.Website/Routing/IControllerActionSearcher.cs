@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 
-namespace Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Web.Website.Routing
 {
     public interface IControllerActionSearcher
     {

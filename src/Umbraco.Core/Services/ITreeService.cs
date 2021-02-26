@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Web.Trees;
+using Umbraco.Cms.Core.Trees;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Represents a service which manages section trees.

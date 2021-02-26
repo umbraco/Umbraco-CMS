@@ -1,14 +1,14 @@
 using System;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Compose;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Infrastructure.Security;
+using Umbraco.Cms.Core.Compose;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     /// <summary>
     /// Binds to events to write audit logs for the <see cref="IBackOfficeUserManager"/>

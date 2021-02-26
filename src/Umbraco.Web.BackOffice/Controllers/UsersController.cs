@@ -14,35 +14,35 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Mail;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.BackOffice.ActionResults;
+using Umbraco.Cms.Web.BackOffice.Extensions;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.ModelBinders;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Web.BackOffice.ActionResults;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     [Authorize(Policy = AuthorizationPolicies.SectionAccessUsers)]
@@ -710,8 +710,6 @@ namespace Umbraco.Web.BackOffice.Controllers
             IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             changingPasswordModel.CurrentUserHasSectionAccess = currentUser.HasSectionAccess(Constants.Applications.Users);
             changingPasswordModel.CurrentUsername = currentUser.Username;
-            changingPasswordModel.SavingUserId = found.Id;
-            changingPasswordModel.SavingUsername = found.Username;
 
             Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);
 

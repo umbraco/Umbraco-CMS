@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.Persistence.Mappers
+namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 {
     public interface IMapperCollection : IBuilderCollection<BaseMapper>
     {

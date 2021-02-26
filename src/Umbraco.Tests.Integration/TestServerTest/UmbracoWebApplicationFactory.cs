@@ -5,7 +5,7 @@ using System;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.Hosting;
 
-namespace Umbraco.Tests.Integration.TestServerTest
+namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
     public class UmbracoWebApplicationFactory<TStartup> : WebApplicationFactory<TStartup>
         where TStartup : class

@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Cms.Infrastructure.Search
 {
     // examine's final composer composes after all user composers
     // and *also* after ICoreComposer (in case IUserComposer is disabled)

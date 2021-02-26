@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Core.Security
 {
-
     /// <summary>
     /// No-op lookup normalizer to maintain compatibility with ASP.NET Identity 2
     /// </summary>

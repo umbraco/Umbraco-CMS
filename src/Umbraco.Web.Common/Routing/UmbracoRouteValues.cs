@@ -1,11 +1,9 @@
 using System;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Extensions;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.Controllers;
 
-namespace Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Web.Common.Routing
 {
     /// <summary>
     /// Represents the data required to route to a specific controller/action during an Umbraco request
@@ -23,12 +21,10 @@ namespace Umbraco.Web.Common.Routing
         public UmbracoRouteValues(
             IPublishedRequest publishedRequest,
             ControllerActionDescriptor controllerActionDescriptor,
-            string templateName = null,
-            bool hasHijackedRoute = false)
+            string templateName = null)
         {
             PublishedRequest = publishedRequest;
             ControllerActionDescriptor = controllerActionDescriptor;
-            HasHijackedRoute = hasHijackedRoute;
             TemplateName = templateName;
         }
 
@@ -61,10 +57,5 @@ namespace Umbraco.Web.Common.Routing
         /// Gets the <see cref="IPublishedRequest"/>
         /// </summary>
         public IPublishedRequest PublishedRequest { get; }
-
-        /// <summary>
-        /// Gets a value indicating whether the current request has a hijacked route/user controller routed for it
-        /// </summary>
-        public bool HasHijackedRoute { get; }
     }
 }

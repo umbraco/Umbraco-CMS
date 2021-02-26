@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core.PublishedCache
 {
     public interface ITagQuery
     {

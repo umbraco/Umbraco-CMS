@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Xml.Linq;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     internal class SvgFile : ImageFile
     {
@@ -16,9 +16,9 @@ namespace Umbraco.Web.Media.Exif
             var height = document.Root?.Attributes().Where(x => x.Name == "height").Select(x => x.Value).FirstOrDefault();
 
             Properties.Add(new ExifSInt(ExifTag.PixelYDimension,
-                height == null ? Core.Constants.Conventions.Media.DefaultSize : int.Parse(height)));
+                height == null ? Constants.Conventions.Media.DefaultSize : int.Parse(height)));
             Properties.Add(new ExifSInt(ExifTag.PixelXDimension,
-                width == null ? Core.Constants.Conventions.Media.DefaultSize : int.Parse(width)));
+                width == null ? Constants.Conventions.Media.DefaultSize : int.Parse(width)));
 
             Format = ImageFileFormat.SVG;
         }

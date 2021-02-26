@@ -1,8 +1,7 @@
-﻿using NPoco;
-using Umbraco.Core.Migrations.Expressions.Alter.Expressions;
-using Umbraco.Core.Migrations.Expressions.Alter.Table;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table;
 
-namespace Umbraco.Core.Migrations.Expressions.Alter
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter
 {
     /// <summary>
     /// Implements <see cref="IAlterBuilder"/>.

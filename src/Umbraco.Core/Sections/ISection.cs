@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models.Sections
+﻿namespace Umbraco.Cms.Core.Sections
 {
     /// <summary>
     /// Defines a back office section.

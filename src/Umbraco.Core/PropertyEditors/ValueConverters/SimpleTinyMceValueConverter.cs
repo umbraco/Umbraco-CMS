@@ -1,8 +1,8 @@
 using System;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// Value converter for the RTE so that it always returns IHtmlString so that Html.Raw doesn't have to be used.

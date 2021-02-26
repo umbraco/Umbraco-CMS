@@ -1,9 +1,9 @@
 using Microsoft.AspNet.Identity;
-using IPasswordHasher = Umbraco.Core.Security.IPasswordHasher;
+using IPasswordHasher = Umbraco.Cms.Core.Security.IPasswordHasher;
 
 namespace Umbraco.Web
 {
-    public class AspNetPasswordHasher : IPasswordHasher
+    public class AspNetPasswordHasher : Cms.Core.Security.IPasswordHasher
     {
         private PasswordHasher _underlyingHasher;
 

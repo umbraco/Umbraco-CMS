@@ -3,20 +3,20 @@ using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Web.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
+using IUser = Umbraco.Cms.Core.Models.Membership.IUser;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     /// <summary>
     /// Changes the password for an identity user
     /// </summary>
-    internal class PasswordChanger<TUser> : IPasswordChanger<TUser>
-        where TUser : UmbracoIdentityUser
+    internal class PasswordChanger<TUser> : IPasswordChanger<TUser>  where TUser : UmbracoIdentityUser
     {
         private readonly ILogger<PasswordChanger<TUser>> _logger;
 
@@ -66,18 +66,18 @@ namespace Umbraco.Web.BackOffice.Security
             // Are we just changing another user's password?
             if (changingPasswordModel.OldPassword.IsNullOrWhiteSpace())
             {
-                // if it's the current user, the current user cannot reset their own password
-                // For members, this should not happen
-                if (changingPasswordModel.CurrentUsername == changingPasswordModel.SavingUsername)
-                {
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset is not allowed", new[] { "value" }) });
-                }
+                //// if it's the current user, the current user cannot reset their own password
+                //// For members, this should not happen
+                //if (changingPasswordModel.CurrentUsername == changingPasswordModel.SavingUsername)
+                //{
+                //    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset is not allowed", new[] { "value" }) });
+                //}
 
-                // if the current user has access to reset/manually change the password
-                if (changingPasswordModel.CurrentUserHasSectionAccess)
-                {
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user is not authorized", new[] { "value" }) });
-                }
+                //// if the current user has access to reset/manually change the password
+                //if (currentUser.HasSectionAccess(Constants.Applications.Users) == false)
+                //{
+                //    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user is not authorized", new[] { "value" }) });
+                //}
 
                 // ok, we should be able to reset it
                 string resetToken = await userMgr.GeneratePasswordResetTokenAsync(identityUser);

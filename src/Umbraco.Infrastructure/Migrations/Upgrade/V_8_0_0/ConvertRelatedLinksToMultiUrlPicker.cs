@@ -2,11 +2,12 @@
 using System.Linq;
 using System.Runtime.Serialization;
 using Newtonsoft.Json;
-using Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class ConvertRelatedLinksToMultiUrlPicker : MigrationBase
     {
@@ -18,8 +19,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var sqlDataTypes = Sql()
                 .Select<DataTypeDto>()
                 .From<DataTypeDto>()
-                .Where<DataTypeDto>(x => x.EditorAlias == Constants.PropertyEditors.Legacy.Aliases.RelatedLinks
-                                         || x.EditorAlias == Constants.PropertyEditors.Legacy.Aliases.RelatedLinks2);
+                .Where<DataTypeDto>(x => x.EditorAlias == Cms.Core.Constants.PropertyEditors.Legacy.Aliases.RelatedLinks
+                                         || x.EditorAlias == Cms.Core.Constants.PropertyEditors.Legacy.Aliases.RelatedLinks2);
 
             var dataTypes = Database.Fetch<DataTypeDto>(sqlDataTypes);
             var dataTypeIds = dataTypes.Select(x => x.NodeId).ToList();
@@ -28,7 +29,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
             foreach (var dataType in dataTypes)
             {
-                dataType.EditorAlias = Constants.PropertyEditors.Aliases.MultiUrlPicker;
+                dataType.EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.MultiUrlPicker;
                 Database.Update(dataType);
             }
 

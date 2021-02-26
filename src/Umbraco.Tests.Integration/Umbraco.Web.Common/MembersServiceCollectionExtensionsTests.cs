@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Web.Common.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.Common
 {

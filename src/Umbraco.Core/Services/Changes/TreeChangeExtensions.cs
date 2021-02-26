@@ -1,6 +1,10 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Core.Services.Changes
+using System.Collections.Generic;
+using Umbraco.Cms.Core.Services.Changes;
+
+namespace Umbraco.Extensions
 {
     public static class TreeChangeExtensions
     {

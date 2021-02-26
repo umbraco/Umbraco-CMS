@@ -1,19 +1,20 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Net.Mail;
 using System.Threading.Tasks;
-using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using MimeKit.Text;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
-using Umbraco.Core.Mail;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Models;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Infrastructure
 {
-
     /// <summary>
     /// A utility class for sending emails
     /// </summary>

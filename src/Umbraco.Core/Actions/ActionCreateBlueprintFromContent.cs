@@ -1,8 +1,4 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.CodeAnnotations;
-
-
-namespace Umbraco.Web.Actions
+﻿namespace Umbraco.Cms.Core.Actions
 {
     public class ActionCreateBlueprintFromContent : IAction
     {

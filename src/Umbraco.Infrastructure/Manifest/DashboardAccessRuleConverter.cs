@@ -1,10 +1,10 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Dashboards;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Infrastructure.Serialization;
 
-namespace Umbraco.Core.Manifest
+namespace Umbraco.Cms.Core.Manifest
 {
     /// <summary>
     /// Implements a json read converter for <see cref="IAccessRule"/>.

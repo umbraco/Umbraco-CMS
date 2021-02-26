@@ -8,16 +8,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
-using MapperCollection = Umbraco.Core.Persistence.Mappers.MapperCollection;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Extensions;
+using MapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.MapperCollection;
 
-namespace Umbraco.Core.Runtime
+namespace Umbraco.Cms.Infrastructure.Runtime
 {
     public class SqlMainDomLock : IMainDomLock
     {
@@ -77,7 +80,7 @@ _hostingEnvironment = hostingEnvironment;
             {
                 db = _dbFactory.CreateDatabase();
 
-                _hasTable = db.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
+                _hasTable = db.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
                 if (!_hasTable)
                 {
                     // the Db does not contain the required table, we must be in an install state we have no choice but to assume we can acquire
@@ -89,7 +92,7 @@ _hostingEnvironment = hostingEnvironment;
                 try
                 {
                     // wait to get a write lock
-                    _sqlServerSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Constants.Locks.MainDom);
+                    _sqlServerSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Cms.Core.Constants.Locks.MainDom);
                 }
                 catch(SqlException ex)
                 {
@@ -198,7 +201,7 @@ _hostingEnvironment = hostingEnvironment;
                         {
                             // re-check if its still false, we don't want to re-query once we know its there since this
                             // loop needs to use minimal resources
-                            _hasTable = db.HasTable(Constants.DatabaseSchema.Tables.KeyValue);
+                            _hasTable = db.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
                             if (!_hasTable)
                             {
                                 // the Db does not contain the required table, we just keep looping since we can't query the db
@@ -208,7 +211,7 @@ _hostingEnvironment = hostingEnvironment;
 
                         db.BeginTransaction(IsolationLevel.ReadCommitted);
                         // get a read lock
-                        _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+                        _sqlServerSyntax.ReadLock(db, Cms.Core.Constants.Locks.MainDom);
 
                         if (!IsMainDomValue(_lockId, db))
                         {
@@ -294,7 +297,7 @@ _hostingEnvironment = hostingEnvironment;
             {
                 transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
                 // get a read lock
-                _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+                _sqlServerSyntax.ReadLock(db, Cms.Core.Constants.Locks.MainDom);
 
                         // the row
                         var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
@@ -306,7 +309,7 @@ _hostingEnvironment = hostingEnvironment;
                     // which indicates that we
                     // can acquire it and it has shutdown.
 
-                    _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+                    _sqlServerSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
 
                     // so now we update the row with our appdomain id
                     InsertLockRecord(_lockId, db);
@@ -365,7 +368,7 @@ _hostingEnvironment = hostingEnvironment;
             {
                 transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
 
-                _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+                _sqlServerSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
 
                 // so now we update the row with our appdomain id
                 InsertLockRecord(_lockId, db);
@@ -448,7 +451,7 @@ _hostingEnvironment = hostingEnvironment;
                                 db.BeginTransaction(IsolationLevel.ReadCommitted);
 
                                 // get a write lock
-                                _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+                                _sqlServerSyntax.WriteLock(db, Cms.Core.Constants.Locks.MainDom);
 
                                 // When we are disposed, it means we have released the MainDom lock
                                 // and called all MainDom release callbacks, in this case

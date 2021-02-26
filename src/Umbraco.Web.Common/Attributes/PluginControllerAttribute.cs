@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
+﻿using System;
 using System.Linq;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Web.Common.Attributes
+namespace Umbraco.Cms.Web.Common.Attributes
 {
     /// <summary>
     /// Indicates that a controller is a plugin controller and will be routed to its own area.

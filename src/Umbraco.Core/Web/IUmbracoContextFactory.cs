@@ -1,5 +1,5 @@
 ﻿
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core.Web
 {
     /// <summary>
     /// Creates and manages <see cref="IUmbracoContext"/> instances.

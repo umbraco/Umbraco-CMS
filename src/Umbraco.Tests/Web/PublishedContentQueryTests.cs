@@ -6,11 +6,12 @@ using Examine.LuceneEngine.Providers;
 using Lucene.Net.Store;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Examine;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Infrastructure;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Web
 {
@@ -55,7 +56,7 @@ namespace Umbraco.Tests.Web
                     [UmbracoExamineFieldNames.VariesByCultureFieldName] = "y"
                 }));
             }
-            
+
             return indexer;
         }
 
@@ -84,7 +85,7 @@ namespace Umbraco.Tests.Web
             {
                 var fieldNames = new[] { "title", "title_en-us", "title_fr-fr" };
                 using (var indexer = CreateTestIndex(luceneDir, fieldNames))
-                {   
+                {
                     var pcq = CreatePublishedContentQuery(indexer);
 
                     var results = pcq.Search("Products", culture, "TestIndex");

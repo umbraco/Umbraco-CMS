@@ -4,9 +4,10 @@
 using System;
 using System.Collections.Generic;
 using NUnit.Framework;
-using Umbraco.Web.Macros;
+using Umbraco.Cms.Infrastructure.Macros;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Macros
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Macros
 {
     [TestFixture]
     public class MacroParserTests

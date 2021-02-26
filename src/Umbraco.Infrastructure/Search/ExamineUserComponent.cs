@@ -1,7 +1,7 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Runtime;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Cms.Infrastructure.Search
 {
     /// <summary>
     /// An abstract class for custom index authors to inherit from

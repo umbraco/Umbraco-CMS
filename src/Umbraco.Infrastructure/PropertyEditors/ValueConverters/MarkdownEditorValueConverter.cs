@@ -1,10 +1,13 @@
-﻿using System;
-using HeyRed.MarkdownSharp;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Templates;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+using System;
+using HeyRed.MarkdownSharp;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Templates;
+
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
     public class MarkdownEditorValueConverter : PropertyValueConverterBase
@@ -19,7 +22,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(IPublishedPropertyType propertyType)
-            => Constants.PropertyEditors.Aliases.MarkdownEditor.Equals(propertyType.EditorAlias);
+            => Cms.Core.Constants.PropertyEditors.Aliases.MarkdownEditor.Equals(propertyType.EditorAlias);
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof (IHtmlEncodedString);

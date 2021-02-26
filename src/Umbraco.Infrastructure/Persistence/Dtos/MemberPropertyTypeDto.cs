@@ -1,9 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.MemberPropertyType)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.MemberPropertyType)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
     internal class MemberPropertyTypeDto

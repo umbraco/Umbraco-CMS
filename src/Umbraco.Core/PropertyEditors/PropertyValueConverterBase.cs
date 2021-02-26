@@ -1,12 +1,12 @@
 ﻿using System;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Provides a default implementation for <see cref="IPropertyValueConverter" />.
     /// </summary>
-    /// <seealso cref="Umbraco.Core.PropertyEditors.IPropertyValueConverter" />
+    /// <seealso cref="IPropertyValueConverter" />
     public abstract class PropertyValueConverterBase : IPropertyValueConverter
     {
         /// <inheritdoc />

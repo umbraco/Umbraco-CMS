@@ -2,13 +2,12 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Security;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     /// <summary>
     /// Validates the incoming <see cref="MemberSave"/> model

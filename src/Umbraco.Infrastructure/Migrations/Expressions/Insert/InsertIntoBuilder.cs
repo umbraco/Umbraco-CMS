@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using Umbraco.Core.Migrations.Expressions.Insert.Expressions;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert.Expressions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Insert
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert
 {
     /// <summary>
     /// Implements <see cref="IInsertIntoBuilder"/>.

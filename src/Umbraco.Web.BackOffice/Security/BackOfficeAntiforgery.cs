@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Antiforgery;
+﻿using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
-using System.Linq;
-using System.Threading.Tasks;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
 
     /// <summary>
@@ -113,6 +114,6 @@ namespace Umbraco.Web.BackOffice.Security
             }
         }
 
-        
+
     }
 }

@@ -4,13 +4,12 @@ using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Models.Membership;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Core.Security
 {
-
     /// <summary>
     /// A user manager for Umbraco (either back office users or front-end members)
     /// </summary>
@@ -257,7 +256,7 @@ namespace Umbraco.Infrastructure.Security
         /// of the operation.
         /// </returns>
         Task<IdentityResult> CreateAsync(TUser user, string password);
-        
+
         /// <summary>
         /// Generate a password for a user based on the current password validator
         /// </summary>

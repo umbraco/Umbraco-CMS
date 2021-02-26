@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Core.Security;
-using Umbraco.Core;
-using Umbraco.Core.Models.Membership;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Serialization;
-using Umbraco.Infrastructure.Security;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     /// <summary>
     /// A password hasher for back office users
@@ -43,7 +43,7 @@ namespace Umbraco.Web.BackOffice.Security
         /// <returns></returns>
         /// <remarks>
         /// This will check the user's current hashed password format stored with their user row and use that to verify the hash. This could be any hashes
-        /// from the very old v4, to the older v6-v8, to the older aspnet identity and finally to the most recent 
+        /// from the very old v4, to the older v6-v8, to the older aspnet identity and finally to the most recent
         /// </remarks>
         public override PasswordVerificationResult VerifyHashedPassword(BackOfficeIdentityUser user, string hashedPassword, string providedPassword)
         {
@@ -61,10 +61,10 @@ namespace Umbraco.Web.BackOffice.Security
 
                 // We will explicitly detect names here
                 // The default is PBKDF2.ASPNETCORE.V3:
-                //      PBKDF2 with HMAC-SHA256, 128-bit salt, 256-bit subkey, 10000 iterations.                
+                //      PBKDF2 with HMAC-SHA256, 128-bit salt, 256-bit subkey, 10000 iterations.
                 // The underlying class only lets us change 2 things which is the version: options.CompatibilityMode and the iteration count
                 // The PBKDF2.ASPNETCORE.V2 settings are:
-                //      PBKDF2 with HMAC-SHA1, 128-bit salt, 256-bit subkey, 1000 iterations.                
+                //      PBKDF2 with HMAC-SHA1, 128-bit salt, 256-bit subkey, 1000 iterations.
 
                 switch (deserialized.HashAlgorithm)
                 {

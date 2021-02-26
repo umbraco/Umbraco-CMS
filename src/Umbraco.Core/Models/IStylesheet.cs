@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     public interface IStylesheet : IFile
     {

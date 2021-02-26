@@ -11,10 +11,12 @@ using System.Xml;
 using System.Xml.XPath;
 using System.Xml.Xsl;
 using NUnit.Framework;
-using Umbraco.Core.Xml;
-using Umbraco.Core.Xml.XPath;
+using Umbraco.Cms.Core.Xml;
+using Umbraco.Cms.Core.Xml.XPath;
+using Umbraco.Cms.Tests.Common.TestHelpers;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.CoreXml
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.CoreXml
 {
     [TestFixture]
     public class NavigableNavigatorTests

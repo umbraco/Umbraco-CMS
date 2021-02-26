@@ -3,10 +3,8 @@ using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using NUglify.Helpers;
-using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Extensions
+namespace Umbraco.Extensions
 {
     public static class EndpointRouteBuilderExtensions
     {
@@ -109,8 +107,8 @@ namespace Umbraco.Web.Common.Extensions
         {
             string prefixPathSegment = isBackOffice
                 ? areaName.IsNullOrWhiteSpace()
-                    ? $"{Core.Constants.Web.Mvc.BackOfficePathSegment}/Api"
-                    : $"{Core.Constants.Web.Mvc.BackOfficePathSegment}/{areaName}"
+                    ? $"{Cms.Core.Constants.Web.Mvc.BackOfficePathSegment}/Api"
+                    : $"{Cms.Core.Constants.Web.Mvc.BackOfficePathSegment}/{areaName}"
                 : areaName.IsNullOrWhiteSpace()
                     ? "Api"
                     : areaName;

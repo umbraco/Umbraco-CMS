@@ -1,12 +1,12 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
-using System.Text;
 using Serilog;
 using Serilog.Events;
 using Serilog.Parsing;
+using Umbraco.Cms.Core.Logging;
 
-namespace Umbraco.Core.Logging
+namespace Umbraco.Cms.Core.Logging
 {
     public class MessageTemplates : IMessageTemplates
     {

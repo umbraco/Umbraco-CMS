@@ -8,16 +8,17 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Core.Security
 {
     // TODO: Make this into a base class that can be re-used
 
@@ -84,7 +85,7 @@ namespace Umbraco.Infrastructure.Security
             // prefix will help us determine if the password hasn't actually been specified yet.
             // this will hash the guid with a salt so should be nicely random
             var aspHasher = new PasswordHasher<BackOfficeIdentityUser>();
-            var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
+            var emptyPasswordValue = Cms.Core.Constants.Security.EmptyPasswordPrefix +
                                       aspHasher.HashPassword(user, Guid.NewGuid().ToString("N"));
 
             var userEntity = new User(_globalSettings, user.Name, user.Email, user.UserName, emptyPasswordValue)

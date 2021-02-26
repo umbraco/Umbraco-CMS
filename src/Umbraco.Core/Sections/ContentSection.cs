@@ -1,7 +1,4 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Models.Sections;
-
-namespace Umbraco.Web.Sections
+﻿namespace Umbraco.Cms.Core.Sections
 {
     /// <summary>
     /// Defines the back office content section

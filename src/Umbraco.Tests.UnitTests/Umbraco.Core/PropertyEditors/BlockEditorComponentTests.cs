@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Web.Compose;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Compose;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
     [TestFixture]
     public class BlockEditorComponentTests

@@ -5,13 +5,15 @@ using System;
 using System.Diagnostics;
 using NPoco;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Tests.Common.TestHelpers;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
 {
     [TestFixture]
     public class NPocoSqlTests : BaseUsingSqlSyntax

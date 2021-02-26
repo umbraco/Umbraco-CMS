@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace Umbraco.Core.PropertyEditors.Validators
+namespace Umbraco.Cms.Core.PropertyEditors.Validators
 {
     /// <summary>
     /// A validator that validates an email address

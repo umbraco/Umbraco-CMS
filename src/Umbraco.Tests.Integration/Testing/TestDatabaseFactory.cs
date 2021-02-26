@@ -4,9 +4,9 @@
 using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Tests.Integration.Testing
+namespace Umbraco.Cms.Tests.Integration.Testing
 {
     public class TestDatabaseFactory
     {

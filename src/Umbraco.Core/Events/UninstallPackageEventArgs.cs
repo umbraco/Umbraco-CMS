@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Packaging;
+using Umbraco.Cms.Core.Packaging;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     public class UninstallPackageEventArgs: CancellableObjectEventArgs<IEnumerable<UninstallationSummary>>
     {

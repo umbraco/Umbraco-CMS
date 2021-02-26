@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="IMediaType"/>
@@ -98,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return l;
         }
 
-        protected override Guid NodeObjectTypeId => Constants.ObjectTypes.MediaType;
+        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.MediaType;
 
         protected override void PersistNewItem(IMediaType entity)
         {

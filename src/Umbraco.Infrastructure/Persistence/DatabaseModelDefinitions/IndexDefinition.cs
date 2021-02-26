@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+﻿using System.Collections.Generic;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
 {
     public class IndexDefinition
     {

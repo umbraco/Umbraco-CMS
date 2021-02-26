@@ -1,23 +1,20 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Strings;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     /// <summary>
     /// Represents the File Service, which is an easy access to operations involving <see cref="IFile"/> objects like Scripts, Stylesheets and Templates
@@ -34,8 +31,8 @@ namespace Umbraco.Core.Services.Implement
         private readonly GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        private const string PartialViewHeader = "@inherits Umbraco.Web.Common.AspNetCore.UmbracoViewPage";
-        private const string PartialViewMacroHeader = "@inherits Umbraco.Web.Common.Macros.PartialViewMacroPage";
+        private const string PartialViewHeader = "@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage";
+        private const string PartialViewMacroHeader = "@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage";
 
         public FileService(IScopeProvider uowProvider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IStylesheetRepository stylesheetRepository, IScriptRepository scriptRepository, ITemplateRepository templateRepository,
@@ -75,7 +72,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public void SaveStylesheet(IStylesheet stylesheet, int userId = Constants.Security.SuperUserId)
+        public void SaveStylesheet(IStylesheet stylesheet, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -97,7 +94,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public void DeleteStylesheet(string path, int userId = Constants.Security.SuperUserId)
+        public void DeleteStylesheet(string path, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -199,7 +196,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public void SaveScript(IScript script, int userId = Constants.Security.SuperUserId)
+        public void SaveScript(IScript script, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -220,7 +217,7 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public void DeleteScript(string path, int userId = Constants.Security.SuperUserId)
+        public void DeleteScript(string path, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -312,7 +309,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns>
         /// The template created
         /// </returns>
-        public Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, ITemplate>> CreateTemplateForContentType(string contentTypeAlias, string contentTypeName, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var template = new Template(_shortStringHelper, contentTypeName,
                 //NOTE: We are NOT passing in the content type alias here, we want to use it's name since we don't
@@ -377,7 +374,7 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="masterTemplate"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        public ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = Constants.Security.SuperUserId)
+        public ITemplate CreateTemplateWithIdentity(string name, string alias, string content, ITemplate masterTemplate = null, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             if (name == null)
             {
@@ -526,7 +523,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="template"><see cref="Template"/> to save</param>
         /// <param name="userId"></param>
-        public void SaveTemplate(ITemplate template, int userId = Constants.Security.SuperUserId)
+        public void SaveTemplate(ITemplate template, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             if (template == null)
             {
@@ -561,7 +558,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="templates">List of <see cref="Template"/> to save</param>
         /// <param name="userId">Optional id of the user</param>
-        public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId)
+        public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var templatesA = templates.ToArray();
             using (var scope = ScopeProvider.CreateScope())
@@ -587,7 +584,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="alias">Alias of the <see cref="ITemplate"/> to delete</param>
         /// <param name="userId"></param>
-        public void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId)
+        public void DeleteTemplate(string alias, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -731,17 +728,17 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId)
+        public Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             return CreatePartialViewMacro(partialView, PartialViewType.PartialView, snippetName, userId);
         }
 
-        public Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = Constants.Security.SuperUserId)
+        public Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, string snippetName = null, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             return CreatePartialViewMacro(partialView, PartialViewType.PartialViewMacro, snippetName, userId);
         }
 
-        private Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, PartialViewType partialViewType, string snippetName = null, int userId = Constants.Security.SuperUserId)
+        private Attempt<IPartialView> CreatePartialViewMacro(IPartialView partialView, PartialViewType partialViewType, string snippetName = null, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             string partialViewHeader;
             switch (partialViewType)
@@ -807,17 +804,17 @@ namespace Umbraco.Core.Services.Implement
             return Attempt<IPartialView>.Succeed(partialView);
         }
 
-        public bool DeletePartialView(string path, int userId = Constants.Security.SuperUserId)
+        public bool DeletePartialView(string path, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             return DeletePartialViewMacro(path, PartialViewType.PartialView, userId);
         }
 
-        public bool DeletePartialViewMacro(string path, int userId = Constants.Security.SuperUserId)
+        public bool DeletePartialViewMacro(string path, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             return DeletePartialViewMacro(path, PartialViewType.PartialViewMacro, userId);
         }
 
-        private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int userId = Constants.Security.SuperUserId)
+        private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
@@ -847,17 +844,17 @@ namespace Umbraco.Core.Services.Implement
             return true;
         }
 
-        public Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = Constants.Security.SuperUserId)
+        public Attempt<IPartialView> SavePartialView(IPartialView partialView, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             return SavePartialView(partialView, PartialViewType.PartialView, userId);
         }
 
-        public Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId)
+        public Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             return SavePartialView(partialView, PartialViewType.PartialViewMacro, userId);
         }
 
-        private Attempt<IPartialView> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int userId = Constants.Security.SuperUserId)
+        private Attempt<IPartialView> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {

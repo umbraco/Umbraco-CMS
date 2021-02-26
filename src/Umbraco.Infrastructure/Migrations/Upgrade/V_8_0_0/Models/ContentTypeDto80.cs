@@ -1,8 +1,8 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models
 {
 
     /// <summary>
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models
     [ExplicitColumns]
     internal class ContentTypeDto80
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.ContentType;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.ContentType;
 
         [Column("pk")]
         [PrimaryKeyColumn(IdentitySeed = 535)]

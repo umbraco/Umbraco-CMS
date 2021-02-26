@@ -1,14 +1,14 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class DocumentCultureVariationDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.DocumentCultureVariation;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.DocumentCultureVariation;
 
         [Column("id")]
         [PrimaryKeyColumn]

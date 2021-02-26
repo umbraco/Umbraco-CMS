@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     public interface ILogViewer
     {

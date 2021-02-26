@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.Compose
+namespace Umbraco.Cms.Core.Compose
 {
     public sealed class RelateOnCopyComposer : ComponentComposer<RelateOnCopyComponent>, ICoreComposer
     { }

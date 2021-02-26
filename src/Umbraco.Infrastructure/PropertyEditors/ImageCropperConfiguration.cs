@@ -1,6 +1,9 @@
-﻿using System.Runtime.Serialization;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Core.PropertyEditors
+using System.Runtime.Serialization;
+
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the image cropper value editor.

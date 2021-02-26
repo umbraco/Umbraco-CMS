@@ -2,17 +2,16 @@
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Core;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.ModelBinders
+namespace Umbraco.Cms.Web.BackOffice.ModelBinders
 {
     /// <summary>
     /// The model binder for <see cref="T:Umbraco.Web.Models.ContentEditing.ContentItemSave" />

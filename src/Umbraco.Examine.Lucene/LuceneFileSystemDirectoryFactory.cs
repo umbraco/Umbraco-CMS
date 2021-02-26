@@ -1,17 +1,19 @@
-﻿using Umbraco.Core.Configuration;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Hosting;
-using Lucene.Net.Store;
-using System.IO;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
+using System.IO;
 using Examine.LuceneEngine.Directories;
+using Lucene.Net.Store;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
-
     public class LuceneFileSystemDirectoryFactory : ILuceneDirectoryFactory
     {
         private readonly ITypeFinder _typeFinder;

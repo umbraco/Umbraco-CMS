@@ -1,8 +1,8 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Infrastructure.Security;
+using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Web.BackOffice.Extensions
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for <see cref="IdentityBuilder"/>

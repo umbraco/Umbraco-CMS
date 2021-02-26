@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.Models.PublishedContent;
-
-namespace Umbraco.Web.Models.TemplateQuery
+﻿namespace Umbraco.Cms.Core.Models.TemplateQuery
 {
     public class QueryCondition
     {

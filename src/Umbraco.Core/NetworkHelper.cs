@@ -1,6 +1,7 @@
 ﻿using System;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Currently just used to get the machine name in med trust and to format a machine name for use with file names

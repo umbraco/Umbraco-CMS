@@ -1,14 +1,14 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     [TableName(TableName)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
     internal class ContentTypeDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.ContentType;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.ContentType;
 
         [Column("pk")]
         [PrimaryKeyColumn(IdentitySeed = 535)]

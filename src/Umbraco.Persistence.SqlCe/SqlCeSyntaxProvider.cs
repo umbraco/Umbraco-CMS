@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using NPoco;
-using Umbraco.Core;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.SqlSyntax;
-using ColumnInfo = Umbraco.Core.Persistence.SqlSyntax.ColumnInfo;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using ColumnInfo = Umbraco.Cms.Infrastructure.Persistence.SqlSyntax.ColumnInfo;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Persistence.SqlCe
+namespace Umbraco.Cms.Persistence.SqlCe
 {
     /// <summary>
     /// Represents an SqlSyntaxProvider for Sql Ce

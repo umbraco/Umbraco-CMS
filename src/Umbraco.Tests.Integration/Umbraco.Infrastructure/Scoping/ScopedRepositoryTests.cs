@@ -5,20 +5,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Core.Sync;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
-using Umbraco.Web;
-using Umbraco.Web.Cache;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Sync;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Scoping
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]

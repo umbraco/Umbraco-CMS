@@ -4,8 +4,9 @@ using System.Collections.Generic;
 using System.Linq.Expressions;
 using System.Text;
 using NPoco;
+using Umbraco.Cms.Core.Persistence.Querying;
 
-namespace Umbraco.Core.Persistence.Querying
+namespace Umbraco.Cms.Infrastructure.Persistence.Querying
 {
     /// <summary>
     /// Represents a query builder.

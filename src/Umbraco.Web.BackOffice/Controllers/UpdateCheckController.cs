@@ -1,21 +1,21 @@
-﻿using System;
+using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
-using Semver;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Models;
-using Umbraco.Web.Security;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class UpdateCheckController : UmbracoAuthorizedJsonController
@@ -49,8 +49,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 try
                 {
-                    var version = new SemVersion(_umbracoVersion.Current.Major, _umbracoVersion.Current.Minor,
-                        _umbracoVersion.Current.Build, _umbracoVersion.Comment);
+                    var version = new SemVersion(_umbracoVersion.Version.Major, _umbracoVersion.Version.Minor,
+                        _umbracoVersion.Version.Build, _umbracoVersion.Comment);
                     var result = await _upgradeService.CheckUpgrade(version);
 
                     return new UpgradeCheckResponse(result.UpgradeType, result.Comment, result.UpgradeUrl, _umbracoVersion);

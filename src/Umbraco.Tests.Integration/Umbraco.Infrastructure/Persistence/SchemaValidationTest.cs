@@ -1,11 +1,11 @@
 ﻿using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.Persistence
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]

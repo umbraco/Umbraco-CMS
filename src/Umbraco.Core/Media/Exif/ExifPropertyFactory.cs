@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Creates exif properties from interoperability parameters.

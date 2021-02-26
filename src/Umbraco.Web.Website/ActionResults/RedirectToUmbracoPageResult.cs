@@ -1,18 +1,17 @@
 using System;
-using System.Collections.Specialized;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Website.ActionResults
+namespace Umbraco.Cms.Web.Website.ActionResults
 {
-
     /// <summary>
     /// Redirects to an Umbraco page by Id or Entity
     /// </summary>

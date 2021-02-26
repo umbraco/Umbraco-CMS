@@ -1,4 +1,4 @@
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// The user manager for members

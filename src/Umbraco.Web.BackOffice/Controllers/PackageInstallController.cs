@@ -3,26 +3,27 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Semver;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models.Packaging;
-using Umbraco.Core.Packaging;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.WebAssets;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.ActionsResults;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Packaging;
+using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// A controller used for installing packages and managing all of the data in the packages section in the back office
@@ -138,7 +139,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (ins.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
                 var packageMinVersion = ins.UmbracoVersion;
-                if (_umbracoVersion.Current < packageMinVersion)
+                if (_umbracoVersion.Version < packageMinVersion)
                 {
                     model.IsCompatible = false;
                 }
@@ -168,7 +169,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 {
                     //we always save package files to /App_Data/packages/package-guid.umb for processing as a standard so lets copy.
 
-                    var packagesFolder = _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.Packages);
+                    var packagesFolder = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Packages);
                     Directory.CreateDirectory(packagesFolder);
                     var packageFile = Path.Combine(packagesFolder, model.PackageGuid + ".umb");
 
@@ -222,7 +223,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 var packageFile = await _packagingService.FetchPackageFileAsync(
                     Guid.Parse(packageGuid),
-                    _umbracoVersion.Current,
+                    _umbracoVersion.Version,
                     _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
                 fileName = packageFile.Name;
@@ -266,7 +267,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (packageInfo.UmbracoVersionRequirementsType == RequirementsType.Strict)
             {
                 var packageMinVersion = packageInfo.UmbracoVersion;
-                if (_umbracoVersion.Current < packageMinVersion)
+                if (_umbracoVersion.Version < packageMinVersion)
                     return ValidationErrorResult.CreateNotificationValidationErrorResult(
                         _localizedTextService.Localize("packager/targetVersionMismatch", new[] {packageMinVersion.ToString()}));
             }

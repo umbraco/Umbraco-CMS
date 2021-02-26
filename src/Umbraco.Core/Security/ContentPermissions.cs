@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
 
     /// <summary>
@@ -155,7 +155,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public ContentAccess CheckPermissions(
             int nodeId,
-            IUser user,            
+            IUser user,
             out IContent contentItem,
             IReadOnlyList<char> permissionsToCheck = null)
         {

@@ -11,24 +11,24 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.PropertyEditors;
-using DataType = Umbraco.Core.Models.DataType;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.ModelBinders;
+using Umbraco.Extensions;
+using DataType = Umbraco.Cms.Core.Models.DataType;
 
-namespace Umbraco.Tests.Integration.Umbraco.Web.Backoffice.Filters
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Mapper = true, WithApplication = true, Logger = UmbracoTestOptions.Logger.Console)]

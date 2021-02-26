@@ -1,13 +1,15 @@
 ﻿using System.Collections.Generic;
 using System.Xml;
-using Umbraco.Core;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Common.Attributes;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.PropertyEditors
+namespace Umbraco.Cms.Web.BackOffice.PropertyEditors
 {
     /// <summary>
     /// ApiController to provide RTE configuration with available plugins and commands from the RTE config

@@ -1,7 +1,7 @@
-﻿using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.Common.Filters;
+﻿using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.Common.Filters;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// An abstract API controller that only supports JSON and all requests must contain the correct csrf header

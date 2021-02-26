@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// Checks user access to media
@@ -62,7 +61,7 @@ namespace Umbraco.Core.Security
         }
 
         public MediaAccess CheckPermissions(IMedia media, IUser user)
-        {            
+        {
             if (user == null) throw new ArgumentNullException(nameof(user));
 
             if (media == null) return MediaAccess.NotFound;

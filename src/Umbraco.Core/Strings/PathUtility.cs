@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Strings
+namespace Umbraco.Cms.Core.Strings
 {
     public static class PathUtility
     {

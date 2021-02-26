@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 {
     [TestFixture]
     public class MemberIdentityUserStoreTests

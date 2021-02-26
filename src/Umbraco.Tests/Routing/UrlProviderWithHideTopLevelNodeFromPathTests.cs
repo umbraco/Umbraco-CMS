@@ -1,10 +1,11 @@
-﻿using NUnit.Framework;
-using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Tests.Common;
+﻿using Microsoft.Extensions.Logging;
+using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Extensions;
 using Umbraco.Tests.Testing;
-using Umbraco.Web.Routing;
-using Umbraco.Core.DependencyInjection;
 
 namespace Umbraco.Tests.Routing
 {

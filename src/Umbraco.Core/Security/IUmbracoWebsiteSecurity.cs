@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Umbraco.Core.Models.Security;
+using Umbraco.Cms.Core.Models.Security;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     public interface IUmbracoWebsiteSecurity
     {

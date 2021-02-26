@@ -5,11 +5,12 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Web.WebAssets;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.WebAssets;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.AngularIntegration
 {
     [TestFixture]
     public class ServerVariablesParserTests

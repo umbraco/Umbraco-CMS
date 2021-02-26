@@ -1,11 +1,10 @@
 using System.Threading.Tasks;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Web.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     public interface IPasswordChanger<TUser> where TUser : UmbracoIdentityUser
     {

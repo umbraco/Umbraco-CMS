@@ -4,16 +4,14 @@ using System.Linq;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.WebAssets;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.WebAssets
+namespace Umbraco.Cms.Infrastructure.WebAssets
 {
     public class BackOfficeWebAssets
     {

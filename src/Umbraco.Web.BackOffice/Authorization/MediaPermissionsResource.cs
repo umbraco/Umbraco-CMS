@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.BackOffice.Authorization
 {
     public class MediaPermissionsResource
     {

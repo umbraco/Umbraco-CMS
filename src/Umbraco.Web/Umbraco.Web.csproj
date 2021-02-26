@@ -126,9 +126,6 @@
     <!--
     <Compile Include="**\*.cs" Exclude="obj\**\*.cs;**\*.aspx.cs;**\*.ascx.cs;**\*.designer.cs" />
     -->
-    <Compile Include="..\SolutionInfo.cs">
-      <Link>Properties\SolutionInfo.cs</Link>
-    </Compile>
     <Compile Include="AspNet\AspNetHostingEnvironment.cs" />
     <Compile Include="AspNet\AspNetApplicationShutdownRegistry.cs" />
     <Compile Include="AspNet\AspNetSessionManager.cs" />
@@ -173,10 +170,8 @@
     <Compile Include="WebApi\SessionHttpControllerRouteHandler.cs" />
     <Compile Include="WebApi\UmbracoApiControllerTypeCollectionBuilder.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeByIdRouteHandler.cs" />
-    <Compile Include="Mvc\EnsurePublishedContentRequestAttribute.cs" />
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
-    <Compile Include="Mvc\MergeParentContextViewDataAttribute.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
@@ -193,7 +188,6 @@
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerBase.cs" />
     <Compile Include="ModelStateExtensions.cs" />
-    <Compile Include="Mvc\MergeModelStateToChildActionAttribute.cs" />
     <Compile Include="Mvc\PluginController.cs" />
     <Compile Include="Mvc\Strings.Designer.cs">
       <AutoGen>True</AutoGen>

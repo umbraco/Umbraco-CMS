@@ -1,4 +1,4 @@
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core.Web
 {
     public interface ISessionManager
     {

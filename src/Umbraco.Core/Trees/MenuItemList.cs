@@ -1,9 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Threading;
-using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Web.Models.Trees
+using System.Collections.Generic;
+using System.Threading;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.Trees
 {
     /// <summary>
     /// A custom menu list

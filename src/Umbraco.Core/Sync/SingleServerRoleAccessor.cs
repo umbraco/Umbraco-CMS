@@ -1,8 +1,4 @@
-using System;
-using System.Collections.Generic;
-using Umbraco.Web;
-
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Core.Sync
 {
     /// <summary>
     /// Can be used when Umbraco is definitely not operating in a Load Balanced scenario to micro-optimize some startup performance

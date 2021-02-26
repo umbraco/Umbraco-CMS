@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Tests.Common.Builders.Extensions
+namespace Umbraco.Cms.Tests.Common.Builders.Extensions
 {
     public static class StringExtensions
     {

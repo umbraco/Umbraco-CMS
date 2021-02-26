@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class SuperZero : MigrationBase
     {
@@ -33,7 +33,7 @@
             Database.Execute("update umbracoUser2NodeNotify set userId=-1 where userId=0;");
             Database.Execute("update umbracoNode set nodeUser=-1 where nodeUser=0;");
             Database.Execute("update umbracoUserLogin set userId=-1 where userId=0;");
-            Database.Execute($"update {Constants.DatabaseSchema.Tables.ContentVersion} set userId=-1 where userId=0;");
+            Database.Execute($"update {Cms.Core.Constants.DatabaseSchema.Tables.ContentVersion} set userId=-1 where userId=0;");
             Database.Execute("delete from umbracoUser where id=0;");
         }
     }

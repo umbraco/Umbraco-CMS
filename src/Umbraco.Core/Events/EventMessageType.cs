@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Events
+﻿namespace Umbraco.Cms.Core.Events
 {
     /// <summary>
     /// The type of event message

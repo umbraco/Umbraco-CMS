@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Reflection;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Indicates that a composer should be disabled.

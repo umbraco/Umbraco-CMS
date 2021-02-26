@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
+﻿using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Defines a Macro
@@ -51,7 +49,7 @@ namespace Umbraco.Core.Models
         /// </summary>
         [DataMember]
         bool DontRender { get; set; }
-                
+
         /// <summary>
         /// Gets or set the path to the macro source to render
         /// </summary>

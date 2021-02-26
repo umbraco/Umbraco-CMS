@@ -9,13 +9,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Security;
-using Umbraco.Infrastructure.Security;
-using Umbraco.Net;
-using Umbraco.Web.Common.Security;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Web.Common.Security;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 {
     [TestFixture]
     public class MemberIdentityUserManagerTests
@@ -54,7 +53,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Security
             _mockPasswordConfiguration.Setup(x => x.Value).Returns(() =>
                 new MemberPasswordConfigurationSettings()
                 {
-                    
+
                 });
 
             var pwdValidators = new List<PasswordValidator<MembersIdentityUser>>

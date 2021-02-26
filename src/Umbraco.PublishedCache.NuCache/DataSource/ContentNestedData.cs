@@ -1,8 +1,8 @@
-using Newtonsoft.Json;
 using System.Collections.Generic;
-using Umbraco.Core.Serialization;
+using Newtonsoft.Json;
+using Umbraco.Cms.Infrastructure.Serialization;
 
-namespace Umbraco.Web.PublishedCache.NuCache.DataSource
+namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
     /// <summary>
     /// The content item 1:M data that is serialized to JSON

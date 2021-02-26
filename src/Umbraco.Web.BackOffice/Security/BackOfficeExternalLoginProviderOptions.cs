@@ -1,7 +1,4 @@
-﻿using System;
-using System.Runtime.Serialization;
-
-namespace Umbraco.Web.BackOffice.Security
+﻿namespace Umbraco.Cms.Web.BackOffice.Security
 {
 
 
@@ -11,7 +8,7 @@ namespace Umbraco.Web.BackOffice.Security
     public class BackOfficeExternalLoginProviderOptions
     {
         public BackOfficeExternalLoginProviderOptions(
-            string buttonStyle, string icon, 
+            string buttonStyle, string icon,
             ExternalSignInAutoLinkOptions autoLinkOptions = null,
             bool denyLocalLogin = false,
             bool autoRedirectLoginToExternalProvider = false,

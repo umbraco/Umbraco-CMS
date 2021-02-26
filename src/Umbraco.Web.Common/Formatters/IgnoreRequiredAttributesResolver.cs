@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 
-namespace Umbraco.Web.Common.Formatters
+namespace Umbraco.Cms.Web.Common.Formatters
 {
     public class IgnoreRequiredAttributesResolver : DefaultContractResolver
     {

@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Core.Cache;
+using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Cache
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Cache
 {
     [TestFixture]
     public class DictionaryAppCacheTests : AppCacheTests

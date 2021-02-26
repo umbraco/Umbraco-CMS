@@ -1,17 +1,18 @@
 ﻿using System;
-using Examine;
 using System.Collections.Generic;
 using System.Linq;
+using Examine;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public class MediaValueSetBuilder : BaseValueSetBuilder<IMedia>
     {

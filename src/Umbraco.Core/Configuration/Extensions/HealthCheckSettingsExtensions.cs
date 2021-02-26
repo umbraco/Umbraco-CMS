@@ -1,7 +1,8 @@
 ﻿using System;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Core.Configuration.Extensions
+namespace Umbraco.Extensions
 {
     public static class HealthCheckSettingsExtensions
     {

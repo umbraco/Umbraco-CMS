@@ -3,9 +3,9 @@
 
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.BackOffice.Security;
+using Umbraco.Cms.Web.BackOffice.Security;
 
-namespace Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.BackOffice.Authorization
 {
     /// <summary>
     /// Ensures the resource cannot be accessed if <see cref="IBackOfficeExternalLoginProviders.HasDenyLocalLogin"/> returns true.

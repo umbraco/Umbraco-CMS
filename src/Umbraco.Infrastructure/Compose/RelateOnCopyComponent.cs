@@ -1,9 +1,10 @@
-﻿using Umbraco.Core.Composing;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
+﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
 
-namespace Umbraco.Core.Compose
+namespace Umbraco.Cms.Core.Compose
 {
     // TODO: This should just exist in the content service/repo!
     public sealed class RelateOnCopyComponent : IComponent
@@ -27,20 +28,20 @@ namespace Umbraco.Core.Compose
             ContentService.Copied -= ContentServiceCopied;
         }
 
-        private void ContentServiceCopied(IContentService sender, Events.CopyEventArgs<IContent> e)
+        private void ContentServiceCopied(IContentService sender, CopyEventArgs<IContent> e)
         {
             if (e.RelateToOriginal == false) return;
 
 
-            var relationType = _relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
+            var relationType = _relationService.GetRelationTypeByAlias(Cms.Core.Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
 
             if (relationType == null)
             {
-                relationType = new RelationType(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
-                    Constants.Conventions.RelationTypes.RelateDocumentOnCopyName,
+                relationType = new RelationType(Cms.Core.Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
+                    Cms.Core.Constants.Conventions.RelationTypes.RelateDocumentOnCopyName,
                     true,
-                    Constants.ObjectTypes.Document,
-                    Constants.ObjectTypes.Document);
+                    Cms.Core.Constants.ObjectTypes.Document,
+                    Cms.Core.Constants.ObjectTypes.Document);
 
                 _relationService.Save(relationType);
             }

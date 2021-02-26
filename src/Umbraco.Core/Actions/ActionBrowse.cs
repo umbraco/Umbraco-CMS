@@ -1,8 +1,4 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.CodeAnnotations;
-
-
-namespace Umbraco.Web.Actions
+﻿namespace Umbraco.Cms.Core.Actions
 {
     /// <summary>
     /// This action is used as a security constraint that grants a user the ability to view nodes in a tree

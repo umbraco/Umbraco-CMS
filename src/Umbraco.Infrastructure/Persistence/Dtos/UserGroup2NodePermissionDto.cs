@@ -1,9 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.UserGroup2NodePermission)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.UserGroup2NodePermission)]
     [ExplicitColumns]
     internal class UserGroup2NodePermissionDto
     {

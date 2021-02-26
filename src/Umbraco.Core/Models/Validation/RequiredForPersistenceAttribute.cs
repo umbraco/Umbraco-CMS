@@ -1,9 +1,9 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Core.Models.Validation
+namespace Umbraco.Cms.Core.Models.Validation
 {
     /// <summary>
     /// Specifies that a data field value is required in order to persist an object.

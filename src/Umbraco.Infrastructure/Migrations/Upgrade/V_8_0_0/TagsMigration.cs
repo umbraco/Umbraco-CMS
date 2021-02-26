@@ -1,7 +1,6 @@
-﻿using System.Linq;
-using Umbraco.Core.Persistence.Dtos;
+﻿using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class TagsMigration : MigrationBase
     {
@@ -12,11 +11,11 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         public override void Migrate()
         {
             // alter columns => non-null
-            AlterColumn<TagDto>(Constants.DatabaseSchema.Tables.Tag, "group");
-            AlterColumn<TagDto>(Constants.DatabaseSchema.Tables.Tag, "tag");
+            AlterColumn<TagDto>(Cms.Core.Constants.DatabaseSchema.Tables.Tag, "group");
+            AlterColumn<TagDto>(Cms.Core.Constants.DatabaseSchema.Tables.Tag, "tag");
 
             // kill unused parentId column
-            Delete.Column("ParentId").FromTable(Constants.DatabaseSchema.Tables.Tag).Do();
+            Delete.Column("ParentId").FromTable(Cms.Core.Constants.DatabaseSchema.Tables.Tag).Do();
         }
     }
 }

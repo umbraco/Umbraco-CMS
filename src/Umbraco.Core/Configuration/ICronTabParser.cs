@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Cms.Core.Configuration
 {
     /// <summary>
     /// Defines the contract for that allows the parsing of chrontab expressions.

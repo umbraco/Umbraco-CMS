@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     [DataContract(Name = "tag", Namespace = "")]
     public class TagModel

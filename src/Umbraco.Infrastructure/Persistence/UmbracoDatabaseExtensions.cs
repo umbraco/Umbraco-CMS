@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Linq;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     internal static class UmbracoDatabaseExtensions
     {

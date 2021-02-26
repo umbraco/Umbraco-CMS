@@ -6,13 +6,13 @@ using System.Text;
 using System.Web.Configuration;
 using System.Web.Security;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Net;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Security.Providers
@@ -325,7 +325,7 @@ namespace Umbraco.Web.Security.Providers
             if (userIsOnline)
             {
                 // when upgrading from 7.2 to 7.3 trying to save will throw
-                if (_umbracoVersion.Current >= new Version(7, 3, 0, 0))
+                if (_umbracoVersion.Version >= new Version(7, 3, 0, 0))
                 {
                     var now = DateTime.Now;
                     // update the database data directly instead of a full member save which requires DB locks
@@ -573,7 +573,7 @@ namespace Umbraco.Web.Security.Providers
             if (requiresFullSave)
             {
                 // when upgrading from 7.2 to 7.3 trying to save will throw
-                if (_umbracoVersion.Current >= new Version(7, 3, 0, 0))
+                if (_umbracoVersion.Version >= new Version(7, 3, 0, 0))
                     MemberService.Save(member, false);
             }
             else

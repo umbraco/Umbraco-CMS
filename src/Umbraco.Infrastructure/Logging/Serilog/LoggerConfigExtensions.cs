@@ -7,10 +7,11 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Compact;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 
-namespace Umbraco.Core.Logging.Serilog
+namespace Umbraco.Extensions
 {
     public static class LoggerConfigExtensions
     {
@@ -69,7 +70,7 @@ namespace Umbraco.Core.Logging.Serilog
         {
             //Main .txt logfile - in similar format to older Log4Net output
             //Ends with ..txt as Date is inserted before file extension substring
-            logConfig.WriteTo.File(Path.Combine(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles),  $"UmbracoTraceLog.{Environment.MachineName}..txt"),
+            logConfig.WriteTo.File(Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles),  $"UmbracoTraceLog.{Environment.MachineName}..txt"),
                 shared: true,
                 rollingInterval: RollingInterval.Day,
                 restrictedToMinimumLevel: minimumLevel,
@@ -138,7 +139,7 @@ namespace Umbraco.Core.Logging.Serilog
             // .clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
             // Ends with ..txt as Date is inserted before file extension substring
             logConfig.WriteTo.File(new CompactJsonFormatter(),
-                Path.Combine(hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles) ,$"UmbracoTraceLog.{Environment.MachineName}..json"),
+                Path.Combine(hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles) ,$"UmbracoTraceLog.{Environment.MachineName}..json"),
                 shared: true,
                 rollingInterval: RollingInterval.Day, // Create a new JSON file every day
                 retainedFileCountLimit: retainedFileCount, // Setting to null means we keep all files - default is 31 days

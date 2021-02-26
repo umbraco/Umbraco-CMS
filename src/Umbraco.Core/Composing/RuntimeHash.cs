@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core.Logging;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Determines the runtime hash based on file system paths to scan

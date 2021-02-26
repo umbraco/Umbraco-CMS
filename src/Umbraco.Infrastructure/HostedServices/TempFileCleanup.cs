@@ -5,10 +5,10 @@ using System;
 using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Runtime;
 
-namespace Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Infrastructure.HostedServices
 {
     /// <summary>
     /// Used to cleanup temporary file locations.

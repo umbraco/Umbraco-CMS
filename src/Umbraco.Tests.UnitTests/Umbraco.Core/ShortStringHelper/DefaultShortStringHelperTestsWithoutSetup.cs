@@ -5,12 +5,11 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Strings;
-using CoreStrings = Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.UmbracoSettings;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
     [TestFixture]
     public class DefaultShortStringHelperTestsWithoutSetup
@@ -309,7 +308,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
         public void Utf8ToAsciiConverter()
         {
             const string str = "a\U00010F00z\uA74Ftéô";
-            var output = CoreStrings.Utf8ToAsciiConverter.ToAsciiString(str);
+            var output = Cms.Core.Strings.Utf8ToAsciiConverter.ToAsciiString(str);
             Assert.AreEqual("a?zooteo", output);
         }
 

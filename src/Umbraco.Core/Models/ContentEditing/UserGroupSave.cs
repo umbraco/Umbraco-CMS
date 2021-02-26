@@ -2,10 +2,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     [DataContract(Name = "userGroup", Namespace = "")]
     public class UserGroupSave : EntityBasic, IValidatableObject

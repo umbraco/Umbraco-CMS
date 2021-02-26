@@ -1,7 +1,8 @@
 using System;
 using NCrontab;
+using Umbraco.Cms.Core.Configuration;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Cms.Core.Configuration
 {
     public class NCronTabParser : ICronTabParser
     {

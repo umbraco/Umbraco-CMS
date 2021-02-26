@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
 
     /// <summary>
@@ -19,7 +18,7 @@ namespace Umbraco.Core.Models.Membership
         int[] StartContentIds { get; set; }
         int[] StartMediaIds { get; set; }
         string Language { get; set; }
-        
+
         DateTime? InvitedDate { get; set; }
 
         /// <summary>

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Persistence.FaultHandling
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
 {
     /// <summary>
     /// Contains information required for the <see cref="RetryPolicy.Retrying"/> event.

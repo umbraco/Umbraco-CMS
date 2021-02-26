@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class RenameUmbracoDomainsTable : MigrationBase
     {
@@ -8,7 +8,7 @@
 
         public override void Migrate()
         {
-            Rename.Table("umbracoDomains").To(Constants.DatabaseSchema.Tables.Domain).Do();
+            Rename.Table("umbracoDomains").To(Cms.Core.Constants.DatabaseSchema.Tables.Domain).Do();
         }
     }
 }

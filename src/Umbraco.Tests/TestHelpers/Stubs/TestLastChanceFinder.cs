@@ -1,4 +1,4 @@
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Routing;
 
 namespace Umbraco.Tests.TestHelpers.Stubs
 {

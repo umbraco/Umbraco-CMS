@@ -1,9 +1,6 @@
-﻿using Microsoft.AspNetCore.Authentication.OAuth;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
 
     /// <summary>

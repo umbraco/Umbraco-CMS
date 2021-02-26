@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using NPoco;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     public class SqlTemplates
     {

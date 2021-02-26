@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     [AttributeUsage(AttributeTargets.Class)]
     public sealed class SearchableTreeAttribute : Attribute

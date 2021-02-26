@@ -1,11 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Core.PropertyEditors
+using System;
+using System.Collections.Generic;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Utility class for dealing with <see cref="ContentService"/> Copying/Saving events for complex editors

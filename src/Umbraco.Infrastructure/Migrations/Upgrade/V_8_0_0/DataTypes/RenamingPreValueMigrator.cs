@@ -1,8 +1,7 @@
-﻿using System;
-using System.Linq;
-using Umbraco.Core.Exceptions;
+﻿using System.Linq;
+using Umbraco.Cms.Core.Exceptions;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
 {
     class RenamingPreValueMigrator : DefaultPreValueMigrator
     {
@@ -19,7 +18,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
             switch (editorAlias)
             {
                 case "Umbraco.NoEdit":
-                    return Constants.PropertyEditors.Aliases.Label;
+                    return Cms.Core.Constants.PropertyEditors.Aliases.Label;
                 default:
                     throw new PanicException($"The alias {editorAlias} is not supported");
             }

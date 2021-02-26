@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Mappers
+namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 {
     [MapperFor(typeof(IUser))]
     [MapperFor(typeof(User))]

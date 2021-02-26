@@ -5,13 +5,11 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using NUnit.Framework;
-using Umbraco.Core;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Extensions;
-using Constants = Umbraco.Core.Constants;
-using static Umbraco.Core.Constants.Web.Routing;
+using static Umbraco.Cms.Core.Constants.Web.Routing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
 {
     [TestFixture]
     public class EndpointRouteBuilderExtensionsTests

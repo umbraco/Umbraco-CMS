@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Mapping
+﻿namespace Umbraco.Cms.Core.Mapping
 {
     /// <summary>
     /// Defines maps for <see cref="UmbracoMapper"/>.

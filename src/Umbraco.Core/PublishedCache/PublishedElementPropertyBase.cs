@@ -1,9 +1,9 @@
 ﻿using System;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
 
-namespace Umbraco.Web.PublishedCache
+namespace Umbraco.Cms.Core.PublishedCache
 {
     internal class PublishedElementPropertyBase : PublishedPropertyBase
     {

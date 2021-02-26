@@ -1,15 +1,17 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     internal class ColorPickerConfigurationEditor : ConfigurationEditor<ColorPickerConfiguration>
     {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
+﻿namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
 {
     public enum ModificationType
     {

@@ -1,11 +1,11 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.WebAssets;
-using Umbraco.Web.BackOffice.ActionResults;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Web.BackOffice.ActionResults;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     public class MinifyJavaScriptResultAttribute : ActionFilterAttribute
     {

@@ -1,6 +1,6 @@
 ﻿using NPoco;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     // this is PropertyTypeDto + the special property type fields for members
     // it is used for querying everything needed for a property type, at once

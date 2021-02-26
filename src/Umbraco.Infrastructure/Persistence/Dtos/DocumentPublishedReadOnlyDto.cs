@@ -1,9 +1,9 @@
 ﻿using System;
 using NPoco;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Document)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.Document)]
     [PrimaryKey("versionId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class DocumentPublishedReadOnlyDto

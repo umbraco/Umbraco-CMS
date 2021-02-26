@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.IO;
-using Umbraco.Core.Migrations.PostMigrations;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class RadioAndCheckboxPropertyEditorsMigration : PropertyEditorsMigrationBase
     {
@@ -31,8 +31,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         {
             var refreshCache = false;
 
-            refreshCache |= Migrate(GetDataTypes(Constants.PropertyEditors.Aliases.RadioButtonList), false);
-            refreshCache |= Migrate(GetDataTypes(Constants.PropertyEditors.Aliases.CheckBoxList), true);
+            refreshCache |= Migrate(GetDataTypes(Cms.Core.Constants.PropertyEditors.Aliases.RadioButtonList), false);
+            refreshCache |= Migrate(GetDataTypes(Cms.Core.Constants.PropertyEditors.Aliases.CheckBoxList), true);
 
             // if some data types have been updated directly in the database (editing DataTypeDto and/or PropertyDataDto),
             // bypassing the services, then we need to rebuild the cache entirely, including the umbracoContentNu table

@@ -6,9 +6,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Security;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Hosting;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Security
 {

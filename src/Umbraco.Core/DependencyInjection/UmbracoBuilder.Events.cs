@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Events;
+using Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Cms.Core.DependencyInjection
 {
 
     /// <summary>

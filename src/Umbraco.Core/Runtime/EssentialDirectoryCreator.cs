@@ -1,10 +1,10 @@
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 
-namespace Umbraco.Core.Runtime
+namespace Umbraco.Cms.Core.Runtime
 {
     public class EssentialDirectoryCreator : INotificationHandler<UmbracoApplicationStarting>
     {

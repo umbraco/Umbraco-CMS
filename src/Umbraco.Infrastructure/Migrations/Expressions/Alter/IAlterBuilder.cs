@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Migrations.Expressions.Alter.Table;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Table;
 
-namespace Umbraco.Core.Migrations.Expressions.Alter
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter
 {
     /// <summary>
     /// Builds an Alter expression.

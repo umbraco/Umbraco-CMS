@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Packaging
+﻿namespace Umbraco.Cms.Core.Packaging
 {
     public enum PackageInstallType
     {

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Models.Packaging
+namespace Umbraco.Cms.Core.Models.Packaging
 {
     public interface IPackageInfo
     {

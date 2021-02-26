@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Editors;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// This is used for the response of PostAddFile so that we can analyze the response in a filter and remove the

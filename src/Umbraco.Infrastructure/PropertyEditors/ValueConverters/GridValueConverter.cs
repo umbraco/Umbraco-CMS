@@ -1,13 +1,16 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.Grid;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Configuration.Grid;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// This ensures that the grid config is merged in with the front-end value
@@ -24,7 +27,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         }
 
         public override bool IsConverter(IPublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.Grid);
+            => propertyType.EditorAlias.InvariantEquals(Cms.Core.Constants.PropertyEditors.Aliases.Grid);
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
             => typeof (JToken);

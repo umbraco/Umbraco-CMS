@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// An internal repository for managing entity containers such as doc type, media type, data type containers.
@@ -21,7 +23,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public EntityContainerRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<EntityContainerRepository> logger, Guid containerObjectType)
             : base(scopeAccessor, cache, logger)
         {
-            var allowedContainers = new[] { Constants.ObjectTypes.DocumentTypeContainer, Constants.ObjectTypes.MediaTypeContainer, Constants.ObjectTypes.DataTypeContainer };
+            var allowedContainers = new[] { Cms.Core.Constants.ObjectTypes.DocumentTypeContainer, Cms.Core.Constants.ObjectTypes.MediaTypeContainer, Cms.Core.Constants.ObjectTypes.DataTypeContainer };
             _containerObjectType = containerObjectType;
             if (allowedContainers.Contains(_containerObjectType) == false)
                 throw new InvalidOperationException("No container type exists with ID: " + _containerObjectType);
@@ -92,7 +94,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var entity = new EntityContainer(nodeDto.NodeId, nodeDto.UniqueId,
                 nodeDto.ParentId, nodeDto.Path, nodeDto.Level, nodeDto.SortOrder,
                 containedObjectType,
-                nodeDto.Text, nodeDto.UserId ?? Constants.Security.UnknownUserId);
+                nodeDto.Text, nodeDto.UserId ?? Cms.Core.Constants.Security.UnknownUserId);
 
             // reset dirty initial properties (U4-1946)
             entity.ResetDirtyProperties(false);

@@ -1,7 +1,6 @@
-﻿using Umbraco.Core.Cache;
-using Umbraco.Web;
+﻿using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
 
     public class HybridUmbracoWebsiteSecurityAccessor : HybridAccessorBase<IUmbracoWebsiteSecurity>, IUmbracoWebsiteSecurityAccessor

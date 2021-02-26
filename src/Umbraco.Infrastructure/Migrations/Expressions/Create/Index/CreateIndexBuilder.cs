@@ -1,8 +1,9 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common.Expressions;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Create.Index
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index
 {
     public class CreateIndexBuilder : ExpressionBuilderBase<CreateIndexExpression>,
         ICreateIndexForTableBuilder,
@@ -56,29 +57,29 @@ namespace Umbraco.Core.Migrations.Expressions.Create.Index
 
         /// <inheritdoc />
         ICreateIndexOnColumnBuilder ICreateIndexColumnOptionsBuilder.Unique()
-        {                       
-            Expression.Index.IndexType = IndexTypes.UniqueNonClustered;            
+        {
+            Expression.Index.IndexType = IndexTypes.UniqueNonClustered;
             return this;
         }
 
         /// <inheritdoc />
         public ICreateIndexOnColumnBuilder NonClustered()
         {
-            Expression.Index.IndexType = IndexTypes.NonClustered;            
+            Expression.Index.IndexType = IndexTypes.NonClustered;
             return this;
         }
 
         /// <inheritdoc />
         public ICreateIndexOnColumnBuilder Clustered()
-        {           
-           Expression.Index.IndexType = IndexTypes.Clustered;           
+        {
+           Expression.Index.IndexType = IndexTypes.Clustered;
            return this;
         }
 
         /// <inheritdoc />
         ICreateIndexOnColumnBuilder ICreateIndexOptionsBuilder.Unique()
         {
-            Expression.Index.IndexType = IndexTypes.UniqueNonClustered;           
+            Expression.Index.IndexType = IndexTypes.UniqueNonClustered;
             return this;
         }
     }

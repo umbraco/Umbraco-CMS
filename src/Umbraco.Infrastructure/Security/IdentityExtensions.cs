@@ -1,9 +1,9 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
 
-namespace Umbraco.Infrastructure.Security
+namespace Umbraco.Extensions
 {
     public static class IdentityExtensions
     {

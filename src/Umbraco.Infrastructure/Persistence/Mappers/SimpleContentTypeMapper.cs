@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Mappers
+namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 {
     // TODO: This mapper is actually very useless because the only time it would ever be used is when trying to generate a strongly typed query
     // on an IContentBase object which is what exposes ISimpleContentType, however the queries that we execute in the content repositories don't actually

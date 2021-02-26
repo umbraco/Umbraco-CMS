@@ -4,13 +4,13 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Migrations.PostMigrations;
-using Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0
 {
     public class ConvertTinyMceAndGridMediaUrlsToLocalLink : MigrationBase
     {
@@ -33,8 +33,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
                     .InnerJoin<PropertyTypeDto80>().On<PropertyDataDto80, PropertyTypeDto80>((left, right) => left.PropertyTypeId == right.Id)
                     .InnerJoin<DataTypeDto>().On<PropertyTypeDto80, DataTypeDto>((left, right) => left.DataTypeId == right.NodeId)
                 .Where<DataTypeDto>(x =>
-                    x.EditorAlias == Constants.PropertyEditors.Aliases.TinyMce ||
-                    x.EditorAlias == Constants.PropertyEditors.Aliases.Grid);
+                    x.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.TinyMce ||
+                    x.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.Grid);
 
             var properties = Database.Fetch<PropertyDataDto80>(sqlPropertyData);
 
@@ -46,7 +46,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
 
 
                 bool propertyChanged = false;
-                if (property.PropertyTypeDto.DataTypeDto.EditorAlias == Constants.PropertyEditors.Aliases.Grid)
+                if (property.PropertyTypeDto.DataTypeDto.EditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.Grid)
                 {
                     try
                     {

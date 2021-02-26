@@ -1,8 +1,8 @@
 ﻿using System;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     public interface IServerRegistration : IServerAddress, IEntity, IRememberBeingDirty
     {

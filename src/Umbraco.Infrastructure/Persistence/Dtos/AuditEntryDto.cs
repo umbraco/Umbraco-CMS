@@ -1,11 +1,11 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.AuditEntry)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.AuditEntry)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class AuditEntryDto

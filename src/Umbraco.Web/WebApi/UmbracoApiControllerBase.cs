@@ -1,20 +1,18 @@
 using System;
-using System.Web;
 using System.Web.Http;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Owin;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
-using Umbraco.Web.Features;
-using Umbraco.Web.Routing;
 using Umbraco.Web.WebApi.Filters;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Web.WebApi
 {

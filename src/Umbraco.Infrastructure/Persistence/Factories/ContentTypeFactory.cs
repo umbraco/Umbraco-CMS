@@ -2,12 +2,12 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Factories
+namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     // factory for
     // IContentType (document types)
@@ -118,7 +118,7 @@ namespace Umbraco.Core.Persistence.Factories
             entity.UpdateDate = dto.NodeDto.CreateDate;
             entity.Path = dto.NodeDto.Path;
             entity.Level = dto.NodeDto.Level;
-            entity.CreatorId = dto.NodeDto.UserId ?? Constants.Security.UnknownUserId;
+            entity.CreatorId = dto.NodeDto.UserId ?? Cms.Core.Constants.Security.UnknownUserId;
             entity.AllowedAsRoot = dto.AllowAtRoot;
             entity.IsContainer = dto.IsContainer;
             entity.IsElement = dto.IsElement;
@@ -132,11 +132,11 @@ namespace Umbraco.Core.Persistence.Factories
         {
             Guid nodeObjectType;
             if (entity is IContentType)
-                nodeObjectType = Constants.ObjectTypes.DocumentType;
+                nodeObjectType = Cms.Core.Constants.ObjectTypes.DocumentType;
             else if (entity is IMediaType)
-                nodeObjectType = Constants.ObjectTypes.MediaType;
+                nodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType;
             else if (entity is IMemberType)
-                nodeObjectType = Constants.ObjectTypes.MemberType;
+                nodeObjectType = Cms.Core.Constants.ObjectTypes.MemberType;
             else
                 throw new Exception("Invalid entity.");
 

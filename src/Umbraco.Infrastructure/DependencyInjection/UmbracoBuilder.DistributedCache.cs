@@ -1,16 +1,16 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Events;
-using Umbraco.Core.Services.Changes;
-using Umbraco.Core.Sync;
-using Umbraco.Infrastructure.Cache;
-using Umbraco.Web.Cache;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Search;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Infrastructure.Sync;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IUmbracoBuilder"/> class.

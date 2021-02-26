@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Represents the entry point into Umbraco's distributed cache infrastructure.

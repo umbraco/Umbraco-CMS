@@ -1,8 +1,7 @@
-﻿using System;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Sync;
+﻿using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Sync;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// A base class for "payload" class refreshers.

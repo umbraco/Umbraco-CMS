@@ -2,16 +2,16 @@
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Routing;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Routing;
 using Formatting = Newtonsoft.Json.Formatting;
 
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     public class LogViewerConfig : ILogViewerConfig
     {
         private readonly IHostingEnvironment _hostingEnvironment;
-        private static readonly string _pathToSearches = WebPath.Combine(Constants.SystemDirectories.Config, "logviewer.searches.config.js");
+        private static readonly string _pathToSearches = WebPath.Combine(Cms.Core.Constants.SystemDirectories.Config, "logviewer.searches.config.js");
         private readonly FileInfo _searchesConfig;
 
         public LogViewerConfig(IHostingEnvironment hostingEnvironment)

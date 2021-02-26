@@ -1,9 +1,9 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core.Templates
+namespace Umbraco.Cms.Core.Templates
 {
     /// <summary>
     /// Methods used to render umbraco components as HTML in templates

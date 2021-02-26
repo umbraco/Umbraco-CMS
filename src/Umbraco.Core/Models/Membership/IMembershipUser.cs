@@ -1,7 +1,7 @@
 using System;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
     /// <summary>
     /// Defines the base contract for <see cref="IMember"/> and <see cref="IUser"/>
