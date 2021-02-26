@@ -284,6 +284,10 @@ stages:
     pool:
         vmImage: 'windows-latest'
     steps:
+        - task: UseDotNet@2
+          displayName: 'Use .Net Core sdk 5.0.x'
+          inputs:
+              version: 5.0.x
         - task: PowerShell@2
           displayName: 'Prep build tool, build C# & JS Docs'
           inputs:
