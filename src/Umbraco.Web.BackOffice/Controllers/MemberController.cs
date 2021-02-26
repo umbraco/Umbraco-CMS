@@ -486,26 +486,28 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager);
 
-                if (passwordChangeResult.Success)
-                {
-                    contentItem.PersistedContent.RawPasswordValue = passwordChangeResult.Result.ResetPassword;
-                    if (identityMember.LastPasswordChangeDateUtc != null)
-                    {
-                        contentItem.PersistedContent.LastPasswordChangeDate = DateTime.UtcNow;
-                    }
-
-                    identityMember.LastPasswordChangeDateUtc = contentItem.PersistedContent.LastPasswordChangeDate;
-                }
-
                 if (passwordChangeResult.Result.ChangeError?.MemberNames != null)
                 {
                     foreach (string memberName in passwordChangeResult.Result.ChangeError?.MemberNames)
                     {
                         ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError?.ErrorMessage ?? string.Empty);
                     }
+                    return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
                 }
 
-                return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
+                if (passwordChangeResult.Success)
+                {
+                    // get the identity member now the password and dates have changed
+                    identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
+
+                    //TODO: confirm this is correct
+                    contentItem.PersistedContent.RawPasswordValue = identityMember.PasswordHash;
+
+                    if (identityMember.LastPasswordChangeDateUtc != null)
+                    {
+                        contentItem.PersistedContent.LastPasswordChangeDate = (DateTime)identityMember.LastPasswordChangeDateUtc;
+                    }
+                }
             }
 
             IdentityResult updatedResult = await _memberManager.UpdateAsync(identityMember);
