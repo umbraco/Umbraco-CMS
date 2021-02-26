@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
@@ -34,6 +35,9 @@ namespace Umbraco.Cms.Web.Website.Controllers
             {
                 return CurrentUmbracoPage();
             }
+
+            // TODO: This is supposed to be for members! not users
+            //throw new NotImplementedException("Implement this for members");
 
             if (await _websiteSecurityAccessor.WebsiteSecurity.LoginAsync(model.Username, model.Password) == false)
             {
