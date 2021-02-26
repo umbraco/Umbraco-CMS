@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly SecuritySettings _securitySettings;
         private readonly IEmailSender _emailSender;
-        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly AppCaches _appCaches;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUserService _userService;
@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _imageUrlGenerator = imageUrlGenerator;
             _securitySettings = securitySettings.Value;
             _emailSender = emailSender;
-            _backOfficeSecurityAccessor = backofficeSecurityAccessor;
+            _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _appCaches = appCaches;
             _shortStringHelper = shortStringHelper;
             _userService = userService;
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         public ActionResult<string[]> GetCurrentUserAvatarUrls()
         {
-            var urls = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
+            var urls = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
             if (urls == null)
                 return new ValidationErrorResult("Could not access Gravatar endpoint");
 
@@ -290,7 +290,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var hideDisabledUsers = _securitySettings.HideDisabledUsersInBackOffice;
             var excludeUserGroups = new string[0];
-            var isAdmin = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin();
+            var isAdmin = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin();
             if (isAdmin == false)
             {
                 //this user is not an admin so in that case we need to exclude all admin users
@@ -299,7 +299,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var filterQuery = _sqlContext.Query<IUser>();
 
-            if (!_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsSuper())
+            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsSuper())
             {
                 // only super can see super - but don't use IsSuper, cannot be mapped to SQL
                 //filterQuery.Where(x => !x.IsSuper());
@@ -364,7 +364,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser, null, null, null, userSave.UserGroups);
+            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, null, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 return Unauthorized(canSaveUser.Result);
@@ -453,7 +453,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, userSave.UserGroups);
+            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, user, null, null, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 return new ValidationErrorResult(canSaveUser.Result, StatusCodes.Status401Unauthorized);
@@ -516,7 +516,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 //send the email
 
-                await SendUserInviteEmailAsync(display, _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Name, _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Email, user, userSave.Message);
+                await SendUserInviteEmailAsync(display, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Email, user, userSave.Message);
 
             }
 
@@ -610,7 +610,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
 
             //Perform authorization here to see if the current user can actually save this user with the info being requested
-            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
+            var canSaveUser = _userEditorAuthorizationHelper.IsAuthorized(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, userSave.StartContentIds, userSave.StartMediaIds, userSave.UserGroups);
             if (canSaveUser == false)
             {
                 return Unauthorized(canSaveUser.Result);
@@ -670,7 +670,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var display = _umbracoMapper.Map<UserDisplay>(user);
 
             // determine if the user has changed their own language;
-            var currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            var currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
             var userHasChangedOwnLanguage =
                 user.Id == currentUser.Id && currentUser.Language != user.Language;
 
@@ -708,7 +708,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            IUser currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
             // if it's the current user, the current user cannot reset their own password
             if (currentUser.Username == found.Username)
@@ -747,7 +747,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IActionResult PostDisableUsers([FromQuery]int[] userIds)
         {
-            var tryGetCurrentUserId = _backOfficeSecurityAccessor.BackOfficeSecurity.GetUserId();
+            var tryGetCurrentUserId = _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId();
             if (tryGetCurrentUserId && userIds.Contains(tryGetCurrentUserId.Result))
             {
                 return ValidationErrorResult.CreateNotificationValidationErrorResult("The current user cannot disable itself");
