@@ -549,7 +549,8 @@
                         parentTabContentTypes: [],
                         parentTabContentTypeNames: [],
                         name: "",
-                        tabState: "init"
+                        tabState: "init",
+                        id: groups.length + 1
                     };
 
                     group = addInitProperty(group);
