@@ -413,6 +413,7 @@ namespace Umbraco.Web.Editors
         /// </summary>
         /// <param name="contentId"></param>
         [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes, Constants.Trees.Content)]
+        [OutgoingEditorModelEvent]
         public IEnumerable<ContentTypeBasic> GetAllowedChildren(int contentId)
         {
             if (contentId == Constants.System.RecycleBinContent)

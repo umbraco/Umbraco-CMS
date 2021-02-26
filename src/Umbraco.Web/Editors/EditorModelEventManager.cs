@@ -23,6 +23,8 @@ namespace Umbraco.Web.Editors
         public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<IEnumerable<Tab<IDashboard>>>> SendingDashboardModel;
         public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<IEnumerable<Tab<IDashboardSlim>>>> SendingDashboardSlimModel;
 
+        public static event TypedEventHandler<HttpActionExecutedContext, EditorModelEventArgs<IEnumerable<ContentTypeBasic>>> SendingAllowedContentChildrenModel;
+
         private static void OnSendingDashboardModel(HttpActionExecutedContext sender, EditorModelEventArgs<IEnumerable<Tab<IDashboardSlim>>> e)
         {
             var handler = SendingDashboardSlimModel;
@@ -53,6 +55,13 @@ namespace Umbraco.Web.Editors
             handler?.Invoke(sender, e);
         }
 
+        private static void OnSendingAllowedContentChildrenModel(HttpActionExecutedContext sender,
+            EditorModelEventArgs<IEnumerable<ContentTypeBasic>> e)
+        {
+            var handler = SendingAllowedContentChildrenModel;
+            handler?.Invoke(sender, e);
+        }
+
         /// <summary>
         /// Based on the type, emit's a specific event
         /// </summary>
@@ -74,6 +83,9 @@ namespace Umbraco.Web.Editors
 
             if (e.Model is IEnumerable<Tab<IDashboardSlim>>)
                 OnSendingDashboardModel(sender, new EditorModelEventArgs<IEnumerable<Tab<IDashboardSlim>>>(e));
+
+            if (e.Model is IEnumerable<ContentTypeBasic>)
+                OnSendingAllowedContentChildrenModel(sender, new EditorModelEventArgs<IEnumerable<ContentTypeBasic>>(e));
         }
     }
 }
