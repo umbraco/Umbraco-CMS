@@ -9,7 +9,7 @@ using System.Reflection;
 using System.Text;
 using Umbraco.Core.Persistence.FaultHandling;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Core.Persistence
 {
     internal static class DatabaseDebugHelper
     {

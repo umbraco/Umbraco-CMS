@@ -34,9 +34,9 @@ stages:
     steps:
 
     - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.0.x'
+      displayName: 'Use .Net Core sdk 5.x'
       inputs:
-        version: 5.0.x
+        version: 5.x
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet test'
@@ -54,9 +54,9 @@ stages:
     steps:
 
     - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.0.x'
+      displayName: 'Use .Net Core sdk 5.x'
       inputs:
-        version: 5.0.x
+        version: 5.x
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet test'
@@ -77,9 +77,9 @@ stages:
     steps:
 
     - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.0.x'
+      displayName: 'Use .Net Core sdk 5.x'
       inputs:
-        version: 5.0.x
+        version: 5.x
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet test'
@@ -98,9 +98,9 @@ stages:
     steps:
 
     - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.0.x'
+      displayName: 'Use .Net Core sdk 5.x'
       inputs:
-        version: 5.0.x
+        version: 5.x
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet test'
@@ -116,9 +116,9 @@ stages:
     steps:
 
     - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.0.x'
+      displayName: 'Use .Net Core sdk 5.x'
       inputs:
-        version: 5.0.x
+        version: 5.x
 
     - powershell: 'sqllocaldb start mssqllocaldb'
       displayName: 'Start MSSQL LocalDb'
@@ -136,9 +136,9 @@ stages:
     steps:
 
         - task: UseDotNet@2
-          displayName: 'Use .Net Core sdk 5.0.x'
+          displayName: 'Use .Net Core sdk 5.x'
           inputs:
-            version: 5.0.x
+            version: 5.x
 
         - task: NuGetToolInstaller@1
           displayName: 'Use NuGet Latest'
@@ -278,16 +278,16 @@ stages:
 
 
   - job: Generate_Docs
-    timeoutInMinutes: 30
+    timeoutInMinutes: 60
     condition: ne(variables['Umbraco.IsReleaseBuild'], 'false')
     displayName: 'Generate Code Documentation'
     pool:
         vmImage: 'windows-latest'
     steps:
         - task: UseDotNet@2
-          displayName: 'Use .Net Core sdk 5.0.x'
+          displayName: 'Use .Net Core sdk 5.x'
           inputs:
-              version: 5.0.x
+              version: 5.x
         - task: PowerShell@2
           displayName: 'Prep build tool, build C# & JS Docs'
           inputs:
