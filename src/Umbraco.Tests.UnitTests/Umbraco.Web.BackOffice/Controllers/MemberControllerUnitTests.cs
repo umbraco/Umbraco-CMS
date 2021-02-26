@@ -35,6 +35,7 @@ using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Mapping;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Security;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 using MemberMapDefinition = Umbraco.Cms.Web.BackOffice.Mapping.MemberMapDefinition;
 

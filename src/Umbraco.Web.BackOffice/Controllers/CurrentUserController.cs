@@ -24,10 +24,10 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
-using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -223,12 +223,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public async Task<ActionResult<ModelWithNotifications<string>>> PostChangePassword(ChangingPasswordModel changingPasswordModel)
         {
             IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            changingPasswordModel.Id = currentUser.Id;
 
-            // if the current user has access to reset/manually change the password
-            if (currentUser.HasSectionAccess(Constants.Applications.Users) == false)
-            {
-                return new ValidationErrorResult("The current user is not authorized");
-            }
+            // all current users have access to reset/manually change their password
 
             Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _backOfficeUserManager);
 

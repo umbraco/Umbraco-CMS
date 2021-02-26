@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
@@ -21,6 +22,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Extensions
 {
@@ -83,7 +85,8 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<PreviewAuthenticationMiddleware>();
             builder.Services.AddUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
             builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
-            builder.Services.AddUnique<IPasswordChanger<UmbracoIdentityUser>, PasswordChanger<UmbracoIdentityUser>>();
+            builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
+            builder.Services.AddUnique<IPasswordChanger<MembersIdentityUser>, PasswordChanger<MembersIdentityUser>>();
 
             return builder;
         }

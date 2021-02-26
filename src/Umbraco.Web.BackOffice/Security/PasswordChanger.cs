@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.Common.Security
 {
     /// <summary>
     /// Changes the password for an identity user
