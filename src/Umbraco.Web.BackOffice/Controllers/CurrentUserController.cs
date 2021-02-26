@@ -223,13 +223,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public async Task<ActionResult<ModelWithNotifications<string>>> PostChangePassword(ChangingPasswordModel changingPasswordModel)
         {
             IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-            changingPasswordModel.CurrentUserHasSectionAccess = currentUser.HasSectionAccess(Constants.Applications.Users);
 
-            // the current user has access to change their password
-            changingPasswordModel.CurrentUserHasSectionAccess = true;
-            changingPasswordModel.CurrentUsername = currentUser.Username;
-            changingPasswordModel.SavingUsername = currentUser.Username;
-            changingPasswordModel.SavingUserId = currentUser.Id;
+            // if the current user has access to reset/manually change the password
+            if (currentUser.HasSectionAccess(Constants.Applications.Users) == false)
+            {
+                return new ValidationErrorResult("The current user is not authorized");
+            }
 
             Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _backOfficeUserManager);
 

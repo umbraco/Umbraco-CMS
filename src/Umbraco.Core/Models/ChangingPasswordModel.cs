@@ -25,25 +25,5 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         [DataMember(Name = "id")]
         public int Id { get; set; }
-
-        /// <summary>
-        /// The username of the user/member who is changing the password
-        /// </summary>
-        public string CurrentUsername { get; set; }
-
-        /// <summary>
-        /// The ID of the user/member whose password is being changed
-        /// </summary>
-        public int SavingUserId { get; set; }
-
-        /// <summary>
-        /// The username of the user/memeber whose password is being changed
-        /// </summary>
-        public string SavingUsername { get; set; }
-
-        /// <summary>
-        /// True if the current user has access to change the password for the member/user
-        /// </summary>
-        public bool CurrentUserHasSectionAccess { get; set; }
     }
 }

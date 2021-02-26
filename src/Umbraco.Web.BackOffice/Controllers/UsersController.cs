@@ -708,8 +708,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
 
             IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
-            changingPasswordModel.CurrentUserHasSectionAccess = currentUser.HasSectionAccess(Constants.Applications.Users);
-            changingPasswordModel.CurrentUsername = currentUser.Username;
+
+            // if it's the current user, the current user cannot reset their own password
+            if (currentUser.Username == found.Username)
+            {
+                return new ValidationErrorResult("Password reset is not allowed");
+            }
+
+            // if the current user has access to reset/manually change the password
+            if (currentUser.HasSectionAccess(Constants.Applications.Users) == false)
+            {
+                return new ValidationErrorResult("The current user is not authorized");
+            }
 
             Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);
 

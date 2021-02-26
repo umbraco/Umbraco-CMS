@@ -471,16 +471,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 }
 
                 IUser currentUser = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                // if the current user has access to reset/manually change the password
+                if (currentUser.HasSectionAccess(Constants.Applications.Members) == false)
+                {
+                    return new ValidationErrorResult("The current user is not authorized");
+                }
                 var changingPasswordModel = new ChangingPasswordModel
                 {
                     Id = intId.Result,
                     OldPassword = contentItem.Password.OldPassword,
                     NewPassword = contentItem.Password.NewPassword,
-                    CurrentUsername = currentUser.Username,
-                    SavingUserId = foundMember.Id,
-                    SavingUsername = foundMember.Username,
-                    CurrentUserHasSectionAccess = currentUser.HasSectionAccess(Constants.Applications.Members)
-            };
+                };
 
                 Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager);
 
