@@ -6,7 +6,6 @@
           "src": "../",
           "files": [
             "Umbraco.Core/Umbraco.Core.csproj",
-            "Umbraco.Examine.Lucene/Umbraco.Examine.Lucene.csproj",
             "Umbraco.Infrastructure/Umbraco.Infrastructure.csproj",
             "Umbraco.Persistence.SqlCe/Umbraco.Persistence.SqlCe.csproj",
             "Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj",

@@ -2,8 +2,6 @@
   href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Core.html
 - name: Infrastructure
   href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Infrastructure.html
-- name: Examine.Lucene
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Examine.Lucene.html
 - name: SqlCe
   href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Persistence.SqlCe.html
 - name: NuCache

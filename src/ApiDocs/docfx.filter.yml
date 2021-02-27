@@ -2,8 +2,6 @@ apiRules:
   - include:
       uidRegex: ^Umbraco\.Cms\.Core
   - include:
-      uidRegex: ^Umbraco\.Cms\.Examine\.Lucene
-  - include:
       uidRegex: ^Umbraco\.Cms\.Infrastructure
   - include:
       uidRegex: ^Umbraco\.Cms\.Persistence\.SqlCe
