@@ -295,7 +295,7 @@ stages:
               targetType: 'inline'
               script: |
                   choco install docfx -y
-                  docfx "$(Agent.BuildDirectory)\ApiDocs\docfx.json"
+                  docfx "$(Agent.BuildDirectory)\src\ApiDocs\docfx.json"
                   if ($lastexitcode -ne 0){
                       throw ("Error generating docs")
                   }
