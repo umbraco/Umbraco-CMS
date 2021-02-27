@@ -2,8 +2,6 @@
   href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Core.html
 - name: Infrastructure
   href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Infrastructure.html
-- name: SqlCe
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Persistence.SqlCe.html
 - name: NuCache
   href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.PublishedCache.NuCache.html
 - name: Web.Common

@@ -4,8 +4,6 @@ apiRules:
   - include:
       uidRegex: ^Umbraco\.Cms\.Infrastructure
   - include:
-      uidRegex: ^Umbraco\.Cms\.Persistence\.SqlCe
-  - include:
       uidRegex: ^Umbraco\.Cms\.PublsishedCache\.NuCache
   - include:
       uidRegex: ^Umbraco\.Cms\.Web\.BackOffice

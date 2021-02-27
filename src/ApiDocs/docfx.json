@@ -7,7 +7,6 @@
           "files": [
             "Umbraco.Core/Umbraco.Core.csproj",
             "Umbraco.Infrastructure/Umbraco.Infrastructure.csproj",
-            "Umbraco.Persistence.SqlCe/Umbraco.Persistence.SqlCe.csproj",
             "Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj",
             "Umbraco.Web.BackOffice/Umbraco.Web.BackOffice.csproj",
             "Umbraco.Web.Common/Umbraco.Web.Common.csproj",
