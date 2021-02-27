@@ -294,11 +294,22 @@ stages:
           inputs:
               targetType: 'inline'
               script: |
-                  $uenv=./build.ps1 -get -doc
-                  $nugetsourceUmbraco = "https://api.nuget.org/v3/index.json"
-                  $uenv.PrepareCSharpDocs()
+                  choco install docfx -y
+                  docfx "$(Agent.BuildDirectory)\ApiDocs\docfx.json"
+                  if ($lastexitcode -ne 0){
+                      throw ("Error generating docs")
+                  }
               errorActionPreference: 'continue'
               workingDirectory: 'build'
+
+        - task: ArchiveFiles@2
+          displayName: 'Zip C# Docs'
+          inputs:
+              rootFolderOrFile: '$(Agent.BuildDirectory)/_site'
+              includeRootFolder: true
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/docs/csharp-docs.zip'
+              replaceExistingArchive: true
 
         - task: PowerShell@2
           displayName: 'Prep build tool - JS Docs'

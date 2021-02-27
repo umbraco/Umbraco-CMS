@@ -59,7 +59,6 @@
       "_enableSearch": true,
       "_disableContribution": false
     },
-    "dest": "../../build.tmp/_site",
     "template": [
       "default", "umbracotemplate"
     ]
