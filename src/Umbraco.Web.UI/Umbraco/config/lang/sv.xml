@@ -243,10 +243,10 @@
     <key alias="formsInstall">Installera Umbraco Forms</key>
   </area>
   <area alias="prompt">
-    <key alias="stay">Stanna</key>
-    <key alias="discardChanges">Ignorera ändringar</key>
-    <key alias="unsavedChanges">Du har ändringar som inte är sparade</key>
-    <key alias="unsavedChangesWarning">Vill du verkligen lämna sidan? Du har ändringar som inte är sparade</key>
+    <key alias="stay">Stay</key>
+    <key alias="discardChanges">Discard changes</key>
+    <key alias="unsavedChanges">You have unsaved changes</key>
+    <key alias="unsavedChangesWarning">Are you sure you want to navigate away from this page? - you have unsaved changes</key>
   </area>
   <area alias="bulk">
     <key alias="done">Klar</key>
@@ -272,6 +272,8 @@
     <key alias="copiedItemOfItems">Kopierade %0% av %1% objekt</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Länktitel</key>
+    <key alias="urlLinkPicker">Länk</key>
     <key alias="anchorInsert">Namn</key>
     <key alias="assignDomain">Hantera domännamn</key>
     <key alias="closeThisWindow">Stäng fönstret</key>
@@ -308,7 +310,9 @@
     <key alias="siterepublished">Cache för webbplatsen har uppdaterats. Allt publicerat innehåll är nu uppdaterat. Innehåll som inte har publicerats är fortfarande opublicerat.</key>
     <key alias="siterepublishHelp">Webbplatsens cache kommer att uppdateras. Allt innehåll som är publicerat kommer att uppdateras. Innehåll som inte är publicerat kommer att förbli opublicerat.</key>
     <key alias="selectContentStartNode">Välj startnod för innehåll</key>
+    <key alias="selectMedia">Välj media</key>
     <key alias="selectIcon">Välj ikon</key>
+    <key alias="selectLink">Välj länk</key>
     <key alias="selectMediaStartNode">Välj startnod för media</key>
     <key alias="selectUserGroups">Välj användargrupper</key>
     <key alias="selectSections">Välj sektioner</key>
@@ -318,6 +322,9 @@
     <key alias="thumbnailimageclickfororiginal">Klicka på förhandsgranskningsbilden för att se bilden i full storlek</key>
     <key alias="treepicker">Välj ett objekt</key>
     <key alias="viewCacheItem">Se cachat objekt</key>
+    <key alias="linkToPage">Länk till sida</key>
+    <key alias="openInNewWindow">Öppnar länken i ett nytt fönster eller flik</key>
+    <key alias="linkToMedia">Länk till media</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description">Redigera de olika översättningarna för ordboksinlägget %0% nedan. Du kan lägga till ytterligare språk under 'språk' i menyn till vänster.</key>
@@ -551,7 +558,7 @@
     <key alias="theEndHeader">Umbraco %0% är installerat och klart för användning</key>
     <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>UmbracoConfigurationStatus</strong> på slutet till <strong>%0%</strong>]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>börja omedelbart</strong> genom att klicka på "Starta Umbraco"-knappen nedan. <br />Om du är en <strong>ny Umbraco användare</strong>kan du hitta massor av resurser på våra kom igång sidor.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara Umbraco back office och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara Umbraco backoffice och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
     <key alias="Unavailable">Anslutningen till databasen misslyckades.</key>
     <key alias="watch">Se</key>
     <key alias="welcomeIntro"><![CDATA[Den här guiden kommer att guida dig genom processen med att konfigurera <strong>Umbraco %0%</strong> antingen för en ny installation eller en uppgradering från version 3.0. <br /><br /> Tryck på <strong>"next"</strong> för att börja.]]></key>
@@ -725,7 +732,6 @@
     <key alias="users">Användare</key>
   </area>
   <area alias="settings">
-    <key alias="asAContentMasterType">som huvudinnehållstyp. Tabbar från huvudinnehållstyper visas inte och kan endast redigeras på själva huvudinnehållstypen.</key>
     <key alias="contentTypeEnabled">Huvudinnehållstyp påslagen</key>
     <key alias="contentTypeUses">Denna huvudinnehållstyp använder</key>
     <key alias="defaulttemplate">Defaultmall</key>
@@ -741,8 +747,8 @@
     <key alias="tabs">Flikar</key>
   </area>
   <area alias="sort">
-    <key alias="sortOrder">Sortera ordningen</key>
-    <key alias="sortCreationDate">Skapandedatum</key>
+    <key alias="sortOrder">Sort order</key>
+    <key alias="sortCreationDate">Creation date</key>
     <key alias="sortDone">Sortering klar</key>
     <key alias="sortHelp">Välj i vilken ordning du vill ha sidorna genom att dra dem upp eller ner i listan. Du kan också klicka på kolumnrubrikerna för att sortera grupper av sidor</key>
     <key alias="sortPleaseWait"><![CDATA[Vänta medan sidorna sorteras. Det kan ta en stund.]]></key>
@@ -815,12 +821,12 @@
   </area>
   <area alias="grid">
     <key alias="media">Bild</key>
-    <key alias="macro">Makro</key>
+    <key alias="macro">Macro</key>
     <key alias="insertControl">Lägg till</key>
-    <key alias="chooseLayout">Välj utformning</key>
+    <key alias="chooseLayout">Choose layout</key>
     <key alias="addRows">Lägg till rad</key>
-    <key alias="addElement">Lägg till innehåll</key>
-    <key alias="dropElement">Släpp innehåll</key>
+    <key alias="addElement">Add content</key>
+    <key alias="dropElement">Drop content</key>
     <key alias="contentNotAllowed">Indholdet er ikke tilladt her</key>
     <key alias="contentAllowed">Indholdet er tilladt her</key>
     <key alias="clickToEmbed">Klicka för att lägga in</key>
@@ -847,7 +853,7 @@
   <area alias="templateEditor">
     <key alias="alternativeField">Alternativt fält</key>
     <key alias="alternativeText">Alternativ text</key>
-    <key alias="casing">Hölje</key>
+    <key alias="casing">Casing</key>
     <key alias="chooseField">Välj fält</key>
     <key alias="convertLineBreaks">Konvertera radbrytningar</key>
     <key alias="convertLineBreaksHelp">Byter radbrytningar mot html-taggen &amp;lt;br&amp;gt;</key>
@@ -940,7 +946,7 @@
     <key alias="changePassword">Ändra lösenord</key>
     <key alias="changePhoto">Ändra bild</key>
     <key alias="confirmNewPassword">Bekräfta det nya lösenordet</key>
-    <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco Back Office genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
+    <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco backoffice genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
     <key alias="contentChannel">Innehållskanal</key>
     <key alias="createAnotherUser">Skapa en till användare</key>
     <key alias="createUserHelp">Skapa nya användare för att ge dom åtkomst till Umbraco. När en ny användare skapas kommer ett lösenord genereras som du kan dela med användaren.</key>
@@ -963,7 +969,7 @@
     <key alias="lastLockoutDate">Senast utlåst</key>
     <key alias="lastLogin">Senast inloggad</key>
     <key alias="lastPasswordChangeDate">Lösenordet ändrades</key>
-    <key alias="loginname">Logga in</key>
+    <key alias="loginname">Login</key>
     <key alias="mediastartnode">Startnod i mediabiblioteket</key>
     <key alias="mediastartnodehelp">Begränsa media sectionen till en specifik startnod</key>
     <key alias="mediastartnodes">Media startnoder</key>

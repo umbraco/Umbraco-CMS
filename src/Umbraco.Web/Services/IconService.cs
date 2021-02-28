@@ -13,31 +13,24 @@ namespace Umbraco.Web.Services
     public class IconService : IIconService
     {
         private readonly IGlobalSettings _globalSettings;
+        private readonly IHtmlSanitizer _htmlSanitizer;
 
-        public IconService(IGlobalSettings globalSettings)
+        public IconService(IGlobalSettings globalSettings, IHtmlSanitizer htmlSanitizer)
         {
             _globalSettings = globalSettings;
+            _htmlSanitizer = htmlSanitizer;
         }
 
 
         /// <inheritdoc />
         public IList<IconModel> GetAllIcons()
         {
-            var icons = new List<IconModel>();
             var directory = new DirectoryInfo(IOHelper.MapPath($"{_globalSettings.IconsPath}/"));
             var iconNames = directory.GetFiles("*.svg");
 
-            iconNames.OrderBy(f => f.Name).ToList().ForEach(iconInfo =>
-            {
-                var icon = GetIcon(iconInfo);
+            return iconNames.OrderBy(f => f.Name)
+                .Select(iconInfo => GetIcon(iconInfo)).WhereNotNull().ToList();
 
-                if (icon != null)
-                {
-                    icons.Add(icon);
-                }
-            });
-
-            return icons;
         }
 
         /// <inheritdoc />
@@ -68,15 +61,10 @@ namespace Umbraco.Web.Services
         /// <returns></returns>
         private IconModel CreateIconModel(string iconName, string iconPath)
         {
-            var sanitizer = new HtmlSanitizer();
-            sanitizer.AllowedAttributes.UnionWith(Constants.SvgSanitizer.Attributes);
-            sanitizer.AllowedCssProperties.UnionWith(Constants.SvgSanitizer.Attributes);
-            sanitizer.AllowedTags.UnionWith(Constants.SvgSanitizer.Tags);
-
             try
             {
                 var svgContent = System.IO.File.ReadAllText(iconPath);
-                var sanitizedString = sanitizer.Sanitize(svgContent);
+                var sanitizedString = _htmlSanitizer.Sanitize(svgContent);
 
                 var svg = new IconModel
                 {

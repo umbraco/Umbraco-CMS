@@ -69,7 +69,7 @@ namespace Umbraco.Examine
                 }
                 catch (Exception e)
                 {
-                    _logger.Error<IndexRebuilder>(e, "Index populating failed for populator {Populator}", populator.GetType());                    
+                    _logger.Error<IndexRebuilder,Type>(e, "Index populating failed for populator {Populator}", populator.GetType());                    
                 }
             }
         }
