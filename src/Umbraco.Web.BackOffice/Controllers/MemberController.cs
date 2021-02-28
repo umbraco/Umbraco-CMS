@@ -495,18 +495,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
                 }
 
-                if (passwordChangeResult.Success)
+                if (!passwordChangeResult.Success)
                 {
-                    // get the identity member now the password and dates have changed
-                    identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
+                    return new ValidationErrorResult("The password could not be changed");
+                }
 
-                    //TODO: confirm this is correct
-                    contentItem.PersistedContent.RawPasswordValue = identityMember.PasswordHash;
+                // get the identity member now the password and dates have changed
+                identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
 
-                    if (identityMember.LastPasswordChangeDateUtc != null)
-                    {
-                        contentItem.PersistedContent.LastPasswordChangeDate = (DateTime)identityMember.LastPasswordChangeDateUtc;
-                    }
+                //TODO: confirm this is correct
+                contentItem.PersistedContent.RawPasswordValue = identityMember.PasswordHash;
+
+                if (identityMember.LastPasswordChangeDateUtc != null)
+                {
+                    contentItem.PersistedContent.LastPasswordChangeDate = (DateTime)identityMember.LastPasswordChangeDateUtc;
                 }
             }
 
