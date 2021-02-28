@@ -23,32 +23,71 @@ resources:
     options: --name mssql
 
 stages:
-- stage: Linux
+- stage: Unit_Tests
+  displayName: 'Unit Tests'  # friendly name to display in the UI
   dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
   jobs:
 
-  - job: Unit_Tests
-    displayName: 'Unit Tests'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
+      - job: Linux_Unit_Tests
+        displayName: 'Linux'
+        pool:
+            vmImage: 'ubuntu-latest'
+        steps:
+            - task: UseDotNet@2
+              displayName: 'Use .Net Core sdk 5.x'
+              inputs:
+                  version: 5.x
 
-    - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.x'
-      inputs:
-        version: 5.x
+            - task: DotNetCoreCLI@2
+              displayName: 'dotnet test'
+              inputs:
+                  command: test
+                  projects: '**/*.Tests.UnitTests.csproj'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: '**/*.Tests.UnitTests.csproj'
 
-  - job: Integration_Tests
+    - job: MacOS_Unit_Tests
+      displayName: 'Mac OS'
+      pool:
+          vmImage: 'macOS-latest'
+      steps:
+
+          - task: UseDotNet@2
+            displayName: 'Use .Net Core sdk 5.x'
+            inputs:
+                version: 5.x
+
+          - task: DotNetCoreCLI@2
+            displayName: 'dotnet test'
+            inputs:
+                command: test
+                projects: '**/*.Tests.UnitTests.csproj'
+
+      - job: Windows_Unit_Tests
+        displayName: 'Windows'
+        pool:
+            vmImage: 'windows-latest'
+        steps:
+
+            - task: UseDotNet@2
+              displayName: 'Use .Net Core sdk 5.x'
+              inputs:
+                  version: 5.x
+
+            - task: DotNetCoreCLI@2
+              displayName: 'dotnet test'
+              inputs:
+                  command: test
+                  projects: '**/*.Tests.UnitTests.csproj'
+
+- stage: Integration_Tests
+  dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
+  jobs:
+
+  - job: Linux_Integration_Tests
     services:
       mssql: mssql
     timeoutInMinutes: 120
-    displayName: 'Integration Tests'
+    displayName: 'Linux'
     pool:
       vmImage: 'ubuntu-latest'
     steps:
@@ -66,68 +105,34 @@ stages:
       env:
         UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
 
-- stage: MacOS
-  dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
-  jobs:
 
-  - job: Unit_Tests
-    displayName: 'Unit Tests'
-    pool:
-      vmImage: 'macOS-latest'
-    steps:
-
-    - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.x'
-      inputs:
-        version: 5.x
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: '**/*.Tests.UnitTests.csproj'
-
-- stage: Windows
-  dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
-  jobs:
-
-  - job: Unit_Tests
-    displayName: 'Unit Tests'
-    pool:
-      vmImage: 'windows-latest'
-    steps:
-
-    - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.x'
-      inputs:
-        version: 5.x
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: '**\*.Tests.UnitTests.csproj'
-
-  - job: Integration_Tests
+  - job: Windows_Integration_Tests
     timeoutInMinutes: 120
-    displayName: 'Integration Tests'
+    displayName: 'Windows'
     pool:
-      vmImage: 'windows-latest'
+        vmImage: 'windows-latest'
     steps:
 
-    - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.x'
-      inputs:
-        version: 5.x
+        - task: UseDotNet@2
+          displayName: 'Use .Net Core sdk 5.x'
+          inputs:
+              version: 5.x
 
-    - powershell: 'sqllocaldb start mssqllocaldb'
-      displayName: 'Start MSSQL LocalDb'
+        - powershell: 'sqllocaldb start mssqllocaldb'
+          displayName: 'Start MSSQL LocalDb'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: '**\Umbraco.Tests.Integration.csproj'
+        - task: DotNetCoreCLI@2
+          displayName: 'dotnet test'
+          inputs:
+              command: test
+              projects: '**\Umbraco.Tests.Integration.csproj'
+
+
+
+- stage: Artifacts
+  dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
+  jobs:
+
 
   - job: Build_Artifacts
     displayName: 'Build Artifacts'
@@ -284,10 +289,10 @@ stages:
     pool:
         vmImage: 'windows-latest'
     steps:
-#        - task: UseDotNet@2
-#          displayName: 'Use .Net Core sdk 5.x'
-#          inputs:
-#              version: 5.x
+        - task: UseDotNet@2
+          displayName: 'Use .Net Core sdk 5.x'
+          inputs:
+              version: 5.x
 
         - task: PowerShell@2
           displayName: 'Prep build tool -  C# Docs'
