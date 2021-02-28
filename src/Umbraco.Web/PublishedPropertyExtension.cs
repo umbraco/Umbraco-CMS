@@ -41,7 +41,7 @@ namespace Umbraco.Web
                 var valueConverted = value.TryConvertTo<T>();
                 if (valueConverted) return valueConverted.Result;
 
-                // cannot cast nor convert the value, nothing we can return but 'default'
+                // cannot cast nor convert the value, nothing we can return but 'defaultValue'
                 // note: we don't want to fallback in that case - would make little sense
                 return defaultValue;
             }
