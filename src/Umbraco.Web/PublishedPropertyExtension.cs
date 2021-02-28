@@ -64,7 +64,7 @@ namespace Umbraco.Web
             var noValueConverted = noValue.TryConvertTo<T>();
             if (noValueConverted) return noValueConverted.Result;
 
-            // cannot cast noValue nor convert it, nothing we can return but 'default'
+            // cannot cast noValue nor convert it, nothing we can return but 'defaultValue'
             return defaultValue;
         }
 
