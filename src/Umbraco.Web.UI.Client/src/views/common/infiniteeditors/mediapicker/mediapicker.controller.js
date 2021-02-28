@@ -496,18 +496,18 @@ angular.module("umbraco")
                         mediaItem.updateDate = mediaItem.metaData.UpdateDate;
                     }
                 }
-                mediaItem.filtered = allowedTypes && allowedTypes.indexOf(mediaItem.metaData.ContentTypeAlias) < 0;
             }
 
             function getChildren(id) {
                 vm.loading = true;
-                return entityResource.getPagedDescendants(id, "Media", vm.searchOptions).then(function (data) {
+                return entityResource.getPagedChildren(id, "Media", vm.searchOptions).then(function (data) {
 
                     var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
 
                     // update image data to work with image grid
                     if (data.items) {
                         data.items.forEach(mediaItem => setMediaMetaData(mediaItem));
+                        data.items.forEach(mediaItem => mediaItem.filtered = allowedTypes && allowedTypes.indexOf(mediaItem.metaData.ContentTypeAlias) < 0);
                     }
 
                     vm.searchOptions.filter = "";
