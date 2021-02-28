@@ -37,13 +37,25 @@
     /// <remarks>
     /// See: https://github.com/umbraco/rfcs/blob/907f3758cf59a7b6781296a60d57d537b3b60b8c/cms/0011-block-data-structure.md#strongly-typed
     /// </remarks>
-    public interface IBlockReference<TContent, TSettings> : IBlockReference<TSettings>
+    public interface IBlockReference<TContent, TSettings> : IBlockContent<TContent>, IBlockSettings<TSettings>, IBlockReference
+    {
+
+    }
+
+    /// <summary>
+    /// Represents the content for a Block editor implementation.
+    /// </summary>
+    /// <typeparam name="TContent">The type of the content.</typeparam>
+    /// <remarks>
+    /// See: https://github.com/umbraco/rfcs/blob/907f3758cf59a7b6781296a60d57d537b3b60b8c/cms/0011-block-data-structure.md#strongly-typed
+    /// </remarks>
+    public interface IBlockContent<TContent>
     {
         /// <summary>
-        /// Gets the content.
+        /// Gets the settings.
         /// </summary>
         /// <value>
-        /// The content.
+        /// The settings.
         /// </value>
         TContent Content { get; }
     }
