@@ -244,10 +244,10 @@ stages:
     - stage: Artifacts_Docs
       displayName: 'Static Code Documentation'
       dependsOn: []
+      condition: 'ne(variables[''Umbraco.IsReleaseBuild''], ''false'')'
       jobs:
           - job: Generate_Docs
             timeoutInMinutes: 60
-            condition: 'ne(variables[''Umbraco.IsReleaseBuild''], ''false'')'
             displayName: Generate Code Documentation
             pool:
                 vmImage: windows-latest
