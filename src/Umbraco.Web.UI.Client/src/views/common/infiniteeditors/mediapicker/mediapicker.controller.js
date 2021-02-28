@@ -79,7 +79,7 @@ angular.module("umbraco")
 
             vm.searchOptions = {
                 pageNumber: 1,
-                pageSize: 100,
+                pageSize: 20,
                 totalItems: 0,
                 totalPages: 0,
                 filter: '',
@@ -496,27 +496,31 @@ angular.module("umbraco")
                         mediaItem.updateDate = mediaItem.metaData.UpdateDate;
                     }
                 }
+                mediaItem.filtered = allowedTypes && allowedTypes.indexOf(mediaItem.metaData.ContentTypeAlias) < 0;
             }
 
             function getChildren(id) {
                 vm.loading = true;
-                return entityResource.getChildren(id, "Media", vm.searchOptions).then(function (data) {
+                return entityResource.getPagedDescendants(id, "Media", vm.searchOptions).then(function (data) {
 
                     var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
 
-                    for (var i = 0; i < data.length; i++) {
-                        if (data[i].metaData.MediaPath !== null) {
-                            data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
-                            data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
-                        }
-                        if (data[i].metaData.UpdateDate !== null){
-                            data[i].updateDate = data[i].metaData.UpdateDate;
-                        }
-                        data[i].filtered = allowedTypes && allowedTypes.indexOf(data[i].metaData.ContentTypeAlias) < 0;
+                    // update image data to work with image grid
+                    if (data.items) {
+                        data.items.forEach(mediaItem => setMediaMetaData(mediaItem));
                     }
 
                     vm.searchOptions.filter = "";
-                    $scope.images = data ? data : [];
+                    $scope.images = data.items ? data.items : [];
+
+                    // update pagination
+                    if (data.pageNumber > 0)
+                        vm.searchOptions.pageNumber = data.pageNumber;
+                    if (data.pageSize > 0)
+                        vm.searchOptions.pageSize = data.pageSize;
+
+                    vm.searchOptions.totalItems = data.totalItems;
+                    vm.searchOptions.totalPages = data.totalPages;
 
                     // set already selected medias to selected
                     preSelectMedia();
