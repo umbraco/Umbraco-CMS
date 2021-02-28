@@ -241,6 +241,10 @@ stages:
                       PathtoPublish: $(build.artifactstagingdirectory)
                       ArtifactName: logs
                   condition: succeededOrFailed()
+    - stage: Artifacts_Docs
+      displayName: 'Static Code Documentation'
+      dependsOn: []
+      jobs:
           - job: Generate_Docs
             timeoutInMinutes: 60
             condition: 'ne(variables[''Umbraco.IsReleaseBuild''], ''false'')'
