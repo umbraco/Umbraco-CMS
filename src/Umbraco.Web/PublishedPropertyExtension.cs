@@ -55,11 +55,11 @@ namespace Umbraco.Web
             // we don't have a value - neither direct nor fallback
             // give a chance to the converter to return something (eg empty enumerable)
             var noValue = property.GetValue(culture, segment);
-            if (noValue is T noValueAsT) return noValueAsT;
             if (noValue == null)
             {
                 return defaultValue;
             }
+            if (noValue is T noValueAsT) return noValueAsT;
 
             var noValueConverted = noValue.TryConvertTo<T>();
             if (noValueConverted) return noValueConverted.Result;
