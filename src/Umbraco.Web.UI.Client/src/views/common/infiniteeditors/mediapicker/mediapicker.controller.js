@@ -506,8 +506,10 @@ angular.module("umbraco")
 
                     // update image data to work with image grid
                     if (data.items) {
-                        data.items.forEach(mediaItem => setMediaMetaData(mediaItem));
-                        data.items.forEach(mediaItem => mediaItem.filtered = allowedTypes && allowedTypes.indexOf(mediaItem.metaData.ContentTypeAlias) < 0);
+                        data.items.forEach(mediaItem => {
+                            setMediaMetaData(mediaItem);
+                            mediaItem.filtered = allowedTypes && allowedTypes.indexOf(mediaItem.metaData.ContentTypeAlias) < 0;
+                        });
                     }
 
                     vm.searchOptions.filter = "";
