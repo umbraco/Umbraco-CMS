@@ -7,9 +7,8 @@ namespace Umbraco.Core.Models.Blocks
     /// <summary>
     /// Represents a layout item for the Block List editor.
     /// </summary>
-    /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
     [DataContract(Name = "block", Namespace = "")]
-    public class BlockListItem : IBlockReference<IPublishedElement>
+    public class BlockListItem : IBlockReference<IPublishedElement, IPublishedElement>
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="BlockListItem" /> class.
@@ -70,7 +69,6 @@ namespace Umbraco.Core.Models.Blocks
     /// Represents a layout item with a generic content type for the Block List editor.
     /// </summary>
     /// <typeparam name="T">The type of the content.</typeparam>
-    /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
     public class BlockListItem<T> : BlockListItem
         where T : IPublishedElement
     {
@@ -101,7 +99,6 @@ namespace Umbraco.Core.Models.Blocks
     /// </summary>
     /// <typeparam name="TContent">The type of the content.</typeparam>
     /// <typeparam name="TSettings">The type of the settings.</typeparam>
-    /// <seealso cref="Umbraco.Core.Models.Blocks.IBlockReference{Umbraco.Core.Models.PublishedContent.IPublishedElement}" />
     public class BlockListItem<TContent, TSettings> : BlockListItem<TContent>
         where TContent : IPublishedElement
         where TSettings : IPublishedElement
