@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Models.Blocks
+﻿using Umbraco.Core.Models.PublishedContent;
+
+namespace Umbraco.Core.Models.Blocks
 {
     /// <summary>
     /// Represents a data item reference for a Block Editor implementation.
@@ -38,6 +40,7 @@
     /// See: https://github.com/umbraco/rfcs/blob/907f3758cf59a7b6781296a60d57d537b3b60b8c/cms/0011-block-data-structure.md#strongly-typed
     /// </remarks>
     public interface IBlockReference<TContent, TSettings> : IBlockContent<TContent>, IBlockSettings<TSettings>, IBlockReference
+        where TContent : IPublishedElement
     {
 
     }
@@ -50,6 +53,7 @@
     /// See: https://github.com/umbraco/rfcs/blob/907f3758cf59a7b6781296a60d57d537b3b60b8c/cms/0011-block-data-structure.md#strongly-typed
     /// </remarks>
     public interface IBlockContent<TContent>
+        where TContent : IPublishedElement
     {
         /// <summary>
         /// Gets the settings.
