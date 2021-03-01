@@ -26,19 +26,29 @@
     color: @gray-7;
 }
 
-h5{
+h5, .h5{
   color: @gray-1;
   font-weight: bold;
   font-size: 15px;
   margin-top: 15px;
 }
 
-h5.-border-bottom {
+h1.-border-bottom,
+h2.-border-bottom,
+h3.-border-bottom,
+h4.-border-bottom,
+h5.-border-bottom,
+h6.-border-bottom {
 	border-bottom: 1px solid @gray-9;
 	padding-bottom: 5px;
 }
 
-h5.-black {
+h1.-black,
+h2.-black,
+h3.-black,
+h4.-black,
+h5.-black,
+h6.-black {
 	color: @black;
 }
 
@@ -141,7 +151,7 @@ h5.-black {
     }
 }
 
-.umb-property:last-of-type .umb-control-group {
+umb-property:last-of-type .umb-control-group {
     &::after {
         margin-top: 0px;
         height: 0;
@@ -198,13 +208,27 @@ h5.-black {
     .control-description {
         display: block;
         clear: both;
+        overflow-wrap: break-word;
+    }
+
+    &::after {
+        content: '';
+        display: block;
+        clear: both;
     }
 }
+
+.umb-editor--infiniteMode .umb-control-group .control-header {
+    padding-bottom: 5px;
+}
+
 .form-horizontal .umb-control-group .control-header {
     float: left;
     width: 160px;
     padding-top: 5px;
+    padding-bottom: 0;
     text-align: left;
+    margin-bottom: 5px;
 
     .control-label {
         width: auto;
@@ -214,7 +238,7 @@ h5.-black {
 
     .control-description {
         max-width:480px;// avoiding description becoming too wide when its placed on top of property.
-        margin-bottom: 10px;
+        margin-bottom: 5px;
     }
 }
 @media (max-width: 767px) {
@@ -222,9 +246,27 @@ h5.-black {
     .form-horizontal .umb-control-group .control-header {
         float: none;
         width: 100%;
+        &::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
     }
     
-
+}
+.form-horizontal .umb-control-group.--label-on-top > .umb-el-wrap {
+    & > .control-header {
+        float: none;
+        width: 100%;
+        &::after {
+            content: "";
+            display: table;
+            clear: both;
+        }
+    }
+    & > .controls {
+        margin-left: 0;
+    }
 }
 
 /* LABELS*/
@@ -256,6 +298,7 @@ label:not([for]) {
 /* CONTROL VALIDATION */
 .umb-control-required {
     color: @controlRequiredColor;
+    font-weight: 900;
 }
 
 .controls-row {
@@ -267,7 +310,7 @@ label:not([for]) {
     margin-left: 0;
 }
 
-.controls-row label {
+.controls-row label:not(.umb-form-check) {
   display: inline-block;
 }
 
@@ -347,8 +390,14 @@ label:not([for]) {
   border: none !important;
 }
 
-table thead a {
+table thead a,
+table thead button {
   color: @gray-2;
+}
+
+table thead button:hover,
+table thead button:focus{
+    text-decoration: underline;
 }
 
 /* UI interactions */
@@ -557,6 +606,9 @@ table thead a {
 	display: inline;
 }
 
+.relative {
+  position:relative;
+}
 
 // Input label styles
 // @Simon: not sure where to put this part yet
@@ -616,4 +668,9 @@ input[type=checkbox]:checked + .input-label--small {
 .diff ins {
   background-color: @green-l3;
   text-decoration: none;
+}
+
+.language-icon {
+    color: #BBBABF;
+    margin-right: 5px;
 }

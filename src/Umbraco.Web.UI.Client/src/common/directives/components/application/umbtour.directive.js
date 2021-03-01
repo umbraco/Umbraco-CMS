@@ -264,19 +264,19 @@ In the following example you see how to run some custom logic before a step goes
 
                     // If the currentStep JSON object has 'skipStepIfVisible'
                     // It's a DOM selector - if we find it then we ship over this step
-                    if(upcomingStep.skipStepIfVisible) {
-                        let tryFindDomEl = document.querySelector(upcomingStep.element);
-                        if(tryFindDomEl) {
+                    if (upcomingStep.skipStepIfVisible) {
+                        let tryFindDomEl = document.querySelector(upcomingStep.skipStepIfVisible);
+                        if (tryFindDomEl) {
                             // check if element is visible:
                             if( tryFindDomEl.offsetWidth || tryFindDomEl.offsetHeight || tryFindDomEl.getClientRects().length ) {
                                 // if it was visible then we skip the step.
                                 nextStep();
+                                return;
                             }
                         }
                     }
 
                     startStep();
-
                 } else {
                     // tour completed - final step
                     scope.loadingStep = true;

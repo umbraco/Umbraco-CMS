@@ -42,5 +42,18 @@ namespace Umbraco.Web
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
         IHtmlString RenderMacro(int contentId, string alias, IDictionary<string, object> parameters);
+
+        /// <summary>
+        /// Renders the macro with the specified alias, passing in the specified parameters.
+        /// </summary>
+        /// <param name="content">An IPublishedContent to use for the context for the macro rendering</param>
+        /// <param name="alias">The alias.</param>
+        /// <param name="parameters">The parameters.</param>
+        /// <returns>A raw HTML string of the macro output</returns>
+        /// <remarks>
+        /// Currently only used when the node is unpublished and unable to get the contentId item from the
+        /// content cache as its unpublished. This deals with taking in a preview/draft version of the content node
+        /// </remarks>
+        IHtmlString RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object> parameters);
     }
 }

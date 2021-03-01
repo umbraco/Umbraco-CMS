@@ -49,7 +49,7 @@ namespace Umbraco.Web.ContentApps
                     });
 
                 default:
-                    throw new NotSupportedException($"Object type {o.GetType()} is not supported here.");
+                    return null;
             }
         }
     }

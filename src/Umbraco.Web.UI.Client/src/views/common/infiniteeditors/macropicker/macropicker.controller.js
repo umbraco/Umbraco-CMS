@@ -22,6 +22,7 @@ function MacroPickerController($scope, entityResource, macroResource, umbPropEdi
         if ($scope.wizardStep === "macroSelect") {
             editParams(true);
         } else {
+            $scope.$broadcast("formSubmitting", { scope: $scope });
             $scope.model.submit($scope.model);
         }
     };

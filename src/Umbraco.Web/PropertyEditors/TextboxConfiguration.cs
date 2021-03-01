@@ -7,7 +7,7 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class TextboxConfiguration
     {
-        [ConfigurationField("maxChars", "Maximum allowed characters", "textstringlimited", Description = "If empty, 500 character limit")]
+        [ConfigurationField("maxChars", "Maximum allowed characters", "textstringlimited", Description = "If empty, 512 character limit")]
         public int? MaxChars { get; set; }
     }
 }

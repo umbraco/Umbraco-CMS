@@ -96,7 +96,7 @@ namespace Umbraco.Web.Routing
         {
             // note - at that point the original legacy module did something do handle IIS custom 404 errors
             //   ie pages looking like /anything.aspx?404;/path/to/document - I guess the reason was to support
-            //   "directory urls" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
+            //   "directory URLs" without having to do wildcard mapping to ASP.NET on old IIS. This is a pain
             //   to maintain and probably not used anymore - removed as of 06/2012. @zpqrtbnk.
             //
             //   to trigger Umbraco's not-found, one should configure IIS and/or ASP.NET custom 404 errors
@@ -417,8 +417,8 @@ namespace Umbraco.Web.Routing
             // some finders may implement caching
 
             using (_profilingLogger.DebugDuration<PublishedRouter>(
-                $"{tracePrefix}Begin finders",
-                $"{tracePrefix}End finders, {(request.HasPublishedContent ? "a document was found" : "no document was found")}"))
+                $"{tracePrefix}Executing finders...",
+                $"{tracePrefix}Completed executing finders"))
             {
                 //iterate but return on first one that finds it
                 var found = _contentFinders.Any(finder =>
@@ -426,6 +426,16 @@ namespace Umbraco.Web.Routing
                     _logger.Debug<PublishedRouter>("Finder {ContentFinderType}", finder.GetType().FullName);
                     return finder.TryFindContent(request);
                 });
+
+                _profilingLogger.Debug<PublishedRouter>(
+                    "Found? {Found} Content: {PublishedContentId}, Template: {TemplateAlias}, Domain: {Domain}, Culture: {Culture}, Is404: {Is404}, StatusCode: {StatusCode}",
+                    found,
+                    request.HasPublishedContent ? request.PublishedContent.Id : "NULL",
+                    request.HasTemplate ? request.TemplateAlias : "NULL",
+                    request.HasDomain ? request.Domain.ToString() : "NULL",
+                    request.Culture?.Name ?? "NULL",
+                    request.Is404,
+                    request.ResponseStatusCode);
             }
 
             // indicate that the published content (if any) we have at the moment is the

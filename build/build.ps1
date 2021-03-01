@@ -125,7 +125,23 @@
         $error.Clear()
 
         Write-Output "### gulp build for version $($this.Version.Release)" >> $log 2>&1
-        npx gulp build --buildversion=$this.Version.Release >> $log 2>&1
+        npm run build --buildversion=$this.Version.Release >> $log 2>&1
+		
+		# We can ignore this warning, we need to update to node 12 at some point - https://github.com/jsdom/jsdom/issues/2939
+		$indexes = [System.Collections.ArrayList]::new()
+		$index = 0;
+		$error | ForEach-Object {
+			# Find which of the errors is the ExperimentalWarning
+			if($_.ToString().Contains("ExperimentalWarning: The fs.promises API is experimental")) {
+				[void]$indexes.Add($index)
+			}
+			$index++
+		}
+		$indexes | ForEach-Object {
+			# Loop through the list of indexes and remove the errors that we expect and feel confident we can ignore
+			$error.Remove($error[$_])
+		}
+		
         if (-not $?) { throw "Failed to build" } # that one is expected to work
     } finally {
         Pop-Location
@@ -475,7 +491,7 @@
     # change baseUrl
     $BaseUrl = "https://our.umbraco.com/apidocs/v8/ui/"
     $IndexPath = "./api/index.html"
-    (Get-Content $IndexPath).replace('location.href.replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
+    (Get-Content $IndexPath).replace('origin + location.href.substr(origin.length).replace(rUrl, indexFile)', "`'" + $BaseUrl + "`'") | Set-Content $IndexPath
 
     # zip it
     & $this.BuildEnv.Zip a -tzip -r "$out\ui-docs.zip" "$src\Umbraco.Web.UI.Docs\api\*.*"

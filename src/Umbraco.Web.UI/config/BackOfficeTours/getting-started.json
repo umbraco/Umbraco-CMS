@@ -200,7 +200,7 @@
                 "event": "click"
             },
             {
-                "element": "[data-element='editor-data-type-picker'] [data-element='datatypeconfig-Textarea'] > a",
+                "element": "[data-element='editor-data-type-picker'] [data-element='datatypeconfig-Textarea']",
                 "title": "Editor settings",
                 "content": "Each property editor can have individual settings. For the textarea editor you can set a character limit but in this case it is not needed.",
                 "event": "click"
@@ -312,7 +312,7 @@
                 "event": "click",
                 "eventElement": "#tree [data-element='tree-item-templates'] [data-element='tree-item-expand']",
                 "view": "templatetree",
-                "skipStepIfVisible": "#tree [data-element='tree-item-templates'] > div > button[data-element=tree-item-expand].icon-navigation-down"
+                "skipStepIfVisible": "#tree [data-element='tree-item-templates'] > div > button[data-element=tree-item-expand] span.icon-navigation-down"
             },
             {
                 "element": "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home Page']",
