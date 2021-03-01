@@ -122,7 +122,6 @@ namespace Umbraco.Cms.Web.Website.Routing
             httpContext.Features.Set(umbracoRouteValues);
 
             // publish an event that we've routed a request
-            // TODO: does this occur on 404 or have we already returned?
             await _eventAggregator.PublishAsync(new UmbracoRoutedRequest(_umbracoContextAccessor.UmbracoContext));
 
             // Need to check if there is form data being posted back to an Umbraco URL
