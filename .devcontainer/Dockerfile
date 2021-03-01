@@ -30,7 +30,7 @@ RUN if [ "$USER_GID" != "1000" ] || [ "$USER_UID" != "1000" ]; then groupmod --g
 # And this Linux package is needed in order to build it
 # https://github.com/imagemin/imagemin-gifsicle/issues/40#issuecomment-616487214
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
-    && apt-get -y install --no-install-recommends dh-autoreconf
+    && apt-get -y install --no-install-recommends dh-autoreconf chromium-browser
 
 # [Optional] Uncomment this line to install global node packages.
 # RUN su vscode -c "source /usr/local/share/nvm/nvm.sh && npm install -g <your-package-here>" 2>&1
