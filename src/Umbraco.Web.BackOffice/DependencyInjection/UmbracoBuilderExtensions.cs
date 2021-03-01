@@ -85,9 +85,12 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
 
             builder.AddNotificationHandler<UserLoginSuccessNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserLogoutSuccessNotification, BackOfficeUserManagerAuditer>();
             builder.AddNotificationHandler<UserLoginFailedNotification, BackOfficeUserManagerAuditer>();
             builder.AddNotificationHandler<UserForgotPasswordRequestedNotification, BackOfficeUserManagerAuditer>();
             builder.AddNotificationHandler<UserForgotPasswordChangedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserPasswordChangedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserPasswordResetNotification, BackOfficeUserManagerAuditer>();
 
             return builder;
         }

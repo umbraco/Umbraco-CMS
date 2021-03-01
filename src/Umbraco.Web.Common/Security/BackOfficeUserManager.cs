@@ -123,7 +123,7 @@ namespace Umbraco.Cms.Web.Common.Security
             IdentityResult result = await base.ChangePasswordWithResetAsync(userId, token, newPassword);
             if (result.Succeeded)
             {
-                NotifyPasswordChanged(_httpContextAccessor.HttpContext?.User, userId);
+                NotifyPasswordReset(_httpContextAccessor.HttpContext?.User, userId);
             }
 
             return result;
@@ -223,6 +223,10 @@ namespace Umbraco.Cms.Web.Common.Security
 
         public void NotifyPasswordChanged(IPrincipal currentUser, string userId) => Notify(currentUser,
             (currentUserId, ip) => new UserPasswordChangedNotification(ip, userId, currentUserId)
+        );
+
+        public void NotifyPasswordReset(IPrincipal currentUser, string userId) => Notify(currentUser,
+            (currentUserId, ip) => new UserPasswordResetNotification(ip, userId, currentUserId)
         );
 
         public void NotifyResetAccessFailedCount(IPrincipal currentUser, string userId) => Notify(currentUser,

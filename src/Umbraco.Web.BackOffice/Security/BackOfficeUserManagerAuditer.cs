@@ -17,7 +17,9 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         INotificationHandler<UserLogoutSuccessNotification>,
         INotificationHandler<UserLoginFailedNotification>,
         INotificationHandler<UserForgotPasswordRequestedNotification>,
-        INotificationHandler<UserForgotPasswordChangedNotification>
+        INotificationHandler<UserForgotPasswordChangedNotification>,
+        INotificationHandler<UserPasswordChangedNotification>,
+        INotificationHandler<UserPasswordResetNotification>
     {
         private readonly IAuditService _auditService;
         private readonly IUserService _userService;
@@ -50,6 +52,12 @@ namespace Umbraco.Cms.Web.BackOffice.Security
 
         public void Handle(UserForgotPasswordChangedNotification notification) =>
             WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/password/forgot/change", "password forgot/change");
+
+        public void Handle(UserPasswordChangedNotification notification) =>
+            WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/password/change", "password change");
+
+        public void Handle(UserPasswordResetNotification notification) =>
+            WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/password/reset", "password reset");
 
         private IUser GetPerformingUser(string userId)
         {
