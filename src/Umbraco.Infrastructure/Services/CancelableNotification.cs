@@ -205,26 +205,26 @@ namespace Umbraco.Cms.Infrastructure.Services
         public IEnumerable<MoveEventInfo<T>> MoveInfoCollection => Target;
     }
 
-    public class TrashingNotification<T> : CancelableObjectNotification<IEnumerable<MoveEventInfo<T>>>
+    public class MovingToRecycleBinNotification<T> : CancelableObjectNotification<IEnumerable<MoveEventInfo<T>>>
     {
-        public TrashingNotification(MoveEventInfo<T> target, EventMessages messages) : base(new[] { target }, messages)
+        public MovingToRecycleBinNotification(MoveEventInfo<T> target, EventMessages messages) : base(new[] { target }, messages)
         {
         }
 
-        public TrashingNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages) : base(target, messages)
+        public MovingToRecycleBinNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages) : base(target, messages)
         {
         }
 
         public IEnumerable<MoveEventInfo<T>> MoveInfoCollection => Target;
     }
 
-    public class TrashedNotification<T> : ObjectNotification<IEnumerable<MoveEventInfo<T>>>
+    public class MovedToRecycleBinNotification<T> : ObjectNotification<IEnumerable<MoveEventInfo<T>>>
     {
-        public TrashedNotification(MoveEventInfo<T> target, EventMessages messages) : base(new[] { target }, messages)
+        public MovedToRecycleBinNotification(MoveEventInfo<T> target, EventMessages messages) : base(new[] { target }, messages)
         {
         }
 
-        public TrashedNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages) : base(target, messages)
+        public MovedToRecycleBinNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages) : base(target, messages)
         {
         }
 
@@ -324,34 +324,27 @@ namespace Umbraco.Cms.Infrastructure.Services
         public IEnumerable<T> UnpublishedEntities => Target;
     }
 
-    public class EmptiedRecycleBinNotification : INotification
+    public class EmptiedRecycleBinNotification<T> : INotification where T : class
     {
-        public EmptiedRecycleBinNotification(Guid nodeObjectType, EventMessages messages)
+        public EmptiedRecycleBinNotification(EventMessages messages)
         {
-            NodeObjectType = nodeObjectType;
             Messages = messages;
         }
 
-        public Guid NodeObjectType { get; }
-
         public EventMessages Messages { get; }
-
-        public bool IsContentRecycleBin => NodeObjectType == Constants.ObjectTypes.Document;
-
-        public bool IsMediaRecycleBin => NodeObjectType == Constants.ObjectTypes.Media;
     }
 
-    public class EmptyingRecycleBinNotification : EmptiedRecycleBinNotification, ICancelableNotification
+    public class EmptyingRecycleBinNotification<T> : EmptiedRecycleBinNotification<T>, ICancelableNotification where T : class
     {
-        public EmptyingRecycleBinNotification(Guid nodeObjectType, EventMessages messages)
-            : base(nodeObjectType, messages)
+        public EmptyingRecycleBinNotification(EventMessages messages)
+            : base(messages)
         {
         }
 
         public bool Cancel { get; set; }
     }
 
-    public class DeletedVersionsNotification : INotification
+    public class DeletedVersionsNotification<T> : INotification where T : class
     {
         public DeletedVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
         {
@@ -373,7 +366,7 @@ namespace Umbraco.Cms.Infrastructure.Services
         public DateTime DateToRetain { get; }
     }
 
-    public class DeletingVersionsNotification : DeletedVersionsNotification, ICancelableNotification
+    public class DeletingVersionsNotification<T> : DeletedVersionsNotification<T>, ICancelableNotification where T : class
     {
         public DeletingVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
             : base(id, messages, specificVersion, deletePriorVersions, dateToRetain)

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Compose
         INotificationHandler<SortedNotification<IContent>>,
         INotificationHandler<PublishedNotification<IContent>>,
         INotificationHandler<MovedNotification<IContent>>,
-        INotificationHandler<TrashedNotification<IContent>>,
+        INotificationHandler<MovedToRecycleBinNotification<IContent>>,
         INotificationHandler<CopiedNotification<IContent>>,
         INotificationHandler<RolledBackNotification<IContent>>,
         INotificationHandler<SentToPublishNotification<IContent>>,
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Compose
             }
         }
 
-        public void Handle(TrashedNotification<IContent> notification) => _notifier.Notify(_actions.GetAction<ActionDelete>(), notification.MoveInfoCollection.Select(m => m.Entity).ToArray());
+        public void Handle(MovedToRecycleBinNotification<IContent> notification) => _notifier.Notify(_actions.GetAction<ActionDelete>(), notification.MoveInfoCollection.Select(m => m.Entity).ToArray());
 
         public void Handle(CopiedNotification<IContent> notification) => _notifier.Notify(_actions.GetAction<ActionCopy>(), notification.Original);
 

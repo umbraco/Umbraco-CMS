@@ -183,14 +183,6 @@ namespace Umbraco.Cms.Core.Cache
             _distributedCache.RefreshContentCache(args.Changes.ToArray());
         }
 
-        // TODO: our weird events handling wants this for now
-        private void ContentService_Deleted(IContentService sender, DeleteEventArgs<IContent> e) { }
-        private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e) { }
-        private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e) { }
-        private void ContentService_EmptiedRecycleBin(IContentService sender, RecycleBinEventArgs e) { }
-        private void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e) { }
-        private void ContentService_Unpublished(IContentService sender, PublishEventArgs<IContent> e) { }
-
         //private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
         //{
         //    _distributedCache.RefreshUnpublishedPageCache(e.SavedEntities.ToArray());
@@ -395,13 +387,6 @@ namespace Umbraco.Cms.Core.Cache
         {
             _distributedCache.RefreshMediaCache(args.Changes.ToArray());
         }
-
-        // TODO: our weird events handling wants this for now
-        private void MediaService_Saved(IMediaService sender, SaveEventArgs<IMedia> e) { }
-        private void MediaService_Deleted(IMediaService sender, DeleteEventArgs<IMedia> e) { }
-        private void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e) { }
-        private void MediaService_Trashed(IMediaService sender, MoveEventArgs<IMedia> e) { }
-        private void MediaService_EmptiedRecycleBin(IMediaService sender, RecycleBinEventArgs e) { }
 
         #endregion
 

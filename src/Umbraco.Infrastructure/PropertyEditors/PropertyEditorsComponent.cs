@@ -40,13 +40,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         private void Initialize(FileUploadPropertyEditor fileUpload)
         {
-            MediaService.Saving += fileUpload.MediaServiceSaving;
-            _terminate.Add(() => MediaService.Saving -= fileUpload.MediaServiceSaving);
-
-            void mediaServiceDeleted(IMediaService sender, DeleteEventArgs<IMedia> args) => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            MediaService.Deleted += mediaServiceDeleted;
-            _terminate.Add(() => MediaService.Deleted -= mediaServiceDeleted);
-
             void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
             MemberService.Deleted += memberServiceDeleted;
             _terminate.Add(() => MemberService.Deleted -= memberServiceDeleted);
@@ -54,13 +47,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         private void Initialize(ImageCropperPropertyEditor imageCropper)
         {
-            MediaService.Saving += imageCropper.MediaServiceSaving;
-            _terminate.Add(() => MediaService.Saving -= imageCropper.MediaServiceSaving);
-
-            void mediaServiceDeleted(IMediaService sender, DeleteEventArgs<IMedia> args) => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            MediaService.Deleted += mediaServiceDeleted;
-            _terminate.Add(() => MediaService.Deleted -= mediaServiceDeleted);
-
             void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
             MemberService.Deleted += memberServiceDeleted;
             _terminate.Add(() => MemberService.Deleted -= memberServiceDeleted);

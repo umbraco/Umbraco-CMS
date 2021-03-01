@@ -1796,7 +1796,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _eventAggregator.Publish(new UnpublishedNotification<IContent>(content, evtMsgs));
                 }
 
-                DeleteLocked(scope, content);
+                DeleteLocked(scope, content, evtMsgs);
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.Remove).ToEventArgs());
                 Audit(AuditType.Delete, userId, content.Id);
@@ -1807,10 +1807,8 @@ namespace Umbraco.Cms.Core.Services.Implement
             return OperationResult.Succeed(evtMsgs);
         }
 
-        private void DeleteLocked(IScope scope, IContent content)
+        private void DeleteLocked(IScope scope, IContent content, EventMessages evtMsgs)
         {
-            var evtMsgs = EventMessagesFactory.Get();
-
             void DoDelete(IContent c)
             {
                 _documentRepository.Delete(c);
@@ -1849,7 +1847,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var notification = new DeletingVersionsNotification(id, evtMsgs, dateToRetain: versionDate);
+                var notification = new DeletingVersionsNotification<IContent>(id, evtMsgs, dateToRetain: versionDate);
                 _eventAggregator.Publish(notification);
                 if (notification.Cancel)
                 {
@@ -1860,7 +1858,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
                 _documentRepository.DeleteVersions(id, versionDate);
 
-                _eventAggregator.Publish(new DeletedVersionsNotification(id, evtMsgs, dateToRetain: versionDate));
+                _eventAggregator.Publish(new DeletedVersionsNotification<IContent>(id, evtMsgs, dateToRetain: versionDate));
                 Audit(AuditType.Delete, userId, Cms.Core.Constants.System.Root, "Delete (by version date)");
 
                 scope.Complete();
@@ -1881,7 +1879,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var notification = new DeletingVersionsNotification(id, evtMsgs, specificVersion: versionId);
+                var notification = new DeletingVersionsNotification<IContent>(id, evtMsgs, specificVersion: versionId);
                 _eventAggregator.Publish(notification);
                 if (notification.Cancel)
                 {
@@ -1900,7 +1898,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 if (c.VersionId != versionId && c.PublishedVersionId != versionId) // don't delete the current or published version
                     _documentRepository.DeleteVersion(versionId);
 
-                _eventAggregator.Publish(new DeletedVersionsNotification(id, evtMsgs, specificVersion: versionId));
+                _eventAggregator.Publish(new DeletedVersionsNotification<IContent>(id, evtMsgs, specificVersion: versionId));
                 Audit(AuditType.Delete, userId, Cms.Core.Constants.System.Root, "Delete (by version)");
 
                 scope.Complete();
@@ -1924,7 +1922,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var originalPath = content.Path;
                 var moveEventInfo = new MoveEventInfo<IContent>(content, originalPath, Cms.Core.Constants.System.RecycleBinContent);
 
-                var notification = new TrashingNotification<IContent>(moveEventInfo, evtMsgs);
+                var notification = new MovingToRecycleBinNotification<IContent>(moveEventInfo, evtMsgs);
                 _eventAggregator.Publish(notification);
                 if (notification.Cancel)
                 {
@@ -1945,7 +1943,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
 
-                _eventAggregator.Publish(new TrashedNotification<IContent>(moveInfo, evtMsgs));
+                _eventAggregator.Publish(new MovedToRecycleBinNotification<IContent>(moveInfo, evtMsgs));
                 Audit(AuditType.Move, userId, content.Id, "Moved to recycle bin");
 
                 scope.Complete();
@@ -2091,7 +2089,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         public OperationResult EmptyRecycleBin(int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            var nodeObjectType = Cms.Core.Constants.ObjectTypes.Document;
             var deleted = new List<IContent>();
             var evtMsgs = EventMessagesFactory.Get();
 
@@ -2104,7 +2101,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // are managed by Delete, and not here.
 
                 // no idea what those events are for, keep a simplified version
-                var notification = new EmptyingRecycleBinNotification(nodeObjectType, evtMsgs);
+                var notification = new EmptyingRecycleBinNotification<IContent>(evtMsgs);
                 _eventAggregator.Publish(notification);
                 if (notification.Cancel)
                 {
@@ -2117,11 +2114,11 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var contents = _documentRepository.Get(query).ToArray();
                 foreach (var content in contents)
                 {
-                    DeleteLocked(scope, content);
+                    DeleteLocked(scope, content, evtMsgs);
                     deleted.Add(content);
                 }
 
-                _eventAggregator.Publish(new EmptiedRecycleBinNotification(nodeObjectType, evtMsgs));
+                _eventAggregator.Publish(new EmptiedRecycleBinNotification<IContent>(evtMsgs));
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs());
                 Audit(AuditType.Delete, userId, Cms.Core.Constants.System.RecycleBinContent, "Recycle bin emptied");
 
@@ -2843,7 +2840,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                     // delete content
                     // triggers the deleted event (and handles the files)
-                    DeleteLocked(scope, content);
+                    DeleteLocked(scope, content, evtMsgs);
                     changes.Add(new TreeChange<IContent>(content, TreeChangeTypes.Remove));
                 }
 
@@ -2852,7 +2849,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     .ToArray();
                 if (moveInfos.Length > 0)
                 {
-                    _eventAggregator.Publish(new TrashedNotification<IContent>(moveInfos, evtMsgs));
+                    _eventAggregator.Publish(new MovedToRecycleBinNotification<IContent>(moveInfos, evtMsgs));
                 }
                 scope.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 

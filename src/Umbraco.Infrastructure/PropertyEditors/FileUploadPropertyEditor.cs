@@ -26,7 +26,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = "icon-download-alt")]
     // TODO: insert these notification handlers in core composition
-    public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator, INotificationHandler<CopiedNotification<IContent>>, INotificationHandler<DeletedNotification<IContent>>
+    public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
+        INotificationHandler<CopiedNotification<IContent>>, INotificationHandler<DeletedNotification<IContent>>,
+        INotificationHandler<DeletedNotification<IMedia>>, INotificationHandler<SavingNotification<IMedia>>
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ContentSettings _contentSettings;
@@ -124,37 +126,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
         }
 
-        /// <summary>
-        /// After a media has been created, auto-fill the properties.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
-        internal void MediaServiceCreated(IMediaService sender, NewEventArgs<IMedia> args)
-        {
-            AutoFillProperties(args.Entity);
-        }
-
-        /// <summary>
-        /// After a media has been saved, auto-fill the properties.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
-        public void MediaServiceSaving(IMediaService sender, SaveEventArgs<IMedia> args)
-        {
-            foreach (var entity in args.SavedEntities)
-                AutoFillProperties(entity);
-        }
-
-        /// <summary>
-        /// After a content item has been saved, auto-fill the properties.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
-        public void ContentServiceSaving(IContentService sender, SaveEventArgs<IContent> args)
-        {
-            foreach (var entity in args.SavedEntities)
-                AutoFillProperties(entity);
-        }
 
         public void Handle(CopiedNotification<IContent> notification)
         {
@@ -189,6 +160,16 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         public void Handle(DeletedNotification<IContent> notification) => notification.MediaFilesToDelete.AddRange(ServiceDeleted(notification.DeletedEntities.OfType<ContentBase>()));
+
+        public void Handle(DeletedNotification<IMedia> notification) => notification.MediaFilesToDelete.AddRange(ServiceDeleted(notification.DeletedEntities.OfType<ContentBase>()));
+
+        public void Handle(SavingNotification<IMedia> notification)
+        {
+            foreach (var entity in notification.SavedEntities)
+            {
+                AutoFillProperties(entity);
+            }
+        }
 
         /// <summary>
         /// Auto-fill properties (or clear).
