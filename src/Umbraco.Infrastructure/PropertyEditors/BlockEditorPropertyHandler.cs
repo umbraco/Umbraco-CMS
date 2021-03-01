@@ -1,36 +1,28 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models.Blocks;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Compose
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
-    /// A component for Block editors used to bind to events
+    /// A handler for Block editors used to bind to notifications
     /// </summary>
-    public class BlockEditorComponent : IComponent
+    // TODO: insert these notification handlers in core composition
+    public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificationHandler
     {
-        private ComplexPropertyEditorContentEventHandler _handler;
         private readonly BlockListEditorDataConverter _converter = new BlockListEditorDataConverter();
 
-        public void Initialize()
-        {
-            _handler = new ComplexPropertyEditorContentEventHandler(
-                Constants.PropertyEditors.Aliases.BlockList,
-                ReplaceBlockListUdis);
-        }
+        protected override string EditorAlias => Constants.PropertyEditors.Aliases.BlockList;
 
-        public void Terminate() => _handler?.Dispose();
-
-        private string ReplaceBlockListUdis(string rawJson, bool onlyMissingUdis)
+        protected override string FormatPropertyValue(string rawJson, bool onlyMissingKeys)
         {
             // the block editor doesn't ever have missing UDIs so when this is true there's nothing to process
-            if (onlyMissingUdis) return rawJson;
+            if (onlyMissingKeys)
+                return rawJson;
 
             return ReplaceBlockListUdis(rawJson, null);
         }

@@ -1,15 +1,20 @@
-﻿using System.Linq;
+using System.Linq;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Compose
 {
-    public sealed class RelateOnTrashComponent : IComponent
+    // TODO: insert these notification handlers in core composition
+    // TODO: lots of duplicate code in this one, refactor
+    public sealed class RelateOnTrashHandler :
+        INotificationHandler<MovedNotification<IContent>>,
+        INotificationHandler<TrashedNotification<IContent>>
     {
         private readonly IRelationService _relationService;
         private readonly IEntityService _entityService;
@@ -17,7 +22,7 @@ namespace Umbraco.Cms.Core.Compose
         private readonly IAuditService _auditService;
         private readonly IScopeProvider _scopeProvider;
 
-        public RelateOnTrashComponent(
+        public RelateOnTrashHandler(
             IRelationService relationService,
             IEntityService entityService,
             ILocalizedTextService textService,
@@ -31,27 +36,10 @@ namespace Umbraco.Cms.Core.Compose
             _scopeProvider = scopeProvider;
         }
 
-        public void Initialize()
+        public void Handle(MovedNotification<IContent> notification)
         {
-            ContentService.Moved += ContentService_Moved;
-            ContentService.Trashed += ContentService_Trashed;
-            MediaService.Moved += MediaService_Moved;
-            MediaService.Trashed += MediaService_Trashed;
-        }
-
-        public void Terminate()
-        {
-            ContentService.Moved -= ContentService_Moved;
-            ContentService.Trashed -= ContentService_Trashed;
-            MediaService.Moved -= MediaService_Moved;
-            MediaService.Trashed -= MediaService_Trashed;
-        }
-
-        private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e)
-        {
-            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Cms.Core.Constants.System.RecycleBinContentString)))
+            foreach (var item in notification.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Cms.Core.Constants.System.RecycleBinContentString)))
             {
-
                 const string relationTypeAlias = Cms.Core.Constants.Conventions.RelationTypes.RelateParentDocumentOnDeleteAlias;
                 var relations = _relationService.GetByChildId(item.Entity.Id);
 
@@ -62,20 +50,7 @@ namespace Umbraco.Cms.Core.Compose
             }
         }
 
-        private void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e)
-        {
-            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Cms.Core.Constants.System.RecycleBinMediaString)))
-            {
-                const string relationTypeAlias = Cms.Core.Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
-                var relations = _relationService.GetByChildId(item.Entity.Id);
-                foreach (var relation in relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)))
-                {
-                    _relationService.Delete(relation);
-                }
-            }
-        }
-
-        private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e)
+        public void Handle(TrashedNotification<IContent> notification)
         {
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -94,7 +69,7 @@ namespace Umbraco.Cms.Core.Compose
                     _relationService.Save(relationType);
                 }
 
-                foreach (var item in e.MoveInfoCollection)
+                foreach (var item in notification.MoveInfoCollection)
                 {
                     var originalPath = item.OriginalPath.ToDelimitedList();
                     var originalParentId = originalPath.Count > 2
@@ -122,6 +97,55 @@ namespace Umbraco.Cms.Core.Compose
                 }
 
                 scope.Complete();
+            }
+        }
+    }
+
+
+    public sealed class RelateOnTrashComponent : IComponent
+    {
+        private readonly IRelationService _relationService;
+        private readonly IEntityService _entityService;
+        private readonly ILocalizedTextService _textService;
+        private readonly IAuditService _auditService;
+        private readonly IScopeProvider _scopeProvider;
+
+        public RelateOnTrashComponent(
+            IRelationService relationService,
+            IEntityService entityService,
+            ILocalizedTextService textService,
+            IAuditService auditService,
+            IScopeProvider scopeProvider)
+        {
+            _relationService = relationService;
+            _entityService = entityService;
+            _textService = textService;
+            _auditService = auditService;
+            _scopeProvider = scopeProvider;
+        }
+
+        public void Initialize()
+        {
+            MediaService.Moved += MediaService_Moved;
+            MediaService.Trashed += MediaService_Trashed;
+        }
+
+        public void Terminate()
+        {
+            MediaService.Moved -= MediaService_Moved;
+            MediaService.Trashed -= MediaService_Trashed;
+        }
+
+        private void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e)
+        {
+            foreach (var item in e.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Cms.Core.Constants.System.RecycleBinMediaString)))
+            {
+                const string relationTypeAlias = Cms.Core.Constants.Conventions.RelationTypes.RelateParentMediaFolderOnDeleteAlias;
+                var relations = _relationService.GetByChildId(item.Entity.Id);
+                foreach (var relation in relations.Where(x => x.RelationType.Alias.InvariantEquals(relationTypeAlias)))
+                {
+                    _relationService.Delete(relation);
+                }
             }
         }
 

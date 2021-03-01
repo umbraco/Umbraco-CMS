@@ -1,29 +1,19 @@
-﻿using System;
+using System;
 using System.Linq;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Compose
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
-    /// A component for NestedContent used to bind to events
+    /// A handler for NestedContent used to bind to notifications
     /// </summary>
-    public class NestedContentPropertyComponent : IComponent
+    // TODO: insert these notification handlers in core composition
+    public class NestedContentPropertyHandler : ComplexPropertyEditorContentNotificationHandler
     {
-        private ComplexPropertyEditorContentEventHandler _handler;
+        protected override string EditorAlias => Constants.PropertyEditors.Aliases.NestedContent;
 
-        public void Initialize()
-        {
-            _handler = new ComplexPropertyEditorContentEventHandler(
-                Constants.PropertyEditors.Aliases.NestedContent,
-                CreateNestedContentKeys);
-        }
-
-        public void Terminate() => _handler?.Dispose();
-
-        private string CreateNestedContentKeys(string rawJson, bool onlyMissingKeys) => CreateNestedContentKeys(rawJson, onlyMissingKeys, null);
+        protected override string FormatPropertyValue(string rawJson, bool onlyMissingKeys) => CreateNestedContentKeys(rawJson, onlyMissingKeys, null);
 
         // internal for tests
         internal string CreateNestedContentKeys(string rawJson, bool onlyMissingKeys, Func<Guid> createGuid = null)
@@ -78,6 +68,5 @@ namespace Umbraco.Cms.Core.Compose
                 }
             }
         }
-
     }
 }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -24,7 +25,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         "fileupload",
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = "icon-download-alt")]
-    public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator
+    // TODO: insert these notification handlers in core composition
+    public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator, INotificationHandler<CopiedNotification<IContent>>, INotificationHandler<DeletedNotification<IContent>>
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ContentSettings _contentSettings;
@@ -32,6 +34,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly IContentService _contentService;
 
         public FileUploadPropertyEditor(
             ILoggerFactory loggerFactory,
@@ -42,7 +45,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             UploadAutoFillProperties uploadAutoFillProperties,
-            IJsonSerializer jsonSerializer)
+            IJsonSerializer jsonSerializer,
+            IContentService contentService)
             : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
@@ -51,6 +55,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _localizationService = localizationService;
             _localizedTextService = localizedTextService;
             _uploadAutoFillProperties = uploadAutoFillProperties;
+            _contentService = contentService;
         }
 
         /// <summary>
@@ -120,37 +125,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <summary>
-        /// After a content has been copied, also copy uploaded files.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
-        internal void ContentServiceCopied(IContentService sender, CopyEventArgs<IContent> args)
-        {
-            // get the upload field properties with a value
-            var properties = args.Original.Properties.Where(IsUploadField);
-
-            // copy files
-            var isUpdated = false;
-            foreach (var property in properties)
-            {
-                //copy each of the property values (variants, segments) to the destination
-                foreach (var propertyValue in property.Values)
-                {
-                    var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
-                    if (propVal == null || !(propVal is string str) || str.IsNullOrWhiteSpace()) continue;
-                    var sourcePath = _mediaFileSystem.GetRelativePath(str);
-                    var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
-                    args.Copy.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath), propertyValue.Culture, propertyValue.Segment);
-                    isUpdated = true;
-                }
-            }
-
-            // if updated, re-save the copy with the updated value
-            if (isUpdated)
-                sender.Save(args.Copy);
-        }
-
-        /// <summary>
         /// After a media has been created, auto-fill the properties.
         /// </summary>
         /// <param name="sender">The event sender.</param>
@@ -181,6 +155,40 @@ namespace Umbraco.Cms.Core.PropertyEditors
             foreach (var entity in args.SavedEntities)
                 AutoFillProperties(entity);
         }
+
+        public void Handle(CopiedNotification<IContent> notification)
+        {
+            // get the upload field properties with a value
+            var properties = notification.Original.Properties.Where(IsUploadField);
+
+            // copy files
+            var isUpdated = false;
+            foreach (var property in properties)
+            {
+                //copy each of the property values (variants, segments) to the destination
+                foreach (var propertyValue in property.Values)
+                {
+                    var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
+                    if (propVal == null || !(propVal is string str) || str.IsNullOrWhiteSpace())
+                    {
+                        continue;
+                    }
+
+                    var sourcePath = _mediaFileSystem.GetRelativePath(str);
+                    var copyPath = _mediaFileSystem.CopyFile(notification.Copy, property.PropertyType, sourcePath);
+                    notification.Copy.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath), propertyValue.Culture, propertyValue.Segment);
+                    isUpdated = true;
+                }
+            }
+
+            // if updated, re-save the copy with the updated value
+            if (isUpdated)
+            {
+                _contentService.Save(notification.Copy);
+            }
+        }
+
+        public void Handle(DeletedNotification<IContent> notification) => notification.MediaFilesToDelete.AddRange(ServiceDeleted(notification.DeletedEntities.OfType<ContentBase>()));
 
         /// <summary>
         /// Auto-fill properties (or clear).

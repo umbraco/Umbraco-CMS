@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -42,16 +42,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         {
             MediaService.Saving += fileUpload.MediaServiceSaving;
             _terminate.Add(() => MediaService.Saving -= fileUpload.MediaServiceSaving);
-            ContentService.Copied += fileUpload.ContentServiceCopied;
-            _terminate.Add(() => ContentService.Copied -= fileUpload.ContentServiceCopied);
 
             void mediaServiceDeleted(IMediaService sender, DeleteEventArgs<IMedia> args) => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
             MediaService.Deleted += mediaServiceDeleted;
             _terminate.Add(() => MediaService.Deleted -= mediaServiceDeleted);
-
-            void contentServiceDeleted(IContentService sender, DeleteEventArgs<IContent> args) => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            ContentService.Deleted += contentServiceDeleted;
-            _terminate.Add(() => ContentService.Deleted -= contentServiceDeleted);
 
             void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
             MemberService.Deleted += memberServiceDeleted;
@@ -62,16 +56,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         {
             MediaService.Saving += imageCropper.MediaServiceSaving;
             _terminate.Add(() => MediaService.Saving -= imageCropper.MediaServiceSaving);
-            ContentService.Copied += imageCropper.ContentServiceCopied;
-            _terminate.Add(() => ContentService.Copied -= imageCropper.ContentServiceCopied);
 
             void mediaServiceDeleted(IMediaService sender, DeleteEventArgs<IMedia> args) => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
             MediaService.Deleted += mediaServiceDeleted;
             _terminate.Add(() => MediaService.Deleted -= mediaServiceDeleted);
-
-            void contentServiceDeleted(IContentService sender, DeleteEventArgs<IContent> args) => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            ContentService.Deleted += contentServiceDeleted;
-            _terminate.Add(() => ContentService.Deleted -= contentServiceDeleted);
 
             void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
             MemberService.Deleted += memberServiceDeleted;

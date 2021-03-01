@@ -126,8 +126,6 @@ namespace Umbraco.Cms.Core.Cache
                 () => MediaService.TreeChanged -= MediaService_TreeChanged);
 
             // bind to content events
-            Bind(() => ContentService.Copied += ContentService_Copied, // needed for permissions
-                () => ContentService.Copied -= ContentService_Copied);
             Bind(() => ContentService.TreeChanged += ContentService_TreeChanged,// handles all content changes
                 () => ContentService.TreeChanged -= ContentService_TreeChanged);
 

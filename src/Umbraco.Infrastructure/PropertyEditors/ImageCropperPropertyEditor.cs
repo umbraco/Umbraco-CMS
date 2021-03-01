@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -31,7 +32,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         HideLabel = false,
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = "icon-crop")]
-    public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator
+    // TODO: insert these notification handlers in core composition
+    public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator, INotificationHandler<CopiedNotification<IContent>>, INotificationHandler<DeletedNotification<IContent>>
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ContentSettings _contentSettings;
@@ -39,6 +41,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly IIOHelper _ioHelper;
         private readonly UploadAutoFillProperties _autoFillProperties;
         private readonly ILogger<ImageCropperPropertyEditor> _logger;
+        private readonly IContentService _contentService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
@@ -53,7 +56,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IShortStringHelper shortStringHelper,
             ILocalizedTextService localizedTextService,
             UploadAutoFillProperties uploadAutoFillProperties,
-            IJsonSerializer jsonSerializer)
+            IJsonSerializer jsonSerializer,
+            IContentService contentService)
             : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
             _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
@@ -61,6 +65,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
             _autoFillProperties = uploadAutoFillProperties ?? throw new ArgumentNullException(nameof(uploadAutoFillProperties));
+            _contentService = contentService;
             _logger = loggerFactory.CreateLogger<ImageCropperPropertyEditor>();
         }
 
@@ -175,12 +180,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// After a content has been copied, also copy uploaded files.
         /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
-        public void ContentServiceCopied(IContentService sender, CopyEventArgs<IContent> args)
+        public void Handle(CopiedNotification<IContent> notification)
         {
             // get the image cropper field properties
-            var properties = args.Original.Properties.Where(IsCropperField);
+            var properties = notification.Original.Properties.Where(IsCropperField);
 
             // copy files
             var isUpdated = false;
@@ -191,18 +194,26 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 {
                     var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
                     var src = GetFileSrcFromPropertyValue(propVal, out var jo);
-                    if (src == null) continue;
+                    if (src == null)
+                    {
+                        continue;
+                    }
                     var sourcePath = _mediaFileSystem.GetRelativePath(src);
-                    var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
+                    var copyPath = _mediaFileSystem.CopyFile(notification.Copy, property.PropertyType, sourcePath);
                     jo["src"] = _mediaFileSystem.GetUrl(copyPath);
-                    args.Copy.SetValue(property.Alias, jo.ToString(), propertyValue.Culture, propertyValue.Segment);
+                    notification.Copy.SetValue(property.Alias, jo.ToString(), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
             }
             // if updated, re-save the copy with the updated value
             if (isUpdated)
-                sender.Save(args.Copy);
+            {
+                _contentService.Save(notification.Copy);
+            }
+
         }
+
+        public void Handle(DeletedNotification<IContent> notification) => notification.MediaFilesToDelete.AddRange(ServiceDeleted(notification.DeletedEntities.OfType<ContentBase>()));
 
         /// <summary>
         /// After a media has been created, auto-fill the properties.
