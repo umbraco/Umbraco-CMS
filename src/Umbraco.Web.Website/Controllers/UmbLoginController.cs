@@ -18,8 +18,13 @@ namespace Umbraco.Cms.Web.Website.Controllers
     {
         private readonly IUmbracoWebsiteSecurityAccessor _websiteSecurityAccessor;
 
-        public UmbLoginController(IUmbracoContextAccessor umbracoContextAccessor, IUmbracoDatabaseFactory databaseFactory,
-            ServiceContext services, AppCaches appCaches, IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider,
+        public UmbLoginController(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IUmbracoDatabaseFactory databaseFactory,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger profilingLogger,
+            IPublishedUrlProvider publishedUrlProvider,
             IUmbracoWebsiteSecurityAccessor websiteSecurityAccessor)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
@@ -35,9 +40,6 @@ namespace Umbraco.Cms.Web.Website.Controllers
             {
                 return CurrentUmbracoPage();
             }
-
-            // TODO: This is supposed to be for members! not users
-            //throw new NotImplementedException("Implement this for members");
 
             if (await _websiteSecurityAccessor.WebsiteSecurity.LoginAsync(model.Username, model.Password) == false)
             {

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Scoping;
 
@@ -18,12 +18,15 @@ namespace Umbraco.Cms.Core
     {
         private readonly IRequestCache _requestCache;
 
+        // TODO: Do they need to be static?? These are singleton instances IMO they shouldn't be static
         // ReSharper disable StaticMemberInGenericType
-        private static readonly object Locker = new object();
-        private static bool _registered;
+        private static readonly object s_locker = new object();
+        private static bool s_registered;
         // ReSharper restore StaticMemberInGenericType
 
-        protected abstract string ItemKey { get; }
+        private string _itemKey;
+
+        protected string ItemKey => _itemKey ?? (_itemKey = GetType().FullName);
 
         // read
         // http://blog.stephencleary.com/2013/04/implicit-async-context-asynclocal.html
@@ -43,34 +46,42 @@ namespace Umbraco.Cms.Core
         private T NonContextValue
         {
             get => CallContext<T>.GetData(ItemKey);
-            set
-            {
-                CallContext<T>.SetData(ItemKey, value);
-            }
+            set => CallContext<T>.SetData(ItemKey, value);
         }
 
         protected HybridAccessorBase(IRequestCache requestCache)
         {
             _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
 
-            lock (Locker)
+            lock (s_locker)
             {
                 // register the itemKey once with SafeCallContext
-                if (_registered) return;
-                _registered = true;
+                if (s_registered)
+                {
+                    return;
+                }
+
+                s_registered = true;
             }
 
             // ReSharper disable once VirtualMemberCallInConstructor
             var itemKey = ItemKey; // virtual
             SafeCallContext.Register(() =>
             {
-                var value = CallContext<T>.GetData(itemKey);
+                T value = CallContext<T>.GetData(itemKey);
                 return value;
             }, o =>
             {
-                if (o == null) return;
-                var value = o as T;
-                if (value == null) throw new ArgumentException($"Expected type {typeof(T).FullName}, got {o.GetType().FullName}", nameof(o));
+                if (o == null)
+                {
+                    return;
+                }
+
+                if (!(o is T value))
+                {
+                    throw new ArgumentException($"Expected type {typeof(T).FullName}, got {o.GetType().FullName}", nameof(o));
+                }
+
                 CallContext<T>.SetData(itemKey, value);
             });
         }
@@ -93,9 +104,13 @@ namespace Umbraco.Cms.Core
                     NonContextValue = value;
                 }
                 else if (value == null)
+                {
                     _requestCache.Remove(ItemKey);
+                }
                 else
+                {
                     _requestCache.Set(ItemKey, value);
+                }
             }
         }
     }

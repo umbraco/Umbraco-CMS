@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {

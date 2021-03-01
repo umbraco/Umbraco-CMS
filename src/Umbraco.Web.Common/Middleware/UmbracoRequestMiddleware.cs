@@ -10,9 +10,11 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Web.Common.Profiler;
+using Umbraco.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware
@@ -83,27 +85,26 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
             EnsureContentCacheInitialized();
 
-            _backofficeSecurityFactory.EnsureBackOfficeSecurity();  // Needs to be before UmbracoContext, TODO: Why?
+            // TODO: This dependency chain is broken and needs to be fixed.
+            // This is required to be called before EnsureUmbracoContext else the UmbracoContext's IBackOfficeSecurity instance is null
+            // This is ugly Temporal Coupling which also means that developers can no longer just use IUmbracoContextFactory the
+            // way it was intended.
+            _backofficeSecurityFactory.EnsureBackOfficeSecurity();
             UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
             Uri currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);
             _hostingEnvironment.EnsureApplicationMainUrl(currentApplicationUrl);
 
-
-            bool isFrontEndRequest = umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest();
-
             var pathAndQuery = context.Request.GetEncodedPathAndQuery();
 
             try
             {
-                if (isFrontEndRequest)
-                {
-                    LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
-                    _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, pathAndQuery);
-                }
+                // Verbose log start of every request
+                LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
+                _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, pathAndQuery);
 
                 try
-                {
+                {                    
                     await _eventAggregator.PublishAsync(new UmbracoRequestBegin(umbracoContextReference.UmbracoContext));
                 }
                 catch (Exception ex)
@@ -126,11 +127,10 @@ namespace Umbraco.Cms.Web.Common.Middleware
             }
             finally
             {
-                if (isFrontEndRequest)
-                {
-                    LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
-                    _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, pathAndQuery, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
-                }
+                // Verbose log end of every request (in v8 we didn't log the end request of ALL requests, only the front-end which was
+                // strange since we always logged the beginning, so now we just log start/end of all requests)
+                LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
+                _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, pathAndQuery, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
 
                 try
                 {

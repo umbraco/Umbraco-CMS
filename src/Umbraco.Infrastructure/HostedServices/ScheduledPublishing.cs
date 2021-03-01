@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Core.Security;
 
 namespace Umbraco.Cms.Infrastructure.HostedServices
 {
@@ -106,7 +107,11 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 // - batched messenger should not depend on a current HttpContext
                 //    but then what should be its "scope"? could we attach it to scopes?
                 // - and we should definitively *not* have to flush it here (should be auto)
-                //
+
+                // TODO: This dependency chain is broken and needs to be fixed.
+                // This is required to be called before EnsureUmbracoContext else the UmbracoContext's IBackOfficeSecurity instance is null
+                // This is a very ugly Temporal Coupling which also means that developers can no longer just use IUmbracoContextFactory the
+                // way it was intended.
                 _backofficeSecurityFactory.EnsureBackOfficeSecurity();
                 using UmbracoContextReference contextReference = _umbracoContextFactory.EnsureUmbracoContext();
                 try
