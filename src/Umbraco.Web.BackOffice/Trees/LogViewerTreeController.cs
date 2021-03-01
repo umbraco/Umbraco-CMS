@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -18,8 +19,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     {
         public LogViewerTreeController(
             ILocalizedTextService localizedTextService,
-            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection)
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IEventAggregator eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
         }
 
