@@ -1,10 +1,10 @@
 using System;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 
@@ -19,10 +19,10 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         private readonly UriUtility _uriUtility;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
-        private readonly IBackOfficeSecurity _backofficeSecurity;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
         private Uri _originalRequestUrl;
         private Uri _cleanedUmbracoUrl;
@@ -33,13 +33,13 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         // warn: does *not* manage setting any IUmbracoContextAccessor
         internal UmbracoContext(
             IPublishedSnapshotService publishedSnapshotService,
-            IBackOfficeSecurity backofficeSecurity,
             UmbracoRequestPaths umbracoRequestPaths,
             IHostingEnvironment hostingEnvironment,
             IVariationContextAccessor variationContextAccessor,
             UriUtility uriUtility,
             ICookieManager cookieManager,
-            IRequestAccessor requestAccessor)
+            IRequestAccessor requestAccessor,
+            IHttpContextAccessor httpContextAccessor)
         {
             if (publishedSnapshotService == null)
             {
@@ -51,10 +51,9 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
             _requestAccessor = requestAccessor;
-
+            _httpContextAccessor = httpContextAccessor;
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
-            _backofficeSecurity = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
             _umbracoRequestPaths = umbracoRequestPaths;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
@@ -143,7 +142,7 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             Uri requestUrl = _requestAccessor.GetRequestUrl();
             if (requestUrl != null
                 && _umbracoRequestPaths.IsBackOfficeRequest(requestUrl.AbsolutePath) == false
-                && _backofficeSecurity.CurrentUser != null)
+                && _httpContextAccessor.HttpContext?.GetCurrentIdentity() != null)
             {
                 var previewToken = _cookieManager.GetCookieValue(Core.Constants.Web.PreviewCookieName); // may be null or empty
                 _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;

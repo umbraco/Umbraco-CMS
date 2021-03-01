@@ -1,10 +1,10 @@
 using System;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Cms.Web.Common.UmbracoContext
@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
         private readonly IRequestAccessor _requestAccessor;
-        private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UriUtility _uriUtility;
 
         /// <summary>
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             UriUtility uriUtility,
             ICookieManager cookieManager,
             IRequestAccessor requestAccessor,
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+            IHttpContextAccessor httpContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedSnapshotService = publishedSnapshotService ?? throw new ArgumentNullException(nameof(publishedSnapshotService));
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             _uriUtility = uriUtility ?? throw new ArgumentNullException(nameof(uriUtility));
             _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
             _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(requestAccessor));
-            _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
+            _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
         private IUmbracoContext CreateUmbracoContext()
@@ -75,13 +75,13 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
 
             return new UmbracoContext(
                 _publishedSnapshotService,
-                _backofficeSecurityAccessor.BackOfficeSecurity,
                 _umbracoRequestPaths,
                 _hostingEnvironment,
                 _variationContextAccessor,
                 _uriUtility,
                 _cookieManager,
-                _requestAccessor);
+                _requestAccessor,
+                _httpContextAccessor);
         }
 
         /// <inheritdoc />
