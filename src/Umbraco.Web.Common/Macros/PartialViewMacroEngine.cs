@@ -59,13 +59,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             }
 
             HttpContext httpContext = _httpContextAccessor.GetRequiredHttpContext();
-            //var routeVals = new RouteData();
-            //routeVals.Values.Add(ControllerToken, "PartialViewMacro");
-            //routeVals.Values.Add(ActionToken, "Index");
-
-            //TODO: Was required for UmbracoViewPage need to figure out if we still need that, i really don't think this is necessary
-            //routeVals.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
-
+            
             RouteData currentRouteData = httpContext.GetRouteData();
 
             // Check if there's proxied ViewData (i.e. returned from a SurfaceController)
@@ -81,9 +75,6 @@ namespace Umbraco.Cms.Web.Common.Macros
                 TextWriter.Null,
                 new HtmlHelperOptions()
             );
-
-
-            //routeVals.DataTokens.Add("ParentActionViewContext", viewContext);
 
             var writer = new StringWriter();
             var viewComponentContext = new ViewComponentContext(
