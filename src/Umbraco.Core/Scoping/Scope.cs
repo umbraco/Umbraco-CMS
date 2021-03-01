@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Data;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -34,6 +35,15 @@ namespace Umbraco.Core.Scoping
         private ICompletable _fscope;
         private IEventDispatcher _eventDispatcher;
 
+        // ReadLocks and WriteLocks owned by the entire chain, managed by the outermost scope
+        public Dictionary<int, int> ReadLocks;
+        public Dictionary<int, int> WriteLocks;
+
+        // ReadLocks and WriteLocks requested by this specific scope, required to be able to decrement
+        // Using HashSets works well assume that you're only gonna request a lock once pr. scope
+        private HashSet<int> _readLocks;
+        private HashSet<int> _writelocks;
+
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
             ILogger logger, FileSystems fileSystems, Scope parent, ScopeContext scopeContext, bool detachable,
@@ -57,6 +67,11 @@ namespace Umbraco.Core.Scoping
             _autoComplete = autoComplete;
 
             Detachable = detachable;
+
+            ReadLocks = new Dictionary<int, int>();
+            WriteLocks = new Dictionary<int, int>();
+            _readLocks = new HashSet<int>();
+            _writelocks = new HashSet<int>();
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
@@ -348,6 +363,17 @@ namespace Umbraco.Core.Scoping
 #endif
             }
 
+            // Decrement the lock counters
+            foreach (var readLockId in _readLocks)
+            {
+                DecrementReadLock(readLockId);
+            }
+
+            foreach (var writeLockId in _writelocks)
+            {
+                DecrementWriteLock(writeLockId);
+            }
+
             var parent = ParentScope;
             _scopeProvider.AmbientScope = parent; // might be null = this is how scopes are removed from context objects
 
@@ -486,32 +512,179 @@ namespace Umbraco.Core.Scoping
         private static bool LogUncompletedScopes => (_logUncompletedScopes
             ?? (_logUncompletedScopes = Current.Configs.CoreDebug().LogUncompletedScopes)).Value;
 
+        /// <summary>
+        /// Decrements the count of the ReadLocks with a specific ID we currently hold
+        /// </summary>
+        /// <param name="lockId">Lock ID to decrement</param>
+        public void DecrementReadLock(int lockId)
+        {
+            if (ParentScope != null)
+            {
+                ParentScope.DecrementReadLock(lockId);
+            }
+            else
+            {
+                ReadLocks[lockId] -= 1;
+            }
+        }
+
+        /// <summary>
+        /// Decrements the count of the WriteLocks with a specific ID we currently hold
+        /// </summary>
+        /// <param name="lockId">Lock ID to decrement</param>
+        public void DecrementWriteLock(int lockId)
+        {
+            if (ParentScope != null)
+            {
+                ParentScope.DecrementWriteLock(lockId);
+            }
+            else
+            {
+                WriteLocks[lockId] -= 1;
+            }
+        }
+
         /// <inheritdoc />
-        public void ReadLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.ReadLock(Database, lockIds);
+        public void ReadLock(params int[] lockIds)
+        {
+            if (ParentScope != null)
+            {
+                foreach (var id in lockIds)
+                {
+                    // We need to keep track of what lockIds we have requests to be able to decrement them.
+                    // We have to do this out of the recursion to not add the ids to all scopes.
+                    _readLocks.Add(id);
+                }
+            }
+            // Delegate acquiring the lock to the parent.
+            ReadLockInner(lockIds);
+        }
+
+        internal void ReadLockInner(params int[] lockIds)
+        {
+            if (ParentScope != null)
+            {
+                // Delegate acquiring the lock to the parent.
+                ParentScope.ReadLockInner(lockIds);
+                return;
+            }
+
+            foreach (var lockId in lockIds)
+            {
+                // Only acquire the lock if we haven't done so yet.
+                if (!ReadLocks.ContainsKey(lockId))
+                {
+                    Database.SqlContext.SqlSyntax.ReadLock(Database, lockId);
+                    ReadLocks[lockId] = 0;
+                }
+
+                // Increment the amount of locks we have of the specific ID after we've acquired it.
+                ReadLocks[lockId] += 1;
+            }
+        }
 
         /// <inheritdoc />
         public void ReadLock(TimeSpan timeout, int lockId)
         {
+            if (ParentScope != null)
+            {
+                _readLocks.Add(lockId);
+            }
+
+            ReadLockInner(timeout, lockId);
+        }
+
+        internal void ReadLockInner(TimeSpan timeout, int lockId)
+        {
+            if (ParentScope != null)
+            {
+                ParentScope.ReadLockInner(timeout, lockId);
+                return;
+            }
+
             var syntax2 = Database.SqlContext.SqlSyntax as ISqlSyntaxProvider2;
             if (syntax2 == null)
             {
                 throw new InvalidOperationException($"{Database.SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
             }
-            syntax2.ReadLock(Database, timeout, lockId);
+
+            if (!ReadLocks.ContainsKey(lockId))
+            {
+                syntax2.ReadLock(Database, timeout, lockId);
+                ReadLocks[lockId] = 0;
+            }
+
+            ReadLocks[lockId] += 1;
         }
 
         /// <inheritdoc />
-        public void WriteLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.WriteLock(Database, lockIds);
+        public void WriteLock(params int[] lockIds)
+        {
+            // For some reason adding ids to the writelocks set of the outer most parent scope causes issues...
+            if (ParentScope != null)
+            {
+                foreach (var lockId in lockIds)
+                {
+                    _writelocks.Add(lockId);
+                }
+            }
+            WriteLockInner(lockIds);
+        }
+
+        internal void WriteLockInner(int[] lockIds)
+        {
+            // If we have a parent we just delegate lock creation to parent.
+            if (ParentScope != null)
+            {
+                ParentScope.WriteLockInner(lockIds);
+                return;
+            }
+
+            // Only acquire lock if we haven't yet (WriteLocks not containing the key)
+            foreach (var lockId in lockIds)
+            {
+                if (!WriteLocks.ContainsKey(lockId))
+                {
+                    Database.SqlContext.SqlSyntax.WriteLock(Database, lockId);
+                    WriteLocks[lockId] = 0;
+                }
+
+                // Increment count of the lock by 1.
+                WriteLocks[lockId] += 1;
+            }
+        }
 
         /// <inheritdoc />
         public void WriteLock(TimeSpan timeout, int lockId)
         {
+            if (ParentScope != null)
+            {
+                _writelocks.Add(lockId);
+            }
+            WriteLockInner(timeout, lockId);
+        }
+
+        internal void WriteLockInner(TimeSpan timeout, int lockId)
+        {
+            if (ParentScope != null)
+            {
+                ParentScope.WriteLockInner(timeout, lockId);
+                return;
+            }
+
             var syntax2 = Database.SqlContext.SqlSyntax as ISqlSyntaxProvider2;
             if (syntax2 == null)
             {
                 throw new InvalidOperationException($"{Database.SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
             }
-            syntax2.WriteLock(Database, timeout, lockId);
+
+            if (!WriteLocks.ContainsKey(lockId))
+            {
+                syntax2.WriteLock(Database, timeout, lockId);
+                WriteLocks[lockId] = 0;
+            }
+
+            WriteLocks[lockId] += 1;
         }
     }
 }
