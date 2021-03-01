@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
@@ -32,6 +33,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IShortStringHelper _shortStringHelper;
         private readonly ILogger<ContentService> _logger;
         private IQuery<IContent> _queryNotTrashed;
+        private readonly IEventAggregator _eventAggregator;
 
         #region Constructors
 
@@ -39,7 +41,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             IEventMessagesFactory eventMessagesFactory,
             IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository,
-            Lazy<IPropertyValidationService> propertyValidationService, IShortStringHelper shortStringHelper)
+            Lazy<IPropertyValidationService> propertyValidationService, IShortStringHelper shortStringHelper, IEventAggregator eventAggregator)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _documentRepository = documentRepository;
@@ -50,6 +52,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _languageRepository = languageRepository;
             _propertyValidationService = propertyValidationService;
             _shortStringHelper = shortStringHelper;
+            _eventAggregator = eventAggregator;
             _logger = loggerFactory.CreateLogger<ContentService>();
         }
 
@@ -747,11 +750,15 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new ContentSavingEventArgs(content, evtMsgs);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
+                if (raiseEvents)
                 {
-                    scope.Complete();
-                    return OperationResult.Cancel(evtMsgs);
+                    var notification = new SavingNotification<IContent>(content, evtMsgs);
+                    _eventAggregator.Publish(notification);
+                    if (notification.Cancel)
+                    {
+                        scope.Complete();
+                        return OperationResult.Cancel(evtMsgs);
+                    }
                 }
 
                 scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
@@ -773,7 +780,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    scope.Events.Dispatch(Saved, this, saveEventArgs.ToContentSavedEventArgs(), nameof(Saved));
+                    _eventAggregator.Publish(new SavedNotification<IContent>(content, evtMsgs));
                 }
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
@@ -802,11 +809,15 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new ContentSavingEventArgs(contentsA, evtMsgs);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
+                if (raiseEvents)
                 {
-                    scope.Complete();
-                    return OperationResult.Cancel(evtMsgs);
+                    var notification = new SavingNotification<IContent>(contentsA, evtMsgs);
+                    _eventAggregator.Publish(notification);
+                    if (notification.Cancel)
+                    {
+                        scope.Complete();
+                        return OperationResult.Cancel(evtMsgs);
+                    }
                 }
 
                 var treeChanges = contentsA.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode));
@@ -823,7 +834,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    scope.Events.Dispatch(Saved, this, saveEventArgs.ToContentSavedEventArgs(), nameof(Saved));
+                    _eventAggregator.Publish(new SavedNotification<IContent>(contentsA, evtMsgs));
                 }
                 scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
                 Audit(AuditType.Save, userId == -1 ? 0 : userId, Cms.Core.Constants.System.Root, "Saved multiple content");
@@ -867,9 +878,12 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 var allLangs = _languageRepository.GetMany().ToList();
 
-                var saveEventArgs = new ContentSavingEventArgs(content, evtMsgs);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
+                var notification = new SavingNotification<IContent>(content, evtMsgs);
+                _eventAggregator.Publish(notification);
+                if (notification.Cancel)
+                {
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+                }
 
                 // if culture is specific, first publish the invariant values, then publish the culture itself.
                 // if culture is '*', then publish them all (including variants)
@@ -881,7 +895,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
                 content.PublishCulture(impact);
 
-                var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, allLangs, userId, raiseEvents);
+                var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, raiseEvents);
                 scope.Complete();
                 return result;
             }
@@ -905,9 +919,16 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var allLangs = _languageRepository.GetMany().ToList();
 
                 var evtMsgs = EventMessagesFactory.Get();
-                var saveEventArgs = new ContentSavingEventArgs(content, evtMsgs);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
-                    return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+
+                if (raiseEvents)
+                {
+                    var notification = new SavingNotification<IContent>(content, evtMsgs);
+                    _eventAggregator.Publish(notification);
+                    if (notification.Cancel)
+                    {
+                        return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+                    }
+                }
 
                 var varies = content.ContentType.VariesByCulture();
 
@@ -927,7 +948,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 foreach (var impact in impacts)
                     content.PublishCulture(impact);
 
-                var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, allLangs, userId, raiseEvents);
+                var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, raiseEvents);
                 scope.Complete();
                 return result;
             }
@@ -969,9 +990,12 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 var allLangs = _languageRepository.GetMany().ToList();
 
-                var saveEventArgs = new ContentSavingEventArgs(content, evtMsgs);
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
+                var notification = new SavingNotification<IContent>(content, evtMsgs);
+                _eventAggregator.Publish(notification);
+                if (notification.Cancel)
+                {
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+                }
 
                 // all cultures = unpublish whole
                 if (culture == "*" || (!content.ContentType.VariesByCulture() && culture == null))
@@ -982,7 +1006,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     // to be non-routable so that when it's re-published all variants were as they were.
 
                     content.PublishedState = PublishedState.Unpublishing;
-                    var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, allLangs, userId);
+                    var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId);
                     scope.Complete();
                     return result;
                 }
@@ -996,7 +1020,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     var removed = content.UnpublishCulture(culture);
 
                     //save and publish any changes
-                    var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, allLangs, userId);
+                    var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId);
 
                     scope.Complete();
 
@@ -1039,13 +1063,16 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
 
-                var saveEventArgs = new ContentSavingEventArgs(content, evtMsgs);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
+                var notification = new SavingNotification<IContent>(content, evtMsgs);
+                _eventAggregator.Publish(notification);
+                if (notification.Cancel)
+                {
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
+                }
 
                 var allLangs = _languageRepository.GetMany().ToList();
 
-                var result = CommitDocumentChangesInternal(scope, content, saveEventArgs, allLangs, userId, raiseEvents);
+                var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, raiseEvents);
                 scope.Complete();
                 return result;
             }
@@ -1069,15 +1096,13 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </para>
         /// </remarks>
         private PublishResult CommitDocumentChangesInternal(IScope scope, IContent content,
-            ContentSavingEventArgs saveEventArgs, IReadOnlyCollection<ILanguage> allLangs,
+            EventMessages evtMsgs, IReadOnlyCollection<ILanguage> allLangs,
             int userId = Cms.Core.Constants.Security.SuperUserId,
             bool raiseEvents = true, bool branchOne = false, bool branchRoot = false)
         {
             if (scope == null) throw new ArgumentNullException(nameof(scope));
             if (content == null) throw new ArgumentNullException(nameof(content));
-            if (saveEventArgs == null) throw new ArgumentNullException(nameof(saveEventArgs));
-
-            var evtMsgs = saveEventArgs.Messages;
+            if (evtMsgs == null) throw new ArgumentNullException(nameof(evtMsgs));
 
             PublishResult publishResult = null;
             PublishResult unpublishResult = null;
@@ -1210,7 +1235,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             // raise the Saved event, always
             if (raiseEvents)
             {
-                scope.Events.Dispatch(Saved, this, saveEventArgs.ToContentSavedEventArgs(), nameof(Saved));
+                _eventAggregator.Publish(new SavedNotification<IContent>(content, evtMsgs));
             }
 
             if (unpublishing) // we have tried to unpublish - won't happen in a branch
@@ -1375,8 +1400,9 @@ namespace Umbraco.Cms.Core.Services.Implement
                         if (pendingCultures.Count == 0)
                             continue; //shouldn't happen but no point in processing this document if there's nothing there
 
-                        var saveEventArgs = new ContentSavingEventArgs(d, evtMsgs);
-                        if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
+                        var notification = new SavingNotification<IContent>(d, evtMsgs);
+                        _eventAggregator.Publish(notification);
+                        if (notification.Cancel)
                         {
                             results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
                             continue;
@@ -1390,7 +1416,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                             d.UnpublishCulture(c);
                         }
 
-                        var result = CommitDocumentChangesInternal(scope, d, saveEventArgs, allLangs.Value, d.WriterId);
+                        var result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId);
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                         results.Add(result);
@@ -1436,11 +1462,12 @@ namespace Umbraco.Cms.Core.Services.Implement
                         if (pendingCultures.Count == 0)
                             continue; //shouldn't happen but no point in processing this document if there's nothing there
 
-                        var saveEventArgs = new ContentSavingEventArgs(d, evtMsgs);
-                        if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
+                        var notification = new SavingNotification<IContent>(d, evtMsgs);
+                        _eventAggregator.Publish(notification);
+                        if (notification.Cancel)
                         {
                             results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
-                            continue; // this document is canceled move next
+                            continue;
                         }
 
                         var publishing = true;
@@ -1470,7 +1497,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                         else if (!publishing)
                             result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d);
                         else
-                            result = CommitDocumentChangesInternal(scope, d, saveEventArgs, allLangs.Value, d.WriterId);
+                            result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId);
 
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1718,9 +1745,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (culturesToPublish.Count == 0) // empty = already published
                 return new PublishResult(PublishResultType.SuccessPublishAlready, evtMsgs, document);
 
-            var saveEventArgs = new ContentSavingEventArgs(document, evtMsgs);
-            if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Saving)))
+            var notification = new SavingNotification<IContent>(document, evtMsgs);
+            _eventAggregator.Publish(notification);
+            if (notification.Cancel)
+            {
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document);
+            }
 
             // publish & check if values are valid
             if (!publishCultures(document, culturesToPublish, allLangs))
@@ -1729,7 +1759,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
             }
 
-            var result = CommitDocumentChangesInternal(scope, document, saveEventArgs, allLangs, userId, branchOne: true, branchRoot: isRoot);
+            var result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, userId, branchOne: true, branchRoot: isRoot);
             if (result.Success)
                 publishedDocuments.Add(document);
             return result;
@@ -1746,6 +1776,9 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
+                var deleteNotification = new DeletingNotification<IContent>(content, evtMsgs);
+                _eventAggregator.Publish(deleteNotification);
+
                 var deleteEventArgs = new DeleteEventArgs<IContent>(content, evtMsgs);
                 if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs, nameof(Deleting)))
                 {
@@ -2322,16 +2355,23 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         private OperationResult Sort(IScope scope, IContent[] itemsA, int userId, EventMessages evtMsgs, bool raiseEvents)
         {
-            var saveEventArgs = new ContentSavingEventArgs(itemsA, evtMsgs);
             if (raiseEvents)
             {
-                //raise cancelable sorting event
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs, nameof(Sorting)))
+                // raise cancelable sorting event
+                var sortingNotification = new SortingNotification<IContent>(itemsA, evtMsgs);
+                _eventAggregator.Publish(sortingNotification);
+                if (sortingNotification.Cancel)
+                {
                     return OperationResult.Cancel(evtMsgs);
+                }
 
-                //raise saving event (this one cannot be canceled)
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saving, this, saveEventArgs, nameof(Saving));
+                // raise cancelable saving event 
+                var savingNotification = new SavingNotification<IContent>(itemsA, evtMsgs);
+                _eventAggregator.Publish(savingNotification);
+                if (savingNotification.Cancel)
+                {
+                    return OperationResult.Cancel(evtMsgs);
+                }
             }
 
             var published = new List<IContent>();
@@ -2364,10 +2404,9 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             if (raiseEvents)
             {
-                var savedEventsArgs = saveEventArgs.ToContentSavedEventArgs();
                 //first saved, then sorted
-                scope.Events.Dispatch(Saved, this, savedEventsArgs, nameof(Saved));
-                scope.Events.Dispatch(Sorted, this, savedEventsArgs, nameof(Sorted));
+                _eventAggregator.Publish(new SavedNotification<IContent>(itemsA, evtMsgs));
+                _eventAggregator.Publish(new SortedNotification<IContent>(itemsA, evtMsgs));
             }
 
             scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
@@ -2482,11 +2521,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// Occurs after Sorting
         /// </summary>
         public static event TypedEventHandler<IContentService, SaveEventArgs<IContent>> Sorted;
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IContentService, ContentSavingEventArgs> Saving;
 
         /// <summary>
         /// Occurs after Save

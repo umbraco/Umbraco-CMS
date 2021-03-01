@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -7,10 +7,53 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
+    // TODO: add copying handling
+    public abstract class ComplexPropertyEditorContentNotificationHandler
+        : INotificationHandler<SavingNotification<IContent>>
+    {
+        private readonly string _editorAlias;
+        private readonly Func<string, bool, string> _formatPropertyValue;
+
+        protected ComplexPropertyEditorContentNotificationHandler(string editorAlias, Func<string, bool, string> formatPropertyValue)
+        {
+            _editorAlias = editorAlias;
+            _formatPropertyValue = formatPropertyValue;
+        }
+
+        public void Handle(SavingNotification<IContent> notification)
+        {
+            foreach (var entity in notification.SavedEntities)
+            {
+                var props = entity.GetPropertiesByEditor(_editorAlias);
+                UpdatePropertyValues(props, true);
+            }
+        }
+
+        private void UpdatePropertyValues(IEnumerable<IProperty> props, bool onlyMissingKeys)
+        {
+            foreach (var prop in props)
+            {
+                // A Property may have one or more values due to cultures
+                var propVals = prop.Values;
+                foreach (var cultureVal in propVals)
+                {
+                    // Remove keys from published value & any nested properties
+                    var updatedPublishedVal = _formatPropertyValue(cultureVal.PublishedValue?.ToString(), onlyMissingKeys);
+                    cultureVal.PublishedValue = updatedPublishedVal;
+
+                    // Remove keys from edited/draft value & any nested properties
+                    var updatedEditedVal = _formatPropertyValue(cultureVal.EditedValue?.ToString(), onlyMissingKeys);
+                    cultureVal.EditedValue = updatedEditedVal;
+                }
+            }
+        }
+    }
+
     /// <summary>
     /// Utility class for dealing with <see cref="ContentService"/> Copying/Saving events for complex editors
     /// </summary>
@@ -26,7 +69,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _editorAlias = editorAlias;
             _formatPropertyValue = formatPropertyValue;
             ContentService.Copying += ContentService_Copying;
-            ContentService.Saving += ContentService_Saving;
+            //ContentService.Saving += ContentService_Saving;
         }
 
         /// <summary>
@@ -84,7 +127,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 if (disposing)
                 {
                     ContentService.Copying -= ContentService_Copying;
-                    ContentService.Saving -= ContentService_Saving;
+                    //ContentService.Saving -= ContentService_Saving;
                 }
                 _disposedValue = true;
             }

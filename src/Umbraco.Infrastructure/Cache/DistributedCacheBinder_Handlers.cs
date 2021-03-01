@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -126,8 +126,6 @@ namespace Umbraco.Cms.Core.Cache
                 () => MediaService.TreeChanged -= MediaService_TreeChanged);
 
             // bind to content events
-            Bind(() => ContentService.Saved += ContentService_Saved, // needed for permissions
-                () => ContentService.Saved -= ContentService_Saved);
             Bind(() => ContentService.Copied += ContentService_Copied, // needed for permissions
                 () => ContentService.Copied -= ContentService_Copied);
             Bind(() => ContentService.TreeChanged += ContentService_TreeChanged,// handles all content changes
@@ -179,19 +177,6 @@ namespace Umbraco.Cms.Core.Cache
         /// case then we need to clear all user permissions cache.
         /// </remarks>
         private void ContentService_Copied(IContentService sender, CopyEventArgs<IContent> e)
-        {
-        }
-
-        /// <summary>
-        /// Handles cache refreshing for when content is saved (not published)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <remarks>
-        /// When an entity is saved we need to notify other servers about the change in order for the Examine indexes to
-        /// stay up-to-date for unpublished content.
-        /// </remarks>
-        private void ContentService_Saved(IContentService sender, SaveEventArgs<IContent> e)
         {
         }
 
