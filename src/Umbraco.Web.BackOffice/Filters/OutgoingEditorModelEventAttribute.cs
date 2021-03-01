@@ -55,25 +55,23 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 {
                     var model = objectContent.Value;
 
-                    if (model is ContentItemDisplay content)
+                    switch (model)
                     {
-                        _eventAggregator.Publish(new SendingContentNotification(content, umbracoContext));
-                    }
-                    else if (model is MediaItemDisplay media)
-                    {
-                        _eventAggregator.Publish(new SendingMediaNotification(media, umbracoContext));
-                    }
-                    else if (model is MemberDisplay member)
-                    {
-                        _eventAggregator.Publish(new SendingMemberNotification(member, umbracoContext));
-                    }
-                    else if (model is UserDisplay user)
-                    {
-                        _eventAggregator.Publish(new SendingUserNotification(user, umbracoContext));
-                    }
-                    else if (model is IEnumerable<Tab<IDashboardSlim>> dashboards)
-                    {
-                        _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
+                        case ContentItemDisplay content:
+                            _eventAggregator.Publish(new SendingContentNotification(content, umbracoContext));
+                            break;
+                        case MediaItemDisplay media:
+                            _eventAggregator.Publish(new SendingMediaNotification(media, umbracoContext));
+                            break;
+                        case MemberDisplay member:
+                            _eventAggregator.Publish(new SendingMemberNotification(member, umbracoContext));
+                            break;
+                        case UserDisplay user:
+                            _eventAggregator.Publish(new SendingUserNotification(user, umbracoContext));
+                            break;
+                        case IEnumerable<Tab<IDashboardSlim>> dashboards:
+                            _eventAggregator.Publish(new SendingDashboardsNotification(dashboards, umbracoContext));
+                            break;
                     }
                 }
             }
