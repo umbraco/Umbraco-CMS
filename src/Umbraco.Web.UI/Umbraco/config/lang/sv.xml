@@ -272,6 +272,8 @@
     <key alias="copiedItemOfItems">Kopierade %0% av %1% objekt</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Länktitel</key>
+    <key alias="urlLinkPicker">Länk</key>
     <key alias="anchorInsert">Namn</key>
     <key alias="assignDomain">Hantera domännamn</key>
     <key alias="closeThisWindow">Stäng fönstret</key>
@@ -308,7 +310,9 @@
     <key alias="siterepublished">Cache för webbplatsen har uppdaterats. Allt publicerat innehåll är nu uppdaterat. Innehåll som inte har publicerats är fortfarande opublicerat.</key>
     <key alias="siterepublishHelp">Webbplatsens cache kommer att uppdateras. Allt innehåll som är publicerat kommer att uppdateras. Innehåll som inte är publicerat kommer att förbli opublicerat.</key>
     <key alias="selectContentStartNode">Välj startnod för innehåll</key>
+    <key alias="selectMedia">Välj media</key>
     <key alias="selectIcon">Välj ikon</key>
+    <key alias="selectLink">Välj länk</key>
     <key alias="selectMediaStartNode">Välj startnod för media</key>
     <key alias="selectUserGroups">Välj användargrupper</key>
     <key alias="selectSections">Välj sektioner</key>
@@ -318,6 +322,9 @@
     <key alias="thumbnailimageclickfororiginal">Klicka på förhandsgranskningsbilden för att se bilden i full storlek</key>
     <key alias="treepicker">Välj ett objekt</key>
     <key alias="viewCacheItem">Se cachat objekt</key>
+    <key alias="linkToPage">Länk till sida</key>
+    <key alias="openInNewWindow">Öppnar länken i ett nytt fönster eller flik</key>
+    <key alias="linkToMedia">Länk till media</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description">Redigera de olika översättningarna för ordboksinlägget %0% nedan. Du kan lägga till ytterligare språk under 'språk' i menyn till vänster.</key>
@@ -504,7 +511,7 @@
     <key alias="databaseHeader">Databaskonfiguration</key>
     <key alias="databaseInstall"><![CDATA[För att installera Umbraco %0% databasen, tryck på knappen <strong>installera</strong>]]></key>
     <key alias="databaseInstallDone"><![CDATA[Nu har Umbraco %0% kopierats till din databas. Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
-    <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br />><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank"> Mer information om att redigera web.config hittar du här.</a></p>]]></key>
+    <key alias="databaseNotFound"><![CDATA[<p>Databasen kunde inte hittas! Kontrollera att informationen i databasanslutnings-inställningarna i filen "web.config" är rätt.</p> <p>För att fortsätta måste du redigera filen "web.config" (du kan använda Visual Studio eller din favorit text-redigerare), bläddra till slutet, lägg till databasanslutnings-inställningarna för din databas i fältet som heter "umbracoDbDSN" och spara filen. </p> <p> Klicka på <strong>Försök igen</strong> knappen när du är klar.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">Mer information om att redigera web.config hittar du här</a>.</p>]]></key>
     <key alias="databaseText"><![CDATA[För att avsluta det här steget måste du veta lite information om din databasserver ("connection string").<br /> Eventuellt kan du behöva kontakta ditt webb-hotell. Om du installerar på en lokal maskin eller server kan du få informationen från din systemadministratör.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p> Tryck <strong>Uppgradera</strong> knappen för att uppgradera din databas till Umbraco %0%</p> <p> Du behöver inte vara orolig. Inget innehåll kommer att raderas och efteråt kommer allt att fungera som vanligt! </p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Din databas har nu uppgraderats till den senaste versionen %0%.<br />Tryck <strong>Nästa</strong> för att fortsätta.]]></key>
@@ -532,7 +539,7 @@
     <key alias="permissionsSettingUpPermissions">Konfigurerar mapprättigheter</key>
     <key alias="permissionsText">Umbraco behöver skriv/ändra rättigheter till vissa mappar för att spara filer som bilder och PDFer. Umbraco sparar också temporär data (så kallad cache) för att öka prestandan på din webbplats.</key>
     <key alias="runwayFromScratch">Jag vill börja från början</key>
-    <key alias="runwayFromScratchText"><![CDATA[Just nu är din webbplats för fullständigt tom och det är ju perfekt om du vill börja från början med att skapa dina egna dokumentyper och mallar. (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lär dig hur</a>) Du kan fortfarande välja att installera Runway senare. Gå in i Utvecklarsektionen och välj Paket.]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[Just nu är din webbplats för fullständigt tom och det är ju perfekt om du vill börja från början med att skapa dina egna dokumentyper och mallar. (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lär dig hur</a>) Du kan fortfarande välja att installera Runway senare. Gå in i Utvecklarsektionen och välj Paket.]]></key>
     <key alias="runwayHeader">Du har just installerat en ren Umbraco platform. Vad vill du göra härnäst?</key>
     <key alias="runwayInstalled">Runway är installerat</key>
     <key alias="runwayInstalledText"><![CDATA[Du har nu grunden på plats. Välj vilka moduler du vill installera ovanpå den.<br /> Det här är vår lista över rekommenderade moduler, markera de moduler du vill installera, eller visa den <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fullständiga listan</a>]]></key>
@@ -551,7 +558,7 @@
     <key alias="theEndHeader">Umbraco %0% är installerat och klart för användning</key>
     <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>UmbracoConfigurationStatus</strong> på slutet till <strong>%0%</strong>]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>börja omedelbart</strong> genom att klicka på "Starta Umbraco"-knappen nedan. <br />Om du är en <strong>ny Umbraco användare</strong>kan du hitta massor av resurser på våra kom igång sidor.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara Umbraco back office och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara Umbraco backoffice och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
     <key alias="Unavailable">Anslutningen till databasen misslyckades.</key>
     <key alias="watch">Se</key>
     <key alias="welcomeIntro"><![CDATA[Den här guiden kommer att guida dig genom processen med att konfigurera <strong>Umbraco %0%</strong> antingen för en ny installation eller en uppgradering från version 3.0. <br /><br /> Tryck på <strong>"next"</strong> för att börja.]]></key>
@@ -567,7 +574,7 @@
     <key alias="renewSession">Förnya nu för att spara ditt arbete</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="greeting0">Happy super Sunday</key>
     <key alias="greeting1">Happy manic Monday</key>
     <key alias="greeting2">Happy tremendous Tuesday</key>
@@ -725,7 +732,6 @@
     <key alias="users">Användare</key>
   </area>
   <area alias="settings">
-    <key alias="asAContentMasterType">som huvudinnehållstyp. Tabbar från huvudinnehållstyper visas inte och kan endast redigeras på själva huvudinnehållstypen.</key>
     <key alias="contentTypeEnabled">Huvudinnehållstyp påslagen</key>
     <key alias="contentTypeUses">Denna huvudinnehållstyp använder</key>
     <key alias="defaulttemplate">Defaultmall</key>
@@ -940,7 +946,7 @@
     <key alias="changePassword">Ändra lösenord</key>
     <key alias="changePhoto">Ändra bild</key>
     <key alias="confirmNewPassword">Bekräfta det nya lösenordet</key>
-    <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco Back Office genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
+    <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco backoffice genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
     <key alias="contentChannel">Innehållskanal</key>
     <key alias="createAnotherUser">Skapa en till användare</key>
     <key alias="createUserHelp">Skapa nya användare för att ge dom åtkomst till Umbraco. När en ny användare skapas kommer ett lösenord genereras som du kan dela med användaren.</key>

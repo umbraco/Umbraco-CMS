@@ -41,7 +41,7 @@ context('Templates', () => {
         cy.umbracoSuccessNotification().should('be.visible');
         // For some reason cy.umbracoErrorNotification tries to click the element which is not possible
         // if it doesn't actually exist, making should('not.be.visible') impossible.
-        cy.get('.umb-notifications__notifications > .alert-error').should('not.be.visible');
+        cy.get('.umb-notifications__notifications > .alert-error').should('not.exist');
 
         //Clean up
         cy.umbracoEnsureTemplateNameNotExists(name);

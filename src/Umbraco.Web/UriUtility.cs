@@ -42,7 +42,7 @@ namespace Umbraco.Web
         public static string ToAbsolute(string url)
         {
             //return ResolveUrl(url);
-            url = url.TrimStart('~');
+            url = url.TrimStart(Constants.CharArrays.Tilde);
             return _appPathPrefix + url;
         }
 
@@ -102,7 +102,7 @@ namespace Umbraco.Web
             }
             if (path != "/")
             {
-                path = path.TrimEnd('/');
+                path = path.TrimEnd(Constants.CharArrays.ForwardSlash);
             }
 
             //if any part of the path contains .aspx, replace it with nothing.
@@ -216,7 +216,7 @@ namespace Umbraco.Web
             var pos = Math.Min(pos1, pos2);
 
             var path = pos > 0 ? uri.Substring(0, pos) : uri;
-            path = path.TrimEnd('/');
+            path = path.TrimEnd(Constants.CharArrays.ForwardSlash);
 
             if (pos > 0)
                 path += uri.Substring(pos);

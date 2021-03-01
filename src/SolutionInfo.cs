@@ -2,7 +2,7 @@
 using System.Resources;
 
 [assembly: AssemblyCompany("Umbraco")]
-[assembly: AssemblyCopyright("Copyright © Umbraco 2020")]
+[assembly: AssemblyCopyright("Copyright © Umbraco 2021")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -18,5 +18,5 @@ using System.Resources;
 [assembly: AssemblyVersion("8.0.0")]
 
 // these are FYI and changed automatically
-[assembly: AssemblyFileVersion("8.9.1")]
-[assembly: AssemblyInformationalVersion("8.9.1")]
+[assembly: AssemblyFileVersion("8.12.0")]
+[assembly: AssemblyInformationalVersion("8.12.0-rc")]

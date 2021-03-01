@@ -6,7 +6,7 @@ using Umbraco.Core;
 using Umbraco.Web.Security;
 using Umbraco.Core.Composing;
 using Current = Umbraco.Web.Composing.Current;
-
+using CharArrays = Umbraco.Core.Constants.CharArrays;
 namespace Umbraco.Web.Mvc
 {
     /// <summary>
@@ -40,7 +40,7 @@ namespace Umbraco.Web.Mvc
                 AllowType = "";
 
             var members = new List<int>();
-            foreach (var s in AllowMembers.Split(','))
+            foreach (var s in AllowMembers.Split(CharArrays.Comma))
             {
                 if (int.TryParse(s, out var id))
                 {
@@ -49,7 +49,7 @@ namespace Umbraco.Web.Mvc
             }
 
             var helper = Current.Factory.GetInstance<MembershipHelper>();
-            return helper.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members);
+            return helper.IsMemberAuthorized(AllowType.Split(CharArrays.Comma), AllowGroup.Split(CharArrays.Comma), members);
             
         }
 
