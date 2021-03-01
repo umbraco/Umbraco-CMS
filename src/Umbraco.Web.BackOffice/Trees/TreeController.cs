@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Extensions;
@@ -18,8 +19,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         protected ILocalizedTextService LocalizedTextService { get; }
 
-        protected TreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection)
-            : base(umbracoApiControllerTypeCollection)
+        protected TreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IEventAggregator eventAggregator)
+            : base(umbracoApiControllerTypeCollection, eventAggregator)
         {
             LocalizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _treeAttribute = GetTreeAttribute();

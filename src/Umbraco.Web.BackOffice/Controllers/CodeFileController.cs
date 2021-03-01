@@ -338,7 +338,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             switch (type)
             {
                 case Constants.Trees.PartialViews:
-                    if (IsDirectory(virtualPath, Constants.SystemDirectories.PartialViews))
+                    if (IsDirectory(_hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.PartialViews, virtualPath))))
                     {
                         _fileService.DeletePartialViewFolder(virtualPath);
                         return Ok();
@@ -350,7 +350,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     return new UmbracoProblemResult("No Partial View or folder found with the specified path", HttpStatusCode.NotFound);
 
                 case Constants.Trees.PartialViewMacros:
-                    if (IsDirectory(virtualPath, Constants.SystemDirectories.MacroPartials))
+                    if (IsDirectory(_hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.MacroPartials, virtualPath))))
                     {
                         _fileService.DeletePartialViewMacroFolder(virtualPath);
                         return Ok();
@@ -362,7 +362,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     return new UmbracoProblemResult("No Partial View Macro or folder found with the specified path", HttpStatusCode.NotFound);
 
                 case Constants.Trees.Scripts:
-                    if (IsDirectory(virtualPath, _globalSettings.UmbracoScriptsPath))
+                    if (IsDirectory(_hostingEnvironment.MapPathWebRoot(Path.Combine(_globalSettings.UmbracoScriptsPath, virtualPath))))
                     {
                         _fileService.DeleteScriptFolder(virtualPath);
                         return Ok();
@@ -374,7 +374,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                     return new UmbracoProblemResult("No Script or folder found with the specified path", HttpStatusCode.NotFound);
                 case Constants.Trees.Stylesheets:
-                    if (IsDirectory(virtualPath, _globalSettings.UmbracoCssPath))
+                    if (IsDirectory(_hostingEnvironment.MapPathWebRoot(Path.Combine(_globalSettings.UmbracoCssPath, virtualPath))))
                     {
                         _fileService.DeleteStyleSheetFolder(virtualPath);
                         return Ok();
@@ -665,9 +665,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return value;
         }
 
-        private bool IsDirectory(string virtualPath, string systemDirectory)
+        private bool IsDirectory(string path)
         {
-            var path = _hostingEnvironment.MapPathContentRoot(systemDirectory + "/" + virtualPath);
             var dirInfo = new DirectoryInfo(path);
             return dirInfo.Attributes == FileAttributes.Directory;
         }
