@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Trees;
@@ -39,9 +40,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             ILogger<ContentTreeControllerBase> logger,
             ActionCollection actionCollection,
             IUserService userService,
-            IDataTypeService dataTypeService
+            IDataTypeService dataTypeService,
+            IEventAggregator eventAggregator
             )
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _entityService = entityService;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;

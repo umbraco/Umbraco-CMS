@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Trees;
 using Umbraco.Cms.Core.Services;
@@ -28,7 +29,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
         private readonly ILocalizationService _localizationService;
 
-        public DictionaryTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IMenuItemCollectionFactory menuItemCollectionFactory, ILocalizationService localizationService) : base(localizedTextService, umbracoApiControllerTypeCollection)
+        public DictionaryTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IMenuItemCollectionFactory menuItemCollectionFactory, ILocalizationService localizationService, IEventAggregator eventAggregator) : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _menuItemCollectionFactory = menuItemCollectionFactory;
             _localizationService = localizationService;

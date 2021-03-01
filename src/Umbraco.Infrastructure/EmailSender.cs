@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Infrastructure
                 }
                 else
                 {
-                    await client.SendAsync(mailMessage);
+                    client.Send(mailMessage);
                 }
 
                 await client.DisconnectAsync(true);

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -56,8 +57,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             IContentService contentService,
             IPublicAccessService publicAccessService,
             ILocalizationService localizationService,
+            IEventAggregator eventAggregator,
             IEmailSender emailSender)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService, eventAggregator)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
