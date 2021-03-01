@@ -3,9 +3,9 @@
 * @name umbraco.services.iconHelper
 * @description A helper service for dealing with icons, mostly dealing with legacy tree icons
 **/
-function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
+function iconHelper($http, $q, $sce, $timeout) {
 
-    var converter = [
+    const converter = [
         { oldIcon: ".sprNew", newIcon: "add" },
         { oldIcon: ".sprDelete", newIcon: "remove" },
         { oldIcon: ".sprMove", newIcon: "enter" },
@@ -85,15 +85,15 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
         { oldIcon: ".sprTreeDeveloperPython", newIcon: "icon-linux" }
     ];
 
-    var collectedIcons;
+    let collectedIcons;
 
-    var imageConverter = [
+    let imageConverter = [
         {oldImage: "contour.png", newIcon: "icon-umb-contour"}
     ];
 
-    var iconCache = [];
-    var resourceLoadStatus = "none";
-    var promiseQueue = [];
+    const iconCache = [];
+    const promiseQueue = [];
+    let resourceLoadStatus = "none";
 
     /**
      * This is the same approach as use for loading the localized text json 
@@ -102,7 +102,7 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
      * Subsequent requests are returned immediately as the icons are cached into 
      */
     function init() {       
-        var deferred = $q.defer();
+        const deferred = $q.defer();
 
         if (resourceLoadStatus === "loaded") {
             deferred.resolve(iconCache);
@@ -119,7 +119,6 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
         $http({ method: "GET", url: Umbraco.Sys.ServerVariables.umbracoUrls.iconApiBaseUrl + 'GetIcons' })
             .then(function (response) {
                 resourceLoadStatus = "loaded";
-                var resourceLoadingPromise = [];
 
                 for (const [key, value] of Object.entries(response.data.Data)) {
                     iconCache.push({name: key, svgString: $sce.trustAsHtml(value)})
@@ -128,13 +127,13 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
                 deferred.resolve(iconCache);
 
                 //ensure all other queued promises are resolved
-                for (var p in resourceLoadingPromise) {
+                for (let p in promiseQueue) {
                     promiseQueue[p].resolve(iconCache);
                 }
             }, function (err) {
                 deferred.reject("Something broke");
                 //ensure all other queued promises are resolved
-                for (var p in resourceLoadingPromise) {
+                for (let p in promiseQueue) {
                     promiseQueue[p].reject("Something broke");
                 }
             });
@@ -304,9 +303,8 @@ function iconHelper($http, $q, $sce, $timeout, umbRequestHelper) {
         },
 
          /** Returns the cached icon or undefined */
-        _getIconFromCache: function(iconName) {
-            return _.find(iconCache, {name: iconName});
-        }
+        _getIconFromCache: iconName => iconCache.find(icon => icon.name === iconName)
+        
     };
 }
 angular.module('umbraco.services').factory('iconHelper', iconHelper);

@@ -103,7 +103,8 @@ namespace Umbraco.Web.Services
                 if (Directory.Exists(iconPath))
                 {
                     var dirIcons = new DirectoryInfo(iconPath).EnumerateFiles("*.svg", SearchOption.TopDirectoryOnly)
-                        .Where(x => !pluginIcons.Any(i => i.Name == x.Name));
+                        .Where(x => !pluginIcons.Any(i => string.Equals(i.Name, x.Name, StringComparison.InvariantCultureIgnoreCase)));
+
                     pluginIcons.AddRange(dirIcons);
                 }
             }
@@ -111,7 +112,7 @@ namespace Umbraco.Web.Services
             // add icons from IconsPath if not already added from plugins
             var directory = new DirectoryInfo(IOHelper.MapPath($"{_globalSettings.IconsPath}/"));
             var iconNames = directory.GetFiles("*.svg")
-                .Where(x => pluginIcons.Any(i => i.Name == x.Name) == false)
+                .Where(x => !pluginIcons.Any(i => string.Equals(i.Name, x.Name, StringComparison.InvariantCultureIgnoreCase)))
                 .ToList();
 
             iconNames.AddRange(pluginIcons);
@@ -120,7 +121,7 @@ namespace Umbraco.Web.Services
         }
 
         private IReadOnlyDictionary<string, string> GetIconDictionary() => _cache.GetCacheItem(
-            "Umbraco.Web.Services.IconService::IconDictionary",
+            $"{typeof(IconService).FullName}.{nameof(GetIconDictionary)}",
             () => GetAllIconNames()
                     .Select(GetIcon)
                     .Where(i => i != null)
