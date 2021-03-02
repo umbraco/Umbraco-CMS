@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Trees;
@@ -31,7 +32,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private readonly IDataTypeService _dataTypeService;
 
 
-        public DataTypeTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, UmbracoTreeSearcher treeSearcher, IMenuItemCollectionFactory menuItemCollectionFactory, IEntityService entityService, IDataTypeService dataTypeService) : base(localizedTextService, umbracoApiControllerTypeCollection)
+        public DataTypeTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, UmbracoTreeSearcher treeSearcher, IMenuItemCollectionFactory menuItemCollectionFactory, IEntityService entityService, IDataTypeService dataTypeService, IEventAggregator eventAggregator) : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _treeSearcher = treeSearcher;
             _menuItemCollectionFactory = menuItemCollectionFactory;

@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
@@ -30,8 +31,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
-            IFileSystems fileSystems)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory)
+            IFileSystems fileSystems,
+            IEventAggregator eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator)
         {
             FileSystem = fileSystems.PartialViewsFileSystem;
         }
