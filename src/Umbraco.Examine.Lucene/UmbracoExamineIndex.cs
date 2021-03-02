@@ -1,9 +1,10 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Examine;
 using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
@@ -35,7 +36,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         // context because they will fork a thread/task/whatever which should *not* capture our
         // call context (and the database it can contain)! ideally we should be able to override
         // SafelyProcessQueueItems but that's not possible in the current version of Examine.
-
+        // TODO: Make SafelyProcessQueueItems  overrideable or make this easier
 
         /// <summary>
         /// Create a new <see cref="UmbracoExamineIndex"/>
@@ -92,7 +93,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public IEnumerable<string> GetFields()
         {
             //we know this is a LuceneSearcher
-            var searcher = (LuceneSearcher) GetSearcher();
+            var searcher = (LuceneSearcher)GetSearcher();
             return searcher.GetAllIndexedFields();
         }
 
@@ -106,9 +107,26 @@ namespace Umbraco.Cms.Infrastructure.Examine
         {
             if (CanInitialize())
             {
-                using (new SafeCallContext())
+                // Use SafeCallContext to prevent the current Execution Context (AsyncLocal) flow to child
+                // tasks executed in the base class so we don't leak Scopes.
+                // TODO: See notes at the top of this class
+                using (ExecutionContext.SuppressFlow())
                 {
                     base.PerformDeleteFromIndex(itemIds, onComplete);
+                }                
+            }
+        }
+
+        protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs> onComplete)
+        {
+            if (CanInitialize())
+            {
+                // Use SafeCallContext to prevent the current Execution Context (AsyncLocal) flow to child
+                // tasks executed in the base class so we don't leak Scopes.
+                // TODO: See notes at the top of this class
+                using (ExecutionContext.SuppressFlow())
+                {
+                    base.PerformIndexItems(values, onComplete);
                 }
             }
         }
@@ -167,9 +185,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
         protected override void AddDocument(Document doc, ValueSet valueSet, IndexWriter writer)
         {
             _logger.LogDebug("Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
-                valueSet.Id,
-                valueSet.Category,
-                valueSet.ItemType);
+            valueSet.Id,
+            valueSet.Category,
+            valueSet.ItemType);
 
             base.AddDocument(doc, valueSet, writer);
         }

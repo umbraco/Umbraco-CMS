@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Core.Scoping
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
-            Console.WriteLine("create " + InstanceId.ToString("N").Substring(0, 8));
+            logger.LogDebug("create " + InstanceId.ToString("N").Substring(0, 8));
 #endif
 
             if (detachable)
@@ -333,7 +333,9 @@ namespace Umbraco.Cms.Core.Scoping
             if (completed.HasValue == false || completed.Value == false)
             {
                 if (LogUncompletedScopes)
-                    _logger.LogDebug("Uncompleted Child Scope at\r\n {StackTrace}", Environment.StackTrace);
+                {
+                    _logger.LogWarning("Uncompleted Child Scope at\r\n {StackTrace}", Environment.StackTrace);
+                }
 
                 _completed = false;
             }
@@ -342,7 +344,9 @@ namespace Umbraco.Cms.Core.Scoping
         private void EnsureNotDisposed()
         {
             if (_disposed)
+            {
                 throw new ObjectDisposedException(GetType().FullName);
+            }
 
             // TODO: safer?
             //if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
@@ -356,15 +360,18 @@ namespace Umbraco.Cms.Core.Scoping
             if (this != _scopeProvider.AmbientScope)
             {
 #if DEBUG_SCOPES
-                var ambient = _scopeProvider.AmbientScope;
-                _logger.Debug<Scope>("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
+                Scope ambient = _scopeProvider.AmbientScope;
+                _logger.LogDebug("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
                 if (ambient == null)
+                {
                     throw new InvalidOperationException("Not the ambient scope (no ambient scope).");
-                var ambientInfos = _scopeProvider.GetScopeInfo(ambient);
-                var disposeInfos = _scopeProvider.GetScopeInfo(this);
+                }
+
+                ScopeInfo ambientInfos = _scopeProvider.GetScopeInfo(ambient);
+                ScopeInfo disposeInfos = _scopeProvider.GetScopeInfo(this);
                 throw new InvalidOperationException("Not the ambient scope (see ctor stack traces).\r\n"
-                    + "- ambient ctor ->\r\n" + ambientInfos.CtorStack + "\r\n"
-                    + "- dispose ctor ->\r\n" + disposeInfos.CtorStack + "\r\n");
+                    + "- ambient ->\r\n" + ambientInfos.ToString() + "\r\n"
+                    + "- dispose ->\r\n" + disposeInfos.ToString() + "\r\n");
 #else
                 throw new InvalidOperationException("Not the ambient scope.");
 #endif
@@ -500,13 +507,8 @@ namespace Umbraco.Cms.Core.Scoping
             }
         }
 
-        // backing field for LogUncompletedScopes
-        private static bool? _logUncompletedScopes;
-
-        // caching config
         // true if Umbraco.CoreDebugSettings.LogUncompletedScope appSetting is set to "true"
-        private bool LogUncompletedScopes => (_logUncompletedScopes
-            ?? (_logUncompletedScopes = _coreDebugSettings.LogIncompletedScopes)).Value;
+        private bool LogUncompletedScopes => _coreDebugSettings.LogIncompletedScopes;
 
         /// <inheritdoc />
         public void ReadLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.ReadLock(Database, lockIds);

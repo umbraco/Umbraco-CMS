@@ -18,11 +18,8 @@ namespace Umbraco.Cms.Core
     {
         private readonly IRequestCache _requestCache;
 
-        // TODO: Do they need to be static?? These are singleton instances IMO they shouldn't be static
-        // ReSharper disable StaticMemberInGenericType
-        private static readonly object s_locker = new object();
-        private static bool s_registered;
-        // ReSharper restore StaticMemberInGenericType
+        private readonly object _locker = new object();
+        private bool _registered;
 
         private string _itemKey;
 
@@ -53,37 +50,15 @@ namespace Umbraco.Cms.Core
         {
             _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
 
-            lock (s_locker)
+            lock (_locker)
             {
-                // register the itemKey once with SafeCallContext
-                if (s_registered)
+                if (_registered)
                 {
                     return;
                 }
 
-                s_registered = true;
+                _registered = true;
             }
-
-            // ReSharper disable once VirtualMemberCallInConstructor
-            var itemKey = ItemKey; // virtual
-            SafeCallContext.Register(() =>
-            {
-                T value = CallContext<T>.GetData(itemKey);
-                return value;
-            }, o =>
-            {
-                if (o == null)
-                {
-                    return;
-                }
-
-                if (!(o is T value))
-                {
-                    throw new ArgumentException($"Expected type {typeof(T).FullName}, got {o.GetType().FullName}", nameof(o));
-                }
-
-                CallContext<T>.SetData(itemKey, value);
-            });
         }
 
         protected T Value

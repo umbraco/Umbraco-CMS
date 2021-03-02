@@ -1,36 +1,41 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
-    /// Implements a fast <see cref="IAppCache"/> on top of HttpContext.Items.
+    /// Implements a <see cref="IAppCache"/> on top of <see cref="IHttpContextAccessor"/>
     /// </summary>
     /// <remarks>
-    /// <para>If no current HttpContext items can be found (no current HttpContext,
-    /// or no Items...) then this cache acts as a pass-through and does not cache
-    /// anything.</para>
+    /// <para>The HttpContext is not thread safe and no part of it is which means we need to include our own thread
+    /// safety mechanisms. This relies on notifications: <see cref="UmbracoRequestBegin"/> and <see cref="UmbracoRequestEnd"/>
+    /// in order to facilitate the correct locking and releasing allocations.
+    /// </para>
     /// </remarks>
-    public class GenericDictionaryRequestAppCache : FastDictionaryAppCacheBase, IRequestCache
+    public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCache
     {
+        //private static readonly string s_contextItemsLockKey = $"{typeof(HttpContextRequestAppCache).FullName}::LockEntered";
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestAppCache"/> class with a context, for unit tests!
         /// </summary>
-        public GenericDictionaryRequestAppCache(Func<IDictionary<object, object>> requestItems) : base()
-        {
-            ContextItems = requestItems;
-        }
-
-        private Func<IDictionary<object, object>> ContextItems { get; }
+        public HttpContextRequestAppCache(IHttpContextAccessor httpContextAccessor)
+            => _httpContextAccessor = httpContextAccessor;
 
         public bool IsAvailable => TryGetContextItems(out _);
 
         private bool TryGetContextItems(out IDictionary<object, object> items)
         {
-            items = ContextItems?.Invoke();
+            items = _httpContextAccessor.HttpContext?.Items;
             return items != null;
         }
 
@@ -38,7 +43,10 @@ namespace Umbraco.Cms.Core.Cache
         public override object Get(string key, Func<object> factory)
         {
             //no place to cache so just return the callback result
-            if (!TryGetContextItems(out var items)) return factory();
+            if (!TryGetContextItems(out var items))
+            {
+                return factory();
+            }
 
             key = GetCacheKey(key);
 
@@ -140,33 +148,67 @@ namespace Umbraco.Cms.Core.Cache
 
         #region Lock
 
-        private const string ContextItemsLockKey = "Umbraco.Core.Cache.HttpRequestCache::LockEntered";
+        protected override void EnterReadLock()
+        {
+            if (!TryGetContextItems(out _))
+            {
+                return;
+            }
 
-        protected override void EnterReadLock() => EnterWriteLock();
+            ReaderWriterLockSlim locker = GetLock();
+            locker.EnterReadLock();
+        }
 
         protected override void EnterWriteLock()
         {
-            if (!TryGetContextItems(out var items)) return;
+            if (!TryGetContextItems(out _))
+            {
+                return;
+            }
 
-            // note: cannot keep 'entered' as a class variable here,
-            // since there is one per request - so storing it within
-            // ContextItems - which is locked, so this should be safe
+            ReaderWriterLockSlim locker = GetLock();
+            locker.EnterWriteLock();
 
-            var entered = false;
-            Monitor.Enter(items, ref entered);
-            items[ContextItemsLockKey] = entered;
+            //// note: cannot keep 'entered' as a class variable here,
+            //// since there is one per request - so storing it within
+            //// ContextItems - which is locked, so this should be safe
+
+            //var entered = false;
+            //Monitor.Enter(items, ref entered);
+            //items[s_contextItemsLockKey] = entered;
         }
 
-        protected override void ExitReadLock() => ExitWriteLock();
+        protected override void ExitReadLock()
+        {
+            if (!TryGetContextItems(out _))
+            {
+                return;
+            }
+
+            ReaderWriterLockSlim locker = GetLock();
+            if (locker.IsReadLockHeld)
+            {
+                locker.ExitReadLock();
+            }
+        }
 
         protected override void ExitWriteLock()
         {
-            if (!TryGetContextItems(out var items)) return;
+            if (!TryGetContextItems(out _))
+            {
+                return;
+            }
 
-            var entered = (bool?)items[ContextItemsLockKey] ?? false;
-            if (entered)
-                Monitor.Exit(items);
-            items.Remove(ContextItemsLockKey);
+            ReaderWriterLockSlim locker = GetLock();
+            if (locker.IsWriteLockHeld)
+            {
+                locker.ExitWriteLock();
+            }
+
+            //var entered = (bool?)items[s_contextItemsLockKey] ?? false;
+            //if (entered)
+            //    Monitor.Exit(items);
+            //items.Remove(s_contextItemsLockKey);
         }
 
         #endregion
@@ -185,5 +227,40 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <summary>
+        /// Ensures and returns the current lock
+        /// </summary>
+        /// <returns></returns>
+        private ReaderWriterLockSlim GetLock() => _httpContextAccessor.GetRequiredHttpContext().RequestServices.GetRequiredService<RequestLock>().Locker;
+
+        /// <summary>
+        /// Used as Scoped instance to allow locking within a request
+        /// </summary>
+        internal class RequestLock : IDisposable
+        {
+            private bool _disposedValue;
+
+            public ReaderWriterLockSlim Locker { get; } = new ReaderWriterLockSlim();
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (!_disposedValue)
+                {
+                    if (disposing)
+                    {
+                        Locker.Dispose();
+                    }
+
+                    _disposedValue = true;
+                }
+            }
+
+            public void Dispose()
+            {
+                // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+                Dispose(disposing: true);
+            }
+        }
     }
 }

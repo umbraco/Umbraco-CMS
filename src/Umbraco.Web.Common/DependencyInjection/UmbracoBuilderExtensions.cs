@@ -54,6 +54,7 @@ using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
 using Umbraco.Core.Security;
+using static Umbraco.Cms.Core.Cache.HttpContextRequestAppCache;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
@@ -86,15 +87,18 @@ namespace Umbraco.Extensions
 
             IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 
-            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles);
+            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
             var loggingConfig = new LoggingConfiguration(loggingDir);
 
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
 
+            // TODO: This doesn't seem right? The HttpContextAccessor is normally added to the container
+            // with ASP.NET Core's own ext methods. Is there a chance we can end up with a different
+            // accessor registered and resolved?
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             services.AddSingleton(httpContextAccessor);
 
-            var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext?.Items);
+            var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
             var appCaches = AppCaches.Create(requestCache);
             services.AddUnique(appCaches);
 
@@ -263,9 +267,9 @@ namespace Umbraco.Extensions
 
             builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             builder.Services.AddUnique<IBackOfficeSecurityFactory, BackOfficeSecurityFactory>();
-            builder.Services.AddUnique<IBackOfficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
+            builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
             builder.AddNotificationHandler<UmbracoRoutedRequest, UmbracoWebsiteSecurityFactory>();
-            builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, HybridUmbracoWebsiteSecurityAccessor>();
+            builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, UmbracoWebsiteSecurityAccessor>();
 
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
             builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
@@ -285,6 +289,7 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<ContentModelBinder>();
 
             builder.Services.AddScoped<UmbracoHelper>();
+            builder.Services.AddScoped<RequestLock>();
 
             builder.AddHttpClients();
 
