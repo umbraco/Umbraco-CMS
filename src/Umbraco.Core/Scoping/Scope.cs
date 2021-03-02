@@ -40,9 +40,9 @@ namespace Umbraco.Core.Scoping
         public Dictionary<int, int> WriteLocks;
 
         // ReadLocks and WriteLocks requested by this specific scope, required to be able to decrement
-        // Using HashSets works well assume that you're only gonna request a lock once pr. scope
-        private HashSet<int> _readLocks;
-        private HashSet<int> _writelocks;
+        // Using Lists just in case someone for some reason requests the same lock twice in the same scope.
+        private List<int> _readLocks;
+        private List<int> _writelocks;
 
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
@@ -70,8 +70,8 @@ namespace Umbraco.Core.Scoping
 
             ReadLocks = new Dictionary<int, int>();
             WriteLocks = new Dictionary<int, int>();
-            _readLocks = new HashSet<int>();
-            _writelocks = new HashSet<int>();
+            _readLocks = new List<int>();
+            _writelocks = new List<int>();
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
@@ -518,14 +518,14 @@ namespace Umbraco.Core.Scoping
         /// <param name="lockId">Lock ID to decrement</param>
         public void DecrementReadLock(int lockId)
         {
+            // If we aren't the outermost scope, pass it on to the parent.
             if (ParentScope != null)
             {
                 ParentScope.DecrementReadLock(lockId);
+                return;
             }
-            else
-            {
-                ReadLocks[lockId] -= 1;
-            }
+
+            ReadLocks[lockId] -= 1;
         }
 
         /// <summary>
@@ -534,14 +534,14 @@ namespace Umbraco.Core.Scoping
         /// <param name="lockId">Lock ID to decrement</param>
         public void DecrementWriteLock(int lockId)
         {
+            // If we aren't the outermost scope, pass it on to the parent.
             if (ParentScope != null)
             {
                 ParentScope.DecrementWriteLock(lockId);
+                return;
             }
-            else
-            {
-                WriteLocks[lockId] -= 1;
-            }
+
+            WriteLocks[lockId] -= 1;
         }
 
         /// <inheritdoc />
@@ -551,15 +551,18 @@ namespace Umbraco.Core.Scoping
             {
                 foreach (var id in lockIds)
                 {
-                    // We need to keep track of what lockIds we have requests to be able to decrement them.
+                    // We need to keep track of what lockIds we have requested locks for to be able to decrement them.
                     // We have to do this out of the recursion to not add the ids to all scopes.
                     _readLocks.Add(id);
                 }
             }
-            // Delegate acquiring the lock to the parent.
             ReadLockInner(lockIds);
         }
 
+        /// <summary>
+        /// Handles acquiring read locks, will delegate it to the parent if there are any.
+        /// </summary>
+        /// <param name="lockIds">Array of lock object identifiers.</param>
         internal void ReadLockInner(params int[] lockIds)
         {
             if (ParentScope != null)
@@ -569,6 +572,7 @@ namespace Umbraco.Core.Scoping
                 return;
             }
 
+            // If we are the parent, then handle the lock request.
             foreach (var lockId in lockIds)
             {
                 // Only acquire the lock if we haven't done so yet.
@@ -594,6 +598,11 @@ namespace Umbraco.Core.Scoping
             ReadLockInner(timeout, lockId);
         }
 
+        /// <summary>
+        /// Handles acquiring a read lock with a specified timeout, will delegate it to the parent if there are any.
+        /// </summary>
+        /// <param name="timeout">The database timeout in milliseconds.</param>
+        /// <param name="lockId">The lock object identifier.</param>
         internal void ReadLockInner(TimeSpan timeout, int lockId)
         {
             if (ParentScope != null)
@@ -631,6 +640,10 @@ namespace Umbraco.Core.Scoping
             WriteLockInner(lockIds);
         }
 
+        /// <summary>
+        /// Handles acquiring write locks, will delegate it to the parent if there are any.
+        /// </summary>
+        /// <param name="lockIds">Array of lock object identifiers.</param>
         internal void WriteLockInner(int[] lockIds)
         {
             // If we have a parent we just delegate lock creation to parent.
@@ -664,6 +677,11 @@ namespace Umbraco.Core.Scoping
             WriteLockInner(timeout, lockId);
         }
 
+        /// <summary>
+        /// Handles acquiring a write lock with a specified timeout, will delegate it to the parent if there are any.
+        /// </summary>
+        /// <param name="timeout">The database timeout in milliseconds.</param>
+        /// <param name="lockId">The lock object identifier.</param>
         internal void WriteLockInner(TimeSpan timeout, int lockId)
         {
             if (ParentScope != null)
