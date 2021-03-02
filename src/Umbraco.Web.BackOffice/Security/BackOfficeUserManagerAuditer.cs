@@ -1,6 +1,4 @@
 using System;
-using Umbraco.Cms.Core.Compose;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
@@ -23,26 +21,18 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     {
         private readonly IAuditService _auditService;
         private readonly IUserService _userService;
-        private readonly GlobalSettings _globalSettings;
 
-        public BackOfficeUserManagerAuditer(IAuditService auditService, IUserService userService, GlobalSettings globalSettings)
+        public BackOfficeUserManagerAuditer(IAuditService auditService, IUserService userService/*, GlobalSettings globalSettings*/)
         {
             _auditService = auditService;
             _userService = userService;
-            _globalSettings = globalSettings;
         }
 
         public void Handle(UserLoginSuccessNotification notification)
-        {
-            var performingUser = GetPerformingUser(notification.PerformingUserId);
-            WriteAudit(performingUser, notification.AffectedUserId, notification.IpAddress, "umbraco/user/sign-in/login", "login success");
-        }
+            => WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/sign-in/login", "login success");
 
         public void Handle(UserLogoutSuccessNotification notification)
-        {
-            var performingUser = GetPerformingUser(notification.PerformingUserId);
-            WriteAudit(performingUser, notification.AffectedUserId, notification.IpAddress, "umbraco/user/sign-in/logout", "logout success");
-        }
+            => WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/sign-in/logout", "logout success");
 
         public void Handle(UserLoginFailedNotification notification) =>
             WriteAudit(notification.PerformingUserId, "0", notification.IpAddress, "umbraco/user/sign-in/failed", "login failed", "");
@@ -58,17 +48,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
 
         public void Handle(UserPasswordResetNotification notification) =>
             WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/password/reset", "password reset");
-
-        private IUser GetPerformingUser(string userId)
-        {
-            if (!int.TryParse(userId, out int asInt))
-            {
-                return AuditEventsComponent.UnknownUser(_globalSettings);
-            }
-
-            IUser found = asInt >= 0 ? _userService.GetUserById(asInt) : null;
-            return found ?? AuditEventsComponent.UnknownUser(_globalSettings);
-        }
 
         private static string FormatEmail(IMembershipUser user) => user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? "" : $"<{user.Email}>";
 
@@ -95,20 +74,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             }
 
             WriteAudit(performingIdAsInt, performingDetails, affectedIdAsInt, ipAddress, eventType, eventDetails, affectedDetails);
-        }
-
-        private void WriteAudit(IUser performingUser, string affectedId, string ipAddress, string eventType, string eventDetails)
-        {
-            var performingDetails = performingUser == null
-                ? $"User UNKNOWN"
-                : $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}";
-
-            if (!int.TryParse(affectedId, out int affectedIdInt))
-            {
-                affectedIdInt = 0;
-            }
-
-            WriteAudit(performingUser?.Id ?? 0, performingDetails, affectedIdInt, ipAddress, eventType, eventDetails);
         }
 
         private void WriteAudit(int performingId, string performingDetails, int affectedId, string ipAddress, string eventType, string eventDetails, string affectedDetails = null)
