@@ -8,6 +8,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
@@ -22,6 +23,7 @@ using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
@@ -49,6 +51,14 @@ namespace Umbraco.Tests.Scoping
             Builder.Services.AddUnique(f => Mock.Of<IServerRoleAccessor>());
             Builder.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Builder.TypeLoader.GetCacheRefreshers());
+            Builder.AddNotificationHandler<PublishedNotification<IContent>, NotificationHandler>();
+        }
+
+        public class NotificationHandler : INotificationHandler<PublishedNotification<IContent>>
+        {
+            public void Handle(PublishedNotification<IContent> notification) => PublishedContent?.Invoke(notification);
+
+            public static Action<PublishedNotification<IContent>> PublishedContent { get; set; }
         }
 
         public override void TearDown()
@@ -58,16 +68,8 @@ namespace Umbraco.Tests.Scoping
             _distributedCacheBinder?.UnbindEvents();
             _distributedCacheBinder = null;
 
-            _onPublishedAssertAction = null;
-            ContentService.Published -= OnPublishedAssert;
+            NotificationHandler.PublishedContent = null;
         }
-
-        private void OnPublishedAssert(IContentService sender, PublishEventArgs<IContent> args)
-        {
-            _onPublishedAssertAction?.Invoke();
-        }
-
-        private Action _onPublishedAssertAction;
 
         protected override IPublishedSnapshotService CreatePublishedSnapshotService(GlobalSettings globalSettings = null)
         {
@@ -149,7 +151,7 @@ namespace Umbraco.Tests.Scoping
 
             // event handler
             var evented = 0;
-            _onPublishedAssertAction = () =>
+            NotificationHandler.PublishedContent = notification =>
             {
                 evented++;
 
@@ -170,8 +172,6 @@ namespace Umbraco.Tests.Scoping
             var x = umbracoContext.Content.GetById(item.Id);
             Assert.IsNotNull(x);
             Assert.AreEqual("name", x.Name(VariationContextAccessor));
-
-            ContentService.Published += OnPublishedAssert;
 
             using (var scope = ScopeProvider.CreateScope())
             {

@@ -160,6 +160,7 @@ namespace Umbraco.Tests.Testing
 
         protected UmbracoMapper Mapper => Factory.GetRequiredService<UmbracoMapper>();
         protected IHttpContextAccessor HttpContextAccessor => Factory.GetRequiredService<IHttpContextAccessor>();
+        protected IContentService ContentService => Factory.GetRequiredService<IContentService>();
         protected IRuntimeState RuntimeState => MockRuntimeState(RuntimeLevel.Run);
         private ILoggerFactory _loggerFactory;
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -9,6 +9,7 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -20,6 +21,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Extensions;
@@ -72,6 +74,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         [SetUp]
         public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
+
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
+            .AddNotificationHandler<PublishingNotification<IContent>, ContentNotificationHandler>()
+            .AddNotificationHandler<CopyingNotification<IContent>, ContentNotificationHandler>()
+            .AddNotificationHandler<CopiedNotification<IContent>, ContentNotificationHandler>();
 
         [TearDown]
         public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;
@@ -1076,7 +1083,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Publish_Content_WithEvents()
         {
-            ContentService.Publishing += ContentServiceOnPublishing;
+            bool publishingWasCalled = false;
+
+            ContentNotificationHandler.PublishingContent = notification =>
+            {
+                Assert.AreEqual(1, notification.PublishedEntities.Count());
+                IContent entity = notification.PublishedEntities.First();
+                Assert.AreEqual("foo", entity.Name);
+
+                IContent e = ContentService.GetById(entity.Id);
+                Assert.AreEqual("Home", e.Name);
+
+                publishingWasCalled = true;
+            };
 
             // tests that during 'publishing' event, what we get from the repo is the 'old' content,
             // because 'publishing' fires before the 'saved' event ie before the content is actually
@@ -1094,21 +1113,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
                 IContent e = ContentService.GetById(content.Id);
                 Assert.AreEqual("foo", e.Name);
+
+                Assert.IsTrue(publishingWasCalled);
             }
             finally
             {
-                ContentService.Publishing -= ContentServiceOnPublishing;
+                ContentNotificationHandler.PublishingContent = null;
             }
-        }
-
-        private void ContentServiceOnPublishing(IContentService sender, PublishEventArgs<IContent> args)
-        {
-            Assert.AreEqual(1, args.PublishedEntities.Count());
-            IContent entity = args.PublishedEntities.First();
-            Assert.AreEqual("foo", entity.Name);
-
-            IContent e = ContentService.GetById(entity.Id);
-            Assert.AreEqual("Home", e.Name);
         }
 
         [Test]
@@ -1899,26 +1910,31 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void Can_Copy_And_Modify_Content_With_Events()
         {
             // see https://github.com/umbraco/Umbraco-CMS/issues/5513
-            static void Copying(IContentService sender, CopyEventArgs<IContent> args)
-            {
-                args.Copy.SetValue("title", "1");
-                args.Original.SetValue("title", "2");
-            }
 
-            static void Copied(IContentService sender, CopyEventArgs<IContent> args)
+            bool copyingWasCalled = false;
+            bool copiedWasCalled = false;
+
+            ContentNotificationHandler.CopyingContent = notification =>
             {
-                string copyVal = args.Copy.GetValue<string>("title");
-                string origVal = args.Original.GetValue<string>("title");
+                notification.Copy.SetValue("title", "1");
+                notification.Original.SetValue("title", "2");
+
+                copyingWasCalled = true;
+            };
+
+            ContentNotificationHandler.CopiedContent = notification =>
+            {
+                string copyVal = notification.Copy.GetValue<string>("title");
+                string origVal = notification.Original.GetValue<string>("title");
 
                 Assert.AreEqual("1", copyVal);
                 Assert.AreEqual("2", origVal);
-            }
+
+                copiedWasCalled = true;
+            };
 
             try
             {
-                ContentService.Copying += Copying;
-                ContentService.Copied += Copied;
-
                 Template template = TemplateBuilder.CreateTextPageTemplate();
                 FileService.SaveTemplate(template);
 
@@ -1930,11 +1946,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
                 IContent copy = ContentService.Copy(content, content.ParentId, false, Constants.Security.SuperUserId);
                 Assert.AreEqual("1", copy.GetValue("title"));
+
+                Assert.IsTrue(copyingWasCalled);
+                Assert.IsTrue(copiedWasCalled);
             }
             finally
             {
-                ContentService.Copying -= Copying;
-                ContentService.Copied -= Copied;
+                ContentNotificationHandler.CopyingContent = null;
+                ContentNotificationHandler.CopiedContent = null;
             }
         }
 
@@ -3274,6 +3293,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             content.SetCultureName("content-en", langUk.IsoCode);
 
             return content;
+        }
+
+        public class ContentNotificationHandler :
+            INotificationHandler<CopyingNotification<IContent>>,
+            INotificationHandler<CopiedNotification<IContent>>,
+            INotificationHandler<PublishingNotification<IContent>>
+        {
+            public void Handle(PublishingNotification<IContent> notification) => PublishingContent?.Invoke(notification);
+
+            public void Handle(CopyingNotification<IContent> notification) => CopyingContent?.Invoke(notification);
+
+            public void Handle(CopiedNotification<IContent> notification) => CopiedContent?.Invoke(notification);
+
+            public static Action<PublishingNotification<IContent>> PublishingContent { get; set; }
+
+            public static Action<CopyingNotification<IContent>> CopyingContent { get; set; }
+
+            public static Action<CopiedNotification<IContent>> CopiedContent { get; set; }
         }
     }
 }

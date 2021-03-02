@@ -1,14 +1,17 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Infrastructure.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -22,7 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         PublishedRepositoryEvents = true,
         WithApplication = true,
         Logger = UmbracoTestOptions.Logger.Console)]
-    public class ContentServiceEventTests : UmbracoIntegrationTest
+    public class ContentServiceNotificationTests : UmbracoIntegrationTest
     {
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 
@@ -45,6 +48,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             global::Umbraco.Cms.Core.Services.Implement.ContentTypeService.ClearScopeEvents();
             CreateTestData();
         }
+
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
+            .AddNotificationHandler<SavingNotification<IContent>, ContentNotificationHandler>()
+            .AddNotificationHandler<SavedNotification<IContent>, ContentNotificationHandler>()
+            .AddNotificationHandler<PublishingNotification<IContent>, ContentNotificationHandler>()
+            .AddNotificationHandler<PublishedNotification<IContent>, ContentNotificationHandler>()
+            .AddNotificationHandler<UnpublishingNotification<IContent>, ContentNotificationHandler>()
+            .AddNotificationHandler<UnpublishedNotification<IContent>, ContentNotificationHandler>();
 
         private void CreateTestData()
         {
@@ -82,36 +93,43 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // properties: title, bodyText, keywords, description
             document.SetValue("title", "title-en", "en-US");
 
-            void OnSaving(IContentService sender, ContentSavingEventArgs e)
+            var savingWasCalled = false;
+            var savedWasCalled = false;
+
+            ContentNotificationHandler.SavingContent = notification =>
             {
-                IContent saved = e.SavedEntities.First();
+                IContent saved = notification.SavedEntities.First();
 
                 Assert.AreSame(document, saved);
 
-                Assert.IsTrue(e.IsSavingCulture(saved, "en-US"));
-                Assert.IsFalse(e.IsSavingCulture(saved, "fr-FR"));
-            }
+                Assert.IsTrue(notification.IsSavingCulture(saved, "en-US"));
+                Assert.IsFalse(notification.IsSavingCulture(saved, "fr-FR"));
 
-            void OnSaved(IContentService sender, ContentSavedEventArgs e)
+                savingWasCalled = true;
+            };
+
+            ContentNotificationHandler.SavedContent = notification =>
             {
-                IContent saved = e.SavedEntities.First();
+                IContent saved = notification.SavedEntities.First();
 
                 Assert.AreSame(document, saved);
 
-                Assert.IsTrue(e.HasSavedCulture(saved, "en-US"));
-                Assert.IsFalse(e.HasSavedCulture(saved, "fr-FR"));
-            }
+                Assert.IsTrue(notification.HasSavedCulture(saved, "en-US"));
+                Assert.IsFalse(notification.HasSavedCulture(saved, "fr-FR"));
 
-            ContentService.Saving += OnSaving;
-            ContentService.Saved += OnSaved;
+                savedWasCalled = true;
+            };
+
             try
             {
                 ContentService.Save(document);
+                Assert.IsTrue(savingWasCalled);
+                Assert.IsTrue(savedWasCalled);
             }
             finally
             {
-                ContentService.Saving -= OnSaving;
-                ContentService.Saved -= OnSaved;
+                ContentNotificationHandler.SavingContent = null;
+                ContentNotificationHandler.SavedContent = null;
             }
         }
 
@@ -120,18 +138,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent document = new Content("content", -1, _contentType);
 
-            void OnSaving(IContentService sender, ContentSavingEventArgs e)
+            var savingWasCalled = false;
+            var savedWasCalled = false;
+
+            ContentNotificationHandler.SavingContent = notification =>
             {
-                IContent saved = e.SavedEntities.First();
+                IContent saved = notification.SavedEntities.First();
 
                 Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
 
                 saved.SetValue("title", "title");
-            }
 
-            void OnSaved(IContentService sender, ContentSavedEventArgs e)
+                savingWasCalled = true;
+            };
+
+            ContentNotificationHandler.SavedContent = notification =>
             {
-                IContent saved = e.SavedEntities.First();
+                IContent saved = notification.SavedEntities.First();
 
                 Assert.AreSame("title", document.GetValue<string>("title"));
 
@@ -140,18 +163,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
                 Assert.AreEqual("title", propValue.EditedValue);
                 Assert.IsNull(propValue.PublishedValue);
-            }
 
-            ContentService.Saving += OnSaving;
-            ContentService.Saved += OnSaved;
+                savedWasCalled = true;
+            };
+
             try
             {
                 ContentService.Save(document);
+                Assert.IsTrue(savingWasCalled);
+                Assert.IsTrue(savedWasCalled);
             }
             finally
             {
-                ContentService.Saving -= OnSaving;
-                ContentService.Saved -= OnSaved;
+                ContentNotificationHandler.SavingContent = null;
+                ContentNotificationHandler.SavedContent = null;
             }
         }
 
@@ -179,36 +204,43 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // re-get - dirty properties need resetting
             document = ContentService.GetById(document.Id);
 
-            void OnPublishing(IContentService sender, ContentPublishingEventArgs e)
+            var publishingWasCalled = false;
+            var publishedWasCalled = false;
+
+            ContentNotificationHandler.PublishingContent += notification =>
             {
-                IContent publishing = e.PublishedEntities.First();
+                IContent publishing = notification.PublishedEntities.First();
 
                 Assert.AreSame(document, publishing);
 
-                Assert.IsFalse(e.IsPublishingCulture(publishing, "en-US"));
-                Assert.IsTrue(e.IsPublishingCulture(publishing, "fr-FR"));
-            }
+                Assert.IsFalse(notification.IsPublishingCulture(publishing, "en-US"));
+                Assert.IsTrue(notification.IsPublishingCulture(publishing, "fr-FR"));
 
-            void OnPublished(IContentService sender, ContentPublishedEventArgs e)
+                publishingWasCalled = true;
+            };
+
+            ContentNotificationHandler.PublishedContent += notification =>
             {
-                IContent published = e.PublishedEntities.First();
+                IContent published = notification.PublishedEntities.First();
 
                 Assert.AreSame(document, published);
 
-                Assert.IsFalse(e.HasPublishedCulture(published, "en-US"));
-                Assert.IsTrue(e.HasPublishedCulture(published, "fr-FR"));
-            }
+                Assert.IsFalse(notification.HasPublishedCulture(published, "en-US"));
+                Assert.IsTrue(notification.HasPublishedCulture(published, "fr-FR"));
 
-            ContentService.Publishing += OnPublishing;
-            ContentService.Published += OnPublished;
+                publishedWasCalled = true;
+            };
+
             try
             {
                 ContentService.SaveAndPublish(document, "fr-FR");
+                Assert.IsTrue(publishingWasCalled);
+                Assert.IsTrue(publishedWasCalled);
             }
             finally
             {
-                ContentService.Publishing -= OnPublishing;
-                ContentService.Published -= OnPublished;
+                ContentNotificationHandler.PublishingContent = null;
+                ContentNotificationHandler.PublishedContent = null;
             }
 
             document = ContentService.GetById(document.Id);
@@ -223,18 +255,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             IContent document = new Content("content", -1, _contentType);
 
-            void OnSaving(IContentService sender, ContentSavingEventArgs e)
+            var savingWasCalled = false;
+            var savedWasCalled = false;
+
+            ContentNotificationHandler.SavingContent = notification =>
             {
-                IContent saved = e.SavedEntities.First();
+                IContent saved = notification.SavedEntities.First();
 
                 Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
 
                 saved.SetValue("title", "title");
-            }
 
-            void OnSaved(IContentService sender, ContentSavedEventArgs e)
+                savingWasCalled = true;
+            };
+
+            ContentNotificationHandler.SavedContent = notification =>
             {
-                IContent saved = e.SavedEntities.First();
+                IContent saved = notification.SavedEntities.First();
 
                 Assert.AreSame("title", document.GetValue<string>("title"));
 
@@ -243,21 +280,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
                 Assert.AreEqual("title", propValue.EditedValue);
                 Assert.AreEqual("title", propValue.PublishedValue);
-            }
 
-            // We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be
-            // used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
-            // are published, but Saving is raised BEFORE.
-            ContentService.Saving += OnSaving;
-            ContentService.Saved += OnSaved;
+                savedWasCalled = true;
+            };
+
             try
             {
                 ContentService.SaveAndPublish(document);
+                Assert.IsTrue(savingWasCalled);
+                Assert.IsTrue(savedWasCalled);
             }
             finally
             {
-                ContentService.Saving -= OnSaving;
-                ContentService.Saved -= OnSaved;
+                ContentNotificationHandler.SavingContent = null;
+                ContentNotificationHandler.SavedContent = null;
             }
         }
 
@@ -278,27 +314,28 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // re-create it
             document = new Content("content", -1, _contentType);
 
-            void OnSaving(IContentService sender, ContentSavingEventArgs e)
+            var savingWasCalled = false;
+
+            ContentNotificationHandler.SavingContent = notification =>
             {
-                IContent saved = e.SavedEntities.First();
+                IContent saved = notification.SavedEntities.First();
 
                 Assert.IsTrue(document.GetValue<string>("title").IsNullOrWhiteSpace());
 
                 saved.SetValue("title", "title");
-            }
 
-            // We are binding to Saving (not Publishing), because the Publishing event is really just used for cancelling, it should not be
-            // used for setting values and it won't actually work! This is because the Publishing event is raised AFTER the values on the model
-            // are published, but Saving is raised BEFORE.
-            ContentService.Saving += OnSaving;
+                savingWasCalled = true;
+            };
+
             try
             {
                 result = ContentService.SaveAndPublish(document);
                 Assert.IsTrue(result.Success); // will succeed now because we were able to specify the required value in the Saving event
+                Assert.IsTrue(savingWasCalled);
             }
             finally
             {
-                ContentService.Saving -= OnSaving;
+                ContentNotificationHandler.SavingContent = null;
             }
         }
 
@@ -328,50 +365,84 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // re-get - dirty properties need resetting
             document = contentService.GetById(document.Id);
 
-            void OnPublishing(IContentService sender, ContentPublishingEventArgs e)
-            {
-                IContent publishing = e.PublishedEntities.First();
-
-                Assert.AreSame(document, publishing);
-
-                Assert.IsFalse(e.IsPublishingCulture(publishing, "en-US"));
-                Assert.IsFalse(e.IsPublishingCulture(publishing, "fr-FR"));
-
-                Assert.IsFalse(e.IsUnpublishingCulture(publishing, "en-US"));
-                Assert.IsTrue(e.IsUnpublishingCulture(publishing, "fr-FR"));
-            }
-
-            void OnPublished(IContentService sender, ContentPublishedEventArgs e)
-            {
-                IContent published = e.PublishedEntities.First();
-
-                Assert.AreSame(document, published);
-
-                Assert.IsFalse(e.HasPublishedCulture(published, "en-US"));
-                Assert.IsFalse(e.HasPublishedCulture(published, "fr-FR"));
-
-                Assert.IsFalse(e.HasUnpublishedCulture(published, "en-US"));
-                Assert.IsTrue(e.HasUnpublishedCulture(published, "fr-FR"));
-            }
-
             document.UnpublishCulture("fr-FR");
 
-            ContentService.Publishing += OnPublishing;
-            ContentService.Published += OnPublished;
+            var unpublishingWasCalled = false;
+            var unpublishedWasCalled = false;
+
+            ContentNotificationHandler.UnpublishingContent += notification =>
+            {
+                IContent unpublished = notification.UnpublishedEntities.First();
+
+                Assert.AreSame(document, unpublished);
+
+                Assert.IsFalse(notification.IsUnpublishingCulture(unpublished, "en-US"));
+                Assert.IsTrue(notification.IsUnpublishingCulture(unpublished, "fr-FR"));
+
+                unpublishingWasCalled = true;
+            };
+
+            ContentNotificationHandler.UnpublishedContent += notification =>
+            {
+                IContent unpublished = notification.UnpublishedEntities.First();
+
+                Assert.AreSame(document, unpublished);
+
+                Assert.IsFalse(notification.HasUnpublishedCulture(unpublished, "en-US"));
+                Assert.IsTrue(notification.HasUnpublishedCulture(unpublished, "fr-FR"));
+
+                unpublishedWasCalled = true;
+            };
+
             try
             {
                 contentService.CommitDocumentChanges(document);
+                Assert.IsTrue(unpublishingWasCalled);
+                Assert.IsTrue(unpublishedWasCalled);
             }
             finally
             {
-                ContentService.Publishing -= OnPublishing;
-                ContentService.Published -= OnPublished;
+                ContentNotificationHandler.UnpublishingContent = null;
+                ContentNotificationHandler.UnpublishedContent = null;
             }
 
             document = contentService.GetById(document.Id);
 
             Assert.IsFalse(document.IsCulturePublished("fr-FR"));
             Assert.IsTrue(document.IsCulturePublished("en-US"));
+        }
+
+        public class ContentNotificationHandler :
+            INotificationHandler<SavingNotification<IContent>>,
+            INotificationHandler<SavedNotification<IContent>>,
+            INotificationHandler<PublishingNotification<IContent>>,
+            INotificationHandler<PublishedNotification<IContent>>,
+            INotificationHandler<UnpublishingNotification<IContent>>,
+            INotificationHandler<UnpublishedNotification<IContent>>
+        {
+            public void Handle(SavingNotification<IContent> notification) => SavingContent?.Invoke(notification);
+
+            public void Handle(SavedNotification<IContent> notification) => SavedContent?.Invoke(notification);
+
+            public void Handle(PublishingNotification<IContent> notification) => PublishingContent?.Invoke(notification);
+
+            public void Handle(PublishedNotification<IContent> notification) => PublishedContent?.Invoke(notification);
+
+            public void Handle(UnpublishingNotification<IContent> notification) => UnpublishingContent?.Invoke(notification);
+
+            public void Handle(UnpublishedNotification<IContent> notification) => UnpublishedContent?.Invoke(notification);
+
+            public static Action<SavingNotification<IContent>> SavingContent { get; set; }
+
+            public static Action<SavedNotification<IContent>> SavedContent { get; set; }
+
+            public static Action<PublishingNotification<IContent>> PublishingContent { get; set; }
+
+            public static Action<PublishedNotification<IContent>> PublishedContent { get; set; }
+
+            public static Action<UnpublishingNotification<IContent>> UnpublishingContent { get; set; }
+
+            public static Action<UnpublishedNotification<IContent>> UnpublishedContent { get; set; }
         }
     }
 }
