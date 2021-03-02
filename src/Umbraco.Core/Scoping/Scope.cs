@@ -35,14 +35,10 @@ namespace Umbraco.Core.Scoping
         private ICompletable _fscope;
         private IEventDispatcher _eventDispatcher;
 
-        // ReadLocks and WriteLocks owned by the entire chain, managed by the outermost scope
+        // ReadLocks and WriteLocks if we're the outer most scope it's those owned by the entire chain
+        // If we're a child scope it's those that we have requested.
         public Dictionary<int, int> ReadLocks;
         public Dictionary<int, int> WriteLocks;
-
-        // ReadLocks and WriteLocks requested by this specific scope, required to be able to decrement
-        // Using Lists just in case someone for some reason requests the same lock twice in the same scope.
-        private List<int> _readLocks;
-        private List<int> _writelocks;
 
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
@@ -70,8 +66,6 @@ namespace Umbraco.Core.Scoping
 
             ReadLocks = new Dictionary<int, int>();
             WriteLocks = new Dictionary<int, int>();
-            _readLocks = new List<int>();
-            _writelocks = new List<int>();
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
@@ -363,15 +357,18 @@ namespace Umbraco.Core.Scoping
 #endif
             }
 
-            // Decrement the lock counters
-            foreach (var readLockId in _readLocks)
+            // Decrement the lock counters on the parent if any.
+            if (ParentScope != null)
             {
-                DecrementReadLock(readLockId);
-            }
+                foreach (var readLockPair in ReadLocks)
+                {
+                    DecrementReadLock(readLockPair.Key, readLockPair.Value);
+                }
 
-            foreach (var writeLockId in _writelocks)
-            {
-                DecrementWriteLock(writeLockId);
+                foreach (var writeLockPair in WriteLocks)
+                {
+                    DecrementWriteLock(writeLockPair.Key, writeLockPair.Value);
+                }
             }
 
             var parent = ParentScope;
@@ -516,80 +513,109 @@ namespace Umbraco.Core.Scoping
         /// Decrements the count of the ReadLocks with a specific lock object identifier we currently hold
         /// </summary>
         /// <param name="lockId">Lock object identifier to decrement</param>
-        public void DecrementReadLock(int lockId)
+        /// <param name="amountToDecrement">Amount to decrement the lock count with</param>
+        public void DecrementReadLock(int lockId, int amountToDecrement)
         {
             // If we aren't the outermost scope, pass it on to the parent.
             if (ParentScope != null)
             {
-                ParentScope.DecrementReadLock(lockId);
+                ParentScope.DecrementReadLock(lockId, amountToDecrement);
                 return;
             }
 
-            ReadLocks[lockId] -= 1;
+            ReadLocks[lockId] -= amountToDecrement;
         }
 
         /// <summary>
         /// Decrements the count of the WriteLocks with a specific lock object identifier we currently hold.
         /// </summary>
         /// <param name="lockId">Lock object identifier to decrement.</param>
-        public void DecrementWriteLock(int lockId)
+        /// <param name="amountToDecrement">Amount to decrement the lock count with</param>
+        public void DecrementWriteLock(int lockId, int amountToDecrement)
         {
             // If we aren't the outermost scope, pass it on to the parent.
             if (ParentScope != null)
             {
-                ParentScope.DecrementWriteLock(lockId);
+                ParentScope.DecrementWriteLock(lockId, amountToDecrement);
                 return;
             }
 
-            WriteLocks[lockId] -= 1;
+            WriteLocks[lockId] -= amountToDecrement;
+        }
+
+        /// <summary>
+        /// Increment the count of the read locks we've requested
+        /// </summary>
+        /// <remarks>
+        /// This should only be done on child scopes since it's then used to decrement the count later.
+        /// </remarks>
+        /// <param name="lockIds"></param>
+        private void IncrementRequestedReadLock(params int[] lockIds)
+        {
+            // We need to keep track of what lockIds we have requested locks for to be able to decrement them.
+            if (ParentScope != null)
+            {
+                foreach (var lockId in lockIds)
+                {
+                    if (!ReadLocks.ContainsKey(lockId))
+                    {
+                        ReadLocks[lockId] = 0;
+                    }
+
+                    ReadLocks[lockId] += 1;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Increment the count of the write locks we've requested
+        /// </summary>
+        /// <remarks>
+        /// This should only be done on child scopes since it's then used to decrement the count later.
+        /// </remarks>
+        /// <param name="lockIds"></param>
+        private void IncrementRequestedWriteLock(params int[] lockIds)
+        {
+            // We need to keep track of what lockIds we have requested locks for to be able to decrement them.
+            if (ParentScope != null)
+            {
+                foreach (var lockId in lockIds)
+                {
+                    if (!WriteLocks.ContainsKey(lockId))
+                    {
+                        WriteLocks[lockId] = 0;
+                    }
+
+                    WriteLocks[lockId] += 1;
+                }
+            }
         }
 
         /// <inheritdoc />
         public void ReadLock(params int[] lockIds)
         {
-            if (ParentScope != null)
-            {
-                foreach (var id in lockIds)
-                {
-                    // We need to keep track of what lockIds we have requested locks for to be able to decrement them.
-                    // We have to do this out of the recursion to not add the ids to all scopes.
-                    _readLocks.Add(id);
-                }
-            }
+            IncrementRequestedReadLock(lockIds);
             ReadLockInner(null, lockIds);
         }
 
         /// <inheritdoc />
         public void ReadLock(TimeSpan timeout, int lockId)
         {
-            if (ParentScope != null)
-            {
-                _readLocks.Add(lockId);
-            }
-
+            IncrementRequestedReadLock(lockId);
             ReadLockInner(timeout, lockId);
         }
 
         /// <inheritdoc />
         public void WriteLock(params int[] lockIds)
         {
-            if (ParentScope != null)
-            {
-                foreach (var lockId in lockIds)
-                {
-                    _writelocks.Add(lockId);
-                }
-            }
+            IncrementRequestedWriteLock(lockIds);
             WriteLockInner(null, lockIds);
         }
 
         /// <inheritdoc />
         public void WriteLock(TimeSpan timeout, int lockId)
         {
-            if (ParentScope != null)
-            {
-                _writelocks.Add(lockId);
-            }
+            IncrementRequestedWriteLock(lockId);
             WriteLockInner(timeout, lockId);
         }
 
