@@ -1,0 +1,21 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
+using Umbraco.Cms.Core.Events;
+
+namespace Umbraco.Cms.Infrastructure.Services.Notifications
+{
+    public class MovingNotification<T> : CancelableObjectNotification<IEnumerable<MoveEventInfo<T>>>
+    {
+        public MovingNotification(MoveEventInfo<T> target, EventMessages messages) : base(new[] {target}, messages)
+        {
+        }
+
+        public MovingNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages) : base(target, messages)
+        {
+        }
+
+        public IEnumerable<MoveEventInfo<T>> MoveInfoCollection => Target;
+    }
+}

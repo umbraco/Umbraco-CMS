@@ -1,0 +1,20 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Umbraco.Cms.Core.Events;
+
+namespace Umbraco.Cms.Infrastructure.Services.Notifications
+{
+    public abstract class ObjectNotification<T> : INotification where T : class
+    {
+        protected ObjectNotification(T target, EventMessages messages)
+        {
+            Messages = messages;
+            Target = target;
+        }
+
+        public EventMessages Messages { get; }
+
+        protected T Target { get; }
+    }
+}
