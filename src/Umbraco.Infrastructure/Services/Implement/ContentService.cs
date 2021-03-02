@@ -34,7 +34,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly ILogger<ContentService> _logger;
         private IQuery<IContent> _queryNotTrashed;
         private readonly IEventAggregator _eventAggregator;
-        private readonly IRelationService _relationService;
 
         #region Constructors
 
@@ -42,7 +41,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             IEventMessagesFactory eventMessagesFactory,
             IDocumentRepository documentRepository, IEntityRepository entityRepository, IAuditRepository auditRepository,
             IContentTypeRepository contentTypeRepository, IDocumentBlueprintRepository documentBlueprintRepository, ILanguageRepository languageRepository,
-            Lazy<IPropertyValidationService> propertyValidationService, IShortStringHelper shortStringHelper, IEventAggregator eventAggregator, IRelationService relationService)
+            Lazy<IPropertyValidationService> propertyValidationService, IShortStringHelper shortStringHelper, IEventAggregator eventAggregator)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _documentRepository = documentRepository;
@@ -54,7 +53,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             _propertyValidationService = propertyValidationService;
             _shortStringHelper = shortStringHelper;
             _eventAggregator = eventAggregator;
-            _relationService = relationService;
             _logger = loggerFactory.CreateLogger<ContentService>();
         }
 
@@ -1300,7 +1298,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     if (!branchOne) // for branches, handled by SaveAndPublishBranch
                     {
                         scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                        _eventAggregator.Publish(new PublishingNotification<IContent>(content, evtMsgs));
+                        _eventAggregator.Publish(new PublishedNotification<IContent>(content, evtMsgs));
                     }
 
                     // it was not published and now is... descendants that were 'published' (but
@@ -2252,12 +2250,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(copy, TreeChangeTypes.RefreshBranch).ToEventArgs());
                 foreach (var x in copies)
                 {
-                    if (relateToOriginal)
-                    {
-                        RelateOnCopy(x.Item1, x.Item2);
-                    }
-
-                    _eventAggregator.Publish(new CopiedNotification<IContent>(x.Item1, x.Item2, parentId, evtMsgs));
+                    _eventAggregator.Publish(new CopiedNotification<IContent>(x.Item1, x.Item2, parentId, relateToOriginal, evtMsgs));
                 }
                 Audit(AuditType.Copy, userId, content.Id);
 
@@ -2265,26 +2258,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
 
             return copy;
-        }
-
-        private void RelateOnCopy(IContent original, IContent copy)
-        {
-            var relationType = _relationService.GetRelationTypeByAlias(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias);
-            if (relationType == null)
-            {
-                relationType = new RelationType(Constants.Conventions.RelationTypes.RelateDocumentOnCopyAlias,
-                    Constants.Conventions.RelationTypes.RelateDocumentOnCopyName,
-                    true,
-                    Constants.ObjectTypes.Document,
-                    Constants.ObjectTypes.Document);
-
-                _relationService.Save(relationType);
-            }
-
-            var relation = new Relation(original.Id, copy.Id, relationType);
-            _relationService.Save(relation);
-
-            Audit(AuditType.Copy, copy.WriterId, copy.Id, $"Copied content with Id: '{copy.Id}' related to original content with Id: '{original.Id}'");
         }
 
         /// <summary>

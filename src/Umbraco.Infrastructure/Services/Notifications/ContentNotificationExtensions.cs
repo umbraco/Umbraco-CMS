@@ -23,13 +23,19 @@ namespace Umbraco.Cms.Infrastructure.Services.Notifications
         /// Determines whether a culture is being published, during a Publishing notification
         /// </summary>
         public static bool IsPublishingCulture(this PublishingNotification<IContent> notification, IContent content, string culture)
-            => content.PublishCultureInfos.TryGetValue(culture, out ContentCultureInfos cultureInfo) && cultureInfo.IsDirty();
+            => IsPublishingCulture(content, culture);
 
         /// <summary>
-        /// Determines whether a culture is being unpublished, during a Publishing notification
+        /// Determines whether a culture is being unpublished, during an Publishing notification
+        /// </summary>
+        public static bool IsUnpublishingCulture(this PublishingNotification<IContent> notification, IContent content, string culture)
+            => IsUnpublishingCulture(content, culture);
+
+        /// <summary>
+        /// Determines whether a culture is being unpublished, during a Unpublishing notification
         /// </summary>
         public static bool IsUnpublishingCulture(this UnpublishingNotification<IContent> notification, IContent content, string culture)
-            => content.IsPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + culture); //bit of a hack since we know that the content implementation tracks changes this way
+            => IsUnpublishingCulture(content, culture);
 
         /// <summary>
         /// Determines whether a culture has been published, during a Published notification
@@ -40,8 +46,22 @@ namespace Umbraco.Cms.Infrastructure.Services.Notifications
         /// <summary>
         /// Determines whether a culture has been unpublished, during a Published notification
         /// </summary>
-        public static bool HasUnpublishedCulture(this UnpublishedNotification<IContent> notification, IContent content, string culture)
-            => content.WasPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + culture);
+        public static bool HasUnpublishedCulture(this PublishedNotification<IContent> notification, IContent content, string culture)
+            => HasUnpublishedCulture(content, culture);
 
+        /// <summary>
+        /// Determines whether a culture has been unpublished, during an Unpublished notification
+        /// </summary>
+        public static bool HasUnpublishedCulture(this UnpublishedNotification<IContent> notification, IContent content, string culture)
+            => HasUnpublishedCulture(content, culture);
+
+        private static bool IsUnpublishingCulture(IContent content, string culture)
+            => content.IsPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + culture); 
+
+        public static bool IsPublishingCulture(IContent content, string culture)
+            => content.PublishCultureInfos.TryGetValue(culture, out ContentCultureInfos cultureInfo) && cultureInfo.IsDirty();
+
+        public static bool HasUnpublishedCulture(IContent content, string culture)
+            => content.WasPropertyDirty(ContentBase.ChangeTrackingPrefix.UnpublishedCulture + culture);
     }
 }

@@ -367,43 +367,51 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             document.UnpublishCulture("fr-FR");
 
-            var unpublishingWasCalled = false;
-            var unpublishedWasCalled = false;
+            var publishingWasCalled = false;
+            var publishedWasCalled = false;
 
-            ContentNotificationHandler.UnpublishingContent += notification =>
+            // TODO: revisit this - it was migrated when removing static events, but the expected result seems illogic - why does this test bind to Published and not Unpublished?
+
+            ContentNotificationHandler.PublishingContent += notification =>
             {
-                IContent unpublished = notification.UnpublishedEntities.First();
+                IContent published = notification.PublishedEntities.First();
 
-                Assert.AreSame(document, unpublished);
+                Assert.AreSame(document, published);
 
-                Assert.IsFalse(notification.IsUnpublishingCulture(unpublished, "en-US"));
-                Assert.IsTrue(notification.IsUnpublishingCulture(unpublished, "fr-FR"));
+                Assert.IsFalse(notification.IsPublishingCulture(published, "en-US"));
+                Assert.IsFalse(notification.IsPublishingCulture(published, "fr-FR"));
 
-                unpublishingWasCalled = true;
+                Assert.IsFalse(notification.IsUnpublishingCulture(published, "en-US"));
+                Assert.IsTrue(notification.IsUnpublishingCulture(published, "fr-FR"));
+
+                publishingWasCalled = true;
             };
 
-            ContentNotificationHandler.UnpublishedContent += notification =>
+            ContentNotificationHandler.PublishedContent += notification =>
             {
-                IContent unpublished = notification.UnpublishedEntities.First();
+                IContent published = notification.PublishedEntities.First();
 
-                Assert.AreSame(document, unpublished);
+                Assert.AreSame(document, published);
 
-                Assert.IsFalse(notification.HasUnpublishedCulture(unpublished, "en-US"));
-                Assert.IsTrue(notification.HasUnpublishedCulture(unpublished, "fr-FR"));
+                Assert.IsFalse(notification.HasPublishedCulture(published, "en-US"));
+                Assert.IsFalse(notification.HasPublishedCulture(published, "fr-FR"));
 
-                unpublishedWasCalled = true;
+                Assert.IsFalse(notification.HasUnpublishedCulture(published, "en-US"));
+                Assert.IsTrue(notification.HasUnpublishedCulture(published, "fr-FR"));
+
+                publishedWasCalled = true;
             };
 
             try
             {
                 contentService.CommitDocumentChanges(document);
-                Assert.IsTrue(unpublishingWasCalled);
-                Assert.IsTrue(unpublishedWasCalled);
+                Assert.IsTrue(publishingWasCalled);
+                Assert.IsTrue(publishedWasCalled);
             }
             finally
             {
-                ContentNotificationHandler.UnpublishingContent = null;
-                ContentNotificationHandler.UnpublishedContent = null;
+                ContentNotificationHandler.PublishingContent = null;
+                ContentNotificationHandler.PublishedContent = null;
             }
 
             document = contentService.GetById(document.Id);
