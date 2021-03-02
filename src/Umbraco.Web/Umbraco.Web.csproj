@@ -159,7 +159,6 @@
     <Compile Include="UmbracoBuilderExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
-    <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
