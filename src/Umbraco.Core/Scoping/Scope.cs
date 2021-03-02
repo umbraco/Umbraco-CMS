@@ -513,9 +513,9 @@ namespace Umbraco.Core.Scoping
             ?? (_logUncompletedScopes = Current.Configs.CoreDebug().LogUncompletedScopes)).Value;
 
         /// <summary>
-        /// Decrements the count of the ReadLocks with a specific ID we currently hold
+        /// Decrements the count of the ReadLocks with a specific lock object identifier we currently hold
         /// </summary>
-        /// <param name="lockId">Lock ID to decrement</param>
+        /// <param name="lockId">Lock object identifier to decrement</param>
         public void DecrementReadLock(int lockId)
         {
             // If we aren't the outermost scope, pass it on to the parent.
@@ -529,9 +529,9 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <summary>
-        /// Decrements the count of the WriteLocks with a specific ID we currently hold
+        /// Decrements the count of the WriteLocks with a specific lock object identifier we currently hold.
         /// </summary>
-        /// <param name="lockId">Lock ID to decrement</param>
+        /// <param name="lockId">Lock object identifier to decrement.</param>
         public void DecrementWriteLock(int lockId)
         {
             // If we aren't the outermost scope, pass it on to the parent.
@@ -556,35 +556,7 @@ namespace Umbraco.Core.Scoping
                     _readLocks.Add(id);
                 }
             }
-            ReadLockInner(lockIds);
-        }
-
-        /// <summary>
-        /// Handles acquiring read locks, will delegate it to the parent if there are any.
-        /// </summary>
-        /// <param name="lockIds">Array of lock object identifiers.</param>
-        internal void ReadLockInner(params int[] lockIds)
-        {
-            if (ParentScope != null)
-            {
-                // Delegate acquiring the lock to the parent.
-                ParentScope.ReadLockInner(lockIds);
-                return;
-            }
-
-            // If we are the parent, then handle the lock request.
-            foreach (var lockId in lockIds)
-            {
-                // Only acquire the lock if we haven't done so yet.
-                if (!ReadLocks.ContainsKey(lockId))
-                {
-                    Database.SqlContext.SqlSyntax.ReadLock(Database, lockId);
-                    ReadLocks[lockId] = 0;
-                }
-
-                // Increment the amount of locks we have of the specific ID after we've acquired it.
-                ReadLocks[lockId] += 1;
-            }
+            ReadLockInner(null, lockIds);
         }
 
         /// <inheritdoc />
@@ -598,38 +570,9 @@ namespace Umbraco.Core.Scoping
             ReadLockInner(timeout, lockId);
         }
 
-        /// <summary>
-        /// Handles acquiring a read lock with a specified timeout, will delegate it to the parent if there are any.
-        /// </summary>
-        /// <param name="timeout">The database timeout in milliseconds.</param>
-        /// <param name="lockId">The lock object identifier.</param>
-        internal void ReadLockInner(TimeSpan timeout, int lockId)
-        {
-            if (ParentScope != null)
-            {
-                ParentScope.ReadLockInner(timeout, lockId);
-                return;
-            }
-
-            var syntax2 = Database.SqlContext.SqlSyntax as ISqlSyntaxProvider2;
-            if (syntax2 == null)
-            {
-                throw new InvalidOperationException($"{Database.SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
-            }
-
-            if (!ReadLocks.ContainsKey(lockId))
-            {
-                syntax2.ReadLock(Database, timeout, lockId);
-                ReadLocks[lockId] = 0;
-            }
-
-            ReadLocks[lockId] += 1;
-        }
-
         /// <inheritdoc />
         public void WriteLock(params int[] lockIds)
         {
-            // For some reason adding ids to the writelocks set of the outer most parent scope causes issues...
             if (ParentScope != null)
             {
                 foreach (var lockId in lockIds)
@@ -637,34 +580,7 @@ namespace Umbraco.Core.Scoping
                     _writelocks.Add(lockId);
                 }
             }
-            WriteLockInner(lockIds);
-        }
-
-        /// <summary>
-        /// Handles acquiring write locks, will delegate it to the parent if there are any.
-        /// </summary>
-        /// <param name="lockIds">Array of lock object identifiers.</param>
-        internal void WriteLockInner(int[] lockIds)
-        {
-            // If we have a parent we just delegate lock creation to parent.
-            if (ParentScope != null)
-            {
-                ParentScope.WriteLockInner(lockIds);
-                return;
-            }
-
-            // Only acquire lock if we haven't yet (WriteLocks not containing the key)
-            foreach (var lockId in lockIds)
-            {
-                if (!WriteLocks.ContainsKey(lockId))
-                {
-                    Database.SqlContext.SqlSyntax.WriteLock(Database, lockId);
-                    WriteLocks[lockId] = 0;
-                }
-
-                // Increment count of the lock by 1.
-                WriteLocks[lockId] += 1;
-            }
+            WriteLockInner(null, lockIds);
         }
 
         /// <inheritdoc />
@@ -678,31 +594,127 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <summary>
-        /// Handles acquiring a write lock with a specified timeout, will delegate it to the parent if there are any.
+        /// Handles acquiring a read lock, will delegate it to the parent if there are any.
         /// </summary>
-        /// <param name="timeout">The database timeout in milliseconds.</param>
-        /// <param name="lockId">The lock object identifier.</param>
-        internal void WriteLockInner(TimeSpan timeout, int lockId)
+        /// <param name="timeout">Optional database timeout in milliseconds.</param>
+        /// <param name="lockIds">Array of lock object identifiers.</param>
+        internal void ReadLockInner(TimeSpan? timeout = null, params int[] lockIds)
         {
             if (ParentScope != null)
             {
-                ParentScope.WriteLockInner(timeout, lockId);
+                // Delegate acquiring the lock to the parent if any.
+                ParentScope.ReadLockInner(timeout, lockIds);
                 return;
             }
 
+            // If we are the parent, then handle the lock request.
+            foreach (var lockId in lockIds)
+            {
+                // Only acquire the lock if we haven't done so yet.
+                if (!ReadLocks.ContainsKey(lockId))
+                {
+                    if (timeout is null)
+                    {
+                        // We want a lock with a custom timeout
+                        ObtainReadLock(lockId);
+                    }
+                    else
+                    {
+                        // We just want an ordinary lock.
+                        ObtainTimoutReadLock(lockId, timeout.Value);
+                    }
+                    // Add the lockId as a key to the dict.
+                    ReadLocks[lockId] = 0;
+                }
+
+                ReadLocks[lockId] += 1;
+            }
+        }
+
+        /// <summary>
+        /// Handles acquiring a write lock with a specified timeout, will delegate it to the parent if there are any.
+        /// </summary>
+        /// <param name="timeout">Optional database timeout in milliseconds.</param>
+        /// <param name="lockIds">Array of lock object identifiers.</param>
+        internal void WriteLockInner(TimeSpan? timeout = null, params int[] lockIds)
+        {
+            if (ParentScope != null)
+            {
+                // If we have a parent we delegate lock creation to parent.
+                ParentScope.WriteLockInner(timeout, lockIds);
+                return;
+            }
+
+            foreach (var lockId in lockIds)
+            {
+                // Only acquire lock if we haven't yet (WriteLocks not containing the key)
+                if (!WriteLocks.ContainsKey(lockId))
+                {
+                    if (timeout is null)
+                    {
+                        ObtainWriteLock(lockId);
+                    }
+                    else
+                    {
+                        ObtainTimeoutWriteLock(lockId, timeout.Value);
+                    }
+                    // Add the lockId as a key to the dict.
+                    WriteLocks[lockId] = 0;
+                }
+
+                // Increment count of the lock by 1.
+                WriteLocks[lockId] += 1;
+            }
+        }
+
+        /// <summary>
+        /// Obtains an ordinary read lock.
+        /// </summary>
+        /// <param name="lockId">Lock object identifier to lock.</param>
+        private void ObtainReadLock(int lockId)
+        {
+            Database.SqlContext.SqlSyntax.ReadLock(Database, lockId);
+        }
+
+        /// <summary>
+        /// Obtains a read lock with a custom timeout.
+        /// </summary>
+        /// <param name="lockId">Lock object identifier to lock.</param>
+        /// <param name="timeout">TimeSpan specifying the timout period.</param>
+        private void ObtainTimoutReadLock(int lockId, TimeSpan timeout)
+        {
             var syntax2 = Database.SqlContext.SqlSyntax as ISqlSyntaxProvider2;
             if (syntax2 == null)
             {
                 throw new InvalidOperationException($"{Database.SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
             }
 
-            if (!WriteLocks.ContainsKey(lockId))
+            syntax2.ReadLock(Database, timeout, lockId);
+        }
+
+        /// <summary>
+        /// Obtains an ordinary write lock.
+        /// </summary>
+        /// <param name="lockId">Lock object identifier to lock.</param>
+        private void ObtainWriteLock(int lockId)
+        {
+            Database.SqlContext.SqlSyntax.WriteLock(Database, lockId);
+        }
+
+        /// <summary>
+        /// Obtains a write lock with a custom timeout.
+        /// </summary>
+        /// <param name="lockId">Lock object identifier to lock.</param>
+        /// <param name="timeout">TimeSpan specifying the timout period.</param>
+        private void ObtainTimeoutWriteLock(int lockId, TimeSpan timeout)
+        {
+            var syntax2 = Database.SqlContext.SqlSyntax as ISqlSyntaxProvider2;
+            if (syntax2 == null)
             {
-                syntax2.WriteLock(Database, timeout, lockId);
-                WriteLocks[lockId] = 0;
+                throw new InvalidOperationException($"{Database.SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
             }
 
-            WriteLocks[lockId] += 1;
+            syntax2.WriteLock(Database, timeout, lockId);
         }
     }
 }

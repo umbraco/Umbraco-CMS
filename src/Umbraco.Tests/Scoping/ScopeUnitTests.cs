@@ -177,6 +177,64 @@ namespace Umbraco.Tests.Scoping
         }
 
         [Test]
+        public void WriteLocks_Count_correctly_If_Lock_Requested_Twice_In_Scope()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (var outerscope = scopeProvider.CreateScope())
+            {
+                var realOuterScope = (Scope) outerscope;
+                outerscope.WriteLock(Constants.Locks.ContentTree);
+                outerscope.WriteLock(Constants.Locks.ContentTree);
+                Assert.AreEqual(2, realOuterScope.WriteLocks[Constants.Locks.ContentTree]);
+
+                using (var innerScope = scopeProvider.CreateScope())
+                {
+                    innerScope.WriteLock(Constants.Locks.ContentTree);
+                    innerScope.WriteLock(Constants.Locks.ContentTree);
+                    Assert.AreEqual(4, realOuterScope.WriteLocks[Constants.Locks.ContentTree]);
+
+                    innerScope.WriteLock(Constants.Locks.Languages);
+                    innerScope.WriteLock(Constants.Locks.Languages);
+                    Assert.AreEqual(2, realOuterScope.WriteLocks[Constants.Locks.Languages]);
+                    innerScope.Complete();
+                }
+                Assert.AreEqual(0, realOuterScope.WriteLocks[Constants.Locks.Languages]);
+                Assert.AreEqual(2, realOuterScope.WriteLocks[Constants.Locks.ContentTree]);
+                outerscope.Complete();
+            }
+        }
+
+        [Test]
+        public void ReadLocks_Count_correctly_If_Lock_Requested_Twice_In_Scope()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (var outerscope = scopeProvider.CreateScope())
+            {
+                var realOuterScope = (Scope) outerscope;
+                outerscope.ReadLock(Constants.Locks.ContentTree);
+                outerscope.ReadLock(Constants.Locks.ContentTree);
+                Assert.AreEqual(2, realOuterScope.ReadLocks[Constants.Locks.ContentTree]);
+
+                using (var innerScope = scopeProvider.CreateScope())
+                {
+                    innerScope.ReadLock(Constants.Locks.ContentTree);
+                    innerScope.ReadLock(Constants.Locks.ContentTree);
+                    Assert.AreEqual(4, realOuterScope.ReadLocks[Constants.Locks.ContentTree]);
+
+                    innerScope.ReadLock(Constants.Locks.Languages);
+                    innerScope.ReadLock(Constants.Locks.Languages);
+                    Assert.AreEqual(2, realOuterScope.ReadLocks[Constants.Locks.Languages]);
+                    innerScope.Complete();
+                }
+                Assert.AreEqual(0, realOuterScope.ReadLocks[Constants.Locks.Languages]);
+                Assert.AreEqual(2, realOuterScope.ReadLocks[Constants.Locks.ContentTree]);
+                outerscope.Complete();
+            }
+        }
+
+        [Test]
         public void Nested_Scopes_WriteLocks_Count_Correctly()
         {
             var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
