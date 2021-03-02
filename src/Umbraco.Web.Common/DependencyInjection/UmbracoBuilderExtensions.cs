@@ -53,7 +53,6 @@ using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
-using Umbraco.Core.Security;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions

@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core
                     return;
                 }
 
-                if (!(o is T value))
+                if (o is not T value)
                 {
                     throw new ArgumentException($"Expected type {typeof(T).FullName}, got {o.GetType().FullName}", nameof(o));
                 }

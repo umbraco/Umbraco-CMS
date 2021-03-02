@@ -1,7 +1,6 @@
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Cms.Web.Common.Security
 {

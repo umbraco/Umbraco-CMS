@@ -3,7 +3,6 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <RootNamespace>Umbraco.Cms.Web.UI.NetCore</RootNamespace>
-        <LangVersion>latest</LangVersion>
         <RootNamespace>Umbraco.Cms.Web.UI.NetCore</RootNamespace>
     </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -22,7 +21,6 @@
 
   <ItemGroup>
     <Folder Include="App_Plugins" />
-    <Folder Include="Views" />
     <Folder Include="wwwroot\Media" />
   </ItemGroup>
 
