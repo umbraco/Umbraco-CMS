@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
@@ -82,24 +82,9 @@ namespace Umbraco.Cms.Tests.Integration.Cache
                 new EventDefinition<IMemberGroupService, SaveEventArgs<IMemberGroup>>(null, MemberGroupService, new SaveEventArgs<IMemberGroup>(Enumerable.Empty<IMemberGroup>())),
                 new EventDefinition<IMemberGroupService, DeleteEventArgs<IMemberGroup>>(null, MemberGroupService, new DeleteEventArgs<IMemberGroup>(Enumerable.Empty<IMemberGroup>())),
 
-                new EventDefinition<IMediaService, SaveEventArgs<IMedia>>(null, MediaService, new SaveEventArgs<IMedia>(Enumerable.Empty<IMedia>())),
-                new EventDefinition<IMediaService, DeleteEventArgs<IMedia>>(null, MediaService, new DeleteEventArgs<IMedia>(Enumerable.Empty<IMedia>())),
-                new EventDefinition<IMediaService, MoveEventArgs<IMedia>>(null, MediaService, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(null, "", -1)), "Moved"),
-                new EventDefinition<IMediaService, MoveEventArgs<IMedia>>(null, MediaService, new MoveEventArgs<IMedia>(new MoveEventInfo<IMedia>(null, "", -1)), "Trashed"),
-                new EventDefinition<IMediaService, RecycleBinEventArgs>(null, MediaService, new RecycleBinEventArgs(Guid.NewGuid())),
-
-                new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "Saved"),
-                new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>()), "Deleted"),
-
                 // not managed
                 //new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "SavedBlueprint"),
                 //new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>()), "DeletedBlueprint"),
-
-                new EventDefinition<IContentService, CopyEventArgs<IContent>>(null, ContentService, new CopyEventArgs<IContent>(null, null, -1)),
-                new EventDefinition<IContentService, MoveEventArgs<IContent>>(null, ContentService, new MoveEventArgs<IContent>(new MoveEventInfo<IContent>(null, "", -1)), "Trashed"),
-                new EventDefinition<IContentService, RecycleBinEventArgs>(null, ContentService, new RecycleBinEventArgs(Guid.NewGuid())),
-                new EventDefinition<IContentService, PublishEventArgs<IContent>>(null, ContentService, new PublishEventArgs<IContent>(Enumerable.Empty<IContent>()), "Published"),
-                new EventDefinition<IContentService, PublishEventArgs<IContent>>(null, ContentService, new PublishEventArgs<IContent>(Enumerable.Empty<IContent>()), "Unpublished"),
 
                 new EventDefinition<IPublicAccessService, SaveEventArgs<PublicAccessEntry>>(null, PublicAccessService, new SaveEventArgs<PublicAccessEntry>(Enumerable.Empty<PublicAccessEntry>())),
                 new EventDefinition<IPublicAccessService, DeleteEventArgs<PublicAccessEntry>>(null, PublicAccessService, new DeleteEventArgs<PublicAccessEntry>(Enumerable.Empty<PublicAccessEntry>())),
