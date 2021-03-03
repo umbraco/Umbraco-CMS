@@ -112,6 +112,33 @@ namespace Umbraco.Tests.Web.Controllers
         }
 
         [Test]
+        [TestCase(Constants.Security.AdminGroupAlias, ExpectedResult = true)]
+        [TestCase(Constants.Security.EditorGroupAlias, ExpectedResult = false)]
+        public bool Cannot_save_groups_you_are_not_part_of_yourselves_unless_you_are_admin(string groupAlias)
+        {
+            var currentUser = Mock.Of<IUser>(user => user.Groups == new[]
+            {
+                new ReadOnlyUserGroup(1, "CurrentUser", "icon-user", null, null, groupAlias, new string[0], new string[0])
+            });
+            IUser savingUser = null; // This means it is a new created user
+
+            var contentService = new Mock<IContentService>();
+            var mediaService = new Mock<IMediaService>();
+            var userService = new Mock<IUserService>();
+            var entityService = new Mock<IEntityService>();
+
+            var authHelper = new UserEditorAuthorizationHelper(
+                contentService.Object,
+                mediaService.Object,
+                userService.Object,
+                entityService.Object);
+
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "userGroupTheCurrentUserDoNotHave" });
+
+            return result.Success;
+        }
+
+        [Test]
         public void Can_Add_Another_Content_Start_Node_On_User_With_Access()
         {
             var nodePaths = new Dictionary<int, string>
