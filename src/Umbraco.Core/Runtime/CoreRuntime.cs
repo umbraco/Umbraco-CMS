@@ -13,10 +13,9 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
 namespace Umbraco.Core.Runtime
@@ -191,12 +190,20 @@ namespace Umbraco.Core.Runtime
                 // create the factory
                 _factory = Current.Factory = composition.CreateFactory();
 
-                // Create unattended user, we have to this after factory is created since we use UserService.
-                CreateUnattendedUser();
+                // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
+                if (_state.Reason == RuntimeLevelReason.UpgradeMigrations && _state.Level == RuntimeLevel.Run)
+                {
+                    // do the upgrade
+                    DoUnattendedUpgrade(_factory.GetInstance<DatabaseBuilder>());
+
+                    // upgrade is done, set reason to Run
+                    _state.Reason = RuntimeLevelReason.Run;
+                }
 
                 // create & initialize the components
                 _components = _factory.GetInstance<ComponentCollection>();
                 _components.Initialize();
+
 
             }
             catch (Exception e)
@@ -271,7 +278,7 @@ namespace Umbraco.Core.Runtime
 
                 // all conditions fulfilled, do the install
                 Logger.Info<CoreRuntime>("Starting unattended install.");
-
+                
                 try
                 {
                     database.BeginTransaction();
@@ -292,69 +299,15 @@ namespace Umbraco.Core.Runtime
             }
         }
 
-        /// <summary>
-        /// Creates a user, using environment variables during Unattended Install.
-        /// This is purely for automated acceptance testing.
-        /// </summary>
-        private void CreateUnattendedUser()
+        private void DoUnattendedUpgrade(DatabaseBuilder databaseBuilder)
         {
-            // Do a lot of checks and balances to ensure that we can, and should create the unattended user.
-            // Unattended install is not enabled, don't touch users...
-            if (RuntimeOptions.InstallUnattended == false) return;
-
-            // We're doing a non unattended install or something, don't do anything
-            if (_state.Level != RuntimeLevel.Run) return;
-
-            var unattendedName = Environment.GetEnvironmentVariable("unattendedName");
-            var unattendedEmail = Environment.GetEnvironmentVariable("unattendedEmail");
-            var unattendedPassword = Environment.GetEnvironmentVariable("unattendedPass");
-            
-
-            // Missing environment variable(s)
-            if (unattendedName.IsNullOrWhiteSpace()                
-                || unattendedEmail.IsNullOrWhiteSpace()
-                || unattendedPassword.IsNullOrWhiteSpace()
+            var plan = new UmbracoPlan();
+            using (ProfilingLogger.TraceDuration<CoreRuntime>("Starting unattended upgrade.", "Unattended upgrade completed."))
             {
-                return;
+                var result = databaseBuilder.UpgradeSchemaAndData(plan);
+                if (result.Success == false)
+                    throw new UnattendedInstallException("An error occurred while running the unattended upgrade.\n" + result.Message);
             }
-
-            var userService = _factory.GetInstance<IUserService>();
-            var admin = userService.GetUserById(Constants.Security.SuperUserId);
-            if (admin == null)
-            {
-                throw new InvalidOperationException("Could not find the super user!");
-            }
-
-            // User email/login has already been modified
-            if (admin.Email == unattendedEmail) return;
-
-            // Everything looks good, create the user
-            var membershipProvider = Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-            var superUser = membershipProvider.GetUser(Constants.Security.SuperUserId, true);
-            if (superUser == null)
-            {
-                throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
-            }
-
-            try
-            {
-                var success = superUser.ChangePassword("default", unattendedPassword);
-                if (success == false)
-                {
-                    throw new FormatException("Password must be at least " + membershipProvider.MinRequiredPasswordLength + " characters long and contain at least " + membershipProvider.MinRequiredNonAlphanumericCharacters + " symbols");
-                }
-            }
-            catch (Exception)
-            {
-                throw new FormatException("Password must be at least " + membershipProvider.MinRequiredPasswordLength + " characters long and contain at least " + membershipProvider.MinRequiredNonAlphanumericCharacters + " symbols");
-            }
-
-            // Set name, email & login
-            admin.Name = unattendedName.Trim();
-            admin.Email = unattendedEmail.Trim();            
-            admin.Username = unattendedEmail.Trim();
-
-            userService.Save(admin);
         }
 
         protected virtual void ConfigureUnhandledException()
