@@ -53,6 +53,7 @@ using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
+using Umbraco.Core.Events;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
@@ -269,6 +270,12 @@ namespace Umbraco.Extensions
                 .Add(umbracoApiControllerTypes);
 
             builder.Services.AddUnique<InstallAreaRoutes>();
+
+            // This is a lovely file with no real groupings it seems
+            // Put close to install & upgrade stuff for the notification/event listener for
+            builder.AddNotificationHandler<UmbracoApplicationStarting, CreateUnattendedUserNotificationHandler>();
+
+
 
             builder.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
             builder.Services.AddUnique<UmbracoRequestMiddleware>();
