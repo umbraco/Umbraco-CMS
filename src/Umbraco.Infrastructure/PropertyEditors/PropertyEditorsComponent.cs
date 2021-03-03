@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Services.Implement;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
+    // TODO: delete this component and make the "ContainedFilePaths" methods on FileUploadPropertyEditor and ImageCropperPropertyEditor private once MemberService uses notifications instead of static events
     public sealed class PropertyEditorsComponent : IComponent
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -40,14 +41,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         private void Initialize(FileUploadPropertyEditor fileUpload)
         {
-            void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(fileUpload.ContainedFilePaths(args.DeletedEntities.Cast<ContentBase>()));
             MemberService.Deleted += memberServiceDeleted;
             _terminate.Add(() => MemberService.Deleted -= memberServiceDeleted);
         }
 
         private void Initialize(ImageCropperPropertyEditor imageCropper)
         {
-            void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(imageCropper.ContainedFilePaths(args.DeletedEntities.Cast<ContentBase>()));
             MemberService.Deleted += memberServiceDeleted;
             _terminate.Add(() => MemberService.Deleted -= memberServiceDeleted);
         }

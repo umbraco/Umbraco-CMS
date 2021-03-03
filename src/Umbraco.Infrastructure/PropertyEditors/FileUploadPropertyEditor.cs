@@ -92,16 +92,17 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
         /// <summary>
-        /// Ensures any files associated are removed
+        /// The paths to all file upload property files contained within a collection of content entities
         /// </summary>
-        /// <param name="deletedEntities"></param>
-        internal IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
-        {
-            return deletedEntities.SelectMany(x => x.Properties)
-                .Where(IsUploadField)
-                .SelectMany(GetFilePathsFromPropertyValues)
-                .Distinct();
-        }
+        /// <param name="entities"></param>
+        /// <remarks>
+        /// This method must be made private once MemberService events have been replaced by notifications
+        /// </remarks>
+        internal IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
+            .SelectMany(x => x.Properties)
+            .Where(IsUploadField)
+            .SelectMany(GetFilePathsFromPropertyValues)
+            .Distinct();
 
         /// <summary>
         /// Look through all property values stored against the property and resolve any file paths stored
@@ -157,9 +158,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
         }
 
-        public void Handle(DeletedNotification<IContent> notification) => notification.MediaFilesToDelete.AddRange(ServiceDeleted(notification.DeletedEntities.OfType<ContentBase>()));
+        public void Handle(DeletedNotification<IContent> notification) => DeleteContainedFiles(notification.DeletedEntities);
 
-        public void Handle(DeletedNotification<IMedia> notification) => notification.MediaFilesToDelete.AddRange(ServiceDeleted(notification.DeletedEntities.OfType<ContentBase>()));
+        public void Handle(DeletedNotification<IMedia> notification) => DeleteContainedFiles(notification.DeletedEntities);
+
+        private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
+        {
+            var filePathsToDelete = ContainedFilePaths(deletedEntities);
+            _mediaFileSystem.DeleteMediaFiles(filePathsToDelete);
+        }
 
         public void Handle(SavingNotification<IMedia> notification)
         {

@@ -8,10 +8,10 @@ namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
     public class DeletedNotification<T> : EnumerableObjectNotification<T>
     {
-        public DeletedNotification(T target, EventMessages messages) : base(target, messages) => MediaFilesToDelete = new List<string>();
+        public DeletedNotification(T target, EventMessages messages) : base(target, messages)
+        {
+        }
 
         public IEnumerable<T> DeletedEntities => Target;
-
-        public List<string> MediaFilesToDelete { get; }
     }
 }
