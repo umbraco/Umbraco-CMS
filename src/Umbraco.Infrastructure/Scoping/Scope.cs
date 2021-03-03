@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Core.Scoping
         private readonly ScopeProvider _scopeProvider;
         private readonly CoreDebugSettings _coreDebugSettings;
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IEventAggregator _eventAggregator;
         private readonly ILogger<Scope> _logger;
 
         private readonly IsolationLevel _isolationLevel;
@@ -35,12 +36,15 @@ namespace Umbraco.Cms.Core.Scoping
         private EventMessages _messages;
         private ICompletable _fscope;
         private IEventDispatcher _eventDispatcher;
+        // eventually this may need to be injectable - for now we'll create it explicitly and let future needs determine if it should be injectable
+        private IScopedNotificationPublisher _notificationPublisher;
 
         // initializes a new scope
         private Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
+            IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             Scope parent,
@@ -56,6 +60,7 @@ namespace Umbraco.Cms.Core.Scoping
             _scopeProvider = scopeProvider;
             _coreDebugSettings = coreDebugSettings;
             _mediaFileSystem = mediaFileSystem;
+            _eventAggregator = eventAggregator;
             _logger = logger;
 
             Context = scopeContext;
@@ -68,6 +73,7 @@ namespace Umbraco.Cms.Core.Scoping
             _autoComplete = autoComplete;
 
             Detachable = detachable;
+
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
@@ -124,6 +130,7 @@ namespace Umbraco.Cms.Core.Scoping
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
+            IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             bool detachable,
@@ -134,7 +141,7 @@ namespace Umbraco.Cms.Core.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileSystem, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, coreDebugSettings, mediaFileSystem, eventAggregator, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         // initializes a new scope in a nested scopes chain, with its parent
@@ -142,6 +149,7 @@ namespace Umbraco.Cms.Core.Scoping
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
+            IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             Scope parent,
@@ -151,7 +159,7 @@ namespace Umbraco.Cms.Core.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileSystem, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, coreDebugSettings, mediaFileSystem, eventAggregator, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
@@ -314,6 +322,16 @@ namespace Umbraco.Cms.Core.Scoping
             }
         }
 
+        public IScopedNotificationPublisher Notifications
+        {
+            get
+            {
+                EnsureNotDisposed();
+                if (ParentScope != null) return ParentScope.Notifications;
+                return _notificationPublisher ?? (_notificationPublisher = new ScopedNotificationPublisher(_eventAggregator));
+            }
+        }
+
         /// <inheritdoc />
         public bool Complete()
         {
@@ -453,7 +471,10 @@ namespace Umbraco.Cms.Core.Scoping
             {
                 // deal with events
                 if (onException == false)
+                {
                     _eventDispatcher?.ScopeExit(completed);
+                    _notificationPublisher?.ScopeExit(completed);
+                }
             }, () =>
             {
                 // if *we* created it, then get rid of it

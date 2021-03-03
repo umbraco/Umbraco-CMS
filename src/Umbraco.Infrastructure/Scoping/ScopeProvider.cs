@@ -26,8 +26,9 @@ namespace Umbraco.Cms.Core.Scoping
         private readonly FileSystems _fileSystems;
         private readonly CoreDebugSettings _coreDebugSettings;
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IEventAggregator _eventAggregator;
 
-        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, IOptions<CoreDebugSettings> coreDebugSettings, IMediaFileSystem mediaFileSystem, ILogger<ScopeProvider> logger, ILoggerFactory loggerFactory, IRequestCache requestCache)
+        public ScopeProvider(IUmbracoDatabaseFactory databaseFactory, FileSystems fileSystems, IOptions<CoreDebugSettings> coreDebugSettings, IMediaFileSystem mediaFileSystem, ILogger<ScopeProvider> logger, ILoggerFactory loggerFactory, IRequestCache requestCache, IEventAggregator eventAggregator)
         {
             DatabaseFactory = databaseFactory;
             _fileSystems = fileSystems;
@@ -36,6 +37,7 @@ namespace Umbraco.Cms.Core.Scoping
             _logger = logger;
             _loggerFactory = loggerFactory;
             _requestCache = requestCache;
+            _eventAggregator = eventAggregator;
             // take control of the FileSystems
             _fileSystems.IsScoped = () => AmbientScope != null && AmbientScope.ScopedFileSystems;
 
@@ -253,7 +255,7 @@ namespace Umbraco.Cms.Core.Scoping
             IEventDispatcher eventDispatcher = null,
             bool? scopeFileSystems = null)
         {
-            return new Scope(this, _coreDebugSettings, _mediaFileSystem, _loggerFactory.CreateLogger<Scope>(), _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems);
+            return new Scope(this, _coreDebugSettings, _mediaFileSystem, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, true, null, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems);
         }
 
         /// <inheritdoc />
@@ -309,13 +311,13 @@ namespace Umbraco.Cms.Core.Scoping
             {
                 var ambientContext = AmbientContext;
                 var newContext = ambientContext == null ? new ScopeContext() : null;
-                var scope = new Scope(this, _coreDebugSettings, _mediaFileSystem, _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
+                var scope = new Scope(this, _coreDebugSettings, _mediaFileSystem, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, false, newContext, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
                 // assign only if scope creation did not throw!
                 SetAmbient(scope, newContext ?? ambientContext);
                 return scope;
             }
 
-            var nested = new Scope(this, _coreDebugSettings, _mediaFileSystem, _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
+            var nested = new Scope(this, _coreDebugSettings, _mediaFileSystem, _eventAggregator, _loggerFactory.CreateLogger<Scope>(), _fileSystems, ambientScope, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete);
             SetAmbient(nested, AmbientContext);
             return nested;
         }
