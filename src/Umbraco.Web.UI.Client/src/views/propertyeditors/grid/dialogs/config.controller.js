@@ -17,21 +17,20 @@ function ConfigController($scope) {
         }
     }
 
-    vm.showEmptyState = function() {
-        return $scope.model.config.length === 0
-            && Object.keys($scope.model.config).length === 0
-            && $scope.model.styles.length === 0;
-    }
+    vm.showEmptyState = false;
+    vm.showConfig = false;
+    vm.showStyles = false;
 
-    vm.showConfig = function() {
-        return $scope.model.config &&
+    $scope.$watchGroup(['model.config.length', 'model.styles.length'], function(newValues, oldValues, scope) {
+
+        vm.showConfig = $scope.model.config &&
             ($scope.model.config.length > 0 || Object.keys($scope.model.config).length > 0);
-    }
-
-    vm.showStyles = function() {
-        return $scope.model.styles &&
+        vm.showStyles = $scope.model.styles &&
             ($scope.model.styles.length > 0 || Object.keys($scope.model.styles).length > 0);
-    }
+
+        vm.showEmptyState = vm.showConfig === false && vm.showStyles === false;
+
+    });
 
 }
 
