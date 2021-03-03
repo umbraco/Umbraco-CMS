@@ -56,7 +56,7 @@
       allowRemove: '<',
       onRemove: '&',
       sorting: '<',
-      groupValServerField: '@',
+      nameValServerField: '@',
       onNameFocus: '&'
     },
     controller: umbContentTypeGroupController

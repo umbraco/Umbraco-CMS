@@ -110,7 +110,9 @@
                         property="property"
                         sortable="sortingMode"
                         on-edit="editPropertyTypeSettings(property)"
-                        on-remove="deleteProperty(model.groups[openTabIndex].properties, property)">
+                        on-remove="deleteProperty(model.groups[openTabIndex].properties, property)"
+                        alias-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + model.groups[openTabIndex].properties.indexOf(property) + '].Alias'}}"
+                        label-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + model.groups[openTabIndex].properties.indexOf(property) + '].Label'}}">
                     </umb-content-type-property>
 
                     <umb-content-type-property-placeholder
@@ -130,7 +132,7 @@
                 allow-remove="!sortingMode"
                 on-remove="removeFieldset(group)"
                 sorting="sortingMode && !fieldset.inherited"
-                group-val-server-field="{{'Fieldsets[' + model.fieldsets.indexOf(fieldset) + '].Name'}}">
+                name-val-server-field="{{'Fieldsets[' + model.fieldsets.indexOf(fieldset) + '].Name'}}">
                 
                 <ul class="umb-group-builder__properties">
                     <li ng-repeat="property in model.groups[openTabIndex].properties | filter:propertiesInFieldset(fieldset.id)" data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
@@ -138,7 +140,9 @@
                             property="property"
                             sortable="sortingMode"
                             on-edit="editPropertyTypeSettings(property)"
-                            on-remove="deleteProperty(model.groups[openTabIndex].properties, property)">
+                            on-remove="deleteProperty(model.groups[openTabIndex].properties, property)"
+                            alias-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + model.groups[openTabIndex].properties.indexOf(property) + '].Alias'}}"
+                            label-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + model.groups[openTabIndex].properties.indexOf(property) + '].Label'}}">
                         </umb-content-type-property>
                     </li>
                     <li>
