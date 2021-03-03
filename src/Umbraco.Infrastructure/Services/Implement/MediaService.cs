@@ -31,13 +31,11 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         private readonly IMediaFileSystem _mediaFileSystem;
 
-        private readonly IEventAggregator _eventAggregator;
-
         #region Constructors
 
         public MediaService(IScopeProvider provider, IMediaFileSystem mediaFileSystem, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IMediaRepository mediaRepository, IAuditRepository auditRepository, IMediaTypeRepository mediaTypeRepository,
-            IEntityRepository entityRepository, IShortStringHelper shortStringHelper, IEventAggregator eventAggregator)
+            IEntityRepository entityRepository, IShortStringHelper shortStringHelper)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _mediaFileSystem = mediaFileSystem;
@@ -46,7 +44,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             _mediaTypeRepository = mediaTypeRepository;
             _entityRepository = entityRepository;
             _shortStringHelper = shortStringHelper;
-            _eventAggregator = eventAggregator;
         }
 
         #endregion
@@ -299,16 +296,14 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             if (withIdentity)
             {
-                var notification = new SavingNotification<IMedia>(media, evtMsgs);
-                _eventAggregator.Publish(notification);
-                if (notification.Cancel)
+                if (scope.Notifications.PublishCancelable(new SavingNotification<IMedia>(media, evtMsgs)))
                 {
                     return;
                 }
 
                 _mediaRepository.Save(media);
 
-                _eventAggregator.Publish(new SavedNotification<IMedia>(media, evtMsgs));
+                scope.Notifications.Publish(new SavedNotification<IMedia>(media, evtMsgs));
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, TreeChangeTypes.RefreshNode).ToEventArgs());
             }
 
@@ -666,15 +661,10 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (raiseEvents)
+                if (raiseEvents && scope.Notifications.PublishCancelable(new SavingNotification<IMedia>(media, evtMsgs)))
                 {
-                    var notification = new SavingNotification<IMedia>(media, evtMsgs);
-                    _eventAggregator.Publish(notification);
-                    if (notification.Cancel)
-                    {
-                        scope.Complete();
-                        return OperationResult.Attempt.Cancel(evtMsgs);
-                    }
+                    scope.Complete();
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 // poor man's validation?
@@ -693,7 +683,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 _mediaRepository.Save(media);
                 if (raiseEvents)
                 {
-                    _eventAggregator.Publish(new SavedNotification<IMedia>(media, evtMsgs));
+                    scope.Notifications.Publish(new SavedNotification<IMedia>(media, evtMsgs));
                 }
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, changeType).ToEventArgs());
@@ -718,15 +708,10 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (raiseEvents)
+                if (raiseEvents && scope.Notifications.PublishCancelable(new SavingNotification<IMedia>(mediasA, evtMsgs)))
                 {
-                    var notification = new SavingNotification<IMedia>(mediasA, evtMsgs);
-                    _eventAggregator.Publish(notification);
-                    if (notification.Cancel)
-                    {
-                        scope.Complete();
-                        return OperationResult.Attempt.Cancel(evtMsgs);
-                    }
+                    scope.Complete();
+                    return OperationResult.Attempt.Cancel(evtMsgs);
                 }
 
                 var treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode));
@@ -741,7 +726,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    _eventAggregator.Publish(new SavedNotification<IMedia>(mediasA, evtMsgs));
+                    scope.Notifications.Publish(new SavedNotification<IMedia>(mediasA, evtMsgs));
                 }
                 scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
                 Audit(AuditType.Save, userId == -1 ? 0 : userId, Cms.Core.Constants.System.Root, "Bulk save media");
@@ -767,9 +752,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var notification = new DeletingNotification<IMedia>(media, evtMsgs);
-                _eventAggregator.Publish(notification);
-                if (notification.Cancel)
+                if (scope.Notifications.PublishCancelable(new DeletingNotification<IMedia>(media, evtMsgs)))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -793,7 +776,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             void DoDelete(IMedia c)
             {
                 _mediaRepository.Delete(c);
-                _eventAggregator.Publish(new DeletedNotification<IMedia>(c, evtMsgs));
+                scope.Notifications.Publish(new DeletedNotification<IMedia>(c, evtMsgs));
 
                 // media files deleted by QueuingEventDispatcher
             }
@@ -836,9 +819,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            var notification = new DeletingVersionsNotification<IMedia>(id, evtMsgs, dateToRetain: versionDate);
-            _eventAggregator.Publish(notification);
-            if (notification.Cancel)
+            if (scope.Notifications.PublishCancelable(new DeletingVersionsNotification<IMedia>(id, evtMsgs, dateToRetain: versionDate)))
             {
                 return;
             }
@@ -847,7 +828,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
             _mediaRepository.DeleteVersions(id, versionDate);
 
-            _eventAggregator.Publish(new DeletedVersionsNotification<IMedia>(id, evtMsgs, dateToRetain: versionDate));
+            scope.Notifications.Publish(new DeletedVersionsNotification<IMedia>(id, evtMsgs, dateToRetain: versionDate));
             Audit(AuditType.Delete, userId, Cms.Core.Constants.System.Root, "Delete Media by version date");
         }
 
@@ -865,9 +846,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var notification = new DeletingVersionsNotification<IMedia>(id, evtMsgs, specificVersion: versionId);
-                _eventAggregator.Publish(notification);
-                if (notification.Cancel)
+                if (scope.Notifications.PublishCancelable(new DeletingVersionsNotification<IMedia>(id, evtMsgs, specificVersion: versionId)))
                 {
                     scope.Complete();
                     return;
@@ -885,7 +864,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _mediaRepository.DeleteVersion(versionId);
 
-                _eventAggregator.Publish(new DeletedVersionsNotification<IMedia>(id, evtMsgs, specificVersion: versionId));
+                scope.Notifications.Publish(new DeletedVersionsNotification<IMedia>(id, evtMsgs, specificVersion: versionId));
                 Audit(AuditType.Delete, userId, Cms.Core.Constants.System.Root, "Delete Media by version");
 
                 scope.Complete();
@@ -917,9 +896,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 var moveEventInfo = new MoveEventInfo<IMedia>(media, originalPath, Cms.Core.Constants.System.RecycleBinMedia);
 
-                var notification = new MovingToRecycleBinNotification<IMedia>(moveEventInfo, evtMsgs);
-                _eventAggregator.Publish(notification);
-                if (notification.Cancel)
+                if (scope.Notifications.PublishCancelable(new MovingToRecycleBinNotification<IMedia>(moveEventInfo, evtMsgs)))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -928,9 +905,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                 PerformMoveLocked(media, Cms.Core.Constants.System.RecycleBinMedia, null, userId, moves, true);
 
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch).ToEventArgs());
-                var moveInfo = moves.Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId))
-                    .ToArray();
-                _eventAggregator.Publish(new MovedToRecycleBinNotification<IMedia>(moveInfo, evtMsgs));
+                var moveInfo = moves.Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId)).ToArray();
+                scope.Notifications.Publish(new MovedToRecycleBinNotification<IMedia>(moveInfo, evtMsgs));
                 Audit(AuditType.Move, userId, media.Id, "Move Media to recycle bin");
 
                 scope.Complete();
@@ -967,9 +943,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     throw new InvalidOperationException("Parent does not exist or is trashed."); // causes rollback
 
                 var moveEventInfo = new MoveEventInfo<IMedia>(media, media.Path, parentId);
-                var notification = new MovingNotification<IMedia>(moveEventInfo, evtMsgs);
-                _eventAggregator.Publish(notification);
-                if (notification.Cancel)
+                if (scope.Notifications.PublishCancelable(new MovingNotification<IMedia>(moveEventInfo, evtMsgs)))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -985,7 +959,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var moveInfo = moves //changes
                     .Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
-                _eventAggregator.Publish(new MovedNotification<IMedia>(moveInfo, evtMsgs));
+                scope.Notifications.Publish(new MovedNotification<IMedia>(moveInfo, evtMsgs));
                 Audit(AuditType.Move, userId, media.Id);
                 scope.Complete();
             }
@@ -1066,9 +1040,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // v7 EmptyingRecycleBin and EmptiedRecycleBin events are greatly simplified since
                 // each deleted items will have its own deleting/deleted events. so, files and such
                 // are managed by Delete, and not here.
-                var notification = new EmptyingRecycleBinNotification<IMedia>(evtMsgs);
-                _eventAggregator.Publish(notification);
-                if (notification.Cancel)
+                if (scope.Notifications.PublishCancelable(new EmptyingRecycleBinNotification<IMedia>(evtMsgs)))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
@@ -1082,7 +1054,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     DeleteLocked(scope, media, evtMsgs);
                     deleted.Add(media);
                 }
-                _eventAggregator.Publish(new EmptiedRecycleBinNotification<IMedia>(new EventMessages()));
+                scope.Notifications.Publish(new EmptiedRecycleBinNotification<IMedia>(new EventMessages()));
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.Remove)).ToEventArgs());
                 Audit(AuditType.Delete, userId, Cms.Core.Constants.System.RecycleBinMedia, "Empty Media recycle bin");
                 scope.Complete();
@@ -1112,15 +1084,10 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (raiseEvents)
+                if (raiseEvents && scope.Notifications.PublishCancelable(new SavingNotification<IMedia>(itemsA, evtMsgs)))
                 {
-                    var notification = new SavingNotification<IMedia>(itemsA, evtMsgs);
-                    _eventAggregator.Publish(notification);
-                    if (notification.Cancel)
-                    {
-                        scope.Complete();
-                        return false;
-                    }
+                    scope.Complete();
+                    return false;
                 }
 
                 var saved = new List<IMedia>();
@@ -1146,7 +1113,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    _eventAggregator.Publish(new SavedNotification<IMedia>(itemsA, evtMsgs));
+                    scope.Notifications.Publish(new SavedNotification<IMedia>(itemsA, evtMsgs));
                 }
                 scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
                 Audit(AuditType.Sort, userId, 0);
@@ -1264,9 +1231,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var query = Query<IMedia>().WhereIn(x => x.ContentTypeId, mediaTypeIdsA);
                 var medias = _mediaRepository.Get(query).ToArray();
 
-                var notification = new DeletingNotification<IMedia>(medias, evtMsgs);
-                _eventAggregator.Publish(notification);
-                if (notification.Cancel)
+                if (scope.Notifications.PublishCancelable(new DeletingNotification<IMedia>(medias, evtMsgs)))
                 {
                     scope.Complete();
                     return;
@@ -1297,7 +1262,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     .ToArray();
                 if (moveInfos.Length > 0)
                 {
-                    _eventAggregator.Publish(new MovedToRecycleBinNotification<IMedia>(moveInfos, evtMsgs));
+                    scope.Notifications.Publish(new MovedToRecycleBinNotification<IMedia>(moveInfos, evtMsgs));
                 }
                 scope.Events.Dispatch(TreeChanged, this, changes.ToEventArgs());
 
