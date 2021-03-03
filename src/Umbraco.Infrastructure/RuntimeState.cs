@@ -2,15 +2,16 @@ using System;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Core.Events;
 
 namespace Umbraco.Cms.Core
 {
@@ -24,6 +25,7 @@ namespace Umbraco.Cms.Core
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly ILogger<RuntimeState> _logger;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
+        private readonly IEventAggregator _eventAggregator;
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -42,13 +44,15 @@ namespace Umbraco.Cms.Core
             IUmbracoVersion umbracoVersion,
             IUmbracoDatabaseFactory databaseFactory,
             ILogger<RuntimeState> logger,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            IEventAggregator eventAggregator)
         {
             _globalSettings = globalSettings.Value;
             _umbracoVersion = umbracoVersion;
             _databaseFactory = databaseFactory;
             _logger = logger;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
+            _eventAggregator = eventAggregator;
         }
 
 
@@ -194,7 +198,7 @@ namespace Umbraco.Cms.Core
             Reason = reason;
         }
 
-        public void DoUnattendedInstall()
+        public async void DoUnattendedInstall()
         {
              // unattended install is not enabled
             if (_globalSettings.InstallUnattended == false) return;
@@ -232,6 +236,11 @@ namespace Umbraco.Cms.Core
                     creator.InitializeDatabaseSchema();
                     database.CompleteTransaction();
                     _logger.LogInformation("Unattended install completed.");
+
+                    // Emit an event with EventAggregator that unattended install completed
+                    // Then this event can be listened for and create an unattended user
+                    await _eventAggregator.PublishAsync(new UnattendedInstallNotification());
+
                 }
                 catch (Exception ex)
                 {
