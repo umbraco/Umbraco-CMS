@@ -271,9 +271,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddUnique<InstallAreaRoutes>();
 
-            // This is a lovely file with no real groupings it seems
-            // Put close to install & upgrade stuff for the notification/event listener for
-            builder.AddNotificationHandler<UmbracoApplicationStarting, CreateUnattendedUserNotificationHandler>();
+            
 
 
 
@@ -295,6 +293,13 @@ namespace Umbraco.Extensions
             // TODO: Does this belong in web components??
             builder.AddNuCache();
 
+            return builder;
+        }
+
+        public static IUmbracoBuilder AddUnattedInstallCreateUser(this IUmbracoBuilder builder)
+        {
+            builder.AddNotificationHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
+            //builder.AddNotificationHandler<UmbracoApplicationStarting, CreateUnattendedUserNotificationHandler>();
             return builder;
         }
 

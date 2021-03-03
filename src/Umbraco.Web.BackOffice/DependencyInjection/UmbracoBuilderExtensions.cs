@@ -47,7 +47,8 @@ namespace Umbraco.Extensions
                 .AddPreviewSupport()
                 .AddHostedServices()
                 .AddDistributedCache()
-                .AddModelsBuilderDashboard();
+                .AddModelsBuilderDashboard()
+                .AddUnattedInstallCreateUser(); // Put last to test that everything else injected/setup & happy
 
         /// <summary>
         /// Adds Umbraco back office authentication requirements
