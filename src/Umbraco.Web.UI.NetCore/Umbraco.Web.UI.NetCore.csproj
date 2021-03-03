@@ -21,6 +21,7 @@
 
   <ItemGroup>
     <Folder Include="App_Plugins" />
+    <Folder Include="Views" />
     <Folder Include="wwwroot\Media" />
   </ItemGroup>
 
