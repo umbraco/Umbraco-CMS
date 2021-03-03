@@ -165,8 +165,14 @@ namespace Umbraco.Cms.Core.Scoping
 
         #region Ambient Context
 
-        internal const string ContextItemKey = "Umbraco.Core.Scoping.ScopeContext";
+        internal static readonly string ContextItemKey = $"{typeof(ScopeProvider).FullName}";
 
+        /// <summary>
+        /// Get or set the Ambient (Current) <see cref="IScopeContext"/> for the current execution context.
+        /// </summary>
+        /// <remarks>
+        /// The current execution context may be request based (HttpContext) or on a background thread (AsyncLocal)
+        /// </remarks>
         public IScopeContext AmbientContext
         {
             get
@@ -205,7 +211,12 @@ namespace Umbraco.Cms.Core.Scoping
 
         IScope IScopeAccessor.AmbientScope => AmbientScope;
 
-        // null if there is none
+        /// <summary>
+        /// Get or set the Ambient (Current) <see cref="Scope"/> for the current execution context.
+        /// </summary>
+        /// <remarks>
+        /// The current execution context may be request based (HttpContext) or on a background thread (AsyncLocal)
+        /// </remarks>
         public Scope AmbientScope
         {
             // try http context, fallback onto call context
@@ -237,6 +248,12 @@ namespace Umbraco.Cms.Core.Scoping
 
         #endregion
 
+        /// <summary>
+        /// Set the Ambient (Current) <see cref="Scope"/> and <see cref="IScopeContext"/> for the current execution context.
+        /// </summary>
+        /// <remarks>
+        /// The current execution context may be request based (HttpContext) or on a background thread (AsyncLocal)
+        /// </remarks>
         public void SetAmbient(Scope scope, IScopeContext context = null)
         {
             // clear all
@@ -302,12 +319,16 @@ namespace Umbraco.Cms.Core.Scoping
         /// <inheritdoc />
         public IScope DetachScope()
         {
-            var ambientScope = AmbientScope;
+            Scope ambientScope = AmbientScope;
             if (ambientScope == null)
+            {
                 throw new InvalidOperationException("There is no ambient scope.");
+            }
 
             if (ambientScope.Detachable == false)
+            {
                 throw new InvalidOperationException("Ambient scope is not detachable.");
+            }
 
             SetAmbient(ambientScope.OrigScope, ambientScope.OrigContext);
             ambientScope.OrigScope = null;
@@ -508,7 +529,6 @@ namespace Umbraco.Cms.Core.Scoping
             Scope = scope;
             Created = DateTime.Now;
             CtorStack = ctorStack;
-            CreatedThreadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
         }
 
         public IScope Scope { get; } // the scope itself
@@ -516,7 +536,6 @@ namespace Umbraco.Cms.Core.Scoping
         // the scope's parent identifier
         public Guid Parent => ((Scope)Scope).ParentScope == null ? Guid.Empty : ((Scope)Scope).ParentScope.InstanceId;
 
-        public int CreatedThreadId { get; } // the thread id that created this scope
         public DateTime Created { get; } // the date time the scope was created
         public bool Disposed { get; set; } // whether the scope has been disposed already
         public string Context { get; set; } // the current 'context' that contains the scope (null, "http" or "lcc")
@@ -529,10 +548,10 @@ namespace Umbraco.Cms.Core.Scoping
                 .AppendLine("ScopeInfo:")
                 .Append("Instance Id: ")
                 .AppendLine(Scope.InstanceId.ToString())
-                .Append("Instance Id: ")
+                .Append("Parent Id: ")
                 .AppendLine(Parent.ToString())
                 .Append("Created Thread Id: ")
-                .AppendLine(CreatedThreadId.ToInvariantString())
+                .AppendLine(Scope.CreatedThreadId.ToInvariantString())
                 .Append("Created At: ")
                 .AppendLine(Created.ToString("O"))
                 .Append("Disposed: ")

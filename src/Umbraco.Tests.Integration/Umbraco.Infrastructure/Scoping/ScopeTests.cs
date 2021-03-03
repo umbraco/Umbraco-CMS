@@ -2,6 +2,11 @@
 // See LICENSE for more details.
 
 using System;
+using System.Threading;
+using System.Threading.Tasks;
+using Castle.Core.Logging;
+using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Scoping;
@@ -19,6 +24,45 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
         [SetUp]
         public void SetUp() => Assert.IsNull(ScopeProvider.AmbientScope); // gone
+
+        [Test]
+        public void Non_Disposed_Nested_Scope_Throws()
+        {
+            ScopeProvider scopeProvider = ScopeProvider;
+
+            Assert.IsNull(ScopeProvider.AmbientScope);
+            IScope mainScope = scopeProvider.CreateScope();
+
+            IScope nested = scopeProvider.CreateScope(); // not disposing
+
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => mainScope.Dispose());
+            Console.WriteLine(ex);
+        }
+
+        [Test]
+        public void Non_Joined_Child_Thread_Nested_Scope_Throws()
+        {
+            ScopeProvider scopeProvider = ScopeProvider;
+
+            Assert.IsNull(ScopeProvider.AmbientScope);
+            IScope mainScope = scopeProvider.CreateScope();
+
+            // Task.Run will flow the execution context unless ExecutionContext.SuppressFlow() is explicitly called.
+            // This is what occurs in normal async behavior since it is expected to await (and join) the main thread,
+            // but if Task.Run is used as a fire and forget thread without being done correctly then the Scope will
+            // flow to that thread.
+            var t = Task.Run(() =>
+            {                
+                using IScope nested = scopeProvider.CreateScope();
+                Thread.Sleep(2000); // block for a bit
+            });
+
+            // now dispose the main without waiting for the child thread to join
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => mainScope.Dispose());
+
+            Task.WaitAll(t);
+            Console.WriteLine(ex);
+        }
 
         [Test]
         public void SimpleCreateScope()
@@ -113,9 +157,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
 
-                // only if Core.DEBUG_SCOPES are defined
-                //// Assert.IsEmpty(scopeProvider.CallContextObjects);
-
                 using (IScope nested = scopeProvider.CreateScope(callContext: true))
                 {
                     Assert.IsInstanceOf<Scope>(nested);
@@ -126,10 +167,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                     // it's moved over to call context
                     IScope callContextScope = CallContext<IScope>.GetData(ScopeProvider.ScopeItemKey);
                     Assert.IsNotNull(callContextScope);
-
-                    // only if Core.DEBUG_SCOPES are defined
-                    // var ccnested = scopeProvider.CallContextObjects[callContextKey];
-                    // Assert.AreSame(nested, ccnested);
                 }
 
                 // it's naturally back in http context
@@ -404,12 +441,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         [Test]
         public void CallContextScope1()
         {
+            var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
             ScopeProvider scopeProvider = ScopeProvider;
             using (IScope scope = scopeProvider.CreateScope())
             {
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.IsNotNull(scopeProvider.AmbientContext);
-                using (new SafeCallContext())
+
+                // Run on another thread without a flowed context
+                Task t = taskHelper.RunBackgroundTask(() =>
                 {
                     Assert.IsNull(scopeProvider.AmbientScope);
                     Assert.IsNull(scopeProvider.AmbientContext);
@@ -423,7 +463,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
                     Assert.IsNull(scopeProvider.AmbientScope);
                     Assert.IsNull(scopeProvider.AmbientContext);
-                }
+
+                    return Task.CompletedTask;
+                });
+
+                Task.WaitAll(t);
 
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.AreSame(scope, scopeProvider.AmbientScope);
@@ -436,6 +480,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         [Test]
         public void CallContextScope2()
         {
+            var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
             ScopeProvider scopeProvider = ScopeProvider;
             Assert.IsNull(scopeProvider.AmbientScope);
 
@@ -443,7 +488,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             {
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.IsNotNull(scopeProvider.AmbientContext);
-                using (new SafeCallContext())
+
+                // Run on another thread without a flowed context
+                Task t = taskHelper.RunBackgroundTask(() =>
                 {
                     Assert.IsNull(scopeProvider.AmbientScope);
                     Assert.IsNull(scopeProvider.AmbientContext);
@@ -457,7 +504,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
                     Assert.IsNull(scopeProvider.AmbientScope);
                     Assert.IsNull(scopeProvider.AmbientContext);
-                }
+                    return Task.CompletedTask;
+                });
+
+                Task.WaitAll(t);
 
                 Assert.IsNotNull(scopeProvider.AmbientScope);
                 Assert.AreSame(scope, scopeProvider.AmbientScope);

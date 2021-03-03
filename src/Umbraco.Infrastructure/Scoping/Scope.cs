@@ -1,6 +1,8 @@
 using System;
 using System.Data;
+using System.Threading;
 using Microsoft.Extensions.Logging;
+using Umbraco.Extensions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
@@ -76,16 +78,29 @@ namespace Umbraco.Cms.Core.Scoping
 
             if (detachable)
             {
-                if (parent != null) throw new ArgumentException("Cannot set parent on detachable scope.", nameof(parent));
-                if (scopeContext != null) throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
-                if (autoComplete) throw new ArgumentException("Cannot auto-complete a detachable scope.", nameof(autoComplete));
+                if (parent != null)
+                {
+                    throw new ArgumentException("Cannot set parent on detachable scope.", nameof(parent));
+                }
+
+                if (scopeContext != null)
+                {
+                    throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
+                }
+
+                if (autoComplete)
+                {
+                    throw new ArgumentException("Cannot auto-complete a detachable scope.", nameof(autoComplete));
+                }
 
                 // detachable creates its own scope context
                 Context = new ScopeContext();
 
                 // see note below
                 if (scopeFileSystems == true)
+                {
                     _fscope = fileSystems.Shadow();
+                }
 
                 return;
             }
@@ -98,16 +113,22 @@ namespace Umbraco.Cms.Core.Scoping
                 // TODO: means that it's OK to go from L2 to None for reading purposes, but writing would be BAD!
                 // this is for XmlStore that wants to bypass caches when rebuilding XML (same for NuCache)
                 if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode > repositoryCacheMode)
+                {
                     throw new ArgumentException($"Value '{repositoryCacheMode}' cannot be lower than parent value '{parent.RepositoryCacheMode}'.", nameof(repositoryCacheMode));
+                }
 
                 // cannot specify a dispatcher!
                 if (_eventDispatcher != null)
+                {
                     throw new ArgumentException("Value cannot be specified on nested scope.", nameof(eventDispatcher));
+                }
 
                 // cannot specify a different fs scope!
                 // can be 'true' only on outer scope (and false does not make much sense)
                 if (scopeFileSystems != null && parent._scopeFileSystem != scopeFileSystems)
+                {
                     throw new ArgumentException($"Value '{scopeFileSystems.Value}' be different from parent value '{parent._scopeFileSystem}'.", nameof(scopeFileSystems));
+                }
             }
             else
             {
@@ -115,7 +136,9 @@ namespace Umbraco.Cms.Core.Scoping
                 // every scoped FS to trigger the creation of shadow FS "on demand", and that would be
                 // pretty pointless since if scopeFileSystems is true, we *know* we want to shadow
                 if (scopeFileSystems == true)
+                {
                     _fscope = fileSystems.Shadow();
+                }
             }
         }
 
@@ -155,6 +178,8 @@ namespace Umbraco.Cms.Core.Scoping
         { }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
+
+        public int CreatedThreadId { get; } = Thread.CurrentThread.ManagedThreadId;
 
         public ISqlContext SqlContext => _scopeProvider.SqlContext;
 
@@ -357,11 +382,14 @@ namespace Umbraco.Cms.Core.Scoping
         {
             EnsureNotDisposed();
 
+
             if (this != _scopeProvider.AmbientScope)
             {
+                var failedMessage = $"The {nameof(Scope)} {this.GetDebugInfo()} being disposed is not the Ambient {nameof(Scope)} {_scopeProvider.AmbientScope.GetDebugInfo()}. This typically indicates that a child {nameof(Scope)} was not disposed or flowed to a child thread that was not re-joined to the thread that the parent originated (i.e. Task.Run used as a fire and forget task without ExecutionContext.SuppressFlow()).";
+
 #if DEBUG_SCOPES
                 Scope ambient = _scopeProvider.AmbientScope;
-                _logger.LogDebug("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
+                _logger.LogWarning("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
                 if (ambient == null)
                 {
                     throw new InvalidOperationException("Not the ambient scope (no ambient scope).");
@@ -369,11 +397,11 @@ namespace Umbraco.Cms.Core.Scoping
 
                 ScopeInfo ambientInfos = _scopeProvider.GetScopeInfo(ambient);
                 ScopeInfo disposeInfos = _scopeProvider.GetScopeInfo(this);
-                throw new InvalidOperationException("Not the ambient scope (see ctor stack traces).\r\n"
+                throw new InvalidOperationException($"{failedMessage} (see ctor stack traces).\r\n"
                     + "- ambient ->\r\n" + ambientInfos.ToString() + "\r\n"
                     + "- dispose ->\r\n" + disposeInfos.ToString() + "\r\n");
 #else
-                throw new InvalidOperationException("Not the ambient scope.");
+                throw new InvalidOperationException(failedMessage);
 #endif
             }
 
@@ -385,15 +413,20 @@ namespace Umbraco.Cms.Core.Scoping
 #endif
 
             if (_autoComplete && _completed == null)
+            {
                 _completed = true;
+            }
 
             if (parent != null)
+            {
                 parent.ChildCompleted(_completed);
+            }
             else
+            {
                 DisposeLastScope();
+            }
 
             _disposed = true;
-            GC.SuppressFinalize(this);
         }
 
         private void DisposeLastScope()
@@ -489,14 +522,15 @@ namespace Umbraco.Cms.Core.Scoping
             });
         }
 
-        private static void TryFinally(params Action[] actions)
-        {
-            TryFinally(0, actions);
-        }
+        private static void TryFinally(params Action[] actions) => TryFinally(0, actions);
 
         private static void TryFinally(int index, Action[] actions)
         {
-            if (index == actions.Length) return;
+            if (index == actions.Length)
+            {
+                return;
+            }
+
             try
             {
                 actions[index]();

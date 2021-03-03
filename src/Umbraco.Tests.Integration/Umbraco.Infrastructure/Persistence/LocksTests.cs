@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
 using System.Linq;
@@ -85,10 +85,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                 });
             }
 
-            // safe call context ensures that current scope does not leak into starting threads
-            using (new SafeCallContext())
+            // ensure that current scope does not leak into starting threads
+            using (ExecutionContext.SuppressFlow())
             {
-                foreach (var thread in threads) thread.Start();
+                foreach (var thread in threads)
+                {
+                    thread.Start();
+                }
             }
 
             m2.Wait();
@@ -96,13 +99,18 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             var maxAcquired = acquired;
             m1.Set();
 
-            foreach (var thread in threads) thread.Join();
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
 
             Assert.AreEqual(threadCount, maxAcquired);
             Assert.AreEqual(0, acquired);
 
             for (var i = 0; i < threadCount; i++)
+            {
                 Assert.IsNull(exceptions[i]);
+            }
         }
 
         [Test]
@@ -115,7 +123,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             var acquired = 0;
             var entered = 0;
             var ms = new AutoResetEvent[threadCount];
-            for (var i = 0; i < threadCount; i++) ms[i] = new AutoResetEvent(false);
+            for (var i = 0; i < threadCount; i++)
+            {
+                ms[i] = new AutoResetEvent(false);
+            }
+
             var m1 = new ManualResetEventSlim(false);
 
             for (var i = 0; i < threadCount; i++)
@@ -153,28 +165,43 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                 });
             }
 
-            // safe call context ensures that current scope does not leak into starting threads
-            using (new SafeCallContext())
+            // ensure that current scope does not leak into starting threads
+            using (ExecutionContext.SuppressFlow())
             {
-                foreach (var thread in threads) thread.Start();
+                foreach (var thread in threads)
+                {
+                    thread.Start();
+                }
             }
 
             m1.Wait();
             // all threads have entered
             ms[0].Set(); // let 0 go
             Thread.Sleep(100);
-            for (var i = 1; i < threadCount; i++) ms[i].Set(); // let others go
+            for (var i = 1; i < threadCount; i++)
+            {
+                ms[i].Set(); // let others go
+            }
+
             Thread.Sleep(500);
             // only 1 thread has locked
             Assert.AreEqual(1, acquired);
-            for (var i = 0; i < threadCount; i++) ms[i].Set(); // let all go
+            for (var i = 0; i < threadCount; i++)
+            {
+                ms[i].Set(); // let all go
+            }
 
-            foreach (var thread in threads) thread.Join();
+            foreach (var thread in threads)
+            {
+                thread.Join();
+            }
 
             Assert.AreEqual(0, acquired);
 
             for (var i = 0; i < threadCount; i++)
+            {
                 Assert.IsNull(exceptions[i]);
+            }
         }
 
         [Retry(10)] // TODO make this test non-flaky.
@@ -191,8 +218,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             var thread1 = new Thread(() => DeadLockTestThread(1, 2, ev1, ev2, ref e1));
             var thread2 = new Thread(() => DeadLockTestThread(2, 1, ev2, ev1, ref e2));
 
-            // safe call context ensures that current scope does not leak into starting threads
-            using (new SafeCallContext())
+            // ensure that current scope does not leak into starting threads
+            using (ExecutionContext.SuppressFlow())
             {
                 thread1.Start();
                 thread2.Start();
@@ -242,9 +269,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
                     myEv.Set();
 
                     if (id1 == 1)
+                    {
                         otherEv.WaitOne();
+                    }
                     else
+                    {
                         Thread.Sleep(5200); // wait for deadlock...
+                    }
 
                     Console.WriteLine($"[{id1}] WAIT {id2}");
                     scope.WriteLock(id2);
@@ -275,8 +306,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
             var thread1 = new Thread(() => NoDeadLockTestThread(1, ev1, ev2, ref e1));
             var thread2 = new Thread(() => NoDeadLockTestThread(2, ev2, ev1, ref e1));
 
-            // need safe call context else the current one leaks into *both* threads
-            using (new SafeCallContext())
+            // ensure that current scope does not leak into starting threads
+            using (ExecutionContext.SuppressFlow())
             {
                 thread1.Start();
                 thread2.Start();

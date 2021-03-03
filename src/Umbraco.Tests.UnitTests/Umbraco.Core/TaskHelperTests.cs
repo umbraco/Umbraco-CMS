@@ -15,13 +15,13 @@ using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 {
     [TestFixture]
-    public class FireAndForgetTasksTests
+    public class TaskHelperTests
     {
         [Test]
         [AutoMoqData]
         public void RunBackgroundTask__Suppress_Execution_Context(
-            [Frozen] ILogger<FireAndForgetTasks> logger,
-            FireAndForgetTasks sut)
+            [Frozen] ILogger<TaskHelper> logger,
+            TaskHelper sut)
         {
             var local = new AsyncLocal<string>
             {
@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 
             string taskResult = null;
             
-            Task t = sut.RunBackgroundTask(() =>
+            Task t = sut.ExecuteBackgroundTask(() =>
             {
                 // FireAndForgetTasks ensure that flow is suppressed therefore this value will be null
                 taskResult = local.Value;
@@ -45,11 +45,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
         [Test]
         [AutoMoqData]
         public void RunBackgroundTask__Must_Run_Func(
-            [Frozen] ILogger<FireAndForgetTasks> logger,
-            FireAndForgetTasks sut)
+            [Frozen] ILogger<TaskHelper> logger,
+            TaskHelper sut)
         {
             var i = 0;
-            Task t = sut.RunBackgroundTask(() =>
+            Task t = sut.ExecuteBackgroundTask(() =>
             {
                 Interlocked.Increment(ref i);
                 return Task.CompletedTask;
@@ -63,11 +63,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
         [Test]
         [AutoMoqData]
         public void RunBackgroundTask__Log_Error_When_Exception_Happen_In_Background_Task(
-            [Frozen] ILogger<FireAndForgetTasks> logger,
+            [Frozen] ILogger<TaskHelper> logger,
             Exception exception,
-            FireAndForgetTasks sut)
+            TaskHelper sut)
         {
-            Task t = sut.RunBackgroundTask(() => throw exception);
+            Task t = sut.ExecuteBackgroundTask(() => throw exception);
 
             Task.WaitAll(t);
 

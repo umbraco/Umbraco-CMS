@@ -170,7 +170,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             // Services required to run background jobs (with out the handler)
             builder.Services.AddUnique<IBackgroundTaskQueue, BackgroundTaskQueue>();
-            builder.Services.AddUnique<FireAndForgetTasks>();
+            builder.Services.AddUnique<TaskHelper>();
 
             return builder;
         }

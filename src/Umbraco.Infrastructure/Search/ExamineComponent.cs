@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
         private readonly BackgroundIndexRebuilder _backgroundIndexRebuilder;
-        private readonly FireAndForgetTasks _taskHelper;
+        private readonly TaskHelper _taskHelper;
         private readonly IScopeProvider _scopeProvider;
         private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Infrastructure.Search
             IValueSetBuilder<IMedia> mediaValueSetBuilder,
             IValueSetBuilder<IMember> memberValueSetBuilder,
             BackgroundIndexRebuilder backgroundIndexRebuilder,
-            FireAndForgetTasks taskHelper)
+            TaskHelper taskHelper)
         {
             _services = services;
             _scopeProvider = scopeProvider;
@@ -657,12 +657,12 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// </summary>
         private class DeferedReIndexForContent : DeferedAction
         {
-            private readonly FireAndForgetTasks _taskHelper;
+            private readonly TaskHelper _taskHelper;
             private readonly ExamineComponent _examineComponent;
             private readonly IContent _content;
             private readonly bool _isPublished;
 
-            public DeferedReIndexForContent(FireAndForgetTasks taskHelper, ExamineComponent examineComponent, IContent content, bool isPublished)
+            public DeferedReIndexForContent(TaskHelper taskHelper, ExamineComponent examineComponent, IContent content, bool isPublished)
             {
                 _taskHelper = taskHelper;
                 _examineComponent = examineComponent;
@@ -672,7 +672,7 @@ namespace Umbraco.Cms.Infrastructure.Search
 
             public override void Execute() => Execute(_taskHelper, _examineComponent, _content, _isPublished);
 
-            public static void Execute(FireAndForgetTasks taskHelper, ExamineComponent examineComponent, IContent content, bool isPublished)
+            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IContent content, bool isPublished)
                 => taskHelper.RunBackgroundTask(() =>
                 {
                     using IScope scope = examineComponent._scopeProvider.CreateScope(autoComplete: true);
@@ -702,12 +702,12 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// </summary>
         private class DeferedReIndexForMedia : DeferedAction
         {
-            private readonly FireAndForgetTasks _taskHelper;
+            private readonly TaskHelper _taskHelper;
             private readonly ExamineComponent _examineComponent;
             private readonly IMedia _media;
             private readonly bool _isPublished;
 
-            public DeferedReIndexForMedia(FireAndForgetTasks taskHelper, ExamineComponent examineComponent, IMedia media, bool isPublished)
+            public DeferedReIndexForMedia(TaskHelper taskHelper, ExamineComponent examineComponent, IMedia media, bool isPublished)
             {
                 _taskHelper = taskHelper;
                 _examineComponent = examineComponent;
@@ -717,7 +717,7 @@ namespace Umbraco.Cms.Infrastructure.Search
 
             public override void Execute() => Execute(_taskHelper, _examineComponent, _media, _isPublished);
 
-            public static void Execute(FireAndForgetTasks taskHelper, ExamineComponent examineComponent, IMedia media, bool isPublished) =>
+            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IMedia media, bool isPublished) =>
                 // perform the ValueSet lookup on a background thread
                 taskHelper.RunBackgroundTask(() =>
                 {
@@ -744,9 +744,9 @@ namespace Umbraco.Cms.Infrastructure.Search
         {
             private readonly ExamineComponent _examineComponent;
             private readonly IMember _member;
-            private readonly FireAndForgetTasks _taskHelper;
+            private readonly TaskHelper _taskHelper;
 
-            public DeferedReIndexForMember(FireAndForgetTasks taskHelper, ExamineComponent examineComponent, IMember member)
+            public DeferedReIndexForMember(TaskHelper taskHelper, ExamineComponent examineComponent, IMember member)
             {
                 _examineComponent = examineComponent;
                 _member = member;
@@ -755,7 +755,7 @@ namespace Umbraco.Cms.Infrastructure.Search
 
             public override void Execute() => Execute(_taskHelper, _examineComponent, _member);
 
-            public static void Execute(FireAndForgetTasks taskHelper, ExamineComponent examineComponent, IMember member) =>
+            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IMember member) =>
                 // perform the ValueSet lookup on a background thread
                 taskHelper.RunBackgroundTask(() =>
                 {
