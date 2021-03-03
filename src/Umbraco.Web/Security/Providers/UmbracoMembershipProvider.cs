@@ -3,7 +3,6 @@ using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
 using System.Text;
-using System.Web;
 using System.Web.Configuration;
 using System.Web.Security;
 using Umbraco.Core;
@@ -14,7 +13,6 @@ using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
-using Umbraco.Core.Models.Identity;
 
 namespace Umbraco.Web.Security.Providers
 {
@@ -357,7 +355,7 @@ namespace Umbraco.Web.Security.Providers
                     member.LastLoginDate = now;
                     member.UpdateDate = now;
                 }
-                    
+
             }
 
             return ConvertToMembershipUser(member);
@@ -604,11 +602,21 @@ namespace Umbraco.Web.Security.Providers
             {
                 // when upgrading from 7.2 to 7.3 trying to save will throw
                 if (UmbracoVersion.Current >= new Version(7, 3, 0, 0))
-                    MemberService.Save(member, false);
+                {
+                    // We need to raise event to ensure caches are updated. (e.g. the cache that uses username as key).
+                    // Even that this is a heavy operation, because indexes are updates, we consider that okay, as it
+                    // is still cheap to do a successful login.
+                    MemberService.Save(member, true);
+                }
+
             }
             else
             {
-                // set the last login date without full save (fast, no locks)
+                // set the last login date without full save (fast, no locks).
+                // We do not update caches. This is to the best of our knowledge okay, as this info are only stored
+                // because it is required by the membership provider.
+                // If we one day have to revisit this, we will most likely need to spilt the events in membership info
+                // saved and umbraco info saved.  We don't want to update indexes etc when it is just membership info that is saved
                 MemberService.SetLastLogin(member.Username, member.LastLoginDate);
             }
 
