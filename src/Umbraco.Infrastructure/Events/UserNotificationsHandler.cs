@@ -9,7 +9,6 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -19,9 +18,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Compose
+namespace Umbraco.Cms.Core.Events
 {
-    // TODO: this should probably be moved to another namespace
     public sealed class UserNotificationsHandler :
         INotificationHandler<SavedNotification<IContent>>,
         INotificationHandler<SortedNotification<IContent>>,

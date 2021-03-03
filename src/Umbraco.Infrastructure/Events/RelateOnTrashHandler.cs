@@ -1,14 +1,12 @@
 using System.Linq;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Compose
+namespace Umbraco.Cms.Core.Events
 {
-    // TODO: this should probably be moved to another namespace
     // TODO: lots of duplicate code in this one, refactor
     public sealed class RelateOnTrashHandler :
         INotificationHandler<MovedNotification<IContent>>,

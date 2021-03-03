@@ -1,11 +1,9 @@
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Services.Notifications;
 
-namespace Umbraco.Cms.Core.Compose
+namespace Umbraco.Cms.Core.Events
 {
-    // TODO: this should probably be moved to another namespace
     public class RelateOnCopyHandler : INotificationHandler<CopiedNotification<IContent>>
     {
         private readonly IRelationService _relationService;
