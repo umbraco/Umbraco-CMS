@@ -449,7 +449,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 Assert.IsNotNull(scopeProvider.AmbientContext);
 
                 // Run on another thread without a flowed context
-                Task t = taskHelper.RunBackgroundTask(() =>
+                Task t = taskHelper.ExecuteBackgroundTask(() =>
                 {
                     Assert.IsNull(scopeProvider.AmbientScope);
                     Assert.IsNull(scopeProvider.AmbientContext);
@@ -490,7 +490,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 Assert.IsNotNull(scopeProvider.AmbientContext);
 
                 // Run on another thread without a flowed context
-                Task t = taskHelper.RunBackgroundTask(() =>
+                Task t = taskHelper.ExecuteBackgroundTask(() =>
                 {
                     Assert.IsNull(scopeProvider.AmbientScope);
                     Assert.IsNull(scopeProvider.AmbientContext);

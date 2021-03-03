@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
                 // execute on another disconnected thread (execution context will not flow)
-                Task t = taskHelper.RunBackgroundTask(() =>
+                Task t = taskHelper.ExecuteBackgroundTask(() =>
                 {
                     Assert.IsFalse(mediaFileSystem.FileExists("f1.txt"));
 
@@ -159,7 +159,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             {
                 // This is testing when another thread concurrently tries to create a scoped file system
                 // because at the moment we don't support concurrent scoped filesystems.
-                Task t = taskHelper.RunBackgroundTask(() =>
+                Task t = taskHelper.ExecuteBackgroundTask(() =>
                 {
                     // ok to create a 'normal' other scope
                     using (IScope other = scopeProvider.CreateScope())
@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             {
                 // This is testing when another thread concurrently tries to create a scoped file system
                 // because at the moment we don't support concurrent scoped filesystems.
-                Task t = taskHelper.RunBackgroundTask(() =>
+                Task t = taskHelper.ExecuteBackgroundTask(() =>
                 {
                     // not ok to create a 'scoped filesystems' other scope
                     // because at the moment we don't support concurrent scoped filesystems
