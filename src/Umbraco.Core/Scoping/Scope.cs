@@ -35,10 +35,12 @@ namespace Umbraco.Core.Scoping
         private ICompletable _fscope;
         private IEventDispatcher _eventDispatcher;
 
+        private object _dictionaryLocker;
+
         // ReadLocks and WriteLocks if we're the outer most scope it's those owned by the entire chain
         // If we're a child scope it's those that we have requested.
-        public Dictionary<int, int> ReadLocks;
-        public Dictionary<int, int> WriteLocks;
+        internal readonly Dictionary<int, int> ReadLocks;
+        internal readonly Dictionary<int, int> WriteLocks;
 
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
@@ -64,6 +66,7 @@ namespace Umbraco.Core.Scoping
 
             Detachable = detachable;
 
+            _dictionaryLocker = new object();
             ReadLocks = new Dictionary<int, int>();
             WriteLocks = new Dictionary<int, int>();
 
@@ -360,14 +363,20 @@ namespace Umbraco.Core.Scoping
             // Decrement the lock counters on the parent if any.
             if (ParentScope != null)
             {
-                foreach (var readLockPair in ReadLocks)
+                lock (_dictionaryLocker)
                 {
-                    DecrementReadLock(readLockPair.Key, readLockPair.Value);
+                    foreach (var readLockPair in ReadLocks)
+                    {
+                        DecrementReadLock(readLockPair.Key, readLockPair.Value);
+                    }
                 }
 
-                foreach (var writeLockPair in WriteLocks)
+                lock (_dictionaryLocker)
                 {
-                    DecrementWriteLock(writeLockPair.Key, writeLockPair.Value);
+                    foreach (var writeLockPair in WriteLocks)
+                    {
+                        DecrementWriteLock(writeLockPair.Key, writeLockPair.Value);
+                    }
                 }
             }
 
@@ -523,7 +532,10 @@ namespace Umbraco.Core.Scoping
                 return;
             }
 
-            ReadLocks[lockId] -= amountToDecrement;
+            lock (_dictionaryLocker)
+            {
+                ReadLocks[lockId] -= amountToDecrement;
+            }
         }
 
         /// <summary>
@@ -540,7 +552,10 @@ namespace Umbraco.Core.Scoping
                 return;
             }
 
-            WriteLocks[lockId] -= amountToDecrement;
+            lock (_dictionaryLocker)
+            {
+                WriteLocks[lockId] -= amountToDecrement;
+            }
         }
 
         /// <summary>
@@ -557,12 +572,15 @@ namespace Umbraco.Core.Scoping
             {
                 foreach (var lockId in lockIds)
                 {
-                    if (!ReadLocks.ContainsKey(lockId))
+                    lock (_dictionaryLocker)
                     {
-                        ReadLocks[lockId] = 0;
-                    }
+                        if (!ReadLocks.ContainsKey(lockId))
+                        {
+                            ReadLocks[lockId] = 0;
+                        }
 
-                    ReadLocks[lockId] += 1;
+                        ReadLocks[lockId] += 1;
+                    }
                 }
             }
         }
@@ -581,12 +599,15 @@ namespace Umbraco.Core.Scoping
             {
                 foreach (var lockId in lockIds)
                 {
-                    if (!WriteLocks.ContainsKey(lockId))
+                    lock (_dictionaryLocker)
                     {
-                        WriteLocks[lockId] = 0;
-                    }
+                        if (!WriteLocks.ContainsKey(lockId))
+                        {
+                            WriteLocks[lockId] = 0;
+                        }
 
-                    WriteLocks[lockId] += 1;
+                        WriteLocks[lockId] += 1;
+                    }
                 }
             }
         }
@@ -636,24 +657,27 @@ namespace Umbraco.Core.Scoping
             // If we are the parent, then handle the lock request.
             foreach (var lockId in lockIds)
             {
-                // Only acquire the lock if we haven't done so yet.
-                if (!ReadLocks.ContainsKey(lockId))
+                lock (_dictionaryLocker)
                 {
-                    if (timeout is null)
+                    // Only acquire the lock if we haven't done so yet.
+                    if (!ReadLocks.ContainsKey(lockId))
                     {
-                        // We want a lock with a custom timeout
-                        ObtainReadLock(lockId);
+                        if (timeout is null)
+                        {
+                            // We want a lock with a custom timeout
+                            ObtainReadLock(lockId);
+                        }
+                        else
+                        {
+                            // We just want an ordinary lock.
+                            ObtainTimoutReadLock(lockId, timeout.Value);
+                        }
+                        // Add the lockId as a key to the dict.
+                        ReadLocks[lockId] = 0;
                     }
-                    else
-                    {
-                        // We just want an ordinary lock.
-                        ObtainTimoutReadLock(lockId, timeout.Value);
-                    }
-                    // Add the lockId as a key to the dict.
-                    ReadLocks[lockId] = 0;
-                }
 
-                ReadLocks[lockId] += 1;
+                    ReadLocks[lockId] += 1;
+                }
             }
         }
 
@@ -673,23 +697,26 @@ namespace Umbraco.Core.Scoping
 
             foreach (var lockId in lockIds)
             {
-                // Only acquire lock if we haven't yet (WriteLocks not containing the key)
-                if (!WriteLocks.ContainsKey(lockId))
+                lock (_dictionaryLocker)
                 {
-                    if (timeout is null)
+                    // Only acquire lock if we haven't yet (WriteLocks not containing the key)
+                    if (!WriteLocks.ContainsKey(lockId))
                     {
-                        ObtainWriteLock(lockId);
+                        if (timeout is null)
+                        {
+                            ObtainWriteLock(lockId);
+                        }
+                        else
+                        {
+                            ObtainTimeoutWriteLock(lockId, timeout.Value);
+                        }
+                        // Add the lockId as a key to the dict.
+                        WriteLocks[lockId] = 0;
                     }
-                    else
-                    {
-                        ObtainTimeoutWriteLock(lockId, timeout.Value);
-                    }
-                    // Add the lockId as a key to the dict.
-                    WriteLocks[lockId] = 0;
-                }
 
-                // Increment count of the lock by 1.
-                WriteLocks[lockId] += 1;
+                    // Increment count of the lock by 1.
+                    WriteLocks[lockId] += 1;
+                }
             }
         }
 
