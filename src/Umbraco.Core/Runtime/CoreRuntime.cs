@@ -305,42 +305,56 @@ namespace Umbraco.Core.Runtime
             // We're doing a non unattended install or something, don't do anything
             if (_state.Level != RuntimeLevel.Run) return;
 
-            var unattendedUsername = Environment.GetEnvironmentVariable("unattendedName");
-            var unattendedPassword = Environment.GetEnvironmentVariable("unattendedPass");
+            var unattendedName = Environment.GetEnvironmentVariable("unattendedName");
             var unattendedEmail = Environment.GetEnvironmentVariable("unattendedEmail");
+            var unattendedPassword = Environment.GetEnvironmentVariable("unattendedPass");
+            
 
             // Missing environment variable(s)
-            if (unattendedUsername.IsNullOrWhiteSpace()
+            if (unattendedName.IsNullOrWhiteSpace()                
+                || unattendedEmail.IsNullOrWhiteSpace()
                 || unattendedPassword.IsNullOrWhiteSpace()
-                || unattendedEmail.IsNullOrWhiteSpace())
             {
                 return;
             }
 
             var userService = _factory.GetInstance<IUserService>();
+            var admin = userService.GetUserById(Constants.Security.SuperUserId);
+            if (admin == null)
+            {
+                throw new InvalidOperationException("Could not find the super user!");
+            }
 
-            // User has already been created.
-            if (userService.Exists(unattendedUsername)) return;
+            // User email/login has already been modified
+            if (admin.Email == unattendedEmail) return;
 
             // Everything looks good, create the user
             var membershipProvider = Security.MembershipProviderExtensions.GetUsersMembershipProvider();
-            membershipProvider.CreateUser(unattendedEmail,
-                unattendedPassword,
-                unattendedEmail,
-                null,
-                null,
-                true,
-                null,
-                out var status);
+            var superUser = membershipProvider.GetUser(Constants.Security.SuperUserId, true);
+            if (superUser == null)
+            {
+                throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
+            }
 
-            // Fetch the user, in order to set up groups.
-            var user = userService.GetByEmail(unattendedEmail);
-            user.Name = unattendedUsername;
-            user.AddGroup(userService.GetUserGroupByAlias("admin") as IReadOnlyUserGroup);
-            user.AddGroup(userService.GetUserGroupByAlias("sensitiveData") as IReadOnlyUserGroup);
-            user.IsApproved = true;
-            // And then re save the user
-            userService.Save(user);
+            try
+            {
+                var success = superUser.ChangePassword("default", unattendedPassword);
+                if (success == false)
+                {
+                    throw new FormatException("Password must be at least " + membershipProvider.MinRequiredPasswordLength + " characters long and contain at least " + membershipProvider.MinRequiredNonAlphanumericCharacters + " symbols");
+                }
+            }
+            catch (Exception)
+            {
+                throw new FormatException("Password must be at least " + membershipProvider.MinRequiredPasswordLength + " characters long and contain at least " + membershipProvider.MinRequiredNonAlphanumericCharacters + " symbols");
+            }
+
+            // Set name, email & login
+            admin.Name = unattendedName.Trim();
+            admin.Email = unattendedEmail.Trim();            
+            admin.Username = unattendedEmail.Trim();
+
+            userService.Save(admin);
         }
 
         protected virtual void ConfigureUnhandledException()
