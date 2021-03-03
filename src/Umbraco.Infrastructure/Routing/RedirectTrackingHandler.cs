@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -30,13 +31,17 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly IVariationContextAccessor _variationContextAccessor;
+        private readonly IRequestCache _requestCache;
 
-        public RedirectTrackingHandler(IOptionsMonitor<WebRoutingSettings> webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor)
+        private const string NotificationStateKey = "Umbraco.Cms.Core.Routing.RedirectTrackingHandler";
+
+        public RedirectTrackingHandler(IOptionsMonitor<WebRoutingSettings> webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor, IRequestCache requestCache)
         {
             _webRoutingSettings = webRoutingSettings;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _redirectUrlService = redirectUrlService;
             _variationContextAccessor = variationContextAccessor;
+            _requestCache = requestCache;
         }
 
         public void Handle(PublishingNotification<IContent> notification)
@@ -86,8 +91,7 @@ namespace Umbraco.Cms.Core.Routing
             CreateRedirects(oldRoutes);
         }
 
-        // TODO: figure out how to do notification state / temp state
-        private OldRoutesDictionary GetOldRoutes() => new OldRoutesDictionary();
+        private OldRoutesDictionary GetOldRoutes() => (OldRoutesDictionary)_requestCache.Get(NotificationStateKey, () => new OldRoutesDictionary());
 
         private void StoreOldRoute(IContent entity, OldRoutesDictionary oldRoutes)
         {
