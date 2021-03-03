@@ -74,8 +74,5 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             Assert.IsTrue(identityResult.Succeeded);
             Assert.IsTrue(!identityResult.Errors.Any());
         }
-
-        //GetPasswordHashAsync
-        //GetUserIdAsync
     }
 }
