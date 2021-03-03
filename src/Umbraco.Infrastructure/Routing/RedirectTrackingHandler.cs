@@ -20,7 +20,6 @@ namespace Umbraco.Cms.Core.Routing
     ///     strategy using rewriting rules probably
     /// </para>
     /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
-    // TODO: insert these notification handlers in core composition
     public sealed class RedirectTrackingHandler :
         INotificationHandler<PublishingNotification<IContent>>,
         INotificationHandler<PublishedNotification<IContent>>,

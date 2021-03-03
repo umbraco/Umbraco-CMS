@@ -11,7 +11,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// <summary>
     /// A handler for Block editors used to bind to notifications
     /// </summary>
-    // TODO: insert these notification handlers in core composition
     public class BlockEditorPropertyHandler : ComplexPropertyEditorContentNotificationHandler
     {
         private readonly BlockListEditorDataConverter _converter = new BlockListEditorDataConverter();

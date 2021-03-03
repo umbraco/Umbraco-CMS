@@ -25,7 +25,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         "fileupload",
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = "icon-download-alt")]
-    // TODO: insert these notification handlers in core composition
     public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         INotificationHandler<CopiedNotification<IContent>>, INotificationHandler<DeletedNotification<IContent>>,
         INotificationHandler<DeletedNotification<IMedia>>, INotificationHandler<SavingNotification<IMedia>>

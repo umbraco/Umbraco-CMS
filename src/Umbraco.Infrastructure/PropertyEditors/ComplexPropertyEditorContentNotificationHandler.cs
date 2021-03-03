@@ -9,7 +9,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
-    // TODO: insert these notification handlers in core composition
     public abstract class ComplexPropertyEditorContentNotificationHandler :
         INotificationHandler<SavingNotification<IContent>>,
         INotificationHandler<CopyingNotification<IContent>>

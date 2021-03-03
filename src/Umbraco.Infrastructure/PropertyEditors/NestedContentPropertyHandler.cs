@@ -8,7 +8,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// <summary>
     /// A handler for NestedContent used to bind to notifications
     /// </summary>
-    // TODO: insert these notification handlers in core composition
     public class NestedContentPropertyHandler : ComplexPropertyEditorContentNotificationHandler
     {
         protected override string EditorAlias => Constants.PropertyEditors.Aliases.NestedContent;

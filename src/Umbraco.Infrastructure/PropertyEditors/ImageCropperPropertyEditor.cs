@@ -32,7 +32,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
         HideLabel = false,
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = "icon-crop")]
-    // TODO: insert these notification handlers in core composition
     public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         INotificationHandler<CopiedNotification<IContent>>, INotificationHandler<DeletedNotification<IContent>>,
         INotificationHandler<DeletedNotification<IMedia>>, INotificationHandler<SavingNotification<IMedia>>

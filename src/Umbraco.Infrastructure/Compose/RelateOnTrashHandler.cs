@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Compose
 {
-    // TODO: insert these notification handlers in core composition
+    // TODO: this should probably be moved to another namespace
     // TODO: lots of duplicate code in this one, refactor
     public sealed class RelateOnTrashHandler :
         INotificationHandler<MovedNotification<IContent>>,

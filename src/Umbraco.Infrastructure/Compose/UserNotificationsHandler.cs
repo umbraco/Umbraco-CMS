@@ -21,8 +21,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Compose
 {
-    // TODO: insert these notification handlers in core composition
-    public sealed class NotificationsHandler :
+    // TODO: this should probably be moved to another namespace
+    public sealed class UserNotificationsHandler :
         INotificationHandler<SavedNotification<IContent>>,
         INotificationHandler<SortedNotification<IContent>>,
         INotificationHandler<PublishedNotification<IContent>>,
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Compose
         private readonly ActionCollection _actions;
         private readonly IContentService _contentService;
 
-        public NotificationsHandler(Notifier notifier, ActionCollection actions, IContentService contentService)
+        public UserNotificationsHandler(Notifier notifier, ActionCollection actions, IContentService contentService)
         {
             _notifier = notifier;
             _actions = actions;
