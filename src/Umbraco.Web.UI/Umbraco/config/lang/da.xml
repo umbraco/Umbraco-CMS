@@ -264,6 +264,8 @@
     <key alias="titleOptional">Titel (valgfri)</key>
     <key alias="altTextOptional">Alternativ tekst (valgfri)</key>
     <key alias="type">Type</key>
+    <key alias="variantsToPublish">Hvilke varianter vil du udgive?</key>
+    <key alias="variantsToSave">Vælg hvilke varianter, der skal gemmes.</key>
     <key alias="unpublish">Afpublicér</key>
     <key alias="unpublished">Afpubliceret</key>
     <key alias="notCreated">Ikke oprettet</key>
@@ -305,6 +307,7 @@
     <key alias="schedulePublishHelp">Vælg dato og klokkeslæt for at udgive og/eller afpublicere indholdet.</key>
     <key alias="createEmpty">Opret ny</key>
     <key alias="createFromClipboard">Indsæt fra udklipsmappen</key>
+    <key alias="nodeIsInTrash">Dette element er i papirkurven</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Opret en ny indholdsskabelon fra '%0%'</key>
@@ -326,7 +329,7 @@
     <key alias="copyFailed">Kopiering af mediet fejlede</key>
     <key alias="createFolderFailed">Oprettelse af mappen under parent med id %0% fejlede</key>
     <key alias="renameFolderFailed">Omdøbning af mappen med id %0% fejlede</key>
-    <key alias="dragAndDropYourFilesIntoTheArea">Træk dine filer ind i dropzonen for, at uploade dem til mediebiblioteketet.</key>
+    <key alias="dragAndDropYourFilesIntoTheArea">Træk dine filer ind i dropzonen for, at uploade dem til mediebiblioteket.</key>
   </area>
   <area alias="member">
     <key alias="createNewMember">Opret et nyt medlem</key>
@@ -348,6 +351,16 @@
     <key alias="noMediaTypesWithNoSettingsAccess">Det valgte medie i træet tillader ikke at medier oprettes under det.</key>
     <key alias="noMediaTypesEditPermissions">Rediger tilladelser for denne medietype.</key>
     <key alias="documentTypeWithoutTemplate">Dokumenttype uden skabelon</key>
+    <key alias="documentTypeWithTemplate">Dokumenttype med skabelon</key>
+    <key alias="documentTypeWithTemplateDescription">Definerer en indholdsside, der kan oprettes af redaktørerne i indholdstræet, og som er kan tilgås direkte på en URL.</key>
+    <key alias="documentType">Dokumenttype</key>
+    <key alias="documentTypeDescription">Definerer en indholdskomponent, der kan oprettes af redaktørerne i indholdstræet og benyttes i sammenhæng med andet indhold, men som ikke kan tilgås direkte på en URL.</key>
+    <key alias="elementType">Element-type</key>
+    <key alias="elementTypeDescription">Definerer skabelonen for et sæt at egenskaber, der kan anvendes som skema i avancerede felter som f.eks. 'Block List' eller 'Nested Content'.</key>
+    <key alias="composition">Komposition</key>
+    <key alias="compositionDescription">Definerer et sæt genbrugbare egenskaber, der kan inkluderes i definitionen af andre dokumenttyper - f.eks. et sæt 'Almindelige side-data'.</key>
+    <key alias="folder">Mappe</key>
+    <key alias="folderDescription">Benyttes til at organisere dokumenttyper, element-typer og kompositioner i dokumenttype-træet.</key>
     <key alias="newFolder">Ny mappe</key>
     <key alias="newDataType">Ny datatype</key>
     <key alias="newJavascriptFile">Ny JavaScript-fil</key>
@@ -527,7 +540,7 @@
     <key alias="fields">felter</key>
     <key alias="indexCannotRead">Indexet skal bygges igen, for at kunne læses</key>
     <key alias="processIsTakingLonger">Processen tager længere tid end forventet. Kontrollér Umbraco loggen for at se om der er sket fejl under operationen</key>
-    <key alias="indexCannotRebuild">Dette index kan ikke genbygess for det ikke har nogen</key>
+    <key alias="indexCannotRebuild">Dette index kan ikke genbygges for det ikke har nogen</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
   </area>
   <area alias="placeholders">
@@ -611,7 +624,6 @@
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
     <key alias="propertyHasErrors">Denne egenskab er ugyldig</key>
-    <key alias="errorPropertyEditorNotSupportedInElementTypes">Feltet %0% bruger editor %1% som ikke er supporteret for ElementTyper.</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
@@ -839,7 +851,7 @@
     <key alias="permissionsSettingUpPermissions">Sætter folderrettigheder op</key>
     <key alias="permissionsText">Umbraco har behov for 'write/modify' adgang til bestemte foldere, for at kunne gemme filer som billeder og PDF'er. Umbraco gemmer også midlertidige data (eksempelvis cachen) for at forbedre ydelsen på dit website.</key>
     <key alias="runwayFromScratch">Jeg har lyst til at begynde på bar bund</key>
-    <key alias="runwayFromScratchText"><![CDATA[Dit website er helt tomt for øjeblikket, så det er perfekt hvis du ønsker at begynde på bar bund og oprette dine egne dokumenttyper og skabeloner. (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lær hvordan</a>) Du kan stadig vælge at installere Runway senere. Gå venligst til Udvikler-sektionen og vælg Pakker.]]></key>
+    <key alias="runwayFromScratchText"><![CDATA[Dit website er helt tomt for øjeblikket, så det er perfekt hvis du ønsker at begynde på bar bund og oprette dine egne dokumenttyper og skabeloner. (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">lær hvordan</a>) Du kan stadig vælge at installere Runway senere. Gå venligst til Udvikler-sektionen og vælg Pakker.]]></key>
     <key alias="runwayHeader">Du har lige opsat en ren Umbraco-platform. Hvad ønsker du nu at gøre?</key>
     <key alias="runwayInstalled">Runway er installeret</key>
     <key alias="runwayInstalledText"><![CDATA[Du har fundamentet på plads. Vælg hvilke moduler du ønsker at installere ovenpå det.<br/>Dette er vores liste over anbefalede moduler. Kryds dem af du ønsker at installere eller se den <a href="#" onclick="toggleModules(); return false;" id="toggleModuleList">fulde liste af moduler</a>  ]]></key>
@@ -885,7 +897,7 @@
     <key alias="instruction">Log ind nedenfor</key>
     <key alias="signInWith">Log ind med</key>
     <key alias="timeout">Din session er udløbet</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Glemt adgangskode?</key>
     <key alias="forgottenPasswordInstruction">En e-mail vil blive sendt til den angivne adresse med et link til at nulstille din adgangskode</key>
     <key alias="requestPasswordResetConfirmation">En e-mail med instruktioner for nulstilling af adgangskoden vil blive sendt til den angivne adresse, hvis det matcher vores optegnelser</key>
@@ -937,7 +949,7 @@ Mange hilsner fra Umbraco robotten
     <p>Dette er en automatisk mail for at informere dig om at opgaven <strong>'%1%'</strong>
     er blevet udførtpå siden <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> af brugeren <strong>'%3%'</strong> </p>
     <div style="margin: 8px 0; padding: 8px; display: block;"> <br />
-    <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <br /> </div> <p> <h3>Opdateringssammendrag:</h3> <table style="width: 100%;"> %6% </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISÉR&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SLET&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p>Hav en fortsat god dag!<br /><br /> De bedste hilsner fra umbraco robotten </p>]]></key>
+    <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <br /> </div> <p> <h3>Opdateringssammendrag:</h3> <table style="width: 100%;"> %6% </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISÉR&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SLET&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p>Hav en fortsat god dag!<br /><br /> De bedste hilsner fra Umbraco robotten </p>]]></key>
     <key alias="mailSubject">[%0%] Notificering om %1% udført på %2%</key>
     <key alias="notifications">Notificeringer</key>
   </area>
@@ -1054,10 +1066,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="contentPublishedFailedInvalid"><![CDATA[
     %0% kunne ikke publiceres da følgende egenskaber :  %1%  ikke overholdte valderingsreglerne.
     ]]></key>
-    <key alias="contentPublishedFailedByEvent"><![CDATA[
-        %0% kunne ikke publiceres, et 3. part tilføjelsesprogram annullerede handlingen.
-    ]]>
-    </key>
     <key alias="contentPublishedFailedByEvent">%0% kunne ikke udgives, fordi et 3. parts modul annullerede handlingen</key>
     <key alias="contentPublishedFailedByMissingName"><![CDATA[%0% kan ikke udgives, fordi det mangler et navn.]]></key>
     <key alias="includeUnpublished">Medtag ikke-udgivede undersider</key>
@@ -1106,7 +1114,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="currentVersion">Nuværende version</key>
     <key alias="diffHelp"><![CDATA[Her vises forskellene mellem den nuværende version og den valgte version<br /><del>Rød</del> tekst vil ikke blive vist i den valgte version. <ins>Grøn betyder tilføjet</ins>]]></key>
     <key alias="documentRolledBack">Dokument tilbagerullet</key>
-    <key alias="headline">Vælg en version at sammenligne med den nuværende version</key>
     <key alias="htmlHelp">Her vises den valgte version som html. Hvis du ønsker at se forskellen mellem de 2 versioner på samme tid, brug 'diff'-oversigten</key>
     <key alias="rollbackTo">Tilbagerulning til</key>
     <key alias="selectVersion">Vælg version</key>
@@ -1438,6 +1445,8 @@ Mange hilsner fra Umbraco robotten
     <key alias="elementDescription">En Element-type er tiltænkt brug i f.eks. Nested Content, ikke i indholdstræet.</key>
     <key alias="elementDoesNotSupport">Dette benyttes ikke for en Element-type</key>
     <key alias="propertyHasChanges">Du har lavet ændringer til denne egenskab. Er du sikker på at du vil kassere dem?</key>
+    <key alias="displaySettingsHeadline">Visning</key>
+    <key alias="displaySettingsLabelOnTop">Label hen over (fuld bredde)</key>
   </area>
   <area alias="languages">
     <key alias="addLanguage">Tilføj sprog</key>
@@ -1580,7 +1589,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="noLockouts">er ikke blevet låst ude</key>
     <key alias="noPasswordChange">Kodeordet er ikke blevet ændret</key>
     <key alias="confirmNewPassword">Gentag dit nye kodeord</key>
-    <key alias="changePasswordDescription">Du kan ændre dit kodeord, som giver dig adgang til Umbraco Back Office ved at udfylde formularen og klikke på knappen 'Skift dit kodeord'</key>
+    <key alias="changePasswordDescription">Du kan ændre dit kodeord, som giver dig adgang til Umbraco backoffice ved at udfylde formularen og klikke på knappen 'Skift dit kodeord'</key>
     <key alias="contentChannel">Indholdskanal</key>
     <key alias="createAnotherUser">Opret endnu en bruger</key>
     <key alias="createUserHelp">Opret nye brugere for at give dem adgang til Umbraco. Når en ny bruger oprettes, genereres der en adgangskode, som du kan dele med brugeren.</key>
@@ -1680,13 +1689,20 @@ Mange hilsner fra Umbraco robotten
     <key alias="validationRegExp">Indtast et regulært udtryk</key>
     <key alias="minCount">Du skal tilføje mindst</key>
     <key alias="maxCount">Du kan kun have</key>
+    <key alias="addUpTo">Tilføj op til </key>
     <key alias="items">elementer</key>
+    <key alias="urls">URL(er)</key>
+    <key alias="urlsSelected">URL(er) valgt</key>
     <key alias="itemsSelected">elementer valgt</key>
     <key alias="invalidDate">Ugyldig dato</key>
     <key alias="invalidNumber">Ikke et tal</key>
+    <key alias="invalidNumberStepSize">Ikke en gyldig numerisk trinstørrelse</key>
     <key alias="invalidEmail">Ugyldig e-mail</key>
-    <key alias="entriesShort"><![CDATA[Minimum %0% entries, needs <strong>%1%</strong> more.]]></key>
-    <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
+    <key alias="invalidNull">Værdien kan ikke være tom</key>
+    <key alias="invalidEmpty">Værdien kan ikke være tom</key>
+    <key alias="invalidPattern">Værdien er ugyldig, som ikke matcher det korrekte format</key>
+    <key alias="entriesShort"><![CDATA[Minimum %0% element(er), tilføj <strong>%1%</strong> mere.]]></key>
+    <key alias="entriesExceed"><![CDATA[Maksimum %0% element(er), <strong>%1%</strong> for mange.]]></key>
   </area>
   <area alias="redirectUrls">
     <key alias="disableUrlTracker">Slå URL tracker fra</key>
@@ -1825,12 +1841,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="tooltipForPropertyActionsMenu">Åben egenskabshandlinger</key>
   </area>
   <area alias="blockEditor">
-    <key alias="headlineCreateBlock">Opret ny blok</key>
-    <key alias="headlineAddSettingsElementType">Tilføj en indstillings afsnit</key>
+    <key alias="headlineCreateBlock">Vælg elementtype</key>
+    <key alias="headlineAddSettingsElementType">Tilføj en indstillings elementtype</key>
     <key alias="headlineAddCustomView">Tilføj visning</key>
     <key alias="headlineAddCustomStylesheet">Tilføj stylesheet</key>
     <key alias="headlineAddThumbnail">Vælg billede</key>
-    <key alias="labelcreateNewElementType">Opret ny</key>
+    <key alias="labelcreateNewElementType">Opret ny elementtype</key>
     <key alias="labelCustomStylesheet">Overskriv stylesheet</key>
     <key alias="addCustomStylesheet">Tilføj stylesheet</key>
     <key alias="headlineEditorAppearance">Redigerings udseende</key>
@@ -1842,7 +1858,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="labelLabelTemplate">Label</key>
     <key alias="labelCustomView">Speciel visning</key>
     <key alias="labelCustomViewInfoTitle">Vis speciel visning beskrivelsen</key>
-    <key alias="labelCustomViewDescription">Overskrift hvordan denne block præsenteres i BackOffice interfacet. Vælg en .html fil der indeholder din præsensation.</key>
+    <key alias="labelCustomViewDescription">Overskrift hvordan denne block præsenteres i backoffice interfacet. Vælg en .html fil der indeholder din præsensation.</key>
     <key alias="labelSettingsElementType">Indstillings model</key>
     <key alias="labelEditorSize">Rederings lagets størrelse</key>
     <key alias="addCustomView">Tilføj speciel visning</key>
@@ -1864,6 +1880,37 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
     <key alias="elementTypeDoesNotExistHeadline">Error!</key>
     <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
+    <key alias="propertyEditorNotSupported">Feltet %0% bruger editor %1% som ikke er supporteret for blokke.</key>
   </area>
-
+    <area alias="contentTemplatesDashboard">
+        <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
+        <key alias="whatDescription">Indholdsskabeloner er foruddefineret indhold der kan vælges når der oprettes nye indholdselementer.</key>
+        <key alias="createHeadline">Hvordan opretter jeg en Indholdsskabelon?</key>
+        <key alias="createDescription">
+            <![CDATA[
+            <p>Der er to måder at oprette Indholdsskabeloner på:</p>
+            <ul>
+                <li>Højreklik på en indholdsnode og vælg "Opret indholdsskabelon" for at oprette en ny Indholdsskabelon.</li>
+                <li>Højreklik på Indholdsskabeloner i sektionen Indstillinger og vælg den dokumenttype du vil oprette en Indholdsskabelon for.</li>
+            </ul>
+            <p>Når indholdsskabelonen har fået et navn, kan redaktører begynde at bruge indholdsskabelonen som udgangspunkt for deres nye side.</p>
+        ]]>
+        </key>
+        <key alias="manageHeadline">Hvordan vedligeholder jeg Indholdsskabeloner?</key>
+        <key alias="manageDescription">Du kan redigere og slette Indholdsskabeloner fra "Indholdsskabeloner" i sektionen Indstillinger. Fold dokumenttypen som Indholdsskabelonen er baseret på ud og klik på den for at redigere eller slette den.</key>
+    </area>
+  <area alias="preview">
+    <key alias="endLabel">Afslut</key>
+    <key alias="endTitle">Afslut forhåndsvisning</key>
+    <key alias="openWebsiteLabel">Vis i nyt vindue</key>
+    <key alias="openWebsiteTitle">Åben forhåndsvisning i nyt vindue</key>
+    <key alias="returnToPreviewHeadline">Forhåndsvisning af indholdet?</key>
+    <key alias="returnToPreviewDescription">Du har afslutet forhåndsvisning, vil du starte forhåndsvisning igen for at se seneste gemte version af indholdet?</key>
+    <key alias="returnToPreviewButton">Start forhåndsvisning</key>
+    <key alias="returnToPreviewDeclineButton">Se udgivet indhold</key>
+    <key alias="viewPublishedContentHeadline">Se udgivet indhold?</key>
+    <key alias="viewPublishedContentDescription">Du er i forhåndsvisning, vil du afslutte for at se den udgivet version?</key>
+    <key alias="viewPublishedContentAcceptButton">Se udgivet version</key>
+    <key alias="viewPublishedContentDeclineButton">Forbliv i forhåndsvisning</key>
+  </area>
 </language>

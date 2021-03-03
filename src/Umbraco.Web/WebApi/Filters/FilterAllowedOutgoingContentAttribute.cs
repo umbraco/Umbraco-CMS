@@ -9,7 +9,7 @@ using Umbraco.Core;
 using Umbraco.Web.Composing;
 using Umbraco.Core.Models;
 using Umbraco.Web.Actions;
-
+using Umbraco.Core.Cache;
 
 namespace Umbraco.Web.WebApi.Filters
 {
@@ -21,52 +21,58 @@ namespace Umbraco.Web.WebApi.Filters
     {
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
+        private readonly AppCaches _appCaches;
         private readonly char _permissionToCheck;
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType)
-            : this(outgoingType, Current.Services.UserService, Current.Services.EntityService)
+            : this(outgoingType, ActionBrowse.ActionLetter, string.Empty, Current.Services.UserService, Current.Services.EntityService, Current.AppCaches)
         {
-            _permissionToCheck = ActionBrowse.ActionLetter;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, char permissionToCheck)
-            : this(outgoingType, Current.Services.UserService, Current.Services.EntityService)
+            : this(outgoingType, permissionToCheck, string.Empty, Current.Services.UserService, Current.Services.EntityService, Current.AppCaches)
         {
-            _permissionToCheck = permissionToCheck;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName)
-            : this(outgoingType, propertyName, Current.Services.UserService, Current.Services.EntityService)
+            : this(outgoingType, ActionBrowse.ActionLetter, propertyName, Current.Services.UserService, Current.Services.EntityService, Current.AppCaches)
         {
-            _permissionToCheck = ActionBrowse.ActionLetter;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, IUserService userService, IEntityService entityService)
-            : base(outgoingType)
+            : this(outgoingType, ActionBrowse.ActionLetter, string.Empty, userService, entityService, Current.AppCaches)
         {
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-            _permissionToCheck = ActionBrowse.ActionLetter;
+        }
+
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType, IUserService userService, IEntityService entityService, AppCaches appCaches)
+            : this(outgoingType, ActionBrowse.ActionLetter, string.Empty, userService, entityService, appCaches)
+        {
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, char permissionToCheck, IUserService userService, IEntityService entityService)
-            : base(outgoingType)
+            : this(outgoingType, permissionToCheck, string.Empty, userService, entityService, Current.AppCaches)
         {
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-            _userService = userService;
-            _entityService = entityService;
-            _permissionToCheck = permissionToCheck;
         }
 
         public FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName, IUserService userService, IEntityService entityService)
+            : this(outgoingType, ActionBrowse.ActionLetter, propertyName, userService, entityService, Current.AppCaches)
+        {
+        }
+
+        public FilterAllowedOutgoingContentAttribute(Type outgoingType, string propertyName, IUserService userService, IEntityService entityService, AppCaches appCaches)
+            : this(outgoingType, ActionBrowse.ActionLetter, propertyName, userService, entityService, appCaches)
+        {
+        }
+
+        private FilterAllowedOutgoingContentAttribute(Type outgoingType, char permissionToCheck, string propertyName, IUserService userService, IEntityService entityService, AppCaches appCaches)
             : base(outgoingType, propertyName)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+            _appCaches = appCaches;
             _userService = userService;
             _entityService = entityService;
-            _permissionToCheck = ActionBrowse.ActionLetter;
+            _permissionToCheck = permissionToCheck;
         }
 
         protected override void FilterItems(IUser user, IList items)
@@ -78,7 +84,7 @@ namespace Umbraco.Web.WebApi.Filters
 
         protected override int[] GetUserStartNodes(IUser user)
         {
-            return user.CalculateContentStartNodeIds(_entityService);
+            return user.CalculateContentStartNodeIds(_entityService, _appCaches);
         }
 
         protected override int RecycleBinId
@@ -110,7 +116,7 @@ namespace Umbraco.Web.WebApi.Filters
                     if (nodePermission.Contains(_permissionToCheck.ToString(CultureInfo.InvariantCulture)) == false)
                     {
                         toRemove.Add(item);
-                    }                    
+                    }
                 }
                 foreach (var item in toRemove)
                 {

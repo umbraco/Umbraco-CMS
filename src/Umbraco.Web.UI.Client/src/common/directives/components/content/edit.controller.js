@@ -2,7 +2,7 @@
     'use strict';
 
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
-        appState, contentResource, entityResource, navigationService, notificationsService,
+        appState, contentResource, entityResource, navigationService, notificationsService, contentAppHelper,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
         editorState, $http, eventsService, overlayService, $location, localStorageService, treeService,
         $exceptionHandler) {
@@ -223,7 +223,6 @@
             //we are editing so get the content item from the server
             return $scope.getMethod()($scope.contentId)
                 .then(function (data) {
-
                     $scope.content = data;
 
                     appendRuntimeData();
@@ -271,7 +270,7 @@
          * @param {any} app the active content app
          */
         function createButtons(content) {
-            
+
             var isBlueprint = content.isBlueprint;
 
             if ($scope.page.isNew && $location.path().search(/contentBlueprints/i) !== -1) {
@@ -282,7 +281,7 @@
             $scope.page.saveButtonStyle = content.trashed || content.isElement || isBlueprint ? "primary" : "info";
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
-            if ($scope.activeApp && $scope.activeApp.alias !== "umbContent" && $scope.activeApp.alias !== "umbInfo" && $scope.activeApp.alias !== "umbListView") {
+            if ($scope.activeApp && !contentAppHelper.isContentBasedApp($scope.activeApp)) {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
                 $scope.page.showSaveButton = false;
@@ -466,7 +465,7 @@
 
                 syncTreeNode($scope.content, data.path, false, args.reloadChildren);
 
-                eventsService.emit("content.saved", { content: $scope.content, action: args.action });
+                eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: true });
 
                 resetNestedFieldValiation(fieldsToRollback);
                 ensureDirtyIsSetIfAnyVariantIsDirty();
@@ -474,7 +473,14 @@
                 return $q.when(data);
             },
                 function (err) {
+
+
                     syncTreeNode($scope.content, $scope.content.path);
+
+                    if (err && err.status === 400 && err.data) {
+                        // content was saved but is invalid.
+                        eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: false });
+                    }
 
                     resetNestedFieldValiation(fieldsToRollback);
 
@@ -981,7 +987,7 @@
         $scope.appChanged = function (activeApp) {
 
             $scope.activeApp = activeApp;
-            
+
             _.forEach($scope.content.apps, function (app) {
                 app.active = false;
                 if (app.alias === $scope.activeApp.alias) {
