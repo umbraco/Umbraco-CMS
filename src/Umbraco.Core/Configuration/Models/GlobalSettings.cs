@@ -94,6 +94,23 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// the <c>Run</c> level.</para>
         /// </remarks>
         public bool InstallUnattended { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets a value to use for creating a user with a name for Unattended Installs
+        /// </summary>
+        public string UnattendedUserName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets a value to use for creating a user with an email for Unattended Installs
+        /// </summary>
+        public string UnattendedUserEmail { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets a value to use for creating a user with a password for Unattended Installs
+        /// </summary>
+        public string UnattendedUserPassword { get; set; } = string.Empty;
+
+
         /// <summary>
         /// Gets or sets a value indicating whether to disable the election for a single server.
         /// </summary>
