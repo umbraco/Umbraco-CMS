@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Core
             Reason = reason;
         }
 
-        public async void DoUnattendedInstall()
+        public void DoUnattendedInstall()
         {
              // unattended install is not enabled
             if (_globalSettings.InstallUnattended == false) return;
@@ -239,7 +239,7 @@ namespace Umbraco.Cms.Core
 
                     // Emit an event with EventAggregator that unattended install completed
                     // Then this event can be listened for and create an unattended user
-                    await _eventAggregator.PublishAsync(new UnattendedInstallNotification());
+                    _eventAggregator.Publish(new UnattendedInstallNotification());
 
                 }
                 catch (Exception ex)

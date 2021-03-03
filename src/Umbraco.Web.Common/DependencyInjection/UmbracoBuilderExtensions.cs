@@ -271,7 +271,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddUnique<InstallAreaRoutes>();
 
-            
+
 
 
 
@@ -298,7 +298,7 @@ namespace Umbraco.Extensions
 
         public static IUmbracoBuilder AddUnattedInstallCreateUser(this IUmbracoBuilder builder)
         {
-            builder.AddNotificationHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
+            builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
             //builder.AddNotificationHandler<UmbracoApplicationStarting, CreateUnattendedUserNotificationHandler>();
             return builder;
         }
