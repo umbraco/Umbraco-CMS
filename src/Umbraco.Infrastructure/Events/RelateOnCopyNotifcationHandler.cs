@@ -4,12 +4,12 @@ using Umbraco.Cms.Infrastructure.Services.Notifications;
 
 namespace Umbraco.Cms.Core.Events
 {
-    public class RelateOnCopyHandler : INotificationHandler<CopiedNotification<IContent>>
+    public class RelateOnCopyNotifcationHandler : INotificationHandler<CopiedNotification<IContent>>
     {
         private readonly IRelationService _relationService;
         private readonly IAuditService _auditService;
 
-        public RelateOnCopyHandler(IRelationService relationService, IAuditService auditService)
+        public RelateOnCopyNotifcationHandler(IRelationService relationService, IAuditService auditService)
         {
             _relationService = relationService;
             _auditService = auditService;

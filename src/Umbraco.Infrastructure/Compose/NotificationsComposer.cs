@@ -32,11 +32,11 @@ namespace Umbraco.Cms.Core.Compose
 
             // add handlers for building content relations
             builder
-                .AddNotificationHandler<CopiedNotification<IContent>, RelateOnCopyHandler>()
-                .AddNotificationHandler<MovedNotification<IContent>, RelateOnTrashHandler>()
-                .AddNotificationHandler<MovedToRecycleBinNotification<IContent>, RelateOnTrashHandler>()
-                .AddNotificationHandler<MovedNotification<IMedia>, RelateOnTrashHandler>()
-                .AddNotificationHandler<MovedToRecycleBinNotification<IMedia>, RelateOnTrashHandler>();
+                .AddNotificationHandler<CopiedNotification<IContent>, RelateOnCopyNotifcationHandler>()
+                .AddNotificationHandler<MovedNotification<IContent>, RelateOnTrashNotificationHandler>()
+                .AddNotificationHandler<MovedToRecycleBinNotification<IContent>, RelateOnTrashNotificationHandler>()
+                .AddNotificationHandler<MovedNotification<IMedia>, RelateOnTrashNotificationHandler>()
+                .AddNotificationHandler<MovedToRecycleBinNotification<IMedia>, RelateOnTrashNotificationHandler>();
 
             // add notification handlers for property editors
             builder

@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Events
 {
     // TODO: lots of duplicate code in this one, refactor
-    public sealed class RelateOnTrashHandler :
+    public sealed class RelateOnTrashNotificationHandler :
         INotificationHandler<MovedNotification<IContent>>,
         INotificationHandler<MovedToRecycleBinNotification<IContent>>,
         INotificationHandler<MovedNotification<IMedia>>,
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Events
         private readonly IAuditService _auditService;
         private readonly IScopeProvider _scopeProvider;
 
-        public RelateOnTrashHandler(
+        public RelateOnTrashNotificationHandler(
             IRelationService relationService,
             IEntityService entityService,
             ILocalizedTextService textService,
