@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
 
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
-            _backofficeSecurity = backofficeSecurity ?? throw new ArgumentNullException(nameof(backofficeSecurity));
+            _backofficeSecurity = backofficeSecurity;
             _umbracoRequestPaths = umbracoRequestPaths;
 
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             Uri requestUrl = _requestAccessor.GetRequestUrl();
             if (requestUrl != null
                 && _umbracoRequestPaths.IsBackOfficeRequest(requestUrl.AbsolutePath) == false
-                && _backofficeSecurity.CurrentUser != null)
+                && _backofficeSecurity?.CurrentUser != null)
             {
                 var previewToken = _cookieManager.GetCookieValue(Core.Constants.Web.PreviewCookieName); // may be null or empty
                 _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;
