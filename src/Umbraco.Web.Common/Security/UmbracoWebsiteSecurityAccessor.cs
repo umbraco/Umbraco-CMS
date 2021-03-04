@@ -18,6 +18,6 @@ namespace Umbraco.Cms.Web.Common.Security
         /// Gets or sets the <see cref="IUmbracoWebsiteSecurity"/> object.
         /// </summary>
         public IUmbracoWebsiteSecurity WebsiteSecurity
-            => _httpContextAccessor.HttpContext?.RequestServices.GetService<IUmbracoWebsiteSecurity>();
+            => _httpContextAccessor.HttpContext?.RequestServices?.GetService<IUmbracoWebsiteSecurity>();
     }
 }
