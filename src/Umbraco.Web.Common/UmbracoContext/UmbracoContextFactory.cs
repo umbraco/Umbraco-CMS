@@ -18,11 +18,9 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
-
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
-        private readonly IRequestAccessor _requestAccessor;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly UriUtility _uriUtility;
 
@@ -38,7 +36,6 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             IHostingEnvironment hostingEnvironment,
             UriUtility uriUtility,
             ICookieManager cookieManager,
-            IRequestAccessor requestAccessor,
             IHttpContextAccessor httpContextAccessor)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -49,7 +46,6 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _uriUtility = uriUtility ?? throw new ArgumentNullException(nameof(uriUtility));
             _cookieManager = cookieManager ?? throw new ArgumentNullException(nameof(cookieManager));
-            _requestAccessor = requestAccessor ?? throw new ArgumentNullException(nameof(requestAccessor));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
         }
 
@@ -80,7 +76,6 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
                 _variationContextAccessor,
                 _uriUtility,
                 _cookieManager,
-                _requestAccessor,
                 _httpContextAccessor);
         }
 

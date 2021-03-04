@@ -65,7 +65,6 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
                 new AspNetCoreCookieManager(httpContextAccessor),
-                Mock.Of<IRequestAccessor>(),
                 httpContextAccessor);
 
             return umbracoContextFactory;

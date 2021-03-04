@@ -1,5 +1,6 @@
 using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Extensions;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -18,12 +19,12 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly UriUtility _uriUtility;
         private readonly ICookieManager _cookieManager;
-        private readonly IRequestAccessor _requestAccessor;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
         private string _previewToken;
         private bool? _previewing;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
+        private Uri _requestUrl;
         private Uri _originalRequestUrl;
         private Uri _cleanedUmbracoUrl;
 
@@ -38,7 +39,6 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             IVariationContextAccessor variationContextAccessor,
             UriUtility uriUtility,
             ICookieManager cookieManager,
-            IRequestAccessor requestAccessor,
             IHttpContextAccessor httpContextAccessor)
         {
             if (publishedSnapshotService == null)
@@ -50,7 +50,6 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
             _uriUtility = uriUtility;
             _hostingEnvironment = hostingEnvironment;
             _cookieManager = cookieManager;
-            _requestAccessor = requestAccessor;
             _httpContextAccessor = httpContextAccessor;
             ObjectCreated = DateTime.Now;
             UmbracoRequestId = Guid.NewGuid();
@@ -71,6 +70,9 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         /// </remarks>
         internal Guid UmbracoRequestId { get; }
 
+        // lazily get/create a Uri for the current request
+        private Uri RequestUrl => _requestUrl ?? (_requestUrl = new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl()));
+
         /// <inheritdoc/>
         // set the urls lazily, no need to allocate until they are needed...
         // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
@@ -78,7 +80,7 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
         // the current domain during application startup.
         // see: http://issues.umbraco.org/issue/U4-1890
-        public Uri OriginalRequestUrl => _originalRequestUrl ?? (_originalRequestUrl = _requestAccessor.GetRequestUrl() ?? new Uri("http://localhost"));
+        public Uri OriginalRequestUrl => _originalRequestUrl ?? (_originalRequestUrl = RequestUrl ?? new Uri("http://localhost"));
 
         /// <inheritdoc/>
         // set the urls lazily, no need to allocate until they are needed...
@@ -105,8 +107,8 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         /// <inheritdoc/>
         public bool IsDebug => // NOTE: the request can be null during app startup!
                 _hostingEnvironment.IsDebugMode
-                       && (string.IsNullOrEmpty(_requestAccessor.GetRequestValue("umbdebugshowtrace")) == false
-                           || string.IsNullOrEmpty(_requestAccessor.GetRequestValue("umbdebug")) == false
+                       && (string.IsNullOrEmpty(_httpContextAccessor.HttpContext.GetRequestValue("umbdebugshowtrace")) == false
+                           || string.IsNullOrEmpty(_httpContextAccessor.HttpContext.GetRequestValue("umbdebug")) == false
                            || string.IsNullOrEmpty(_cookieManager.GetCookieValue("UMB-DEBUG")) == false);
 
         /// <inheritdoc/>
@@ -139,9 +141,8 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
 
         private void DetectPreviewMode()
         {
-            Uri requestUrl = _requestAccessor.GetRequestUrl();
-            if (requestUrl != null
-                && _umbracoRequestPaths.IsBackOfficeRequest(requestUrl.AbsolutePath) == false
+            if (RequestUrl != null
+                && _umbracoRequestPaths.IsBackOfficeRequest(RequestUrl.AbsolutePath) == false
                 && _httpContextAccessor.HttpContext?.GetCurrentIdentity() != null)
             {
                 var previewToken = _cookieManager.GetCookieValue(Core.Constants.Web.PreviewCookieName); // may be null or empty
