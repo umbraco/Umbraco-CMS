@@ -112,9 +112,11 @@ namespace Umbraco.Tests.Web.Controllers
         }
 
         [Test]
-        [TestCase(Constants.Security.AdminGroupAlias, ExpectedResult = true)]
-        [TestCase(Constants.Security.EditorGroupAlias, ExpectedResult = false)]
-        public bool Cannot_save_groups_you_are_not_part_of_yourselves_unless_you_are_admin(string groupAlias)
+        [TestCase(Constants.Security.AdminGroupAlias, Constants.Security.AdminGroupAlias, ExpectedResult = true)]
+        [TestCase(Constants.Security.AdminGroupAlias, "SomethingElse", ExpectedResult = true)]
+        [TestCase(Constants.Security.EditorGroupAlias, Constants.Security.AdminGroupAlias, ExpectedResult = false)]
+        [TestCase(Constants.Security.EditorGroupAlias, "SomethingElse", ExpectedResult = true)]
+        public bool Can_only_save_non_admin_group_unless_you_are_admin(string groupAlias, string groupToAdd)
         {
             var currentUser = Mock.Of<IUser>(user => user.Groups == new[]
             {
@@ -133,7 +135,7 @@ namespace Umbraco.Tests.Web.Controllers
                 userService.Object,
                 entityService.Object);
 
-            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "userGroupTheCurrentUserDoNotHave" });
+            var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { groupToAdd });
 
             return result.Success;
         }
