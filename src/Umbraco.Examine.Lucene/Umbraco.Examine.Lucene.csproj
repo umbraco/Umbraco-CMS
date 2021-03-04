@@ -4,8 +4,8 @@
         <TargetFramework>net472</TargetFramework>
         <RootNamespace>Umbraco.Cms.Infrastructure.Examine</RootNamespace>
         <Product>Umbraco CMS</Product>
-        <RootNamespace>Umbraco.Examine</RootNamespace>
         <Title>Umbraco.Examine.Lucene</Title>
+        <PackageId>Umbraco.Cms.Examine.Lucene</PackageId>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

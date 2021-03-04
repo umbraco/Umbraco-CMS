@@ -4,7 +4,7 @@
         <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>Umbraco.Cms.Infrastructure.PublishedCache</RootNamespace>
         <LangVersion>8</LangVersion>
-        <RootNamespace>Umbraco.Infrastructure.PublishedCache</RootNamespace>
+        <PackageId>Umbraco.Cms.PublishedCache.NuCache</PackageId>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

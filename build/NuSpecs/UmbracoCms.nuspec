@@ -17,7 +17,8 @@
         <repository type="git" url="https://github.com/umbraco/umbraco-cms" />
         <dependencies>
             <group targetFramework="net5.0">
-                <dependency id="Umbraco.Cms.Web" version="[$version$]" />
+                <dependency id="Umbraco.Cms.Web.Website" version="[$version$]" />
+                <dependency id="Umbraco.Cms.Web.BackOffice" version="[$version$]" />
             </group>
         </dependencies>
         <!--

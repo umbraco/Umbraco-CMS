@@ -5,6 +5,7 @@
         <OutputType>Library</OutputType>
         <LangVersion>latest</LangVersion>
         <RootNamespace>Umbraco.Cms.Web.BackOffice</RootNamespace>
+        <PackageId>Umbraco.Cms.Web.BackOffice</PackageId>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
