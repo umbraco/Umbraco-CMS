@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -32,7 +33,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
 
@@ -54,7 +56,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
 
@@ -79,7 +82,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] {"FunGroup"});
 
@@ -104,7 +108,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "test" });
 
@@ -170,7 +175,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
             var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234, 5555 }, new int[0], new string[0]);
@@ -208,7 +214,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             //removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
             var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234 }, new int[0], new string[0]);
@@ -246,7 +253,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             //adding 1234 but currentUser doesn't have access to it ... nope
             var result = authHelper.IsAuthorized(currentUser, savingUser, new []{1234}, new int[0], new string[0]);
@@ -284,7 +292,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... ok
             var result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 5555 }, new int[0], new string[0]);
@@ -322,7 +331,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             //adding 1234 but currentUser doesn't have access to it ... nope
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] {1234}, new string[0]);
@@ -360,7 +370,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... ok
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 5555 }, new string[0]);
@@ -398,7 +409,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             //adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234, 5555 }, new string[0]);
@@ -436,7 +448,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             //removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234 }, new string[0]);
