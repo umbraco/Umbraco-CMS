@@ -33,14 +33,7 @@
         "icon": "icon-coin",
         "config": {
             "style": "font-size: 36px; line-height: 45px; font-weight: bold",
-            "markup": "<h1>#value#</h1>",
-            "settings": {
-                "color": {
-                    "key": "color",
-                    "label": "Color",
-                    "view": "textstring"
-                }
-            }
+            "markup": "<h1>#value#</h1>"
         }
     },
     {
