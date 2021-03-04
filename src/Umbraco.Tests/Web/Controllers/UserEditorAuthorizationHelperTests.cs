@@ -120,8 +120,9 @@ namespace Umbraco.Tests.Web.Controllers
         [TestCase(Constants.Security.AdminGroupAlias, Constants.Security.AdminGroupAlias, ExpectedResult = true)]
         [TestCase(Constants.Security.AdminGroupAlias, "SomethingElse", ExpectedResult = true)]
         [TestCase(Constants.Security.EditorGroupAlias, Constants.Security.AdminGroupAlias, ExpectedResult = false)]
-        [TestCase(Constants.Security.EditorGroupAlias, "SomethingElse", ExpectedResult = true)]
-        public bool Can_only_save_non_admin_group_unless_you_are_admin(string groupAlias, string groupToAdd)
+        [TestCase(Constants.Security.EditorGroupAlias, "SomethingElse", ExpectedResult = false)]
+        [TestCase(Constants.Security.EditorGroupAlias, Constants.Security.EditorGroupAlias, ExpectedResult = true)]
+        public bool Can_only_add_user_groups_you_are_part_of_yourself_unless_you_are_admin(string groupAlias, string groupToAdd)
         {
             var currentUser = Mock.Of<IUser>(user => user.Groups == new[]
             {
