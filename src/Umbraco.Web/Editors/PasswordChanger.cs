@@ -87,7 +87,7 @@ namespace Umbraco.Web.Editors
 
                 if (!currentUser.IsAdmin() && savingUser.IsAdmin())
                 {
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user can't change password for specific user", new[] { "resetPassword" }) });
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user cannot change password for specific user", new[] { "resetPassword" }) });
                 }
 
                 //ok, we should be able to reset it
