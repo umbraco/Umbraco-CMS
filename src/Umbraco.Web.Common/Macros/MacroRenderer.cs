@@ -353,13 +353,12 @@ namespace Umbraco.Cms.Web.Common.Macros
                 return Attempt.Fail(new MacroContent { Text = "[macro failed (no content)]" });
             }
 
-            ILocalizedTextService textService = _textService;
 
             return ExecuteMacroWithErrorWrapper(model,
                           $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
                           "Executed PartialView.",
                           () => _partialViewMacroEngine.Execute(model, content),
-                          () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
+                          () => _textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
         }
 
 

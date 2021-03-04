@@ -17,13 +17,9 @@ namespace Umbraco.Cms.Core
         where T : class
     {
         private readonly IRequestCache _requestCache;
-
-        private readonly object _locker = new object();
-        private bool _registered;
-
         private string _itemKey;
 
-        protected string ItemKey => _itemKey ?? (_itemKey = GetType().FullName);
+        protected string ItemKey => _itemKey ??= GetType().FullName;
 
         // read
         // http://blog.stephencleary.com/2013/04/implicit-async-context-asynclocal.html
@@ -47,19 +43,7 @@ namespace Umbraco.Cms.Core
         }
 
         protected HybridAccessorBase(IRequestCache requestCache)
-        {
-            _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
-
-            lock (_locker)
-            {
-                if (_registered)
-                {
-                    return;
-                }
-
-                _registered = true;
-            }
-        }
+            => _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
 
         protected T Value
         {
