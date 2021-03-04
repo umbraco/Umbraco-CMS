@@ -21,7 +21,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Compose
 {
-    // TODO: this component must be removed entirely - there is some code duplication in NotificationsHandler in anticipation of this component being deleted
+    /// <remarks>
+    /// TODO: this component must be removed entirely - there is some code duplication in <see cref="UserNotificationsHandler"/> in anticipation of this component being deleted
+    /// </remarks>
     public sealed class NotificationsComponent : IComponent
     {
         private readonly Notifier _notifier;

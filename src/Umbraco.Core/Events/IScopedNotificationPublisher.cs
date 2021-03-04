@@ -1,3 +1,6 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Threading.Tasks;
 
 namespace Umbraco.Cms.Core.Events
