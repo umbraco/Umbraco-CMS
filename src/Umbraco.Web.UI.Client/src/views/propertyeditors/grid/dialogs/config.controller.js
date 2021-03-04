@@ -21,7 +21,10 @@ function ConfigController($scope) {
     vm.showConfig = false;
     vm.showStyles = false;
 
-    $scope.$watchGroup(['model.config.length', 'model.styles.length'], function(newValues, oldValues, scope) {
+    $scope.$watchCollection('model.config', onWatch);
+    $scope.$watchCollection('model.styles', onWatch);
+
+    function onWatch() {
 
         vm.showConfig = $scope.model.config &&
             ($scope.model.config.length > 0 || Object.keys($scope.model.config).length > 0);
@@ -30,7 +33,7 @@ function ConfigController($scope) {
 
         vm.showEmptyState = vm.showConfig === false && vm.showStyles === false;
 
-    });
+    }
 
 }
 
