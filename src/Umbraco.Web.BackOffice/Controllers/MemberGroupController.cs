@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
@@ -26,17 +28,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IMemberGroupService _memberGroupService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
-
+        private readonly RoleManager<IdentityRole<string>> _roleManager;
+     
         public MemberGroupController(
             IMemberGroupService memberGroupService,
             UmbracoMapper umbracoMapper,
-            ILocalizedTextService localizedTextService
+            ILocalizedTextService localizedTextService,
+            RoleManager<IdentityRole<string>> roleManager
             )
         {
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
+            _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
-            _localizedTextService =
-                localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
+            _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
         /// <summary>
@@ -46,13 +50,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         public ActionResult<MemberGroupDisplay> GetById(int id)
         {
-            var memberGroup = _memberGroupService.GetById(id);
+            IdentityRole<string> memberGroup = _roleManager.FindByIdAsync(id.ToString()).Result;
             if (memberGroup == null)
             {
                 return NotFound();
             }
 
-            var dto = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+            MemberGroupDisplay dto = _umbracoMapper.Map<IdentityRole<string>, MemberGroupDisplay>(memberGroup);
             return dto;
         }
 
@@ -64,7 +68,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         public ActionResult<MemberGroupDisplay> GetById(Guid id)
         {
-            var memberGroup = _memberGroupService.GetById(id);
+            IMemberGroup memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
                 return NotFound();
@@ -82,9 +86,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
+            {
                 return NotFound();
+            }
 
-            var memberGroup = _memberGroupService.GetById(guidUdi.Guid);
+            IMemberGroup memberGroup = _memberGroupService.GetById(guidUdi.Guid);
             if (memberGroup == null)
             {
                 return NotFound();
@@ -95,15 +101,22 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public IEnumerable<MemberGroupDisplay> GetByIds([FromQuery]int[] ids)
         {
-            return _memberGroupService.GetByIds(ids)
-                    .Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>);
+            var roles = new List<IdentityRole<string>>();
+
+            foreach (int id in ids)
+            {
+                Task<IdentityRole<string>> role = _roleManager.FindByIdAsync(id.ToString());
+                roles.Add(role.Result);
+            }
+
+            return roles.Select(x=> _umbracoMapper.Map<IdentityRole<string>, MemberGroupDisplay>(x));
         }
 
         [HttpDelete]
         [HttpPost]
         public IActionResult DeleteById(int id)
         {
-            var memberGroup = _memberGroupService.GetById(id);
+            IMemberGroup memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
                 return NotFound();
@@ -113,11 +126,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return Ok();
         }
 
-        public IEnumerable<MemberGroupDisplay> GetAllGroups()
-        {
-            return _memberGroupService.GetAll()
-                    .Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>);
-        }
+        public IEnumerable<MemberGroupDisplay> GetAllGroups() => _roleManager.Roles.Select(x => _umbracoMapper.Map<IdentityRole<string>, MemberGroupDisplay>(x));
 
         public MemberGroupDisplay GetEmpty()
         {

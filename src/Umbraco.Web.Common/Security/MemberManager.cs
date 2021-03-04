@@ -16,21 +16,21 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Security
 {
-    public class MemberManager : UmbracoUserManager<MembersIdentityUser, MemberPasswordConfigurationSettings>, IMemberManager
+    public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswordConfigurationSettings>, IMemberManager
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public MemberManager(
             IIpResolver ipResolver,
-            IUserStore<MembersIdentityUser> store,
-            IOptions<MembersIdentityOptions> optionsAccessor,
-            IPasswordHasher<MembersIdentityUser> passwordHasher,
-            IEnumerable<IUserValidator<MembersIdentityUser>> userValidators,
-            IEnumerable<IPasswordValidator<MembersIdentityUser>> passwordValidators,
+            IUserStore<MemberIdentityUser> store,
+            IOptions<MemberIdentityOptions> optionsAccessor,
+            IPasswordHasher<MemberIdentityUser> passwordHasher,
+            IEnumerable<IUserValidator<MemberIdentityUser>> userValidators,
+            IEnumerable<IPasswordValidator<MemberIdentityUser>> passwordValidators,
             BackOfficeIdentityErrorDescriber errors,
             IServiceProvider services,
             IHttpContextAccessor httpContextAccessor,
-            ILogger<UserManager<MembersIdentityUser>> logger,
+            ILogger<UserManager<MemberIdentityUser>> logger,
             IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
             : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors, services, logger, passwordConfiguration)
         {

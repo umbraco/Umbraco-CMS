@@ -16,18 +16,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
     [TestFixture]
     public class MemberRoleStoreTests
     {
-        private Mock<IMemberService> _mockMemberService;
         private Mock<IMemberGroupService> _mockMemberGroupService;
         private IdentityErrorDescriber ErrorDescriber => new IdentityErrorDescriber();
 
-        public MembersRoleStore CreateSut()
+        public MemberRoleStore CreateSut()
         {
-            _mockMemberService = new Mock<IMemberService>();
             _mockMemberGroupService = new Mock<IMemberGroupService>();
-            return new MembersRoleStore(
-                _mockMemberService.Object,
+            return new MemberRoleStore(
                 _mockMemberGroupService.Object,
-                new Mock<IScopeProvider>().Object,
                 ErrorDescriber);
         }
 
@@ -35,7 +31,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public void GivenICreateAMemberRole_AndTheGroupIsNull_ThenIShouldGetAFailedResultAsync()
         {
             // arrange
-            MembersRoleStore sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             CancellationToken fakeCancellationToken = new CancellationToken() { };
 
             // act
@@ -50,7 +46,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenICreateAMemberRole_AndTheGroupIsPopulatedCorrectly_ThenIShouldGetASuccessResultAsync()
         {
             // arrange
-            MembersRoleStore sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeRole = new IdentityRole<string>()
             {
                 Id = "777",
@@ -78,7 +74,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheGroupExistsWithTheSameName_ThenIShouldGetASuccessResultAsyncButNoUpdatesMade()
         {
             // arrange
-            MembersRoleStore sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeRole = new IdentityRole<string>()
             {
                 Id = "777",
@@ -107,7 +103,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheGroupExistsWithADifferentSameName_ThenIShouldGetASuccessResultAsyncWithUpdatesMade()
         {
             // arrange
-            MembersRoleStore sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeRole = new IdentityRole<string>()
             {
                 Id = "777",
@@ -137,7 +133,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheGroupDoesntExist_ThenIShouldGetAFailureResultAsync()
         {
             // arrange
-            MembersRoleStore sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeRole = new IdentityRole<string>()
             {
                 Id = "777",
@@ -161,7 +157,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheIdCannotBeParsedToAnInt_ThenIShouldGetAFailureResultAsync()
         {
             // arrange
-            MembersRoleStore sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeRole = new IdentityRole<string>()
             {
                 Id = "7a77",
@@ -184,7 +180,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIDeleteAMemberRole_AndItExists_ThenTheMemberGroupShouldBeDeleted_AndIShouldGetASuccessResultAsync()
         {
             // arrange
-            MembersRoleStore sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeRole = new IdentityRole<string>()
             {
                 Id = "777",
@@ -211,7 +207,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIDeleteAMemberRole_AndTheIdCannotBeParsedToAnInt_ThenTheMemberGroupShouldNotBeDeleted_AndIShouldGetAFailResultAsync()
         {
             // arrange
-            MembersRoleStore sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeRole = new IdentityRole<string>()
             {
                 Id = "7a77",
@@ -236,7 +232,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIDeleteAMemberRole_AndItDoesntExist_ThenTheMemberGroupShouldNotBeDeleted_AndIShouldGetAFailResultAsync()
         {
             // arrange
-            MembersRoleStore sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeRole = new IdentityRole<string>()
             {
                 Id = "777",
@@ -261,7 +257,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIGetAllMemberRoles_ThenIShouldGetAllMemberGroups_AndASuccessResultAsync()
         {
             // arrange
-            MembersRoleStore sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeRole = new IdentityRole<string>("fakeGroupName")
             {
                 Id = "777"

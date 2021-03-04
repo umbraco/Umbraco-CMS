@@ -32,6 +32,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _memberGroupService = memberGroupService;
         }
 
+        //TODO: change to role store
         protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormCollection queryStrings)
         {
             return _memberGroupService.GetAll()
@@ -49,6 +50,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var root = rootResult.Value;
 
             //check if there are any groups
+            //TODO: change to role store
             root.HasChildren = _memberGroupService.GetAll().Any();
             return root;
         }

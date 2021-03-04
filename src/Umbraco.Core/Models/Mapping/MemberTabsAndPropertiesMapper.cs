@@ -237,6 +237,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             var userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
 
             // create a dictionary of all roles (except internal roles) + "false"
+            //TODO: use MembersRoleStore
             var result = _memberGroupService.GetAll()
                 .Select(x => x.Name)
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access

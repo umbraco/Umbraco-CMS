@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -7,7 +6,6 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Security
@@ -15,19 +13,12 @@ namespace Umbraco.Cms.Core.Security
     /// <summary>
     /// A custom user store that uses Umbraco member data
     /// </summary>
-    public class MembersRoleStore : RoleStoreBase<IdentityRole<string>, string, IdentityUserRole<string>, IdentityRoleClaim<string>>
+    public class MemberRoleStore : RoleStoreBase<IdentityRole<string>, string, IdentityUserRole<string>, IdentityRoleClaim<string>>
     {
-        private readonly IMemberService _memberService;
         private readonly IMemberGroupService _memberGroupService;
-        private readonly IScopeProvider _scopeProvider;
 
-        public MembersRoleStore(IMemberService memberService, IMemberGroupService memberGroupService, IScopeProvider scopeProvider, IdentityErrorDescriber describer)
-            : base(describer)
-        {
-            _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
-            _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
-            _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
-        }
+        public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber describer)
+            : base(describer) => _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
 
         /// <inheritdoc />
         public override IQueryable<IdentityRole<string>> Roles
@@ -94,7 +85,7 @@ namespace Umbraco.Cms.Core.Security
             }
             else
             {
-                //TODO: throw exception when not found, or return failure? And is this the correcet message
+                //TODO: throw exception when not found, or return failure? And is this the correct message
                 return Task.FromResult(IdentityResult.Failed(ErrorDescriber.InvalidRoleName(role.Name)));
             }
 
@@ -123,7 +114,7 @@ namespace Umbraco.Cms.Core.Security
             }
             else
             {
-                //TODO: throw exception when not found, or return failure? And is this the correcet message
+                //TODO: throw exception when not found, or return failure? And is this the correct message
                 return Task.FromResult(IdentityResult.Failed(ErrorDescriber.InvalidRoleName(role.Name)));
             }
 
@@ -152,6 +143,8 @@ namespace Umbraco.Cms.Core.Security
 
             return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
         }
+
+        ///TODO: are we implementing these claims methods?
 
         /// <inheritdoc />
         public override Task<IList<Claim>> GetClaimsAsync(IdentityRole<string> role, CancellationToken cancellationToken = new CancellationToken()) => throw new System.NotImplementedException();

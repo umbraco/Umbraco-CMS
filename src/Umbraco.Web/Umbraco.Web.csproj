@@ -176,7 +176,6 @@
     <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
-    <Compile Include="Security\Providers\MembersRoleProvider.cs" />
     <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="UrlHelperExtensions.cs" />

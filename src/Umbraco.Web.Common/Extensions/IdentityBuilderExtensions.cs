@@ -10,13 +10,13 @@ namespace Umbraco.Extensions
     public static class IdentityBuilderExtensions
     {
         /// <summary>
-        /// Adds a <see cref="UserManager{TUser}"/> for the <seealso cref="MembersIdentityUser"/>.
+        /// Adds a <see cref="UserManager{TUser}"/> for the <seealso cref="MemberIdentityUser"/>.
         /// </summary>
         /// <typeparam name="TInterface">The usermanager interface</typeparam>
         /// <typeparam name="TUserManager">The usermanager type</typeparam>
         /// <returns>The current <see cref="IdentityBuilder"/> instance.</returns>
         public static IdentityBuilder AddMembersManager<TInterface, TUserManager>(this IdentityBuilder identityBuilder)
-            where TUserManager : UserManager<MembersIdentityUser>, TInterface
+            where TUserManager : UserManager<MemberIdentityUser>, TInterface
         {
             identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TUserManager));
             return identityBuilder;

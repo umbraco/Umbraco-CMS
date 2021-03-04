@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IPasswordChanger<MembersIdentityUser> _passwordChanger;
+        private readonly IPasswordChanger<MemberIdentityUser> _passwordChanger;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberController"/> class.
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IJsonSerializer jsonSerializer,
-            IPasswordChanger<MembersIdentityUser> passwordChanger)
+            IPasswordChanger<MemberIdentityUser> passwordChanger)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
         {
             _propertyEditors = propertyEditors;
@@ -355,7 +355,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
             }
 
-            var identityMember = MembersIdentityUser.CreateNew(
+            var identityMember = MemberIdentityUser.CreateNew(
                 contentItem.Username,
                 contentItem.Email,
                 memberType.Alias,
@@ -445,7 +445,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 ModelState.AddModelError("custom", "An admin cannot lock a user");
             }
 
-            MembersIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
+            MemberIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
             if (identityMember == null)
             {
                 return new ValidationErrorResult("Identity member was not found");
@@ -586,7 +586,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="contentItem">The member content item</param>
         /// <param name="identityMember">The member as an identity user</param>
-        private async Task AddOrUpdateRoles(MemberSave contentItem, MembersIdentityUser identityMember)
+        private async Task AddOrUpdateRoles(MemberSave contentItem, MemberIdentityUser identityMember)
         {
             // We're gonna look up the current roles now because the below code can cause
             // events to be raised and developers could be manually adding roles to members in

@@ -86,7 +86,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
             builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
             builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
-            builder.Services.AddUnique<IPasswordChanger<MembersIdentityUser>, PasswordChanger<MembersIdentityUser>>();
+            builder.Services.AddUnique<IPasswordChanger<MemberIdentityUser>, PasswordChanger<MemberIdentityUser>>();
 
             return builder;
         }

@@ -42,10 +42,10 @@ namespace Umbraco.Cms.Core.Security
                     target.EnableChangeTracking();
                 });
 
-            mapper.Define<IMember, MembersIdentityUser>(
+            mapper.Define<IMember, MemberIdentityUser>(
                 (source, context) =>
                 {
-                    var target = new MembersIdentityUser(source.Id);
+                    var target = new MemberIdentityUser(source.Id);
                     target.DisableChangeTracking();
                     return target;
                 },
@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Core.Security
             //target.Roles =;
         }
 
-        private void Map(IMember source, MembersIdentityUser target)
+        private void Map(IMember source, MemberIdentityUser target)
         {
             target.Email = source.Email;
             target.UserName = source.Username;

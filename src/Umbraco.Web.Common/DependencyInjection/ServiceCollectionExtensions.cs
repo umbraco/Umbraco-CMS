@@ -65,17 +65,17 @@ namespace Umbraco.Extensions
         public static void AddMembersIdentity(this IServiceCollection services) =>
             services.BuildMembersIdentity()
                 .AddDefaultTokenProviders()
-                .AddUserStore<MembersUserStore>()
+                .AddUserStore<MemberUserStore>()
                 .AddMembersManager<IMemberManager, MemberManager>();
 
 
-        private static MembersIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
+        private static MemberIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
         {
             // Services used by Umbraco members identity
-            services.TryAddScoped<IUserValidator<MembersIdentityUser>, UserValidator<MembersIdentityUser>>();
-            services.TryAddScoped<IPasswordValidator<MembersIdentityUser>, PasswordValidator<MembersIdentityUser>>();
-            services.TryAddScoped<IPasswordHasher<MembersIdentityUser>, PasswordHasher<MembersIdentityUser>>();
-            return new MembersIdentityBuilder(services);
+            services.TryAddScoped<IUserValidator<MemberIdentityUser>, UserValidator<MemberIdentityUser>>();
+            services.TryAddScoped<IPasswordValidator<MemberIdentityUser>, PasswordValidator<MemberIdentityUser>>();
+            services.TryAddScoped<IPasswordHasher<MemberIdentityUser>, PasswordHasher<MemberIdentityUser>>();
+            return new MemberIdentityBuilder(services);
         }
 
         private static void RemoveIntParamenterIfValueGreatherThen(IDictionary<string, string> commands, string parameter, int maxValue)

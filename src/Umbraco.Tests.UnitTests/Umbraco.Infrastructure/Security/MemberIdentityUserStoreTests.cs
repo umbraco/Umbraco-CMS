@@ -20,10 +20,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
     {
         private Mock<IMemberService> _mockMemberService;
 
-        public MembersUserStore CreateSut()
+        public MemberUserStore CreateSut()
         {
             _mockMemberService = new Mock<IMemberService>();
-            return new MembersUserStore(
+            return new MemberUserStore(
                 _mockMemberService.Object,
                 new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>())),
                 new Mock<IScopeProvider>().Object,
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public void GivenICreateUser_AndTheUserIsNull_ThenIShouldGetAFailedResultAsync()
         {
             // arrange
-            MembersUserStore sut = CreateSut();
+            MemberUserStore sut = CreateSut();
             CancellationToken fakeCancellationToken = new CancellationToken(){};
 
             // act
@@ -49,8 +49,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenICreateANewUser_AndTheUserIsPopulatedCorrectly_ThenIShouldGetASuccessResultAsync()
         {
             // arrange
-            MembersUserStore sut = CreateSut();
-            var fakeUser = new MembersIdentityUser() { };
+            MemberUserStore sut = CreateSut();
+            var fakeUser = new MemberIdentityUser() { };
             var fakeCancellationToken = new CancellationToken() { };
 
             IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
