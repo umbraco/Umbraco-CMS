@@ -80,7 +80,8 @@ namespace Umbraco.Cms.Core.Security
 
             if (!int.TryParse(role.Id, out int roleId))
             {
-                return new Task<IdentityResult>(() => IdentityResult.Failed());
+                //TODO: what identity error should we return in this case?
+                return Task.FromResult(IdentityResult.Failed(ErrorDescriber.DefaultError()));
             }
 
             IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
@@ -90,6 +91,11 @@ namespace Umbraco.Cms.Core.Security
                 {
                     _memberGroupService.Save(memberGroup);
                 }
+            }
+            else
+            {
+                //TODO: throw exception when not found, or return failure? And is this the correcet message
+                return Task.FromResult(IdentityResult.Failed(ErrorDescriber.InvalidRoleName(role.Name)));
             }
 
             return Task.FromResult(IdentityResult.Success);
@@ -106,7 +112,8 @@ namespace Umbraco.Cms.Core.Security
 
             if (!int.TryParse(role.Id, out int roleId))
             {
-                return new Task<IdentityResult>(() => IdentityResult.Failed());
+                //TODO: what identity error should we return in this case?
+                return Task.FromResult(IdentityResult.Failed(ErrorDescriber.DefaultError()));
             }
 
             IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
@@ -116,8 +123,8 @@ namespace Umbraco.Cms.Core.Security
             }
             else
             {
-                //TODO: throw exception when not found, or return failure?
-                return Task.FromResult(IdentityResult.Failed());
+                //TODO: throw exception when not found, or return failure? And is this the correcet message
+                return Task.FromResult(IdentityResult.Failed(ErrorDescriber.InvalidRoleName(role.Name)));
             }
 
             return Task.FromResult(IdentityResult.Success);
