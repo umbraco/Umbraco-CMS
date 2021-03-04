@@ -138,7 +138,8 @@ namespace Umbraco.Tests.Web.Controllers
                 contentService.Object,
                 mediaService.Object,
                 userService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             var result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { groupToAdd });
 
