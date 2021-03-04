@@ -79,7 +79,7 @@ namespace Umbraco.Web.Editors
             {
                 var savingGroupAliases = userGroupAliases.ToArray();
 
-                // As we know the current user is not admin, it is only allowed to use groups that the user do have themselves.
+                // As we know the current user is not admin, the only limit is he cannot add to the Admin group
 
                 if (savingGroupAliases.Contains(Constants.Security.AdminGroupAlias))
                 {
