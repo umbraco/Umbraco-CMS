@@ -57,32 +57,46 @@
                                 <span ng-if="!$last">, </span>
                             </span>
                         </div>
-                        <ng-form class="umb-group-builder__tab-title-wrapper" name="groupNameForm" data-element="group-name">
+                        <div class="umb-group-builder__tab-title-wrapper">
                             <i class="umb-group-builder__tab-title-icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
-                            <div class="umb-group-builder__tab-name" ng-if="tab.inherited || sortingMode">{{ tab.name }}</div>
-                            <input
-                                ng-if="!tab.inherited && !sortingMode"
-                                class="umb-group-builder__group-title-input"
-                                data-element="group-name-field"
-                                type="text"
-                                localize="placeholder"
-                                placeholder="@placeholders_entername"
-                                name="groupName"
-                                ng-model="tab.name"
-                                ng-class="{'-placeholder': tab.name == ''}"
-                                ng-disabled="$index !== openTabIndex"
-                                umb-auto-focus
-                                umb-auto-resize
-                                ng-focus="activateGroup(tab)"
-                                required
-                                val-server-field="{{'Groups[' + $index + '].Name'}}"
-                                data-lpignore="true" />
-                            
-                            <div class="umb-group-builder__tab-val-message" ng-messages="groupNameForm.groupName.$error" show-validation-on-submit>
-                                <div class="umb-validation-label -arrow-bottom" ng-message="valServerField">{{groupNameForm.groupName.errorMsg}}</div>
-                                <div class="umb-validation-label -arrow-bottom" ng-message="required"><localize key="required"></localize></div>
-                            </div>
-                        </ng-form>
+                            <ng-form name="groupNameForm" data-element="group-name">
+                                <div class="umb-group-builder__tab-name" ng-if="tab.inherited || sortingMode">{{ tab.name }}</div>
+                                <input
+                                    ng-if="!tab.inherited && !sortingMode"
+                                    class="umb-group-builder__group-title-input"
+                                    data-element="group-name-field"
+                                    type="text"
+                                    localize="placeholder"
+                                    placeholder="@placeholders_entername"
+                                    name="groupName"
+                                    ng-model="tab.name"
+                                    ng-class="{'-placeholder': tab.name == ''}"
+                                    ng-disabled="$index !== openTabIndex"
+                                    umb-auto-focus
+                                    umb-auto-resize
+                                    ng-focus="activateGroup(tab)"
+                                    required
+                                    val-server-field="{{'Groups[' + $index + '].Name'}}"
+                                    data-lpignore="true" />
+                                
+                                <div class="umb-group-builder__tab-val-message" ng-messages="groupNameForm.groupName.$error" show-validation-on-submit>
+                                    <div class="umb-validation-label -arrow-bottom" ng-message="valServerField">{{groupNameForm.groupName.errorMsg}}</div>
+                                    <div class="umb-validation-label -arrow-bottom" ng-message="required"><localize key="required"></localize></div>
+                                </div>
+                            </ng-form>
+
+                            <ng-form name="tabSortOrderForm" class="umb-group-builder__tab-sort-order">
+                                <div ng-if="sortingMode">
+                                    <input name="tabSortOrder" type="number" class="umb-property-editor-tiny" style="margin-bottom: 0;" ng-model="tab.sortOrder" ng-disabled="tab.inherited" ng-blur="changeSortOrderValue(tab)" required />
+        
+                                    <!-- This is a manual validation message not bound to a validator -->
+                                    <div class="umb-validation-label -arrow-left" ng-if="tabSortOrderForm.tabSortOrder.$error.required && tab.showSortOrderMissing"><localize key="required"></localize></div>
+                                    <div ng-messages="tabSortOrderForm.tabSortOrder.$error" show-validation-on-submit>
+                                        <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required"></localize></div>
+                                    </div>
+                                </div>
+                            </ng-form>
+                        </div>
                     </div>
                     <div class="umb-group-builder__tab-remove" ng-if="!sortingMode && canRemoveGroup(tab)">
                         <button type="button" class="btn-reset" ng-click="togglePrompt(tab)">
