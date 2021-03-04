@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Web.Common.Security
@@ -13,12 +14,9 @@ namespace Umbraco.Cms.Web.Common.Security
         public BackOfficeSecurityAccessor(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
 
         /// <summary>
-        /// Gets or sets the <see cref="IBackOfficeSecurity"/> object.
+        /// Gets the current <see cref="IBackOfficeSecurity"/> object.
         /// </summary>
         public IBackOfficeSecurity BackOfficeSecurity
-        {
-            get => _httpContextAccessor.HttpContext?.Features.Get<IBackOfficeSecurity>();
-            set => _httpContextAccessor.HttpContext?.Features.Set(value);
-        }
+            => _httpContextAccessor.HttpContext?.RequestServices.GetService<IBackOfficeSecurity>();
     }
 }

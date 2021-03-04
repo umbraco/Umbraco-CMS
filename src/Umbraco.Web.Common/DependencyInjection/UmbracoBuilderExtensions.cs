@@ -265,7 +265,6 @@ namespace Umbraco.Extensions
             // register the umbraco context factory
 
             builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            builder.Services.AddUnique<IBackOfficeSecurityFactory, BackOfficeSecurityFactory>();
             builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
             builder.AddNotificationHandler<UmbracoRoutedRequest, UmbracoWebsiteSecurityFactory>();
             builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, UmbracoWebsiteSecurityAccessor>();
@@ -289,6 +288,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddScoped<UmbracoHelper>();
             builder.Services.AddScoped<RequestLock>();
+            builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
 
             builder.AddHttpClients();
 

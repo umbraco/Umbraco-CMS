@@ -36,7 +36,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
-        private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
         private readonly PublishedSnapshotServiceEventHandler _publishedSnapshotServiceEventHandler;
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -52,7 +51,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
             ILogger<UmbracoRequestMiddleware> logger,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache,
-            IBackOfficeSecurityFactory backofficeSecurityFactory,
             PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler,
             IEventAggregator eventAggregator,
             IProfiler profiler,
@@ -61,7 +59,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
             _requestCache = requestCache;
-            _backofficeSecurityFactory = backofficeSecurityFactory;
             _publishedSnapshotServiceEventHandler = publishedSnapshotServiceEventHandler;
             _eventAggregator = eventAggregator;
             _hostingEnvironment = hostingEnvironment;
@@ -84,11 +81,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
             EnsureContentCacheInitialized();
 
-            // TODO: This dependency chain is broken and needs to be fixed.
-            // This is required to be called before EnsureUmbracoContext else the UmbracoContext's IBackOfficeSecurity instance is null
-            // This is ugly Temporal Coupling which also means that developers can no longer just use IUmbracoContextFactory the
-            // way it was intended.
-            _backofficeSecurityFactory.EnsureBackOfficeSecurity();
             UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
             Uri currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);

@@ -107,7 +107,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// <returns>The string URL of the controller action.</returns>
         protected string PrepareUrl(string url)
         {
-            IBackOfficeSecurityFactory backofficeSecurityFactory = GetRequiredService<IBackOfficeSecurityFactory>();
             IUmbracoContextFactory umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
             IHttpContextAccessor httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
 
@@ -122,11 +121,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 }
             };
 
-            // TODO: This dependency chain is broken and needs to be fixed.
-            // This is required to be called before EnsureUmbracoContext else the UmbracoContext's IBackOfficeSecurity instance is null
-            // This is a very ugly Temporal Coupling which also means that developers can no longer just use IUmbracoContextFactory the
-            // way it was intended.
-            backofficeSecurityFactory.EnsureBackOfficeSecurity();
             umbracoContextFactory.EnsureUmbracoContext();
 
             return url;
