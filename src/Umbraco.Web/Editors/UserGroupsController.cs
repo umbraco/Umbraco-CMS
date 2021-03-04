@@ -36,7 +36,6 @@ namespace Umbraco.Web.Editors
 
             //if sections were added we need to check that the current user has access to that section
             isAuthorized = authHelper.AuthorizeSectionChanges(Security.CurrentUser,
-                userGroupSave.PersistedUserGroup.AllowedSections,
                 userGroupSave.Sections);
             if (isAuthorized == false)
                 throw new HttpResponseException(Request.CreateResponse(HttpStatusCode.Unauthorized, isAuthorized.Result));
