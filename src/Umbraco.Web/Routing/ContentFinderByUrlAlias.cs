@@ -4,6 +4,7 @@ using System.Text;
 using Umbraco.Core;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.Routing
@@ -39,6 +40,7 @@ namespace Umbraco.Web.Routing
                     frequest.HasDomain ? frequest.Domain.ContentId : 0,
                     frequest.Culture.Name,
                     frequest.Uri.GetAbsolutePathDecoded(),
+                    frequest.Uri.AbsoluteUri,
                     frequest.UmbracoContext);
 
                 if (node != null)
@@ -51,9 +53,9 @@ namespace Umbraco.Web.Routing
             return node != null;
         }
 
-        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias, UmbracoContext umbracoContext)
+        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string absolutePath, string absoluteUri, UmbracoContext umbracoContext)
         {
-            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (absolutePath == null) throw new ArgumentNullException(nameof(absolutePath));
 
             // the alias may be "foo/bar" or "/foo/bar"
             // there may be spaces as in "/foo/bar,  /foo/nil"
@@ -64,11 +66,11 @@ namespace Umbraco.Web.Routing
 
             const string propertyAlias = Constants.Conventions.Content.UrlAlias;
 
-            var test1 = alias.TrimStart(Constants.CharArrays.ForwardSlash) + ",";
+            var test1 = absolutePath.TrimStart(Constants.CharArrays.ForwardSlash) + ",";
             var test2 = ",/" + test1; // test2 is ",/alias,"
             test1 = "," + test1; // test1 is ",alias,"
 
-            bool IsMatch(IPublishedContent c, string a1, string a2, Domain[] rootNodeDomains)
+            bool IsMatch(IPublishedContent c, string requestAlias1, string requestAlias2, string requestAbsoluteUrl, string rootAbsoluteUrl)
             {
                 // this basically implements the original XPath query ;-(
                 //
@@ -94,21 +96,17 @@ namespace Umbraco.Web.Routing
 
                 if (string.IsNullOrWhiteSpace(v)) return false;
 
+                // Build up a comparison list of the current node's urlAlias to compare with the current request
                 var sb = new StringBuilder(",");
                 foreach (var urlAlias in v.Split(','))
                 {
+                    // Add the node's urlAlias to the list
                     sb.Append(urlAlias.Replace(" ", "") + ",");
-                    if (rootNodeDomains == null || rootNodeDomains.Length <= 0) continue;
-                    foreach (var domain in rootNodeDomains)
-                    {
-                        if (domain.Culture.Name == culture)
-                        {
-                            sb.Append(domain.Name + (urlAlias.StartsWith("/") || domain.Name.EndsWith("/") ? "" : "/") + urlAlias.Replace(" ", "") + ",");
-                        }
-                    }
+                    // Add the root node's absolute url joined to the node's urlAlias to the list
+                    sb.Append(rootAbsoluteUrl + (urlAlias.StartsWith("/") || rootAbsoluteUrl.EndsWith("/") ? "" : "/") + urlAlias.Replace(" ", "") + ",");
                 }
                 var urlAliases = sb.ToString();
-                return urlAliases.InvariantContains(a1) || urlAliases.InvariantContains(a2);
+                return urlAliases.InvariantContains(requestAlias1) || urlAliases.InvariantContains(requestAlias2) || urlAliases.InvariantContains(requestAbsoluteUrl);
             }
 
             // TODO: even with Linq, what happens below has to be horribly slow
@@ -117,14 +115,14 @@ namespace Umbraco.Web.Routing
             if (rootNodeId > 0)
             {
                 var rootNode = cache.GetById(rootNodeId);
-                var rootNodeDomains = umbracoContext?.PublishedSnapshot?.Domains?.GetAssigned(rootNodeId)?.ToArray();
-                return rootNode?.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2, rootNodeDomains));
+                var rootNodeAbsoluteUrl = umbracoContext?.Url(rootNodeId, UrlMode.Absolute, culture);
+                return rootNode?.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2, absoluteUri, rootNodeAbsoluteUrl));
             }
 
             foreach (var rootContent in cache.GetAtRoot())
             {
-                var rootNodeDomains = umbracoContext?.PublishedSnapshot?.Domains?.GetAssigned(rootContent.Id)?.ToArray();
-                var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2, rootNodeDomains));
+                var rootNodeAbsoluteUrl = umbracoContext?.Url(rootNodeId, UrlMode.Absolute, culture);
+                var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2, absoluteUri, rootNodeAbsoluteUrl));
                 if (c != null) return c;
             }
 
