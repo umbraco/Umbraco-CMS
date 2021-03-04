@@ -26,8 +26,42 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         public void SetUp() => Assert.IsNull(ScopeProvider.AmbientScope); // gone
 
         [Test]
-        public void Non_Disposed_Nested_Scope_Throws()
+        [Ignore("This does not occur in netcore currently because we are not tracking children, nor 'top' Ambient")]
+        public void GivenChildThread_WhenTheParentDisposes_ThenInvalidOperationExceptionThrows()
         {
+            ScopeProvider scopeProvider = ScopeProvider;
+
+            Assert.IsNull(ScopeProvider.AmbientScope);
+            IScope mainScope = scopeProvider.CreateScope();
+
+            var t = Task.Run(() =>
+            {
+                Console.WriteLine("Child Task start: " + scopeProvider.AmbientScope.InstanceId);
+                // This will evict the parent and set the child
+                IScope nested = scopeProvider.CreateScope();
+                Console.WriteLine("Child Task scope created: " + scopeProvider.AmbientScope.InstanceId);
+                Thread.Sleep(2000); // block, which means the parent stays evicted for a bit
+                Console.WriteLine("Child Task before dispose: " + scopeProvider.AmbientScope.InstanceId);
+                nested.Dispose(); // disposing the child will re-add the parent but it's too late, the parent has tried to dispose
+                Console.WriteLine("Child Task after dispose: " + scopeProvider.AmbientScope.InstanceId);
+            });
+
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() =>
+            {
+                Console.WriteLine("Parent Task disposing: " + scopeProvider.AmbientScope?.InstanceId);
+                mainScope.Dispose(); // oops! the parent has been evicted at this state
+                Console.WriteLine("Parent Task disposed: " + scopeProvider.AmbientScope?.InstanceId);
+            });
+
+            Task.WaitAll(t);
+            Console.WriteLine(ex);
+        }
+
+        [Test]
+        public void GivenNonDisposedChildScope_WhenTheParentDisposes_ThenInvalidOperationExceptionThrows()
+        {
+            // this all runs in the same execution context so the AmbientScope reference isn't a copy
+
             ScopeProvider scopeProvider = ScopeProvider;
 
             Assert.IsNull(ScopeProvider.AmbientScope);
@@ -40,7 +74,39 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void Non_Joined_Child_Thread_Nested_Scope_Throws()
+        public void GivenChildThread_WhenParentDisposedBeforeChild_ChildScopeThrows()
+        {
+            ScopeProvider scopeProvider = ScopeProvider;
+
+            Assert.IsNull(ScopeProvider.AmbientScope);
+            IScope mainScope = scopeProvider.CreateScope();
+
+            var t = Task.Run(() =>
+            {
+                Console.WriteLine("Child Task start: " + scopeProvider.AmbientScope.InstanceId);
+                IScope nested = scopeProvider.CreateScope();
+                // AsyncLocal has flowed so the AmbientScope here is replaced with nested
+                // BUT the AmbientScope in the main thread is not replaced which means
+                // when the main thread's Scope compares this == AmbientScope it will be true,
+                // similarly when this nested thread's Scope compares this == AmbientScope it will also
+                // be true. This is why disposing the parent scope succeeds with an exception.
+                Console.WriteLine("Child Task scope created: " + scopeProvider.AmbientScope.InstanceId);
+                Thread.Sleep(2000); // block for a bit to ensure the parent task is disposed first
+                Console.WriteLine("Child Task before dispose: " + scopeProvider.AmbientScope.InstanceId);
+                ObjectDisposedException ex = Assert.Throws<ObjectDisposedException>(() => nested.Dispose());
+                Console.WriteLine(ex);
+            });
+
+            // now dispose the main without waiting for the child thread to join
+            Console.WriteLine("Parent Task disposing: " + scopeProvider.AmbientScope.InstanceId);
+            mainScope.Dispose();
+            Console.WriteLine("Parent Task disposed: " + scopeProvider.AmbientScope?.InstanceId);
+
+            Task.WaitAll(t);
+        }
+
+        [Test]
+        public void GivenChildThread_WhenChildDisposedBeforeParent_OK()
         {
             ScopeProvider scopeProvider = ScopeProvider;
 
@@ -52,16 +118,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             // but if Task.Run is used as a fire and forget thread without being done correctly then the Scope will
             // flow to that thread.
             var t = Task.Run(() =>
-            {                
-                using IScope nested = scopeProvider.CreateScope();
-                Thread.Sleep(2000); // block for a bit
+            {
+                Console.WriteLine("Child Task start: " + scopeProvider.AmbientScope.InstanceId);
+                IScope nested = scopeProvider.CreateScope();                
+                Console.WriteLine("Child Task before dispose: " + scopeProvider.AmbientScope.InstanceId);
+                nested.Dispose();
+                Console.WriteLine("Child Task after disposed: " + scopeProvider.AmbientScope.InstanceId);
             });
-
-            // now dispose the main without waiting for the child thread to join
-            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => mainScope.Dispose());
+            
+            Thread.Sleep(2000); // block for a bit to ensure the child task is disposed first
+            Console.WriteLine("Parent Task disposing: " + scopeProvider.AmbientScope.InstanceId);
+            mainScope.Dispose();
+            Console.WriteLine("Parent Task disposed: " + scopeProvider.AmbientScope?.InstanceId);
 
             Task.WaitAll(t);
-            Console.WriteLine(ex);
+            Assert.Pass();
         }
 
         [Test]
