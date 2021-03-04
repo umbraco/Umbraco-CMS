@@ -5,7 +5,6 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Persistence.SqlCe;
-using Umbraco.Core;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web
