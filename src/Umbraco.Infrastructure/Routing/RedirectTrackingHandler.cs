@@ -47,44 +47,28 @@ namespace Umbraco.Cms.Core.Routing
             _requestCache = requestCache;
         }
 
-        public void Handle(PublishingNotification<IContent> notification)
+        public void Handle(PublishingNotification<IContent> notification) => StoreOldRoutes(notification.PublishedEntities);
+
+        public void Handle(PublishedNotification<IContent> notification) => CreateRedirectsForOldRoutes();
+
+        public void Handle(MovingNotification<IContent> notification) => StoreOldRoutes(notification.MoveInfoCollection.Select(m => m.Entity));
+
+        public void Handle(MovedNotification<IContent> notification) => CreateRedirectsForOldRoutes();
+
+        private void StoreOldRoutes(IEnumerable<IContent> entities)
         {
             // don't let the notification handlers kick in if Redirect Tracking is turned off in the config
             if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking)
                 return;
 
             var oldRoutes = GetOldRoutes();
-            foreach (var entity in notification.PublishedEntities)
+            foreach (var entity in entities)
             {
                 StoreOldRoute(entity, oldRoutes);
             }
         }
 
-        public void Handle(PublishedNotification<IContent> notification)
-        {
-            // don't let the notification handlers kick in if Redirect Tracking is turned off in the config
-            if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking)
-                return;
-
-            var oldRoutes = GetOldRoutes();
-            CreateRedirects(oldRoutes);
-        }
-
-        public void Handle(MovingNotification<IContent> notification)
-        {
-            // don't let the notification handlers kick in if Redirect Tracking is turned off in the config
-            if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking)
-                return;
-
-            var oldRoutes = GetOldRoutes();
-            foreach (var info in notification.MoveInfoCollection)
-            {
-                StoreOldRoute(info.Entity, oldRoutes);
-            }
-        }
-
-        // TODO refactor (this is duplicate code, see published notification handling above)
-        public void Handle(MovedNotification<IContent> notification)
+        private void CreateRedirectsForOldRoutes()
         {
             // don't let the notification handlers kick in if Redirect Tracking is turned off in the config
             if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking)
