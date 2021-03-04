@@ -49,15 +49,19 @@
 
             function setSortingOptions() {
 
-                scope.sortableOptionsGroup = {
+                const defaultOptions = {
                     axis: 'y',
                     distance: 10,
                     tolerance: "pointer",
                     opacity: 0.7,
                     scroll: true,
                     cursor: "move",
+                    zIndex: 6000
+                };
+
+                scope.sortableOptionsGroup = {
+                    ...defaultOptions,
                     placeholder: "umb-group-builder__group-sortable-placeholder",
-                    zIndex: 6000,
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
                     start: function (e, ui) {
@@ -69,14 +73,9 @@
                 };
 
                 scope.sortableOptionsTabs = {
+                    ...defaultOptions,
                     axis: 'x',
-                    distance: 10,
-                    tolerance: "pointer",
-                    opacity: 0.7,
-                    scroll: true,
-                    cursor: "move",
                     placeholder: "umb-group-builder__tab-sortable-placeholder",
-                    zIndex: 6000,
                     handle: ".umb-group-builder__tab-handle",
                     items: ".umb-group-builder__tab-sortable",
                     start: function (e, ui) {
@@ -89,14 +88,8 @@
                 };
 
                 scope.sortableOptionsFieldset = {
-                    axis: 'y',
-                    distance: 10,
-                    tolerance: "pointer",
-                    opacity: 0.7,
-                    scroll: true,
-                    cursor: "move",
+                    ...defaultOptions,
                     placeholder: "umb-group-builder__group-sortable-placeholder",
-                    zIndex: 6000,
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__fieldset-sortable",
                     start: function (e, ui) {
@@ -108,15 +101,9 @@
                 };
 
                 scope.sortableOptionsProperty = {
-                    axis: 'y',
-                    distance: 10,
-                    tolerance: "pointer",
+                    ...defaultOptions,
                     connectWith: ".umb-group-builder__properties",
-                    opacity: 0.7,
-                    scroll: true,
-                    cursor: "move",
                     placeholder: "umb-group-builder__property_sortable-placeholder",
-                    zIndex: 6000,
                     handle: ".umb-group-builder__property-handle",
                     items: ".umb-group-builder__property-sortable",
                     start: function (e, ui) {
@@ -126,7 +113,6 @@
                         updatePropertiesSortOrder();
                     }
                 };
-
             }
 
             function updateTabsSortOrder() {
