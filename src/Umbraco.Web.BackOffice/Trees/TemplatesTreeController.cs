@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
@@ -35,8 +36,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             IMenuItemCollectionFactory menuItemCollectionFactory,
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
-            IFileService fileService
-        ) : base(localizedTextService, umbracoApiControllerTypeCollection)
+            IFileService fileService,
+            IEventAggregator eventAggregator
+        ) : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _treeSearcher = treeSearcher;
             _menuItemCollectionFactory = menuItemCollectionFactory;

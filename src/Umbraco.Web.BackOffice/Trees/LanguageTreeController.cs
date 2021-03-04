@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -19,8 +20,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         public LanguageTreeController(
             ILocalizedTextService textService,
-            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection)
-            : base(textService, umbracoApiControllerTypeCollection)
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IEventAggregator eventAggregator)
+            : base(textService, umbracoApiControllerTypeCollection, eventAggregator)
         {
         }
         protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)

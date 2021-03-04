@@ -9,5 +9,7 @@ namespace Umbraco.Cms.Core.Mail
     public interface IEmailSender
     {
         Task SendAsync(EmailMessage message);
+
+        bool CanSendRequiredEmail();
     }
 }
