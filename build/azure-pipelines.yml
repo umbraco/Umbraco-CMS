@@ -1,332 +1,296 @@
-#############################################################################
-## ASP.NET Core                                                            ##
-## Build and test ASP.NET Core projects targeting .NET Core.               ##
-## Runs tests, creates NuGet packages:                                     ##
-## https://docs.microsoft.com/azure/devops/pipelines/languages/dotnet-core ##
-#############################################################################
-
-# Variables & their default values
 variables:
-  buildConfiguration: 'Release'
-  SA_PASSWORD: UmbracoIntegration123!
-
+    buildConfiguration: Release
+    SA_PASSWORD: UmbracoIntegration123!
 resources:
-  containers:
-  - container: mssql
-    image: mcr.microsoft.com/mssql/server:2017-latest
-    env:
-      ACCEPT_EULA: Y
-      SA_PASSWORD: $(SA_PASSWORD)
-      MSSQL_PID: Developer
-    ports:
-      - 1433:1433
-    options: --name mssql
-
+    containers:
+        - container: mssql
+          image: 'mcr.microsoft.com/mssql/server:2017-latest'
+          env:
+              ACCEPT_EULA: 'Y'
+              SA_PASSWORD: $(SA_PASSWORD)
+              MSSQL_PID: Developer
+          ports:
+              - '1433:1433'
+          options: '--name mssql'
 stages:
-- stage: Linux
-  dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
-  jobs:
+    - stage: Unit_Tests
+      displayName: Unit Tests
+      dependsOn: []
+      jobs:
+          - job: Linux_Unit_Tests
+            displayName: Linux
+            pool:
+                vmImage: ubuntu-latest
+            steps:
+                - task: UseDotNet@2
+                  displayName: Use .Net Core sdk 5.x
+                  inputs:
+                      version: 5.x
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet test
+                  inputs:
+                      command: test
+                      projects: '**/*.Tests.UnitTests.csproj'
+          - job: MacOS_Unit_Tests
+            displayName: Mac OS
+            pool:
+                vmImage: macOS-latest
+            steps:
+                - task: UseDotNet@2
+                  displayName: Use .Net Core sdk 5.x
+                  inputs:
+                      version: 5.x
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet test
+                  inputs:
+                      command: test
+                      projects: '**/*.Tests.UnitTests.csproj'
+          - job: Windows_Unit_Tests
+            displayName: Windows
+            pool:
+                vmImage: windows-latest
+            steps:
+                - task: UseDotNet@2
+                  displayName: Use .Net Core sdk 5.x
+                  inputs:
+                      version: 5.x
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet test
+                  inputs:
+                      command: test
+                      projects: '**/*.Tests.UnitTests.csproj'
+    - stage: Integration_Tests
+      dependsOn: []
+      jobs:
+          - job: Linux_Integration_Tests
+            services:
+                mssql: mssql
+            timeoutInMinutes: 120
+            displayName: Linux
+            pool:
+                vmImage: ubuntu-latest
+            steps:
+                - task: UseDotNet@2
+                  displayName: Use .Net Core sdk 5.x
+                  inputs:
+                      version: 5.x
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet test
+                  inputs:
+                      command: test
+                      projects: '**/Umbraco.Tests.Integration.csproj'
+                  env:
+                      UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
+          - job: Windows_Integration_Tests
+            timeoutInMinutes: 120
+            displayName: Windows
+            pool:
+                vmImage: windows-latest
+            steps:
+                - task: UseDotNet@2
+                  displayName: Use .Net Core sdk 5.x
+                  inputs:
+                      version: 5.x
+                - powershell: sqllocaldb start mssqllocaldb
+                  displayName: Start MSSQL LocalDb
+                - task: DotNetCoreCLI@2
+                  displayName: dotnet test
+                  inputs:
+                      command: test
+                      projects: '**\Umbraco.Tests.Integration.csproj'
+    - stage: Artifacts
+      dependsOn: []
+      jobs:
+          - job: Build_Artifacts
+            displayName: Build Artifacts
+            pool:
+                vmImage: windows-latest
+            steps:
+                - task: UseDotNet@2
+                  displayName: Use .Net Core sdk 5.x
+                  inputs:
+                      version: 5.x
+                - task: NuGetToolInstaller@1
+                  displayName: Use NuGet Latest
+                - task: NuGetCommand@2
+                  displayName: Restore NuGet Packages
+                  inputs:
+                      restoreSolution: '*\src\umbraco.sln'
+                      feedsToUse: config
+                - task: PowerShell@1
+                  displayName: Update Version
+                  condition: 'eq(variables[''Umbraco.IsReleaseBuild''], ''false'')'
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: >
+                          Write-Host "Working folder: $pwd"
 
-  - job: Unit_Tests
-    displayName: 'Unit Tests'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-
-    - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.x'
-      inputs:
-        version: 5.x
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: '**/*.Tests.UnitTests.csproj'
-
-  - job: Integration_Tests
-    services:
-      mssql: mssql
-    timeoutInMinutes: 120
-    displayName: 'Integration Tests'
-    pool:
-      vmImage: 'ubuntu-latest'
-    steps:
-
-    - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.x'
-      inputs:
-        version: 5.x
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: '**/Umbraco.Tests.Integration.csproj'
-      env:
-        UmbracoIntegrationTestConnectionString: 'Server=localhost,1433;User Id=sa;Password=$(SA_PASSWORD);'
-
-- stage: MacOS
-  dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
-  jobs:
-
-  - job: Unit_Tests
-    displayName: 'Unit Tests'
-    pool:
-      vmImage: 'macOS-latest'
-    steps:
-
-    - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.x'
-      inputs:
-        version: 5.x
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: '**/*.Tests.UnitTests.csproj'
-
-- stage: Windows
-  dependsOn: [] # this removes the implicit dependency on previous stage and causes this to run in parallel
-  jobs:
-
-  - job: Unit_Tests
-    displayName: 'Unit Tests'
-    pool:
-      vmImage: 'windows-latest'
-    steps:
-
-    - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.x'
-      inputs:
-        version: 5.x
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: '**\*.Tests.UnitTests.csproj'
-
-  - job: Integration_Tests
-    timeoutInMinutes: 120
-    displayName: 'Integration Tests'
-    pool:
-      vmImage: 'windows-latest'
-    steps:
-
-    - task: UseDotNet@2
-      displayName: 'Use .Net Core sdk 5.x'
-      inputs:
-        version: 5.x
-
-    - powershell: 'sqllocaldb start mssqllocaldb'
-      displayName: 'Start MSSQL LocalDb'
-
-    - task: DotNetCoreCLI@2
-      displayName: 'dotnet test'
-      inputs:
-        command: test
-        projects: '**\Umbraco.Tests.Integration.csproj'
-
-  - job: Build_Artifacts
-    displayName: 'Build Artifacts'
-    pool:
-        vmImage: 'windows-latest'
-    steps:
-
-        - task: UseDotNet@2
-          displayName: 'Use .Net Core sdk 5.x'
-          inputs:
-            version: 5.x
-
-        - task: NuGetToolInstaller@1
-          displayName: 'Use NuGet Latest'
-
-        - task: NuGetCommand@2
-          displayName: 'Restore NuGet Packages'
-          inputs:
-              restoreSolution: '*\src\umbraco.sln'
-              feedsToUse: config
-
-        - task: PowerShell@1
-          displayName: 'Update Version'
-          condition: eq(variables['Umbraco.IsReleaseBuild'], 'false')
-          inputs:
-              scriptType: inlineScript
-              inlineScript: |
-                Write-Host "Working folder: $pwd"
-                $ubuild = build/build.ps1 -get -continue
-
-                $version = $ubuild.GetUmbracoVersion()
-                if ($version.Comment -ne "")
-                  {
-                    # 8.0.0-beta.33.1234
-                    $continuous = "$($version.Semver).$(Build.BuildNumber)"
-                  }
-                else
-                  {
-                    # 8.0.0-alpha.1234
-                    $continuous = "$($version.Release)-alpha.$(Build.BuildNumber)"
-                  }
-                $ubuild.SetUmbracoVersion($continuous)
-
-                #Update the version in template also
-                $templatePath = 'build/templates/UmbracoSolution/.template.config/template.json'
-                $a = Get-Content $templatePath -raw | ConvertFrom-Json
-                $a.symbols.version.defaultValue = $continuous
-                $a | ConvertTo-Json -depth 32| set-content $templatePath
-
-                Write-Host "Building: $continuous"
-
-        - task: PowerShell@1
-          displayName: 'Prepare Build'
-          inputs:
-              scriptType: inlineScript
-              inlineScript: |
-                  Write-Host "Working folder: $pwd"
-                  $ubuild = build\build.ps1 -get
-
-                  $ubuild.PrepareBuild("vso")
-
-        - task: NodeTool@0
-          displayName: 'Use Node 11.x'
-          inputs:
-              versionSpec: 11.x
-
-        - task: Npm@1
-          displayName: 'npm install'
-          inputs:
-              workingDir: src\Umbraco.Web.UI.Client
-              verbose: false
-
-        - task: gulp@0
-          displayName: 'gulp build'
-          inputs:
-              gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
-              targets: build
-              workingDirectory: src\Umbraco.Web.UI.Client
-              publishJUnitResults: true
-              testResultsFiles: '**\TESTS-*.xml'
-
-        - task: PowerShell@1
-          displayName: 'Prepare Packages & Zip'
-          inputs:
-              scriptType: inlineScript
-              inlineScript: |
-                  Write-Host "Working folder: $pwd"
-                  $ubuild = build\build.ps1 -get -continue
-
-                  $ubuild.CompileUmbraco()
-                  $ubuild.PreparePackages()
-                  $ubuild.PackageZip()
-
-        - task: CopyFiles@2
-          displayName: 'Copy Zip Files to Staging'
-          inputs:
-              SourceFolder: build.out
-              Contents: '*.zip'
-              TargetFolder: '$(build.artifactstagingdirectory)'
-              CleanTargetFolder: true
-
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Zip Files'
-          inputs:
-              PathtoPublish: '$(build.artifactstagingdirectory)'
-              ArtifactName: zips
-
-        - task: PowerShell@1
-          displayName: 'Verify & Package NuGet'
-          inputs:
-              scriptType: inlineScript
-              inlineScript: |
-                  Write-Host "Working folder: $pwd"
-                  $ubuild = build\build.ps1 -get -continue
-
-                  $ubuild.VerifyNuGet()
-                  $ubuild.PackageNuGet()
-
-        - task: CopyFiles@2
-          displayName: 'Copy NuPkg Files to Staging'
-          inputs:
-              SourceFolder: build.out
-              Contents: '*.nupkg'
-              TargetFolder: '$(build.artifactstagingdirectory)'
-              CleanTargetFolder: true
-
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish NuPkg Files'
-          inputs:
-              PathtoPublish: '$(build.artifactstagingdirectory)'
-              ArtifactName: nupkg
-
-        - task: CopyFiles@2
-          displayName: 'Copy Log Files to Staging'
-          inputs:
-              SourceFolder: build.tmp
-              Contents: '*.log'
-              TargetFolder: '$(build.artifactstagingdirectory)'
-              CleanTargetFolder: true
-          condition: succeededOrFailed()
-
-        - task: PublishBuildArtifacts@1
-          displayName: 'Publish Log Files'
-          inputs:
-              PathtoPublish: '$(build.artifactstagingdirectory)'
-              ArtifactName: logs
-          condition: succeededOrFailed()
+                          $ubuild = build/build.ps1 -get -continue
 
 
-  - job: Generate_Docs
-    timeoutInMinutes: 60
-    condition: ne(variables['Umbraco.IsReleaseBuild'], 'false')
-    displayName: 'Generate Code Documentation'
-    pool:
-        vmImage: 'windows-latest'
-    steps:
-        - task: UseDotNet@2
-          displayName: 'Use .Net Core sdk 5.x'
-          inputs:
-              version: 5.x
+                          $version = $ubuild.GetUmbracoVersion()
 
-        - task: PowerShell@2
-          displayName: 'Prep build tool -  C# Docs'
-          inputs:
-              targetType: 'inline'
-              script: |
-                  choco install docfx -y
-                  docfx metadata "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                          if ($version.Comment -ne "")
+                            {
+                              # 8.0.0-beta.33.1234
+                              $continuous = "$($version.Semver).$(Build.BuildNumber)"
+                            }
+                          else
+                            {
+                              # 8.0.0-alpha.1234
+                              $continuous = "$($version.Release)-alpha.$(Build.BuildNumber)"
+                            }
+                          $ubuild.SetUmbracoVersion($continuous)
+
+
+                          #Update the version in template also
+
+                          $templatePath =
+                          'build/templates/UmbracoSolution/.template.config/template.json'
+
+                          $a = Get-Content $templatePath -raw | ConvertFrom-Json
+
+                          $a.symbols.version.defaultValue = $continuous
+
+                          $a | ConvertTo-Json -depth 32| set-content $templatePath
+
+
+                          Write-Host "Building: $continuous"
+                - task: PowerShell@1
+                  displayName: Prepare Build
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: |
+                          Write-Host "Working folder: $pwd"
+                          $ubuild = build\build.ps1 -get
+
+                          $ubuild.PrepareBuild("vso")
+                - task: NodeTool@0
+                  displayName: Use Node 11.x
+                  inputs:
+                      versionSpec: 11.x
+                - task: Npm@1
+                  displayName: npm install
+                  inputs:
+                      workingDir: src\Umbraco.Web.UI.Client
+                      verbose: false
+                - task: gulp@0
+                  displayName: gulp build
+                  inputs:
+                      gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
+                      targets: build
+                      workingDirectory: src\Umbraco.Web.UI.Client
+                      publishJUnitResults: true
+                      testResultsFiles: '**\TESTS-*.xml'
+                - task: PowerShell@1
+                  displayName: Prepare Packages & Zip
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: |
+                          Write-Host "Working folder: $pwd"
+                          $ubuild = build\build.ps1 -get -continue
+
+                          $ubuild.CompileUmbraco()
+                          $ubuild.PreparePackages()
+                          $ubuild.PackageZip()
+                - task: CopyFiles@2
+                  displayName: Copy Zip Files to Staging
+                  inputs:
+                      SourceFolder: build.out
+                      Contents: '*.zip'
+                      TargetFolder: $(build.artifactstagingdirectory)
+                      CleanTargetFolder: true
+                - task: PublishBuildArtifacts@1
+                  displayName: Publish Zip Files
+                  inputs:
+                      PathtoPublish: $(build.artifactstagingdirectory)
+                      ArtifactName: zips
+                - task: PowerShell@1
+                  displayName: Verify & Package NuGet
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: |
+                          Write-Host "Working folder: $pwd"
+                          $ubuild = build\build.ps1 -get -continue
+
+                          $ubuild.VerifyNuGet()
+                          $ubuild.PackageNuGet()
+                - task: CopyFiles@2
+                  displayName: Copy NuPkg Files to Staging
+                  inputs:
+                      SourceFolder: build.out
+                      Contents: '*.nupkg'
+                      TargetFolder: $(build.artifactstagingdirectory)
+                      CleanTargetFolder: true
+                - task: PublishBuildArtifacts@1
+                  displayName: Publish NuPkg Files
+                  inputs:
+                      PathtoPublish: $(build.artifactstagingdirectory)
+                      ArtifactName: nupkg
+                - task: CopyFiles@2
+                  displayName: Copy Log Files to Staging
+                  inputs:
+                      SourceFolder: build.tmp
+                      Contents: '*.log'
+                      TargetFolder: $(build.artifactstagingdirectory)
+                      CleanTargetFolder: true
+                  condition: succeededOrFailed()
+                - task: PublishBuildArtifacts@1
+                  displayName: Publish Log Files
+                  inputs:
+                      PathtoPublish: $(build.artifactstagingdirectory)
+                      ArtifactName: logs
+                  condition: succeededOrFailed()
+    - stage: Artifacts_Docs
+      displayName: 'Static Code Documentation'
+      dependsOn: []
+      condition: 'ne(variables[''Umbraco.IsReleaseBuild''], ''false'')'
+      jobs:
+          - job: Generate_Docs
+            timeoutInMinutes: 60
+            displayName: Generate Code Documentation
+            pool:
+                vmImage: windows-latest
+            steps:
+                - task: UseDotNet@2
+                  displayName: Use .Net Core sdk 5.x
+                  inputs:
+                      version: 5.x
+                - task: PowerShell@2
+                  displayName: 'Prep build tool -  C# Docs'
+                  inputs:
+                      targetType: inline
+                      script: |
+                          choco install docfx -y
+                          docfx metadata "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
                   docfx build "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
-                  if ($lastexitcode -ne 0){
-                      throw ("Error generating docs")
-                  }
-              errorActionPreference: 'continue'
-              workingDirectory: 'build'
-
-        - task: ArchiveFiles@2
-          displayName: 'Zip C# Docs'
-          inputs:C
-              rootFolderOrFile: '$(Build.SourcesDirectory)/src/ApiDocs/_site'
-              includeRootFolder: true
-              archiveType: 'zip'
-              archiveFile: '$(Build.ArtifactStagingDirectory)/docs/csharp-docs.zip'
-              replaceExistingArchive: true
-
-        - task: PowerShell@2
-          displayName: 'Prep build tool - JS Docs'
-          inputs:
-              targetType: 'inline'
-              script: |
-                  $uenv=./build.ps1 -get -doc
-                  $uenv.SandboxNode()
-                  $uenv.CompileBelle()
-                  $uenv.PrepareAngularDocs()
-                  $uenv.RestoreNode()
-              errorActionPreference: 'continue'
-              workingDirectory: 'build'
-
-        - task: PublishPipelineArtifact@1
-          inputs:
-              targetPath: '$(Build.Repository.LocalPath)\build.out\'
-              artifact: 'docs'
-              publishLocation: 'pipeline'
+                          if ($lastexitcode -ne 0){
+                              throw ("Error generating docs")
+                          }
+                      errorActionPreference: continue
+                      workingDirectory: build
+                - task: ArchiveFiles@2
+                  displayName: 'Zip C# Docs'
+                  inputs:C
+                      rootFolderOrFile: $(Build.SourcesDirectory)/src/ApiDocs/_site
+                      includeRootFolder: true
+                      archiveType: zip
+                      archiveFile: $(Build.ArtifactStagingDirectory)/docs/csharp-docs.zip
+                      replaceExistingArchive: true
+                - task: PowerShell@2
+                  displayName: Prep build tool - JS Docs
+                  inputs:
+                      targetType: inline
+                      script: |
+                          $uenv=./build.ps1 -get -doc
+                          $uenv.SandboxNode()
+                          $uenv.CompileBelle()
+                          $uenv.PrepareAngularDocs()
+                          $uenv.RestoreNode()
+                      errorActionPreference: continue
+                      workingDirectory: build
+                - task: PublishPipelineArtifact@1
+                  inputs:
+                      targetPath: $(Build.Repository.LocalPath)\build.out\
+                      artifact: docs
+                      publishLocation: pipeline
