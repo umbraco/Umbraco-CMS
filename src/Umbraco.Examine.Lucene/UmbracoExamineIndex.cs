@@ -31,12 +31,12 @@ namespace Umbraco.Cms.Infrastructure.Examine
         private readonly ILoggerFactory _loggerFactory;
 
         private readonly IRuntimeState _runtimeState;
+
         // note
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
         // context because they will fork a thread/task/whatever which should *not* capture our
-        // call context (and the database it can contain)! ideally we should be able to override
-        // SafelyProcessQueueItems but that's not possible in the current version of Examine.
-        // TODO: Make SafelyProcessQueueItems  overrideable or make this easier
+        // call context (and the database it can contain)!
+        // TODO: FIX Examine to not flow the ExecutionContext so callers don't need to worry about this!
 
         /// <summary>
         /// Create a new <see cref="UmbracoExamineIndex"/>
