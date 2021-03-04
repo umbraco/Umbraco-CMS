@@ -1194,7 +1194,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <summary>
         /// Occurs after change.
         /// </summary>
-        public static event TypedEventHandler<IMediaService, TreeChange<IMedia>.EventArgs> TreeChanged;
+        /// <remarks>
+        /// This event needs to be rewritten using notifications instead
+        /// </remarks>
+        internal static event TypedEventHandler<IMediaService, TreeChange<IMedia>.EventArgs> TreeChanged;
 
         #endregion
 
