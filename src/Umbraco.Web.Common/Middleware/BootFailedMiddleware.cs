@@ -1,10 +1,10 @@
-﻿using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Umbraco.Core;
-using Umbraco.Core.Exceptions;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Common.Middleware
+namespace Umbraco.Cms.Web.Common.Middleware
 {
     /// <summary>
     /// Executes when Umbraco booting fails in order to show the problem

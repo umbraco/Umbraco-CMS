@@ -4,17 +4,18 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NPoco;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Represents a repository for doing CRUD operations for <see cref="Language"/>
@@ -112,13 +113,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                            {
                                //NOTE: There is no constraint between the Language and cmsDictionary/cmsLanguageText tables (?)
                                // but we still need to remove them
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.DictionaryValue + " WHERE languageId = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.PropertyData + " WHERE languageId = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE languageId = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE languageId = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.TagRelationship + " WHERE tagId IN (SELECT id FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id)",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id",
-                               "DELETE FROM " + Constants.DatabaseSchema.Tables.Language + " WHERE id = @id"
+                               "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.DictionaryValue + " WHERE languageId = @id",
+                               "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.PropertyData + " WHERE languageId = @id",
+                               "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.ContentVersionCultureVariation + " WHERE languageId = @id",
+                               "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.DocumentCultureVariation + " WHERE languageId = @id",
+                               "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.TagRelationship + " WHERE tagId IN (SELECT id FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id)",
+                               "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Tag + " WHERE languageId = @id",
+                               "DELETE FROM " + Cms.Core.Constants.DatabaseSchema.Tables.Language + " WHERE id = @id"
                            };
             return list;
         }

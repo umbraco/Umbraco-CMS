@@ -6,11 +6,12 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.SqlSyntax
+namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
     /// <summary>
     /// Represents the Base Sql Syntax provider implementation.

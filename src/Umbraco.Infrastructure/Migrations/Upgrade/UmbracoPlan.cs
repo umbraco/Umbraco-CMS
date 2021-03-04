@@ -1,17 +1,17 @@
 ﻿using System;
-using Semver;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Migrations.Upgrade.Common;
-using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
-using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_9_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_10_0;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_10_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_7_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_9_0;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 {
     /// <summary>
     /// Represents Umbraco's migration plan.
@@ -25,7 +25,7 @@ namespace Umbraco.Core.Migrations.Upgrade
         /// Initializes a new instance of the <see cref="UmbracoPlan"/> class.
         /// </summary>
         public UmbracoPlan(IUmbracoVersion umbracoVersion)
-            : base(Constants.System.UmbracoUpgradePlanName)
+            : base(Cms.Core.Constants.System.UmbracoUpgradePlanName)
         {
             _umbracoVersion = umbracoVersion;
             DefinePlan();

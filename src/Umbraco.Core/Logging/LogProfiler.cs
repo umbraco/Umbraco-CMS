@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Core.Logging
+namespace Umbraco.Cms.Core.Logging
 {
     /// <summary>
     /// Implements <see cref="IProfiler"/> by writing profiling results to an <see cref="ILogger"/>.

@@ -1,15 +1,15 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class ContentVersionCultureVariationDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.ContentVersionCultureVariation;
         private int? _updateUserId;
 
         [Column("id")]

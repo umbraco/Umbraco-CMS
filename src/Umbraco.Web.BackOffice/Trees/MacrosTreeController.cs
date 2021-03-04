@@ -2,16 +2,17 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     [Authorize(Policy = AuthorizationPolicies.TreeAccessMacros)]
     [Tree(Constants.Applications.Settings, Constants.Trees.Macros, TreeTitle = "Macros", SortOrder = 4, TreeGroup = Constants.Trees.Groups.Settings)]
@@ -22,7 +23,7 @@ namespace Umbraco.Web.BackOffice.Trees
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
         private readonly IMacroService  _macroService;
 
-        public MacrosTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IMenuItemCollectionFactory menuItemCollectionFactory, IMacroService macroService) : base(localizedTextService, umbracoApiControllerTypeCollection)
+        public MacrosTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IMenuItemCollectionFactory menuItemCollectionFactory, IMacroService macroService, IEventAggregator eventAggregator) : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _menuItemCollectionFactory = menuItemCollectionFactory;
             _macroService = macroService;

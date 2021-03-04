@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.Access)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.Access)]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class AccessDto

@@ -1,7 +1,6 @@
 ﻿using System.Runtime.Serialization;
-using Umbraco.Core;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     [DataContract(Name = "link", Namespace = "")]
     public class LinkDisplay

@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Compose
+namespace Umbraco.Cms.Core.Compose
 {
     /// <summary>
     /// Used to ensure that the public access data file is kept up to date properly

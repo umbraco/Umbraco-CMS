@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -8,27 +7,26 @@ using System.Threading.Tasks;
 using CSharpTest.Net.Collections;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Changes;
-using Umbraco.Infrastructure.PublishedCache.Persistence;
-using Umbraco.Web.Cache;
-using Umbraco.Web.PublishedCache.NuCache.DataSource;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
+using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 using File = System.IO.File;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
-
     internal class PublishedSnapshotService : IPublishedSnapshotService
     {
         private readonly ServiceContext _serviceContext;

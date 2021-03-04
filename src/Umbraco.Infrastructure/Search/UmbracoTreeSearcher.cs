@@ -2,19 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Umbraco.Core;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Services;
-using Umbraco.Core.Trees;
-using Umbraco.Examine;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Cms.Infrastructure.Search
 {
 
     /// <summary>

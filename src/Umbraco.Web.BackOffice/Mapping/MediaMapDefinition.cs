@@ -1,17 +1,19 @@
 ﻿using System;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.BackOffice.Trees;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Mapping;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Trees;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Mapping
+namespace Umbraco.Cms.Web.BackOffice.Mapping
 {
     /// <summary>
     /// Declares model mappings for media.

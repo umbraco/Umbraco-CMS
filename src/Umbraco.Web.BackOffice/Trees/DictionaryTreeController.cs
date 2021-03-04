@@ -3,17 +3,19 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
 
     // We are allowed to see the dictionary tree, if we are allowed to manage templates, such that se can use the
@@ -27,7 +29,7 @@ namespace Umbraco.Web.BackOffice.Trees
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
         private readonly ILocalizationService _localizationService;
 
-        public DictionaryTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IMenuItemCollectionFactory menuItemCollectionFactory, ILocalizationService localizationService) : base(localizedTextService, umbracoApiControllerTypeCollection)
+        public DictionaryTreeController(ILocalizedTextService localizedTextService, UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection, IMenuItemCollectionFactory menuItemCollectionFactory, ILocalizationService localizationService, IEventAggregator eventAggregator) : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _menuItemCollectionFactory = menuItemCollectionFactory;
             _localizationService = localizationService;

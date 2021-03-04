@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Core.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations
 {
     /// <summary>
     /// Implements <see cref="IMigrationContext"/>.

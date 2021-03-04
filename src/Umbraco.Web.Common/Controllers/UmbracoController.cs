@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Umbraco.Web.Common.Controllers
+namespace Umbraco.Cms.Web.Common.Controllers
 {
     /// <summary>
     /// Provides a base class for Umbraco controllers.

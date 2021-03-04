@@ -1,10 +1,10 @@
 using System;
 using System.Drawing;
 using System.IO;
-using Umbraco.Core;
-using Umbraco.Core.Media;
+using Umbraco.Cms.Core.Media;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Media
+namespace Umbraco.Cms.Infrastructure.Media
 {
     internal class ImageDimensionExtractor : IImageDimensionExtractor
     {

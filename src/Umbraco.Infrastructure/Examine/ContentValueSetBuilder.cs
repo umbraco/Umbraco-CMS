@@ -1,15 +1,15 @@
-﻿using Examine;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Examine;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Builds <see cref="ValueSet"/>s for <see cref="IContent"/> items

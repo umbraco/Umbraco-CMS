@@ -1,14 +1,14 @@
 using System;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Routing;
-using Umbraco.Core.Security;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Web.Common.UmbracoContext
 {
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
@@ -145,7 +145,7 @@ namespace Umbraco.Web
                 && _umbracoRequestPaths.IsBackOfficeRequest(requestUrl.AbsolutePath) == false
                 && _backofficeSecurity.CurrentUser != null)
             {
-                var previewToken = _cookieManager.GetCookieValue(Constants.Web.PreviewCookieName); // may be null or empty
+                var previewToken = _cookieManager.GetCookieValue(Core.Constants.Web.PreviewCookieName); // may be null or empty
                 _previewToken = previewToken.IsNullOrWhiteSpace() ? null : previewToken;
             }
 

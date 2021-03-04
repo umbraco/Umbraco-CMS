@@ -1,21 +1,20 @@
 using System;
 using System.Collections.Generic;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
-using Umbraco.Net;
-using Umbraco.Web.Models.ContentEditing;
 
-
-namespace Umbraco.Web.Common.Security
+namespace Umbraco.Cms.Web.Common.Security
 {
     public class BackOfficeUserManager : UmbracoUserManager<BackOfficeIdentityUser, UserPasswordConfigurationSettings>, IBackOfficeUserManager
     {
@@ -28,13 +27,12 @@ namespace Umbraco.Web.Common.Security
             IPasswordHasher<BackOfficeIdentityUser> passwordHasher,
             IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
             IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
-            BackOfficeLookupNormalizer keyNormalizer,
             BackOfficeIdentityErrorDescriber errors,
             IServiceProvider services,
             IHttpContextAccessor httpContextAccessor,
             ILogger<UserManager<BackOfficeIdentityUser>> logger,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration)
-            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger, passwordConfiguration)
+            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors, services, logger, passwordConfiguration)
         {
             _httpContextAccessor = httpContextAccessor;
         }
@@ -138,7 +136,7 @@ namespace Umbraco.Web.Common.Security
 
             return result;
         }
-
+        
         /// <inheritdoc/>
         public override async Task<IdentityResult> SetLockoutEndDateAsync(BackOfficeIdentityUser user, DateTimeOffset? lockoutEnd)
         {
@@ -178,7 +176,7 @@ namespace Umbraco.Web.Common.Security
 
         private string GetCurrentUserId(IPrincipal currentUser)
         {
-            UmbracoBackOfficeIdentity umbIdentity = currentUser?.GetUmbracoIdentity();
+            ClaimsIdentity umbIdentity = currentUser?.GetUmbracoIdentity();
             var currentUserId = umbIdentity?.GetUserId<string>() ?? Core.Constants.Security.SuperUserIdAsString;
             return currentUserId;
         }

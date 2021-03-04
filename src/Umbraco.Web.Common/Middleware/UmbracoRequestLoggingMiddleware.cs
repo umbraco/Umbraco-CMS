@@ -1,13 +1,10 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.Extensions;
 using Serilog.Context;
-using Umbraco.Core;
-using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Middleware
+namespace Umbraco.Cms.Web.Common.Middleware
 {
     /// <summary>
     /// Adds request based serilog enrichers to the LogContext for each request
@@ -16,7 +13,7 @@ namespace Umbraco.Web.Common.Middleware
     {
         private readonly HttpSessionIdEnricher _sessionIdEnricher;
         private readonly HttpRequestNumberEnricher _requestNumberEnricher;
-        private readonly HttpRequestIdEnricher _requestIdEnricher;        
+        private readonly HttpRequestIdEnricher _requestIdEnricher;
 
         public UmbracoRequestLoggingMiddleware(
             HttpSessionIdEnricher sessionIdEnricher,

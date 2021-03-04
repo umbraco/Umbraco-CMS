@@ -1,6 +1,4 @@
-﻿using NPoco;
-
-namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions
 {
     public class DeleteDefaultConstraintExpression : MigrationExpressionBase
     {

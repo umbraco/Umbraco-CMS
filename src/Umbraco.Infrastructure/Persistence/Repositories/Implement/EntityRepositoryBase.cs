@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
-
     /// <summary>
     /// Provides a base class to all <see cref="IEntity"/> based repositories.
     /// </summary>

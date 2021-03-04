@@ -7,14 +7,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NPoco;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Tests.UnitTests.TestHelpers;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 {
     [TestFixture]
     public abstract class BaseUsingSqlSyntax

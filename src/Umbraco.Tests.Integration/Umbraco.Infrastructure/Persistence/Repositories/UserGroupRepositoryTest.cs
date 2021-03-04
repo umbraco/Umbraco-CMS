@@ -5,23 +5,23 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class UserGroupRepositoryTest : UmbracoIntegrationTest
     {
         private UserGroupRepository CreateRepository(IScopeProvider provider) =>
-            new UserGroupRepository((IScopeAccessor)provider, global::Umbraco.Core.Cache.AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
+            new UserGroupRepository((IScopeAccessor)provider, global::Umbraco.Cms.Core.Cache.AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
 
         [Test]
         public void Can_Perform_Add_On_UserGroupRepository()
@@ -131,7 +131,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositor
 
                 int id = userGroup.Id;
 
-                var repository2 = new UserGroupRepository((IScopeAccessor)provider, global::Umbraco.Core.Cache.AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
+                var repository2 = new UserGroupRepository((IScopeAccessor)provider, global::Umbraco.Cms.Core.Cache.AppCaches.Disabled, LoggerFactory.CreateLogger<UserGroupRepository>(), LoggerFactory, ShortStringHelper);
                 repository2.Delete(userGroup);
                 scope.Complete();
 

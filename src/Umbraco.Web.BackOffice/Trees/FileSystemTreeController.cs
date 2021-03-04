@@ -4,24 +4,27 @@ using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Services;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     public abstract class FileSystemTreeController : TreeController
     {
         protected FileSystemTreeController(
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
-            IMenuItemCollectionFactory menuItemCollectionFactory
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IEventAggregator eventAggregator
         )
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             MenuItemCollectionFactory = menuItemCollectionFactory;
         }

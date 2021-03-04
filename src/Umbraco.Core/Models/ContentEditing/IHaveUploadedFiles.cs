@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.Editors;
+using Umbraco.Cms.Core.Models.Editors;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     public interface IHaveUploadedFiles
     {

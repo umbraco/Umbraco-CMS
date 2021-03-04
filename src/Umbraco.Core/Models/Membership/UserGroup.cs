@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
     /// <summary>
     /// Represents a Group for a Backoffice User

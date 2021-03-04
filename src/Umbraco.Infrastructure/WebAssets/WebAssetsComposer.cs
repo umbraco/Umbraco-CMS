@@ -1,7 +1,8 @@
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.WebAssets
+namespace Umbraco.Cms.Infrastructure.WebAssets
 {
     public sealed class WebAssetsComposer : ComponentComposer<WebAssetsComponent>
     {

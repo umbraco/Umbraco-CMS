@@ -1,9 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for web routing settings.

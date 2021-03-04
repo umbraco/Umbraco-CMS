@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Exceptions;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Represents a Content object
@@ -45,6 +45,21 @@ namespace Umbraco.Core.Models
         /// <param name="name">Name of the content</param>
         /// <param name="parent">Parent <see cref="IContent"/> object</param>
         /// <param name="contentType">ContentType for the current Content object</param>
+        /// <param name="userId">The identifier of the user creating the Content object</param>
+        /// <param name="culture">An optional culture.</param>
+        public Content(string name, IContent parent, IContentType contentType, int userId, string culture = null)
+            : this(name, parent, contentType, new PropertyCollection(), culture)
+        {
+            CreatorId = userId;
+            WriterId = userId;
+        }
+
+        /// <summary>
+        /// Constructor for creating a Content object
+        /// </summary>
+        /// <param name="name">Name of the content</param>
+        /// <param name="parent">Parent <see cref="IContent"/> object</param>
+        /// <param name="contentType">ContentType for the current Content object</param>
         /// <param name="properties">Collection of properties</param>
         /// <param name="culture">An optional culture.</param>
         public Content(string name, IContent parent, IContentType contentType, PropertyCollection properties, string culture = null)
@@ -65,6 +80,21 @@ namespace Umbraco.Core.Models
         public Content(string name, int parentId, IContentType contentType, string culture = null)
             : this(name, parentId, contentType, new PropertyCollection(), culture)
         { }
+
+        /// <summary>
+        /// Constructor for creating a Content object
+        /// </summary>
+        /// <param name="name">Name of the content</param>
+        /// <param name="parentId">Id of the Parent content</param>
+        /// <param name="contentType">ContentType for the current Content object</param>
+        /// <param name="userId">The identifier of the user creating the Content object</param>
+        /// <param name="culture">An optional culture.</param>
+        public Content(string name, int parentId, IContentType contentType, int userId, string culture = null)
+            : this(name, parentId, contentType, new PropertyCollection(), culture)
+        {
+            CreatorId = userId;
+            WriterId = userId;
+        }
 
         /// <summary>
         /// Constructor for creating a Content object
@@ -101,12 +131,12 @@ namespace Umbraco.Core.Models
                 {
                     _schedule.ClearCollectionChangedEvents();
                 }
-                    
+
                 SetPropertyValueAndDetectChanges(value, ref _schedule, nameof(ContentSchedule));
                 if (_schedule != null)
                 {
                     _schedule.CollectionChanged += ScheduleCollectionChanged;
-                }   
+                }
             }
         }
 
@@ -237,7 +267,7 @@ namespace Umbraco.Core.Models
                 if (_publishInfos != null)
                 {
                     _publishInfos.CollectionChanged += PublishNamesCollectionChanged;
-                }   
+                }
             }
         }
 

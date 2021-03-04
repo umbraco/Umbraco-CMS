@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Core.Migrations.Expressions.Update
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update
 {
     /// <summary>
     /// Builds an Update expression.

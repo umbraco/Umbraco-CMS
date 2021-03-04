@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Linq;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     public sealed class MemberGroupCacheRefresher : PayloadCacheRefresherBase<MemberGroupCacheRefresher, MemberGroupCacheRefresher.JsonPayload>
     {

@@ -2,9 +2,9 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.Diagnostics
+namespace Umbraco.Cms.Core.Diagnostics
 {
     // taken from https://blogs.msdn.microsoft.com/dondu/2010/10/24/writing-minidumps-in-c/
     // and https://blogs.msdn.microsoft.com/dondu/2010/10/31/writing-minidumps-from-exceptions-in-c/

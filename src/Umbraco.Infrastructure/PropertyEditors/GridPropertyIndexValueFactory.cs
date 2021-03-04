@@ -1,16 +1,18 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Xml;
-using Umbraco.Examine;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Xml;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Parses the grid value into indexable values

@@ -6,13 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
-using User = Umbraco.Core.Models.Membership.User;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using User = Umbraco.Cms.Core.Models.Membership.User;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
 {
     [TestFixture]
     public class UserExtensionsTests

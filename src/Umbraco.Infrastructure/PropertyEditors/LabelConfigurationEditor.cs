@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
-using Umbraco.Core.IO;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Core.PropertyEditors
+using System.Collections.Generic;
+using Umbraco.Cms.Core.IO;
+
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the label value editor.
@@ -20,7 +23,7 @@ namespace Umbraco.Core.PropertyEditors
             // get the value type
             // not simply deserializing Json because we want to validate the valueType
 
-            if (editorValues.TryGetValue(Constants.PropertyEditors.ConfigurationKeys.DataValueType, out var valueTypeObj)
+            if (editorValues.TryGetValue(Cms.Core.Constants.PropertyEditors.ConfigurationKeys.DataValueType, out var valueTypeObj)
                 && valueTypeObj is string stringValue)
             {
                 if (!string.IsNullOrWhiteSpace(stringValue) && ValueTypes.IsValue(stringValue)) // validate

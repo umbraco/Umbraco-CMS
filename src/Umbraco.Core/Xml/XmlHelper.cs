@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.XPath;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.Xml
+namespace Umbraco.Cms.Core.Xml
 {
     /// <summary>
     /// The XmlHelper class contains general helper methods for working with xml in umbraco.

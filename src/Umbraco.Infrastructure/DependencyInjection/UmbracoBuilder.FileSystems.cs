@@ -1,13 +1,14 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.IO.MediaPathSchemes;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.IO.MediaPathSchemes;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     public static partial class UmbracoBuilderExtensions
     {

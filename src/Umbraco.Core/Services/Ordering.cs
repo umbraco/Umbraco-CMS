@@ -1,4 +1,6 @@
-﻿namespace Umbraco.Core.Services
+﻿using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Represents ordering information.

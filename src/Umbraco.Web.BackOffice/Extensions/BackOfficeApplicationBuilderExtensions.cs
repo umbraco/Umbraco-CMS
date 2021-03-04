@@ -1,9 +1,9 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Web.BackOffice.Middleware;
-using Umbraco.Web.BackOffice.Routing;
-using Umbraco.Web.Common.Security;
+using Umbraco.Cms.Web.BackOffice.Middleware;
+using Umbraco.Cms.Web.BackOffice.Routing;
+using Umbraco.Cms.Web.BackOffice.Security;
 
 namespace Umbraco.Extensions
 {

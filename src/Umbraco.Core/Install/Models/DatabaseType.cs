@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Install.Models
+﻿namespace Umbraco.Cms.Core.Install.Models
 {
     public enum DatabaseType
     {

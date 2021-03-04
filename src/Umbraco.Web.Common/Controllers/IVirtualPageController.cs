@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Web.Common.Controllers
 {

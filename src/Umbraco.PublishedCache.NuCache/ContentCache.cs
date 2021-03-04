@@ -4,16 +4,18 @@ using System.Globalization;
 using System.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Xml;
-using Umbraco.Core.Xml.XPath;
-using Umbraco.Web.PublishedCache.NuCache.Navigable;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Xml;
+using Umbraco.Cms.Core.Xml.XPath;
+using Umbraco.Cms.Infrastructure.PublishedCache.Navigable;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     internal class ContentCache : PublishedCacheBase, IPublishedContentCache, INavigableData, IDisposable
     {

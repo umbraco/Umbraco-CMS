@@ -2,20 +2,16 @@
 using System.Collections.Generic;
 using System.Xml.XPath;
 using Examine.Search;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Xml;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Xml;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Query methods used for accessing strongly typed content in templates
     /// </summary>
     public interface IPublishedContentQuery
     {
-
-
-
         IPublishedContent Content(int id);
         IPublishedContent Content(Guid id);
         IPublishedContent Content(Udi id);
@@ -44,7 +40,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="term">The term to search.</param>
         /// <param name="culture">The culture (defaults to a culture insensitive search).</param>
-        /// <param name="indexName">The name of the index to search (defaults to <see cref="Constants.UmbracoIndexes.ExternalIndexName" />).</param>
+        /// <param name="indexName">The name of the index to search (defaults to <see cref="Cms.Core.Constants.UmbracoIndexes.ExternalIndexName" />).</param>
         /// <returns>
         /// The search results.
         /// </returns>

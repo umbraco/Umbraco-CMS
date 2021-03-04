@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Events;
+using Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Binds events to the distributed cache.

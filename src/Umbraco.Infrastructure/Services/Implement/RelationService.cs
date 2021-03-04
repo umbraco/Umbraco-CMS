@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     public class RelationService : ScopeRepositoryService, IRelationService
     {
@@ -490,7 +491,7 @@ namespace Umbraco.Core.Services.Implement
                 }
 
                 _relationTypeRepository.Save(relationType);
-                Audit(AuditType.Save, Constants.Security.SuperUserId, relationType.Id, $"Saved relation type: {relationType.Name}");
+                Audit(AuditType.Save, Cms.Core.Constants.Security.SuperUserId, relationType.Id, $"Saved relation type: {relationType.Name}");
                 scope.Complete();
                 saveEventArgs.CanCancel = false;
                 scope.Events.Dispatch(SavedRelationType, this, saveEventArgs);

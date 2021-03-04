@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using NUnit.Framework;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.BackOffice
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.BackOffice
 {
     public class IdentityExtensionsTests
     {

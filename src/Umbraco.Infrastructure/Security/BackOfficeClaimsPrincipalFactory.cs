@@ -4,16 +4,15 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Security;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// A <see cref="UserClaimsPrincipalFactory{TUser}" for the back office/>
     /// </summary>
     public class BackOfficeClaimsPrincipalFactory : UserClaimsPrincipalFactory<BackOfficeIdentityUser>
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeClaimsPrincipalFactory"/> class.
         /// </summary>
@@ -26,7 +25,7 @@ namespace Umbraco.Core.Security
 
         /// <inheritdoc />
         /// <remarks>
-        /// Returns a custom <see cref="UmbracoBackOfficeIdentity"/> and allows flowing claims from the external identity
+        /// Returns a ClaimsIdentity that has the required claims, and allows flowing of claims from external identity
         /// </remarks>
         public override async Task<ClaimsPrincipal> CreateAsync(BackOfficeIdentityUser user)
         {
@@ -43,10 +42,7 @@ namespace Umbraco.Core.Security
                 baseIdentity.AddClaim(new Claim(claim.ClaimType, claim.ClaimValue));
             }
 
-            // TODO: We want to remove UmbracoBackOfficeIdentity and only rely on ClaimsIdentity, once
-            // that is done then we'll create a ClaimsIdentity with all of the requirements here instead
-            var umbracoIdentity = new UmbracoBackOfficeIdentity(
-                baseIdentity,
+            baseIdentity.AddRequiredClaims(
                 user.Id,
                 user.UserName,
                 user.Name,
@@ -57,7 +53,7 @@ namespace Umbraco.Core.Security
                 user.AllowedSections,
                 user.Roles.Select(x => x.RoleId).ToArray());
 
-            return new ClaimsPrincipal(umbracoIdentity);
+            return new ClaimsPrincipal(baseIdentity);
         }
 
         /// <inheritdoc />

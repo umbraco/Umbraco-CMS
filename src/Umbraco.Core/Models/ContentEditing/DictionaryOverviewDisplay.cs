@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// The dictionary overview display.
@@ -28,7 +28,7 @@ namespace Umbraco.Web.Models.ContentEditing
         /// </summary>
         [DataMember(Name = "id")]
         public int Id { get; set; }
-        
+
         /// <summary>
         /// Gets or sets the level.
         /// </summary>

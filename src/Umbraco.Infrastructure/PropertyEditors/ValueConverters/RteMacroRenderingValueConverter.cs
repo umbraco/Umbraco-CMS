@@ -1,15 +1,18 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Linq;
 using System.Text;
 using HtmlAgilityPack;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Macros;
-using Umbraco.Web.Templates;
+using Umbraco.Cms.Core.Macros;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Macros;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// A value converter for TinyMCE that will ensure any macro content is rendered properly even when

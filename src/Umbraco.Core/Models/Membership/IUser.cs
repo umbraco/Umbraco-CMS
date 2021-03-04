@@ -1,9 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
 
     /// <summary>
@@ -19,8 +18,7 @@ namespace Umbraco.Core.Models.Membership
         int[] StartContentIds { get; set; }
         int[] StartMediaIds { get; set; }
         string Language { get; set; }
-        
-        DateTime? EmailConfirmedDate { get; set; }
+
         DateTime? InvitedDate { get; set; }
 
         /// <summary>
@@ -38,11 +36,6 @@ namespace Umbraco.Core.Models.Membership
         /// Exposes the basic profile data
         /// </summary>
         IProfile ProfileData { get; }
-
-        /// <summary>
-        /// The security stamp used by ASP.Net identity
-        /// </summary>
-        string SecurityStamp { get; set; }
 
         /// <summary>
         /// Will hold the media file system relative path of the users custom avatar if they uploaded one

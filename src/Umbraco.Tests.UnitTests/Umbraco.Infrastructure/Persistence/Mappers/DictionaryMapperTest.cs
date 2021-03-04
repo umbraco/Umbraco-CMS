@@ -2,10 +2,10 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
 {
     [TestFixture]
     public class DictionaryMapperTest

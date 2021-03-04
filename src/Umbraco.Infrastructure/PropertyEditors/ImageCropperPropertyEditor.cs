@@ -1,22 +1,24 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Media;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents an image cropper property editor.
@@ -175,7 +177,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
-        public void ContentServiceCopied(IContentService sender, Core.Events.CopyEventArgs<IContent> args)
+        public void ContentServiceCopied(IContentService sender, CopyEventArgs<IContent> args)
         {
             // get the image cropper field properties
             var properties = args.Original.Properties.Where(IsCropperField);
@@ -207,7 +209,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
-        public void MediaServiceCreated(IMediaService sender, Core.Events.NewEventArgs<IMedia> args)
+        public void MediaServiceCreated(IMediaService sender, NewEventArgs<IMedia> args)
         {
             AutoFillProperties(args.Entity);
         }
@@ -217,7 +219,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
-        public void MediaServiceSaving(IMediaService sender, Core.Events.SaveEventArgs<IMedia> args)
+        public void MediaServiceSaving(IMediaService sender, SaveEventArgs<IMedia> args)
         {
             foreach (var entity in args.SavedEntities)
                 AutoFillProperties(entity);
@@ -228,7 +230,7 @@ namespace Umbraco.Web.PropertyEditors
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
-        public void ContentServiceSaving(IContentService sender, Core.Events.SaveEventArgs<IContent> args)
+        public void ContentServiceSaving(IContentService sender, SaveEventArgs<IContent> args)
         {
             foreach (var entity in args.SavedEntities)
                 AutoFillProperties(entity);

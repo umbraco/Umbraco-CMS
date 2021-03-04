@@ -1,7 +1,7 @@
 ﻿using System.Linq;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class AddLogTableColumns : MigrationBase
     {
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
 
             AddColumnIfNotExists<LogDto>(columns, "entityType");
-            AddColumnIfNotExists<LogDto>(columns, "parameters");            
+            AddColumnIfNotExists<LogDto>(columns, "parameters");
         }
     }
 }

@@ -1,7 +1,7 @@
 using System;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     public class ContentTypeBaseServiceProvider : IContentTypeBaseServiceProvider
     {

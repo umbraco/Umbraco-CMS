@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Runtime;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Provides a simple implementation of <see cref="IMainDom"/>.

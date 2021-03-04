@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Persistence.Dtos;
+﻿using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class LanguageColumns : MigrationBase
     {
@@ -10,8 +10,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            AddColumn<LanguageDto>(Constants.DatabaseSchema.Tables.Language, "isDefaultVariantLang");
-            AddColumn<LanguageDto>(Constants.DatabaseSchema.Tables.Language, "mandatory");
+            AddColumn<LanguageDto>(Cms.Core.Constants.DatabaseSchema.Tables.Language, "isDefaultVariantLang");
+            AddColumn<LanguageDto>(Cms.Core.Constants.DatabaseSchema.Tables.Language, "mandatory");
         }
     }
 }

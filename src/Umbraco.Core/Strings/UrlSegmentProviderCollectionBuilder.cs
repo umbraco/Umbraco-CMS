@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Composing;
+﻿using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.Strings
+namespace Umbraco.Cms.Core.Strings
 {
     public class UrlSegmentProviderCollectionBuilder : OrderedCollectionBuilderBase<UrlSegmentProviderCollectionBuilder, UrlSegmentProviderCollection, IUrlSegmentProvider>
     {

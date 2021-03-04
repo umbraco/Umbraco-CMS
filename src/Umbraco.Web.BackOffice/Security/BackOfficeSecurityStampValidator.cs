@@ -1,16 +1,11 @@
-﻿using System;
-using System.Security.Claims;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Security;
-using Umbraco.Web.Common.Security;
+using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
-
     /// <summary>
     /// A security stamp validator for the back office
     /// </summary>

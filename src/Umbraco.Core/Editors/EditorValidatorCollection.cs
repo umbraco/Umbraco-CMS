@@ -1,10 +1,7 @@
 ﻿using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Cms.Core.Editors
 {
     public class EditorValidatorCollection : BuilderCollectionBase<IEditorValidator>
     {

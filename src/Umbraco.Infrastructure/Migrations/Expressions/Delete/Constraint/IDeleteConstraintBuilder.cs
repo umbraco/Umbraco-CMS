@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Core.Migrations.Expressions.Delete.Constraint
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Constraint
 {
     /// <summary>
     /// Builds a Delete Constraint expression.

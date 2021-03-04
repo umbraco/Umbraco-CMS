@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Migrations.Expressions.Delete.Expressions;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions;
 
-namespace Umbraco.Core.Migrations.Expressions.Delete.Column
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Column
 {
     public class DeleteColumnBuilder : ExpressionBuilderBase<DeleteColumnExpression>,
         IDeleteColumnBuilder

@@ -1,8 +1,8 @@
 ﻿using HeyRed.MarkdownSharp;
-using Umbraco.Core.HealthChecks;
-using Umbraco.Core.HealthChecks.NotificationMethods;
+using Umbraco.Cms.Core.HealthChecks;
+using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 
-namespace Umbraco.Infrastructure.HealthChecks
+namespace Umbraco.Cms.Infrastructure.HealthChecks
 {
     public class MarkdownToHtmlConverter : IMarkdownToHtmlConverter
     {

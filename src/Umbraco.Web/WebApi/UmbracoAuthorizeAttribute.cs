@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Web.Http;
-using Umbraco.Core;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Web.Composing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web.WebApi
 {
-
     // TODO: This has been migrated to netcore and can be removed when ready
 
     public sealed class UmbracoAuthorizeAttribute : AuthorizeAttribute

@@ -1,9 +1,11 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core.Security;
-using System.Globalization;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Web.Common.Filters
+using System.Globalization;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Web.Common.Filters
 {
     /// <summary>
     /// Applied to all Umbraco controllers to ensure the thread culture is set to the culture assigned to the back office identity

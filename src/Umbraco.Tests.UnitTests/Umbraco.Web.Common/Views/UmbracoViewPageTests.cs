@@ -4,17 +4,16 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Common.Views;
-using Umbraco.Web.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Web.Common.ModelBinders;
+using Umbraco.Cms.Web.Common.Views;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Views
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
 {
     [TestFixture]
     public class UmbracoViewPageTests

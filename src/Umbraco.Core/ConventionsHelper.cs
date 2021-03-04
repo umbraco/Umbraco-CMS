@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Strings;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static class ConventionsHelper
     {

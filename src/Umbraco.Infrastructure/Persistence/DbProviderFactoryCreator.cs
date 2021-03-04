@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Data.Common;
 using System.Linq;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     public class DbProviderFactoryCreator : IDbProviderFactoryCreator
     {

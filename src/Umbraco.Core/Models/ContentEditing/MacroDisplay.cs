@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
     /// <summary>
     /// The macro display model
@@ -46,7 +46,7 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "cacheByPage")]
         public bool CacheByPage { get; set; }
 
-        /// <summary> 
+        /// <summary>
         /// Gets or sets a value indicating whether the macro should be cached by user
         /// </summary>
         [DataMember(Name = "cacheByUser")]

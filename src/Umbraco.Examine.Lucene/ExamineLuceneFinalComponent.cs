@@ -1,9 +1,13 @@
-﻿using Microsoft.Extensions.Logging;
-using Examine;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Examine
+using Examine;
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public class ExamineLuceneFinalComponent : IComponent
     {

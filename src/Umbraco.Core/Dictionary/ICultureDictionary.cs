@@ -1,8 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 
-namespace Umbraco.Core.Dictionary
+namespace Umbraco.Cms.Core.Dictionary
 {
     /// <summary>
     /// Represents a dictionary based on a specific culture

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.PropertyEditors
+﻿namespace Umbraco.Cms.Core.PropertyEditors
 {
     public interface IDataValueReferenceFactory
     {
@@ -10,7 +10,7 @@
         bool IsForEditor(IDataEditor dataEditor);
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         IDataValueReference GetDataValueReference();

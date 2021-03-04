@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Collections
+namespace Umbraco.Cms.Core.Collections
 {
     /// <summary>
     /// Represents a list of types.

@@ -1,8 +1,7 @@
-using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models.Identity;
+using Umbraco.Cms.Core.Models.Identity;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Used to store the external login info, this can be replaced with your own implementation

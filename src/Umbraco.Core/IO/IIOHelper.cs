@@ -1,18 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Umbraco.Core.Hosting;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     public interface IIOHelper
     {
         string FindFile(string virtualPath);
 
-        // TODO: This is the same as IHostingEnvironment.ToAbsolute
+        [Obsolete("Use IHostingEnvironment.ToAbsolute instead")]
         string ResolveUrl(string virtualPath);
-
-        Attempt<string> TryResolveUrl(string virtualPath);
 
         /// <summary>
         /// Maps a virtual path to a physical path in the content root folder (i.e. www)
@@ -21,14 +18,6 @@ namespace Umbraco.Core.IO
         /// <returns></returns>
         [Obsolete("Use IHostingEnvironment.MapPathContentRoot or IHostingEnvironment.MapPathWebRoot instead")]
         string MapPath(string path);
-
-        /// <summary>
-        /// Returns true if the path has a root, and is considered fully qualified for the OS it is on
-        /// See https://github.com/dotnet/runtime/blob/30769e8f31b20be10ca26e27ec279cd4e79412b9/src/libraries/System.Private.CoreLib/src/System/IO/Path.cs#L281 for the .NET Standard 2.1 version of this
-        /// </summary>
-        /// <param name="path">The path to check</param>
-        /// <returns>True if the path is fully qualified, false otherwise</returns>
-        bool IsPathFullyQualified(string path);
 
         /// <summary>
         /// Verifies that the current filepath matches a directory where the user is allowed to edit a file.

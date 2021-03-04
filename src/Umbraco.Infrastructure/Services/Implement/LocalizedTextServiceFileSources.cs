@@ -5,11 +5,11 @@ using System.IO;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     /// <summary>
     /// Exposes the XDocument sources from files for the default localization text service and ensure caching is taken care of

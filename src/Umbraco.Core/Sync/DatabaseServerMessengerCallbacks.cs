@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Core.Sync
 {
     /// <summary>
     /// Holds a list of callbacks associated with implementations of <see cref="IServerMessenger"/>.

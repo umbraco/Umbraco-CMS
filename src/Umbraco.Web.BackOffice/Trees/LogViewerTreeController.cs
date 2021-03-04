@@ -1,15 +1,15 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     [Authorize(Policy = AuthorizationPolicies.TreeAccessLogs)]
     [Tree(Constants.Applications.Settings, Constants.Trees.LogViewer, SortOrder= 9, TreeGroup = Constants.Trees.Groups.Settings)]
@@ -19,8 +19,9 @@ namespace Umbraco.Web.BackOffice.Trees
     {
         public LogViewerTreeController(
             ILocalizedTextService localizedTextService,
-            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection)
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IEventAggregator eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
         }
 

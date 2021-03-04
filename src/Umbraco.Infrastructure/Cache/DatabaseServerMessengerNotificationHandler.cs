@@ -1,12 +1,12 @@
-using Microsoft.Extensions.Logging;
-using Umbraco.Core.Events;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Sync;
-using Umbraco.Web;
-using Umbraco.Web.Cache;
-using Umbraco.Web.Routing;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Infrastructure.Cache
+using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Persistence;
+
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Ensures that distributed cache events are setup and the <see cref="IServerMessenger"/> is initialized

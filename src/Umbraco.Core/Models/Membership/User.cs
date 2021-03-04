@@ -2,12 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
     /// <summary>
     /// Represents a backoffice user
@@ -128,7 +127,7 @@ namespace Umbraco.Core.Models.Membership
                 (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
                 enum1 => enum1.GetHashCode());
 
-        
+
         [DataMember]
         public DateTime? EmailConfirmedDate
         {

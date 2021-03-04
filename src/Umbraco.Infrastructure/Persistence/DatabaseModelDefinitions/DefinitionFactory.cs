@@ -1,12 +1,13 @@
 ﻿using System;
-using System.Data;
 using System.Linq;
 using System.Reflection;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
 {
     internal static class DefinitionFactory
     {
@@ -155,7 +156,7 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
                                      Name = indexName,
                                      IndexType = attribute.IndexType,
                                      ColumnName = columnName,
-                                     TableName = tableName,                                                                     
+                                     TableName = tableName,
                                  };
 
             if (string.IsNullOrEmpty(attribute.ForColumns) == false)

@@ -1,7 +1,6 @@
 ﻿using System;
-using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the email address value editor.

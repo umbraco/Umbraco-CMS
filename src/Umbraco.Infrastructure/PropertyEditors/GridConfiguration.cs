@@ -1,8 +1,9 @@
-﻿using Newtonsoft.Json.Linq;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Web.PropertyEditors
+using Newtonsoft.Json.Linq;
+
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the grid value editor.
@@ -17,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
         [ConfigurationField("rte", "Rich text editor", "views/propertyeditors/rte/rte.prevalues.html", Description = "Rich text editor configuration", HideLabel = true)]
         public JObject Rte { get; set; }
 
-        [ConfigurationField(Core.Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
+        [ConfigurationField(Constants.DataTypes.ReservedPreValueKeys.IgnoreUserStartNodes,
             "Ignore User Start Nodes", "boolean",
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
         public bool IgnoreUserStartNodes { get; set; }

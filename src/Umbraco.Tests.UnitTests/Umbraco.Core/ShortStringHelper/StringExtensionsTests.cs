@@ -8,11 +8,12 @@ using System.Linq;
 using System.Text;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper
 {
     [TestFixture]
     public class StringExtensionsTests
@@ -34,19 +35,6 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.ShortStringHelper
             Debug.Print("First: " + first.ToGuid());
             Debug.Print("Second: " + second.ToGuid());
             Assert.AreEqual(result, first.ToGuid() == second.ToGuid());
-        }
-
-        [TestCase("alert('hello');", false)]
-        [TestCase("~/Test.js", true)]
-        [TestCase("../Test.js", true)]
-        [TestCase("/Test.js", true)]
-        [TestCase("Test.js", true)]
-        [TestCase("Test.js==", false)]
-        [TestCase("/Test.js function(){return true;}", false)]
-        public void Detect_Is_JavaScript_Path(string input, bool result)
-        {
-            Attempt<string> output = input.DetectIsJavaScriptPath(Mock.Of<IIOHelper>());
-            Assert.AreEqual(result, output.Success);
         }
 
         [TestCase("hello.txt", "hello")]

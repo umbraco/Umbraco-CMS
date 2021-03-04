@@ -5,19 +5,20 @@ using System.Xml;
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
-using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Extensions;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.PublishedContent;
-using Umbraco.Web;
+using Umbraco.Tests.TestHelpers;
+using Constants = Umbraco.Cms.Core.Constants;
+using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Tests.Cache.PublishedCache
 {

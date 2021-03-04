@@ -1,16 +1,19 @@
-﻿using System;
+using System;
 using System.Threading;
-using Semver;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Migrations.Upgrade;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Core.Events;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Represents the state of the Umbraco runtime.
@@ -22,6 +25,7 @@ namespace Umbraco.Core
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly ILogger<RuntimeState> _logger;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
+        private readonly IEventAggregator _eventAggregator;
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -40,18 +44,20 @@ namespace Umbraco.Core
             IUmbracoVersion umbracoVersion,
             IUmbracoDatabaseFactory databaseFactory,
             ILogger<RuntimeState> logger,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            IEventAggregator eventAggregator)
         {
             _globalSettings = globalSettings.Value;
             _umbracoVersion = umbracoVersion;
             _databaseFactory = databaseFactory;
             _logger = logger;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
+            _eventAggregator = eventAggregator;
         }
 
 
         /// <inheritdoc />
-        public Version Version => _umbracoVersion.Current;
+        public Version Version => _umbracoVersion.Version;
 
         /// <inheritdoc />
         public string VersionComment => _umbracoVersion.Comment;
@@ -230,6 +236,11 @@ namespace Umbraco.Core
                     creator.InitializeDatabaseSchema();
                     database.CompleteTransaction();
                     _logger.LogInformation("Unattended install completed.");
+
+                    // Emit an event with EventAggregator that unattended install completed
+                    // Then this event can be listened for and create an unattended user
+                    _eventAggregator.Publish(new UnattendedInstallNotification());
+
                 }
                 catch (Exception ex)
                 {

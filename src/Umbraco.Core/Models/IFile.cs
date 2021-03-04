@@ -1,7 +1,6 @@
-﻿using System;
-using Umbraco.Core.Models.Entities;
+﻿using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Defines a File
@@ -43,6 +42,6 @@ namespace Umbraco.Core.Models
         /// Gets or sets the file's virtual path (i.e. the file path relative to the root of the website)
         /// </summary>
         string VirtualPath { get; set; }
-        
+
     }
 }

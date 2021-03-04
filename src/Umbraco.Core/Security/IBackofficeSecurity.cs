@@ -1,8 +1,6 @@
-using System;
-using Umbraco.Core;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Membership;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     public interface IBackOfficeSecurity
     {

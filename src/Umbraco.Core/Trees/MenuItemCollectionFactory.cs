@@ -1,7 +1,6 @@
-using Umbraco.Web.Actions;
-using Umbraco.Web.Models.Trees;
+using Umbraco.Cms.Core.Actions;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     public class MenuItemCollectionFactory: IMenuItemCollectionFactory
     {

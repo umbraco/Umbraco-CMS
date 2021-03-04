@@ -1,13 +1,13 @@
-﻿using NPoco;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Services;
+using NPoco;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Core.Persistence.Repositories
+namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IEntityRepository : IRepository
     {
@@ -16,7 +16,7 @@ namespace Umbraco.Core.Persistence.Repositories
         IEntitySlim Get(int id, Guid objectTypeId);
         IEntitySlim Get(Guid key, Guid objectTypeId);
 
-        IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids);        
+        IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids);
         IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys);
 
         /// <summary>
@@ -78,6 +78,6 @@ namespace Umbraco.Core.Persistence.Repositories
         IEnumerable<IEntitySlim> GetPagedResultsByQuery(IQuery<IUmbracoEntity> query, Guid objectType, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IUmbracoEntity> filter, Ordering ordering);
 
-        
+
     }
 }

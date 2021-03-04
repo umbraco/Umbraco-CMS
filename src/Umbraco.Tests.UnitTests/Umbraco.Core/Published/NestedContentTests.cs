@@ -9,21 +9,20 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.Common.PublishedContent;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.PropertyEditors.ValueConverters;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Tests.Common.TestHelpers;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Published
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
 {
     [TestFixture]
     public class NestedContentTests

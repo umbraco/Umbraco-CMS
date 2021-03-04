@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     // TODO: Obsolete this, change all implementations of this like in Dictionary to just use custom Cache policies like in the member repository.
 

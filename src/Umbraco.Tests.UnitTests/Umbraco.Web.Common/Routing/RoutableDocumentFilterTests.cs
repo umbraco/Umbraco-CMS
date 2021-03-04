@@ -6,12 +6,11 @@ using Microsoft.AspNetCore.Routing.Patterns;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Web.Common.Routing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Web.Common.Routing;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.Common.Routing
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
 {
     [TestFixture]
     public class RoutableDocumentFilterTests

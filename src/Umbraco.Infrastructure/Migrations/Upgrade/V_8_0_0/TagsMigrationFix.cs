@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class TagsMigrationFix : MigrationBase
     {
@@ -9,8 +9,8 @@
         public override void Migrate()
         {
             // kill unused parentId column, if it still exists
-            if (ColumnExists(Constants.DatabaseSchema.Tables.Tag, "ParentId"))
-                Delete.Column("ParentId").FromTable(Constants.DatabaseSchema.Tables.Tag).Do();
+            if (ColumnExists(Cms.Core.Constants.DatabaseSchema.Tables.Tag, "ParentId"))
+                Delete.Column("ParentId").FromTable(Cms.Core.Constants.DatabaseSchema.Tables.Tag).Do();
         }
     }
 }

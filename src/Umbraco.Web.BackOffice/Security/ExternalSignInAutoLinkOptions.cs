@@ -1,11 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
 using System;
 using System.Runtime.Serialization;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Security;
-using SecurityConstants = Umbraco.Core.Constants.Security;
+using Microsoft.AspNetCore.Identity;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Security;
+using SecurityConstants = Umbraco.Cms.Core.Constants.Security;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     /// <summary>
     /// Options used to configure auto-linking external OAuth providers

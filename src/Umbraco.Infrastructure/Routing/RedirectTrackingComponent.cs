@@ -2,17 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     /// Implements an Application Event Handler for managing redirect URLs tracking.
     /// <para>when content is renamed or moved, we want to create a permanent 301 redirect from it's old URL</para>

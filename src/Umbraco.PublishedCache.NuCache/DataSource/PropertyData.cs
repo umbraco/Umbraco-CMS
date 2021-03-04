@@ -2,7 +2,7 @@ using System;
 using System.ComponentModel;
 using Newtonsoft.Json;
 
-namespace Umbraco.Web.PublishedCache.NuCache.DataSource
+namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
     public class PropertyData
     {

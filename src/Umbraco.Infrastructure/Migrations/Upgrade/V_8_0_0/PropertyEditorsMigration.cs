@@ -1,8 +1,8 @@
 ﻿using System;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class PropertyEditorsMigration : MigrationBase
     {
@@ -12,12 +12,12 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.ContentPicker2, Constants.PropertyEditors.Aliases.ContentPicker);
-            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MediaPicker2, Constants.PropertyEditors.Aliases.MediaPicker);
-            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MemberPicker2, Constants.PropertyEditors.Aliases.MemberPicker);
-            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2, Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
-            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.TextboxMultiple, Constants.PropertyEditors.Aliases.TextArea, false);
-            RenameDataType(Constants.PropertyEditors.Legacy.Aliases.Textbox, Constants.PropertyEditors.Aliases.TextBox, false);
+            RenameDataType(Cms.Core.Constants.PropertyEditors.Legacy.Aliases.ContentPicker2, Cms.Core.Constants.PropertyEditors.Aliases.ContentPicker);
+            RenameDataType(Cms.Core.Constants.PropertyEditors.Legacy.Aliases.MediaPicker2, Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker);
+            RenameDataType(Cms.Core.Constants.PropertyEditors.Legacy.Aliases.MemberPicker2, Cms.Core.Constants.PropertyEditors.Aliases.MemberPicker);
+            RenameDataType(Cms.Core.Constants.PropertyEditors.Legacy.Aliases.MultiNodeTreePicker2, Cms.Core.Constants.PropertyEditors.Aliases.MultiNodeTreePicker);
+            RenameDataType(Cms.Core.Constants.PropertyEditors.Legacy.Aliases.TextboxMultiple, Cms.Core.Constants.PropertyEditors.Aliases.TextArea, false);
+            RenameDataType(Cms.Core.Constants.PropertyEditors.Legacy.Aliases.Textbox, Cms.Core.Constants.PropertyEditors.Aliases.TextBox, false);
         }
 
         private void RenameDataType(string fromAlias, string toAlias, bool checkCollision = true)

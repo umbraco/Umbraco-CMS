@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Performs the data lookups required to rebuild a media index

@@ -3,8 +3,9 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Configuration.Models.Validation
+namespace Umbraco.Cms.Core.Configuration.Models.Validation
 {
     /// <summary>
     /// Base class for configuration validators.

@@ -2,10 +2,10 @@ using System;
 using System.Collections.Concurrent;
 using System.Threading;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Core;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore
 {
     public class AspNetCoreApplicationShutdownRegistry : IApplicationShutdownRegistry
     {

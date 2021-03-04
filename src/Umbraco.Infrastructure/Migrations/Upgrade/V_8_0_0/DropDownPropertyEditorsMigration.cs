@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.IO;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Migrations.PostMigrations;
-using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class DropDownPropertyEditorsMigration : PropertyEditorsMigrationBase
     {
@@ -108,7 +108,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
         private void UpdateDataType(DataTypeDto dataType, ValueListConfiguration config, bool isMultiple)
         {
             dataType.DbType = ValueStorageType.Nvarchar.ToString();
-            dataType.EditorAlias = Constants.PropertyEditors.Aliases.DropDownListFlexible;
+            dataType.EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.DropDownListFlexible;
 
             var flexConfig = new DropDownFlexibleConfiguration
             {

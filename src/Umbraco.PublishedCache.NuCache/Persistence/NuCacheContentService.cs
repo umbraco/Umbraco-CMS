@@ -1,13 +1,12 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Web.PublishedCache.NuCache;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Implement;
 
-namespace Umbraco.Infrastructure.PublishedCache.Persistence
+namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
 {
     public class NuCacheContentService : RepositoryService, INuCacheContentService
     {

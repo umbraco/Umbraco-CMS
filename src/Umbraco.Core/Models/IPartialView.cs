@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models
+﻿namespace Umbraco.Cms.Core.Models
 {
     public interface IPartialView : IFile
     {

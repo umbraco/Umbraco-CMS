@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Persistence.Dtos;
+﻿using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_9_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_9_0
 {
     public class ExternalLoginTableUserData : MigrationBase
     {
@@ -14,7 +14,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_9_0
         /// </summary>
         public override void Migrate()
         {
-            AddColumn<ExternalLoginDto>(Constants.DatabaseSchema.Tables.ExternalLogin, "userData");
+            AddColumn<ExternalLoginDto>(Cms.Core.Constants.DatabaseSchema.Tables.ExternalLogin, "userData");
         }
     }
 }

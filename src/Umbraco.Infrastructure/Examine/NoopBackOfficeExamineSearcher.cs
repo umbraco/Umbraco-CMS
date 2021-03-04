@@ -1,10 +1,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Umbraco.Examine;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
 
-namespace Umbraco.Infrastructure.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public class NoopBackOfficeExamineSearcher : IBackOfficeExamineSearcher
     {

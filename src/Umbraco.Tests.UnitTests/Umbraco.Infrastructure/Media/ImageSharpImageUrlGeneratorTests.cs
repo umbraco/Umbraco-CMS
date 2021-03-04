@@ -2,11 +2,10 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Infrastructure.Media;
-using Umbraco.Web.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.Media;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Media
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
 {
     [TestFixture]
     public class ImageSharpImageUrlGeneratorTests

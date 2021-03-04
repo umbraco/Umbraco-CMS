@@ -4,15 +4,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded.DependencyInjection;
-using Umbraco.Web.BackOffice.DependencyInjection;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.DependencyInjection;
-using Umbraco.Web.Website.DependencyInjection;
 
-namespace Umbraco.Web.UI.NetCore
+namespace Umbraco.Cms.Web.UI.NetCore
 {
     public class Startup
     {

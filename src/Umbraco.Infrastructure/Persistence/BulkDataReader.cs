@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     /// <summary>
     /// A base implementation of <see cref="IDataReader"/> that is suitable for <see cref="SqlBulkCopy.WriteToServer(IDataReader)"/>.

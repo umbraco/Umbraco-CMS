@@ -1,8 +1,8 @@
 ﻿using System;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Factories
+namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     internal static class MemberGroupFactory
     {
@@ -11,7 +11,7 @@ namespace Umbraco.Core.Persistence.Factories
 
          static MemberGroupFactory()
         {
-            _nodeObjectTypeId = Constants.ObjectTypes.MemberGroup;
+            _nodeObjectTypeId = Cms.Core.Constants.ObjectTypes.MemberGroup;
         }
 
         #region Implementation of IEntityFactory<ITemplate,TemplateDto>

@@ -1,7 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Core.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     public class SearchableTreeCollectionBuilder : LazyCollectionBuilderBase<SearchableTreeCollectionBuilder, SearchableTreeCollection, ISearchableTree>
     {

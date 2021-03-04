@@ -1,8 +1,6 @@
-﻿using System.Globalization;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
+﻿using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Web.PublishedCache
+namespace Umbraco.Cms.Core.PublishedCache
 {
     public interface IPublishedContentCache : IPublishedCache
     {

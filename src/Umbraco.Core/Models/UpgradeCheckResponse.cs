@@ -1,8 +1,8 @@
-﻿using System.Runtime.Serialization;
 using System.Net;
-using Umbraco.Core.Configuration;
+using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Configuration;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     [DataContract(Name = "upgrade", Namespace = "")]
     public class UpgradeCheckResponse
@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models
         {
             Type = upgradeType;
             Comment = upgradeComment;
-            Url = upgradeUrl + "?version=" + WebUtility.UrlEncode(umbracoVersion.Current.ToString(3));
+            Url = upgradeUrl + "?version=" + WebUtility.UrlEncode(umbracoVersion.Version.ToString(3));
         }
     }
 }

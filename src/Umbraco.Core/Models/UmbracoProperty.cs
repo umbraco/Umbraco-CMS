@@ -1,11 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Xml;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using DataType = System.ComponentModel.DataAnnotations.DataType;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// A simple representation of an Umbraco property
@@ -22,7 +18,7 @@ namespace Umbraco.Web.Models
         // and when we set this value on the property object that gets sent to the database we do a TryConvertTo to the
         // real type anyways.
 
-        [DataType(DataType.Text)]
+        [DataType(System.ComponentModel.DataAnnotations.DataType.Text)]
         public string Value { get; set; }
 
         [ReadOnly(true)]

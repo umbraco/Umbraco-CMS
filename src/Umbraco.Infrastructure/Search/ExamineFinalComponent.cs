@@ -1,10 +1,9 @@
 ﻿using System;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Runtime;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Cms.Infrastructure.Search
 {
-
     /// <summary>
     /// Executes after all other examine components have executed
     /// </summary>

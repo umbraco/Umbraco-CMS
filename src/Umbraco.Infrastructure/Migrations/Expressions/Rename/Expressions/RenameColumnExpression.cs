@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Rename.Expressions
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Expressions
 {
     public class RenameColumnExpression : MigrationExpressionBase
     {
@@ -9,9 +9,6 @@
         public virtual string TableName { get; set; }
         public virtual string OldName { get; set; }
         public virtual string NewName { get; set; }
-
-        public override string Process(IMigrationContext context)
-            => GetSql();
 
         /// <inheritdoc />
         protected override string GetSql()

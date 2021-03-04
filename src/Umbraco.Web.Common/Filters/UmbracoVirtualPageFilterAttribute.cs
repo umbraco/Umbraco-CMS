@@ -6,13 +6,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Extensions;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Routing;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
     /// <summary>
     /// Used to set the <see cref="UmbracoRouteValues"/> request feature based on the <see cref="CustomRouteContentFinderDelegate"/> specified (if any)

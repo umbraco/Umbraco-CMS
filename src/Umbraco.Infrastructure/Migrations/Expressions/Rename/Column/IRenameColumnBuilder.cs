@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Rename.Column
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Column
 {
     /// <summary>
     /// Builds a Rename Column expression.

@@ -7,18 +7,18 @@ using System.Linq;
 using System.Reflection;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]

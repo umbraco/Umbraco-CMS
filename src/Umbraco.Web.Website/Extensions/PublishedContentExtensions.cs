@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Web;
 using Examine;
 using Microsoft.AspNetCore.Html;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Examine;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Examine;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Website.Extensions
+namespace Umbraco.Extensions
 {
     public static class PublishedContentExtensions
     {
@@ -99,8 +100,6 @@ namespace Umbraco.Web.Website.Extensions
 
         #region IsSomething: equality
 
-        public static bool IsEqual(this IPublishedContent content, IPublishedContent other) => content.Id == other.Id;
-
         /// <summary>
         /// If the specified <paramref name="content" /> is equal to <paramref name="other" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.
         /// </summary>
@@ -123,16 +122,6 @@ namespace Umbraco.Web.Website.Extensions
         /// The HTML encoded value.
         /// </returns>
         public static IHtmlContent IsEqual(this IPublishedContent content, IPublishedContent other, string valueIfTrue, string valueIfFalse) => new HtmlString(HttpUtility.HtmlEncode(content.IsEqual(other) ? valueIfTrue : valueIfFalse));
-
-        /// <summary>
-        /// If the specified <paramref name="content" /> is not equal to <paramref name="other" />, true will be returned; otherwise, the result will be false />.
-        /// </summary>
-        /// <param name="content">The content.</param>
-        /// <param name="other">The other content.</param>
-        /// <returns>
-        /// The result from checking whether the two published content items are not equal.
-        /// </returns>
-        public static bool IsNotEqual(this IPublishedContent content, IPublishedContent other) => content.IsEqual(other) == false;
 
         /// <summary>
         /// If the specified <paramref name="content" /> is not equal to <paramref name="other" />, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.

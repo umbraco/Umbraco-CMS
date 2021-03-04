@@ -1,7 +1,7 @@
-﻿using Umbraco.Web.Common.Views;
-using Umbraco.Web.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Web.Common.Views;
 
-namespace Umbraco.Web.Common.Macros
+namespace Umbraco.Cms.Web.Common.Macros
 {
     /// <summary>
     /// The base view class that PartialViewMacro views need to inherit from

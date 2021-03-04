@@ -1,7 +1,8 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.Migrations;
+﻿using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Web;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Migrations.PostMigrations
+namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
 {
     /// <summary>
     /// Clears Csrf tokens.

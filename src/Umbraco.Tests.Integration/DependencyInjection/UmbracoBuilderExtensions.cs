@@ -9,24 +9,24 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Runtime;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Core.Sync;
-using Umbraco.Core.WebAssets;
-using Umbraco.Examine;
-using Umbraco.Infrastructure.HostedServices;
-using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Tests.TestHelpers.Stubs;
-using Umbraco.Web.PublishedCache.NuCache;
-using Umbraco.Web.Search;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
+using Umbraco.Cms.Tests.Integration.Implementations;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.Integration.DependencyInjection
+namespace Umbraco.Cms.Tests.Integration.DependencyInjection
 {
     /// <summary>
     /// This is used to replace certain services that are normally registered from our Core / Infrastructure that

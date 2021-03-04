@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
 
 

@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Migrations.Expressions.Create.Expressions;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions;
 
-namespace Umbraco.Core.Migrations.Expressions.Create.Constraint
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Constraint
 {
     public class CreateConstraintBuilder : ExpressionBuilderBase<CreateConstraintExpression>,
                                            ICreateConstraintOnTableBuilder,

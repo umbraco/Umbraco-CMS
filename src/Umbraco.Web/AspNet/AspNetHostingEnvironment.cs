@@ -4,10 +4,12 @@ using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Hosting
 {

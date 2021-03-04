@@ -3,9 +3,9 @@
 
 using System;
 using System.Reflection;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Tests.Testing
+namespace Umbraco.Cms.Tests.Common.Extensions
 {
     public static class ContentBaseExtensions
     {

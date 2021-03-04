@@ -1,9 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Models.Packaging
+namespace Umbraco.Cms.Core.Models.Packaging
 {
     public class PreInstallWarnings
     {

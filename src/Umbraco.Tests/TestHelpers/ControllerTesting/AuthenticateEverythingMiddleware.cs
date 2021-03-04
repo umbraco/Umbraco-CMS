@@ -1,10 +1,13 @@
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Owin;
 using Microsoft.Owin.Security;
 using Microsoft.Owin.Security.Infrastructure;
 using Owin;
-using Umbraco.Core.Security;
+using Umbraco.Extensions;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Tests.TestHelpers.ControllerTesting
 {
@@ -28,8 +31,18 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             protected override Task<AuthenticationTicket> AuthenticateCoreAsync()
             {
                 var securityStamp = Guid.NewGuid().ToString();
-                var identity = new UmbracoBackOfficeIdentity(
-                    Umbraco.Core.Constants.Security.SuperUserIdAsString, "admin", "Admin", new[] { -1 }, new[] { -1 }, "en-US", securityStamp, new[] { "content", "media", "members" }, new[] { "admin" });
+
+                var identity = new ClaimsIdentity();
+                identity.AddRequiredClaims(
+                    Cms.Core.Constants.Security.SuperUserIdAsString,
+                    "admin",
+                    "Admin",
+                    new[] { -1 },
+                    new[] { -1 },
+                    "en-US",
+                    securityStamp,
+                    new[] { "content", "media", "members" },
+                    new[] { "admin" });
 
                 return Task.FromResult(new AuthenticationTicket(
                     identity,

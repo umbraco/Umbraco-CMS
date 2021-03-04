@@ -1,9 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.ContentChildType)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.ContentChildType)]
     [PrimaryKey("Id", AutoIncrement = false)]
     [ExplicitColumns]
     internal class ContentTypeAllowedContentTypeDto

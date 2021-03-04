@@ -1,35 +1,29 @@
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Microsoft.Extensions.Options;
 using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.WebAssets;
-using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.ActionResults;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Features;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Security;
-using Umbraco.Web.Services;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebAssets;
-using Constants = Umbraco.Core.Constants;
 using Microsoft.AspNetCore.Authorization;
-using Umbraco.Web.Common.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewEngines;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.WebAssets;
+using Umbraco.Cms.Web.BackOffice.ActionResults;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [DisableBrowserCache]
     [Area(Constants.Web.Mvc.BackOfficeArea)]

@@ -1,10 +1,11 @@
 ﻿using System.Web.Mvc;
 using System.Web.Services;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.PropertyEditors;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     public class UserPickerConfiguration : ConfigurationEditor
     {

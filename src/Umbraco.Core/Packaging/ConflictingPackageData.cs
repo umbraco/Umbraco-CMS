@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     public class ConflictingPackageData
     {

@@ -1,12 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Web.WebAssets
+namespace Umbraco.Cms.Infrastructure.WebAssets
 {
     /// <summary>
     /// Creates a JavaScript block to initialize the back office
@@ -44,7 +42,6 @@ namespace Umbraco.Web.WebAssets
                 jarray.Append("\"");
                 jarray.Append(file);
                 jarray.Append("\"");
-
             }
             jarray.Append("]");
 

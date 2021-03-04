@@ -5,19 +5,20 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     public abstract class ContentTreeControllerBase : TreeController, ITreeNodeController
     {
@@ -39,9 +40,10 @@ namespace Umbraco.Web.BackOffice.Trees
             ILogger<ContentTreeControllerBase> logger,
             ActionCollection actionCollection,
             IUserService userService,
-            IDataTypeService dataTypeService
+            IDataTypeService dataTypeService,
+            IEventAggregator eventAggregator
             )
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _entityService = entityService;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;

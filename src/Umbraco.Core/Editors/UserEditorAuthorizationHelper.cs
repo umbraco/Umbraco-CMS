@@ -1,12 +1,15 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Web.Editors
+using System.Collections.Generic;
+using System.Linq;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
+
+namespace Umbraco.Cms.Core.Editors
 {
     public class UserEditorAuthorizationHelper
     {

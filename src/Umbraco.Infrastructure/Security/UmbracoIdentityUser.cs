@@ -4,11 +4,10 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Core.Models.Identity
+namespace Umbraco.Cms.Core.Models.Identity
 {
-
     /// <summary>
     /// Abstract class for use in Umbraco Identity for users and members
     /// </summary>
@@ -251,7 +250,7 @@ namespace Umbraco.Core.Models.Identity
         public void EnableChangeTracking() => BeingDirty.EnableChangeTracking();
 
         /// <summary>
-        /// Adds a role 
+        /// Adds a role
         /// </summary>
         /// <param name="role">The role to add</param>
         /// <remarks>

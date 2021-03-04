@@ -1,7 +1,8 @@
 ﻿using System;
 using NPoco;
+using Umbraco.Cms.Core.Persistence.Querying;
 
-namespace Umbraco.Core.Persistence.Querying
+namespace Umbraco.Cms.Infrastructure.Persistence.Querying
 {
     /// <summary>
     /// Represents the Sql Translator for translating a IQuery object to Sql

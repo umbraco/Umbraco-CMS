@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
     public class ExceptionViewModel
     {

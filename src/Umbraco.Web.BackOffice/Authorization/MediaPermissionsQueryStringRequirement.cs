@@ -3,7 +3,7 @@
 
 using Microsoft.AspNetCore.Authorization;
 
-namespace Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.BackOffice.Authorization
 {
     /// <summary>
     /// An authorization requirement for <see cref="MediaPermissionsQueryStringHandler"/>

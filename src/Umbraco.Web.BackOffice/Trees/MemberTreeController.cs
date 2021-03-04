@@ -4,23 +4,23 @@ using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Trees;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Search;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     [Authorize(Policy = AuthorizationPolicies.SectionAccessForMemberTree)]
     [Tree(Constants.Applications.Members, Constants.Trees.Members, SortOrder = 0)]
@@ -42,8 +42,9 @@ namespace Umbraco.Web.BackOffice.Trees
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            IEventAggregator eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _treeSearcher = treeSearcher;
             _menuItemCollectionFactory = menuItemCollectionFactory;
@@ -55,12 +56,14 @@ namespace Umbraco.Web.BackOffice.Trees
         /// <summary>
         /// Gets an individual tree node
         /// </summary>
-        /// <param name="id"></param>
-        /// <param name="queryStrings"></param>
-        /// <returns></returns>
-        public ActionResult<TreeNode> GetTreeNode(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public ActionResult<TreeNode> GetTreeNode([FromRoute]string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
-            var node = GetSingleTreeNode(id, queryStrings);
+            ActionResult<TreeNode> node = GetSingleTreeNode(id, queryStrings);
+
+            if (!(node.Result is null))
+            {
+                return node.Result;
+            }
 
             //add the tree alias to the node since it is standalone (has no root for which this normally belongs)
             node.Value.AdditionalData["treeAlias"] = TreeAlias;

@@ -2,6 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net472</TargetFramework>
+        <RootNamespace>Umbraco.Cms.Persistence.SqlCe</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

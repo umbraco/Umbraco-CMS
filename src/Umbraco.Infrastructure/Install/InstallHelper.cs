@@ -1,22 +1,24 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Models;
-using Umbraco.Net;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Web.Install.Models;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Install
+namespace Umbraco.Cms.Infrastructure.Install
 {
     public sealed class InstallHelper
     {
@@ -96,8 +98,8 @@ namespace Umbraco.Web.Install
                 }
 
                 var installLog = new InstallLog(installId: installId, isUpgrade: IsBrandNewInstall == false,
-                    installCompleted: isCompleted, timestamp: DateTime.Now, versionMajor: _umbracoVersion.Current.Major,
-                    versionMinor: _umbracoVersion.Current.Minor, versionPatch: _umbracoVersion.Current.Build,
+                    installCompleted: isCompleted, timestamp: DateTime.Now, versionMajor: _umbracoVersion.Version.Major,
+                    versionMinor: _umbracoVersion.Version.Minor, versionPatch: _umbracoVersion.Version.Build,
                     versionComment: _umbracoVersion.Comment, error: errorMsg, userAgent: userAgent,
                     dbProvider: dbProvider);
 
@@ -143,7 +145,7 @@ namespace Umbraco.Web.Install
             var packages = new List<Package>();
             try
             {
-                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={_umbracoVersion.Current}";
+                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={_umbracoVersion.Version}";
 
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 {

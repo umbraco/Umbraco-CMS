@@ -1,14 +1,7 @@
-using Umbraco.Core.Cache;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.PackageActions;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Strings;
-using Umbraco.Core.Trees;
-using Umbraco.Web.Media.EmbedProviders;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IUmbracoBuilder"/> class.

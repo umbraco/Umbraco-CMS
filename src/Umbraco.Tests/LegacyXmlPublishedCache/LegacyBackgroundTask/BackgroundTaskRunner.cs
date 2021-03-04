@@ -3,9 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Runtime;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -769,12 +769,12 @@ namespace Umbraco.Web.Scheduling
                             _ => StopImmediate(),
                             // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
                             TaskScheduler.Default);
-                    }   
+                    }
                     else
                     {
                         StopImmediate();
                     }
-                        
+
                 }
             }
 

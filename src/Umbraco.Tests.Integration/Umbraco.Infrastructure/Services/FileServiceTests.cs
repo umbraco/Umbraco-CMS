@@ -1,16 +1,15 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]

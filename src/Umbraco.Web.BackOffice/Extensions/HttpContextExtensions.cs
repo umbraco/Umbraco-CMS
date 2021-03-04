@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions
 {

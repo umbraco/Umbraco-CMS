@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Events;
+using Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core
 {
     public class DefaultEventMessagesFactory : IEventMessagesFactory
     {

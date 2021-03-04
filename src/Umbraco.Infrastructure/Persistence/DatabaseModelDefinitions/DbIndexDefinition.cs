@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
 {
     /// <summary>
     /// Represents a database index definition retrieved by querying the database

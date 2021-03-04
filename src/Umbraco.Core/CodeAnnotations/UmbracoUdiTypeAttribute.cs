@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.CodeAnnotations
+namespace Umbraco.Cms.Core.CodeAnnotations
 {
     [AttributeUsage(AttributeTargets.Field, AllowMultiple = false, Inherited = false)]
     public class UmbracoUdiTypeAttribute : Attribute

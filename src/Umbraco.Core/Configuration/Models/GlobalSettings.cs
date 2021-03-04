@@ -1,7 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for global settings.
@@ -23,15 +23,6 @@ namespace Umbraco.Core.Configuration.Models
         /// Gets or sets a value for the reserved paths.
         /// </summary>
         public string ReservedPaths { get; set; } = StaticReservedPaths;
-
-        /// <summary>
-        /// Gets or sets a value for the configuration status.
-        /// </summary>
-        /// <remarks>
-        /// TODO: https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
-        /// TODO: previously this would throw on set, but presumably we can't do that if we do still want this in config.
-        /// </remarks>
-        public string ConfigurationStatus { get; set; }
 
         /// <summary>
         /// Gets or sets a value for the timeout in minutes.
@@ -103,6 +94,23 @@ namespace Umbraco.Core.Configuration.Models
         /// the <c>Run</c> level.</para>
         /// </remarks>
         public bool InstallUnattended { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets a value to use for creating a user with a name for Unattended Installs
+        /// </summary>
+        public string UnattendedUserName { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets a value to use for creating a user with an email for Unattended Installs
+        /// </summary>
+        public string UnattendedUserEmail { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets a value to use for creating a user with a password for Unattended Installs
+        /// </summary>
+        public string UnattendedUserPassword { get; set; } = string.Empty;
+
+
         /// <summary>
         /// Gets or sets a value indicating whether to disable the election for a single server.
         /// </summary>

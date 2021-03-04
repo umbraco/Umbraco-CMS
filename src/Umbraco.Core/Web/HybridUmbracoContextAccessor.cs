@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Cache;
+﻿using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core.Web
 {
     /// <summary>
     /// Implements a hybrid <see cref="IUmbracoContextAccessor"/>.

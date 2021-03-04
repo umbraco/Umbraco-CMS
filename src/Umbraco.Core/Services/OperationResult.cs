@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core.Events;
+using Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     // TODO: no need for Attempt<OperationResult> - the operation result SHOULD KNOW if it's a success or a failure!
     // but then each WhateverResultType must

@@ -8,9 +8,9 @@ using System.Data;
 using System.Data.Common;
 using System.Data.SqlClient;
 using NUnit.Framework;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence
 {
     /// <summary>
     ///  Unit tests for <see cref="BulkDataReader"/>.

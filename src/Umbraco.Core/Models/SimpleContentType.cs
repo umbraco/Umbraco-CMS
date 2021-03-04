@@ -1,6 +1,7 @@
 ﻿using System;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Implements <see cref="ISimpleContentType"/>.

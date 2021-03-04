@@ -2,12 +2,11 @@
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Extensions
 {
-
     /// <summary>
     /// Extension methods for the cache helper
     /// </summary>
@@ -43,7 +42,7 @@ namespace Umbraco.Extensions
             }
 
             return appCaches.RuntimeCache.GetCacheItem<IHtmlContent>(
-                Core.CacheHelperExtensions.PartialViewCacheKey + cacheKey,
+                CoreCacheHelperExtensions.PartialViewCacheKey + cacheKey,
                 () => htmlHelper.Partial(partialViewName, model, viewData),
                 timeout: new TimeSpan(0, 0, 0, cachedSeconds));
         }

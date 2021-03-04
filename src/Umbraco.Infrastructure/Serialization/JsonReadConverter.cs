@@ -1,9 +1,8 @@
 ﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Core.Exceptions;
 
-namespace Umbraco.Core.Serialization
+namespace Umbraco.Cms.Infrastructure.Serialization
 {
     /// <summary>
     /// Provides a base class for custom <see cref="JsonConverter"/> implementations.

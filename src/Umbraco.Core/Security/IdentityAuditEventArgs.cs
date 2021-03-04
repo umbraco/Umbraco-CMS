@@ -1,7 +1,6 @@
 using System;
 
-
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
 
     /// <summary>

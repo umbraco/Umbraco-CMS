@@ -1,10 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Security;
-using Umbraco.Web.Models.Mapping;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.Mapping;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     public static partial class UmbracoBuilderExtensions
     {
@@ -30,6 +31,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
                 .Add<TagMapDefinition>()
                 .Add<TemplateMapDefinition>()
                 .Add<UserMapDefinition>()
+                .Add<MemberMapDefinition>()
                 .Add<LanguageMapDefinition>()
                 .Add<IdentityMapDefinition>();
 

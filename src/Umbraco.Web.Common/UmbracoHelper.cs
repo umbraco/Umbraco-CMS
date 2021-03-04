@@ -2,14 +2,15 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Xml.XPath;
-using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
-using Umbraco.Core.Templates;
-using Umbraco.Core.Xml;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Core.Xml;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Website
+namespace Umbraco.Cms.Web.Common
 {
     /// <summary>
     /// A helper class that provides many useful methods and functionality for using Umbraco in templates

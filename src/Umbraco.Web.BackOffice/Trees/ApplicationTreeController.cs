@@ -8,19 +8,19 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Primitives;
-using Umbraco.Core;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Extensions;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Services;
-using Umbraco.Web.Trees;
-using static Umbraco.Core.Constants.Web.Routing;
+using static Umbraco.Cms.Core.Constants.Web.Routing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     /// <summary>
     /// Used to return tree root nodes
@@ -265,7 +265,7 @@ namespace Umbraco.Web.BackOffice.Trees
             }
 
             var controller = (TreeControllerBase)result.Value;
-            var rootNodeResult = controller.GetRootNode(querystring);
+            var rootNodeResult = await controller.GetRootNode(querystring);
             if (!(rootNodeResult.Result is null))
             {
                 return rootNodeResult.Result;
@@ -305,7 +305,7 @@ namespace Umbraco.Web.BackOffice.Trees
             }
 
             var controller = (TreeControllerBase)controllerResult.Value;
-            return controller.GetNodes(id.ToInvariantString(), querystring);
+            return await controller.GetNodes(id.ToInvariantString(), querystring);
         }
 
         /// <summary>

@@ -1,14 +1,14 @@
 ﻿using System;
 using System.IO;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Models;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// A controller used to return images for media

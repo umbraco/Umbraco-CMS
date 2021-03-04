@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Core.Mail
+namespace Umbraco.Cms.Core.Mail
 {
     /// <summary>
     /// Simple abstraction to send an email message
@@ -9,5 +9,7 @@ namespace Umbraco.Core.Mail
     public interface IEmailSender
     {
         Task SendAsync(EmailMessage message);
+
+        bool CanSendRequiredEmail();
     }
 }

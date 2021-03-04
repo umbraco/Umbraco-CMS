@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     public interface IBulkSqlInsertProvider
     {

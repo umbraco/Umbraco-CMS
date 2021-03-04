@@ -4,11 +4,11 @@
 using System.Diagnostics;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
 {
     [TestFixture]
     public class DocumentEntityTests

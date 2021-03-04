@@ -1,14 +1,11 @@
-using Umbraco.Core.Security;
-
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
-
     /// <summary>
     /// Event args used when signing out
     /// </summary>
     public class SignOutAuditEventArgs : IdentityAuditEventArgs
     {
-        public SignOutAuditEventArgs(AuditEvent action, string ipAddress, string comment = null, string performingUser = Constants.Security.SuperUserIdAsString, string affectedUser = Constants.Security.SuperUserIdAsString)
+        public SignOutAuditEventArgs(AuditEvent action, string ipAddress, string comment = null, string performingUser = Cms.Core.Constants.Security.SuperUserIdAsString, string affectedUser = Cms.Core.Constants.Security.SuperUserIdAsString)
             : base(action, ipAddress, performingUser, comment, affectedUser, null)
         {
         }

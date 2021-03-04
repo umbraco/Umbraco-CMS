@@ -3,10 +3,10 @@
 
 using System;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Events;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Scoping
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
 {
     [TestFixture]
     public class EventNameExtractorTests

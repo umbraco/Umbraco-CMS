@@ -1,9 +1,8 @@
-﻿
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core.Logging;
 
-namespace Umbraco.Web.Website.ViewEngines
+namespace Umbraco.Cms.Web.Website.ViewEngines
 {
     public class ProfilingViewEngine: IViewEngine
     {

@@ -1,10 +1,9 @@
 ﻿using System;
-using System.Globalization;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Used to generate a string hash using crypto libraries over multiple objects

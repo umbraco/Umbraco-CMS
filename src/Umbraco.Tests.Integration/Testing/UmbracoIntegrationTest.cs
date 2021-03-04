@@ -18,30 +18,28 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Serilog;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.IO;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Runtime;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.DependencyInjection;
+using Umbraco.Cms.Tests.Integration.Extensions;
+using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.DependencyInjection;
-using Umbraco.Infrastructure.PublishedCache.DependencyInjection;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Integration.DependencyInjection;
-using Umbraco.Tests.Integration.Extensions;
-using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Tests.Integration.TestServerTest;
-using Umbraco.Tests.Testing;
-using Umbraco.Web;
-using Umbraco.Web.BackOffice.DependencyInjection;
-using Umbraco.Web.Common.DependencyInjection;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Integration.Testing
+namespace Umbraco.Cms.Tests.Integration.Testing
 {
     /// <summary>
     /// Abstract class for integration tests
@@ -200,7 +198,7 @@ namespace Umbraco.Tests.Integration.Testing
             services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
 
             // Add it!
-            Core.Composing.TypeLoader typeLoader = services.AddTypeLoader(
+            TypeLoader typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
                 webHostEnvironment,
                 TestHelper.GetHostingEnvironment(),
@@ -218,6 +216,7 @@ namespace Umbraco.Tests.Integration.Testing
                 .AddRuntimeMinifier()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
+                .AddMembersIdentity()
                 .AddTestServices(TestHelper, GetAppCaches());
 
             if (TestOptions.Mapper)

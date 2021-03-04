@@ -5,11 +5,11 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using Umbraco.Core;
-using Umbraco.Core.Security;
-using Umbraco.Web.Services;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.BackOffice.Authorization
 {
     /// <summary>
     /// Ensures that the current user has access to the section for which the specified tree(s) belongs

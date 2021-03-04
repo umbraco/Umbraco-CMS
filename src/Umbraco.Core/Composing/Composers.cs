@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using Umbraco.Core.Collections;
-using Umbraco.Core.Logging;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Cms.Core.Collections;
+using Umbraco.Cms.Core.DependencyInjection;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     // note: this class is NOT thread-safe in any ways
 

@@ -3,9 +3,10 @@
 
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Serialization
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Serialization
 {
     [TestFixture]
     public class JsonNetSerializerTests

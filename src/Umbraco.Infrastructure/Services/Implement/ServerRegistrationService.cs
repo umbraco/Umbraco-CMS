@@ -2,15 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     /// <summary>
     /// Manages server registrations in the database.
@@ -47,7 +48,7 @@ namespace Umbraco.Core.Services.Implement
             var serverIdentity = GetCurrentServerIdentity();
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.Servers);
+                scope.WriteLock(Cms.Core.Constants.Locks.Servers);
 
                 ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache(); // ensure we have up-to-date cache
 
@@ -98,7 +99,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.Servers);
+                scope.WriteLock(Cms.Core.Constants.Locks.Servers);
 
                 ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache(); // ensure we have up-to-date cache // ensure we have up-to-date cache
 
@@ -119,7 +120,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Constants.Locks.Servers);
+                scope.WriteLock(Cms.Core.Constants.Locks.Servers);
                 _serverRegistrationRepository.DeactiveStaleServers(staleTimeout);
                 scope.Complete();
             }
@@ -138,7 +139,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Constants.Locks.Servers);
+                scope.ReadLock(Cms.Core.Constants.Locks.Servers);
                 if (refresh) ((ServerRegistrationRepository) _serverRegistrationRepository).ClearCache();
                 return _serverRegistrationRepository.GetMany().Where(x => x.IsActive).ToArray(); // fast, cached // fast, cached
             }

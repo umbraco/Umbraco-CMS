@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// A model representing a step in a tour.

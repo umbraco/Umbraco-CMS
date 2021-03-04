@@ -1,16 +1,16 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Core.Composing;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Examine;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Cms.Infrastructure.Search
 {
-
     /// <summary>
     /// Configures and installs Examine.
     /// </summary>
