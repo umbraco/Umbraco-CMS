@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public class PublishingNotification<T> : CancelableEnumerableObjectNotification<T>
+    public sealed class PublishingNotification<T> : CancelableEnumerableObjectNotification<T>
     {
         public PublishingNotification(T target, EventMessages messages) : base(target, messages)
         {

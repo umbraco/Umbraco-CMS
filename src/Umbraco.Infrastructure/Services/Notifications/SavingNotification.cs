@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public class SavingNotification<T> : CancelableEnumerableObjectNotification<T>
+    public sealed class SavingNotification<T> : CancelableEnumerableObjectNotification<T>
     {
         public SavingNotification(T target, EventMessages messages) : base(target, messages)
         {

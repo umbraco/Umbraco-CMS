@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public class CopyingNotification<T> : CancelableObjectNotification<T> where T : class
+    public sealed class CopyingNotification<T> : CancelableObjectNotification<T> where T : class
     {
         public CopyingNotification(T original, T copy, int parentId, EventMessages messages) : base(original, messages)
         {

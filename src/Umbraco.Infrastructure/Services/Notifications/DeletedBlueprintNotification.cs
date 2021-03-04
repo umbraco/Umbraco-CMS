@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public class DeletedBlueprintNotification<T> : EnumerableObjectNotification<T>
+    public sealed class DeletedBlueprintNotification<T> : EnumerableObjectNotification<T>
     {
         public DeletedBlueprintNotification(T target, EventMessages messages) : base(target, messages)
         {

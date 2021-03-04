@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public class UnpublishedNotification<T> : EnumerableObjectNotification<T>
+    public sealed class UnpublishedNotification<T> : EnumerableObjectNotification<T>
     {
         public UnpublishedNotification(T target, EventMessages messages) : base(target, messages)
         {

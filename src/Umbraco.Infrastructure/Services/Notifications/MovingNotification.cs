@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public class MovingNotification<T> : CancelableObjectNotification<IEnumerable<MoveEventInfo<T>>>
+    public sealed class MovingNotification<T> : CancelableObjectNotification<IEnumerable<MoveEventInfo<T>>>
     {
         public MovingNotification(MoveEventInfo<T> target, EventMessages messages) : base(new[] {target}, messages)
         {
