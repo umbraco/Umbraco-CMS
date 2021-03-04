@@ -266,7 +266,6 @@ namespace Umbraco.Extensions
 
             builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
-            builder.AddNotificationHandler<UmbracoRoutedRequest, UmbracoWebsiteSecurityFactory>();
             builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, UmbracoWebsiteSecurityAccessor>();
 
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
@@ -289,6 +288,7 @@ namespace Umbraco.Extensions
             builder.Services.AddScoped<UmbracoHelper>();
             builder.Services.AddScoped<RequestLock>();
             builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
+            builder.Services.AddScoped<IUmbracoWebsiteSecurity, UmbracoWebsiteSecurity>();
 
             builder.AddHttpClients();
 

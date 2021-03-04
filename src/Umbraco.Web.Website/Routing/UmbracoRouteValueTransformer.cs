@@ -121,9 +121,6 @@ namespace Umbraco.Cms.Web.Website.Routing
             // Store the route values as a httpcontext feature
             httpContext.Features.Set(umbracoRouteValues);
 
-            // publish an event that we've routed a request
-            await _eventAggregator.PublishAsync(new UmbracoRoutedRequest(_umbracoContextAccessor.UmbracoContext));
-
             // Need to check if there is form data being posted back to an Umbraco URL
             PostedDataProxyInfo postedInfo = GetFormInfo(httpContext, values);
             if (postedInfo != null)

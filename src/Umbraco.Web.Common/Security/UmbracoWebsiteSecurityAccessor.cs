@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Web.Common.Security
@@ -17,9 +18,6 @@ namespace Umbraco.Cms.Web.Common.Security
         /// Gets or sets the <see cref="IUmbracoWebsiteSecurity"/> object.
         /// </summary>
         public IUmbracoWebsiteSecurity WebsiteSecurity
-        {
-            get => _httpContextAccessor.HttpContext?.Features.Get<IUmbracoWebsiteSecurity>();
-            set => _httpContextAccessor.HttpContext?.Features.Set(value);
-        }
+            => _httpContextAccessor.HttpContext?.RequestServices.GetService<IUmbracoWebsiteSecurity>();
     }
 }
