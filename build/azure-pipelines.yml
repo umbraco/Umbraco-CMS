@@ -271,7 +271,7 @@ stages:
                       workingDirectory: build
                 - task: ArchiveFiles@2
                   displayName: 'Zip C# Docs'
-                  inputs:C
+                  inputs:
                       rootFolderOrFile: $(Build.SourcesDirectory)/src/ApiDocs/_site
                       includeRootFolder: true
                       archiveType: zip
