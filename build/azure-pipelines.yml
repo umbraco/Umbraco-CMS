@@ -295,7 +295,8 @@ stages:
               targetType: 'inline'
               script: |
                   choco install docfx -y
-                  docfx "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                  docfx metadata "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                  docfx build "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
                   if ($lastexitcode -ne 0){
                       throw ("Error generating docs")
                   }
@@ -304,7 +305,7 @@ stages:
 
         - task: ArchiveFiles@2
           displayName: 'Zip C# Docs'
-          inputs:
+          inputs:C
               rootFolderOrFile: '$(Build.SourcesDirectory)/src/ApiDocs/_site'
               includeRootFolder: true
               archiveType: 'zip'
