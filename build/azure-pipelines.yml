@@ -261,12 +261,12 @@ stages:
                   inputs:
                       targetType: inline
                       script: |
-                          choco install docfx -y
-                          docfx metadata "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
-                  docfx build "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
-                          if ($lastexitcode -ne 0){
-                              throw ("Error generating docs")
-                          }
+                        choco install docfx -y
+                        docfx metadata "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                        docfx build "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                        if ($lastexitcode -ne 0){
+                            throw ("Error generating docs")
+                        }
                       errorActionPreference: continue
                       workingDirectory: build
                 - task: ArchiveFiles@2
