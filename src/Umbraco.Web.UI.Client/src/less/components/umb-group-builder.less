@@ -78,6 +78,15 @@
   display: none;
 }
 
+.umb-group-builder__tab-title-wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.umb-group-builder__tab-title-icon {
+  margin-right: 5px;
+}
+
 .umb-group-builder__tab-name {
   font-weight: bold;
 }
@@ -104,6 +113,10 @@
     font-size: 12px;
     color: @gray-6;
   }
+}
+
+.umb-group-builder__tab.-sortable {
+  cursor: move;
 }
 
 /* ---------- GROUPS ----------  */
@@ -241,7 +254,6 @@ input.umb-group-builder__group-title-input:disabled:hover {
 }
 
 .umb-group-builder__group-sort-order {
-    margin-right: 10px;
     margin-left: auto;
 }
 

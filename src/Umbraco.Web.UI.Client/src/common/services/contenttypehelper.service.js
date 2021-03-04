@@ -293,6 +293,55 @@ function contentTypeHelper(contentTypeResource, dataTypeResource, $filter, $inje
 
         },
 
+        updatePropertiesWithFieldsetsSortOrder: function (group) {
+            if (group.tabState === "init") {
+                return group;
+            }
+
+            let sortOrder = 0;
+
+            group.properties.forEach(function (property) {
+                if (!property.inherited && property.propertyState !== "init") {
+                    property.sortOrder = sortOrder;
+                    sortOrder++;
+                }
+            });
+
+            if (group.fieldsets && group.fieldsets.length > 0) {
+                group.fieldsets.forEach(fieldset => {
+                    fieldset.properties.forEach(function (property) {
+                        if (!property.inherited && property.propertyState !== "init") {
+                            property.sortOrder = sortOrder;
+                            sortOrder++;
+                        }
+                    });
+                });
+            }
+
+            return group;
+        },
+
+        updateFieldsetsSortOrder (groups) {
+            if (!groups) {
+                return groups;
+            }
+
+            let sortOrder = 0;
+
+            groups.forEach(group => {
+                if (group.fieldsets && group.fieldsets.length > 0) {
+                    group.fieldsets.forEach(fieldset => {
+                        if (!fieldset.inherited) {
+                            fieldset.sortOrder = sortOrder;
+                            sortOrder++;
+                        }
+                    })
+                }
+            });
+
+            return groups;
+        },
+
         getTemplatePlaceholder: function () {
 
             var templatePlaceholder = {

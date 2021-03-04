@@ -46,10 +46,9 @@
 
     <!-- WITH TABS --->
     <div ng-if="model.hasTabs">
-
-        <ul class="umb-group-builder__tabs">
-            <li ng-repeat="tab in model.groups">
-                <div ng-if="tab.tabState !== 'init'" ng-click="changeTab($index)" class="umb-group-builder__tab" ng-class="{'is-active': $index === openTabIndex, 'is-inherited': tab.inherited}">
+        <ul class="umb-group-builder__tabs" ui-sortable="sortableOptionsTabs" ng-model="model.groups">
+            <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__tab-sortable': sortingMode}">
+                <div ng-if="tab.tabState !== 'init'" ng-click="changeTab($index)" class="umb-group-builder__tab" ng-class="{'is-active': $index === openTabIndex, 'is-inherited': tab.inherited, 'umb-group-builder__tab-handle -sortable': sortingMode && !tab.inherited}">
                     <div>
                         <div class="umb-group-builder__tab-inherited-label" ng-if="tab.inherited">
                             <localize key="contentTypeEditor_inheritedFrom"></localize>: {{ tab.inheritedFromName }}
@@ -58,7 +57,8 @@
                                 <span ng-if="!$last">, </span>
                             </span>
                         </div>
-                        <ng-form name="groupNameForm" data-element="group-name">
+                        <ng-form class="umb-group-builder__tab-title-wrapper" name="groupNameForm" data-element="group-name">
+                            <i class="umb-group-builder__tab-title-icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
                             <div class="umb-group-builder__tab-name" ng-if="tab.inherited || sortingMode">{{ tab.name }}</div>
                             <input
                                 ng-if="!tab.inherited && !sortingMode"
@@ -102,64 +102,70 @@
             </li>
         </ul>
 
-        <umb-content-type-group ng-if="model.groups.length > 1">
-            <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="model.groups[openTabIndex].properties">
-                <li ng-repeat="property in model.groups[openTabIndex].properties | filter: {fieldsetId: '!'}" data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
-                    <umb-content-type-property
-                        ng-if="property.propertyState !== 'init'"
-                        property="property"
-                        sortable="sortingMode"
-                        on-edit="editPropertyTypeSettings(property)"
-                        on-remove="deleteProperty(model.groups[openTabIndex].properties, property)"
-                        alias-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + model.groups[openTabIndex].properties.indexOf(property) + '].Alias'}}"
-                        label-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + model.groups[openTabIndex].properties.indexOf(property) + '].Label'}}">
-                    </umb-content-type-property>
-
-                    <umb-content-type-property-placeholder
-                        ng-if="property.propertyState === 'init' && !sortingMode"
-                        on-click="addProperty(property, model.groups[openTabIndex])"
-                        focus="property.focus">
-                    </umb-content-type-property-placeholder>
-                </li>
-            </ul>
-        </umb-content-type-group>
-
         <umb-content-type-groups>
-            <umb-content-type-group
-                allow-name="true"
-                ng-repeat="fieldset in model.fieldsets | filter:fieldsetsInGroup(model.groups[openTabIndex].id)"
-                group="fieldset"
-                allow-remove="!sortingMode"
-                on-remove="removeFieldset(group)"
-                sorting="sortingMode && !fieldset.inherited"
-                name-val-server-field="{{'Fieldsets[' + model.fieldsets.indexOf(fieldset) + '].Name'}}">
-                
-                <ul class="umb-group-builder__properties">
-                    <li ng-repeat="property in model.groups[openTabIndex].properties | filter:propertiesInFieldset(fieldset.id)" data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
-                        <umb-content-type-property
-                            property="property"
-                            sortable="sortingMode"
-                            on-edit="editPropertyTypeSettings(property)"
-                            on-remove="deleteProperty(model.groups[openTabIndex].properties, property)"
-                            alias-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + model.groups[openTabIndex].properties.indexOf(property) + '].Alias'}}"
-                            label-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + model.groups[openTabIndex].properties.indexOf(property) + '].Label'}}">
-                        </umb-content-type-property>
-                    </li>
-                    <li>
-                        <umb-content-type-property-placeholder
-                            ng-if="!sortingMode"
-                            on-click="addNewProperty(model.groups[openTabIndex], fieldset)">
-                        </umb-content-type-property-placeholder>
-                    </li>
-                </ul>
-            </umb-content-type-group>
-        </umb-content-type-groups>
+            <div ng-repeat="group in model.groups" ng-hide="$index !== openTabIndex">
+                <umb-content-type-group>
+                    <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties">
+                        <li ng-repeat="property in group.properties" data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
+                            <umb-content-type-property
+                                ng-if="property.propertyState !== 'init'"
+                                property="property"
+                                sortable="sortingMode"
+                                on-edit="editPropertyTypeSettings(property)"
+                                on-remove="deleteProperty(model.groups[openTabIndex].properties, property)"
+                                alias-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + group.properties.indexOf(property) + '].Alias'}}"
+                                label-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + group.properties.indexOf(property) + '].Label'}}">
+                            </umb-content-type-property>
 
-        <umb-content-type-group-placeholder
-            ng-if="model.groups.length > 1 && !sortingMode"
-            on-click="addFieldset()">
-            <localize key="contentTypeEditor_addFieldset"></localize>
-        </umb-content-type-group-placeholder>
+                            <umb-content-type-property-placeholder
+                                ng-if="property.propertyState === 'init' && !sortingMode"
+                                on-click="addProperty(property, group)"
+                                focus="property.focus">
+                            </umb-content-type-property-placeholder>
+                        </li>
+                    </ul>
+                </umb-content-type-group>
+                
+                <div class="umb-group-builder__fieldsets" ui-sortable="sortableOptionsFieldset" ng-model="group.fieldsets">
+                    <div ng-repeat="fieldset in group.fieldsets" ng-class="{'umb-group-builder__fieldset-sortable': sortingMode && !fieldset.inherited}">
+                        <umb-content-type-group
+                            allow-name="true"
+                            group="fieldset"
+                            allow-remove="!sortingMode"
+                            on-remove="removeFieldset(group.fieldsets, fieldset)"
+                            sorting="sortingMode && !fieldset.inherited"
+                            name-val-server-field="{{'Fieldsets[' + model.fieldsets.indexOf(fieldset) + '].Name'}}">
+                            
+                            <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="fieldset.properties">
+                                <li ng-repeat="property in fieldset.properties" data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
+                                    <umb-content-type-property
+                                        property="property"
+                                        sortable="sortingMode"
+                                        on-edit="editPropertyTypeSettings(property)"
+                                        on-remove="deleteProperty(fieldset.properties, property)"
+                                        alias-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + model.groups[openTabIndex].properties.indexOf(property) + '].Alias'}}"
+                                        label-val-server-field="{{'Groups[' + openTabIndex + '].Properties[' + model.groups[openTabIndex].properties.indexOf(property) + '].Label'}}">
+                                    </umb-content-type-property>
+                                </li>
+                                <li>
+                                    <umb-content-type-property-placeholder
+                                        ng-if="!sortingMode"
+                                        on-click="addNewProperty(fieldset, fieldset.id)">
+                                    </umb-content-type-property-placeholder>
+                                </li>
+                            </ul>
+                        </umb-content-type-group>
+                    </div>
+                </div>
+            </div>
+
+            <umb-content-type-group-placeholder
+                ng-if="model.groups.length > 1 && !sortingMode"
+                on-click="addFieldset(model.groups[openTabIndex])">
+                <localize key="contentTypeEditor_addFieldset"></localize>
+            </umb-content-type-group-placeholder>
+
+        </umb-content-type-groups>
     </div>
 
     <!-- WITHOUT TABS -->

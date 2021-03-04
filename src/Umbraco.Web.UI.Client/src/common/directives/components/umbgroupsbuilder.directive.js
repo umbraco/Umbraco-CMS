@@ -15,7 +15,9 @@
             scope.sortingMode = false;
             scope.toolbar = [];
             scope.sortableOptionsGroup = {};
+            scope.sortableOptionsFieldset = {};
             scope.sortableOptionsProperty = {};
+            scope.sortableOptionsTabs = {};
             scope.sortingButtonKey = "general_reorder";
             scope.compositionsButtonState = "init";
 
@@ -63,6 +65,45 @@
                     },
                     stop: function (e, ui) {
                         updateTabsSortOrder();
+                    }
+                };
+
+                scope.sortableOptionsTabs = {
+                    axis: 'x',
+                    distance: 10,
+                    tolerance: "pointer",
+                    opacity: 0.7,
+                    scroll: true,
+                    cursor: "move",
+                    placeholder: "umb-group-builder__tab-sortable-placeholder",
+                    zIndex: 6000,
+                    handle: ".umb-group-builder__tab-handle",
+                    items: ".umb-group-builder__tab-sortable",
+                    start: function (e, ui) {
+                        ui.placeholder.height(ui.item.height());
+                        ui.placeholder.width(ui.item.width());
+                    },
+                    stop: function (e, ui) {
+                        updateTabsSortOrder();
+                    }
+                };
+
+                scope.sortableOptionsFieldset = {
+                    axis: 'y',
+                    distance: 10,
+                    tolerance: "pointer",
+                    opacity: 0.7,
+                    scroll: true,
+                    cursor: "move",
+                    placeholder: "umb-group-builder__group-sortable-placeholder",
+                    zIndex: 6000,
+                    handle: ".umb-group-builder__group-handle",
+                    items: ".umb-group-builder__fieldset-sortable",
+                    start: function (e, ui) {
+                        ui.placeholder.height(ui.item.height());
+                    },
+                    stop: function (e, ui) {
+                        updateFieldsetsSortOrder();
                     }
                 };
 
@@ -178,13 +219,11 @@
             }
 
             function updatePropertiesSortOrder() {
+                scope.model.groups.forEach(group => group = contentTypeHelper.updatePropertiesWithFieldsetsSortOrder(group));
+            }
 
-                angular.forEach(scope.model.groups, function (group) {
-                    if (group.tabState !== "init") {
-                        group.properties = contentTypeHelper.updatePropertiesSortOrder(group.properties);
-                    }
-                });
-
+            function updateFieldsetsSortOrder () {
+                scope.model.groups = contentTypeHelper.updateFieldsetsSortOrder(scope.model.groups);
             }
 
             function setupAvailableContentTypesModel(result) {
@@ -401,27 +440,28 @@
                 scope.openTabIndex = scope.model.groups.length - 2;
             };
 
-            scope.addFieldset = function () {
-                const activeTab = scope.model.groups[scope.openTabIndex];
-
-                if (!activeTab) {
-                    return
+            scope.addFieldset = function (group) {
+                if (!group) {
+                    return;
                 }
 
-                if (!scope.model.fieldsets) {
-                    scope.model.fieldsets = [];
+                if (!group.fieldsets) {
+                    group.fieldsets = [];
                 }
 
                 const fieldset = {
-                    groupId: activeTab.id,
-                    id: scope.model.fieldsets.length + 1, // temp id
-                    name: ""
+                    groupId: group.id,
+                    id: group.fieldsets.length + 1, // temp id
+                    name: "",
+                    properties: []
                 };
 
-                scope.model.fieldsets = [...scope.model.fieldsets, fieldset];
+                group.fieldsets = [...group.fieldsets, fieldset];
+
+                updateFieldsetsSortOrder();
             };
 
-            scope.addNewProperty = function (group, fieldset) {
+            scope.addNewProperty = function (group) {
                 let newProperty = {
                     label: null,
                     alias: null,
@@ -445,9 +485,7 @@
                     view: "views/common/infiniteeditors/propertysettings/propertysettings.html",
                     size: "small",
                     submit: function (model) {
-                        
                         newProperty = {...model.property};
-                        newProperty.fieldsetId = fieldset ? fieldset.id : null;
                         newProperty.propertyState = "active";
 
                         group.properties.push(newProperty);
@@ -463,20 +501,10 @@
             };
 
             /* ---------- FIELDSETS ---------- */
-            scope.fieldsetsInGroup = (groupId) => (fieldset) => fieldset && fieldset.groupId === groupId;
-
-            scope.propertiesInFieldset = (fieldsetId) => (property) => property && property.fieldsetId === fieldsetId;
-
-            scope.removeFieldset = function ({ id }) {
-                if (!id) {
-                    return;
-                }
-
-                // remove all properties related to the fieldset
-                scope.model.groups[scope.openTabIndex].properties = scope.model.groups[scope.openTabIndex].properties.filter(property => property.fieldsetId !== id);
-
-                // remove fieldset
-                scope.model.fieldsets = scope.model.fieldsets.filter(fieldset => fieldset.id !== id);
+            scope.removeFieldset = function (items, { id }) {
+                const index = items.map(item => item.id).findIndex(itemId => itemId === id);
+                items.splice(index, 1);
+                notifyChanged();
             };
 
             /* ---------- GROUPS ---------- */
