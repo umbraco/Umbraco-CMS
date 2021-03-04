@@ -22,12 +22,12 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.2" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.2" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.3" />
       <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />
       <PackageReference Include="NETStandard.Library" Version="2.0.3" />
       <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
-      <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.1" />
+      <PackageReference Include="SixLabors.ImageSharp.Web" Version="1.0.2" />
       <PackageReference Include="Smidge" Version="3.2.0" />
       <PackageReference Include="Smidge.Nuglify" Version="3.2.0" />
     </ItemGroup>
