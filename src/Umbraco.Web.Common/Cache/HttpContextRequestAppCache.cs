@@ -168,14 +168,6 @@ namespace Umbraco.Cms.Core.Cache
 
             ReaderWriterLockSlim locker = GetLock();
             locker.EnterWriteLock();
-
-            //// note: cannot keep 'entered' as a class variable here,
-            //// since there is one per request - so storing it within
-            //// ContextItems - which is locked, so this should be safe
-
-            //var entered = false;
-            //Monitor.Enter(items, ref entered);
-            //items[s_contextItemsLockKey] = entered;
         }
 
         protected override void ExitReadLock()
@@ -204,11 +196,6 @@ namespace Umbraco.Cms.Core.Cache
             {
                 locker.ExitWriteLock();
             }
-
-            //var entered = (bool?)items[s_contextItemsLockKey] ?? false;
-            //if (entered)
-            //    Monitor.Exit(items);
-            //items.Remove(s_contextItemsLockKey);
         }
 
         #endregion
