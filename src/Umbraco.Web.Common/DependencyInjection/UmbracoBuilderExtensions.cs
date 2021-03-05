@@ -299,7 +299,6 @@ namespace Umbraco.Extensions
         public static IUmbracoBuilder AddUnattedInstallCreateUser(this IUmbracoBuilder builder)
         {
             builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
-            //builder.AddNotificationHandler<UmbracoApplicationStarting, CreateUnattendedUserNotificationHandler>();
             return builder;
         }
 
