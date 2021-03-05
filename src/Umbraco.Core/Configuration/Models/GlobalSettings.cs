@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
@@ -25,9 +27,9 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public string ReservedPaths { get; set; } = StaticReservedPaths;
 
         /// <summary>
-        /// Gets or sets a value for the timeout in minutes.
+        /// Gets or sets a value for the timeout
         /// </summary>
-        public int TimeOutInMinutes { get; set; } = 20;
+        public TimeSpan TimeOut{ get; set; } = TimeSpan.FromMinutes(7);
 
         /// <summary>
         /// Gets or sets a value for the default UI language.
@@ -134,5 +136,14 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets a value indicating whether SMTP is configured.
         /// </summary>
         public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(Smtp?.Host);
+
+        /// <summary>
+        /// An int value representing the time in milliseconds to lock the database for a write operation
+        /// </summary>
+        /// <remarks>
+        /// The default value is 5000 milliseconds
+        /// </remarks>
+        /// <value>The timeout in milliseconds.</value>
+        public TimeSpan SqlWriteLockTimeOut { get; } = TimeSpan.FromMilliseconds(5000);
     }
 }

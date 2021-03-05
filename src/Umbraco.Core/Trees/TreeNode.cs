@@ -103,8 +103,19 @@ namespace Umbraco.Cms.Core.Trees
         {
             get
             {
-                // TODO: Is this ever actually used? If not remove, if so, add setter.
                 return string.Empty;
+
+                //TODO Figure out how to do this, without the model has to know a bout services and config.
+                //
+                // if (IconIsClass)
+                //     return string.Empty;
+                //
+                // //absolute path with or without tilde
+                // if (Icon.StartsWith("~") || Icon.StartsWith("/"))
+                //     return IOHelper.ResolveUrl("~" + Icon.TrimStart(Constants.CharArrays.Tilde));
+                //
+                // //legacy icon path
+                // return string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);
             }
         }
 

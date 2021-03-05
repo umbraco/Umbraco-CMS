@@ -57,7 +57,7 @@ namespace Umbraco.Web.Hosting
 
             // this will be the case in unit tests, we'll manually map the path
             var newPath = path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
-            return newPath.StartsWith(ApplicationPhysicalPath) ? newPath : Path.Combine(ApplicationPhysicalPath, newPath.TrimStart('~', '/'));
+            return newPath.StartsWith(ApplicationPhysicalPath) ? newPath : Path.Combine(ApplicationPhysicalPath, newPath.TrimStart(Constants.CharArrays.TildeForwardSlash));
         }
 
         public string MapPathContentRoot(string path) => MapPathWebRoot(path);

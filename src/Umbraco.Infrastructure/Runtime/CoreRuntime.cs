@@ -4,11 +4,15 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -25,6 +29,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly DatabaseBuilder _databaseBuilder;
+        private readonly IUmbracoVersion _umbracoVersion;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
@@ -38,7 +44,9 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IMainDom mainDom,
             IUmbracoDatabaseFactory databaseFactory,
             IEventAggregator eventAggregator,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            DatabaseBuilder databaseBuilder,
+            IUmbracoVersion umbracoVersion)
         {
             State = state;
             _loggerFactory = loggerFactory;
@@ -49,6 +57,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _databaseFactory = databaseFactory;
             _eventAggregator = eventAggregator;
             _hostingEnvironment = hostingEnvironment;
+            _databaseBuilder = databaseBuilder;
+            _umbracoVersion = umbracoVersion;
             _logger = _loggerFactory.CreateLogger<CoreRuntime>();
         }
 
@@ -100,8 +110,31 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             await _eventAggregator.PublishAsync(new UmbracoApplicationStarting(State.Level), cancellationToken);
 
+            // if level is Updrade and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
+            if (State.Reason == RuntimeLevelReason.UpgradeMigrations && State.Level == RuntimeLevel.Upgrade)
+            {
+                // do the upgrade
+                DoUnattendedUpgrade();
+
+                // upgrade is done, set reason to Run
+                DetermineRuntimeLevel();
+
+            }
+
             // create & initialize the components
             _components.Initialize();
+        }
+
+        private void DoUnattendedUpgrade()
+        {
+            var plan = new UmbracoPlan(_umbracoVersion);
+            using (_profilingLogger.TraceDuration<RuntimeState>("Starting unattended upgrade.", "Unattended upgrade completed."))
+            {
+                var result = _databaseBuilder.UpgradeSchemaAndData(plan);
+                if (result.Success == false)
+                    throw new UnattendedInstallException("An error occurred while running the unattended upgrade.\n" + result.Message);
+            }
+
         }
 
         private void DoUnattendedInstall()

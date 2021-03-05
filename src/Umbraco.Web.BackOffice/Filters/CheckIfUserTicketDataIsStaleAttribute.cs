@@ -42,6 +42,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             private readonly IBackOfficeSignInManager _backOfficeSignInManager;
             private readonly IBackOfficeAntiforgery _backOfficeAntiforgery;
             private readonly IScopeProvider _scopeProvider;
+            private readonly AppCaches _appCaches;
 
             public CheckIfUserTicketDataIsStaleFilter(
                 IRequestCache requestCache,
@@ -52,7 +53,8 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 IOptions<GlobalSettings> globalSettings,
                 IBackOfficeSignInManager backOfficeSignInManager,
                 IBackOfficeAntiforgery backOfficeAntiforgery,
-                IScopeProvider scopeProvider)
+                IScopeProvider scopeProvider,
+                AppCaches appCaches)
             {
                 _requestCache = requestCache;
                 _umbracoMapper = umbracoMapper;
@@ -63,6 +65,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 _backOfficeSignInManager = backOfficeSignInManager;
                 _backOfficeAntiforgery = backOfficeAntiforgery;
                 _scopeProvider = scopeProvider;
+                _appCaches = appCaches;
             }
 
 
@@ -142,12 +145,12 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.GetRoles()) == false,
                         () =>
                         {
-                            var startContentIds = user.CalculateContentStartNodeIds(_entityService);
+                            var startContentIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
                             return startContentIds.UnsortedSequenceEqual(identity.GetStartContentNodes()) == false;
                         },
                         () =>
                         {
-                            var startMediaIds = user.CalculateMediaStartNodeIds(_entityService);
+                            var startMediaIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
                             return startMediaIds.UnsortedSequenceEqual(identity.GetStartMediaNodes()) == false;
                         }
                     };

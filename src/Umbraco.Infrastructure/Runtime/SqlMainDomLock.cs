@@ -7,6 +7,7 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -28,25 +29,28 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
         private readonly ILogger<SqlMainDomLock> _logger;
+        private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private IUmbracoDatabase _db;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private SqlServerSyntaxProvider _sqlServerSyntax = new SqlServerSyntaxProvider();
+        private SqlServerSyntaxProvider _sqlServerSyntax;
         private bool _mainDomChanging = false;
         private readonly UmbracoDatabaseFactory _dbFactory;
         private bool _errorDuringAcquiring;
         private object _locker = new object();
         private bool _hasTable = false;
 
-        public SqlMainDomLock(ILogger<SqlMainDomLock> logger, ILoggerFactory loggerFactory, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment, DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
+        public SqlMainDomLock(ILogger<SqlMainDomLock> logger, ILoggerFactory loggerFactory, IOptions<GlobalSettings> globalSettings, IOptions<ConnectionStrings> connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment, DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
             _logger = logger;
-_hostingEnvironment = hostingEnvironment;
+            _globalSettings = globalSettings;
+            _sqlServerSyntax = new SqlServerSyntaxProvider(_globalSettings);
+            _hostingEnvironment = hostingEnvironment;
             _dbFactory = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
-               globalSettings,
+                _globalSettings,
                connectionStrings,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
                dbProviderFactoryCreator,

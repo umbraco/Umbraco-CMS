@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     {
         public void Configure(BackOfficeSecurityStampValidatorOptions options)
         {
-            options.ValidationInterval = TimeSpan.FromMinutes(30);
+            options.ValidationInterval = TimeSpan.FromMinutes(3);
         }
     }
 

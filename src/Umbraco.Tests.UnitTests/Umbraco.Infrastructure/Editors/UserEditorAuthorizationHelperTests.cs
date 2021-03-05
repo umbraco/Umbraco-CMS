@@ -6,6 +6,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -34,7 +35,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
 
@@ -55,7 +57,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new string[0]);
 
@@ -76,7 +79,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "FunGroup" });
 
@@ -97,7 +101,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new int[0], new[] { "test" });
 
@@ -130,7 +135,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             // adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234, 5555 }, new int[0], new string[0]);
@@ -164,7 +170,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             // removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234 }, new int[0], new string[0]);
@@ -198,7 +205,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             // adding 1234 but currentUser doesn't have access to it ... nope
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 1234 }, new int[0], new string[0]);
@@ -232,7 +240,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             // adding 5555 which currentUser has access to since it's a child of 9876 ... ok
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new[] { 5555 }, new int[0], new string[0]);
@@ -266,7 +275,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             // adding 1234 but currentUser doesn't have access to it ... nope
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234 }, new string[0]);
@@ -300,7 +310,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             // adding 5555 which currentUser has access to since it's a child of 9876 ... ok
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 5555 }, new string[0]);
@@ -334,7 +345,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             // adding 5555 which currentUser has access to since it's a child of 9876 ... adding is still ok even though currentUser doesn't have access to 1234
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234, 5555 }, new string[0]);
@@ -368,7 +380,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Editors
             var authHelper = new UserEditorAuthorizationHelper(
                 contentService.Object,
                 mediaService.Object,
-                entityService.Object);
+                entityService.Object,
+                AppCaches.Disabled);
 
             // removing 4567 start node even though currentUser doesn't have acces to it ... removing is ok
             Attempt<string> result = authHelper.IsAuthorized(currentUser, savingUser, new int[0], new[] { 1234 }, new string[0]);

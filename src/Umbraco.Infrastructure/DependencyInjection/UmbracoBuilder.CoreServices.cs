@@ -191,8 +191,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         {
             builder.Services.AddUnique<IMainDomLock>(factory =>
             {
-                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
-                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>().Value;
+                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
+                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>();
                 var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
@@ -200,7 +200,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
 
-                return globalSettings.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
+                return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
                     ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbCreator, hostingEnvironment, databaseSchemaCreatorFactory)
                     : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
             });

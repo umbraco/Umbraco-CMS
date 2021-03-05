@@ -27,6 +27,7 @@ namespace Umbraco.Cms.Core
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
+        /// The initial <see cref="RuntimeState"/>
         /// </summary>
         public static RuntimeState Booting() => new RuntimeState() { Level = RuntimeLevel.Boot };
 

@@ -1,4 +1,5 @@
 using System.Web;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Core
 {
@@ -36,7 +37,7 @@ namespace Umbraco.Core
                 if (string.IsNullOrEmpty(ipAddress))
                     return request.UserHostAddress;
 
-                var addresses = ipAddress.Split(',');
+                var addresses = ipAddress.Split(Constants.CharArrays.Comma);
                 if (addresses.Length != 0)
                     return addresses[0];
 

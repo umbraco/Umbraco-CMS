@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.Routing
                     yield break;
 
                 var umbracoUrlName = node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
-                var aliases = umbracoUrlName?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var aliases = umbracoUrlName?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
                 if (aliases == null || aliases.Any() == false)
                     yield break;
@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Core.Routing
                         ? node.Value<string>(_publishedValueFallback,Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture)
                         : node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
 
-                    var aliases = umbracoUrlName?.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries);
+                    var aliases = umbracoUrlName?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
                     if (aliases == null || aliases.Any() == false)
                         continue;
@@ -138,8 +138,8 @@ namespace Umbraco.Cms.Core.Routing
 
         string CombinePaths(string path1, string path2)
         {
-            string path = path1.TrimEnd('/') + path2;
-            return path == "/" ? path : path.TrimEnd('/');
+            string path = path1.TrimEnd(Constants.CharArrays.ForwardSlash) + path2;
+            return path == "/" ? path : path.TrimEnd(Constants.CharArrays.ForwardSlash);
         }
 
         #endregion

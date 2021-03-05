@@ -480,8 +480,8 @@ namespace Umbraco.Tests.Testing
 
             Builder.Services.AddUnique<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
 
-            var globalSettings = new GlobalSettings();
-            var connectionStrings = new ConnectionStrings();
+            var globalSettings = Microsoft.Extensions.Options.Options.Create(new GlobalSettings());
+            var connectionStrings = Microsoft.Extensions.Options.Options.Create(new ConnectionStrings());
 
             Builder.Services.AddUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(_loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 LoggerFactory,

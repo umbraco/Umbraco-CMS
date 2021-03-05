@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
         public LogViewerConfig(IHostingEnvironment hostingEnvironment)
         {
             _hostingEnvironment = hostingEnvironment;
-            var trimmedPath = _pathToSearches.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar);
+            var trimmedPath = _pathToSearches.TrimStart(Constants.CharArrays.TildeForwardSlash).Replace('/', Path.DirectorySeparatorChar);
             var absolutePath = Path.Combine(_hostingEnvironment.ApplicationPhysicalPath, trimmedPath);
             _searchesConfig = new FileInfo(absolutePath);
         }
