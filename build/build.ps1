@@ -441,17 +441,18 @@
         -c Release `
         -p:PackageVersion="$($this.Version.Semver.ToString())" > "$($this.BuildTemp)\pack.umbraco.log"
 
-    &dotnet pack "$($this.SolutionRoot)\src\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" `
-        --output "$($this.BuildOutput)" `
-        --verbosity detailed `
-        -c Release `
-        -p:PackageVersion="$($this.Version.Semver.ToString())" > "$($this.BuildTemp)\pack.umbraco.Lucene.log"
-
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
+
+    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Lucene.nuspec" `
+        -Properties BuildTmp="$($this.BuildTemp)" `
+        -Version "$($this.Version.Semver.ToString())" `
+        -Verbosity detailed  `
+        -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.lucene.log"
+    if (-not $?) { throw "Failed to pack Nuget UmbracoCms.Lucene.nuspec"}
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.SqlCe.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `

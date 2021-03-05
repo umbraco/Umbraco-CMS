@@ -5,6 +5,9 @@
         <RootNamespace>Umbraco.Cms.Infrastructure.Examine</RootNamespace>
         <Product>Umbraco CMS</Product>
         <Title>Umbraco.Examine.Lucene</Title>
+        <!--We have a specific nuspec file for this, do not pack. -->
+        <IsPackable>false</IsPackable>
+        <!-- But we still need to have PackageId for the depdents to know the actual name of the package. -->
         <PackageId>Umbraco.Cms.Examine.Lucene</PackageId>
     </PropertyGroup>
 
