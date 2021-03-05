@@ -51,12 +51,13 @@
 
                 const defaultOptions = {
                     axis: 'y',
-                    distance: 10,
                     tolerance: "pointer",
                     opacity: 0.7,
                     scroll: true,
                     cursor: "move",
-                    zIndex: 6000
+                    zIndex: 6000,
+                    forcePlaceholderSize: true,
+                    dropOnEmpty: true
                 };
 
                 scope.sortableOptionsGroup = {
@@ -64,24 +65,6 @@
                     placeholder: "umb-group-builder__group-sortable-placeholder",
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
-                    start: function (e, ui) {
-                        ui.placeholder.height(ui.item.height());
-                    },
-                    stop: function (e, ui) {
-                        updateTabsSortOrder();
-                    }
-                };
-
-                scope.sortableOptionsTabs = {
-                    ...defaultOptions,
-                    axis: 'x',
-                    placeholder: "umb-group-builder__tab-sortable-placeholder",
-                    handle: ".umb-group-builder__tab-handle",
-                    items: ".umb-group-builder__tab-sortable",
-                    start: function (e, ui) {
-                        ui.placeholder.height(ui.item.height());
-                        ui.placeholder.width(ui.item.width());
-                    },
                     stop: function (e, ui) {
                         updateTabsSortOrder();
                     }
@@ -92,9 +75,6 @@
                     placeholder: "umb-group-builder__group-sortable-placeholder",
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__fieldset-sortable",
-                    start: function (e, ui) {
-                        ui.placeholder.height(ui.item.height());
-                    },
                     stop: function (e, ui) {
                         updateFieldsetsSortOrder();
                     }
@@ -102,15 +82,26 @@
 
                 scope.sortableOptionsProperty = {
                     ...defaultOptions,
+                    axis: '',
                     connectWith: ".umb-group-builder__properties",
                     placeholder: "umb-group-builder__property_sortable-placeholder",
                     handle: ".umb-group-builder__property-handle",
                     items: ".umb-group-builder__property-sortable",
-                    start: function (e, ui) {
-                        ui.placeholder.height(ui.item.height());
-                    },
+                    helper: "clone",
+                    appendTo: "body",
                     stop: function (e, ui) {
                         updatePropertiesSortOrder();
+                    }
+                };
+
+                scope.droppableOptionsTab = {
+                    accept: '.umb-group-builder__property-sortable',
+                    tolerance : 'pointer',
+                    over: function (evt, ui) {
+                        const tabDropId = evt.target.dataset.tabDropId ? parseInt(evt.target.dataset.tabDropId) : null;
+                        const tabIndex = scope.model.groups.findIndex(group => group.id === tabDropId);
+                        scope.openTabIndex = tabIndex !== -1 ? tabIndex : scope.openTabIndex;
+                        scope.$evalAsync();
                     }
                 };
             }

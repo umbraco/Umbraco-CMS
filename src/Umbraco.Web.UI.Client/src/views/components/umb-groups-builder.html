@@ -47,7 +47,7 @@
     <!-- WITH TABS --->
     <div ng-if="model.hasTabs">
         <ul class="umb-group-builder__tabs" ui-sortable="sortableOptionsTabs" ng-model="model.groups">
-            <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__tab-sortable': sortingMode}">
+            <li ng-repeat="tab in model.groups" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-drop-id="{{tab.id}}">
                 <div ng-if="tab.tabState !== 'init'" ng-click="changeTab($index)" class="umb-group-builder__tab" ng-class="{'is-active': $index === openTabIndex, 'is-inherited': tab.inherited, 'umb-group-builder__tab-handle -sortable': sortingMode && !tab.inherited}">
                     <div>
                         <div class="umb-group-builder__tab-inherited-label" ng-if="tab.inherited">
