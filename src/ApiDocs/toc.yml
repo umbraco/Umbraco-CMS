@@ -1,19 +1,5 @@
 - name: Core
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Core.html
-- name: Infrastructure
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Infrastructure.html
-- name: Examine.Lucene
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Examine.Lucene.html
-- name: SqlCe
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Persistence.SqlCe.html
-- name: NuCache
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.PublishedCache.NuCache.html
-- name: Web.Common
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Web.Common.html
-- name: Web.BackOffice
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Web.BackOffice.html
-- name: Web.Website
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Cms.Web.Website.html
+  href: api/Umbraco.Cms.Core.html
 - name: Extensions
-  href: https://our.umbraco.com/apidocs/csharp/api/Umbraco.Extensions.html
+  href: api/Umbraco.Extensions.html
 
