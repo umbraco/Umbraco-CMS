@@ -298,7 +298,7 @@ stages:
                       errorActionPreference: continue
                       workingDirectory: build
                 - task: PublishPipelineArtifact@1
-                      displayName: Publish to artifacts - JS Docs
+                  displayName: Publish to artifacts - JS Docs
                   inputs:
                       targetPath: $(Build.Repository.LocalPath)\build.out\
                       artifact: docs
