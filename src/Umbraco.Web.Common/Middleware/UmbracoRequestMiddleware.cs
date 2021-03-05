@@ -4,12 +4,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
@@ -153,7 +155,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
         /// <summary>
         /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
         /// </summary>
-        private static void DisposeRequestCacheItems(ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, HttpRequest request)
+        private void DisposeRequestCacheItems(ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, HttpRequest request)
         {
             // do not process if client-side request
             if (request.IsClientSideRequest())
@@ -161,37 +163,16 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 return;
             }
 
-            // get a list of keys to dispose
-            var keys = new HashSet<string>();
-            foreach (var i in requestCache)
+            // dispose the request cache at the end of the request
+            // and it can take care of disposing it's items if there are any
+            if (requestCache is IDisposable rd)
             {
-                if (i.Value is IDisposeOnRequestEnd || i.Key is IDisposeOnRequestEnd)
-                {
-                    keys.Add(i.Key);
-                }
+                rd.Dispose();
             }
 
-            // dispose each item and key that was found as disposable.
-            foreach (var k in keys)
-            {
-                try
-                {
-                    requestCache.Get(k).DisposeIfDisposable();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError("Could not dispose item with key " + k, ex);
-                }
-
-                try
-                {
-                    k.DisposeIfDisposable();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError("Could not dispose item key " + k, ex);
-                }
-            }
+            // ensure this is disposed by DI at the end of the request
+            IHttpScopeReference httpScopeReference = request.HttpContext.RequestServices.GetRequiredService<IHttpScopeReference>();            
+            httpScopeReference.Register();
         }
 
         /// <summary>

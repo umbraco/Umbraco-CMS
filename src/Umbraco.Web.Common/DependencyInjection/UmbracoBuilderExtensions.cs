@@ -286,7 +286,6 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<ContentModelBinder>();
 
             builder.Services.AddScoped<UmbracoHelper>();
-            builder.Services.AddScoped<RequestLock>();
             builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
             builder.Services.AddScoped<IUmbracoWebsiteSecurity, UmbracoWebsiteSecurity>();
 

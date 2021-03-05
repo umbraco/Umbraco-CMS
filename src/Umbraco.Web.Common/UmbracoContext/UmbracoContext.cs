@@ -13,6 +13,9 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
+    // TODO: When https://github.com/umbraco/Umbraco-CMS/pull/9916 is merged, remove IDisposeOnRequestEnd
+    // and just explicitly register the created UmbracoContext with being disposed on end request with
+    // the HttpContext.Response
     public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
     {
         private readonly IHostingEnvironment _hostingEnvironment;

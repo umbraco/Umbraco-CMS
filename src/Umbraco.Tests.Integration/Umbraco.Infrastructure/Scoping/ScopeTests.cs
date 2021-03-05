@@ -2,6 +2,8 @@
 // See LICENSE for more details.
 
 using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Castle.Core.Logging;
@@ -9,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -25,9 +28,18 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         [SetUp]
         public void SetUp() => Assert.IsNull(ScopeProvider.AmbientScope); // gone
 
+        protected override AppCaches GetAppCaches()
+        {
+            // Need to have a mockable request cache for tests
+            var appCaches = new AppCaches(
+                NoAppCache.Instance,
+                Mock.Of<IRequestCache>(x => x.IsAvailable == false),
+                new IsolatedCaches(_ => NoAppCache.Instance));
+            return appCaches;
+        }
+
         [Test]
-        [Ignore("This does not occur in netcore currently because we are not tracking children, nor 'top' Ambient")]
-        public void GivenChildThread_WhenTheParentDisposes_ThenInvalidOperationExceptionThrows()
+        public void GivenUncompletedScopeOnChildThread_WhenTheParentCompletes_TheTransactionIsRolledBack()
         {
             ScopeProvider scopeProvider = ScopeProvider;
 
@@ -36,25 +48,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
             var t = Task.Run(() =>
             {
-                Console.WriteLine("Child Task start: " + scopeProvider.AmbientScope.InstanceId);
-                // This will evict the parent and set the child
                 IScope nested = scopeProvider.CreateScope();
-                Console.WriteLine("Child Task scope created: " + scopeProvider.AmbientScope.InstanceId);
-                Thread.Sleep(2000); // block, which means the parent stays evicted for a bit
-                Console.WriteLine("Child Task before dispose: " + scopeProvider.AmbientScope.InstanceId);
-                nested.Dispose(); // disposing the child will re-add the parent but it's too late, the parent has tried to dispose
-                Console.WriteLine("Child Task after dispose: " + scopeProvider.AmbientScope.InstanceId);
+                Thread.Sleep(2000);
+                nested.Dispose();
             });
 
-            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() =>
-            {
-                Console.WriteLine("Parent Task disposing: " + scopeProvider.AmbientScope?.InstanceId);
-                mainScope.Dispose(); // oops! the parent has been evicted at this state
-                Console.WriteLine("Parent Task disposed: " + scopeProvider.AmbientScope?.InstanceId);
-            });
+            Thread.Sleep(1000); // mimic some long running operation that is shorter than the other thread
+            mainScope.Complete();
+            Assert.Throws<InvalidOperationException>(() => mainScope.Dispose());
 
             Task.WaitAll(t);
-            Console.WriteLine(ex);
         }
 
         [Test]
@@ -74,7 +77,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void GivenChildThread_WhenParentDisposedBeforeChild_ChildScopeThrows()
+        public void GivenChildThread_WhenParentDisposedBeforeChild_ParentScopeThrows()
         {
             ScopeProvider scopeProvider = ScopeProvider;
 
@@ -84,25 +87,25 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             var t = Task.Run(() =>
             {
                 Console.WriteLine("Child Task start: " + scopeProvider.AmbientScope.InstanceId);
+                // This will push the child scope to the top of the Stack
                 IScope nested = scopeProvider.CreateScope();
-                // AsyncLocal has flowed so the AmbientScope here is replaced with nested
-                // BUT the AmbientScope in the main thread is not replaced which means
-                // when the main thread's Scope compares this == AmbientScope it will be true,
-                // similarly when this nested thread's Scope compares this == AmbientScope it will also
-                // be true. This is why disposing the parent scope succeeds with an exception.
                 Console.WriteLine("Child Task scope created: " + scopeProvider.AmbientScope.InstanceId);
-                Thread.Sleep(2000); // block for a bit to ensure the parent task is disposed first
+                Thread.Sleep(5000); // block for a bit to ensure the parent task is disposed first
                 Console.WriteLine("Child Task before dispose: " + scopeProvider.AmbientScope.InstanceId);
-                ObjectDisposedException ex = Assert.Throws<ObjectDisposedException>(() => nested.Dispose());
-                Console.WriteLine(ex);
+                nested.Dispose();
+                Console.WriteLine("Child Task after dispose: " + scopeProvider.AmbientScope.InstanceId);
             });
 
+            // provide some time for the child thread to start so the ambient context is copied in AsyncLocal
+            Thread.Sleep(2000);
             // now dispose the main without waiting for the child thread to join
             Console.WriteLine("Parent Task disposing: " + scopeProvider.AmbientScope.InstanceId);
-            mainScope.Dispose();
+            // This will throw because at this stage a child scope has been created which means
+            // it is the Ambient (top) scope but here we're trying to dispose the non top scope.
+            Assert.Throws<InvalidOperationException>(() => mainScope.Dispose());
+            Task.WaitAll(t);        // wait for the child to dispose
+            mainScope.Dispose();    // now it's ok
             Console.WriteLine("Parent Task disposed: " + scopeProvider.AmbientScope?.InstanceId);
-
-            Task.WaitAll(t);
         }
 
         [Test]
@@ -120,12 +123,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             var t = Task.Run(() =>
             {
                 Console.WriteLine("Child Task start: " + scopeProvider.AmbientScope.InstanceId);
-                IScope nested = scopeProvider.CreateScope();                
+                IScope nested = scopeProvider.CreateScope();
                 Console.WriteLine("Child Task before dispose: " + scopeProvider.AmbientScope.InstanceId);
                 nested.Dispose();
                 Console.WriteLine("Child Task after disposed: " + scopeProvider.AmbientScope.InstanceId);
             });
-            
+
             Thread.Sleep(2000); // block for a bit to ensure the child task is disposed first
             Console.WriteLine("Parent Task disposing: " + scopeProvider.AmbientScope.InstanceId);
             mainScope.Dispose();
@@ -219,6 +222,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         [Test]
         public void NestedMigrateScope()
         {
+            // Get the request cache mock and re-configure it to be available and used
+            var requestCacheDictionary = new Dictionary<string, object>();            
+            IRequestCache requestCache = AppCaches.RequestCache;
+            var requestCacheMock = Mock.Get(requestCache);
+            requestCacheMock
+                .Setup(x => x.IsAvailable)
+                .Returns(true);
+            requestCacheMock
+                .Setup(x => x.Set(It.IsAny<string>(), It.IsAny<object>()))
+                .Returns((string key, object val) =>
+                {
+                    requestCacheDictionary.Add(key, val);
+                    return true;
+                });
+            requestCacheMock
+                .Setup(x => x.Get(It.IsAny<string>()))
+                .Returns((string key) => requestCacheDictionary.TryGetValue(key, out var val) ? val : null);
+
             ScopeProvider scopeProvider = ScopeProvider;
             Assert.IsNull(scopeProvider.AmbientScope);
 
@@ -236,8 +257,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                     Assert.AreSame(scope, ((Scope)nested).ParentScope);
 
                     // it's moved over to call context
-                    IScope callContextScope = CallContext<IScope>.GetData(ScopeProvider.ScopeItemKey);
+                    ScopeStack<IScope> callContextScope = CallContext<ScopeStack<IScope>>.GetData(ScopeProvider.ScopeItemKey);
                     Assert.IsNotNull(callContextScope);
+                    Assert.AreEqual(2, callContextScope.Count);
                 }
 
                 // it's naturally back in http context
@@ -595,7 +617,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             IScope scope = scopeProvider.CreateScope();
             IScope nested = scopeProvider.CreateScope();
             Assert.IsNotNull(scopeProvider.AmbientScope);
-            var scopeRef = new ScopeReference(scopeProvider);
+            var scopeRef = new HttpScopeReference(scopeProvider);
             scopeRef.Dispose();
             Assert.IsNull(scopeProvider.AmbientScope);
             Assert.Throws<ObjectDisposedException>(() =>

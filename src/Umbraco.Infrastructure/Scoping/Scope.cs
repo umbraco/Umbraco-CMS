@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Extensions;
 using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
 
 namespace Umbraco.Cms.Core.Scoping
@@ -71,6 +70,7 @@ namespace Umbraco.Cms.Core.Scoping
 
             Detachable = detachable;
 
+            // TODO: The DEBUG_SCOPES flag will not work with recent Stack changes
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
             logger.LogDebug("create " + InstanceId.ToString("N").Substring(0, 8));
@@ -188,8 +188,16 @@ namespace Umbraco.Cms.Core.Scoping
         {
             get
             {
-                if (_callContext) return true;
-                if (ParentScope != null) return ParentScope.CallContext;
+                if (_callContext)
+                {
+                    return true;
+                }
+
+                if (ParentScope != null)
+                {
+                    return ParentScope.CallContext;
+                }
+
                 return false;
             }
             set => _callContext = value;
@@ -199,7 +207,11 @@ namespace Umbraco.Cms.Core.Scoping
         {
             get
             {
-                if (ParentScope != null) return ParentScope.ScopedFileSystems;
+                if (ParentScope != null)
+                {
+                    return ParentScope.ScopedFileSystems;
+                }
+
                 return _fscope != null;
             }
         }
@@ -209,8 +221,16 @@ namespace Umbraco.Cms.Core.Scoping
         {
             get
             {
-                if (_repositoryCacheMode != RepositoryCacheMode.Unspecified) return _repositoryCacheMode;
-                if (ParentScope != null) return ParentScope.RepositoryCacheMode;
+                if (_repositoryCacheMode != RepositoryCacheMode.Unspecified)
+                {
+                    return _repositoryCacheMode;
+                }
+
+                if (ParentScope != null)
+                {
+                    return ParentScope.RepositoryCacheMode;
+                }
+
                 return RepositoryCacheMode.Default;
             }
         }
@@ -220,10 +240,12 @@ namespace Umbraco.Cms.Core.Scoping
         {
             get
             {
-                if (ParentScope != null) return ParentScope.IsolatedCaches;
+                if (ParentScope != null)
+                {
+                    return ParentScope.IsolatedCaches;
+                }
 
-                return _isolatedCaches ?? (_isolatedCaches
-                           = new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+                return _isolatedCaches ??= new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache()));
             }
         }
 
@@ -249,8 +271,16 @@ namespace Umbraco.Cms.Core.Scoping
         {
             get
             {
-                if (_isolationLevel != IsolationLevel.Unspecified) return _isolationLevel;
-                if (ParentScope != null) return ParentScope.IsolationLevel;
+                if (_isolationLevel != IsolationLevel.Unspecified)
+                {
+                    return _isolationLevel;
+                }
+
+                if (ParentScope != null)
+                {
+                    return ParentScope.IsolationLevel;
+                }
+
                 return Database.SqlContext.SqlSyntax.DefaultIsolationLevel;
             }
         }
@@ -263,14 +293,19 @@ namespace Umbraco.Cms.Core.Scoping
                 EnsureNotDisposed();
 
                 if (_database != null)
+                {
                     return _database;
+                }
 
                 if (ParentScope != null)
                 {
-                    var database = ParentScope.Database;
-                    var currentLevel = database.GetCurrentTransactionIsolationLevel();
+                    IUmbracoDatabase database = ParentScope.Database;
+                    IsolationLevel currentLevel = database.GetCurrentTransactionIsolationLevel();
                     if (_isolationLevel > IsolationLevel.Unspecified && currentLevel < _isolationLevel)
+                    {
                         throw new Exception("Scope requires isolation level " + _isolationLevel + ", but got " + currentLevel + " from parent.");
+                    }
+
                     return _database = database;
                 }
 
@@ -307,8 +342,12 @@ namespace Umbraco.Cms.Core.Scoping
             get
             {
                 EnsureNotDisposed();
-                if (ParentScope != null) return ParentScope.Messages;
-                return _messages ?? (_messages = new EventMessages());
+                if (ParentScope != null)
+                {
+                    return ParentScope.Messages;
+                }
+
+                return _messages ??= new EventMessages();
 
                 // TODO: event messages?
                 // this may be a problem: the messages collection will be cleared at the end of the scope
@@ -334,8 +373,12 @@ namespace Umbraco.Cms.Core.Scoping
             get
             {
                 EnsureNotDisposed();
-                if (ParentScope != null) return ParentScope.Events;
-                return _eventDispatcher ?? (_eventDispatcher = new QueuingEventDispatcher(_mediaFileSystem));
+                if (ParentScope != null)
+                {
+                    return ParentScope.Events;
+                }
+
+                return _eventDispatcher ??= new QueuingEventDispatcher(_mediaFileSystem);
             }
         }
 
@@ -343,14 +386,14 @@ namespace Umbraco.Cms.Core.Scoping
         public bool Complete()
         {
             if (_completed.HasValue == false)
+            {
                 _completed = true;
+            }
+
             return _completed.Value;
         }
 
-        public void Reset()
-        {
-            _completed = null;
-        }
+        public void Reset() => _completed = null;
 
         public void ChildCompleted(bool? completed)
         {
@@ -368,10 +411,17 @@ namespace Umbraco.Cms.Core.Scoping
 
         private void EnsureNotDisposed()
         {
+            // We can't be disposed
             if (_disposed)
             {
-                throw new ObjectDisposedException(GetType().FullName);
+                throw new ObjectDisposedException($"The {nameof(Scope)} ({this.GetDebugInfo()}) is already disposed");
             }
+
+            // And neither can our ancestors if we're trying to be disposed since
+            // a child must always be disposed before it's parent.
+            // This is a safety check, it's actually not entirely possible that a parent can be
+            // disposed before the child since that will end up with a "not the Ambient" exception.
+            ParentScope?.EnsureNotDisposed();
 
             // TODO: safer?
             //if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
@@ -381,7 +431,6 @@ namespace Umbraco.Cms.Core.Scoping
         public void Dispose()
         {
             EnsureNotDisposed();
-
 
             if (this != _scopeProvider.AmbientScope)
             {
@@ -405,8 +454,9 @@ namespace Umbraco.Cms.Core.Scoping
 #endif
             }
 
-            var parent = ParentScope;
-            _scopeProvider.AmbientScope = parent; // might be null = this is how scopes are removed from context objects
+            // Replace the Ambient scope with the parent
+            Scope parent = ParentScope;
+            _scopeProvider.PopAmbientScope(this); // pop, the parent is on the stack so is now current
 
 #if DEBUG_SCOPES
             _scopeProvider.Disposed(this);
@@ -441,9 +491,13 @@ namespace Umbraco.Cms.Core.Scoping
                 try
                 {
                     if (completed)
+                    {
                         _database.CompleteTransaction();
+                    }
                     else
+                    {
                         _database.AbortTransaction();
+                    }
                 }
                 catch
                 {
@@ -456,7 +510,9 @@ namespace Umbraco.Cms.Core.Scoping
                     _database = null;
 
                     if (databaseException)
+                    {
                         RobustExit(false, true);
+                    }
                 }
             }
 
@@ -478,14 +534,20 @@ namespace Umbraco.Cms.Core.Scoping
         //    to ensure we don't leave a scope around, etc
         private void RobustExit(bool completed, bool onException)
         {
-             if (onException) completed = false;
+             if (onException)
+            {
+                completed = false;
+            }
 
             TryFinally(() =>
             {
                 if (_scopeFileSystem == true)
                 {
                     if (completed)
+                    {
                         _fscope.Complete();
+                    }
+
                     _fscope.Dispose();
                     _fscope = null;
                 }
@@ -493,7 +555,9 @@ namespace Umbraco.Cms.Core.Scoping
             {
                 // deal with events
                 if (onException == false)
+                {
                     _eventDispatcher?.ScopeExit(completed);
+                }
             }, () =>
             {
                 // if *we* created it, then get rid of it
@@ -506,7 +570,7 @@ namespace Umbraco.Cms.Core.Scoping
                     finally
                     {
                         // removes the ambient context (ambient scope already gone)
-                        _scopeProvider.SetAmbient(null);
+                        _scopeProvider.PopAmbientScopeContext();
                     }
                 }
             }, () =>
@@ -514,7 +578,18 @@ namespace Umbraco.Cms.Core.Scoping
                 if (Detachable)
                 {
                     // get out of the way, restore original
-                    _scopeProvider.SetAmbient(OrigScope, OrigContext);
+
+                    // TODO: Difficult to know if this is correct since this is all required
+                    // by Deploy which I don't fully understand since there is limited tests on this in the CMS
+                    if (OrigScope != _scopeProvider.AmbientScope)
+                    {
+                        _scopeProvider.PopAmbientScope(_scopeProvider.AmbientScope);
+                    }
+                    if (OrigContext != _scopeProvider.AmbientContext)
+                    {
+                        _scopeProvider.PopAmbientScopeContext();
+                    }
+
                     Attached = false;
                     OrigScope = null;
                     OrigContext = null;

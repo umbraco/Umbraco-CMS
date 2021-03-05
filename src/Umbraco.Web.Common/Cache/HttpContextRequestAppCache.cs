@@ -6,6 +6,7 @@ using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Extensions;
 
@@ -20,7 +21,7 @@ namespace Umbraco.Cms.Core.Cache
     /// in order to facilitate the correct locking and releasing allocations.
     /// </para>
     /// </remarks>
-    public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCache
+    public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCache, IDisposable
     {
         //private static readonly string s_contextItemsLockKey = $"{typeof(HttpContextRequestAppCache).FullName}::LockEntered";
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -28,8 +29,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestAppCache"/> class with a context, for unit tests!
         /// </summary>
-        public HttpContextRequestAppCache(IHttpContextAccessor httpContextAccessor)
-            => _httpContextAccessor = httpContextAccessor;
+        public HttpContextRequestAppCache(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
 
         public bool IsAvailable => TryGetContextItems(out _);
 
@@ -80,14 +80,16 @@ namespace Umbraco.Cms.Core.Cache
             //return result.Value;
 
             var value = result.Value; // will not throw (safe lazy)
-            if (value is SafeLazy.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
+            if (value is SafeLazy.ExceptionHolder eh)
+                eh.Exception.Throw(); // throw once!
             return value;
         }
 
         public bool Set(string key, object value)
         {
             //no place to cache so just return the callback result
-            if (!TryGetContextItems(out var items)) return false;
+            if (!TryGetContextItems(out var items))
+                return false;
             key = GetCacheKey(key);
             try
             {
@@ -105,7 +107,8 @@ namespace Umbraco.Cms.Core.Cache
         public bool Remove(string key)
         {
             //no place to cache so just return the callback result
-            if (!TryGetContextItems(out var items)) return false;
+            if (!TryGetContextItems(out var items))
+                return false;
             key = GetCacheKey(key);
             try
             {
@@ -126,7 +129,8 @@ namespace Umbraco.Cms.Core.Cache
         {
             const string prefix = CacheItemPrefix + "-";
 
-            if (!TryGetContextItems(out var items)) return Enumerable.Empty<KeyValuePair<object, object>>();
+            if (!TryGetContextItems(out var items))
+                return Enumerable.Empty<KeyValuePair<object, object>>();
 
             return items.Cast<KeyValuePair<object, object>>()
                 .Where(x => x.Key is string s && s.StartsWith(prefix));
@@ -134,7 +138,8 @@ namespace Umbraco.Cms.Core.Cache
 
         protected override void RemoveEntry(string key)
         {
-            if (!TryGetContextItems(out var items)) return;
+            if (!TryGetContextItems(out var items))
+                return;
 
             items.Remove(key);
         }
@@ -150,51 +155,47 @@ namespace Umbraco.Cms.Core.Cache
 
         protected override void EnterReadLock()
         {
-            if (!TryGetContextItems(out _))
+            object locker = GetLock();
+            if (locker == null)
             {
                 return;
             }
-
-            ReaderWriterLockSlim locker = GetLock();
-            locker.EnterReadLock();
+            Monitor.Enter(locker);
         }
 
         protected override void EnterWriteLock()
         {
-            if (!TryGetContextItems(out _))
+            object locker = GetLock();
+            if (locker == null)
             {
                 return;
             }
-
-            ReaderWriterLockSlim locker = GetLock();
-            locker.EnterWriteLock();
+            Monitor.Enter(locker);
         }
 
         protected override void ExitReadLock()
         {
-            if (!TryGetContextItems(out _))
+            object locker = GetLock();
+            if (locker == null)
             {
                 return;
             }
-
-            ReaderWriterLockSlim locker = GetLock();
-            if (locker.IsReadLockHeld)
+            if (Monitor.IsEntered(locker))
             {
-                locker.ExitReadLock();
+                Monitor.Exit(locker);
             }
         }
 
         protected override void ExitWriteLock()
         {
-            if (!TryGetContextItems(out _))
+            object locker = GetLock();
+            if (locker == null)
             {
                 return;
             }
-
-            ReaderWriterLockSlim locker = GetLock();
-            if (locker.IsWriteLockHeld)
+            if (Monitor.IsEntered(locker))
             {
-                locker.ExitWriteLock();
+                Monitor.Exit(locker);
             }
         }
 
@@ -202,12 +203,12 @@ namespace Umbraco.Cms.Core.Cache
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            if (!TryGetContextItems(out var items))
+            if (!TryGetContextItems(out IDictionary<object, object> items))
             {
                 yield break;
             }
 
-            foreach (var item in items)
+            foreach (KeyValuePair<object, object> item in items)
             {
                 yield return new KeyValuePair<string, object>(item.Key.ToString(), item.Value);
             }
@@ -219,35 +220,72 @@ namespace Umbraco.Cms.Core.Cache
         /// Ensures and returns the current lock
         /// </summary>
         /// <returns></returns>
-        private ReaderWriterLockSlim GetLock() => _httpContextAccessor.GetRequiredHttpContext().RequestServices.GetRequiredService<RequestLock>().Locker;
+        private object GetLock()
+        {
+            HttpContext httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                return null;
+            }
+
+            RequestLock requestLock = httpContext.Features.Get<RequestLock>();
+            if (requestLock != null)
+            {
+                return requestLock.SyncRoot;
+            }
+
+            IFeatureCollection features = httpContext.Features;
+            HttpResponse response = httpContext.Response;
+
+            lock (httpContext)
+            {
+                requestLock = new RequestLock();
+                features.Set(requestLock);
+                return requestLock.SyncRoot;
+            }
+        }
+
+        // This is not a typical dispose pattern since this can be called multiple times to dispose
+        // whatever might be in the current context.
+        public void Dispose()
+        {
+            // need to resolve from request services since IRequestCache is a non DI service and we don't have a logger when created
+            ILogger<HttpContextRequestAppCache> logger = _httpContextAccessor.HttpContext?.RequestServices?.GetRequiredService<ILogger<HttpContextRequestAppCache>>();
+            foreach (KeyValuePair<string, object> i in this)
+            {
+                // NOTE: All of these will be Lazy<object> since that is how this cache works,
+                // but we'll include the 2nd check too
+                if (i.Value is Lazy<object> lazy && lazy.IsValueCreated && lazy.Value is IDisposeOnRequestEnd doer1)
+                {
+                    try
+                    {
+                        doer1.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError("Could not dispose item with key " + i.Key, ex);
+                    }
+                }
+                else if (i.Value is IDisposeOnRequestEnd doer2)
+                {
+                    try
+                    {
+                        doer2.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        logger.LogError("Could not dispose item with key " + i.Key, ex);
+                    }
+                }
+            }
+        }
 
         /// <summary>
         /// Used as Scoped instance to allow locking within a request
         /// </summary>
-        internal class RequestLock : IDisposable
+        private class RequestLock
         {
-            private bool _disposedValue;
-
-            public ReaderWriterLockSlim Locker { get; } = new ReaderWriterLockSlim();
-
-            protected virtual void Dispose(bool disposing)
-            {
-                if (!_disposedValue)
-                {
-                    if (disposing)
-                    {
-                        Locker.Dispose();
-                    }
-
-                    _disposedValue = true;
-                }
-            }
-
-            public void Dispose()
-            {
-                // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-                Dispose(disposing: true);
-            }
+            public object SyncRoot { get; } = new object();
         }
     }
 }
