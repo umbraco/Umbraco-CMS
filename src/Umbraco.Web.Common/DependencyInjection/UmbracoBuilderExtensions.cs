@@ -271,10 +271,6 @@ namespace Umbraco.Extensions
 
             builder.Services.AddUnique<InstallAreaRoutes>();
 
-
-
-
-
             builder.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
             builder.Services.AddUnique<UmbracoRequestMiddleware>();
             builder.Services.AddUnique<BootFailedMiddleware>();
