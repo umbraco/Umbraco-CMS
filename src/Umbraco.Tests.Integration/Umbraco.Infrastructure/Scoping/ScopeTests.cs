@@ -618,6 +618,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             IScope nested = scopeProvider.CreateScope();
             Assert.IsNotNull(scopeProvider.AmbientScope);
             var scopeRef = new HttpScopeReference(scopeProvider);
+            scopeRef.Register();
             scopeRef.Dispose();
             Assert.IsNull(scopeProvider.AmbientScope);
             Assert.Throws<ObjectDisposedException>(() =>
