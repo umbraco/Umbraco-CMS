@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         /// </summary>
         protected UmbracoPageResult CurrentUmbracoPage()
         {
-            HttpContext.Features.Set(new ProxyViewDataFeature(ViewData));
+            HttpContext.Features.Set(new ProxyViewDataFeature(ViewData, TempData));
             return new UmbracoPageResult(ProfilingLogger);
         }
     }

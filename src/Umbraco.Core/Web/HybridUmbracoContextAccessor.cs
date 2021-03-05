@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Cms.Core.Web
 {
@@ -13,9 +13,6 @@ namespace Umbraco.Cms.Core.Web
         public HybridUmbracoContextAccessor(IRequestCache requestCache)
             : base(requestCache)
         { }
-
-        /// <inheritdoc />
-        protected override string ItemKey => "Umbraco.Web.HybridUmbracoContextAccessor";
 
         /// <summary>
         /// Gets or sets the <see cref="UmbracoContext"/> object.

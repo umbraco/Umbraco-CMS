@@ -256,6 +256,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
 
             builder.Services.AddUnique<IMacroRenderer, MacroRenderer>();
+            builder.Services.AddUnique<PartialViewMacroEngine>();
             builder.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
 
             // register the umbraco context factory
@@ -263,6 +264,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             builder.Services.AddUnique<IBackOfficeSecurityFactory, BackOfficeSecurityFactory>();
             builder.Services.AddUnique<IBackOfficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
+            builder.AddNotificationHandler<UmbracoRoutedRequest, UmbracoWebsiteSecurityFactory>();
             builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, HybridUmbracoWebsiteSecurityAccessor>();
 
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
