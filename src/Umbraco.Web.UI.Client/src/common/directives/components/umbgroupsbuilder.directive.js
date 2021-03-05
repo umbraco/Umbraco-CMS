@@ -57,6 +57,7 @@
                         const group = groupId ? scope.model.groups.find(group => group.id === parseInt(groupId)) : null;
                         group.tabId = scope.openTabId;
                         // TODO: Manually update the model based on the sorting of group in tabs
+                        // TODO: Run through groups and set the correct sort order
                         // updateGroupsSortOrder();
                     }
                 };
@@ -458,14 +459,10 @@
             scope.addGroup = function (tabId) {
                 scope.model.groups = scope.model.groups || [];
 
-
-
-
-                /*
+                // TODO: handle groups added on tabs in between other groups
                 const groupsInTab = tabId ? scope.model.groups.filter(group => group.tabId === tabId) : scope.model.groups;
                 const prevGroup = groupsInTab[groupsInTab.length - 1];
                 const sortOrder = prevGroup && prevGroup.sortOrder !== undefined ? prevGroup.sortOrder + 1 : 0;
-                */
 
                 const group = {
                     properties: [],
