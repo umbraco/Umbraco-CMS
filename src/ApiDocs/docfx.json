@@ -6,7 +6,8 @@
           "src": "../",
           "files": [
             "Umbraco.Core/Umbraco.Core.csproj",
-            "Umbraco.Examine.Lucene/Umbraco.Examine.Lucene.csproj"
+            "Umbraco.Examine.Lucene/Umbraco.Examine.Lucene.csproj",
+            "Umbraco.Infrastructure/Umbraco.Infrastructure.csproj",
           ],
           "exclude": [
             "**/obj/**",

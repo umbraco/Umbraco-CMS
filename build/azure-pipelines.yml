@@ -279,6 +279,12 @@ stages:
                       archiveType: zip
                       archiveFile: $(Build.ArtifactStagingDirectory)\docs\csharp-docs.zip
                       replaceExistingArchive: true
+                - task: PublishPipelineArtifact@1
+                  displayName: Publish to artifacts - C# Docs
+                  inputs:
+                      targetPath: $(Build.ArtifactStagingDirectory)\docs\
+                      artifact: docs
+                      publishLocation: pipeline
                 - task: PowerShell@2
                   displayName: Prep build tool - JS Docs
                   inputs:
@@ -292,6 +298,7 @@ stages:
                       errorActionPreference: continue
                       workingDirectory: build
                 - task: PublishPipelineArtifact@1
+                      displayName: Publish to artifacts - JS Docs
                   inputs:
                       targetPath: $(Build.Repository.LocalPath)\build.out\
                       artifact: docs
