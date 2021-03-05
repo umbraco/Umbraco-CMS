@@ -460,17 +460,13 @@
                 scope.model.groups = scope.model.groups || [];
 
                 // TODO: handle groups added on tabs in between other groups
-                const groupsInTab = tabId ? scope.model.groups.filter(group => group.tabId === tabId) : scope.model.groups;
-                const prevGroup = groupsInTab[groupsInTab.length - 1];
-                const sortOrder = prevGroup && prevGroup.sortOrder !== undefined ? prevGroup.sortOrder + 1 : 0;
 
                 const group = {
                     properties: [],
                     parentTabContentTypes: [],
                     parentTabContentTypeNames: [],
                     name: "",
-                    tabId: tabId || undefined,
-                    sortOrder
+                    tabId: tabId || undefined
                 };
 
                 scope.model.groups = [...scope.model.groups, group];
