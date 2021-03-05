@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the timeout
         /// </summary>
-        public TimeSpan TimeOut{ get; set; } = TimeSpan.FromMinutes(7);
+        public TimeSpan TimeOut{ get; set; } = TimeSpan.FromMinutes(20);
 
         /// <summary>
         /// Gets or sets a value for the default UI language.
