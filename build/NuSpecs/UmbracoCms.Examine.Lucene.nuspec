@@ -3,14 +3,14 @@
     <metadata minClientVersion="4.1.0">
         <id>Umbraco.Cms.Examine.Lucene</id>
         <version>9.0.0</version>
-        <title>Lucene Binaries</title>
+        <title>Umbraco CMS Examine Binaries</title>
         <authors>Umbraco HQ</authors>
         <owners>Umbraco HQ</owners>
         <license type="expression">MIT</license>
         <projectUrl>https://umbraco.com/</projectUrl>
         <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
         <requireLicenseAcceptance>false</requireLicenseAcceptance>
-        <description>Contains dll files required to run Examine.</description>
+        <description>Contains the Examine assemblies needed to run Umbraco Cms. This package only contains assemblies and can be used for package development. Use the UmbracoCms package to setup Umbraco in Visual Studio as an ASP.NET Core project.</description>
         <summary>Contains dll files required to run Examine.</summary>
         <language>en-US</language>
         <tags>umbraco</tags>

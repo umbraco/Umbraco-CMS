@@ -41,7 +41,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
 		..\build\NuSpecs\UmbracoCms.SqlCe.nuspec = ..\build\NuSpecs\UmbracoCms.SqlCe.nuspec
 		..\build\NuSpecs\UmbracoCms.Web.nuspec = ..\build\NuSpecs\UmbracoCms.Web.nuspec
-		..\build\NuSpecs\UmbracoCms.Lucene.nuspec = ..\build\NuSpecs\UmbracoCms.Lucene.nuspec
+		..\build\NuSpecs\UmbracoCms.Examine.Lucene.nuspec = ..\build\NuSpecs\UmbracoCms.Examine.Lucene.nuspec
 	EndProjectSection
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
