@@ -2,7 +2,6 @@
 
   <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
-      <LangVersion>latest</LangVersion>
       <RootNamespace>Umbraco.Cms.Tests.Common</RootNamespace>
       <PackageId>Umbraco.Cms.Tests</PackageId>
       <Title>Umbraco CMS Test Tools</Title>

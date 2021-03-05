@@ -37,6 +37,7 @@ namespace Umbraco.Cms.Web.Common.Macros
         private readonly ISessionManager _sessionManager;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly PartialViewMacroEngine _partialViewMacroEngine;
 
         public MacroRenderer(
             IProfilingLogger profilingLogger,
@@ -52,7 +53,8 @@ namespace Umbraco.Cms.Web.Common.Macros
             IMemberUserKeyProvider memberUserKeyProvider,
             ISessionManager sessionManager,
             IRequestAccessor requestAccessor,
-             IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            PartialViewMacroEngine partialViewMacroEngine)
         {
             _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
             _logger = logger;
@@ -68,6 +70,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             _sessionManager = sessionManager;
             _requestAccessor = requestAccessor;
             _httpContextAccessor = httpContextAccessor;
+            _partialViewMacroEngine = partialViewMacroEngine;
         }
 
         #region MacroContent cache
@@ -338,37 +341,26 @@ namespace Umbraco.Cms.Web.Common.Macros
         private Attempt<MacroContent> ExecuteMacroOfType(MacroModel model, IPublishedContent content)
         {
             if (model == null)
+            {
                 throw new ArgumentNullException(nameof(model));
+            }
 
             // ensure that we are running against a published node (ie available in XML)
             // that may not be the case if the macro is embedded in a RTE of an unpublished document
 
             if (content == null)
+            {
                 return Attempt.Fail(new MacroContent { Text = "[macro failed (no content)]" });
+            }
 
-            var textService = _textService;
 
             return ExecuteMacroWithErrorWrapper(model,
                           $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
                           "Executed PartialView.",
-                          () => ExecutePartialView(model, content),
-                          () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
+                          () => _partialViewMacroEngine.Execute(model, content),
+                          () => _textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
         }
 
-
-        #endregion
-
-        #region Execute engines
-
-        /// <summary>
-        /// Renders a PartialView Macro.
-        /// </summary>
-        /// <returns>The text output of the macro execution.</returns>
-        private MacroContent ExecutePartialView(MacroModel macro, IPublishedContent content)
-        {
-            var engine = new PartialViewMacroEngine(_httpContextAccessor, _hostingEnvironment);
-            return engine.Execute(macro, content);
-        }
 
         #endregion
 
