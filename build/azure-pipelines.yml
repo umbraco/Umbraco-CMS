@@ -246,9 +246,9 @@ stages:
       dependsOn: []
       condition: 'ne(variables[''Umbraco.IsReleaseBuild''], ''false'')'
       jobs:
-          - job: Generate_Docs
+          - job: Generate_Docs_CSharp
             timeoutInMinutes: 60
-            displayName: Generate Code Documentation
+            displayName: Generate C# Docs
             pool:
                 vmImage: windows-latest
             steps:
@@ -285,6 +285,13 @@ stages:
                       targetPath: $(Build.ArtifactStagingDirectory)\docs\
                       artifact: docs
                       publishLocation: pipeline
+
+          - job: Generate_Docs_JS
+            timeoutInMinutes: 60
+            displayName: Generate JS Docs
+            pool:
+                vmImage: windows-latest
+            steps:
                 - task: PowerShell@2
                   displayName: Prep build tool - JS Docs
                   inputs:
