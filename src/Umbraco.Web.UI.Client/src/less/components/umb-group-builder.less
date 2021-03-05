@@ -282,12 +282,15 @@ input.umb-group-builder__group-title-input:disabled:hover {
     }
 }
 
+.umb-group-builder__group-content {
+  padding: 10px 20px 20px 20px;
+}
+
 /* ---------- PROPERTIES ---------- */
 
 .umb-group-builder__properties {
   list-style: none;
   margin: 0;
-  padding: 15px;
   padding-right: 5px;
   min-height: 35px; // the height of a sortable property
 }
@@ -299,14 +302,6 @@ input.umb-group-builder__group-title-input:disabled:hover {
   box-sizing: border-box;
   border-bottom: 1px solid @gray-10; 
   padding: 10px 0;
-}
-
-.umb-group-builder__property:first-of-type {
-  padding-top: 0;
-}
-
-.umb-group-builder__property:last-of-type {
-  margin-bottom: 15px;
 }
 
 .umb-group-builder__property.-inherited {

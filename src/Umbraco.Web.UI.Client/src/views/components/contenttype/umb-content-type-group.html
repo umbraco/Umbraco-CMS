@@ -1,10 +1,10 @@
-<div class="umb-group-builder__group" ng-class="{'-inherited': vm.group.inherited, 'umb-group-builder__group-handle -sortable': vm.sorting}">
+<div class="umb-group-builder__group" ng-class="{'-inherited': vm.group.inherited, 'umb-group-builder__group-handle -sortable': vm.sorting && !vm.group.inherited}">
 
     <div class="umb-group-builder__group-title-wrapper" ng-if="vm.allowName">
 
         <ng-form name="groupNameForm" data-element="group-name">
             <div class="umb-group-builder__group-title control-group -no-margin" ng-class="{'-inherited': vm.group.inherited}">
-                <i class="umb-group-builder__group-title-icon icon-navigation" ng-if="vm.sorting"></i>
+                <i class="umb-group-builder__group-title-icon icon-navigation" ng-if="vm.sorting && !vm.group.inherited"></i>
                 <input data-element="group-name-field"
                         class="umb-group-builder__group-title-input"
                         type="text"
@@ -61,6 +61,8 @@
         </div>
     </div>
 
-    <ng-transclude></ng-transclude>
+    <div class="umb-group-builder__group-content">
+        <ng-transclude></ng-transclude>
+    </div>
 
 </div>

@@ -14,28 +14,11 @@
             scope.dataTypeHasChanged = false;
             scope.sortingMode = false;
             scope.toolbar = [];
-            scope.sortableOptionsGroup = {};
-            scope.sortableOptionsFieldset = {};
-            scope.sortableOptionsProperty = {};
-            scope.sortableOptionsTabs = {};
             scope.sortingButtonKey = "general_reorder";
             scope.compositionsButtonState = "init";
 
             function activate() {
-
                 setSortingOptions();
-
-                // set placeholder property on each group
-                if (scope.model.groups.length !== 0) {
-                    angular.forEach(scope.model.groups, function (group) {
-                        addInitProperty(group);
-                    });
-                }
-
-                // add init tab
-                addInitGroup(scope.model.groups);
-
-                activateFirstGroup(scope.model.groups);
 
                 // localize texts
                 localizationService.localize("validation_validation").then(function (value) {
@@ -50,63 +33,56 @@
             function setSortingOptions() {
 
                 const defaultOptions = {
-                    axis: 'y',
+                    axis: '',
                     tolerance: "pointer",
                     opacity: 0.7,
                     scroll: true,
                     cursor: "move",
                     zIndex: 6000,
                     forcePlaceholderSize: true,
-                    dropOnEmpty: true
+                    dropOnEmpty: true,
+                    helper: "clone",
+                    appendTo: "body"
                 };
 
                 scope.sortableOptionsGroup = {
                     ...defaultOptions,
+                    connectWith: ".umb-group-builder__groups",
                     placeholder: "umb-group-builder__group-sortable-placeholder",
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
-                    stop: function (e, ui) {
-                        updateTabsSortOrder();
-                    }
-                };
-
-                scope.sortableOptionsFieldset = {
-                    ...defaultOptions,
-                    placeholder: "umb-group-builder__group-sortable-placeholder",
-                    handle: ".umb-group-builder__group-handle",
-                    items: ".umb-group-builder__fieldset-sortable",
-                    stop: function (e, ui) {
-                        updateFieldsetsSortOrder();
+                    stop: function (event, ui) {
+                        // make sure reference to tab is correct
+                        const groupId = ui.item[0].dataset.groupId ? parseInt(ui.item[0].dataset.groupId) : null;
+                        const group = groupId ? scope.model.groups.find(group => group.id === parseInt(groupId)) : null;
+                        group.tabId = scope.openTabId;
+                        // TODO: Manually update the model based on the sorting of group in tabs
+                        // updateGroupsSortOrder();
                     }
                 };
 
                 scope.sortableOptionsProperty = {
                     ...defaultOptions,
-                    axis: '',
                     connectWith: ".umb-group-builder__properties",
                     placeholder: "umb-group-builder__property_sortable-placeholder",
                     handle: ".umb-group-builder__property-handle",
                     items: ".umb-group-builder__property-sortable",
-                    helper: "clone",
-                    appendTo: "body",
                     stop: function (e, ui) {
-                        updatePropertiesSortOrder();
+                        // updatePropertiesSortOrder();
                     }
                 };
 
                 scope.droppableOptionsTab = {
-                    accept: '.umb-group-builder__property-sortable',
+                    accept: '.umb-group-builder__property-sortable, .umb-group-builder__group-sortable',
                     tolerance : 'pointer',
                     over: function (evt, ui) {
-                        const tabDropId = evt.target.dataset.tabDropId ? parseInt(evt.target.dataset.tabDropId) : null;
-                        const tabIndex = scope.model.groups.findIndex(group => group.id === tabDropId);
-                        scope.openTabIndex = tabIndex !== -1 ? tabIndex : scope.openTabIndex;
+                        scope.openTabId = evt.target.dataset.tabId ? parseInt(evt.target.dataset.tabId) : null;
                         scope.$evalAsync();
                     }
                 };
             }
 
-            function updateTabsSortOrder() {
+            function updateGroupsSortOrder() {
 
                 var first = true;
                 var prevSortOrder = 0;
@@ -255,10 +231,8 @@
                     }
 
                 } else {
-
                     scope.sortingMode = true;
                     scope.sortingButtonKey = "general_reorderDone";
-
                 }
 
             };
@@ -404,38 +378,40 @@
             };
 
             /* ---------- TABS ---------- */
-
             scope.model.hasTabs = true;
-            scope.openTabIndex = 0;
 
-            scope.changeTab = function (index) {
-                scope.openTabIndex = index;
+            scope.changeTab = function ({ id }) {
+                scope.openTabId = id;
             };
 
-            scope.addTab = function (tab) {
-                scope.addGroup(tab);
-                scope.openTabIndex = scope.model.groups.length - 2;
-            };
+            scope.addTab = function () {
+                scope.model.tabs = scope.model.tabs || [];
 
-            scope.addFieldset = function (group) {
-                if (!group) {
-                    return;
-                }
+                const newTabIndex = scope.model.tabs.length;
+                const lastTab = scope.model.tabs[newTabIndex - 1];
+                const sortOrder = lastTab && lastTab.sortOrder !== undefined ? lastTab.sortOrder + 1 : 0;
 
-                if (!group.fieldsets) {
-                    group.fieldsets = [];
-                }
-
-                const fieldset = {
-                    groupId: group.id,
-                    id: group.fieldsets.length + 1, // temp id
+                const tab = {
+                    id: newTabIndex + 1, // temp id
                     name: "",
-                    properties: []
+                    sortOrder
                 };
 
-                group.fieldsets = [...group.fieldsets, fieldset];
+                if (newTabIndex === 0) {
+                    scope.model.groups.forEach(group => group.tabId = tab.id);
+                }
 
-                updateFieldsetsSortOrder();
+                scope.model.tabs = [...scope.model.tabs, tab];
+
+                scope.openTabId = tab.id;
+            };
+
+            scope.removeTab = function (index) {
+                scope.model.tabs.splice(index, 1);
+            };
+
+            scope.canRemoveTab = function (tab) {
+                return tab.inherited !== true;
             };
 
             scope.addNewProperty = function (group) {
@@ -477,35 +453,30 @@
                 editorService.open(propertySettings);
             };
 
-            /* ---------- FIELDSETS ---------- */
-            scope.removeFieldset = function (items, { id }) {
-                const index = items.map(item => item.id).findIndex(itemId => itemId === id);
-                items.splice(index, 1);
-                notifyChanged();
-            };
-
             /* ---------- GROUPS ---------- */
 
-            scope.addGroup = function (group) {
+            scope.addGroup = function (tabId) {
+                scope.model.groups = scope.model.groups || [];
 
-                // set group sort order
-                var index = scope.model.groups.indexOf(group);
-                var prevGroup = scope.model.groups[index - 1];
 
-                if (index > 0) {
-                    // set index to 1 higher than the previous groups sort order
-                    group.sortOrder = prevGroup.sortOrder + 1;
 
-                } else {
-                    // first group - sort order will be 0
-                    group.sortOrder = 0;
-                }
 
-                // activate group
-                scope.activateGroup(group);
+                /*
+                const groupsInTab = tabId ? scope.model.groups.filter(group => group.tabId === tabId) : scope.model.groups;
+                const prevGroup = groupsInTab[groupsInTab.length - 1];
+                const sortOrder = prevGroup && prevGroup.sortOrder !== undefined ? prevGroup.sortOrder + 1 : 0;
+                */
 
-                // push new init tab to the scope
-                addInitGroup(scope.model.groups);
+                const group = {
+                    properties: [],
+                    parentTabContentTypes: [],
+                    parentTabContentTypeNames: [],
+                    name: "",
+                    tabId: tabId || undefined,
+                    sortOrder
+                };
+
+                scope.model.groups = [...scope.model.groups, group];
             };
 
             scope.activateGroup = function (selectedGroup) {
@@ -535,44 +506,9 @@
                 if (group.sortOrder !== undefined) {
                     group.showSortOrderMissing = false;
                 }
+
                 scope.model.groups = $filter('orderBy')(scope.model.groups, 'sortOrder');
             };
-
-            function addInitGroup(groups) {
-
-                var addGroup = true;
-
-                angular.forEach(groups, function (group) {
-                    if (group.tabState === "init") {
-                        addGroup = false;
-                    }
-                });
-
-                if (addGroup) {
-                    let group = {
-                        properties: [],
-                        parentTabContentTypes: [],
-                        parentTabContentTypeNames: [],
-                        name: "",
-                        tabState: "init",
-                        id: groups.length + 1
-                    };
-
-                    group = addInitProperty(group);
-                    groups.push(group);
-                }
-
-                return groups;
-            }
-
-            function activateFirstGroup(groups) {
-                if (groups && groups.length > 0) {
-                    var firstGroup = groups[0];
-                    if (!firstGroup.tabState || firstGroup.tabState === "inActive") {
-                        firstGroup.tabState = "active";
-                    }
-                }
-            }
 
             /* ---------- PROPERTIES ---------- */
 
