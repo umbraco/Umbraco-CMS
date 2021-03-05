@@ -265,23 +265,19 @@ stages:
                         if ($lastexitcode -ne 0){
                            throw ("Error installing DocFX")
                         }
-                        docfx metadata "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                        docfx "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
                         if ($lastexitcode -ne 0){
-                            throw ("Error generating metadata for docs.")
-                        }
-                        docfx build "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
-                        if ($lastexitcode -ne 0){
-                            throw ("Error building docs from the generated metadata")
+                            throw ("Error generating docs.")
                         }
                       errorActionPreference: continue
                       workingDirectory: build
                 - task: ArchiveFiles@2
                   displayName: 'Zip C# Docs'
                   inputs:
-                      rootFolderOrFile: $(Build.SourcesDirectory)/src/ApiDocs/_site
-                      includeRootFolder: true
+                      rootFolderOrFile: $(Build.SourcesDirectory)\src\ApiDocs\_site
+                      includeRootFolder: false
                       archiveType: zip
-                      archiveFile: $(Build.ArtifactStagingDirectory)/docs/csharp-docs.zip
+                      archiveFile: $(Build.ArtifactStagingDirectory)\docs\csharp-docs.zip
                       replaceExistingArchive: true
                 - task: PowerShell@2
                   displayName: Prep build tool - JS Docs
