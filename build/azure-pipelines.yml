@@ -282,8 +282,8 @@ stages:
                 - task: PublishPipelineArtifact@1
                   displayName: Publish to artifacts - C# Docs
                   inputs:
-                      targetPath: $(Build.ArtifactStagingDirectory)\docs\
-                      artifact: docs
+                      targetPath: $(Build.ArtifactStagingDirectory)\docs\csharp-docs.zip
+                      artifact: docs-cs
                       publishLocation: pipeline
 
           - job: Generate_Docs_JS
