@@ -73,7 +73,6 @@ namespace Umbraco.Cms.Web.Common.Install
                 // Change Password for the default user we ship out of the box
                 // Uses same approach as NewInstall Step
 
-                // TODO: usermanager why you no inject?!
                 using IServiceScope scope = _serviceScopeFactory.CreateScope();
                 IBackOfficeUserManager backOfficeUserManager = scope.ServiceProvider.GetRequiredService<IBackOfficeUserManager>();
                 BackOfficeIdentityUser membershipUser = await backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserId.ToString());
