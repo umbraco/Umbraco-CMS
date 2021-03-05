@@ -265,11 +265,11 @@ stages:
                         if ($lastexitcode -ne 0){
                            throw ("Error installing DocFX")
                         }
-                        docfx metadata "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json" -logLevel "Verbose"
+                        docfx metadata "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
                         if ($lastexitcode -ne 0){
                             throw ("Error generating metadata for docs.")
                         }
-                        docfx build "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json" -logLevel "Verbose"
+                        docfx build "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
                         if ($lastexitcode -ne 0){
                             throw ("Error building docs from the generated metadata")
                         }
