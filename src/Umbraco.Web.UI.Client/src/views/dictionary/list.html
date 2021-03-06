@@ -32,7 +32,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="item in vm.items | orderBy:'displayName' track by item.id" style="cursor: pointer;">
+                    <tr ng-repeat="item in vm.items track by item.id" style="cursor: pointer;">
                         <th>
                             <button type="button" ng-style="item.style" class="btn-reset bold" ng-click="vm.clickItem(item.id)">{{item.name}}</button>
                         </th>
