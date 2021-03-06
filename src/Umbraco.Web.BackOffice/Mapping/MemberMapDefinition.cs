@@ -1,4 +1,6 @@
+using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -33,6 +35,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             mapper.Define<IMember, MemberDisplay>((source, context) => new MemberDisplay(), Map);
             mapper.Define<IMember, MemberBasic>((source, context) => new MemberBasic(), Map);
             mapper.Define<IMemberGroup, MemberGroupDisplay>((source, context) => new MemberGroupDisplay(), Map);
+            mapper.Define<IdentityRole, MemberGroupDisplay>((source, context) => new MemberGroupDisplay(), Map);
             mapper.Define<IMember, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
         }
 
@@ -99,6 +102,19 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         private static void Map(IMember source, ContentPropertyCollectionDto target, MapperContext context)
         {
             target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
+        }
+
+        /// <summary>
+        /// Maps an identity role to a member group display
+        /// </summary>
+        /// <param name="arg1"></param>
+        /// <param name="arg2"></param>
+        /// <param name="arg3"></param>
+        private void Map(IdentityRole source, MemberGroupDisplay target, MapperContext context)
+        {
+            //TODO: this is all that is mapped at this time, we're losing a lot of properties
+            target.Id = source.Id;
+            target.Name = source.Name;
         }
     }
 }

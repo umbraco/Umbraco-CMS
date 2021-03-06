@@ -251,7 +251,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         }
 
         [Test]
-        public async Task GivenIFindAMemberRoleByRoleId_AndRoleIdExists_ThenIShouldGetASuccessResultAsync()
+        public async Task GivenIFindAMemberRoleByRoleKey_AndRoleKeyExists_ThenIShouldGetASuccessResultAsync()
         {
             // arrange
             MemberRoleStore<IdentityRole> sut = CreateSut();
@@ -265,7 +265,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             {
                 Name = "fakeGroupName",
                 CreatorId = 123,
-                Id = 777
+                Id = 777,
+                Key = Guid.NewGuid()
             };
 
             _mockMemberGroupService.Setup(x => x.GetById(fakeRoleId)).Returns(fakeMemberGroup);
@@ -281,7 +282,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         }
 
         [Test]
-        public async Task GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAnInt_ThenIShouldGetAFailureResultAsync()
+        public async Task GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAnIntOrGuid_ThenIShouldGetAFailureResultAsync()
         {
             // arrange
             MemberRoleStore<IdentityRole> sut = CreateSut();
@@ -299,6 +300,72 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             Assert.That(actual, Throws.TypeOf<ArgumentOutOfRangeException>());
             _mockMemberGroupService.VerifyNoOtherCalls();
         }
+
+        [Test]
+        public async Task GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAnIntButCanBeToGuid_ThenIShouldGetASuccessResultAsync()
+        {
+            // arrange
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole("fakeGroupName")
+            {
+                Id = "777"
+            };
+
+            var fakeRoleGuid = Guid.NewGuid();
+
+            IMemberGroup fakeMemberGroup = new MemberGroup()
+            {
+                Name = "fakeGroupName",
+                CreatorId = 123,
+                Id = 777,
+                Key = fakeRoleGuid
+            };
+
+            _mockMemberGroupService.Setup(x => x.GetById(fakeRoleGuid)).Returns(fakeMemberGroup);
+
+            // act
+            IdentityRole actual = await sut.FindByIdAsync(fakeRoleGuid.ToString());
+
+            // assert
+            Assert.AreEqual(fakeRole.Name, actual.Name);
+            Assert.AreEqual(fakeRole.Id, actual.Id);
+            _mockMemberGroupService.Verify(x => x.GetById(fakeRoleGuid));
+            _mockMemberGroupService.VerifyNoOtherCalls();
+        }
+
+
+        [Test]
+        public async Task GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAGuidButCanBeToInt_ThenIShouldGetASuccessResultAsync()
+        {
+            // arrange
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole("fakeGroupName")
+            {
+                Id = "777"
+            };
+
+            var fakeRoleId = 777;
+
+            IMemberGroup fakeMemberGroup = new MemberGroup()
+            {
+                Name = "fakeGroupName",
+                CreatorId = 123,
+                Id = 777,
+                Key = Guid.NewGuid()
+            };
+
+            _mockMemberGroupService.Setup(x => x.GetById(fakeRoleId)).Returns(fakeMemberGroup);
+
+            // act
+            IdentityRole actual = await sut.FindByIdAsync(fakeRoleId.ToString());
+
+            // assert
+            Assert.AreEqual(fakeRole.Name, actual.Name);
+            Assert.AreEqual(fakeRole.Id, actual.Id);
+            _mockMemberGroupService.Verify(x => x.GetById(fakeRoleId));
+            _mockMemberGroupService.VerifyNoOtherCalls();
+        }
+
 
         [Test]
         public async Task GivenIFindAMemberRoleByRoleName_AndRoleNameExists_ThenIShouldGetASuccessResultAsync()

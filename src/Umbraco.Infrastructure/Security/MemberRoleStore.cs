@@ -246,12 +246,25 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(roleId));
             }
 
+            IMemberGroup memberGroup;
+
+            // member group can be found by int or Guid, so try both
             if (!int.TryParse(roleId, out int id))
             {
-                throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Int");
+                if (!Guid.TryParse(roleId, out Guid guid))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(roleId), $"{nameof(roleId)} is not a valid Guid");
+                }
+                else
+                {
+                    memberGroup = _memberGroupService.GetById(guid);
+                }
+            }
+            else
+            {
+                memberGroup = _memberGroupService.GetById(id);
             }
 
-            IMemberGroup memberGroup = _memberGroupService.GetById(id);
             return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
         }
 

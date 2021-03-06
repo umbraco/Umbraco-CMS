@@ -190,6 +190,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         public MemberDisplay GetByKey(Guid key)
         {
+            //TODO: convert to identity
             IMember foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {
