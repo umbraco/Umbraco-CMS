@@ -208,11 +208,6 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(userId));
             }
 
-            if (!Guid.TryParse(userId, out Guid id))
-            {
-                throw new ArgumentOutOfRangeException(nameof(userId), $"{nameof(userId)} is not a valid x");
-            }
-
             IMember user = _memberService.GetById(UserIdToInt(userId));
             if (user == null)
             {
