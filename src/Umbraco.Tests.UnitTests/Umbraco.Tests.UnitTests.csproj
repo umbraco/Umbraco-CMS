@@ -38,4 +38,10 @@
       <None Remove="umbraco\Data\TEMP\TypesCache\umbraco-types.DESKTOP-EU212M2.hash" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Reference Include="Umbraco.Infrastructure">
+        <HintPath>..\Umbraco.Web\bin\Debug\Umbraco.Infrastructure.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
 </Project>

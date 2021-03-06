@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.Commands;
@@ -62,12 +63,23 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds the services required for using Members Identity
         /// </summary>
-        public static void AddMembersIdentity(this IServiceCollection services) =>
+        public static void AddMembersIdentity(this IServiceCollection services)
+        {
             services.BuildMembersIdentity()
                 .AddDefaultTokenProviders()
+                .AddMemberManager<IMemberManager, MemberManager>()
+                //.AddRoles<IdentityRole>()
                 .AddUserStore<MemberUserStore>()
-                .AddMembersManager<IMemberManager, MemberManager>();
+                .AddRoleStore<MemberRoleStore<IdentityRole>>()
+                .AddRoleValidator<RoleValidator<IdentityRole>>()
+                .AddRoleManager<RoleManager<IdentityRole>>();
 
+            //services.AddScoped<IUserClaimsPrincipalFactory<MemberIdentityUser>>(
+            //    s => new UserClaimsPrincipalFactory<MemberIdentityUser, IdentityRole>(
+            //        s.GetService<MemberManager>(),
+            //        s.GetService<RoleManager<IdentityRole>>(),
+            //        s.GetService<IOptions<IdentityOptions>>()));
+        }
 
         private static MemberIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
         {
@@ -75,7 +87,7 @@ namespace Umbraco.Extensions
             services.TryAddScoped<IUserValidator<MemberIdentityUser>, UserValidator<MemberIdentityUser>>();
             services.TryAddScoped<IPasswordValidator<MemberIdentityUser>, PasswordValidator<MemberIdentityUser>>();
             services.TryAddScoped<IPasswordHasher<MemberIdentityUser>, PasswordHasher<MemberIdentityUser>>();
-            return new MemberIdentityBuilder(services);
+            return new MemberIdentityBuilder(typeof(IdentityRole), services);
         }
 
         private static void RemoveIntParamenterIfValueGreatherThen(IDictionary<string, string> commands, string parameter, int maxValue)

@@ -1,7 +1,4 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -13,35 +10,27 @@ namespace Umbraco.Cms.Core.Security
     /// <summary>
     /// A custom user store that uses Umbraco member data
     /// </summary>
-    public class MemberRoleStore : RoleStoreBase<IdentityRole<string>, string, IdentityUserRole<string>, IdentityRoleClaim<string>>
+    public class MemberRoleStore<TRole> : IRoleStore<TRole> where TRole : IdentityRole
     {
         private readonly IMemberGroupService _memberGroupService;
+        private bool _disposed;
 
-        public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber describer)
-            : base(describer) => _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
-
-        /// <inheritdoc />
-        public override IQueryable<IdentityRole<string>> Roles
+        public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
         {
-            get
-            {
-                IEnumerable<IMemberGroup> memberGroups = _memberGroupService.GetAll();
-                var identityRoles = new List<IdentityRole<string>>();
-                foreach (IMemberGroup group in memberGroups)
-                {
-                    IdentityRole<string> identityRole = MapFromMemberGroup(group);
-                    identityRoles.Add(identityRole);
-                }
-
-                return identityRoles.AsQueryable();
-            }
+            _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
+            ErrorDescriber = errorDescriber ?? throw new ArgumentNullException(nameof(errorDescriber));
         }
 
+        /// <summary>
+        /// Gets or sets the <see cref="IdentityErrorDescriber"/> for any error that occurred with the current operation.
+        /// </summary>
+        public IdentityErrorDescriber ErrorDescriber { get; set; }
+        
         /// <inheritdoc />
-        public override Task<IdentityResult> CreateAsync(
-            IdentityRole<string> role,
-            CancellationToken cancellationToken = new CancellationToken())
+        public Task<IdentityResult> CreateAsync(TRole role, CancellationToken cancellationToken = new CancellationToken())
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
             if (role == null)
             {
                 throw new ArgumentNullException(nameof(role));
@@ -61,9 +50,10 @@ namespace Umbraco.Cms.Core.Security
 
 
         /// <inheritdoc />
-        public override Task<IdentityResult> UpdateAsync(IdentityRole<string> role,
-            CancellationToken cancellationToken = new CancellationToken())
+        public Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = new CancellationToken())
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
             if (role == null)
             {
                 throw new ArgumentNullException(nameof(role));
@@ -93,9 +83,10 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override Task<IdentityResult> DeleteAsync(IdentityRole<string> role,
-            CancellationToken cancellationToken = new CancellationToken())
+        public Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = new CancellationToken())
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
             if (role == null)
             {
                 throw new ArgumentNullException(nameof(role));
@@ -122,9 +113,60 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override Task<IdentityRole<string>> FindByIdAsync(string id,
-            CancellationToken cancellationToken = new CancellationToken())
+
+        public Task<string> GetRoleIdAsync(TRole role, CancellationToken cancellationToken)
         {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            if (role == null)
+            {
+                throw new ArgumentNullException(nameof(role));
+            }
+
+            return Task.FromResult(role.Id);
+        }
+
+        public Task<string> GetRoleNameAsync(TRole role, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (!int.TryParse(role.Id, out int roleId))
+            {
+                return null;
+            }
+
+            IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
+
+            return Task.FromResult(memberGroup?.Name);
+        }
+
+        public Task SetRoleNameAsync(TRole role, string roleName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            return null;
+        }
+
+        public Task<string> GetNormalizedRoleNameAsync(TRole role, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            return null;
+        }
+
+        public Task SetNormalizedRoleNameAsync(TRole role, string normalizedName, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            return null;
+        }
+
+        /// <inheritdoc />
+        public Task<TRole> FindByIdAsync(string id, CancellationToken cancellationToken = new CancellationToken())
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
             if (!int.TryParse(id, out int roleId))
             {
                 return null;
@@ -136,39 +178,34 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override Task<IdentityRole<string>> FindByNameAsync(string normalizedName,
-            CancellationToken cancellationToken = new CancellationToken())
+        public Task<TRole> FindByNameAsync(string name, CancellationToken cancellationToken = new CancellationToken())
         {
-            IMemberGroup memberGroup = _memberGroupService.GetByName(normalizedName);
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+            if (name == null)
+            {
+                throw new ArgumentNullException(nameof(name));
+            }
+            IMemberGroup memberGroup = _memberGroupService.GetByName(name);
 
             return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
         }
-
-        ///TODO: are we implementing these claims methods?
-
-        /// <inheritdoc />
-        public override Task<IList<Claim>> GetClaimsAsync(IdentityRole<string> role, CancellationToken cancellationToken = new CancellationToken()) => throw new System.NotImplementedException();
-
-        /// <inheritdoc />
-        public override Task AddClaimAsync(IdentityRole<string> role, Claim claim, CancellationToken cancellationToken = new CancellationToken()) => throw new System.NotImplementedException();
-
-        /// <inheritdoc />
-        public override Task RemoveClaimAsync(IdentityRole<string> role, Claim claim, CancellationToken cancellationToken = new CancellationToken()) => throw new System.NotImplementedException();
 
         /// <summary>
         /// Maps a member group to an identity role
         /// </summary>
         /// <param name="memberGroup"></param>
         /// <returns></returns>
-        private IdentityRole<string> MapFromMemberGroup(IMemberGroup memberGroup)
+        private TRole MapFromMemberGroup(IMemberGroup memberGroup)
         {
             var result = new IdentityRole
             {
                 Id = memberGroup.Id.ToString(),
                 Name = memberGroup.Name
+                //TODO: Are we interested in NormalizedRoleName?
             };
 
-            return result;
+            return result as TRole;
         }
 
         /// <summary>
@@ -177,7 +214,7 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="role"></param>
         /// <param name="memberGroup"></param>
         /// <returns></returns>
-        private bool MapToMemberGroup(IdentityRole<string> role, IMemberGroup memberGroup)
+        private bool MapToMemberGroup(TRole role, IMemberGroup memberGroup)
         {
             var anythingChanged = false;
 
@@ -188,6 +225,22 @@ namespace Umbraco.Cms.Core.Security
             }
 
             return anythingChanged;
+        }
+
+        public void Dispose()
+        {
+            //TODO: is any dispose action necessary here or is this all managed by the IOC container?
+        }
+
+        /// <summary>
+        /// Throws if this class has been disposed.
+        /// </summary>
+        protected void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().Name);
+            }
         }
     }
 }

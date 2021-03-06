@@ -28,13 +28,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IMemberGroupService _memberGroupService;
         private readonly UmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly RoleManager<IdentityRole<string>> _roleManager;
+        private readonly RoleManager<IdentityRole> _roleManager;
      
         public MemberGroupController(
             IMemberGroupService memberGroupService,
             UmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
-            RoleManager<IdentityRole<string>> roleManager
+            RoleManager<IdentityRole> roleManager
             )
         {
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             foreach (int id in ids)
             {
-                Task<IdentityRole<string>> role = _roleManager.FindByIdAsync(id.ToString());
+                Task<IdentityRole> role = _roleManager.FindByIdAsync(id.ToString());
                 roles.Add(role.Result);
             }
 

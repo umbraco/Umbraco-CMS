@@ -22,6 +22,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.2" />
       <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.2" />
       <PackageReference Include="MiniProfiler.AspNetCore.Mvc" Version="4.2.22" />

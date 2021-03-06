@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,7 +6,6 @@ using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
@@ -19,19 +17,19 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         private Mock<IMemberGroupService> _mockMemberGroupService;
         private IdentityErrorDescriber ErrorDescriber => new IdentityErrorDescriber();
 
-        public MemberRoleStore CreateSut()
+        public MemberRoleStore<IdentityRole> CreateSut()
         {
             _mockMemberGroupService = new Mock<IMemberGroupService>();
-            return new MemberRoleStore(
+            return new MemberRoleStore<IdentityRole>(
                 _mockMemberGroupService.Object,
                 ErrorDescriber);
         }
 
         [Test]
-        public void GivenICreateAMemberRole_AndTheGroupIsNull_ThenIShouldGetAFailedResultAsync()
+        public void GivenICreateAMemberRole_AndTheGroupIsNull_ThenIShouldGetAnArgumentException()
         {
             // arrange
-            MemberRoleStore sut = CreateSut();
+            MemberRoleStore<IdentityRole> sut = CreateSut();
             CancellationToken fakeCancellationToken = new CancellationToken() { };
 
             // act
@@ -46,8 +44,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenICreateAMemberRole_AndTheGroupIsPopulatedCorrectly_ThenIShouldGetASuccessResultAsync()
         {
             // arrange
-            MemberRoleStore sut = CreateSut();
-            var fakeRole = new IdentityRole<string>()
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole
             {
                 Id = "777",
                 Name = "testname"
@@ -74,8 +72,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheGroupExistsWithTheSameName_ThenIShouldGetASuccessResultAsyncButNoUpdatesMade()
         {
             // arrange
-            MemberRoleStore sut = CreateSut();
-            var fakeRole = new IdentityRole<string>()
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole
             {
                 Id = "777",
                 Name = "fakeGroupName"
@@ -103,8 +101,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheGroupExistsWithADifferentSameName_ThenIShouldGetASuccessResultAsyncWithUpdatesMade()
         {
             // arrange
-            MemberRoleStore sut = CreateSut();
-            var fakeRole = new IdentityRole<string>()
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole
             {
                 Id = "777",
                 Name = "fakeGroup777"
@@ -133,8 +131,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheGroupDoesntExist_ThenIShouldGetAFailureResultAsync()
         {
             // arrange
-            MemberRoleStore sut = CreateSut();
-            var fakeRole = new IdentityRole<string>()
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole
             {
                 Id = "777",
                 Name = "testname"
@@ -157,31 +155,29 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheIdCannotBeParsedToAnInt_ThenIShouldGetAFailureResultAsync()
         {
             // arrange
-            MemberRoleStore sut = CreateSut();
-            var fakeRole = new IdentityRole<string>()
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole
             {
                 Id = "7a77",
                 Name = "testname"
             };
             var fakeCancellationToken = new CancellationToken() { };
-
-            bool raiseEvents = false;
-
-
+            
             // act
             IdentityResult identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
 
             // assert
             Assert.IsTrue(identityResult.Succeeded == false);
             Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "DefaultError" && x.Description == "An unknown failure has occurred."));
+            _mockMemberGroupService.VerifyNoOtherCalls();
         }
 
         [Test]
         public async Task GivenIDeleteAMemberRole_AndItExists_ThenTheMemberGroupShouldBeDeleted_AndIShouldGetASuccessResultAsync()
         {
             // arrange
-            MemberRoleStore sut = CreateSut();
-            var fakeRole = new IdentityRole<string>()
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole
             {
                 Id = "777",
                 Name = "testname"
@@ -201,14 +197,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             Assert.IsTrue(!identityResult.Errors.Any());
             _mockMemberGroupService.Verify(x => x.GetById(777));
             _mockMemberGroupService.Verify(x => x.Delete(mockMemberGroup));
+            _mockMemberGroupService.VerifyNoOtherCalls();
         }
 
         [Test]
         public async Task GivenIDeleteAMemberRole_AndTheIdCannotBeParsedToAnInt_ThenTheMemberGroupShouldNotBeDeleted_AndIShouldGetAFailResultAsync()
         {
             // arrange
-            MemberRoleStore sut = CreateSut();
-            var fakeRole = new IdentityRole<string>()
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole
             {
                 Id = "7a77",
                 Name = "testname"
@@ -225,6 +222,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             // assert
             Assert.IsTrue(identityResult.Succeeded == false);
             Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "DefaultError" && x.Description == "An unknown failure has occurred."));
+            _mockMemberGroupService.VerifyNoOtherCalls();
         }
 
 
@@ -232,8 +230,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIDeleteAMemberRole_AndItDoesntExist_ThenTheMemberGroupShouldNotBeDeleted_AndIShouldGetAFailResultAsync()
         {
             // arrange
-            MemberRoleStore sut = CreateSut();
-            var fakeRole = new IdentityRole<string>()
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole
             {
                 Id = "777",
                 Name = "testname"
@@ -251,43 +249,142 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             Assert.IsTrue(identityResult.Succeeded == false);
             Assert.IsTrue(identityResult.Errors.Any(x=>x.Code == "InvalidRoleName" && x.Description == "Role name 'testname' is invalid."));
             _mockMemberGroupService.Verify(x => x.GetById(777));
+            _mockMemberGroupService.VerifyNoOtherCalls();
         }
 
         [Test]
-        public async Task GivenIGetAllMemberRoles_ThenIShouldGetAllMemberGroups_AndASuccessResultAsync()
+        public async Task GivenIFindAMemberRoleByRoleId_AndRoleIdExists_ThenIShouldGetASuccessResultAsync()
         {
             // arrange
-            MemberRoleStore sut = CreateSut();
+            MemberRoleStore<IdentityRole> sut = CreateSut();
             var fakeRole = new IdentityRole<string>("fakeGroupName")
             {
                 Id = "777"
             };
-            IEnumerable<IdentityRole<string>> expected = new List<IdentityRole<string>>()
+            int fakeRoleId = 777;
+
+            IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
+                m.Name == "fakeGroupName" &&
+                m.CreatorId == 123 &&
+                m.Id == 777);
+
+            var fakeCancellationToken = new CancellationToken() { };
+
+            _mockMemberGroupService.Setup(x => x.GetById(fakeRoleId)).Returns(mockMemberGroup);
+
+            // act
+            IdentityRole actual = await sut.FindByIdAsync(fakeRole.Id, fakeCancellationToken);
+
+            // assert
+            Assert.AreEqual(fakeRole.Name, actual.Name);
+            Assert.AreEqual(fakeRole.Id, actual.Id);
+            _mockMemberGroupService.Verify(x => x.GetById(fakeRoleId));
+            _mockMemberGroupService.VerifyNoOtherCalls();
+        }
+
+        [Test]
+        public void GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAnInt_ThenIShouldGetAFailureResultAsync()
+        {
+            // arrange
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole
             {
-                fakeRole
+                Id = "7a77",
+                Name = "testname"
+            };
+            var fakeCancellationToken = new CancellationToken() { };
+            
+            // act
+            Task<IdentityRole> actual = sut.FindByIdAsync(fakeRole.Id, fakeCancellationToken);
+
+            // assert
+            Assert.IsNull(actual);
+            _mockMemberGroupService.VerifyNoOtherCalls();
+        }
+
+        [Test]
+        public async Task GivenIFindAMemberRoleByRoleName_AndRoleNameExists_ThenIShouldGetASuccessResultAsync()
+        {
+            // arrange
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole("fakeGroupName")
+            {
+                Id = "777"
             };
 
             IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
-                m.Name == "fakeGroupName" && m.CreatorId == 123 && m.Id == 777);
+                m.Name == "fakeGroupName" &&
+                m.CreatorId == 123 &&
+                m.Id == 777);
 
-            IEnumerable<IMemberGroup> fakeMemberGroups = new List<IMemberGroup>()
-            {
-                mockMemberGroup
-            };
 
-            _mockMemberGroupService.Setup(x => x.GetAll()).Returns(fakeMemberGroups);
+            _mockMemberGroupService.Setup(x => x.GetByName(fakeRole.Name)).Returns(mockMemberGroup);
 
             // act
-            IQueryable<IdentityRole<string>> actual = sut.Roles;
+            IdentityRole actual = await sut.FindByNameAsync(fakeRole.Name);
 
             // assert
-            Assert.AreEqual(expected.AsQueryable().First().Id, actual.First().Id);
-            Assert.AreEqual(expected.AsQueryable().First().Name, actual.First().Name);
-            //Always null:
-            //Assert.AreEqual(expected.AsQueryable().First().NormalizedName, actual.First().NormalizedName);
-            //Always different:
-            //Assert.AreEqual(expected.AsQueryable().First().ConcurrencyStamp, actual.First().ConcurrencyStamp);
-            _mockMemberGroupService.Verify(x => x.GetAll());
+            Assert.AreEqual(fakeRole.Name, actual.Name);
+            Assert.AreEqual(fakeRole.Id, actual.Id);
+            _mockMemberGroupService.Verify(x => x.GetByName(fakeRole.Name));
+        }
+
+        [Test]
+        public void GivenIFindAMemberRoleByRoleName_AndTheNameIsNull_ThenIShouldGetAnArgumentException()
+        {
+            // arrange
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole
+            {
+                Id = "777"
+            };
+            var fakeCancellationToken = new CancellationToken() { };
+
+            // act
+            Action actual = () => sut.FindByNameAsync(fakeRole.Name, fakeCancellationToken);
+            
+            // assert
+            Assert.That(actual, Throws.ArgumentNullException);
+            _mockMemberGroupService.VerifyNoOtherCalls();
+
+        }
+
+        [Test]
+        public void GivenIGetAMemberRoleId_AndTheRoleIsNull_ThenIShouldGetAnArgumentException()
+        {
+            // arrange
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeCancellationToken = new CancellationToken() { };
+
+            // act
+            Action actual = () => sut.GetRoleIdAsync(null, fakeCancellationToken);
+
+            // assert
+            Assert.That(actual, Throws.ArgumentNullException);
+        }
+
+        [Test]
+        public void GivenIGetAMemberRoleId_AndTheRoleIsNotNull_ThenIShouldGetTheMemberRole()
+        {
+            // arrange
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeRole = new IdentityRole("fakeGroupName")
+            {
+                Id = "777"
+            };
+            string fakeRoleId = fakeRole.Id;
+
+            var fakeCancellationToken = new CancellationToken();
+
+            // act
+            Task<string> actual = sut.GetRoleIdAsync(fakeRole, fakeCancellationToken);
+
+            // assert
+            Assert.That(actual, Throws.ArgumentNullException);
+
+
+            // assert
+            Assert.AreEqual(fakeRoleId, actual.Result);
         }
     }
 }

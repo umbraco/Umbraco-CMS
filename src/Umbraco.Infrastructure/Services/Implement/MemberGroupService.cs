@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -113,6 +113,25 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         public void Delete(IMemberGroup memberGroup)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var deleteEventArgs = new DeleteEventArgs<IMemberGroup>(memberGroup);
+                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                {
+                    scope.Complete();
+                    return;
+                }
+
+                _memberGroupRepository.Delete(memberGroup);
+                scope.Complete();
+                deleteEventArgs.CanCancel = false;
+                scope.Events.Dispatch(Deleted, this, deleteEventArgs);
+            }
+        }
+
+
+        public void GetByRole(IMemberGroup memberGroup)
         {
             using (var scope = ScopeProvider.CreateScope())
             {
