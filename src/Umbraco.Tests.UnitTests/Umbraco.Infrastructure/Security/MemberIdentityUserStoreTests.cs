@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             // arrange
             MemberUserStore sut = CreateSut();
-            CancellationToken fakeCancellationToken = new CancellationToken(){};
+            CancellationToken fakeCancellationToken = new CancellationToken() { };
 
             // act
             Action actual = () => sut.CreateAsync(null, fakeCancellationToken);
@@ -73,6 +73,66 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             // assert
             Assert.IsTrue(identityResult.Succeeded);
             Assert.IsTrue(!identityResult.Errors.Any());
+            _mockMemberService.Verify(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
+            _mockMemberService.Verify(x => x.Save(mockMember, It.IsAny<bool>()));
+        }
+
+
+        [Test]
+        public async Task GivenIDeleteUser_AndTheUserIsNotPresent_ThenIShouldGetAFailedResultAsync()
+        {
+            // arrange
+            MemberUserStore sut = CreateSut();
+            var fakeUser = new MemberIdentityUser(777);
+            var fakeCancellationToken = new CancellationToken() { };
+
+            IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
+            IMember mockMember = Mock.Of<IMember>(m =>
+                m.Name == "fakeName" &&
+                m.Email == "fakeemail@umbraco.com" &&
+                m.Username == "fakeUsername" &&
+                m.RawPasswordValue == "fakePassword" &&
+                m.ContentTypeAlias == fakeMemberType.Alias &&
+                m.HasIdentity == true);
+
+            // act
+            Action actual = () => sut.DeleteAsync(fakeUser, fakeCancellationToken);
+
+            // assert
+            Assert.That(actual, Throws.ArgumentNullException);
+            _mockMemberService.VerifyNoOtherCalls();
+        }
+
+        [Test]
+        public async Task GivenIDeleteUser_AndTheUserIsDeletedCorrectly_ThenIShouldGetASuccessResultAsync()
+        {
+            // arrange
+            MemberUserStore sut = CreateSut();
+            var fakeUser = new MemberIdentityUser(777);
+            var fakeCancellationToken = new CancellationToken() { };
+
+            IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
+            IMember mockMember = new Member(fakeMemberType)
+            {
+                Id = 777,
+                Name = "fakeName",
+                Email = "fakeemail@umbraco.com",
+                Username = "fakeUsername",
+                RawPasswordValue = "fakePassword"
+            };
+
+            _mockMemberService.Setup(x => x.GetById(mockMember.Id)).Returns(mockMember);
+            _mockMemberService.Setup(x => x.Delete(mockMember));
+
+            // act
+            IdentityResult identityResult = await sut.DeleteAsync(fakeUser, fakeCancellationToken);
+
+            // assert
+            Assert.IsTrue(identityResult.Succeeded);
+            Assert.IsTrue(!identityResult.Errors.Any());
+            _mockMemberService.Verify(x => x.GetById(mockMember.Id));
+            _mockMemberService.Verify(x => x.Delete(mockMember));
+            _mockMemberService.VerifyNoOtherCalls();
         }
     }
 }
