@@ -1327,7 +1327,6 @@
   </area>
   <area alias="settings">
     <key alias="addIcon">Добавить значок</key>
-    <key alias="asAContentMasterType">в качестве родительского типа. Вкладки родительского типа не показаны и могут быть изменены непосредственно в родительском типе</key>
     <key alias="contentTypeEnabled">Родительский тип контента разрешен</key>
     <key alias="contentTypeUses">Данный тип контента использует</key>
     <key alias="defaulttemplate">Шаблон по-умолчанию</key>

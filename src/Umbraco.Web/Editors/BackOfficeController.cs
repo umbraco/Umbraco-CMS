@@ -129,7 +129,7 @@ namespace Umbraco.Web.Editors
 
             if (parts.Length != 2)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                Logger.Warn<BackOfficeController, string>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
@@ -138,7 +138,7 @@ namespace Umbraco.Web.Editors
             var decoded = token.FromUrlBase64();
             if (decoded.IsNullOrWhiteSpace())
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                Logger.Warn<BackOfficeController, string>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
@@ -146,14 +146,14 @@ namespace Umbraco.Web.Editors
             int intId;
             if (int.TryParse(id, out intId) == false)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                Logger.Warn<BackOfficeController, string>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
             var identityUser = await UserManager.FindByIdAsync(intId);
             if (identityUser == null)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: {UserId}", id);
+                Logger.Warn<BackOfficeController, string>("VerifyUser endpoint reached with non existing user: {UserId}", id);
                 return RedirectToAction("Default");
             }
 
@@ -161,7 +161,7 @@ namespace Umbraco.Web.Editors
 
             if (result.Succeeded == false)
             {
-                Logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", string.Join(",", result.Errors), invite);
+                Logger.Warn<BackOfficeController, string, string>("Could not verify email, Error: {Errors}, Token: {Invite}", string.Join(",", result.Errors), invite);
                 return new RedirectResult(Url.Action("Default") + "#/login/false?invite=3");
             }
 
@@ -226,7 +226,7 @@ namespace Umbraco.Web.Editors
                 .ToDictionary(pv => pv.Key, pv =>
                     pv.ToDictionary(pve => pve.valueAlias, pve => pve.value));
 
-            return new JsonNetResult { Data = nestedDictionary, Formatting = Formatting.None };
+            return new JsonNetResult(JsonNetResult.DefaultJsonSerializerSettings) { Data = nestedDictionary, Formatting = Formatting.None };
         }
 
         /// <summary>
@@ -273,7 +273,7 @@ namespace Umbraco.Web.Editors
                     GetAssetList,
                     new TimeSpan(0, 2, 0));
 
-            return new JsonNetResult { Data = result, Formatting = Formatting.None };
+            return new JsonNetResult(JsonNetResult.DefaultJsonSerializerSettings) { Data = result, Formatting = Formatting.None };
         }
 
         [UmbracoAuthorize(Order = 0)]
@@ -281,7 +281,7 @@ namespace Umbraco.Web.Editors
         public JsonNetResult GetGridConfig()
         {
             var gridConfig = Current.Configs.Grids();
-            return new JsonNetResult { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
+            return new JsonNetResult(JsonNetResult.DefaultJsonSerializerSettings) { Data = gridConfig.EditorsConfig.Editors, Formatting = Formatting.None };
         }
 
 
@@ -351,6 +351,7 @@ namespace Umbraco.Web.Editors
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
         }
 
+        [UmbracoAuthorize]
         [HttpGet]
         public async Task<ActionResult> ExternalLinkLoginCallback()
         {
@@ -433,7 +434,7 @@ namespace Umbraco.Web.Editors
             var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
             if (authType == null)
             {
-                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
+                Logger.Warn<BackOfficeController, string>("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
             }
             else
             {
@@ -450,7 +451,7 @@ namespace Umbraco.Web.Editors
                     shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
                     if (shouldSignIn == false)
                     {
-                        Logger.Warn<BackOfficeController>("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
+                        Logger.Warn<BackOfficeController, string,int>("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
                     }
                 }
 

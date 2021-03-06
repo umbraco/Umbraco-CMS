@@ -51,7 +51,7 @@ namespace Umbraco.Core.Composing
                         }
                         catch (Exception ex)
                         {
-                            _logger.Error<ComponentCollection>(ex, "Error while terminating component {ComponentType}.", componentType.FullName);
+                            _logger.Error<ComponentCollection,string>(ex, "Error while terminating component {ComponentType}.", componentType.FullName);
                         }
                     }
                 }

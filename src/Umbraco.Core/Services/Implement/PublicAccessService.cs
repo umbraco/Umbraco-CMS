@@ -62,12 +62,10 @@ namespace Umbraco.Core.Services.Implement
             //start with the deepest id
             ids.Reverse();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 //This will retrieve from cache!
-                var entries = _publicAccessRepository.GetMany().ToArray();
-
-                scope.Complete();
+                var entries = _publicAccessRepository.GetMany().ToList();
                 foreach (var id in ids)
                 {
                     var found = entries.FirstOrDefault(x => x.ProtectedNodeId == id);

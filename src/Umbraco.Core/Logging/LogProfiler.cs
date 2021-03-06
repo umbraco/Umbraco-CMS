@@ -24,8 +24,8 @@ namespace Umbraco.Core.Logging
         /// <inheritdoc/>
         public IDisposable Step(string name)
         {
-            _logger.Debug<LogProfiler>("Begin: {ProfileName}", name);
-            return new LightDisposableTimer(duration => _logger.Info<LogProfiler>("End {ProfileName} ({ProfileDuration}ms)", name, duration));
+            _logger.Debug<LogProfiler, string>("Begin: {ProfileName}", name);
+            return new LightDisposableTimer(duration => _logger.Info<LogProfiler, string,long>("End {ProfileName} ({ProfileDuration}ms)", name, duration));
         }
 
         /// <inheritdoc/>

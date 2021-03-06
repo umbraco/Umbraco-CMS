@@ -561,7 +561,7 @@
     <key alias="toolsDescription">Dizini yönetmek için araçlar</key>
     <key alias="fields">alanlar</key>
     <key alias="indexCannotRead">Dizin okunamıyor ve yeniden oluşturulması gerekecek</key>
-    <key alias="processIsTakingLonger">İşlem beklenenden uzun sürüyor, bu işlem sırasında herhangi bir hata olup olmadığını görmek için umbraco günlüğünü kontrol edin</key>
+    <key alias="processIsTakingLonger">İşlem beklenenden uzun sürüyor, bu işlem sırasında herhangi bir hata olup olmadığını görmek için Umbraco günlüğünü kontrol edin</key>
     <key alias="indexCannotRebuild">Bu dizin, atanmış olmadığı için yeniden oluşturulamaz</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
   </area>
@@ -631,7 +631,6 @@
     <key alias="errorMandatoryWithoutTab">%0% zorunlu bir alandır</key>
     <key alias="errorRegExp">%1% konumunda %0% doğru biçimde değil</key>
     <key alias="errorRegExpWithoutTab">%0% doğru biçimde değil</key>
-    <key alias="errorPropertyEditorNotSupportedInElementTypes">'%0%' özelliği, Öğe Türlerinde desteklenmeyen '%1%' düzenleyicisini kullanıyor.</key>
   </area>
   <area alias="errors">
     <key alias="receivedErrorFromServer">Sunucudan bir hata aldı</key>
@@ -1469,7 +1468,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
       <key alias="tabs">Sekmeler</key>
       <key alias="contentTypeEnabled">Ana İçerik Türü etkinleştirildi</key>
       <key alias="contentTypeUses">Bu İçerik Türü kullanır</key>
-      Ana İçerik Türü olarak <key alias="asAContentMasterType">. Ana İçerik Türlerinden sekmeler gösterilmez ve yalnızca Ana İçerik Türünün kendisinde düzenlenebilir</key>
       <key alias="noPropertiesDefinedOnTab">Bu sekmede tanımlanmış özellik yok. Yeni bir mülk oluşturmak için üstteki "yeni mülk ekle" bağlantısını tıklayın.</key>
       <key alias="createMatchingTemplate">Eşleşen şablon oluştur</key>
       <key alias="addIcon">Simge ekle</key>
@@ -2575,6 +2573,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Oluşturmayı iptal etmek istediğinizden emin misiniz.]]></key>
     <key alias="elementTypeDoesNotExistHeadline">Hata!</key>
     <key alias="elementTypeDoesNotExistDescription">Bu bloğun ElementType'ı artık mevcut değil</key>
+    <key alias="propertyEditorNotSupported">'%0%' özelliği, bloklarda desteklenmeyen '%1%' düzenleyicisini kullanıyor.</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">İçerik Şablonları Nedir?</key>

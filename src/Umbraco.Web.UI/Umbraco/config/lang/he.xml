@@ -449,7 +449,7 @@ Get help from our award winning community, browse the documentation or watch som
     <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
-To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
+To manage your website, simply open the Umbraco backoffice and start adding content, updating the templates and stylesheets or add new functionality]]></key>
     <key alias="Unavailable">ההתחברות לבסיס הנתונים נכשלה.</key>
     <key alias="Version3">Umbraco גירסה 3</key>
     <key alias="Version4">Umbraco גירסה 4</key>
