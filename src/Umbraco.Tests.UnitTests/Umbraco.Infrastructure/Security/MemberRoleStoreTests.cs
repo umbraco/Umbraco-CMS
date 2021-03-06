@@ -26,17 +26,18 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         }
 
         [Test]
-        public void GivenICreateAMemberRole_AndTheGroupIsNull_ThenIShouldGetAnArgumentException()
+        public void GivenICreateAMemberRole_AndTheGroupIsNull_ThenIShouldGetAFailedIdentityResult()
         {
             // arrange
             MemberRoleStore<IdentityRole> sut = CreateSut();
             CancellationToken fakeCancellationToken = new CancellationToken() { };
 
             // act
-            Action actual = () => sut.CreateAsync(null, fakeCancellationToken);
+            Task<IdentityResult> actual = sut.CreateAsync(null, fakeCancellationToken);
 
             // assert
-            Assert.That(actual, Throws.ArgumentNullException);
+            Assert.IsTrue(actual.Result.Succeeded == false);
+            Assert.IsTrue(actual.Result.Errors.Any(x => x.Code == "IdentityMemberGroupNotFound" && x.Description == "Member group not found"));
         }
 
 
@@ -139,15 +140,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             };
             var fakeCancellationToken = new CancellationToken() { };
 
-            bool raiseEvents = false;
-
-
             // act
             IdentityResult identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
 
             // assert
             Assert.IsTrue(identityResult.Succeeded == false);
-            Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "InvalidRoleName" && x.Description == "Role name 'testname' is invalid."));
+            Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "IdentityMemberGroupNotFound" && x.Description == "Member group not found"));
             _mockMemberGroupService.Verify(x => x.GetById(777));
         }
 
@@ -168,7 +166,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
             // assert
             Assert.IsTrue(identityResult.Succeeded == false);
-            Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "DefaultError" && x.Description == "An unknown failure has occurred."));
+            Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "IdentityIdParseError" && x.Description == "Cannot parse ID to int"));
             _mockMemberGroupService.VerifyNoOtherCalls();
         }
 
@@ -221,7 +219,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
             // assert
             Assert.IsTrue(identityResult.Succeeded == false);
-            Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "DefaultError" && x.Description == "An unknown failure has occurred."));
+            Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "IdentityIdParseError" && x.Description == "Cannot parse ID to int"));
             _mockMemberGroupService.VerifyNoOtherCalls();
         }
 
@@ -247,7 +245,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
             // assert
             Assert.IsTrue(identityResult.Succeeded == false);
-            Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "InvalidRoleName" && x.Description == "Role name 'testname' is invalid."));
+            Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "IdentityMemberGroupNotFound" && x.Description == "Member group not found"));
             _mockMemberGroupService.Verify(x => x.GetById(777));
             _mockMemberGroupService.VerifyNoOtherCalls();
         }
@@ -283,7 +281,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         }
 
         [Test]
-        public void GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAnInt_ThenIShouldGetAFailureResultAsync()
+        public async Task GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAnInt_ThenIShouldGetAFailureResultAsync()
         {
             // arrange
             MemberRoleStore<IdentityRole> sut = CreateSut();
@@ -295,10 +293,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             var fakeCancellationToken = new CancellationToken() { };
 
             // act
-            Task<IdentityRole> actual = sut.FindByIdAsync(fakeRole.Id, fakeCancellationToken);
+            Action actual = () => sut.FindByIdAsync(fakeRole.Id, fakeCancellationToken);
 
             // assert
-            Assert.IsNull(actual);
+            Assert.That(actual, Throws.TypeOf<ArgumentOutOfRangeException>());
             _mockMemberGroupService.VerifyNoOtherCalls();
         }
 

@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Core.Security
     /// </summary>
     public class MemberUserStore : UserStoreBase<MemberIdentityUser, IdentityRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityUserToken<string>, IdentityRoleClaim<string>>
     {
+        private const string genericIdentityErrorCode = "IdentityErrorUserStore";
         private readonly IMemberService _memberService;
         private readonly UmbracoMapper _mapper;
         private readonly IScopeProvider _scopeProvider;
@@ -49,10 +50,10 @@ namespace Umbraco.Cms.Core.Security
         public override IQueryable<MemberIdentityUser> Users => throw new NotImplementedException();
 
         /// <inheritdoc />
-        public override Task<string> GetNormalizedUserNameAsync(MemberIdentityUser user, CancellationToken cancellationToken) => GetUserNameAsync(user, cancellationToken);
+        public override Task<string> GetNormalizedUserNameAsync(MemberIdentityUser user, CancellationToken cancellationToken = default) => GetUserNameAsync(user, cancellationToken);
 
         /// <inheritdoc />
-        public override Task SetNormalizedUserNameAsync(MemberIdentityUser user, string normalizedName, CancellationToken cancellationToken) => SetUserNameAsync(user, normalizedName, cancellationToken);
+        public override Task SetNormalizedUserNameAsync(MemberIdentityUser user, string normalizedName, CancellationToken cancellationToken = default) => SetUserNameAsync(user, normalizedName, cancellationToken);
 
         /// <inheritdoc />
         public override Task<IdentityResult> CreateAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
@@ -104,7 +105,7 @@ namespace Umbraco.Cms.Core.Security
             }
             catch (Exception ex)
             {
-                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = ex.Message, Description = ex.Message }));
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = genericIdentityErrorCode, Description = ex.Message }));
             }
         }
 
@@ -160,7 +161,7 @@ namespace Umbraco.Cms.Core.Security
             }
             catch (Exception ex)
             {
-                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = ex.Message, Description = ex.Message }));
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = genericIdentityErrorCode, Description = ex.Message }));
             }
         }
 
@@ -189,7 +190,7 @@ namespace Umbraco.Cms.Core.Security
             }
             catch (Exception ex)
             {
-                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = ex.Message, Description = ex.Message }));
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = genericIdentityErrorCode, Description = ex.Message }));
             }
         }
 
