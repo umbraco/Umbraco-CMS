@@ -36,7 +36,7 @@
                         <th>
                             <button type="button" ng-style="item.style" class="btn-reset bold" ng-click="vm.clickItem(item.id)">{{item.name}}</button>
                         </th>
-                        <td ng-repeat="column in item.translations">
+                        <td ng-repeat="column in item.translations | orderBy:'displayName'">
                             <button type="button" class="btn-reset" ng-click="vm.clickItem(item.id)">
                                 <i ng-if="column.hasTranslation" class="icon-check color-green" aria-hidden="true"></i>
                                 <span ng-if="column.hasTranslation" class="sr-only"><localize key="visuallyHiddenTexts_hasTranslation"></localize></span>
