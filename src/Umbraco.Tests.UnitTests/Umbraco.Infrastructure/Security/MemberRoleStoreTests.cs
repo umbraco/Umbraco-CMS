@@ -162,7 +162,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 Name = "testname"
             };
             var fakeCancellationToken = new CancellationToken() { };
-            
+
             // act
             IdentityResult identityResult = await sut.UpdateAsync(fakeRole, fakeCancellationToken);
 
@@ -247,7 +247,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
             // assert
             Assert.IsTrue(identityResult.Succeeded == false);
-            Assert.IsTrue(identityResult.Errors.Any(x=>x.Code == "InvalidRoleName" && x.Description == "Role name 'testname' is invalid."));
+            Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "InvalidRoleName" && x.Description == "Role name 'testname' is invalid."));
             _mockMemberGroupService.Verify(x => x.GetById(777));
             _mockMemberGroupService.VerifyNoOtherCalls();
         }
@@ -257,23 +257,23 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             // arrange
             MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole<string>("fakeGroupName")
+            var fakeRole = new IdentityRole("fakeGroupName")
             {
                 Id = "777"
             };
             int fakeRoleId = 777;
 
-            IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
-                m.Name == "fakeGroupName" &&
-                m.CreatorId == 123 &&
-                m.Id == 777);
+            IMemberGroup fakeMemberGroup = new MemberGroup()
+            {
+                Name = "fakeGroupName",
+                CreatorId = 123,
+                Id = 777
+            };
 
-            var fakeCancellationToken = new CancellationToken() { };
-
-            _mockMemberGroupService.Setup(x => x.GetById(fakeRoleId)).Returns(mockMemberGroup);
+            _mockMemberGroupService.Setup(x => x.GetById(fakeRoleId)).Returns(fakeMemberGroup);
 
             // act
-            IdentityRole actual = await sut.FindByIdAsync(fakeRole.Id, fakeCancellationToken);
+            IdentityRole actual = await sut.FindByIdAsync(fakeRole.Id);
 
             // assert
             Assert.AreEqual(fakeRole.Name, actual.Name);
@@ -293,7 +293,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 Name = "testname"
             };
             var fakeCancellationToken = new CancellationToken() { };
-            
+
             // act
             Task<IdentityRole> actual = sut.FindByIdAsync(fakeRole.Id, fakeCancellationToken);
 
@@ -342,7 +342,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
             // act
             Action actual = () => sut.FindByNameAsync(fakeRole.Name, fakeCancellationToken);
-            
+
             // assert
             Assert.That(actual, Throws.ArgumentNullException);
             _mockMemberGroupService.VerifyNoOtherCalls();
@@ -378,10 +378,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
             // act
             Task<string> actual = sut.GetRoleIdAsync(fakeRole, fakeCancellationToken);
-
-            // assert
-            Assert.That(actual, Throws.ArgumentNullException);
-
 
             // assert
             Assert.AreEqual(fakeRoleId, actual.Result);

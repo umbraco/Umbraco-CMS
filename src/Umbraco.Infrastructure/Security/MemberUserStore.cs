@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Security
     /// <summary>
     /// A custom user store that uses Umbraco member data
     /// </summary>
-    public class MemberUserStore : UserStoreBase<MemberIdentityUser, IdentityRole<string>, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityUserToken<string>, IdentityRoleClaim<string>>
+    public class MemberUserStore : UserStoreBase<MemberIdentityUser, IdentityRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityUserToken<string>, IdentityRoleClaim<string>>
     {
         private readonly IMemberService _memberService;
         private readonly UmbracoMapper _mapper;
@@ -40,6 +40,7 @@ namespace Umbraco.Cms.Core.Security
             _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
         }
 
+        //TODO: why is this not supported?
         /// <summary>
         /// Not supported in Umbraco
         /// </summary>
@@ -56,117 +57,140 @@ namespace Umbraco.Cms.Core.Security
         /// <inheritdoc />
         public override Task<IdentityResult> CreateAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            if (user == null)
+            try
             {
-                throw new ArgumentNullException(nameof(user));
+                cancellationToken.ThrowIfCancellationRequested();
+                ThrowIfDisposed();
+                if (user == null)
+                {
+                    throw new ArgumentNullException(nameof(user));
+                }
+
+                // create member
+                IMember memberEntity = _memberService.CreateMember(
+                    user.UserName,
+                    user.Email,
+                    user.Name.IsNullOrWhiteSpace() ? user.UserName : user.Name,
+                    user.MemberTypeAlias.IsNullOrWhiteSpace() ? Constants.Security.DefaultMemberTypeAlias : user.MemberTypeAlias);
+
+                UpdateMemberProperties(memberEntity, user);
+
+                // create the member
+                _memberService.Save(memberEntity);
+
+                if (!memberEntity.HasIdentity)
+                {
+                    throw new DataException("Could not create the member, check logs for details");
+                }
+
+                // re-assign id
+                user.Id = UserIdToString(memberEntity.Id);
+
+                // [from backofficeuser] we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
+                // var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MembersIdentityUser.Logins));
+                // TODO: confirm re externallogins implementation
+                //if (isLoginsPropertyDirty)
+                //{
+                //    _externalLoginService.Save(
+                //        user.Id,
+                //        user.Logins.Select(x => new ExternalLogin(
+                //            x.LoginProvider,
+                //            x.ProviderKey,
+                //            x.UserData)));
+                //}
+
+
+                return Task.FromResult(IdentityResult.Success);
             }
-
-            // create member
-            IMember memberEntity = _memberService.CreateMember(
-                user.UserName,
-                user.Email,
-                user.Name.IsNullOrWhiteSpace() ? user.UserName : user.Name,
-                user.MemberTypeAlias.IsNullOrWhiteSpace() ? Constants.Security.DefaultMemberTypeAlias : user.MemberTypeAlias);
-
-            UpdateMemberProperties(memberEntity, user);
-
-            // create the member
-            _memberService.Save(memberEntity);
-
-            if (!memberEntity.HasIdentity)
+            catch (Exception ex)
             {
-                throw new DataException("Could not create the member, check logs for details");
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = ex.Message, Description = ex.Message }));
             }
-
-            // re-assign id
-            user.Id = UserIdToString(memberEntity.Id);
-
-            // [from backofficeuser] we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
-            // var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MembersIdentityUser.Logins));
-            // TODO: confirm re externallogins implementation
-            //if (isLoginsPropertyDirty)
-            //{
-            //    _externalLoginService.Save(
-            //        user.Id,
-            //        user.Logins.Select(x => new ExternalLogin(
-            //            x.LoginProvider,
-            //            x.ProviderKey,
-            //            x.UserData)));
-            //}
-
-            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <inheritdoc />
         public override Task<IdentityResult> UpdateAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            if (user == null)
+            try
             {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            Attempt<int> asInt = user.Id.TryConvertTo<int>();
-            if (asInt == false)
-            {
-                throw new InvalidOperationException("The user id must be an integer to work with the Umbraco");
-            }
-
-            using (IScope scope = _scopeProvider.CreateScope())
-            {
-                IMember found = _memberService.GetById(asInt.Result);
-                if (found != null)
+                cancellationToken.ThrowIfCancellationRequested();
+                ThrowIfDisposed();
+                if (user == null)
                 {
-                    // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
-                    var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
-
-                    if (UpdateMemberProperties(found, user))
-                    {
-                        _memberService.Save(found);
-                    }
-
-                    // TODO: when to implement external login service?
-
-                    //if (isLoginsPropertyDirty)
-                    //{
-                    //    _externalLoginService.Save(
-                    //        found.Id,
-                    //        user.Logins.Select(x => new ExternalLogin(
-                    //            x.LoginProvider,
-                    //            x.ProviderKey,
-                    //            x.UserData)));
-                    //}
+                    throw new ArgumentNullException(nameof(user));
                 }
 
-                scope.Complete();
-            }
+                Attempt<int> asInt = user.Id.TryConvertTo<int>();
+                if (asInt == false)
+                {
+                    //TODO: should this be thrown, or an identity result?
+                    throw new InvalidOperationException("The user id must be an integer to work with Umbraco");
+                }
 
-            return Task.FromResult(IdentityResult.Success);
+                using (IScope scope = _scopeProvider.CreateScope())
+                {
+                    IMember found = _memberService.GetById(asInt.Result);
+                    if (found != null)
+                    {
+                        // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
+                        var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
+
+                        if (UpdateMemberProperties(found, user))
+                        {
+                            _memberService.Save(found);
+                        }
+
+                        // TODO: when to implement external login service?
+
+                        //if (isLoginsPropertyDirty)
+                        //{
+                        //    _externalLoginService.Save(
+                        //        found.Id,
+                        //        user.Logins.Select(x => new ExternalLogin(
+                        //            x.LoginProvider,
+                        //            x.ProviderKey,
+                        //            x.UserData)));
+                        //}
+                    }
+
+                    scope.Complete();
+
+                    return Task.FromResult(IdentityResult.Success);
+                }
+            }
+            catch (Exception ex)
+            {
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = ex.Message, Description = ex.Message }));
+            }
         }
 
         /// <inheritdoc />
         public override Task<IdentityResult> DeleteAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            if (user == null)
+            try
             {
-                throw new ArgumentNullException(nameof(user));
-            }
+                cancellationToken.ThrowIfCancellationRequested();
+                ThrowIfDisposed();
+                if (user == null)
+                {
+                    throw new ArgumentNullException(nameof(user));
+                }
 
-            IMember found = _memberService.GetById(UserIdToInt(user.Id));
-            if (found != null)
+                IMember found = _memberService.GetById(UserIdToInt(user.Id));
+                if (found != null)
+                {
+                    _memberService.Delete(found);
+                }
+
+                // TODO: when to implement external login service?
+                //_externalLoginService.DeleteUserLogins(UserIdToInt(user.Id));
+
+                return Task.FromResult(IdentityResult.Success);
+            }
+            catch (Exception ex)
             {
-                _memberService.Delete(found);
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = ex.Message, Description = ex.Message }));
             }
-
-            // TODO: when to implement external login service?
-            //_externalLoginService.DeleteUserLogins(UserIdToInt(user.Id));
-
-            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <inheritdoc />
@@ -177,6 +201,16 @@ namespace Umbraco.Cms.Core.Security
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
+
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new ArgumentNullException(nameof(userId));
+            }
+
+            if (!Guid.TryParse(userId, out Guid id))
+            {
+                throw new ArgumentOutOfRangeException(nameof(userId), $"{nameof(userId)} is not a valid x");
+            }
 
             IMember user = _memberService.GetById(UserIdToInt(userId));
             if (user == null)
@@ -208,7 +242,8 @@ namespace Umbraco.Cms.Core.Security
         {
             await base.SetPasswordHashAsync(user, passwordHash, cancellationToken);
 
-            user.PasswordConfig = null; // Clear this so that it's reset at the repository level
+            // Clear this so that it's reset at the repository level
+            user.PasswordConfig = null;
             user.LastPasswordChangeDateUtc = DateTime.UtcNow;
         }
 
@@ -216,7 +251,7 @@ namespace Umbraco.Cms.Core.Security
         public override async Task<bool> HasPasswordAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
         {
             // This checks if it's null
-            var result = await base.HasPasswordAsync(user, cancellationToken);
+            bool result = await base.HasPasswordAsync(user, cancellationToken);
             if (result)
             {
                 // we also want to check empty
@@ -262,8 +297,22 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(login));
             }
 
+            if (string.IsNullOrWhiteSpace(login.LoginProvider))
+            {
+                throw new ArgumentNullException(nameof(login.LoginProvider));
+            }
+
+            if (string.IsNullOrWhiteSpace(login.ProviderKey))
+            {
+                throw new ArgumentNullException(nameof(login.ProviderKey));
+            }
+
             ICollection<IIdentityUserLogin> logins = user.Logins;
-            var instance = new IdentityUserLogin(login.LoginProvider, login.ProviderKey, user.Id.ToString());
+            var instance = new IdentityUserLogin(
+                login.LoginProvider,
+                login.ProviderKey,
+                user.Id.ToString());
+
             IdentityUserLogin userLogin = instance;
             logins.Add(userLogin);
 
@@ -278,6 +327,16 @@ namespace Umbraco.Cms.Core.Security
             if (user == null)
             {
                 throw new ArgumentNullException(nameof(user));
+            }
+
+            if (string.IsNullOrWhiteSpace(loginProvider))
+            {
+                throw new ArgumentNullException(nameof(loginProvider));
+            }
+
+            if (string.IsNullOrWhiteSpace(providerKey))
+            {
+                throw new ArgumentNullException(nameof(providerKey));
             }
 
             IIdentityUserLogin userLogin = user.Logins.SingleOrDefault(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
@@ -311,21 +370,34 @@ namespace Umbraco.Cms.Core.Security
             MemberIdentityUser user = await FindUserAsync(userId, cancellationToken);
             if (user == null)
             {
-                return null;
+                //TODO: error throw or null result?
+                return await Task.FromResult((IdentityUserLogin<string>)null);
+            }
+
+            if (string.IsNullOrWhiteSpace(loginProvider))
+            {
+                throw new ArgumentNullException(nameof(loginProvider));
+            }
+
+            if (string.IsNullOrWhiteSpace(providerKey))
+            {
+                throw new ArgumentNullException(nameof(providerKey));
             }
 
             IList<UserLoginInfo> logins = await GetLoginsAsync(user, cancellationToken);
             UserLoginInfo found = logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
             if (found == null)
             {
-                return null;
+                //TODO: error throw or null result?
+                return await Task.FromResult((IdentityUserLogin<string>)null);
             }
 
             return new IdentityUserLogin<string>
             {
                 LoginProvider = found.LoginProvider,
                 ProviderKey = found.ProviderKey,
-                ProviderDisplayName = found.ProviderDisplayName, // TODO: We don't store this value so it will be null
+                // TODO: We don't store this value so it will be null
+                ProviderDisplayName = found.ProviderDisplayName,
                 UserId = user.Id
             };
         }
@@ -336,9 +408,19 @@ namespace Umbraco.Cms.Core.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
 
+            if (string.IsNullOrWhiteSpace(loginProvider))
+            {
+                throw new ArgumentNullException(nameof(loginProvider));
+            }
+
+            if (string.IsNullOrWhiteSpace(providerKey))
+            {
+                throw new ArgumentNullException(nameof(providerKey));
+            }
+
             var logins = new List<IIdentityUserLogin>();
 
-            // TODO: external login needed?
+            // TODO: external login needed
             //_externalLoginService.Find(loginProvider, providerKey).ToList();
             if (logins.Count == 0)
             {
@@ -350,7 +432,8 @@ namespace Umbraco.Cms.Core.Security
             {
                 LoginProvider = found.LoginProvider,
                 ProviderKey = found.ProviderKey,
-                ProviderDisplayName = null, // TODO: We don't store this value so it will be null
+                // TODO: We don't store this value so it will be null
+                ProviderDisplayName = null,
                 UserId = found.UserId
             });
         }
@@ -358,7 +441,11 @@ namespace Umbraco.Cms.Core.Security
         /// <inheritdoc />
         public override Task AddToRoleAsync(MemberIdentityUser user, string role, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
+            if (cancellationToken != null)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+            }
+
             ThrowIfDisposed();
             if (user == null)
             {
@@ -443,7 +530,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Returns true if a user is in the role
         /// </summary>
-        public override Task<bool> IsInRoleAsync(MemberIdentityUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
+        public override Task<bool> IsInRoleAsync(MemberIdentityUser user, string roleName, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -452,22 +539,28 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            return Task.FromResult(user.Roles.Select(x => x.RoleId).InvariantContains(normalizedRoleName));
+            if (string.IsNullOrWhiteSpace(roleName))
+            {
+                throw new ArgumentNullException(nameof(roleName));
+            }
+
+            return Task.FromResult(user.Roles.Select(x => x.RoleId).InvariantContains(roleName));
         }
 
         /// <summary>
         /// Lists all users of a given role.
         /// </summary>
-        public override Task<IList<MemberIdentityUser>> GetUsersInRoleAsync(string normalizedRoleName, CancellationToken cancellationToken = default)
+        public override Task<IList<MemberIdentityUser>> GetUsersInRoleAsync(string roleName, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-            if (normalizedRoleName == null)
+
+            if (string.IsNullOrWhiteSpace(roleName))
             {
-                throw new ArgumentNullException(nameof(normalizedRoleName));
+                throw new ArgumentNullException(nameof(roleName));
             }
 
-            IEnumerable<IMember> members = _memberService.GetMembersByMemberType(normalizedRoleName);
+            IEnumerable<IMember> members = _memberService.GetMembersByMemberType(roleName);
 
             IList<MemberIdentityUser> membersIdentityUsers = members.Select(x => _mapper.Map<MemberIdentityUser>(x)).ToList();
 
@@ -475,18 +568,23 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc/>
-        protected override Task<IdentityRole<string>> FindRoleAsync(string normalizedRoleName, CancellationToken cancellationToken)
+        protected override Task<IdentityRole> FindRoleAsync(string roleName, CancellationToken cancellationToken)
         {
-            IMemberGroup group = _memberService.GetAllRoles().SingleOrDefault(x => x.Name == normalizedRoleName);
-            if (group == null)
+            if (string.IsNullOrWhiteSpace(roleName))
             {
-                return Task.FromResult((IdentityRole<string>)null);
+                throw new ArgumentNullException(nameof(roleName));
             }
 
-            return Task.FromResult(new IdentityRole<string>(group.Name)
+            IMemberGroup group = _memberService.GetAllRoles().SingleOrDefault(x => x.Name == roleName);
+            if (group == null)
+            {
+                return Task.FromResult((IdentityRole)null);
+            }
+
+            return Task.FromResult(new IdentityRole(group.Name)
             {
                 //TODO: what should the alias be?
-                Id = @group.Id.ToString()
+                Id = group.Id.ToString()
             });
         }
 
@@ -523,7 +621,7 @@ namespace Umbraco.Cms.Core.Security
         {
             if (user != null)
             {
-                //TODO: when to
+                //TODO: implement
                 //user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetAll(UserIdToInt(user.Id))));
             }
 
