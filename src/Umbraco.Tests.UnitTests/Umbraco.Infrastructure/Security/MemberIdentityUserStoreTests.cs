@@ -83,20 +83,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             // arrange
             MemberUserStore sut = CreateSut();
-            var fakeUser = new MemberIdentityUser(777);
-            var fakeCancellationToken = new CancellationToken() { };
-
-            IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
-            IMember mockMember = Mock.Of<IMember>(m =>
-                m.Name == "fakeName" &&
-                m.Email == "fakeemail@umbraco.com" &&
-                m.Username == "fakeUsername" &&
-                m.RawPasswordValue == "fakePassword" &&
-                m.ContentTypeAlias == fakeMemberType.Alias &&
-                m.HasIdentity == true);
 
             // act
-            Action actual = () => sut.DeleteAsync(fakeUser, fakeCancellationToken);
+            Action actual = () => sut.DeleteAsync(null);
 
             // assert
             Assert.That(actual, Throws.ArgumentNullException);
