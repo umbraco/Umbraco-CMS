@@ -362,7 +362,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 memberType.Alias,
                 contentItem.Name);
 
-            IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password.NewPassword);
+            IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password.OldPassword);
 
             if (created.Succeeded == false)
             {
@@ -454,7 +454,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (contentItem.Password != null)
             {
-                IdentityResult validatePassword = await _memberManager.ValidatePasswordAsync(contentItem.Password.NewPassword);
+                IdentityResult validatePassword = await _memberManager.ValidatePasswordAsync(contentItem.Password.OldPassword);
                 if (validatePassword.Succeeded == false)
                 {
                     return new ValidationErrorResult(validatePassword.Errors.ToErrorMessage());
@@ -481,8 +481,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 var changingPasswordModel = new ChangingPasswordModel
                 {
                     Id = intId.Result,
-                    OldPassword = contentItem.Password.OldPassword,
                     NewPassword = contentItem.Password.NewPassword,
+                    OldPassword = contentItem.Password.OldPassword,
                 };
 
                 Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _memberManager);
@@ -536,9 +536,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return false;
             }
 
-            if (contentItem.Password != null && !contentItem.Password.NewPassword.IsNullOrWhiteSpace())
+            if (contentItem.Password != null && !contentItem.Password.OldPassword.IsNullOrWhiteSpace())
             {
-                IdentityResult validPassword = await _memberManager.ValidatePasswordAsync(contentItem.Password.NewPassword);
+                IdentityResult validPassword = await _memberManager.ValidatePasswordAsync(contentItem.Password.OldPassword);
                 if (!validPassword.Succeeded)
                 {
                     ModelState.AddPropertyError(

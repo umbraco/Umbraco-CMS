@@ -1,15 +1,22 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Web.Security;
+using System.Security.Principal;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Web;
+using System.Web.Hosting;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Models.Security;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -17,9 +24,6 @@ using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Security
 {
-    // MIGRATED TO NETCORE
-    // TODO: Analyse all - much can be moved/removed since most methods will occur on the manager via identity implementation
-
     /// <summary>
     /// Helper class containing logic relating to the built-in Umbraco members macros and controllers for:
     /// - Registration
@@ -29,7 +33,6 @@ namespace Umbraco.Web.Security
     /// </summary>
     public class MembershipHelper
     {
-        private readonly RoleProvider _roleProvider;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
@@ -39,7 +42,14 @@ namespace Umbraco.Web.Security
         private readonly ILogger _logger;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IEntityService _entityService;
+        private readonly IMemberManager _memberManager;
+        private readonly IIpResolver _ipResolver;
 
+        //TODO: use from identity
+        private readonly bool _enablePasswordRetrieval = false;
+        private readonly bool _requiresUniqueEmail = true;
+        private readonly int _maxInvalidPasswordAttempts = 10;
+            
         #region Constructors
 
         public MembershipHelper
@@ -52,7 +62,9 @@ namespace Umbraco.Web.Security
             AppCaches appCaches,
             ILoggerFactory loggerFactory,
             IShortStringHelper shortStringHelper,
-            IEntityService entityService
+            IEntityService entityService,
+            IIpResolver ipResolver,
+            IMemberManager memberManager
         )
         {
             MemberCache = memberCache;
@@ -65,6 +77,8 @@ namespace Umbraco.Web.Security
             _logger = _loggerFactory.CreateLogger<MembershipHelper>();
             _shortStringHelper = shortStringHelper;
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+            _ipResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
+            _memberManager = memberManager ?? throw new ArgumentNullException(nameof(memberManager));
         }
 
         #endregion
@@ -73,14 +87,11 @@ namespace Umbraco.Web.Security
 
         /// <summary>
         /// Check if a document object is protected by the "Protect Pages" functionality in umbraco
+        /// The call is a cached call
         /// </summary>
         /// <param name="path">The full path of the document object to check</param>
         /// <returns>True if the document object is protected</returns>
-        public virtual bool IsProtected(string path)
-        {
-            //this is a cached call
-            return _publicAccessService.IsProtected(path);
-        }
+        public virtual bool IsProtected(string path) => _publicAccessService.IsProtected(path);
 
         public virtual IDictionary<string, bool> IsProtected(IEnumerable<string> paths)
         {
@@ -98,11 +109,11 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="path">The full path of the document object to check</param>
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
-        public virtual bool MemberHasAccess(string path)
+        public virtual async Task<bool> MemberHasAccess(string path)
         {
             if (IsProtected(path))
             {
-                return IsLoggedIn() && HasAccess(path, Roles.Provider);
+                return IsLoggedIn() && await HasAccess(path);
             }
             return true;
         }
@@ -112,12 +123,11 @@ namespace Umbraco.Web.Security
         /// </summary>
         /// <param name="paths"></param>
         /// <returns></returns>
-        public virtual IDictionary<string, bool> MemberHasAccess(IEnumerable<string> paths)
+        public virtual async Task<IDictionary<string, bool>> MemberHasAccess(IEnumerable<string> paths)
         {
-            var protectedPaths = IsProtected(paths);
-
-            var pathsWithProtection = protectedPaths.Where(x => x.Value).Select(x => x.Key);
-            var pathsWithAccess = HasAccess(pathsWithProtection, Roles.Provider);
+            IDictionary<string, bool> protectedPaths = IsProtected(paths);
+            IEnumerable<string> pathsWithProtection = protectedPaths.Where(x => x.Value).Select(x => x.Key);
+            IDictionary<string, bool> pathsWithAccess = await HasAccess(pathsWithProtection);
 
             var result = new Dictionary<string, bool>();
             foreach (var path in paths)
@@ -130,58 +140,20 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// This will check if the member has access to this path
-        /// </summary>
-        /// <param name="path"></param>
-        /// <param name="roleProvider"></param>
-        /// <returns></returns>
-        private bool HasAccess(string path, RoleProvider roleProvider)
-        {
-            return _publicAccessService.HasAccess(path, CurrentUserName, roleProvider.GetRolesForUser);
-        }
-
-        private IDictionary<string, bool> HasAccess(IEnumerable<string> paths, RoleProvider roleProvider)
-        {
-            // ensure we only lookup user roles once
-            string[] userRoles = null;
-            string[] getUserRoles(string username)
-            {
-                if (userRoles != null)
-                    return userRoles;
-                userRoles = roleProvider.GetRolesForUser(username).ToArray();
-                return userRoles;
-            }
-
-            var result = new Dictionary<string, bool>();
-            foreach (var path in paths)
-            {
-                result[path] = IsLoggedIn() && _publicAccessService.HasAccess(path, CurrentUserName, getUserRoles);
-            }
-            return result;
-        }
-
-        /// <summary>
         /// Updates the currently logged in members profile
         /// </summary>
         /// <param name="model"></param>
         /// <returns>
         /// The updated MembershipUser object
         /// </returns>
-        public virtual Attempt<MembershipUser> UpdateMemberProfile(ProfileModel model)
+        public virtual async Task<Attempt<MemberIdentityUser>> UpdateMemberProfile(ProfileModel model)
         {
             if (IsLoggedIn() == false)
             {
                 throw new NotSupportedException("No member is currently logged in");
             }
 
-            //get the current membership user
-            var membershipUser = null;
-
-            //NOTE: This should never happen since they are logged in
-            if (membershipUser == null)
-            {
-                throw new InvalidOperationException("Could not find member with username " + _httpContextAccessor.GetRequiredHttpContext().User.Identity.Name);
-            }
+            MemberIdentityUser membershipUser = await GetCurrentUser();
 
             try
             {
@@ -189,30 +161,32 @@ namespace Umbraco.Web.Security
                 if (model.Email.InvariantEquals(membershipUser.Email) == false)
                 {
                     //Use identity to change the email since that is configured to do the checks to check for unique emails if that is configured.
-                    Attempt<MembershipUser> requiresUpdating = UpdateMember(membershipUser, model.Email);
+                    //TODO: come back to UpdateMember
+                    Attempt<MemberIdentityUser> requiresUpdating = UpdateMember(membershipUser, model.Email);
                     membershipUser = requiresUpdating.Result;
                 }
             }
             catch (Exception ex)
             {
                 //This will occur if an email already exists!
-                return Attempt<MembershipUser>.Fail(ex);
+                return Attempt<MemberIdentityUser>.Fail(ex);
             }
 
-            var member = GetCurrentPersistedMember();
+            //TODO: come back to this
+            IMember member = GetCurrentPersistedMember();
 
             //NOTE: If changing the username is a requirement, than that needs to be done via the IMember directly since MembershipProvider's natively do
             // not support changing a username!
-            if (model.Name != null && member.Name != model.Name)
+            if (model.Name != null && membershipUser.Name != model.Name)
             {
-                member.Name = model.Name;
+                membershipUser.Name = model.Name;
             }
 
-            var memberType = _memberTypeService.Get(member.ContentTypeId);
+            IMemberType memberType = _memberTypeService.Get(member.ContentTypeId);
 
             if (model.MemberProperties != null)
             {
-                foreach (var property in model.MemberProperties
+                foreach (UmbracoProperty property in model.MemberProperties
                     //ensure the property they are posting exists
                     .Where(p => memberType.PropertyTypeExists(p.Alias))
                     .Where(property => member.Properties.Contains(property.Alias))
@@ -225,10 +199,11 @@ namespace Umbraco.Web.Security
 
             _memberService.Save(member);
 
+            //TODO: Replace with Identity SignInManager
             //reset the FormsAuth cookie since the username might have changed
-            FormsAuthentication.SetAuthCookie(member.Username, true);
+            //FormsAuthentication.SetAuthCookie(member.Username, true);
 
-            return Attempt<MembershipUser>.Succeed(membershipUser);
+            return Attempt<MemberIdentityUser>.Succeed(membershipUser);
         }
 
         /// <summary>
@@ -240,27 +215,29 @@ namespace Umbraco.Web.Security
         /// true to log the member in upon successful registration
         /// </param>
         /// <returns></returns>
-        public virtual MembershipUser RegisterMember(RegisterModel model, out MembershipCreateStatus status, bool logMemberIn = true)
+        public virtual async Task<Member> RegisterMember(RegisterModel model, bool logMemberIn = true)
         {
+            //TODO: This no longer has an out parameter as it is an aSync method. Is that ok? 
             model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
 
-            MembershipUser membershipUser;
-            membershipUser = CreateUser(
-                     model.MemberTypeAlias,
-                     model.Username, model.Password, model.Email,
-                     // TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
-                     null, null,
-                     true, null, out status);
+            var identityMember = MemberIdentityUser.CreateNew(
+                model.Username,
+                model.Email,
+                model.MemberTypeAlias,
+                model.Name);
 
-            if (status != MembershipCreateStatus.Success)
+            IdentityResult created = await _memberManager.CreateAsync(identityMember, model.Password);
+
+            if (!created.Succeeded)
+            {
                 return null;
+            }
 
-            var member = _memberService.GetByUsername(membershipUser.UserName);
-            member.Name = model.Name;
+            var member = (Member)_memberService.GetByUsername(identityMember.UserName);
 
             if (model.MemberProperties != null)
             {
-                foreach (var property in model.MemberProperties.Where(p => p.Value != null)
+                foreach (UmbracoProperty property in model.MemberProperties.Where(p => p.Value != null)
                     .Where(property => member.Properties.Contains(property.Alias)))
                 {
                     member.Properties[property.Alias].SetValue(property.Value);
@@ -271,14 +248,11 @@ namespace Umbraco.Web.Security
 
             if (logMemberIn)
             {
-                //Set member online
-                GetUser(model.Username, true);
-
-                //Log them in
-                FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
+                //TODO: come back to this
+                SetMemberOnline(identityMember, member);
             }
 
-            return membershipUser;
+            return member;
         }
 
         /// <summary>
@@ -287,27 +261,98 @@ namespace Umbraco.Web.Security
         /// <param name="username"></param>
         /// <param name="password"></param>
         /// <returns></returns>
-        public virtual bool Login(string username, string password)
+        public virtual async Task<bool> Login(string username, string password)
         {
-            var provider = _membershipProvider;
-            //Validate credentials
-            if (provider.ValidateUser(username, password) == false)
+            //TODO: move this logic to the manager
+            MemberIdentityUser member = await _memberManager.FindByNameAsync(username);
+            if (member == null)
             {
+                _logger.LogWarning($"Login attempt failed for member username {0} from IP address {1}, the user does not exist", username, _ipResolver.GetCurrentRequestIpAddress());
                 return false;
             }
+
+            if (member.IsApproved == false)
+            {
+                _logger.LogWarning($"Validation failed for member username {0} from IP address {1}, the user is not approved", username, _ipResolver.GetCurrentRequestIpAddress());
+                return false;
+            }
+
+            if (member.IsLockedOut)
+            {
+                _logger.LogWarning($"Login attempt failed for member username {0} from IP address {1}, the user is locked out", username, _ipResolver.GetCurrentRequestIpAddress());
+                return false;
+            }
+
+            //Validate credentials
+            bool authenticated = await _memberManager.CheckPasswordAsync(member, password);
+
+            if (authenticated == false)
+            {
+                //TODO: Is this too explicit?
+                _logger.LogWarning($"The password was not valid for member user {0} from IP address {1}", username, _ipResolver.GetCurrentRequestIpAddress());
+
+                // TODO: Increment login attempts - lock if too many.
+                // TODO: Should we do this in Identity layer instead?
+                var count = member.AccessFailedCount;
+                count++;
+                member.AccessFailedCount = count;
+
+                if (count >= _maxInvalidPasswordAttempts)
+                {
+                    member.LockoutEnabled = true;
+                    //member.LastLockoutDate = DateTime.Now;
+                    _logger.LogWarning($"Login attempt failed for username {0} from IP address {1}, the user is now locked out, max invalid password attempts exceeded", username, _ipResolver.GetCurrentRequestIpAddress());
+                }
+                else
+                {
+                    _logger.LogWarning($"Login attempt failed for username {0} from IP address {1}", username, _ipResolver.GetCurrentRequestIpAddress());
+                }
+            }
+            else
+            {
+                if (member.AccessFailedCount > 0)
+                {
+                    //we have successfully logged in, reset the AccessFailedCount
+                    member.AccessFailedCount = 0;
+                    return false;
+                }
+
+                _logger.LogWarning($"Login attempt succeeded for member username {0} from IP address {1}", username, _ipResolver.GetCurrentRequestIpAddress());
+            }
+
+            //TODO: old comment, what is still needed in .NET Core?
+            // don't raise events for this! It just sets the member dates, if we do raise events this will
+            // cause all distributed cache to execute - which will clear out some caches we don't want.
+            // http://issues.umbraco.org/issue/U4-3451
+            // TODO: In v8 we aren't going to have an overload to disable events, so we'll need to make a different method
+            // for this type of thing (i.e. UpdateLastLogin or similar).
+
+            member.LastLoginDateUtc = DateTime.Now;
+
+            await _memberManager.UpdateAsync(member);
+
+            //TODO: do we still need to worry about full save/speed?
+            //bool requiresFullSave = false;
+            //set the last login date without full save (fast, no locks)
+            //_memberService.SetLastLogin(member.UserName, member.LastLoginDateUtc.GetValueOrDefault());
+
+            //TODO: replace
             // Get the member, do not set to online - this is done implicitly as part of ValidateUser which is consistent with
             // how the .NET framework SqlMembershipProvider works. Passing in true will just cause more unnecessary SQL queries/locks.
-            var member = provider.GetUser(username, false);
-            if (member == null)
+            MemberIdentityUser identityMember = await GetUser(username, false);
+            if (identityMember == null)
             {
                 //this should not happen
                 _logger.LogWarning("The member validated but then no member was returned with the username {Username}", username);
                 return false;
             }
+
             //Log them in
-            FormsAuthentication.SetAuthCookie(member.UserName, true);
+            //TODO: login user in using SignInManager
+            //FormsAuthentication.SetAuthCookie(member.UserName, true);
             return true;
         }
+
         #region Querying for front-end
 
 
@@ -316,65 +361,46 @@ namespace Umbraco.Web.Security
         /// </summary>
         public virtual void Logout()
         {
-            FormsAuthentication.SignOut();
+            //TODO: Use members SignInManager
+            //FormsAuthentication.SignOut();
         }
 
+        public virtual IPublishedContent GetByProviderKey(object key) => MemberCache.GetByProviderKey(key);
 
-        public virtual IPublishedContent GetByProviderKey(object key)
-        {
-            return MemberCache.GetByProviderKey(key);
-        }
+        public virtual IEnumerable<IPublishedContent> GetByProviderKeys(IEnumerable<object> keys) => keys?.Select(GetByProviderKey).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
 
-        public virtual IEnumerable<IPublishedContent> GetByProviderKeys(IEnumerable<object> keys)
-        {
-            return keys?.Select(GetByProviderKey).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
-        }
+        public virtual IPublishedContent GetById(int memberId) => MemberCache.GetById(memberId);
 
-        public virtual IPublishedContent GetById(int memberId)
-        {
-            return MemberCache.GetById(memberId);
-        }
+        public virtual IEnumerable<IPublishedContent> GetByIds(IEnumerable<int> memberIds) => memberIds?.Select(GetById).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
 
-        public virtual IEnumerable<IPublishedContent> GetByIds(IEnumerable<int> memberIds)
-        {
-            return memberIds?.Select(GetById).WhereNotNull() ?? Enumerable.Empty<IPublishedContent>();
-        }
+        public virtual IPublishedContent GetById(Guid memberId) => GetByProviderKey(memberId);
 
-        public virtual IPublishedContent GetById(Guid memberId)
-        {
-            return GetByProviderKey(memberId);
-        }
+        public virtual IEnumerable<IPublishedContent> GetByIds(IEnumerable<Guid> memberIds) => GetByProviderKeys(memberIds.OfType<object>());
 
-        public virtual IEnumerable<IPublishedContent> GetByIds(IEnumerable<Guid> memberIds)
-        {
-            return GetByProviderKeys(memberIds.OfType<object>());
-        }
+        public virtual IPublishedContent GetByUsername(string username) => MemberCache.GetByUsername(username);
 
-        public virtual IPublishedContent GetByUsername(string username)
-        {
-            return MemberCache.GetByUsername(username);
-        }
-
-        public virtual IPublishedContent GetByEmail(string email)
-        {
-            return MemberCache.GetByEmail(email);
-        }
+        public virtual IPublishedContent GetByEmail(string email) => MemberCache.GetByEmail(email);
 
         public virtual IPublishedContent Get(Udi udi)
         {
             var guidUdi = udi as GuidUdi;
             if (guidUdi == null)
+            {
                 return null;
+            }
 
-            var umbracoType = UdiEntityTypeHelper.ToUmbracoObjectType(udi.EntityType);
+            UmbracoObjectTypes umbracoType = UdiEntityTypeHelper.ToUmbracoObjectType(udi.EntityType);
 
             switch (umbracoType)
             {
                 case UmbracoObjectTypes.Member:
                     // TODO: need to implement Get(guid)!
-                    var memberAttempt = _entityService.GetId(guidUdi.Guid, umbracoType);
+                    Attempt<int> memberAttempt = _entityService.GetId(guidUdi.Guid, umbracoType);
                     if (memberAttempt.Success)
+                    {
                         return GetById(memberAttempt.Result);
+                    }
+
                     break;
             }
 
@@ -391,7 +417,9 @@ namespace Umbraco.Web.Security
             {
                 return null;
             }
-            var result = GetCurrentPersistedMember();
+
+            //TODO: revisit this
+            IMember result = GetCurrentPersistedMember();
             return result == null ? null : MemberCache.GetByMember(result);
         }
 
@@ -405,7 +433,9 @@ namespace Umbraco.Web.Security
             {
                 return -1;
             }
-            var result = GetCurrentMember();
+
+            //TODO: revisit this
+            IPublishedContent result = GetCurrentMember();
             return result?.Id ?? -1;
         }
 
@@ -417,41 +447,47 @@ namespace Umbraco.Web.Security
         /// profile properties
         /// </summary>
         /// <returns></returns>
-        public virtual ProfileModel GetCurrentMemberProfileModel()
+        public virtual async Task<ProfileModel> GetCurrentMemberProfileModel()
         {
             if (IsLoggedIn() == false)
             {
                 return null;
             }
 
-            var membershipUser = GetCurrentUserOnline();
-            var member = GetCurrentPersistedMember();
+            MemberIdentityUser membershipUser = await GetCurrentUserOnline();
+            IMember member = GetCurrentPersistedMember();
+
             //this shouldn't happen but will if the member is deleted in the back office while the member is trying
             // to use the front-end!
             if (member == null)
             {
+                //TODO: Replace with identity SignInmanager
                 //log them out since they've been removed
-                FormsAuthentication.SignOut();
+                //FormsAuthentication.SignOut();
 
                 return null;
             }
 
-            var model = new ProfileModel();
-            model.Name = member.Name;
-            model.MemberTypeAlias = member.ContentTypeAlias;
+            var model = new ProfileModel
+            {
+                Name = member.Name,
+                MemberTypeAlias = member.ContentTypeAlias,
 
-            model.Email = membershipUser.Email;
-            model.UserName = membershipUser.UserName;
-            model.Comment = membershipUser.Comment;
-            model.IsApproved = membershipUser.IsApproved;
-            model.IsLockedOut = membershipUser.IsLockedOut;
-            model.LastLockoutDate = membershipUser.LastLockoutDate;
-            model.CreationDate = membershipUser.CreationDate;
-            model.LastLoginDate = membershipUser.LastLoginDate;
-            model.LastActivityDate = membershipUser.LastActivityDate;
-            model.LastPasswordChangedDate = membershipUser.LastPasswordChangedDate;
+                //TODO: we don't have all these properties on members identity
+                // Comment, LastLockoutDate, CreationDate, LastActivityDate
+                Email = membershipUser.Email,
+                UserName = membershipUser.UserName,
+                //Comment = membershipUser.Comment,
+                IsApproved = membershipUser.IsApproved,
+                IsLockedOut = membershipUser.IsLockedOut,
+                //LastLockoutDate = membershipUser.LastLockoutDate,
+                //CreationDate = membershipUser.CreationDate,
+                LastLoginDate = membershipUser.LastLoginDateUtc.GetValueOrDefault(),
+                //LastActivityDate = membershipUser.LastActivityDate,
+                LastPasswordChangedDate = membershipUser.LastPasswordChangeDateUtc.GetValueOrDefault()
+            };
 
-            var memberType = _memberTypeService.Get(member.ContentTypeId);
+            IMemberType memberType = _memberTypeService.Get(member.ContentTypeId);
 
             var builtIns = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper).Select(x => x.Key).ToArray();
 
@@ -467,10 +503,12 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual RegisterModel CreateRegistrationModel(string memberTypeAlias = null)
         {
-            memberTypeAlias = memberTypeAlias ?? Constants.Conventions.MemberTypes.DefaultAlias;
-            var memberType = _memberTypeService.Get(memberTypeAlias);
+            memberTypeAlias ??= Constants.Conventions.MemberTypes.DefaultAlias;
+            IMemberType memberType = _memberTypeService.Get(memberTypeAlias);
             if (memberType == null)
+            {
                 throw new InvalidOperationException("Could not find a member type with alias " + memberTypeAlias);
+            }
 
             var builtIns = ConventionsHelper.GetStandardPropertyTypeStubs(_shortStringHelper).Select(x => x.Key).ToArray();
             var model = RegisterModel.CreateModel();
@@ -483,14 +521,14 @@ namespace Umbraco.Web.Security
         {
             var viewProperties = new List<UmbracoProperty>();
 
-            foreach (var prop in memberType.PropertyTypes
+            foreach (IPropertyType prop in memberType.PropertyTypes
                     .Where(x => builtIns.Contains(x.Alias) == false && memberType.MemberCanEditProperty(x.Alias))
                     .OrderBy(p => p.SortOrder))
             {
                 var value = string.Empty;
                 if (member != null)
                 {
-                    var propValue = member.Properties[prop.Alias];
+                    IProperty propValue = member.Properties[prop.Alias];
                     if (propValue != null && propValue.GetValue() != null)
                     {
                         value = propValue.GetValue().ToString();
@@ -542,18 +580,17 @@ namespace Umbraco.Web.Security
         /// Gets the current user's roles.
         /// </summary>
         /// <remarks>Roles are cached per user name, at request level.</remarks>
-        public IEnumerable<string> GetCurrentUserRoles()
-            => GetUserRoles(CurrentUserName);
+        public async Task<IEnumerable<string>> GetCurrentUserRoles() => await GetUserRoles(CurrentUserName);
 
         /// <summary>
         /// Gets a user's roles.
         /// </summary>
         /// <remarks>Roles are cached per user name, at request level.</remarks>
-        public IEnumerable<string> GetUserRoles(string userName)
+        public async Task<IEnumerable<string>> GetUserRoles(string userName)
         {
             // optimize by caching per-request (v7 cached per PublishedRequest, in PublishedRouter)
             var key = "Umbraco.Web.Security.MembershipHelper__Roles__" + userName;
-            return _appCaches.RequestCache.GetCacheItem(key, () => Roles.Provider.GetRolesForUser(userName));
+            return await _appCaches.RequestCache.GetCacheItem(key, () => GetRolesForUser(userName));
         }
 
         /// <summary>
@@ -570,13 +607,14 @@ namespace Umbraco.Web.Security
                 return model;
             }
 
-            var member = GetCurrentPersistedMember();
+            IMember member = GetCurrentPersistedMember();
             //this shouldn't happen but will if the member is deleted in the back office while the member is trying
             // to use the front-end!
             if (member == null)
             {
                 //log them out since they've been removed
-                FormsAuthentication.SignOut();
+                //TODO: use identity SigninManager
+                //FormsAuthentication.SignOut();
                 model.IsLoggedIn = false;
                 return model;
             }
@@ -594,14 +632,18 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public bool IsLoggedIn()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
+            //TODO: change to identity
+            HttpContextBase httpContext = _httpContextAccessor.HttpContext;
             return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated;
         }
 
         /// <summary>
-        /// Returns the currently logged in username
+        /// Returns the currently logged in member's username
         /// </summary>
+        /// TODO: this has been changed for identity
         public string CurrentUserName => _httpContextAccessor.GetRequiredHttpContext().User.Identity.Name;
+        //await GetCurrentMember();
+
 
         /// <summary>
         /// Returns true or false if the currently logged in member is authorized based on the parameters provided
@@ -610,17 +652,25 @@ namespace Umbraco.Web.Security
         /// <param name="allowGroups"></param>
         /// <param name="allowMembers"></param>
         /// <returns></returns>
-        public virtual bool IsMemberAuthorized(
+        public virtual async Task<bool> IsMemberAuthorized(
             IEnumerable<string> allowTypes = null,
             IEnumerable<string> allowGroups = null,
             IEnumerable<int> allowMembers = null)
         {
             if (allowTypes == null)
+            {
                 allowTypes = Enumerable.Empty<string>();
+            }
+
             if (allowGroups == null)
+            {
                 allowGroups = Enumerable.Empty<string>();
+            }
+
             if (allowMembers == null)
+            {
                 allowMembers = Enumerable.Empty<int>();
+            }
 
             // Allow by default
             var allowAction = true;
@@ -633,14 +683,17 @@ namespace Umbraco.Web.Security
             else
             {
                 string username;
-                var member = GetCurrentPersistedMember();
+                IMember member = GetCurrentPersistedMember();
                 // If a member could not be resolved from the provider, we are clearly not authorized and can break right here
                 if (member == null)
+                {
                     return false;
+                }
+
                 username = member.Username;
 
                 // If types defined, check member is of one of those types
-                var allowTypesList = allowTypes as IList<string> ?? allowTypes.ToList();
+                IList<string> allowTypesList = allowTypes as IList<string> ?? allowTypes.ToList();
                 if (allowTypesList.Any(allowType => allowType != string.Empty))
                 {
                     // Allow only if member's type is in list
@@ -655,11 +708,11 @@ namespace Umbraco.Web.Security
                 }
 
                 // If groups defined, check member is of one of those groups
-                var allowGroupsList = allowGroups as IList<string> ?? allowGroups.ToList();
+                IList<string> allowGroupsList = allowGroups as IList<string> ?? allowGroups.ToList();
                 if (allowAction && allowGroupsList.Any(allowGroup => allowGroup != string.Empty))
                 {
                     // Allow only if member is assigned to a group in the list
-                    var groups = _roleProvider.GetRolesForUser(username);
+                    IEnumerable<string> groups = await GetRolesForUser(username);
                     allowAction = allowGroupsList.Select(s => s.ToLowerInvariant()).Intersect(groups.Select(myGroup => myGroup.ToLowerInvariant())).Any();
                 }
             }
@@ -680,7 +733,7 @@ namespace Umbraco.Web.Security
         /// <returns>
         /// Returns successful if the membership user required updating, otherwise returns failed if it didn't require updating.
         /// </returns>
-        internal Attempt<MembershipUser> UpdateMember(MembershipUser member, MembershipProvider provider,
+        internal Attempt<MemberIdentityUser> UpdateMember(MemberIdentityUser member,
             string email = null,
             bool? isApproved = null,
             DateTime? lastLoginDate = null,
@@ -692,39 +745,59 @@ namespace Umbraco.Web.Security
             if (email != null)
             {
                 if (member.Email != email)
+                {
                     update = true;
+                }
+
                 member.Email = email;
             }
             if (isApproved.HasValue)
             {
                 if (member.IsApproved != isApproved.Value)
+                {
                     update = true;
+                }
+
                 member.IsApproved = isApproved.Value;
             }
             if (lastLoginDate.HasValue)
             {
-                if (member.LastLoginDate != lastLoginDate.Value)
+                if (member.LastLoginDateUtc != lastLoginDate.Value)
+                {
                     update = true;
-                member.LastLoginDate = lastLoginDate.Value;
+                }
+
+                member.LastLoginDateUtc = lastLoginDate.Value;
             }
-            if (lastActivityDate.HasValue)
-            {
-                if (member.LastActivityDate != lastActivityDate.Value)
-                    update = true;
-                member.LastActivityDate = lastActivityDate.Value;
-            }
-            if (comment != null)
-            {
-                if (member.Comment != comment)
-                    update = true;
-                member.Comment = comment;
-            }
+
+            //TODO: implement for identity
+            //if (lastActivityDate.HasValue)
+            //{
+            //    if (member.LastActivityDate != lastActivityDate.Value)
+            //    {
+            //        update = true;
+            //    }
+
+            //    member.LastActivityDate = lastActivityDate.Value;
+            //}
+            //if (comment != null)
+            //{
+            //    if (member.Comment != comment)
+            //    {
+            //        update = true;
+            //    }
+
+            //    member.Comment = comment;
+            //}
 
             if (update == false)
-                return Attempt<MembershipUser>.Fail(member);
+            {
+                return Attempt<MemberIdentityUser>.Fail(member);
+            }
 
-            provider.UpdateUser(member);
-            return Attempt<MembershipUser>.Succeed(member);
+            //TODO: revisit this
+            UpdateUser(member);
+            return Attempt<MemberIdentityUser>.Succeed(member);
         }
 
         /// <summary>
@@ -733,66 +806,200 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         private IMember GetCurrentPersistedMember()
         {
-            var username = GetCurrentUserName();
+            string username = GetCurrentUserName();
+
+            //TODO: is this still true?
             // The result of this is cached by the MemberRepository
-            var member = _memberService.GetByUsername(username);
+            //MemberIdentityUser member = await _memberManager.FindByNameAsync(username);
+            IMember member = _memberService.GetByUsername(username);
             return member;
         }
 
         /// <summary>
-        /// Changes password for a member/user given the membership provider and the password change model
+        /// This will check if the member has access to this path
         /// </summary>
-        /// <param name="username">The username of the user having their password changed</param>
-        /// <param name="passwordModel"></param>
-        /// <param name="membershipProvider"></param>
+        /// <param name="path"></param>
+        /// <param name="roleProvider"></param>
         /// <returns></returns>
-        private Attempt<PasswordChangedModel> ChangePasswordWithMembershipProvider(
-            string username,
-            ChangingPasswordModel passwordModel)
+        private async Task<bool> HasAccess(string path)
         {
-            // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
-
-            if (passwordModel == null)
-                throw new ArgumentNullException(nameof(passwordModel));
-            var userId = -1;
-
-
-            //we're not resetting it so we need to try to change it.
-
-            if (passwordModel.NewPassword.IsNullOrWhiteSpace())
-            {
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
-            }
-
-            if (EnablePasswordRetrieval)
-            {
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Membership providers using encrypted passwords and password retrieval are not supported", new[] { "value" }) });
-            }
-
-            //without being able to retrieve the original password
-            if (passwordModel.OldPassword.IsNullOrWhiteSpace())
-            {
-                //if password retrieval is not enabled but there is no old password we cannot continue
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password cannot be changed without the old password", new[] { "oldPassword" }) });
-            }
-
-            //if an old password is supplied try to change it
-
-            try
-            {
-                var result = ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
-
-                return result == false
-                    ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "oldPassword" }) })
-                    : Attempt.Succeed(new PasswordChangedModel());
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Could not change member password");
-                return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, error: " + ex.Message + " (see log for full details)", new[] { "value" }) });
-            }
-
+            string[] userRoles = null;
+            return _publicAccessService.HasAccess(path, CurrentUserName, username => getUserRolesAsync(username, ref userRoles));
         }
 
+        private async Task<IEnumerable<string>> GetRolesForUser(string username)
+        {
+            MemberIdentityUser currentMember = await _memberManager.FindByNameAsync(username);
+
+            IEnumerable<string> list = new List<string>();
+
+            //TODO: return groups or roles
+            IEnumerable<IdentityUserRole<string>> currentMemberRoles = currentMember.Roles;
+            foreach (IdentityUserRole<string> role in currentMemberRoles)
+            {
+                list.Append(role.RoleId);
+            }
+
+            return list;
+        }
+
+        private async Task<IDictionary<string, bool>> HasAccess(IEnumerable<string> paths)
+        {
+            // ensure we only lookup user roles once
+            string[] userRoles = null;
+
+            var result = new Dictionary<string, bool>();
+            foreach (var path in paths)
+            {
+                result[path] = IsLoggedIn() && _publicAccessService.HasAccess(path, CurrentUserName, username => getUserRolesAsync(username, ref userRoles));
+            }
+            return result;
+        }
+
+        private string[] getUserRolesAsync(string username, ref string[] userRoles)
+        {
+            if (userRoles != null)
+            {
+                return userRoles;
+            }
+
+            //TODO: amend
+            userRoles = (string[])GetRolesForUser(username).Result;
+            return userRoles;
+        }
+
+
+        /// <summary>
+        /// Sets member online and save
+        /// </summary>
+        /// <param name="identityMember"></param>
+        /// <param name="member"></param>
+        private void SetMemberOnline(MemberIdentityUser identityMember, Member member)
+        {
+            // Set member online
+            // TODO: move to identity
+            // logic and comments taken from legacy UmbracoMembershipProvider
+            // update the database data directly instead of a full member save which requires DB locks
+
+            DateTime now = DateTime.Now;
+            _memberService.SetLastLogin(identityMember.UserName, now);
+            member.LastLoginDate = now;
+            member.UpdateDate = now;
+
+            //Log them in
+            //TODO: Use identity sign-in manager
+            //FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
+        }
+
+        /// <summary>
+        /// Updates e-mail  approved status, lock status and comment on a user.
+        /// </summary>
+        /// <param name="user">A <see cref="T:System.Web.Security.MembershipUser"></see> object that represents the user to update and the updated information for the user.</param>
+        private void UpdateUser(MemberIdentityUser user)
+        {
+            IMember m = _memberService.GetByUsername(user.UserName);
+
+            if (m == null)
+            {
+                throw new Exception(string.Format("No member with the username '{0}' found", user.UserName));
+            }
+
+            if (_requiresUniqueEmail && user.Email.Trim().IsNullOrWhiteSpace() == false)
+            {
+                IEnumerable<IMember> byEmail = _memberService.FindByEmail(user.Email.Trim(), 0, int.MaxValue, out long totalRecs, StringPropertyMatchType.Exact);
+                if (byEmail.Count(x => x.Id != m.Id) > 0)
+                {
+                    throw new Exception(string.Format("A member with the email '{0}' already exists", user.Email));
+                }
+            }
+            m.Email = user.Email;
+
+            m.IsApproved = user.IsApproved;
+            m.IsLockedOut = user.IsLockedOut;
+            if (user.IsLockedOut)
+            {
+                m.LastLockoutDate = DateTime.Now;
+            }
+
+            //TODO: implement comment for member
+            //m.Comments = user.Comment;
+
+            _memberService.Save(m);
+        }
+
+        /// <summary>
+        /// Returns the currently logged in MembershipUser
+        /// </summary>
+        /// <returns></returns>
+        private async Task<MemberIdentityUser> GetCurrentUser()
+        {
+            string username = GetCurrentUserName();
+            return username.IsNullOrWhiteSpace()
+                ? null
+                : await GetUser(username, true);
+        }
+
+
+        /// <summary>
+        /// Returns the currently logged in MembershipUser and flags them as being online - use sparingly (i.e. login)
+        /// </summary>
+        /// <param name="membershipProvider"></param>
+        /// <returns></returns>
+        private async Task<MemberIdentityUser> GetCurrentUserOnline()
+        {
+            string username = GetCurrentUserName();
+            return username.IsNullOrWhiteSpace()
+                ? null
+                : await GetUser(username, true);
+        }
+
+        private async Task<MemberIdentityUser> GetUser(string username, bool isOnline)
+        {
+            MemberIdentityUser membershipUser;
+
+            if (username.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+            else
+            {
+                membershipUser = await _memberManager.FindByNameAsync(username);
+                //NOTE: This should never happen since they are logged in
+                if (membershipUser == null)
+                {
+                    throw new InvalidOperationException("Could not find member with username " + username);
+                }
+
+                if (isOnline)
+                {
+                    IMember member = _memberService.GetByUsername(username);
+                    SetMemberOnline(membershipUser, (Member)member);
+                }
+
+                return membershipUser;
+            }
+        }
+
+        private string GetCurrentUserName()
+        {
+            //TODO: rework for Identity
+            if (HostingEnvironment.IsHosted)
+            {
+                HttpContext current = HttpContext.Current;
+                if (current != null && current.User != null && current.User.Identity != null)
+                {
+                    return current.User.Identity.Name;
+                }
+            }
+            IPrincipal currentPrincipal = Thread.CurrentPrincipal;
+            if (currentPrincipal == null || currentPrincipal.Identity == null)
+            {
+                return string.Empty;
+            }
+            else
+            {
+                return currentPrincipal.Identity.Name;
+            }
+        }
     }
 }

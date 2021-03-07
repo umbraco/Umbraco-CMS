@@ -25,11 +25,9 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberIdentityUser"/> class.
         /// </summary>
-        public MemberIdentityUser(int userId)
-        {
+        public MemberIdentityUser(int userId) =>
             // use the property setters - they do more than just setting a field
             Id = UserIdToString(userId);
-        }
 
         public MemberIdentityUser()
         {

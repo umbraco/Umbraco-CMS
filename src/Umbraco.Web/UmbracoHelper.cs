@@ -118,10 +118,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="alias">The alias.</param>
         /// <returns></returns>
-        public IHtmlEncodedString RenderMacro(string alias)
-        {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, null);
-        }
+        public IHtmlEncodedString RenderMacro(string alias) => _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, null);
 
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
@@ -129,10 +126,7 @@ namespace Umbraco.Web
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        public IHtmlEncodedString RenderMacro(string alias, object parameters)
-        {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
-        }
+        public IHtmlEncodedString RenderMacro(string alias, object parameters) => _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
 
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
@@ -140,10 +134,7 @@ namespace Umbraco.Web
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        public IHtmlEncodedString RenderMacro(string alias, IDictionary<string, object> parameters)
-        {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters);
-        }
+        public IHtmlEncodedString RenderMacro(string alias, IDictionary<string, object> parameters) => _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters);
 
         #endregion
 
@@ -154,10 +145,7 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="key"></param>
         /// <returns></returns>
-        public string GetDictionaryValue(string key)
-        {
-            return CultureDictionary[key];
-        }
+        public string GetDictionaryValue(string key) => CultureDictionary[key];
 
         /// <summary>
         /// Returns the dictionary value for the key specified, and if empty returns the specified default fall back value
@@ -168,7 +156,7 @@ namespace Umbraco.Web
         public string GetDictionaryValue(string key, string altText)
         {
             var dictionaryValue = GetDictionaryValue(key);
-            if (String.IsNullOrWhiteSpace(dictionaryValue))
+            if (string.IsNullOrWhiteSpace(dictionaryValue))
             {
                 dictionaryValue = altText;
             }
@@ -189,19 +177,13 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="path">The full path of the document object to check</param>
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
-        public bool MemberHasAccess(string path)
-        {
-            return _membershipHelper.MemberHasAccess(path);
-        }
+        public async Task<bool> MemberHasAccess(string path) => await _membershipHelper.MemberHasAccess(path);
 
         /// <summary>
         /// Whether or not the current member is logged in (based on the membership provider)
         /// </summary>
         /// <returns>True is the current user is logged in</returns>
-        public bool MemberIsLoggedOn()
-        {
-            return _membershipHelper.IsLoggedIn();
-        }
+        public bool MemberIsLoggedOn() => _membershipHelper.IsLoggedIn();
 
         #endregion
 
@@ -219,60 +201,30 @@ namespace Umbraco.Web
             return guidUdi == null ? null : Member(guidUdi.Guid);
         }
 
-        public IPublishedContent Member(Guid id)
-        {
-            return _membershipHelper.GetById(id);
-        }
+        public IPublishedContent Member(Guid id) => _membershipHelper.GetById(id);
 
-        public IPublishedContent Member(int id)
-        {
-            return _membershipHelper.GetById(id);
-        }
+        public IPublishedContent Member(int id) => _membershipHelper.GetById(id);
 
         public IPublishedContent Member(string id)
         {
-            var asInt = id.TryConvertTo<int>();
+            Attempt<int> asInt = id.TryConvertTo<int>();
             return asInt ? _membershipHelper.GetById(asInt.Result) : _membershipHelper.GetByProviderKey(id);
         }
 
-        public IEnumerable<IPublishedContent> Members(IEnumerable<int> ids)
-        {
-            return _membershipHelper.GetByIds(ids);
-        }
+        public IEnumerable<IPublishedContent> Members(IEnumerable<int> ids) => _membershipHelper.GetByIds(ids);
 
-        public IEnumerable<IPublishedContent> Members(IEnumerable<string> ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
+        public IEnumerable<IPublishedContent> Members(IEnumerable<string> ids) => ids.Select(Member).WhereNotNull();
 
-        public IEnumerable<IPublishedContent> Members(IEnumerable<Guid> ids)
-        {
-            return _membershipHelper.GetByIds(ids);
-        }
+        public IEnumerable<IPublishedContent> Members(IEnumerable<Guid> ids) => _membershipHelper.GetByIds(ids);
 
-        public IEnumerable<IPublishedContent> Members(IEnumerable<Udi> ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-        public IEnumerable<IPublishedContent> Members(params int[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
+        public IEnumerable<IPublishedContent> Members(IEnumerable<Udi> ids) => ids.Select(Member).WhereNotNull();
+        public IEnumerable<IPublishedContent> Members(params int[] ids) => ids.Select(Member).WhereNotNull();
 
-        public IEnumerable<IPublishedContent> Members(params string[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
+        public IEnumerable<IPublishedContent> Members(params string[] ids) => ids.Select(Member).WhereNotNull();
 
-        public IEnumerable<IPublishedContent> Members(params Guid[] ids)
-        {
-            return _membershipHelper.GetByIds(ids);
-        }
+        public IEnumerable<IPublishedContent> Members(params Guid[] ids) => _membershipHelper.GetByIds(ids);
 
-        public IEnumerable<IPublishedContent> Members(params Udi[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
+        public IEnumerable<IPublishedContent> Members(params Udi[] ids) => ids.Select(Member).WhereNotNull();
 
         #endregion
 
@@ -283,17 +235,11 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="id">The unique identifier, or the key, of the content item.</param>
         /// <returns>The content, or null of the content item is not in the cache.</returns>
-        public IPublishedContent Content(object id)
-        {
-            return ContentForObject(id);
-        }
+        public IPublishedContent Content(object id) => ContentForObject(id);
 
         private IPublishedContent ContentForObject(object id) => _publishedContentQuery.Content(id);
 
-        public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
-        {
-            return _publishedContentQuery.ContentSingleAtXPath(xpath, vars);
-        }
+        public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars) => _publishedContentQuery.ContentSingleAtXPath(xpath, vars);
 
         /// <summary>
         /// Gets a content item from the cache.
@@ -403,20 +349,11 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids) => _publishedContentQuery.Content(ids);
 
-        public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars)
-        {
-            return _publishedContentQuery.ContentAtXPath(xpath, vars);
-        }
+        public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars) => _publishedContentQuery.ContentAtXPath(xpath, vars);
 
-        public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
-        {
-            return _publishedContentQuery.ContentAtXPath(xpath, vars);
-        }
+        public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars) => _publishedContentQuery.ContentAtXPath(xpath, vars);
 
-        public IEnumerable<IPublishedContent> ContentAtRoot()
-        {
-            return _publishedContentQuery.ContentAtRoot();
-        }
+        public IEnumerable<IPublishedContent> ContentAtRoot() => _publishedContentQuery.ContentAtRoot();
 
 
 
@@ -438,10 +375,7 @@ namespace Umbraco.Web
         /// this result in to this method.
         /// This method will throw an exception if the value is not of type int or string.
         /// </remarks>
-        public IPublishedContent Media(object id)
-        {
-            return MediaForObject(id);
-        }
+        public IPublishedContent Media(object id) => MediaForObject(id);
 
         private IPublishedContent MediaForObject(object id) => _publishedContentQuery.Media(id);
 
@@ -530,10 +464,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Media(IEnumerable<string> ids) => _publishedContentQuery.Media(ids);
 
-        public IEnumerable<IPublishedContent> MediaAtRoot()
-        {
-            return _publishedContentQuery.MediaAtRoot();
-        }
+        public IEnumerable<IPublishedContent> MediaAtRoot() => _publishedContentQuery.MediaAtRoot();
 
         #endregion
 
@@ -552,22 +483,28 @@ namespace Umbraco.Web
                 parts = null;
                 return false;
             }
-            var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
+            System.Collections.Specialized.NameValueCollection parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
             parts = new Dictionary<string, string>();
             foreach (var key in parsedQueryString.AllKeys)
-            {
+           {
                 parts[key] = parsedQueryString[key];
             }
             //validate all required keys exist
             //the controller
             if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Controller))
+            {
                 return false;
+            }
             //the action
             if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Action))
+            {
                 return false;
+            }
             //the area
             if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Area))
+            {
                 return false;
+            }
 
             return true;
         }

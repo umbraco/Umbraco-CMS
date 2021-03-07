@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Web.Common.Security
                 throw new ArgumentNullException(nameof(userMgr));
             }
 
-            if (changingPasswordModel.NewPassword.IsNullOrWhiteSpace())
+            if (changingPasswordModel.OldPassword.IsNullOrWhiteSpace())
             {
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
             }
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Web.Common.Security
                 // ok, we should be able to reset it
                 string resetToken = await userMgr.GeneratePasswordResetTokenAsync(identityUser);
 
-                IdentityResult resetResult = await userMgr.ChangePasswordWithResetAsync(userId, resetToken, changingPasswordModel.NewPassword);
+                IdentityResult resetResult = await userMgr.ChangePasswordWithResetAsync(userId, resetToken, changingPasswordModel.OldPassword);
 
                 if (resetResult.Succeeded == false)
                 {
@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Web.Common.Security
             }
 
             // can we change to the new password?
-            IdentityResult changeResult = await userMgr.ChangePasswordAsync(identityUser, changingPasswordModel.OldPassword, changingPasswordModel.NewPassword);
+            IdentityResult changeResult = await userMgr.ChangePasswordAsync(identityUser, changingPasswordModel.OldPassword, changingPasswordModel.OldPassword);
             if (changeResult.Succeeded == false)
             {
                 // no, fail with error messages for "password"

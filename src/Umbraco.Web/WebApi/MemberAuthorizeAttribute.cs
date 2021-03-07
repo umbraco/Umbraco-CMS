@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Web.Http;
 using Umbraco.Extensions;
 using Current = Umbraco.Web.Composing.Current;
@@ -29,11 +29,19 @@ namespace Umbraco.Web.WebApi
         protected override bool IsAuthorized(System.Web.Http.Controllers.HttpActionContext actionContext)
         {
             if (AllowMembers.IsNullOrWhiteSpace())
+            {
                 AllowMembers = "";
+            }
+
             if (AllowGroup.IsNullOrWhiteSpace())
+            {
                 AllowGroup = "";
+            }
+
             if (AllowType.IsNullOrWhiteSpace())
+            {
                 AllowType = "";
+            }
 
             var members = new List<int>();
             foreach (var s in AllowMembers.Split(','))
@@ -44,9 +52,9 @@ namespace Umbraco.Web.WebApi
                 }
             }
 
-            var helper = Current.MembershipHelper;
-            return helper.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members);
+            //TODO: confirm
+            Security.MembershipHelper helper = Current.MembershipHelper;
+            return helper.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members).Result;
         }
-
     }
 }

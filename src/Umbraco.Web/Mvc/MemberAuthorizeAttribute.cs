@@ -1,12 +1,14 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Extensions;
+using Umbraco.Web.Security;
 using AuthorizeAttribute = System.Web.Mvc.AuthorizeAttribute;
 using Current = Umbraco.Web.Composing.Current;
 
 namespace Umbraco.Web.Mvc
 {
+    //TODO: update for identity
     /// <summary>
     /// Attribute for attributing controller actions to restrict them
     /// to just authenticated members, and optionally of a particular type and/or group
@@ -31,11 +33,19 @@ namespace Umbraco.Web.Mvc
         protected override bool AuthorizeCore(HttpContextBase httpContext)
         {
             if (AllowMembers.IsNullOrWhiteSpace())
+            {
                 AllowMembers = "";
+            }
+
             if (AllowGroup.IsNullOrWhiteSpace())
+            {
                 AllowGroup = "";
+            }
+
             if (AllowType.IsNullOrWhiteSpace())
+            {
                 AllowType = "";
+            }
 
             var members = new List<int>();
             foreach (var s in AllowMembers.Split(','))
@@ -46,19 +56,15 @@ namespace Umbraco.Web.Mvc
                 }
             }
 
-            var helper = Current.MembershipHelper;
-            return helper.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members);
-
+            MembershipHelper helper = Current.MembershipHelper;
+            return helper.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members).Result;
         }
 
         /// <summary>
         /// Override method to throw exception instead of returning a 401 result
         /// </summary>
         /// <param name="filterContext"></param>
-        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
-        {
-            throw new HttpException(403, "Resource restricted: either member is not logged on or is not of a permitted type or group.");
-        }
+        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext) => throw new HttpException(403, "Resource restricted: either member is not logged on or is not of a permitted type or group.");
 
     }
 }

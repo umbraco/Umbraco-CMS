@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
             FilterMembershipProviderProperties(contentType);
 
             //return the new member with the details filled in
-            return new Member(model.Name, model.Email, model.Username, model.Password.NewPassword, contentType);
+            return new Member(model.Name, model.Email, model.Username, model.Password.OldPassword, contentType);
         }
 
         /// <summary>

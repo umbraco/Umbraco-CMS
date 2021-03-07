@@ -16,6 +16,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
 {
+    //TODO: do we need more logging in member store?
+
     /// <summary>
     /// A custom user store that uses Umbraco member data
     /// </summary>

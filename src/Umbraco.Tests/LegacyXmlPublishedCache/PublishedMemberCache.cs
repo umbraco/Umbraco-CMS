@@ -1,4 +1,5 @@
 using System.Text;
+using System.Xml;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -11,7 +12,7 @@ using Umbraco.Web.Security;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
-    class PublishedMemberCache : IPublishedMemberCache
+    internal class PublishedMemberCache : IPublishedMemberCache
     {
         private readonly IMemberService _memberService;
         private readonly IAppCache _requestCache;
@@ -30,80 +31,81 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _variationContextAccessor = variationContextAccessor;
         }
 
-        public IPublishedContent GetByProviderKey(object key)
-        {
-            return _requestCache.GetCacheItem<IPublishedContent>(
+        public IPublishedContent GetByProviderKey(object key) => _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByProviderKey", key), () =>
                 {
-                    var result = _memberService.GetByProviderKey(key);
-                    if (result == null) return null;
-                    var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
+                    IMember result = _memberService.GetByProviderKey(key);
+                    if (result == null)
+                    {
+                        return null;
+                    }
+
+                    IPublishedContentType type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
                     return new PublishedMember(result, type, _userService, _variationContextAccessor).CreateModel(Current.PublishedModelFactory);
                 });
-        }
 
-        public IPublishedContent GetById(int memberId)
-        {
-            return _requestCache.GetCacheItem<IPublishedContent>(
+        public IPublishedContent GetById(int memberId) => _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetById", memberId), () =>
                 {
-                    var result = _memberService.GetById(memberId);
-                    if (result == null) return null;
-                    var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
+                    IMember result = _memberService.GetById(memberId);
+                    if (result == null)
+                    {
+                        return null;
+                    }
+
+                    IPublishedContentType type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
                     return new PublishedMember(result, type, _userService, _variationContextAccessor).CreateModel(Current.PublishedModelFactory);
                 });
-        }
 
-        public IPublishedContent GetByUsername(string username)
-        {
-            return _requestCache.GetCacheItem<IPublishedContent>(
+        public IPublishedContent GetByUsername(string username) => _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByUsername", username), () =>
                 {
-                    var result = _memberService.GetByUsername(username);
-                    if (result == null) return null;
-                    var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
+                    IMember result = _memberService.GetByUsername(username);
+                    if (result == null)
+                    {
+                        return null;
+                    }
+
+                    IPublishedContentType type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
                     return new PublishedMember(result, type, _userService, _variationContextAccessor).CreateModel(Current.PublishedModelFactory);
                 });
-        }
 
-        public IPublishedContent GetByEmail(string email)
-        {
-            return _requestCache.GetCacheItem<IPublishedContent>(
+        public IPublishedContent GetByEmail(string email) => _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByEmail", email), () =>
                 {
-                    var result = _memberService.GetByEmail(email);
-                    if (result == null) return null;
-                    var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
+                    IMember result = _memberService.GetByEmail(email);
+                    if (result == null)
+                    {
+                        return null;
+                    }
+
+                    IPublishedContentType type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
                     return new PublishedMember(result, type, _userService, _variationContextAccessor).CreateModel(Current.PublishedModelFactory);
                 });
-        }
 
         public IPublishedContent GetByMember(IMember member)
         {
-            var type = _contentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
+            IPublishedContentType type = _contentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
             return new PublishedMember(member, type, _userService, _variationContextAccessor).CreateModel(Current.PublishedModelFactory);
         }
 
         public XPathNavigator CreateNavigator()
         {
-            var doc = _xmlStore.GetMemberXml();
+            XmlDocument doc = _xmlStore.GetMemberXml();
             return doc.CreateNavigator();
         }
 
-        public XPathNavigator CreateNavigator(bool preview)
-        {
-            return CreateNavigator();
-        }
+        public XPathNavigator CreateNavigator(bool preview) => CreateNavigator();
 
         public XPathNavigator CreateNodeNavigator(int id, bool preview)
         {
-            var n = _xmlStore.GetMemberXmlNode(id);
+            XmlNode n = _xmlStore.GetMemberXmlNode(id);
             return n?.CreateNavigator();
         }
 
         private static string GetCacheKey(string key, params object[] additional)
         {
-            var sb = new StringBuilder($"{typeof (MembershipHelper).Name}-{key}");
+            var sb = new StringBuilder($"{typeof(MembershipHelper).Name}-{key}");
             foreach (var s in additional)
             {
                 sb.Append("-");
@@ -114,15 +116,9 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         #region Content types
 
-        public IPublishedContentType GetContentType(int id)
-        {
-            return _contentTypeCache.Get(PublishedItemType.Member, id);
-        }
+        public IPublishedContentType GetContentType(int id) => _contentTypeCache.Get(PublishedItemType.Member, id);
 
-        public IPublishedContentType GetContentType(string alias)
-        {
-            return _contentTypeCache.Get(PublishedItemType.Member, alias);
-        }
+        public IPublishedContentType GetContentType(string alias) => _contentTypeCache.Get(PublishedItemType.Member, alias);
 
         #endregion
     }

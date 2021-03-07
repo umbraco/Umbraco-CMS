@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -18,18 +18,21 @@ namespace Umbraco.Extensions
         public static bool RenameMemberGroupRoleRules(this IPublicAccessService publicAccessService, string oldRolename, string newRolename)
         {
             var hasChange = false;
-            if (oldRolename == newRolename) return false;
+            if (oldRolename == newRolename)
+            {
+                return false;
+            }
 
-            var allEntries = publicAccessService.GetAll();
+            IEnumerable<PublicAccessEntry> allEntries = publicAccessService.GetAll();
 
-            foreach (var entry in allEntries)
+            foreach (PublicAccessEntry entry in allEntries)
             {
                 //get rules that match
-                var roleRules = entry.Rules
+                IEnumerable<PublicAccessRule> roleRules = entry.Rules
                     .Where(x => x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
                     .Where(x => x.RuleValue == oldRolename);
                 var save = false;
-                foreach (var roleRule in roleRules)
+                foreach (PublicAccessRule roleRule in roleRules)
                 {
                     //a rule is being updated so flag this entry to be saved
                     roleRule.RuleValue = newRolename;
@@ -47,11 +50,17 @@ namespace Umbraco.Extensions
 
         public static bool HasAccess(this IPublicAccessService publicAccessService, int documentId, IContentService contentService, string username, IEnumerable<string> currentMemberRoles)
         {
-            var content = contentService.GetById(documentId);
-            if (content == null) return true;
+            IContent content = contentService.GetById(documentId);
+            if (content == null)
+            {
+                return true;
+            }
 
-            var entry = publicAccessService.GetEntryForContent(content);
-            if (entry == null) return true;
+            PublicAccessEntry entry = publicAccessService.GetEntryForContent(content);
+            if (entry == null)
+            {
+                return true;
+            }
 
             return HasAccess(entry, username, currentMemberRoles);
         }
@@ -66,24 +75,35 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static bool HasAccess(this IPublicAccessService publicAccessService, string path, string username, Func<string, IEnumerable<string>> rolesCallback)
         {
-            if (rolesCallback == null) throw new ArgumentNullException("roles");
-            if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
-            if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value cannot be null or whitespace.", "path");
+            if (rolesCallback == null)
+            {
+                throw new ArgumentNullException("roles");
+            }
 
-            var entry = publicAccessService.GetEntryForContent(path.EnsureEndsWith(path));
-            if (entry == null) return true;
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", "username");
+            }
 
-            var roles = rolesCallback(username);
+            if (string.IsNullOrWhiteSpace(path))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", "path");
+            }
 
-            return HasAccess(entry, username, roles);
+            PublicAccessEntry entry = publicAccessService.GetEntryForContent(path.EnsureEndsWith(path));
+            if (entry != null)
+            {
+                IEnumerable<string> roles = rolesCallback(username);
+
+                return HasAccess(entry, username, roles);
+            }
+            return true;
         }
 
-        private static bool HasAccess(PublicAccessEntry entry, string username, IEnumerable<string> roles)
-        {
-            return entry.Rules.Any(x =>
-                (x.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType && username.Equals(x.RuleValue, StringComparison.OrdinalIgnoreCase))
-                || (x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType && roles.Contains(x.RuleValue))
+        private static bool HasAccess(PublicAccessEntry entry, string username, IEnumerable<string> roles) =>
+            entry.Rules.Any(x =>
+                (x.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType && username.Equals(x.RuleValue, StringComparison.OrdinalIgnoreCase)) ||
+                (x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType && roles.Contains(x.RuleValue))
             );
-        }
     }
 }
