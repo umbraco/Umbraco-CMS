@@ -13,7 +13,6 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
-using Umbraco.Web.Security.Providers;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Security
@@ -30,7 +29,6 @@ namespace Umbraco.Web.Security
     /// </summary>
     public class MembershipHelper
     {
-        private readonly MembersMembershipProvider _membershipProvider;
         private readonly RoleProvider _roleProvider;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IMemberService _memberService;
@@ -48,8 +46,6 @@ namespace Umbraco.Web.Security
         (
             IHttpContextAccessor httpContextAccessor,
             IPublishedMemberCache memberCache,
-            MembersMembershipProvider membershipProvider,
-            RoleProvider roleProvider,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IPublicAccessService publicAccessService,
@@ -68,9 +64,6 @@ namespace Umbraco.Web.Security
             _loggerFactory = loggerFactory;
             _logger = _loggerFactory.CreateLogger<MembershipHelper>();
             _shortStringHelper = shortStringHelper;
-
-            _membershipProvider = membershipProvider ?? throw new ArgumentNullException(nameof(membershipProvider));
-            _roleProvider = roleProvider ?? throw new ArgumentNullException(nameof(roleProvider));
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
         }
 
@@ -168,16 +161,6 @@ namespace Umbraco.Web.Security
         }
 
         /// <summary>
-        /// Returns true if the current membership provider is the Umbraco built-in one.
-        /// </summary>
-        /// <returns></returns>
-        public bool IsUmbracoMembershipProviderActive()
-        {
-            var provider = _membershipProvider;
-            return provider.IsUmbracoMembershipProvider();
-        }
-
-        /// <summary>
         /// Updates the currently logged in members profile
         /// </summary>
         /// <param name="model"></param>
@@ -192,19 +175,21 @@ namespace Umbraco.Web.Security
             }
 
             //get the current membership user
-            var provider = _membershipProvider;
-            var membershipUser = provider.GetCurrentUser();
+            var membershipUser = null;
+
             //NOTE: This should never happen since they are logged in
             if (membershipUser == null)
+            {
                 throw new InvalidOperationException("Could not find member with username " + _httpContextAccessor.GetRequiredHttpContext().User.Identity.Name);
+            }
 
             try
             {
                 //check if the email needs to change
                 if (model.Email.InvariantEquals(membershipUser.Email) == false)
                 {
-                    //Use the membership provider to change the email since that is configured to do the checks to check for unique emails if that is configured.
-                    var requiresUpdating = UpdateMember(membershipUser, provider, model.Email);
+                    //Use identity to change the email since that is configured to do the checks to check for unique emails if that is configured.
+                    Attempt<MembershipUser> requiresUpdating = UpdateMember(membershipUser, model.Email);
                     membershipUser = requiresUpdating.Result;
                 }
             }
@@ -260,8 +245,7 @@ namespace Umbraco.Web.Security
             model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
 
             MembershipUser membershipUser;
-            var provider = _membershipProvider;
-            membershipUser = ((UmbracoMembershipProviderBase)provider).CreateUser(
+            membershipUser = CreateUser(
                      model.MemberTypeAlias,
                      model.Username, model.Password, model.Email,
                      // TODO: Support q/a http://issues.umbraco.org/issue/U4-3213
@@ -288,7 +272,7 @@ namespace Umbraco.Web.Security
             if (logMemberIn)
             {
                 //Set member online
-                provider.GetUser(model.Username, true);
+                GetUser(model.Username, true);
 
                 //Log them in
                 FormsAuthentication.SetAuthCookie(membershipUser.UserName, model.CreatePersistentLoginCookie);
@@ -440,9 +424,7 @@ namespace Umbraco.Web.Security
                 return null;
             }
 
-            var provider = _membershipProvider;
-
-            var membershipUser = provider.GetCurrentUserOnline();
+            var membershipUser = GetCurrentUserOnline();
             var member = GetCurrentPersistedMember();
             //this shouldn't happen but will if the member is deleted in the back office while the member is trying
             // to use the front-end!
@@ -485,7 +467,6 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         public virtual RegisterModel CreateRegistrationModel(string memberTypeAlias = null)
         {
-            var provider = _membershipProvider;
             memberTypeAlias = memberTypeAlias ?? Constants.Conventions.MemberTypes.DefaultAlias;
             var memberType = _memberTypeService.Get(memberTypeAlias);
             if (memberType == null)
@@ -589,8 +570,6 @@ namespace Umbraco.Web.Security
                 return model;
             }
 
-            var provider = _membershipProvider;
-
             var member = GetCurrentPersistedMember();
             //this shouldn't happen but will if the member is deleted in the back office while the member is trying
             // to use the front-end!
@@ -653,10 +632,7 @@ namespace Umbraco.Web.Security
             }
             else
             {
-                var provider = _membershipProvider;
-
                 string username;
-
                 var member = GetCurrentPersistedMember();
                 // If a member could not be resolved from the provider, we are clearly not authorized and can break right here
                 if (member == null)
@@ -757,9 +733,7 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         private IMember GetCurrentPersistedMember()
         {
-            var provider = _membershipProvider;
-
-            var username = provider.GetCurrentUserName();
+            var username = GetCurrentUserName();
             // The result of this is cached by the MemberRepository
             var member = _memberService.GetByUsername(username);
             return member;
@@ -774,17 +748,12 @@ namespace Umbraco.Web.Security
         /// <returns></returns>
         private Attempt<PasswordChangedModel> ChangePasswordWithMembershipProvider(
             string username,
-            ChangingPasswordModel passwordModel,
-            MembershipProvider membershipProvider)
+            ChangingPasswordModel passwordModel)
         {
-            var umbracoBaseProvider = membershipProvider as MembershipProviderBase;
-
             // YES! It is completely insane how many options you have to take into account based on the membership provider. yikes!
 
             if (passwordModel == null)
                 throw new ArgumentNullException(nameof(passwordModel));
-            if (membershipProvider == null)
-                throw new ArgumentNullException(nameof(membershipProvider));
             var userId = -1;
 
 
@@ -795,7 +764,7 @@ namespace Umbraco.Web.Security
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
             }
 
-            if (membershipProvider.EnablePasswordRetrieval)
+            if (EnablePasswordRetrieval)
             {
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Membership providers using encrypted passwords and password retrieval are not supported", new[] { "value" }) });
             }
@@ -811,7 +780,7 @@ namespace Umbraco.Web.Security
 
             try
             {
-                var result = membershipProvider.ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
+                var result = ChangePassword(username, passwordModel.OldPassword, passwordModel.NewPassword);
 
                 return result == false
                     ? Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Could not change password, invalid username or password", new[] { "oldPassword" }) })

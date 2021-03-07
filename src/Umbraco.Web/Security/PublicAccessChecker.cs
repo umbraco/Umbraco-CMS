@@ -10,15 +10,12 @@ namespace Umbraco.Web.Security
 {
     public class PublicAccessChecker : IPublicAccessChecker
     {
-        //TODO: This is lazy to avoid circular dependency. We don't care right now because all membership is going to be changed.
-        private readonly Lazy<MembershipHelper> _membershipHelper;
         private readonly IPublicAccessService _publicAccessService;
         private readonly IContentService _contentService;
         private readonly IPublishedValueFallback _publishedValueFallback;
 
-        public PublicAccessChecker(Lazy<MembershipHelper> membershipHelper, IPublicAccessService publicAccessService, IContentService contentService, IPublishedValueFallback publishedValueFallback)
+        public PublicAccessChecker(IPublicAccessService publicAccessService, IContentService contentService, IPublishedValueFallback publishedValueFallback)
         {
-            _membershipHelper = membershipHelper;
             _publicAccessService = publicAccessService;
             _contentService = contentService;
             _publishedValueFallback = publishedValueFallback;
@@ -26,8 +23,6 @@ namespace Umbraco.Web.Security
 
         public PublicAccessStatus HasMemberAccessToContent(int publishedContentId)
         {
-            var membershipHelper = _membershipHelper.Value;
-
             if (membershipHelper.IsLoggedIn() == false)
             {
                 return PublicAccessStatus.NotLoggedIn;

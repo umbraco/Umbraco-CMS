@@ -8,10 +8,12 @@ namespace Umbraco.Web.Macros
         public object GetMemberProviderUserKey()
         {
             //ugh, membershipproviders :(
-            var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-            var member = MembershipProviderExtensions.GetCurrentUser(provider);
+            //var member = MembershipProviderExtensions.GetCurrentUser(provider);
 
-            return member?.ProviderUserKey;
+            //return member?.ProviderUserKey;
+
+            //TODO: replace with identity logic
+            return null;
         }
     }
 }

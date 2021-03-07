@@ -1,4 +1,4 @@
-﻿using System.Text;
+using System.Text;
 using System.Xml.XPath;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -35,8 +35,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByProviderKey", key), () =>
                 {
-                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-
                     var result = _memberService.GetByProviderKey(key);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
@@ -49,8 +47,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetById", memberId), () =>
                 {
-                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-
                     var result = _memberService.GetById(memberId);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
@@ -63,8 +59,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByUsername", username), () =>
                 {
-                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-
                     var result = _memberService.GetByUsername(username);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
@@ -77,8 +71,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return _requestCache.GetCacheItem<IPublishedContent>(
                 GetCacheKey("GetByEmail", email), () =>
                 {
-                    var provider = MembershipProviderExtensions.GetMembersMembershipProvider();
-
                     var result = _memberService.GetByEmail(email);
                     if (result == null) return null;
                     var type = _contentTypeCache.Get(PublishedItemType.Member, result.ContentTypeId);
