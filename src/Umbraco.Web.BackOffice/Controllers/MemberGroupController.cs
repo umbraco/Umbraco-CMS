@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly UmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly RoleManager<IdentityRole> _roleManager;
-     
+
         public MemberGroupController(
             IMemberGroupService memberGroupService,
             UmbracoMapper umbracoMapper,
@@ -114,7 +114,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _umbracoMapper.Map<IdentityRole, MemberGroupDisplay>(identityRole);
         }
 
-        public async Task<IEnumerable<MemberGroupDisplay>> GetByIds([FromQuery]int[] ids)
+        public async Task<IEnumerable<MemberGroupDisplay>> GetByIds([FromQuery] int[] ids)
         {
             var roles = new List<IdentityRole>();
 
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 roles.Add(role);
             }
 
-            return roles.Select(x=> _umbracoMapper.Map<IdentityRole, MemberGroupDisplay>(x));
+            return roles.Select(x => _umbracoMapper.Map<IdentityRole, MemberGroupDisplay>(x));
         }
 
         [HttpDelete]
@@ -158,25 +158,39 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(item);
         }
 
+        /// <summary>
+        /// Saves the member group via the identity role
+        /// If new, creates a new role, else updates the existing role
+        /// </summary>
+        /// <param name="saveModel"></param>
+        /// <returns></returns>
         public async Task<ActionResult<MemberGroupDisplay>> PostSave(MemberGroupSave saveModel)
         {
             int id = int.Parse(saveModel.Id.ToString());
 
-            IdentityRole role = id > 0 ? await _roleManager.FindByIdAsync(saveModel.Id.ToString()) : null;
-
-            if (role == null)
+            IdentityRole role;
+            if (id > 0)
             {
-                return NotFound();
+                role = await _roleManager.FindByIdAsync(saveModel.Id.ToString());
+                role.Name = saveModel.Name;
+                IdentityResult updatedResult = await _roleManager.UpdateAsync(role);
+                if (!updatedResult.Succeeded)
+                {
+                    //TODO: what to retrun if there is a failed identity result
+                    return Problem();
+                }
+            }
+            else
+            {
+                role = new IdentityRole(saveModel.Name);
+                IdentityResult updatedResult = await _roleManager.CreateAsync(role);
             }
 
-            role.Name = saveModel.Name;
-            IdentityResult updatedResult = await _roleManager.UpdateAsync(role);
-
-            if (!updatedResult.Succeeded)
-            {
-                //TODO: what to retrun if there is a failed identity result
-                return Problem();
-            }
+            //TODO: do we need to refetch the role?
+            //if (role == null)
+            //{
+            //    return NotFound();
+            //}
 
             //TODO: should we return the identity role or return the group from the service?
             MemberGroupDisplay display = _umbracoMapper.Map<IdentityRole, MemberGroupDisplay>(role);
