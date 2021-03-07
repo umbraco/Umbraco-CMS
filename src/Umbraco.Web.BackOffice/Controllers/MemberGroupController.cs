@@ -43,6 +43,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
+        //TODO: are there any repercussions elsewhere for us changing these to async?
+
         /// <summary>
         /// Gets the member group json for the member group id
         /// </summary>
@@ -68,7 +70,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return dto;
         }
 
-
         /// <summary>
         /// Gets the member group json for the member group guid
         /// </summary>
@@ -77,18 +78,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public async Task<ActionResult<MemberGroupDisplay>> GetById(Guid id)
         {
             //TODO: did we envisage just identity or a combination of service and identity manager?
-            IdentityRole identityRole = await _roleManager.FindByIdAsync(id.ToString());
-            if (identityRole == null)
-            {
-                return NotFound();
-            }
-            //IMemberGroup memberGroup = _memberGroupService.GetById(id);
-            //if (memberGroup == null)
+            //IdentityRole identityRole = await _roleManager.FindByIdAsync(id.ToString());
+            //if (identityRole == null)
             //{
             //    return NotFound();
             //}
+            IMemberGroup memberGroup = _memberGroupService.GetById(id);
+            if (memberGroup == null)
+            {
+                return NotFound();
+            }
 
-            return _umbracoMapper.Map<IdentityRole, MemberGroupDisplay>(identityRole);
+            return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
         }
 
         /// <summary>
@@ -111,27 +112,36 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return NotFound();
             }
 
-            return _umbracoMapper.Map<IdentityRole, MemberGroupDisplay>(identityRole);
-        }
-
-        public async Task<IEnumerable<MemberGroupDisplay>> GetByIds([FromQuery] int[] ids)
-        {
-            var roles = new List<IdentityRole>();
-
-            foreach (int id in ids)
+            IMemberGroup memberGroup = _memberGroupService.GetById(guidUdi.Guid);
+            if (memberGroup == null)
             {
-                IdentityRole role = await _roleManager.FindByIdAsync(id.ToString());
-                roles.Add(role);
+                return NotFound();
             }
 
-            return roles.Select(x => _umbracoMapper.Map<IdentityRole, MemberGroupDisplay>(x));
+            return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+        }
+
+        public IEnumerable<MemberGroupDisplay> GetByIds([FromQuery] int[] ids)
+        {
+            //var roles = new List<IdentityRole>();
+
+            //foreach (int id in ids)
+            //{
+            //    IdentityRole role = await _roleManager.FindByIdAsync(id.ToString());
+            //    roles.Add(role);
+            //}
+
+            //return roles.Select(x => _umbracoMapper.Map<IdentityRole, MemberGroupDisplay>(x));
+            //TODO: does this need to be done via identity?
+
+            return _memberGroupService.GetByIds(ids)
+                    .Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>);
         }
 
         [HttpDelete]
         [HttpPost]
         public async Task<IActionResult> DeleteById(int id)
         {
-            //TODO: are there any repercussions elsewhere for us changing these to async?
             IdentityRole role = await _roleManager.FindByIdAsync(id.ToString());
 
             if (role == null)
@@ -150,7 +160,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
-        public IEnumerable<MemberGroupDisplay> GetAllGroups() => _roleManager.Roles.Select(x => _umbracoMapper.Map<IdentityRole, MemberGroupDisplay>(x));
+        //TODO: we don't currently implement IQueryableRoleStore<TRole>, still using original service
+        //public IEnumerable<MemberGroupDisplay> GetAllGroups() => _roleManager.Roles.Select(x => _umbracoMapper.Map<IdentityRole, MemberGroupDisplay>(x));
+        public IEnumerable<MemberGroupDisplay> GetAllGroups() => _memberGroupService.GetAll().Select(x => _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(x));
 
         public MemberGroupDisplay GetEmpty()
         {
@@ -169,31 +181,37 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             int id = int.Parse(saveModel.Id.ToString());
 
             IdentityRole role;
+            IdentityResult updatedResult;
             if (id > 0)
             {
                 role = await _roleManager.FindByIdAsync(saveModel.Id.ToString());
                 role.Name = saveModel.Name;
-                IdentityResult updatedResult = await _roleManager.UpdateAsync(role);
-                if (!updatedResult.Succeeded)
-                {
-                    //TODO: what to retrun if there is a failed identity result
-                    return Problem();
-                }
+                updatedResult = await _roleManager.UpdateAsync(role);
+                
             }
             else
             {
                 role = new IdentityRole(saveModel.Name);
-                IdentityResult updatedResult = await _roleManager.CreateAsync(role);
+                updatedResult = await _roleManager.CreateAsync(role);
             }
 
-            //TODO: do we need to refetch the role?
-            //if (role == null)
-            //{
-            //    return NotFound();
-            //}
+            if (!updatedResult.Succeeded)
+            {
+                //TODO: what to return if there is a failed identity result
+                return Problem();
+            }
+
+            //TODO: do we need to refetch the member group?
+            int roleId = int.Parse(role.Id);
+            IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
+
+            if (memberGroup == null)
+            {
+                return NotFound();
+            }
 
             //TODO: should we return the identity role or return the group from the service?
-            MemberGroupDisplay display = _umbracoMapper.Map<IdentityRole, MemberGroupDisplay>(role);
+            MemberGroupDisplay display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
 
             display.AddSuccessNotification(
                             _localizedTextService.Localize("speechBubbles/memberGroupSavedHeader"),
