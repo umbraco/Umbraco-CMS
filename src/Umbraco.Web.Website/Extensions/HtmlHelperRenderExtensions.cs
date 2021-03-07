@@ -165,16 +165,11 @@ namespace Umbraco.Extensions
                 return htmlHelper.ValidationSummary(excludePropertyErrors, message, htmlAttributes);
             }
 
-            var htmlGenerator = GetRequiredService<IHtmlGenerator>(htmlHelper);
+            IHtmlGenerator htmlGenerator = GetRequiredService<IHtmlGenerator>(htmlHelper);
 
-            var viewContext = htmlHelper.ViewContext.Clone();
-            foreach (var key in viewContext.ViewData.Keys.ToArray())
-            {
-                if (!key.StartsWith(prefix))
-                {
-                    viewContext.ViewData.Remove(key);
-                }
-            }
+            ViewContext viewContext = htmlHelper.ViewContext.Clone();
+            //change the HTML field name
+            viewContext.ViewData.TemplateInfo.HtmlFieldPrefix = prefix;
 
             var tagBuilder = htmlGenerator.GenerateValidationSummary(
                 viewContext,
