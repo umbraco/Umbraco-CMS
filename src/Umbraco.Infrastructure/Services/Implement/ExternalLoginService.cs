@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class ExternalLoginService : ScopeRepositoryService, IExternalLoginService
+    public class ExternalLoginService : RepositoryService, IExternalLoginService
     {
         private readonly IExternalLoginRepository _externalLoginRepository;
 

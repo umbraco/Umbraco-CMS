@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // repositories
             builder.Services.AddUnique<IAuditRepository, AuditRepository>();
             builder.Services.AddUnique<IAuditEntryRepository, AuditEntryRepository>();
+            builder.Services.AddUnique<ICacheInstructionRepository, CacheInstructionRepository>();
             builder.Services.AddUnique<IContentTypeRepository, ContentTypeRepository>();
             builder.Services.AddUnique<IDataTypeContainerRepository, DataTypeContainerRepository>();
             builder.Services.AddUnique<IDataTypeRepository, DataTypeRepository>();

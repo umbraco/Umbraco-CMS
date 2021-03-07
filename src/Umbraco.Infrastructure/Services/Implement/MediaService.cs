@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// <summary>
     /// Represents the Media Service, which is an easy access to operations involving <see cref="IMedia"/>
     /// </summary>
-    public class MediaService : ScopeRepositoryService, IMediaService
+    public class MediaService : RepositoryService, IMediaService
     {
         private readonly IMediaRepository _mediaRepository;
         private readonly IMediaTypeRepository _mediaTypeRepository;

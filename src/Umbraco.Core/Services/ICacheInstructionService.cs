@@ -1,0 +1,32 @@
+using System;
+using System.Collections.Generic;
+using Umbraco.Cms.Core.Sync;
+
+namespace Umbraco.Cms.Core.Services
+{
+    public interface ICacheInstructionService
+    {
+        /// <summary>
+        /// Ensures that the cache instruction service is initialized and can be used for syncing messages.
+        /// </summary>
+        CacheInstructionServiceInitializationResult EnsureInitialized(bool released, int lastId);
+
+        /// <summary>
+        /// Creates a cache instruction record from a set of individual instructions and saves it.
+        /// </summary>
+        void DeliverInstructions(IEnumerable<RefreshInstruction> instructions, string localIdentity);
+
+        /// <summary>
+        /// Creates one or more cache instruction records base on the configured batch size from a set of individual instructions and saves them.
+        /// </summary>
+        void DeliverInstructionsInBatches(IEnumerable<RefreshInstruction> instructions, string localIdentity);
+
+        /// <summary>
+        /// Processes and then prunes pending database cache instructions.
+        /// </summary>
+        /// <param name="released">Flag indicating if process is shutting now and operations should exit.</param>
+        /// <param name="localIdentity">Local local identity of the executing AppDomain.</param>
+        /// <param name="lastPruned">Date of last prune operation.</param>
+        CacheInstructionServiceProcessInstructionsResult ProcessInstructions(bool released, string localIdentity, DateTime lastPruned);
+    }
+}
