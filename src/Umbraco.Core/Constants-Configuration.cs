@@ -30,6 +30,7 @@
             public const string ConfigCoreDebug = ConfigCorePrefix + "Debug";
             public const string ConfigExceptionFilter = ConfigPrefix + "ExceptionFilter";
             public const string ConfigGlobal = ConfigPrefix + "Global";
+            public const string ConfigUnattended = ConfigPrefix + "Unattended";
             public const string ConfigHealthChecks = ConfigPrefix + "HealthChecks";
             public const string ConfigHosting = ConfigPrefix + "Hosting";
             public const string ConfigImaging = ConfigPrefix + "Imaging";

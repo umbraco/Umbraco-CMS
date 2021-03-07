@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         [SetUp]
         public virtual void Setup()
         {
-            InMemoryConfiguration[Constants.Configuration.ConfigGlobal + ":" + nameof(GlobalSettings.InstallUnattended)] = "true";
+            InMemoryConfiguration[Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
             IHostBuilder hostBuilder = CreateHostBuilder();
 
             IHost host = hostBuilder.Build();

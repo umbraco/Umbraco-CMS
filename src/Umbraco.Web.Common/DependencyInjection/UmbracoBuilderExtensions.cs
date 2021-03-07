@@ -53,6 +53,7 @@ using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
+using Umbraco.Core.Events;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
@@ -290,6 +291,12 @@ namespace Umbraco.Extensions
             // TODO: Does this belong in web components??
             builder.AddNuCache();
 
+            return builder;
+        }
+
+        public static IUmbracoBuilder AddUnattedInstallCreateUser(this IUmbracoBuilder builder)
+        {
+            builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
             return builder;
         }
 
