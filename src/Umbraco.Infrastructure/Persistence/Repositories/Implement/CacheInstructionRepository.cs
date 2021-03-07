@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         /// <inheritdoc/>
-        public IEnumerable<CacheInstruction> GetInstructions(int lastId, int maxNumberToRetrieve)
+        public IEnumerable<CacheInstruction> GetPendingInstructions(int lastId, int maxNumberToRetrieve)
         {
             Sql<ISqlContext> sql = AmbientScope.SqlContext.Sql().SelectAll()
                 .From<CacheInstructionDto>()

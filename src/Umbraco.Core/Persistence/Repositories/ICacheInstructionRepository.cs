@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// </summary>
         /// <param name="lastId">Last id processed.</param>
         /// <param name="maxNumberToRetrieve">The maximum number of instructions to retrieve.</param>
-        IEnumerable<CacheInstruction> GetInstructions(int lastId, int maxNumberToRetrieve);
+        IEnumerable<CacheInstruction> GetPendingInstructions(int lastId, int maxNumberToRetrieve);
 
         /// <summary>
         /// Deletes cache instructions older than the provided date.

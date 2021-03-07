@@ -248,7 +248,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             // some memory however we cannot do that because inside of this loop the cache refreshers are also
             // performing some lookups which cannot be done with an active reader open.
             lastId = 0;
-            foreach (CacheInstruction instruction in _cacheInstructionRepository.GetInstructions(lastId, MaxInstructionsToRetrieve))
+            foreach (CacheInstruction instruction in _cacheInstructionRepository.GetPendingInstructions(lastId, MaxInstructionsToRetrieve))
             {
                 // If this flag gets set it means we're shutting down! In this case, we need to exit asap and cannot
                 // continue processing anything otherwise we'll hold up the app domain shutdown.
