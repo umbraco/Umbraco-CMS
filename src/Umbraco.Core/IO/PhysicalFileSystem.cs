@@ -74,11 +74,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex, "Not authorized to get directories for '{Path}'", fullPath);
+                Current.Logger.Error<PhysicalFileSystem,string>(ex, "Not authorized to get directories for '{Path}'", fullPath);
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{Path}'", fullPath);
+                Current.Logger.Error<PhysicalFileSystem,string>(ex, "Directory not found for '{Path}'", fullPath);
             }
 
             return Enumerable.Empty<string>();
@@ -110,7 +110,7 @@ namespace Umbraco.Core.IO
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{Path}'", fullPath);
+                Current.Logger.Error<PhysicalFileSystem,string>(ex, "Directory not found for '{Path}'", fullPath);
             }
         }
 
@@ -190,11 +190,11 @@ namespace Umbraco.Core.IO
             }
             catch (UnauthorizedAccessException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex, "Not authorized to get directories for '{Path}'", fullPath);
+                Current.Logger.Error<PhysicalFileSystem,string>(ex, "Not authorized to get directories for '{Path}'", fullPath);
             }
             catch (DirectoryNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex, "Directory not found for '{FullPath}'", fullPath);
+                Current.Logger.Error<PhysicalFileSystem, string>(ex, "Directory not found for '{FullPath}'", fullPath);
             }
 
             return Enumerable.Empty<string>();
@@ -227,7 +227,7 @@ namespace Umbraco.Core.IO
             }
             catch (FileNotFoundException ex)
             {
-                Current.Logger.Error<PhysicalFileSystem>(ex.InnerException, "DeleteFile failed with FileNotFoundException for '{Path}'", fullPath);
+                Current.Logger.Error<PhysicalFileSystem, string>(ex.InnerException, "DeleteFile failed with FileNotFoundException for '{Path}'", fullPath);
             }
         }
 

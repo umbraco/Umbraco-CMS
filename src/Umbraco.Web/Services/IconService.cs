@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Ganss.XSS;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -14,11 +15,13 @@ namespace Umbraco.Web.Services
     public class IconService : IIconService
     {
         private readonly IGlobalSettings _globalSettings;
+        private readonly IHtmlSanitizer _htmlSanitizer;
         private readonly IAppPolicyCache _cache;
 
-        public IconService(IGlobalSettings globalSettings, AppCaches appCaches)
+        public IconService(IGlobalSettings globalSettings, IHtmlSanitizer htmlSanitizer, AppCaches appCaches)
         {
             _globalSettings = globalSettings;
+            _htmlSanitizer = htmlSanitizer;
             _cache = appCaches.RuntimeCache;
         }
 
@@ -74,11 +77,16 @@ namespace Umbraco.Web.Services
         {
             try
             {
-                return new IconModel
+                var svgContent = System.IO.File.ReadAllText(iconPath);
+                var sanitizedString = _htmlSanitizer.Sanitize(svgContent);
+
+                var svg = new IconModel
                 {
                     Name = iconName,
-                    SvgString = System.IO.File.ReadAllText(iconPath)
+                    SvgString = sanitizedString
                 };
+
+                return svg;
             }
             catch
             {
@@ -87,7 +95,7 @@ namespace Umbraco.Web.Services
         }
 
         /// <summary>
-        /// 
+        ///
         /// </summary>
         /// <returns></returns>
         private IEnumerable<FileInfo> GetAllIconNames()
@@ -123,10 +131,10 @@ namespace Umbraco.Web.Services
         private IReadOnlyDictionary<string, string> GetIconDictionary() => _cache.GetCacheItem(
             $"{typeof(IconService).FullName}.{nameof(GetIconDictionary)}",
             () => GetAllIconNames()
-                    .Select(GetIcon)
-                    .Where(i => i != null)
-                    .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
-                    .ToDictionary(g => g.Key, g => g.First().SvgString, StringComparer.OrdinalIgnoreCase)
+                .Select(GetIcon)
+                .Where(i => i != null)
+                .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First().SvgString, StringComparer.OrdinalIgnoreCase)
         );
     }
 }
