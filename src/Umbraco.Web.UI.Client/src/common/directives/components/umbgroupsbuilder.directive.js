@@ -45,6 +45,18 @@
                     appendTo: "body"
                 };
 
+                scope.sortableOptionsTab = {
+                    ...defaultOptions,
+                    connectWith: ".umb-group-builder__tabs",
+                    placeholder: "umb-group-builder__tab-sortable-placeholder",
+                    handle: ".umb-group-builder__tab-handle",
+                    items: ".umb-group-builder__tab-sortable",
+                    stop: function (event, ui) {
+                        updateSortOrder(scope.model.tabs);
+                        updateGroupSortOrder();
+                    }
+                };
+
                 scope.sortableOptionsGroup = {
                     ...defaultOptions,
                     connectWith: ".umb-group-builder__groups",
@@ -52,13 +64,10 @@
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
                     stop: function (event, ui) {
-                        // make sure reference to tab is correct
                         const groupId = ui.item[0].dataset.groupId ? parseInt(ui.item[0].dataset.groupId) : null;
                         const group = groupId ? scope.model.groups.find(group => group.id === parseInt(groupId)) : null;
                         group.tabId = scope.openTabId;
-                        // TODO: Manually update the model based on the sorting of group in tabs
-                        // TODO: Run through groups and set the correct sort order
-                        // updateGroupsSortOrder();
+                        updateGroupSortOrder();
                     }
                 };
 
@@ -69,7 +78,7 @@
                     handle: ".umb-group-builder__property-handle",
                     items: ".umb-group-builder__property-sortable",
                     stop: function (e, ui) {
-                        // updatePropertiesSortOrder();
+                        updatePropertiesSortOrder();
                     }
                 };
 
@@ -83,52 +92,26 @@
                 };
             }
 
-            function updateGroupsSortOrder() {
+            function updateGroupSortOrder () {
+                const order = scope.model.tabs && scope.model.tabs.length > 0 ? scope.model.tabs.map(tab => tab.id) : [];
+                scope.model.groups = scope.model.groups.concat().sort((a, b) => order.indexOf(a.tabId) - order.indexOf(b.tabId));
+                updateSortOrder(scope.model.groups);
+            }
 
-                var first = true;
-                var prevSortOrder = 0;
-
-                scope.model.groups.map(function (group) {
-
-                    var index = scope.model.groups.indexOf(group);
-
-                    if (group.tabState !== "init") {
-
-                        // set the first not inherited tab to sort order 0
-                        if (!group.inherited && first) {
-
-                            // set the first tab sort order to 0 if prev is 0
-                            if (prevSortOrder === 0) {
-                                group.sortOrder = 0;
-                                // when the first tab is inherited and sort order is not 0
-                            } else {
-                                group.sortOrder = prevSortOrder + 1;
-                            }
-
-                            first = false;
-
-                        } else if (!group.inherited && !first) {
-
-                            // find next group
-                            var nextGroup = scope.model.groups[index + 1];
-
-                            // if a groups is dropped in the middle of to groups with
-                            // same sort order. Give it the dropped group same sort order
-                            if (prevSortOrder === nextGroup.sortOrder) {
-                                group.sortOrder = prevSortOrder;
-                            } else {
-                                group.sortOrder = prevSortOrder + 1;
-                            }
-
-                        }
-
-                        // store this tabs sort order as reference for the next
-                        prevSortOrder = group.sortOrder;
-
+            function updateSortOrder(items) {
+                items.forEach((item, index) => {
+                    if (item.inherited) {
+                        return;
                     }
 
-                });
+                    if (index === 0) {
+                        item.sortOrder = 0;
+                        return;
+                    }
 
+                    const prevSortOrder = items[index - 1].sortOrder;
+                    item.sortOrder = prevSortOrder + 1;
+                });
             }
 
             function filterAvailableCompositions(selectedContentType, selecting) {
@@ -173,7 +156,7 @@
             }
 
             function updatePropertiesSortOrder() {
-                scope.model.groups.forEach(group => group = contentTypeHelper.updatePropertiesWithFieldsetsSortOrder(group));
+                scope.model.groups.forEach(group => group.properties = contentTypeHelper.updatePropertiesSortOrder(group.properties));
             }
 
             function updateFieldsetsSortOrder () {
