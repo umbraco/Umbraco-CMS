@@ -284,9 +284,10 @@ namespace Umbraco.Web.Routing
             // we do our best, but can't do the impossible
             // get the "default" domain ie the first one for the culture, else the first one (exists, length > 0)
             if (qualifiedSites == null)
-                return domainAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(culture)) ??
-                       domainAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(defaultCulture)) ??
-                       domainAndUris.First();
+            	return (currentAuthority.IsNullOrWhiteSpace() == false ? (currentAuthority.StartsWith("http") ? domainAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(culture) && (x.Uri.Scheme + "://" + x.Uri.Authority).InvariantEquals(currentAuthority)) : domainAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(culture) && x.Uri.Authority.InvariantEquals(currentAuthority))) : null) ??
+					   domainAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(culture)) ??
+					   domainAndUris.FirstOrDefault(x => x.Culture.Name.InvariantEquals(defaultCulture)) ??
+					   domainAndUris.First();
 
             // find a site that contains the current authority
             var currentSite = qualifiedSites.FirstOrDefault(site => site.Value.Contains(currentAuthority));
