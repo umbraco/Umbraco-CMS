@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -34,51 +33,57 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly IVariationContextAccessor _variationContextAccessor;
-        private readonly IRequestCache _requestCache;
 
         private const string NotificationStateKey = "Umbraco.Cms.Core.Routing.RedirectTrackingHandler";
 
-        public RedirectTrackingHandler(IOptionsMonitor<WebRoutingSettings> webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor, IRequestCache requestCache)
+        public RedirectTrackingHandler(IOptionsMonitor<WebRoutingSettings> webRoutingSettings, IPublishedSnapshotAccessor publishedSnapshotAccessor, IRedirectUrlService redirectUrlService, IVariationContextAccessor variationContextAccessor)
         {
             _webRoutingSettings = webRoutingSettings;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _redirectUrlService = redirectUrlService;
             _variationContextAccessor = variationContextAccessor;
-            _requestCache = requestCache;
         }
 
-        public void Handle(PublishingNotification<IContent> notification) => StoreOldRoutes(notification.PublishedEntities);
+        public void Handle(PublishingNotification<IContent> notification) => StoreOldRoutes(notification.PublishedEntities, notification);
 
-        public void Handle(PublishedNotification<IContent> notification) => CreateRedirectsForOldRoutes();
+        public void Handle(PublishedNotification<IContent> notification) => CreateRedirectsForOldRoutes(notification);
 
-        public void Handle(MovingNotification<IContent> notification) => StoreOldRoutes(notification.MoveInfoCollection.Select(m => m.Entity));
+        public void Handle(MovingNotification<IContent> notification) => StoreOldRoutes(notification.MoveInfoCollection.Select(m => m.Entity), notification);
 
-        public void Handle(MovedNotification<IContent> notification) => CreateRedirectsForOldRoutes();
+        public void Handle(MovedNotification<IContent> notification) => CreateRedirectsForOldRoutes(notification);
 
-        private void StoreOldRoutes(IEnumerable<IContent> entities)
+        private void StoreOldRoutes(IEnumerable<IContent> entities, IStatefulNotification notification)
         {
             // don't let the notification handlers kick in if Redirect Tracking is turned off in the config
             if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking)
                 return;
 
-            var oldRoutes = GetOldRoutes();
+            var oldRoutes = GetOldRoutes(notification);
             foreach (var entity in entities)
             {
                 StoreOldRoute(entity, oldRoutes);
             }
         }
 
-        private void CreateRedirectsForOldRoutes()
+        private void CreateRedirectsForOldRoutes(IStatefulNotification notification)
         {
             // don't let the notification handlers kick in if Redirect Tracking is turned off in the config
             if (_webRoutingSettings.CurrentValue.DisableRedirectUrlTracking)
                 return;
 
-            var oldRoutes = GetOldRoutes();
+            var oldRoutes = GetOldRoutes(notification);
             CreateRedirects(oldRoutes);
         }
 
-        private OldRoutesDictionary GetOldRoutes() => (OldRoutesDictionary)_requestCache.Get(NotificationStateKey, () => new OldRoutesDictionary());
+        private OldRoutesDictionary GetOldRoutes(IStatefulNotification notification)
+        {
+            if (notification.State.ContainsKey(NotificationStateKey) == false)
+            {
+                notification.State[NotificationStateKey] = new OldRoutesDictionary();
+            }
+
+            return (OldRoutesDictionary)notification.State[NotificationStateKey];
+        }
 
         private void StoreOldRoute(IContent entity, OldRoutesDictionary oldRoutes)
         {

@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public sealed class EmptyingRecycleBinNotification<T> : ICancelableNotification where T : class
+    public sealed class EmptyingRecycleBinNotification<T> : StatefulNotification, ICancelableNotification where T : class
     {
         public EmptyingRecycleBinNotification(EventMessages messages) => Messages = messages;
 

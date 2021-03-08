@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public abstract class ObjectNotification<T> : INotification where T : class
+    public abstract class ObjectNotification<T> : StatefulNotification where T : class
     {
         protected ObjectNotification(T target, EventMessages messages)
         {

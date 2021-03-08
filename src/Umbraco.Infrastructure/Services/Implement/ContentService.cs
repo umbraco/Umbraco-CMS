@@ -748,7 +748,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (raiseEvents && scope.Notifications.PublishCancelable(new SavingNotification<IContent>(content, evtMsgs)))
+                var savingNotification = new SavingNotification<IContent>(content, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
@@ -773,7 +774,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    scope.Notifications.Publish(new SavedNotification<IContent>(content, evtMsgs));
+                    scope.Notifications.Publish(new SavedNotification<IContent>(content, evtMsgs).WithStateFrom(savingNotification));
                 }
                 var changeType = TreeChangeTypes.RefreshNode;
                 scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
@@ -802,7 +803,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (raiseEvents && scope.Notifications.PublishCancelable(new SavingNotification<IContent>(contentsA, evtMsgs)))
+                var savingNotification = new SavingNotification<IContent>(contentsA, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
@@ -822,7 +824,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    scope.Notifications.Publish(new SavedNotification<IContent>(contentsA, evtMsgs));
+                    scope.Notifications.Publish(new SavedNotification<IContent>(contentsA, evtMsgs).WithStateFrom(savingNotification));
                 }
                 scope.Events.Dispatch(TreeChanged, this, treeChanges.ToEventArgs());
                 Audit(AuditType.Save, userId == -1 ? 0 : userId, Cms.Core.Constants.System.Root, "Saved multiple content");
@@ -866,7 +868,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 var allLangs = _languageRepository.GetMany().ToList();
 
-                if (scope.Notifications.PublishCancelable(new SavingNotification<IContent>(content, evtMsgs)))
+                var savingNotification = new SavingNotification<IContent>(content, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
                 }
@@ -881,7 +884,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // we don't care about the response here, this response will be rechecked below but we need to set the culture info values now.
                 content.PublishCulture(impact);
 
-                var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, raiseEvents);
+                var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseEvents);
                 scope.Complete();
                 return result;
             }
@@ -906,7 +909,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 var evtMsgs = EventMessagesFactory.Get();
 
-                if (raiseEvents && scope.Notifications.PublishCancelable(new SavingNotification<IContent>(content, evtMsgs)))
+                var savingNotification = new SavingNotification<IContent>(content, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
                 }
@@ -929,7 +933,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 foreach (var impact in impacts)
                     content.PublishCulture(impact);
 
-                var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, raiseEvents);
+                var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseEvents);
                 scope.Complete();
                 return result;
             }
@@ -971,7 +975,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 var allLangs = _languageRepository.GetMany().ToList();
 
-                if (scope.Notifications.PublishCancelable(new SavingNotification<IContent>(content, evtMsgs)))
+                var savingNotification = new SavingNotification<IContent>(content, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
                 }
@@ -985,7 +990,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     // to be non-routable so that when it's re-published all variants were as they were.
 
                     content.PublishedState = PublishedState.Unpublishing;
-                    var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId);
+                    var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
                     scope.Complete();
                     return result;
                 }
@@ -999,7 +1004,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     var removed = content.UnpublishCulture(culture);
 
                     //save and publish any changes
-                    var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId);
+                    var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId);
 
                     scope.Complete();
 
@@ -1042,14 +1047,15 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
 
-                if (scope.Notifications.PublishCancelable(new SavingNotification<IContent>(content, evtMsgs)))
+                var savingNotification = new SavingNotification<IContent>(content, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
                 }
 
                 var allLangs = _languageRepository.GetMany().ToList();
 
-                var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, userId, raiseEvents);
+                var result = CommitDocumentChangesInternal(scope, content, evtMsgs, allLangs, savingNotification.State, userId, raiseEvents);
                 scope.Complete();
                 return result;
             }
@@ -1060,7 +1066,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         /// <param name="scope"></param>
         /// <param name="content"></param>
-        /// <param name="saveEventArgs"></param>
+        /// <param name="notificationState"></param>
         /// <param name="userId"></param>
         /// <param name="raiseEvents"></param>
         /// <param name="branchOne"></param>
@@ -1074,6 +1080,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </remarks>
         private PublishResult CommitDocumentChangesInternal(IScope scope, IContent content,
             EventMessages evtMsgs, IReadOnlyCollection<ILanguage> allLangs,
+            IDictionary<string, object> notificationState,
             int userId = Cms.Core.Constants.Security.SuperUserId,
             bool raiseEvents = true, bool branchOne = false, bool branchRoot = false)
         {
@@ -1127,7 +1134,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                         : null;
 
                 // ensure that the document can be published, and publish handling events, business rules, etc
-                publishResult = StrategyCanPublish(scope, content, /*checkPath:*/ (!branchOne || branchRoot), culturesPublishing, culturesUnpublishing, evtMsgs, allLangs);
+                publishResult = StrategyCanPublish(scope, content, /*checkPath:*/ (!branchOne || branchRoot), culturesPublishing, culturesUnpublishing, evtMsgs, allLangs, notificationState);
                 if (publishResult.Success)
                 {
                     // note: StrategyPublish flips the PublishedState to Publishing!
@@ -1212,7 +1219,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             // raise the Saved event, always
             if (raiseEvents)
             {
-                scope.Notifications.Publish(new SavedNotification<IContent>(content, evtMsgs));
+                scope.Notifications.Publish(new SavedNotification<IContent>(content, evtMsgs).WithState(notificationState));
             }
 
             if (unpublishing) // we have tried to unpublish - won't happen in a branch
@@ -1220,7 +1227,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 if (unpublishResult.Success) // and succeeded, trigger events
                 {
                     // events and audit
-                    scope.Notifications.Publish(new UnpublishedNotification<IContent>(content, evtMsgs));
+                    scope.Notifications.Publish(new UnpublishedNotification<IContent>(content, evtMsgs).WithState(notificationState));
                     scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, TreeChangeTypes.RefreshBranch).ToEventArgs());
 
                     if (culturesUnpublishing != null)
@@ -1275,7 +1282,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     if (!branchOne) // for branches, handled by SaveAndPublishBranch
                     {
                         scope.Events.Dispatch(TreeChanged, this, new TreeChange<IContent>(content, changeType).ToEventArgs());
-                        scope.Notifications.Publish(new PublishedNotification<IContent>(content, evtMsgs));
+                        scope.Notifications.Publish(new PublishedNotification<IContent>(content, evtMsgs).WithState(notificationState));
                     }
 
                     // it was not published and now is... descendants that were 'published' (but
@@ -1284,7 +1291,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     if (!branchOne && isNew == false && previouslyPublished == false && HasChildren(content.Id))
                     {
                         var descendants = GetPublishedDescendantsLocked(content).ToArray();
-                        scope.Notifications.Publish(new PublishedNotification<IContent>(descendants, evtMsgs));
+                        scope.Notifications.Publish(new PublishedNotification<IContent>(descendants, evtMsgs).WithState(notificationState));
                     }
 
                     switch (publishResult.Result)
@@ -1377,7 +1384,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                         if (pendingCultures.Count == 0)
                             continue; //shouldn't happen but no point in processing this document if there's nothing there
 
-                        if (scope.Notifications.PublishCancelable(new SavingNotification<IContent>(d, evtMsgs)))
+                        var savingNotification = new SavingNotification<IContent>(d, evtMsgs);
+                        if (scope.Notifications.PublishCancelable(savingNotification))
                         {
                             results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
                             continue;
@@ -1391,7 +1399,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                             d.UnpublishCulture(c);
                         }
 
-                        var result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId);
+                        var result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
                         results.Add(result);
@@ -1437,7 +1445,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                         if (pendingCultures.Count == 0)
                             continue; //shouldn't happen but no point in processing this document if there's nothing there
 
-                        if (scope.Notifications.PublishCancelable(new SavingNotification<IContent>(d, evtMsgs)))
+                        var savingNotification = new SavingNotification<IContent>(d, evtMsgs);
+                        if (scope.Notifications.PublishCancelable(savingNotification))
                         {
                             results.Add(new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, d));
                             continue;
@@ -1470,7 +1479,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                         else if (!publishing)
                             result = new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, d);
                         else
-                            result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, d.WriterId);
+                            result = CommitDocumentChangesInternal(scope, d, evtMsgs, allLangs.Value, savingNotification.State, d.WriterId);
 
                         if (result.Success == false)
                             _logger.LogError(null, "Failed to publish document id={DocumentId}, reason={Reason}.", d.Id, result.Result);
@@ -1718,7 +1727,8 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (culturesToPublish.Count == 0) // empty = already published
                 return new PublishResult(PublishResultType.SuccessPublishAlready, evtMsgs, document);
 
-            if (scope.Notifications.PublishCancelable(new SavingNotification<IContent>(document, evtMsgs)))
+            var savingNotification = new SavingNotification<IContent>(document, evtMsgs);
+            if (scope.Notifications.PublishCancelable(savingNotification))
             {
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, document);
             }
@@ -1730,7 +1740,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return new PublishResult(PublishResultType.FailedPublishContentInvalid, evtMsgs, document);
             }
 
-            var result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, userId, branchOne: true, branchRoot: isRoot);
+            var result = CommitDocumentChangesInternal(scope, document, evtMsgs, allLangs, savingNotification.State, userId, branchOne: true, branchRoot: isRoot);
             if (result.Success)
                 publishedDocuments.Add(document);
             return result;
@@ -1814,7 +1824,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (scope.Notifications.PublishCancelable(new DeletingVersionsNotification<IContent>(id, evtMsgs, dateToRetain: versionDate)))
+                var deletingVersionsNotification = new DeletingVersionsNotification<IContent>(id, evtMsgs, dateToRetain: versionDate);
+                if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
                 {
                     scope.Complete();
                     return;
@@ -1823,7 +1834,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
                 _documentRepository.DeleteVersions(id, versionDate);
 
-                scope.Notifications.Publish(new DeletedVersionsNotification<IContent>(id, evtMsgs, dateToRetain: versionDate));
+                scope.Notifications.Publish(new DeletedVersionsNotification<IContent>(id, evtMsgs, dateToRetain: versionDate).WithStateFrom(deletingVersionsNotification));
                 Audit(AuditType.Delete, userId, Cms.Core.Constants.System.Root, "Delete (by version date)");
 
                 scope.Complete();
@@ -1844,7 +1855,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (scope.Notifications.PublishCancelable(new DeletingVersionsNotification<IContent>(id, evtMsgs, specificVersion: versionId)))
+                var deletingVersionsNotification = new DeletingVersionsNotification<IContent>(id, evtMsgs, specificVersion: versionId);
+                if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
                 {
                     scope.Complete();
                     return;
@@ -1861,7 +1873,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 if (c.VersionId != versionId && c.PublishedVersionId != versionId) // don't delete the current or published version
                     _documentRepository.DeleteVersion(versionId);
 
-                scope.Notifications.Publish(new DeletedVersionsNotification<IContent>(id, evtMsgs, specificVersion: versionId));
+                scope.Notifications.Publish(new DeletedVersionsNotification<IContent>(id, evtMsgs, specificVersion: versionId).WithStateFrom(deletingVersionsNotification));
                 Audit(AuditType.Delete, userId, Cms.Core.Constants.System.Root, "Delete (by version)");
 
                 scope.Complete();
@@ -1885,7 +1897,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var originalPath = content.Path;
                 var moveEventInfo = new MoveEventInfo<IContent>(content, originalPath, Cms.Core.Constants.System.RecycleBinContent);
 
-                if (scope.Notifications.PublishCancelable(new MovingToRecycleBinNotification<IContent>(moveEventInfo, evtMsgs)))
+                var movingToRecycleBinNotification = new MovingToRecycleBinNotification<IContent>(moveEventInfo, evtMsgs);
+                if (scope.Notifications.PublishCancelable(movingToRecycleBinNotification))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs); // causes rollback
@@ -1904,7 +1917,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
 
-                scope.Notifications.Publish(new MovedToRecycleBinNotification<IContent>(moveInfo, evtMsgs));
+                scope.Notifications.Publish(new MovedToRecycleBinNotification<IContent>(moveInfo, evtMsgs).WithStateFrom(movingToRecycleBinNotification));
                 Audit(AuditType.Move, userId, content.Id, "Moved to recycle bin");
 
                 scope.Complete();
@@ -1947,7 +1960,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 var moveEventInfo = new MoveEventInfo<IContent>(content, content.Path, parentId);
 
-                if (scope.Notifications.PublishCancelable(new MovingNotification<IContent>(moveEventInfo, evtMsgs)))
+                var movingNotification = new MovingNotification<IContent>(moveEventInfo, evtMsgs);
+                if (scope.Notifications.PublishCancelable(movingNotification))
                 {
                     scope.Complete();
                     return; // causes rollback
@@ -1976,7 +1990,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     .Select(x => new MoveEventInfo<IContent>(x.Item1, x.Item2, x.Item1.ParentId))
                     .ToArray();
 
-                scope.Notifications.Publish(new MovedNotification<IContent>(moveInfo, evtMsgs));
+                scope.Notifications.Publish(new MovedNotification<IContent>(moveInfo, evtMsgs).WithStateFrom(movingNotification));
 
                 Audit(AuditType.Move, userId, content.Id);
 
@@ -2061,7 +2075,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // are managed by Delete, and not here.
 
                 // no idea what those events are for, keep a simplified version
-                if (scope.Notifications.PublishCancelable(new EmptyingRecycleBinNotification<IContent>(evtMsgs)))
+                var emptyingRecycleBinNotification = new EmptyingRecycleBinNotification<IContent>(evtMsgs);
+                if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
@@ -2076,7 +2091,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     deleted.Add(content);
                 }
 
-                scope.Notifications.Publish(new EmptiedRecycleBinNotification<IContent>(evtMsgs));
+                scope.Notifications.Publish(new EmptiedRecycleBinNotification<IContent>(evtMsgs).WithStateFrom(emptyingRecycleBinNotification));
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs());
                 Audit(AuditType.Delete, userId, Cms.Core.Constants.System.RecycleBinContent, "Recycle bin emptied");
 
@@ -2228,7 +2243,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (scope.Notifications.PublishCancelable(new SendingToPublishNotification<IContent>(content, evtMsgs)))
+                var sendingToPublishNotification = new SendingToPublishNotification<IContent>(content, evtMsgs);
+                if (scope.Notifications.PublishCancelable(sendingToPublishNotification))
                 {
                     scope.Complete();
                     return false;
@@ -2253,7 +2269,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 if (!saveResult.Success)
                     return saveResult.Success;
 
-                scope.Notifications.Publish(new SentToPublishNotification<IContent>(content, evtMsgs));
+                scope.Notifications.Publish(new SentToPublishNotification<IContent>(content, evtMsgs).WithStateFrom(sendingToPublishNotification));
 
                 if (culturesChanging != null)
                     Audit(AuditType.SendToPublishVariant, userId, content.Id, $"Send To Publish for cultures: {culturesChanging}", culturesChanging);
@@ -2325,16 +2341,18 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         private OperationResult Sort(IScope scope, IContent[] itemsA, int userId, EventMessages evtMsgs, bool raiseEvents)
         {
+            var sortingNotification = new SortingNotification<IContent>(itemsA, evtMsgs);
+            var savingNotification = new SavingNotification<IContent>(itemsA, evtMsgs);
             if (raiseEvents)
             {
                 // raise cancelable sorting event
-                if (scope.Notifications.PublishCancelable(new SortingNotification<IContent>(itemsA, evtMsgs)))
+                if (scope.Notifications.PublishCancelable(sortingNotification))
                 {
                     return OperationResult.Cancel(evtMsgs);
                 }
 
                 // raise cancelable saving event
-                if (scope.Notifications.PublishCancelable(new SavingNotification<IContent>(itemsA, evtMsgs)))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     return OperationResult.Cancel(evtMsgs);
                 }
@@ -2371,8 +2389,8 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (raiseEvents)
             {
                 //first saved, then sorted
-                scope.Notifications.Publish(new SavedNotification<IContent>(itemsA, evtMsgs));
-                scope.Notifications.Publish(new SortedNotification<IContent>(itemsA, evtMsgs));
+                scope.Notifications.Publish(new SavedNotification<IContent>(itemsA, evtMsgs).WithStateFrom(savingNotification));
+                scope.Notifications.Publish(new SortedNotification<IContent>(itemsA, evtMsgs).WithStateFrom(sortingNotification));
             }
 
             scope.Events.Dispatch(TreeChanged, this, saved.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.RefreshNode)).ToEventArgs());
@@ -2482,12 +2500,13 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="evtMsgs"></param>
         /// <param name="culturesPublishing"></param>
         /// <param name="allLangs"></param>
+        /// <param name="notificationState"></param>
         /// <returns></returns>
         private PublishResult StrategyCanPublish(IScope scope, IContent content, bool checkPath, IReadOnlyList<string> culturesPublishing,
-            IReadOnlyCollection<string> culturesUnpublishing, EventMessages evtMsgs, IReadOnlyCollection<ILanguage> allLangs)
+            IReadOnlyCollection<string> culturesUnpublishing, EventMessages evtMsgs, IReadOnlyCollection<ILanguage> allLangs, IDictionary<string, object> notificationState)
         {
             // raise Publishing notification
-            if (scope.Notifications.PublishCancelable(new PublishingNotification<IContent>(content, evtMsgs)))
+            if (scope.Notifications.PublishCancelable(new PublishingNotification<IContent>(content, evtMsgs).WithState(notificationState)))
             {
                 _logger.LogInformation("Document {ContentName} (id={ContentId}) cannot be published: {Reason}", content.Name, content.Id, "publishing was cancelled");
                 return new PublishResult(PublishResultType.FailedPublishCancelledByEvent, evtMsgs, content);
@@ -3010,7 +3029,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (scope.Notifications.PublishCancelable(new RollingBackNotification<IContent>(content, evtMsgs)))
+                var rollingBackNotification = new RollingBackNotification<IContent>(content, evtMsgs);
+                if (scope.Notifications.PublishCancelable(rollingBackNotification))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
@@ -3030,7 +3050,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
                 else
                 {
-                    scope.Notifications.Publish(new RolledBackNotification<IContent>(content, evtMsgs));
+                    scope.Notifications.Publish(new RolledBackNotification<IContent>(content, evtMsgs).WithStateFrom(rollingBackNotification));
 
                     //Logging & Audit message
                     _logger.LogInformation("User '{UserId}' rolled back content '{ContentId}' to version '{VersionId}'", userId, id, versionId);
