@@ -35,10 +35,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.Multiple(() =>
             {
+                Assert.IsTrue(result.Initialized);
                 Assert.IsFalse(result.ColdBootRequired);
                 Assert.AreEqual(0, result.MaxId);
                 Assert.AreEqual(0, result.LastId);
             });
+        }
+
+        [Test]
+        public void Is_Not_Initialized_When_Released()
+        {
+            var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
+
+            CacheInstructionServiceInitializationResult result = sut.EnsureInitialized(true, 0);
+
+            Assert.IsFalse(result.Initialized);
         }
 
         [Test]
@@ -53,6 +64,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.Multiple(() =>
             {
+                Assert.IsTrue(result.Initialized);
                 Assert.IsTrue(result.ColdBootRequired);
                 Assert.AreEqual(1, result.MaxId);
                 Assert.AreEqual(-1, result.LastId);
@@ -71,6 +83,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.Multiple(() =>
             {
+                Assert.IsTrue(result.Initialized);
                 Assert.IsFalse(result.ColdBootRequired);
                 Assert.AreEqual(1, result.LastId);
             });
