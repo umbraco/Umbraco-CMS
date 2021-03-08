@@ -165,6 +165,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 _cacheInstructionRepository.Add(entity);
+                scope.Complete();
             }
         }
 
@@ -193,25 +194,30 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (_profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                ProcessDatabaseInstructions(released, localIdentity, out int lastId);
+                var numberOfInstructionsProcessed = ProcessDatabaseInstructions(released, localIdentity, out int lastId);
 
                 // Check for pruning throttling.
                 if (released || (DateTime.UtcNow - lastPruned) <= _globalSettings.DatabaseServerMessenger.TimeBetweenPruneOperations)
                 {
                     scope.Complete();
-                    return CacheInstructionServiceProcessInstructionsResult.AsCompleted(lastId);
+                    return CacheInstructionServiceProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
                 }
 
+                var instructionsWerePruned = false;
                 switch (_serverRoleAccessor.CurrentServerRole)
                 {
                     case ServerRole.Single:
                     case ServerRole.Master:
                         PruneOldInstructions();
+                        instructionsWerePruned = true;
                         break;
                 }
 
                 scope.Complete();
-                return CacheInstructionServiceProcessInstructionsResult.AsCompletedAndPruned(lastId);
+
+                return instructionsWerePruned
+                    ? CacheInstructionServiceProcessInstructionsResult.AsCompletedAndPruned(numberOfInstructionsProcessed, lastId)
+                    : CacheInstructionServiceProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
             }
         }
 
@@ -221,7 +227,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <remarks>
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// </remarks>
-        private void ProcessDatabaseInstructions(bool released, string localIdentity, out int lastId)
+        /// <returns>Number of instructions processed.</returns>
+        private int ProcessDatabaseInstructions(bool released, string localIdentity, out int lastId)
         {
             // NOTE:
             // We 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
@@ -243,6 +250,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             // Tracks which ones have already been processed to avoid duplicates
             var processed = new HashSet<RefreshInstruction>();
+            var numberOfInstructionsProcessed = 0;
 
             // It would have been nice to do this in a Query instead of Fetch using a data reader to save
             // some memory however we cannot do that because inside of this loop the cache refreshers are also
@@ -282,7 +290,11 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _logger.LogInformation("The current batch of instructions was not processed, app is shutting down");
                     break;
                 }
+
+                numberOfInstructionsProcessed++;
             }
+
+            return numberOfInstructionsProcessed;
         }
 
         /// <summary>

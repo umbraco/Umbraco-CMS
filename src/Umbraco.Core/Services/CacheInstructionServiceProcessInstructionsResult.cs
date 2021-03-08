@@ -11,14 +11,16 @@ namespace Umbraco.Cms.Core.Services
         {
         }
 
+        public int NumberOfInstructionsProcessed { get; private set; }
+
         public int LastId { get; private set; }
 
         public bool InstructionsWerePruned { get; private set; }
 
-        public static CacheInstructionServiceProcessInstructionsResult AsCompleted(int lastId) =>
-            new CacheInstructionServiceProcessInstructionsResult { LastId = lastId };
+        public static CacheInstructionServiceProcessInstructionsResult AsCompleted(int numberOfInstructionsProcessed, int lastId) =>
+            new CacheInstructionServiceProcessInstructionsResult { NumberOfInstructionsProcessed = numberOfInstructionsProcessed, LastId = lastId };
 
-        public static CacheInstructionServiceProcessInstructionsResult AsCompletedAndPruned(int lastId) =>
-            new CacheInstructionServiceProcessInstructionsResult { LastId = lastId, InstructionsWerePruned = true };
+        public static CacheInstructionServiceProcessInstructionsResult AsCompletedAndPruned(int numberOfInstructionsProcessed, int lastId) =>
+            new CacheInstructionServiceProcessInstructionsResult { NumberOfInstructionsProcessed = numberOfInstructionsProcessed, LastId = lastId, InstructionsWerePruned = true };
     };
 }
