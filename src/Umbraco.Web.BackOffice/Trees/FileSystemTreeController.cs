@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Trees;
 using Umbraco.Cms.Core.Services;
@@ -20,9 +21,10 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         protected FileSystemTreeController(
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
-            IMenuItemCollectionFactory menuItemCollectionFactory
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IEventAggregator eventAggregator
         )
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             MenuItemCollectionFactory = menuItemCollectionFactory;
         }

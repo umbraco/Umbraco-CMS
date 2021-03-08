@@ -443,7 +443,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
-            if (!EmailSender.CanSendRequiredEmail(_globalSettings) && !_userManager.HasSendingUserInviteEventHandler)
+            if (!_emailSender.CanSendRequiredEmail() && !_userManager.HasSendingUserInviteEventHandler)
             {
                 return new ValidationErrorResult("No Email server is configured");
             }

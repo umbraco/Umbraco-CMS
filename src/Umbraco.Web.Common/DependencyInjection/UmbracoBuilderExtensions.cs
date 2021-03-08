@@ -53,6 +53,7 @@ using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
+using Umbraco.Core.Events;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
@@ -255,6 +256,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
 
             builder.Services.AddUnique<IMacroRenderer, MacroRenderer>();
+            builder.Services.AddUnique<PartialViewMacroEngine>();
             builder.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
 
             // register the umbraco context factory
@@ -262,6 +264,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             builder.Services.AddUnique<IBackOfficeSecurityFactory, BackOfficeSecurityFactory>();
             builder.Services.AddUnique<IBackOfficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
+            builder.AddNotificationHandler<UmbracoRoutedRequest, UmbracoWebsiteSecurityFactory>();
             builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, HybridUmbracoWebsiteSecurityAccessor>();
 
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
@@ -288,6 +291,12 @@ namespace Umbraco.Extensions
             // TODO: Does this belong in web components??
             builder.AddNuCache();
 
+            return builder;
+        }
+
+        public static IUmbracoBuilder AddUnattedInstallCreateUser(this IUmbracoBuilder builder)
+        {
+            builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
             return builder;
         }
 
