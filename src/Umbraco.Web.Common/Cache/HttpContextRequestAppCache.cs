@@ -235,8 +235,7 @@ namespace Umbraco.Cms.Core.Cache
             }
 
             IFeatureCollection features = httpContext.Features;
-            HttpResponse response = httpContext.Response;
-
+            
             lock (httpContext)
             {
                 requestLock = new RequestLock();

@@ -70,11 +70,10 @@ namespace Umbraco.Cms.Core.Scoping
 
             Detachable = detachable;
 
-            // TODO: The DEBUG_SCOPES flag will not work with recent Stack changes
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
-            logger.LogDebug("create " + InstanceId.ToString("N").Substring(0, 8));
 #endif
+            logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N").Substring(0, 8), Thread.CurrentThread.ManagedThreadId);
 
             if (detachable)
             {

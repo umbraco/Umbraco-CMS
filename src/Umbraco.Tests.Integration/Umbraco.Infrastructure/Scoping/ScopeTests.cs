@@ -257,7 +257,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                     Assert.AreSame(scope, ((Scope)nested).ParentScope);
 
                     // it's moved over to call context
-                    ConcurrentStack<IScope> callContextScope = CallContext<ConcurrentStack<IScope>>.GetData(ScopeProvider.ScopeItemKey);
+                    ConcurrentStack<IScope> callContextScope = scopeProvider.GetCallContextScopeValue();
+
                     Assert.IsNotNull(callContextScope);
                     Assert.AreEqual(2, callContextScope.Count);
                 }

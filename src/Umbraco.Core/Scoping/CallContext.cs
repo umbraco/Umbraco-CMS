@@ -11,6 +11,8 @@ namespace Umbraco.Cms.Core.Scoping
     /// </remarks>
     public static class CallContext<T>
     {
+        // TODO: Kill this. Wherever we need AsyncLocal, we should just use it there.
+
         private static readonly ConcurrentDictionary<string, AsyncLocal<T>> s_state = new ConcurrentDictionary<string, AsyncLocal<T>>();
 
         /// <summary>
