@@ -67,13 +67,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             // arrange
             MemberUserStore sut = CreateSut();
-            CancellationToken fakeCancellationToken = new CancellationToken() { };
+            var fakeCancellationToken = new CancellationToken() { };
 
             // act
-            Action actual = () => sut.SetNormalizedUserNameAsync(null, "username", fakeCancellationToken);
+            var actual = (Task<IdentityResult>)sut.SetNormalizedUserNameAsync(null, "username", fakeCancellationToken);
 
             // assert
-            Assert.That(actual, Throws.ArgumentNullException);
+            Assert.IsFalse(actual.Result.Succeeded);
+            Assert.IsTrue(actual.Result.Errors.Any(x => x.Code == "IdentityErrorUserStore" && x.Description == "Value cannot be null. (Parameter 'user')"));
+            _mockMemberService.VerifyNoOtherCalls();
         }
 
 
@@ -86,10 +88,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             var fakeUser = new MemberIdentityUser() { };
 
             // act
-            Task actual = sut.SetNormalizedUserNameAsync(fakeUser, null, fakeCancellationToken);
+            var actual = (Task<IdentityResult>)sut.SetNormalizedUserNameAsync(fakeUser, null, fakeCancellationToken);
 
             // assert
-            Assert.AreEqual(null, actual);
+            Assert.IsFalse(actual.Result.Succeeded);
+            Assert.IsTrue(actual.Result.Errors.Any(x => x.Code == "IdentityErrorUserStore" && x.Description == "Value cannot be null. (Parameter 'normalizedName')"));
+            _mockMemberService.VerifyNoOtherCalls();
         }
 
         [Test]

@@ -30,14 +30,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             // arrange
             MemberRoleStore<IdentityRole> sut = CreateSut();
-            CancellationToken fakeCancellationToken = new CancellationToken() { };
+            var fakeCancellationToken = new CancellationToken();
 
             // act
             Task<IdentityResult> actual = sut.CreateAsync(null, fakeCancellationToken);
 
             // assert
-            Assert.IsTrue(actual.Result.Succeeded == false);
-            Assert.IsTrue(actual.Result.Errors.Any(x => x.Code == "IdentityMemberGroupNotFound" && x.Description == "Member group not found"));
+            Assert.IsFalse(actual.Result.Succeeded);
+            Assert.IsTrue(actual.Result.Errors.Any(x => x.Code == "IdentityErrorUserStore" && x.Description == "Value cannot be null. (Parameter 'role')"));
         }
 
 

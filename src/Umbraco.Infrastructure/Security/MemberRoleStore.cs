@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Core.Security
         //TODO: How revealing can the error messages be?
         private readonly IdentityError _intParseError = new IdentityError { Code = "IdentityIdParseError", Description = "Cannot parse ID to int" };
         private readonly IdentityError _memberGroupNotFoundError = new IdentityError { Code = "IdentityMemberGroupNotFound", Description = "Member group not found" };
+        private const string genericIdentityErrorCode = "IdentityErrorUserStore";
 
         public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
         {
@@ -57,7 +58,7 @@ namespace Umbraco.Cms.Core.Security
             }
             catch (Exception ex)
             {
-                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = ex.Message, Description = ex.Message }));
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = genericIdentityErrorCode, Description = ex.Message }));
             }
         }
 
