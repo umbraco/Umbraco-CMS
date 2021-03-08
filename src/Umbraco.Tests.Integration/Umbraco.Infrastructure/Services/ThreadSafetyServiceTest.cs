@@ -147,9 +147,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 threads.Add(t);
             }
 
-            // start all threads
-            log.LogInformation("Starting threads");
-            threads.ForEach(x => x.Start());
+            using (ExecutionContext.SuppressFlow())
+            {
+                // start all threads
+                log.LogInformation("Starting threads");
+                threads.ForEach(x => x.Start());
+            }   
 
             // wait for all to complete
             log.LogInformation("Joining threads");
@@ -221,8 +224,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 threads.Add(t);
             }
 
-            // start all threads
-            threads.ForEach(x => x.Start());
+            using (ExecutionContext.SuppressFlow())
+            {
+                // start all threads
+                threads.ForEach(x => x.Start());
+            }
 
             // wait for all to complete
             threads.ForEach(x => x.Join());
