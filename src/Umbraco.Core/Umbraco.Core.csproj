@@ -16,6 +16,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="5.0.0" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
         <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />
