@@ -71,7 +71,9 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
         internal Guid UmbracoRequestId { get; }
 
         // lazily get/create a Uri for the current request
-        private Uri RequestUrl => _requestUrl ?? (_requestUrl = new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl()));
+        private Uri RequestUrl => _requestUrl ??= _httpContextAccessor.HttpContext is null
+            ? null
+            : new Uri(_httpContextAccessor.HttpContext.Request.GetEncodedUrl());
 
         /// <inheritdoc/>
         // set the urls lazily, no need to allocate until they are needed...
