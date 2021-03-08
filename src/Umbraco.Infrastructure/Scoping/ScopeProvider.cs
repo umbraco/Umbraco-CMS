@@ -10,9 +10,7 @@ using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSetting
 using Umbraco.Extensions;
 using System.Collections.Generic;
 using System.Collections.Concurrent;
-using Umbraco.Cms.Infrastructure.Install.InstallSteps;
 
-// TODO: The DEBUG_SCOPES flag will not work with recent Stack changes
 #if DEBUG_SCOPES
 using System.Collections.Generic;
 using System.Linq;
