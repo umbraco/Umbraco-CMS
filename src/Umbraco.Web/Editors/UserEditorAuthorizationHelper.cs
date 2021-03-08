@@ -78,7 +78,9 @@ namespace Umbraco.Web.Editors
             if (userGroupAliases != null)
             {
                 var savingGroupAliases = userGroupAliases.ToArray();
-                var existingGroupAliases = savingUser.Groups.Select(x => x.Alias).ToArray();
+                var existingGroupAliases = savingUser == null
+                ? new string[0]
+                : savingUser.Groups.Select(x => x.Alias).ToArray();
 
                 var addedGroupAliases = savingGroupAliases.Except(existingGroupAliases);
 
