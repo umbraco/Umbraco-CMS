@@ -107,8 +107,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
             AcquireMainDom();
 
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStarting(State.Level), cancellationToken);
-
             // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
             if (State.Reason == RuntimeLevelReason.UpgradeMigrations && State.Level == RuntimeLevel.Run)
             {
@@ -119,6 +117,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 DetermineRuntimeLevel();
 
             }
+
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStarting(State.Level), cancellationToken);
 
             // create & initialize the components
             _components.Initialize();
