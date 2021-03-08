@@ -35,7 +35,7 @@
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// 1433 for SQL if you want to connect from local into the one running inside the container
 	// Can connect to the SQL Server running in the image on local with 'host.docker.internal' as hostname
-	"forwardPorts": [1433, 9000],
+	"forwardPorts": [1433, 9000, 5000, 25],
 
 	// [Optional] To reuse of your local HTTPS dev cert:
 	//
