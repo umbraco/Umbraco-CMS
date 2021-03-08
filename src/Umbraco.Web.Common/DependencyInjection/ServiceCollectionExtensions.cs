@@ -63,23 +63,14 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds the services required for using Members Identity
         /// </summary>
-        public static void AddMembersIdentity(this IServiceCollection services)
-        {
+        public static void AddMembersIdentity(this IServiceCollection services) =>
             services.BuildMembersIdentity()
                 .AddDefaultTokenProviders()
                 .AddMemberManager<IMemberManager, MemberManager>()
-                //.AddRoles<IdentityRole>()
                 .AddUserStore<MemberUserStore>()
                 .AddRoleStore<MemberRoleStore<IdentityRole>>()
                 .AddRoleValidator<RoleValidator<IdentityRole>>()
                 .AddRoleManager<RoleManager<IdentityRole>>();
-
-            //services.AddScoped<IUserClaimsPrincipalFactory<MemberIdentityUser>>(
-            //    s => new UserClaimsPrincipalFactory<MemberIdentityUser, IdentityRole>(
-            //        s.GetService<MemberManager>(),
-            //        s.GetService<RoleManager<IdentityRole>>(),
-            //        s.GetService<IOptions<IdentityOptions>>()));
-        }
 
         private static MemberIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
         {
