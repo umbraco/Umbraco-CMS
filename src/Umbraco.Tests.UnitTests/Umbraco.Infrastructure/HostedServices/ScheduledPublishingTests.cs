@@ -108,8 +108,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 
             var mockServerMessenger = new Mock<IServerMessenger>();
 
-            var mockBackOfficeSecurityFactory = new Mock<IBackOfficeSecurityFactory>();
-
             return new ScheduledPublishing(
                 mockRunTimeState.Object,
                 mockMainDom.Object,
@@ -117,8 +115,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 _mockContentService.Object,
                 mockUmbracoContextFactory.Object,
                 _mockLogger.Object,
-                mockServerMessenger.Object,
-                mockBackOfficeSecurityFactory.Object);
+                mockServerMessenger.Object);
         }
 
         private void VerifyScheduledPublishingNotPerformed() => VerifyScheduledPublishingPerformed(Times.Never());

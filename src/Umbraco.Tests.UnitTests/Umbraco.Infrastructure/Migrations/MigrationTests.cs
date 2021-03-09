@@ -1,7 +1,10 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
+#if DEBUG_SCOPES
+using System.Collections.Generic;
+#endif
 using System.Data;
 using Microsoft.Extensions.Logging;
 using Moq;

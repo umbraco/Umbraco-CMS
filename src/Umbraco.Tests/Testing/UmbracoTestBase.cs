@@ -300,11 +300,11 @@ namespace Umbraco.Tests.Testing
         {
             // imported from TestWithSettingsBase
             // which was inherited by TestWithApplicationBase so pretty much used everywhere
-            Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+            Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 
             // web
             Builder.Services.AddUnique(Current.UmbracoContextAccessor);
-            Builder.Services.AddUnique<IBackOfficeSecurityAccessor>(new HybridBackofficeSecurityAccessor(AppCaches.NoCache.RequestCache));
+            Builder.Services.AddUnique<IBackOfficeSecurityAccessor>(Mock.Of<IBackOfficeSecurityAccessor>());
             Builder.Services.AddUnique<IPublishedRouter, PublishedRouter>();
             Builder.WithCollectionBuilder<ContentFinderCollectionBuilder>();
 

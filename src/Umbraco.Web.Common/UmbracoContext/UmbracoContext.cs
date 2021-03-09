@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Web.Common.UmbracoContext
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
-    public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
+    public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
     {
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly UriUtility _uriUtility;

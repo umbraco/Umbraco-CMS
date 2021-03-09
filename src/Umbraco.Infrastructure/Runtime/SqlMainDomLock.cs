@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -254,37 +254,40 @@ _hostingEnvironment = hostingEnvironment;
         {
             var updatedTempId = tempId + UpdatedSuffix;
 
-            return Task.Run(() =>
+            using (ExecutionContext.SuppressFlow())
             {
-                try
+                return Task.Run(() =>
                 {
-                    using var db = _dbFactory.CreateDatabase();
-
-                    var watch = new Stopwatch();
-                    watch.Start();
-                    while (true)
+                    try
                     {
-                        // poll very often, we need to take over as fast as we can
-                        // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
-                        Thread.Sleep(1000);
+                        using var db = _dbFactory.CreateDatabase();
 
-                        var acquired = TryAcquire(db, tempId, updatedTempId);
-                        if (acquired.HasValue)
-                            return acquired.Value;
-
-                        if (watch.ElapsedMilliseconds >= millisecondsTimeout)
+                        var watch = new Stopwatch();
+                        watch.Start();
+                        while (true)
                         {
-                            return AcquireWhenMaxWaitTimeElapsed(db);
+                            // poll very often, we need to take over as fast as we can
+                            // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
+                            Thread.Sleep(1000);
+
+                            var acquired = TryAcquire(db, tempId, updatedTempId);
+                            if (acquired.HasValue)
+                                return acquired.Value;
+
+                            if (watch.ElapsedMilliseconds >= millisecondsTimeout)
+                            {
+                                return AcquireWhenMaxWaitTimeElapsed(db);
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "An error occurred trying to acquire and waiting for existing SqlMainDomLock to shutdown");
-                    return false;
-                }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "An error occurred trying to acquire and waiting for existing SqlMainDomLock to shutdown");
+                        return false;
+                    }
 
-            }, _cancellationTokenSource.Token);
+                }, _cancellationTokenSource.Token);
+            }
         }
 
         private bool? TryAcquire(IUmbracoDatabase db, string tempId, string updatedTempId)

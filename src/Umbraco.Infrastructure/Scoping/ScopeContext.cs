@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Scoping
@@ -40,6 +41,8 @@ namespace Umbraco.Cms.Core.Scoping
         }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
+
+        public int CreatedThreadId { get; } = Thread.CurrentThread.ManagedThreadId;
 
         private IDictionary<string, IEnlistedObject> Enlisted => _enlisted
             ?? (_enlisted = new Dictionary<string, IEnlistedObject>());
