@@ -687,27 +687,23 @@ namespace Umbraco.Cms.Infrastructure.Search
                 {
                     using IScope scope = examineComponent._scopeProvider.CreateScope(autoComplete: true);
 
-                    // Background thread, wrap the whole thing in an explicit scope since we know
-                    // DB services are used within this logic.
-                    using (examineComponent._scopeProvider.CreateScope(autoComplete: true))
+                    // for content we have a different builder for published vs unpublished
+                    // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
+                    var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
                     {
-                        // for content we have a different builder for published vs unpublished
-                        // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
-                        var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
-                        {
-                            [true] = new Lazy<List<ValueSet>>(() => examineComponent._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
-                            [false] = new Lazy<List<ValueSet>>(() => examineComponent._contentValueSetBuilder.GetValueSets(content).ToList())
-                        };
+                        [true] = new Lazy<List<ValueSet>>(() => examineComponent._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
+                        [false] = new Lazy<List<ValueSet>>(() => examineComponent._contentValueSetBuilder.GetValueSets(content).ToList())
+                    };
 
-                        foreach (IUmbracoIndex index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                            //filter the indexers
-                            .Where(x => isPublished || !x.PublishedValuesOnly)
-                            .Where(x => x.EnableDefaultEventHandler))
-                        {
-                            List<ValueSet> valueSet = builders[index.PublishedValuesOnly].Value;
-                            index.IndexItems(valueSet);
-                        }
+                    foreach (IUmbracoIndex index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                        //filter the indexers
+                        .Where(x => isPublished || !x.PublishedValuesOnly)
+                        .Where(x => x.EnableDefaultEventHandler))
+                    {
+                        List<ValueSet> valueSet = builders[index.PublishedValuesOnly].Value;
+                        index.IndexItems(valueSet);
                     }
+
                     return Task.CompletedTask;
                 });
         }

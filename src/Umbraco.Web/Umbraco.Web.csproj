@@ -67,7 +67,6 @@
     </PackageReference>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.30" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="HtmlAgilityPack" Version="1.11.31" />
     <PackageReference Include="HtmlSanitizer">
       <Version>5.0.376</Version>

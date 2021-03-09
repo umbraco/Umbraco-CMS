@@ -278,7 +278,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         public override void WriteLock(IDatabase db, params int[] lockIds)
         {
-            WriteLock(db, TimeSpan.FromSeconds(5), lockIds);
+            WriteLock(db, _globalSettings.Value.SqlWriteLockTimeOut, lockIds);
         }
 
         public void WriteLock(IDatabase db, TimeSpan timeout, params int[] lockIds)
@@ -302,7 +302,7 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
             foreach (var lockId in lockIds)
             {
-                ObtainWriteLock(db, _globalSettings.Value.SqlWriteLockTimeOut, lockId);
+                ObtainWriteLock(db, timeout, lockId);
             }
         }
 
