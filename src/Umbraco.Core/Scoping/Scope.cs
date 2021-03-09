@@ -571,12 +571,14 @@ namespace Umbraco.Core.Scoping
                 {
                     lock (_dictionaryLocker)
                     {
-                        if (!ReadLocks.ContainsKey(lockId))
+                        if (ReadLocks.ContainsKey(lockId))
                         {
-                            ReadLocks[lockId] = 0;
+                            ReadLocks[lockId] += 1;
                         }
-
-                        ReadLocks[lockId] += 1;
+                        else
+                        {
+                            ReadLocks[lockId] = 1;
+                        }
                     }
                 }
             }
@@ -598,12 +600,14 @@ namespace Umbraco.Core.Scoping
                 {
                     lock (_dictionaryLocker)
                     {
-                        if (!WriteLocks.ContainsKey(lockId))
+                        if (WriteLocks.ContainsKey(lockId))
                         {
-                            WriteLocks[lockId] = 0;
+                            WriteLocks[lockId] = 1;
                         }
-
-                        WriteLocks[lockId] += 1;
+                        else
+                        {
+                            WriteLocks[lockId] += 1;
+                        }
                     }
                 }
             }
