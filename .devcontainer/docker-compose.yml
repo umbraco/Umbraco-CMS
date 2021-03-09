@@ -56,7 +56,7 @@ services:
   smtp4dev:
     image: rnwood/smtp4dev:v3
     restart: always
-    # ports:
+    ports:
       # Change the number before : to the port the web interface should be accessible on
       - '5000:80'
       # Change the number before : to the port the SMTP server should be accessible on
