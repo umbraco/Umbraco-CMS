@@ -18,6 +18,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
@@ -26,7 +27,6 @@ using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
@@ -107,7 +107,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// <returns>The string URL of the controller action.</returns>
         protected string PrepareUrl(string url)
         {
-            IBackOfficeSecurityFactory backofficeSecurityFactory = GetRequiredService<IBackOfficeSecurityFactory>();
             IUmbracoContextFactory umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
             IHttpContextAccessor httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
 
@@ -122,7 +121,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 }
             };
 
-            backofficeSecurityFactory.EnsureBackOfficeSecurity();
             umbracoContextFactory.EnsureUmbracoContext();
 
             return url;

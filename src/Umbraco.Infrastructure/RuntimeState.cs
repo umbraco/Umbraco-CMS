@@ -20,7 +20,8 @@ namespace Umbraco.Cms.Core
     /// </summary>
     public class RuntimeState : IRuntimeState
     {
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptions<GlobalSettings> _globalSettings;
+        private readonly IOptions<UnattendedSettings> _unattendedSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly ILogger<RuntimeState> _logger;
@@ -41,13 +42,15 @@ namespace Umbraco.Cms.Core
         /// </summary>
         public RuntimeState(
             IOptions<GlobalSettings> globalSettings,
+            IOptions<UnattendedSettings> unattendedSettings,
             IUmbracoVersion umbracoVersion,
             IUmbracoDatabaseFactory databaseFactory,
             ILogger<RuntimeState> logger,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
             IEventAggregator eventAggregator)
         {
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings;
+            _unattendedSettings = unattendedSettings;
             _umbracoVersion = umbracoVersion;
             _databaseFactory = databaseFactory;
             _logger = logger;
@@ -102,7 +105,7 @@ namespace Umbraco.Cms.Core
                         // cannot connect to configured database, this is bad, fail
                         _logger.LogDebug("Could not connect to database.");
 
-                        if (_globalSettings.InstallMissingDatabase)
+                        if (_globalSettings.Value.InstallMissingDatabase)
                         {
                             // ok to install on a configured but missing database
                             Level = RuntimeLevel.Install;
@@ -201,13 +204,13 @@ namespace Umbraco.Cms.Core
         public void DoUnattendedInstall()
         {
              // unattended install is not enabled
-            if (_globalSettings.InstallUnattended == false) return;
+            if (_unattendedSettings.Value.InstallUnattended == false) return;
 
             // no connection string set
             if (_databaseFactory.Configured == false) return;
 
             var connect = false;
-            var tries = _globalSettings.InstallMissingDatabase ? 2 : 5;
+            var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
             for (var i = 0;;)
             {
                 connect = _databaseFactory.CanConnect;
@@ -288,7 +291,7 @@ namespace Umbraco.Cms.Core
             // anything other than install wants a database - see if we can connect
             // (since this is an already existing database, assume localdb is ready)
             bool canConnect;
-            var tries = _globalSettings.InstallMissingDatabase ? 2 : 5;
+            var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
             for (var i = 0; ;)
             {
                 canConnect = databaseFactory.CanConnect;

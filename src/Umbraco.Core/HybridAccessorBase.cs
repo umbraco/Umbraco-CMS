@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Scoping;
 
@@ -17,13 +17,9 @@ namespace Umbraco.Cms.Core
         where T : class
     {
         private readonly IRequestCache _requestCache;
+        private string _itemKey;
 
-        // ReSharper disable StaticMemberInGenericType
-        private static readonly object Locker = new object();
-        private static bool _registered;
-        // ReSharper restore StaticMemberInGenericType
-
-        protected abstract string ItemKey { get; }
+        protected string ItemKey => _itemKey ??= GetType().FullName;
 
         // read
         // http://blog.stephencleary.com/2013/04/implicit-async-context-asynclocal.html
@@ -43,37 +39,11 @@ namespace Umbraco.Cms.Core
         private T NonContextValue
         {
             get => CallContext<T>.GetData(ItemKey);
-            set
-            {
-                CallContext<T>.SetData(ItemKey, value);
-            }
+            set => CallContext<T>.SetData(ItemKey, value);
         }
 
         protected HybridAccessorBase(IRequestCache requestCache)
-        {
-            _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
-
-            lock (Locker)
-            {
-                // register the itemKey once with SafeCallContext
-                if (_registered) return;
-                _registered = true;
-            }
-
-            // ReSharper disable once VirtualMemberCallInConstructor
-            var itemKey = ItemKey; // virtual
-            SafeCallContext.Register(() =>
-            {
-                var value = CallContext<T>.GetData(itemKey);
-                return value;
-            }, o =>
-            {
-                if (o == null) return;
-                var value = o as T;
-                if (value == null) throw new ArgumentException($"Expected type {typeof(T).FullName}, got {o.GetType().FullName}", nameof(o));
-                CallContext<T>.SetData(itemKey, value);
-            });
-        }
+            => _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
 
         protected T Value
         {
@@ -93,9 +63,13 @@ namespace Umbraco.Cms.Core
                     NonContextValue = value;
                 }
                 else if (value == null)
+                {
                     _requestCache.Remove(ItemKey);
+                }
                 else
+                {
                     _requestCache.Set(ItemKey, value);
+                }
             }
         }
     }

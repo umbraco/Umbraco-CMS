@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
@@ -11,6 +10,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Infrastructure.Runtime
 {
@@ -25,7 +25,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IServiceScopeFactory _serviceScopeFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
@@ -39,8 +38,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IMainDom mainDom,
             IUmbracoDatabaseFactory databaseFactory,
             IEventAggregator eventAggregator,
-            IHostingEnvironment hostingEnvironment,
-            IServiceScopeFactory  serviceScopeFactory)
+            IHostingEnvironment hostingEnvironment)
         {
             State = state;
             _loggerFactory = loggerFactory;
@@ -51,7 +49,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _databaseFactory = databaseFactory;
             _eventAggregator = eventAggregator;
             _hostingEnvironment = hostingEnvironment;
-            _serviceScopeFactory = serviceScopeFactory;
             _logger = _loggerFactory.CreateLogger<CoreRuntime>();
         }
 
@@ -63,8 +60,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         /// <inheritdoc/>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            using IServiceScope scope = _serviceScopeFactory.CreateScope();
-
             StaticApplicationLogging.Initialize(_loggerFactory);
 
             AppDomain.CurrentDomain.UnhandledException += (_, args) =>

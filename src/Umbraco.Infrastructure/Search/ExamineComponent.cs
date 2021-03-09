@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Threading.Tasks;
 using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -41,9 +42,11 @@ namespace Umbraco.Cms.Infrastructure.Search
         private const int EnlistPriority = 80;
 
         public ExamineComponent(IMainDom mainDom,
-            IExamineManager examineManager, IProfilingLogger profilingLogger,
+            IExamineManager examineManager,
+            IProfilingLogger profilingLogger,
             ILoggerFactory loggerFactory,
-            IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
+            IScopeProvider scopeProvider,
+            IUmbracoIndexesCreator indexCreator,
             ServiceContext services,
             IContentValueSetBuilder contentValueSetBuilder,
             IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
@@ -88,8 +91,10 @@ namespace Umbraco.Cms.Infrastructure.Search
             }
 
             //create the indexes and register them with the manager
-            foreach(var index in _indexCreator.Create())
+            foreach (IIndex index in _indexCreator.Create())
+            {
                 _examineManager.AddIndex(index);
+            }
 
             _logger.LogDebug("Examine shutdown registered with MainDom");
 
@@ -99,7 +104,9 @@ namespace Umbraco.Cms.Infrastructure.Search
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)
+            {
                 return;
+            }
 
             // bind to distributed cache events - this ensures that this logic occurs on ALL servers
             // that are taking part in a load balanced environment.
@@ -129,10 +136,14 @@ namespace Umbraco.Cms.Infrastructure.Search
         private void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
+            {
                 return;
+            }
 
             if (args.MessageType != MessageType.RefreshByPayload)
+            {
                 throw new NotSupportedException();
+            }
 
             var contentService = _services.ContentService;
 
@@ -167,10 +178,14 @@ namespace Umbraco.Cms.Infrastructure.Search
 
                     IContent published = null;
                     if (content.Published && contentService.IsPathPublished(content))
+                    {
                         published = content;
+                    }
 
                     if (published == null)
+                    {
                         DeleteIndexForEntity(payload.Id, true);
+                    }
 
                     // just that content
                     ReIndexForContent(content, published != null);
@@ -194,9 +209,13 @@ namespace Umbraco.Cms.Infrastructure.Search
                                 if (masked != null) // else everything is masked
                                 {
                                     if (masked.Contains(descendant.ParentId) || !descendant.Published)
+                                    {
                                         masked.Add(descendant.Id);
+                                    }
                                     else
+                                    {
                                         published = descendant;
+                                    }
                                 }
 
                                 ReIndexForContent(descendant, published != null);
@@ -221,7 +240,9 @@ namespace Umbraco.Cms.Infrastructure.Search
         private void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
+            {
                 return;
+            }
 
             switch (args.MessageType)
             {
@@ -256,7 +277,7 @@ namespace Umbraco.Cms.Infrastructure.Search
                 case MessageType.RefreshByPayload:
                     var payload = (MemberCacheRefresher.JsonPayload[])args.MessageObject;
                     var members = payload.Select(x => _services.MemberService.GetById(x.Id));
-                    foreach(var m in members)
+                    foreach (var m in members)
                     {
                         ReIndexForMember(m);
                     }
@@ -272,10 +293,14 @@ namespace Umbraco.Cms.Infrastructure.Search
         private void MediaCacheRefresherUpdated(MediaCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
+            {
                 return;
+            }
 
             if (args.MessageType != MessageType.RefreshByPayload)
+            {
                 throw new NotSupportedException();
+            }
 
             var mediaService = _services.MediaService;
 
@@ -303,7 +328,9 @@ namespace Umbraco.Cms.Infrastructure.Search
                     }
 
                     if (media.Trashed)
+                    {
                         DeleteIndexForEntity(payload.Id, true);
+                    }
 
                     // just that media
                     ReIndexForMedia(media, !media.Trashed);
@@ -330,9 +357,14 @@ namespace Umbraco.Cms.Infrastructure.Search
         private void LanguageCacheRefresherUpdated(LanguageCacheRefresher sender, CacheRefresherEventArgs e)
         {
             if (!(e.MessageObject is LanguageCacheRefresher.JsonPayload[] payloads))
+            {
                 return;
+            }
 
-            if (payloads.Length == 0) return;
+            if (payloads.Length == 0)
+            {
+                return;
+            }
 
             var removedOrCultureChanged = payloads.Any(x =>
                 x.ChangeType == LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
@@ -354,10 +386,14 @@ namespace Umbraco.Cms.Infrastructure.Search
         private void ContentTypeCacheRefresherUpdated(ContentTypeCacheRefresher sender, CacheRefresherEventArgs args)
         {
             if (Suspendable.ExamineEvents.CanIndex == false)
+            {
                 return;
+            }
 
             if (args.MessageType != MessageType.RefreshByPayload)
+            {
                 throw new NotSupportedException();
+            }
 
             var changedIds = new Dictionary<string, (List<int> removedIds, List<int> refreshedIds, List<int> otherIds)>();
 
@@ -370,11 +406,17 @@ namespace Umbraco.Cms.Infrastructure.Search
                 }
 
                 if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.Remove))
+                {
                     idLists.removedIds.Add(payload.Id);
+                }
                 else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshMain))
+                {
                     idLists.refreshedIds.Add(payload.Id);
+                }
                 else if (payload.ChangeTypes.HasType(ContentTypeChangeTypes.RefreshOther))
+                {
                     idLists.otherIds.Add(payload.Id);
+                }
             }
 
             const int pageSize = 500;
@@ -413,9 +455,14 @@ namespace Umbraco.Cms.Infrastructure.Search
                             total = results.TotalItemCount;
                             var paged = results.Skip(page * pageSize);
 
-                            foreach (var item in paged)
-                                if (int.TryParse(item.Id, out var contentId))
+                            foreach (ISearchResult item in paged)
+                            {
+                                if (int.TryParse(item.Id, out int contentId))
+                                {
                                     DeleteIndexForEntity(contentId, false);
+                                }
+                            }
+
                             page++;
                         }
                     }
@@ -427,18 +474,18 @@ namespace Umbraco.Cms.Infrastructure.Search
         {
             const int pageSize = 500;
 
-            var memberTypes = _services.MemberTypeService.GetAll(memberTypeIds);
-            foreach (var memberType in memberTypes)
+            IEnumerable<IMemberType> memberTypes = _services.MemberTypeService.GetAll(memberTypeIds);
+            foreach (IMemberType memberType in memberTypes)
             {
                 var page = 0;
                 var total = long.MaxValue;
                 while (page * pageSize < total)
                 {
-                    var memberToRefresh = _services.MemberService.GetAll(
+                    IEnumerable<IMember> memberToRefresh = _services.MemberService.GetAll(
                         page++, pageSize, out total, "LoginName", Direction.Ascending,
                         memberType.Alias);
 
-                    foreach (var c in memberToRefresh)
+                    foreach (IMember c in memberToRefresh)
                     {
                         ReIndexForMember(c);
                     }
@@ -453,13 +500,13 @@ namespace Umbraco.Cms.Infrastructure.Search
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                var mediaToRefresh = _services.MediaService.GetPagedOfTypes(
+                IEnumerable<IMedia> mediaToRefresh = _services.MediaService.GetPagedOfTypes(
                     //Re-index all content of these types
                     mediaTypeIds,
                     page++, pageSize, out total, null,
                     Ordering.By("Path", Direction.Ascending));
 
-                foreach (var c in mediaToRefresh)
+                foreach (IMedia c in mediaToRefresh)
                 {
                     ReIndexForMedia(c, c.Trashed == false);
                 }
@@ -473,7 +520,7 @@ namespace Umbraco.Cms.Infrastructure.Search
             var total = long.MaxValue;
             while (page * pageSize < total)
             {
-                var contentToRefresh = _services.ContentService.GetPagedOfTypes(
+                IEnumerable<IContent> contentToRefresh = _services.ContentService.GetPagedOfTypes(
                     //Re-index all content of these types
                     contentTypeIds,
                     page++, pageSize, out total, null,
@@ -483,7 +530,7 @@ namespace Umbraco.Cms.Infrastructure.Search
                 //track which Ids have their paths are published
                 var publishChecked = new Dictionary<int, bool>();
 
-                foreach (var c in contentToRefresh)
+                foreach (IContent c in contentToRefresh)
                 {
                     var isPublished = false;
                     if (c.Published)
@@ -508,27 +555,39 @@ namespace Umbraco.Cms.Infrastructure.Search
         {
             var actions = DeferedActions.Get(_scopeProvider);
             if (actions != null)
+            {
                 actions.Add(new DeferedReIndexForContent(_taskHelper, this, sender, isPublished));
+            }
             else
+            {
                 DeferedReIndexForContent.Execute(_taskHelper, this, sender, isPublished);
+            }
         }
 
         private void ReIndexForMember(IMember member)
         {
             var actions = DeferedActions.Get(_scopeProvider);
             if (actions != null)
+            {
                 actions.Add(new DeferedReIndexForMember(_taskHelper, this, member));
+            }
             else
+            {
                 DeferedReIndexForMember.Execute(_taskHelper, this, member);
+            }
         }
 
         private void ReIndexForMedia(IMedia sender, bool isPublished)
         {
             var actions = DeferedActions.Get(_scopeProvider);
             if (actions != null)
+            {
                 actions.Add(new DeferedReIndexForMedia(_taskHelper, this, sender, isPublished));
+            }
             else
+            {
                 DeferedReIndexForMedia.Execute(_taskHelper, this, sender, isPublished);
+            }
         }
 
         /// <summary>
@@ -543,9 +602,13 @@ namespace Umbraco.Cms.Infrastructure.Search
         {
             var actions = DeferedActions.Get(_scopeProvider);
             if (actions != null)
+            {
                 actions.Add(new DeferedDeleteIndex(this, entityId, keepIfUnpublished));
+            }
             else
+            {
                 DeferedDeleteIndex.Execute(this, entityId, keepIfUnpublished);
+            }
         }
         #endregion
 
@@ -556,25 +619,27 @@ namespace Umbraco.Cms.Infrastructure.Search
 
             public static DeferedActions Get(IScopeProvider scopeProvider)
             {
-                var scopeContext = scopeProvider.Context;
+                IScopeContext scopeContext = scopeProvider.Context;
 
                 return scopeContext?.Enlist("examineEvents",
                     () => new DeferedActions(), // creator
                     (completed, actions) => // action
                     {
-                        if (completed) actions.Execute();
+                        if (completed)
+                        {
+                            actions.Execute();
+                        }
                     }, EnlistPriority);
             }
 
-            public void Add(DeferedAction action)
-            {
-                _actions.Add(action);
-            }
+            public void Add(DeferedAction action) => _actions.Add(action);
 
             private void Execute()
             {
-                foreach (var action in _actions)
+                foreach (DeferedAction action in _actions)
+                {
                     action.Execute();
+                }
             }
         }
 
@@ -605,15 +670,13 @@ namespace Umbraco.Cms.Infrastructure.Search
                 _isPublished = isPublished;
             }
 
-            public override void Execute()
-            {
-                Execute(_taskHelper, _examineComponent, _content, _isPublished);
-            }
+            public override void Execute() => Execute(_taskHelper, _examineComponent, _content, _isPublished);
 
             public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IContent content, bool isPublished)
-            {
-                taskHelper.RunBackgroundTask(async () =>
+                => taskHelper.RunBackgroundTask(() =>
                 {
+                    using IScope scope = examineComponent._scopeProvider.CreateScope(autoComplete: true);
+
                     // for content we have a different builder for published vs unpublished
                     // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
                     var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
@@ -622,17 +685,16 @@ namespace Umbraco.Cms.Infrastructure.Search
                         [false] = new Lazy<List<ValueSet>>(() => examineComponent._contentValueSetBuilder.GetValueSets(content).ToList())
                     };
 
-                    foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                    foreach (IUmbracoIndex index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                         //filter the indexers
                         .Where(x => isPublished || !x.PublishedValuesOnly)
                         .Where(x => x.EnableDefaultEventHandler))
                     {
-                        var valueSet = builders[index.PublishedValuesOnly].Value;
+                        List<ValueSet> valueSet = builders[index.PublishedValuesOnly].Value;
                         index.IndexItems(valueSet);
                     }
+                    return Task.CompletedTask;
                 });
-
-            }
         }
 
         /// <summary>
@@ -653,27 +715,26 @@ namespace Umbraco.Cms.Infrastructure.Search
                 _isPublished = isPublished;
             }
 
-            public override void Execute()
-            {
-                Execute(_taskHelper, _examineComponent, _media, _isPublished);
-            }
+            public override void Execute() => Execute(_taskHelper, _examineComponent, _media, _isPublished);
 
-            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IMedia media, bool isPublished)
-            {
+            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IMedia media, bool isPublished) =>
                 // perform the ValueSet lookup on a background thread
-                taskHelper.RunBackgroundTask(async () =>
+                taskHelper.RunBackgroundTask(() =>
                 {
+                    using IScope scope = examineComponent._scopeProvider.CreateScope(autoComplete: true);
+
                     var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
 
-                    foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                    foreach (IUmbracoIndex index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                         //filter the indexers
                         .Where(x => isPublished || !x.PublishedValuesOnly)
                         .Where(x => x.EnableDefaultEventHandler))
                     {
                         index.IndexItems(valueSet);
                     }
+
+                    return Task.CompletedTask;
                 });
-            }
         }
 
         /// <summary>
@@ -692,25 +753,24 @@ namespace Umbraco.Cms.Infrastructure.Search
                 _taskHelper = taskHelper;
             }
 
-            public override void Execute()
-            {
-                Execute(_taskHelper, _examineComponent, _member);
-            }
+            public override void Execute() => Execute(_taskHelper, _examineComponent, _member);
 
-            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IMember member)
-            {
+            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IMember member) =>
                 // perform the ValueSet lookup on a background thread
-                taskHelper.RunBackgroundTask(async () =>
+                taskHelper.RunBackgroundTask(() =>
                 {
+                    using IScope scope = examineComponent._scopeProvider.CreateScope(autoComplete: true);
+
                     var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
-                    foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                    foreach (IUmbracoIndex index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
                         //filter the indexers
                         .Where(x => x.EnableDefaultEventHandler))
                     {
                         index.IndexItems(valueSet);
                     }
+
+                    return Task.CompletedTask;
                 });
-            }
         }
 
         private class DeferedDeleteIndex : DeferedAction
@@ -726,10 +786,7 @@ namespace Umbraco.Cms.Infrastructure.Search
                 _keepIfUnpublished = keepIfUnpublished;
             }
 
-            public override void Execute()
-            {
-                Execute(_examineComponent, _id, _keepIfUnpublished);
-            }
+            public override void Execute() => Execute(_examineComponent, _id, _keepIfUnpublished);
 
             public static void Execute(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
             {

@@ -3,7 +3,6 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <OutputType>Library</OutputType>
-        <LangVersion>latest</LangVersion>
         <RootNamespace>Umbraco.Cms.Web.Website</RootNamespace>
     </PropertyGroup>
 

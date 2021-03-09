@@ -54,6 +54,7 @@ using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
 using Umbraco.Core.Events;
+using static Umbraco.Cms.Core.Cache.HttpContextRequestAppCache;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
@@ -86,15 +87,18 @@ namespace Umbraco.Extensions
 
             IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 
-            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles);
+            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
             var loggingConfig = new LoggingConfiguration(loggingDir);
 
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
 
+            // Manually create and register the HttpContextAccessor. In theory this should not be registered
+            // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
+            // is just based on AsyncLocal, see https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             services.AddSingleton(httpContextAccessor);
 
-            var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext?.Items);
+            var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
             var appCaches = AppCaches.Create(requestCache);
             services.AddUnique(appCaches);
 
@@ -238,7 +242,6 @@ namespace Umbraco.Extensions
             builder.Services.AddUmbracoImageSharp(builder.Config);
 
             // AspNetCore specific services
-            builder.Services.AddUnique<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
             builder.AddNotificationHandler<UmbracoRequestBegin, AspNetCoreRequestAccessor>();
 
@@ -256,24 +259,20 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
 
             builder.Services.AddUnique<IMacroRenderer, MacroRenderer>();
+            builder.Services.AddUnique<PartialViewMacroEngine>();
             builder.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
 
             // register the umbraco context factory
 
             builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            builder.Services.AddUnique<IBackOfficeSecurityFactory, BackOfficeSecurityFactory>();
-            builder.Services.AddUnique<IBackOfficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
-            builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, HybridUmbracoWebsiteSecurityAccessor>();
+            builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
+            builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, UmbracoWebsiteSecurityAccessor>();
 
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
             builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
                 .Add(umbracoApiControllerTypes);
 
             builder.Services.AddUnique<InstallAreaRoutes>();
-
-
-
-
 
             builder.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
             builder.Services.AddUnique<UmbracoRequestMiddleware>();
@@ -287,6 +286,8 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<ContentModelBinder>();
 
             builder.Services.AddScoped<UmbracoHelper>();
+            builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
+            builder.Services.AddScoped<IUmbracoWebsiteSecurity, UmbracoWebsiteSecurity>();
 
             builder.AddHttpClients();
 
@@ -299,7 +300,6 @@ namespace Umbraco.Extensions
         public static IUmbracoBuilder AddUnattedInstallCreateUser(this IUmbracoBuilder builder)
         {
             builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
-            //builder.AddNotificationHandler<UmbracoApplicationStarting, CreateUnattendedUserNotificationHandler>();
             return builder;
         }
 

@@ -27,7 +27,6 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         private readonly IMainDom _mainDom;
         private readonly IRuntimeState _runtimeState;
         private readonly IServerMessenger _serverMessenger;
-        private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
         private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
 
@@ -49,8 +48,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             IContentService contentService,
             IUmbracoContextFactory umbracoContextFactory,
             ILogger<ScheduledPublishing> logger,
-            IServerMessenger serverMessenger,
-            IBackOfficeSecurityFactory backofficeSecurityFactory)
+            IServerMessenger serverMessenger)
             : base(TimeSpan.FromMinutes(1), DefaultDelay)
         {
             _runtimeState = runtimeState;
@@ -60,7 +58,6 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _umbracoContextFactory = umbracoContextFactory;
             _logger = logger;
             _serverMessenger = serverMessenger;
-            _backofficeSecurityFactory = backofficeSecurityFactory;
         }
 
         internal override Task PerformExecuteAsync(object state)
@@ -106,8 +103,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
                 // - batched messenger should not depend on a current HttpContext
                 //    but then what should be its "scope"? could we attach it to scopes?
                 // - and we should definitively *not* have to flush it here (should be auto)
-                //
-                _backofficeSecurityFactory.EnsureBackOfficeSecurity();
+
                 using UmbracoContextReference contextReference = _umbracoContextFactory.EnsureUmbracoContext();
                 try
                 {

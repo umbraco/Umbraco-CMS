@@ -4,7 +4,6 @@
         <TargetFramework>net472</TargetFramework>
         <RootNamespace>Umbraco.Cms.Infrastructure.Examine</RootNamespace>
         <Product>Umbraco CMS</Product>
-        <RootNamespace>Umbraco.Examine</RootNamespace>
         <Title>Umbraco.Examine.Lucene</Title>
     </PropertyGroup>
 
@@ -40,7 +39,7 @@
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
       <PackageReference Include="NPoco" Version="4.0.2" />
         <PackageReference Include="SecurityCodeScan">
-            <Version>3.5.3</Version>
+            <Version>3.5.4</Version>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
