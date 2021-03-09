@@ -75,9 +75,8 @@ Icon with additional attribute. It can be treated like any other dom element
 
                     iconHelper.getIcon(icon)
                         .then(data => {
-                            if (data !== null && data.svgString !== undefined) {
+                            if (data && data.svgString) {
                                 // Watch source SVG string
-                                //icon.svgString.$$unwrapTrustedValue();
                                 scope.svgString = data.svgString;
                             }
                         });

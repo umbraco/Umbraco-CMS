@@ -66,6 +66,7 @@
     <PackageReference Include="Examine" Version="1.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="HtmlSanitizer">
+      <Version>4.0.217</Version>
       <Version>5.0.376</Version>
     </PackageReference>
     <PackageReference Include="ImageProcessor">
