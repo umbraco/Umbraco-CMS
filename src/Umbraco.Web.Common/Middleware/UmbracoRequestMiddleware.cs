@@ -127,10 +127,11 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
                 try
                 {
-                    DisposeRequestCacheItems(_logger, _requestCache, context.Request);
+                    DisposeHttpContextItems(context.Request);
                 }
                 finally
                 {
+                    // Dispose the umbraco context reference which will in turn dispose the UmbracoContext itself.
                     umbracoContextReference.Dispose();
                 }
             }
@@ -153,21 +154,14 @@ namespace Umbraco.Cms.Web.Common.Middleware
         }
 
         /// <summary>
-        /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
+        /// Dispose some request scoped objects that we are maintaining the lifecycle for.
         /// </summary>
-        private void DisposeRequestCacheItems(ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, HttpRequest request)
+        private void DisposeHttpContextItems(HttpRequest request)
         {
             // do not process if client-side request
             if (request.IsClientSideRequest())
             {
                 return;
-            }
-
-            // dispose the request cache at the end of the request
-            // and it can take care of disposing it's items if there are any
-            if (requestCache is IDisposable rd)
-            {
-                rd.Dispose();
             }
 
             // ensure this is disposed by DI at the end of the request

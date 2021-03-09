@@ -5,8 +5,6 @@ using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Extensions;
 
@@ -21,7 +19,7 @@ namespace Umbraco.Cms.Core.Cache
     /// in order to facilitate the correct locking and releasing allocations.
     /// </para>
     /// </remarks>
-    public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCache, IDisposable
+    public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCache
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -80,7 +78,10 @@ namespace Umbraco.Cms.Core.Cache
 
             var value = result.Value; // will not throw (safe lazy)
             if (value is SafeLazy.ExceptionHolder eh)
+            {
                 eh.Exception.Throw(); // throw once!
+            }
+
             return value;
         }
 
@@ -88,7 +89,10 @@ namespace Umbraco.Cms.Core.Cache
         {
             //no place to cache so just return the callback result
             if (!TryGetContextItems(out var items))
+            {
                 return false;
+            }
+
             key = GetCacheKey(key);
             try
             {
@@ -107,7 +111,10 @@ namespace Umbraco.Cms.Core.Cache
         {
             //no place to cache so just return the callback result
             if (!TryGetContextItems(out var items))
+            {
                 return false;
+            }
+
             key = GetCacheKey(key);
             try
             {
@@ -240,41 +247,6 @@ namespace Umbraco.Cms.Core.Cache
                 requestLock = new RequestLock();
                 features.Set(requestLock);
                 return requestLock.SyncRoot;
-            }
-        }
-
-        // This is not a typical dispose pattern since this can be called multiple times to dispose
-        // whatever might be in the current context.
-        public void Dispose()
-        {
-            // need to resolve from request services since IRequestCache is a non DI service and we don't have a logger when created
-            ILogger<HttpContextRequestAppCache> logger = _httpContextAccessor.HttpContext?.RequestServices?.GetRequiredService<ILogger<HttpContextRequestAppCache>>();
-            foreach (KeyValuePair<string, object> i in this)
-            {
-                // NOTE: All of these will be Lazy<object> since that is how this cache works,
-                // but we'll include the 2nd check too
-                if (i.Value is Lazy<object> lazy && lazy.IsValueCreated && lazy.Value is IDisposeOnRequestEnd doer1)
-                {
-                    try
-                    {
-                        doer1.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError("Could not dispose item with key " + i.Key, ex);
-                    }
-                }
-                else if (i.Value is IDisposeOnRequestEnd doer2)
-                {
-                    try
-                    {
-                        doer2.Dispose();
-                    }
-                    catch (Exception ex)
-                    {
-                        logger.LogError("Could not dispose item with key " + i.Key, ex);
-                    }
-                }
             }
         }
 
