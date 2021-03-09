@@ -9,10 +9,8 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 using Umbraco.Web.JavaScript;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Services;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -25,39 +23,19 @@ namespace Umbraco.Web.Editors
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
-        private readonly IIconService _iconService;
 
-        [Obsolete("Use the constructor that injects IIconService.")]
         public PreviewController(
             UmbracoFeatures features,
             IGlobalSettings globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService)
-            :this(features,
-                globalSettings,
-                publishedSnapshotService,
-                umbracoContextAccessor,
-                localizationService,
-                Current.IconService)
-        {
-
-        }
-
-        public PreviewController(
-            UmbracoFeatures features,
-            IGlobalSettings globalSettings,
-            IPublishedSnapshotService publishedSnapshotService,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ILocalizationService localizationService,
-            IIconService iconService)
         {
             _features = features;
             _globalSettings = globalSettings;
             _publishedSnapshotService = publishedSnapshotService;
             _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
-            _iconService = iconService;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
@@ -66,7 +44,7 @@ namespace Umbraco.Web.Editors
         {
             var availableLanguages = _localizationService.GetAllLanguages();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, availableLanguages, _iconService);
+            var model = new BackOfficePreviewModel(_features, _globalSettings, availableLanguages);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
