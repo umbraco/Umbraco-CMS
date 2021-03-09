@@ -41,7 +41,7 @@
     <!-- WITH TABS --->
     <div ng-if="model.hasTabs">
         <ul class="umb-group-builder__tabs" ui-sortable="sortableOptionsTab" ng-model="model.tabs">
-            <li ng-repeat="tab in model.tabs track by tab.id" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-id="{{tab.id}}">
+            <li ng-repeat="tab in model.tabs track by tab.id" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-id="{{tab.id}}" val-groups-in-tab="{ tab: tab, groups: model.groups }">
                 <div ng-click="changeTab(tab)" class="umb-group-builder__tab" ng-class="{'is-active': tab.id === openTabId, 'is-inherited': tab.inherited, 'umb-group-builder__tab-handle -sortable': sortingMode && !tab.inherited}">
                     <div>
                         <div class="umb-group-builder__tab-inherited-label" ng-if="tab.inherited">
@@ -78,7 +78,7 @@
                                 </div>
                             </ng-form>
 
-                            <div ng-show="tabHasValidationError(tab) && tab.id !== openTabId" class="badge">!</div>
+                            <div ng-show="tab.hasError && tab.id !== openTabId" class="badge">!</div>
 
                             <ng-form name="tabSortOrderForm" class="umb-group-builder__tab-sort-order">
                                 <div ng-if="sortingMode">
