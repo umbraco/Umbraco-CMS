@@ -92,9 +92,9 @@ namespace Umbraco.Extensions
 
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
 
-            // TODO: This doesn't seem right? The HttpContextAccessor is normally added to the container
-            // with ASP.NET Core's own ext methods. Is there a chance we can end up with a different
-            // accessor registered and resolved?
+            // Manually create and register the HttpContextAccessor. In theory this should not be registered
+            // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
+            // is just based on AsyncLocal, see https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             services.AddSingleton(httpContextAccessor);
 
@@ -242,7 +242,6 @@ namespace Umbraco.Extensions
             builder.Services.AddUmbracoImageSharp(builder.Config);
 
             // AspNetCore specific services
-            builder.Services.AddUnique<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
             builder.AddNotificationHandler<UmbracoRequestBegin, AspNetCoreRequestAccessor>();
 
