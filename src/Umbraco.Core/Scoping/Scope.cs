@@ -369,10 +369,7 @@ namespace Umbraco.Core.Scoping
                     {
                         DecrementReadLock(readLockPair.Key, readLockPair.Value);
                     }
-                }
 
-                lock (_dictionaryLocker)
-                {
                     foreach (var writeLockPair in WriteLocks)
                     {
                         DecrementWriteLock(writeLockPair.Key, writeLockPair.Value);
