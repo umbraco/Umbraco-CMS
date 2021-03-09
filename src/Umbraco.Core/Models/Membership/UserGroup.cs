@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Models.Membership
         private string _icon;
         private string _name;
         private IEnumerable<string> _permissions;
-        private readonly List<string> _sectionCollection;
+        private List<string> _sectionCollection;
 
         //Custom comparer for enumerable
         private static readonly DelegateEqualityComparer<IEnumerable<string>> StringEnumerableComparer =
@@ -104,7 +104,10 @@ namespace Umbraco.Cms.Core.Models.Membership
             set => SetPropertyValueAndDetectChanges(value, ref _permissions, nameof(Permissions), StringEnumerableComparer);
         }
 
-        public IEnumerable<string> AllowedSections => _sectionCollection;
+        public IEnumerable<string> AllowedSections
+        {
+            get => _sectionCollection;
+        }
 
         public void RemoveAllowedSection(string sectionAlias)
         {
@@ -124,5 +127,16 @@ namespace Umbraco.Cms.Core.Models.Membership
         }
 
         public int UserCount { get; }
+
+        protected override void PerformDeepClone(object clone)
+        {
+
+            base.PerformDeepClone(clone);
+
+            var clonedEntity = (UserGroup)clone;
+
+            //manually clone the start node props
+            clonedEntity._sectionCollection = new List<string>(_sectionCollection);
+        }
     }
 }

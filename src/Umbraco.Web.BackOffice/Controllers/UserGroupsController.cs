@@ -34,9 +34,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IShortStringHelper _shortStringHelper;
         private readonly AppCaches _appCaches;
 
-        public UserGroupsController(IUserService userService, IContentService contentService,
-            IEntityService entityService, IMediaService mediaService, IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            UmbracoMapper umbracoMapper, ILocalizedTextService localizedTextService,
+        public UserGroupsController(
+            IUserService userService,
+            IContentService contentService,
+            IEntityService entityService,
+            IMediaService mediaService,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            UmbracoMapper umbracoMapper,
+            ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             AppCaches appCaches)
         {
@@ -66,7 +71,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return Unauthorized(isAuthorized.Result);
 
             //if sections were added we need to check that the current user has access to that section
-            isAuthorized = authHelper.AuthorizeSectionChanges(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
+            isAuthorized = authHelper.AuthorizeSectionChanges(
+                _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
                 userGroupSave.PersistedUserGroup.AllowedSections,
                 userGroupSave.Sections);
             if (isAuthorized == false)
@@ -82,7 +88,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return Unauthorized(isAuthorized.Result);
 
             //need to ensure current user is in a group if not an admin to avoid a 401
-            EnsureNonAdminUserIsInSavedUserGroup(userGroupSave);
+             EnsureNonAdminUserIsInSavedUserGroup(userGroupSave);
+
+            //map the model to the persisted instance
+            _umbracoMapper.Map(userGroupSave, userGroupSave.PersistedUserGroup);
 
             //save the group
             _userService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());

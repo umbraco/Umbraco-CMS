@@ -79,6 +79,18 @@ namespace Umbraco.Cms.Core.Editors
             if (userGroupAliases != null)
             {
                 var savingGroupAliases = userGroupAliases.ToArray();
+                var existingGroupAliases = savingUser == null
+                ? new string[0]
+                : savingUser.Groups.Select(x => x.Alias).ToArray();
+
+                var addedGroupAliases = savingGroupAliases.Except(existingGroupAliases);
+
+                // As we know the current user is not admin, it is only allowed to use groups that the user do have themselves.
+                var savingGroupAliasesNotAllowed = addedGroupAliases.Except(currentUser.Groups.Select(x=>x.Alias)).ToArray();
+                if (savingGroupAliasesNotAllowed.Any())
+                {
+                    return Attempt.Fail("Cannot assign the group(s) '" + string.Join(", ", savingGroupAliasesNotAllowed) + "', the current user is not part of them or admin");
+                }
 
                 //only validate any groups that have changed.
                 //a non-admin user can remove groups and add groups that they have access to
@@ -94,9 +106,7 @@ namespace Umbraco.Cms.Core.Editors
                 if (userGroupsChanged)
                 {
                     // d) A user cannot assign a group to another user that they do not belong to
-
                     var currentUserGroups = currentUser.Groups.Select(x => x.Alias).ToArray();
-
                     foreach (var group in newGroups)
                     {
                         if (currentUserGroups.Contains(group) == false)
