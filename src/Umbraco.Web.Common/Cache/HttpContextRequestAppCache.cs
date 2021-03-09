@@ -23,7 +23,6 @@ namespace Umbraco.Cms.Core.Cache
     /// </remarks>
     public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCache, IDisposable
     {
-        //private static readonly string s_contextItemsLockKey = $"{typeof(HttpContextRequestAppCache).FullName}::LockEntered";
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
