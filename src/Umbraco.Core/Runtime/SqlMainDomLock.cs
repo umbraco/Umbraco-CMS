@@ -121,7 +121,7 @@ namespace Umbraco.Core.Runtime
             }
 
 
-            return await WaitForExistingAsync(tempId, millisecondsTimeout);
+            return await WaitForExistingAsync(tempId, millisecondsTimeout).ConfigureAwait(false);
         }
 
         public Task ListenAsync()
