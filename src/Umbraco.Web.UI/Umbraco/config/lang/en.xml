@@ -528,6 +528,7 @@
     <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
     <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
     <key alias="yesRemove">Yes, remove</key>
+    <key alias="tabClipboard">Clipboard</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>

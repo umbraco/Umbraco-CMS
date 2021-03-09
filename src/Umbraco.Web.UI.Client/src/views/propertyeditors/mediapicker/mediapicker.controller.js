@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, angularHelper, overlayService) {
+    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, angularHelper, overlayService, clipboardService) {
 
         var vm = this;
 
@@ -10,6 +10,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         vm.add = add;
         vm.remove = remove;
+        vm.copyItem = copyItem;
         vm.editItem = editItem;
         vm.showAdd = showAdd;
 
@@ -159,6 +160,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.ids.splice(index, 1);
             sync();
             setDirty();
+        }
+
+        function copyItem(item) {
+            clipboardService.copy(clipboardService.TYPES.IMAGE, "Media", { "media": item }, null, null, item.udi);
         }
 
         function editItem(item) {
