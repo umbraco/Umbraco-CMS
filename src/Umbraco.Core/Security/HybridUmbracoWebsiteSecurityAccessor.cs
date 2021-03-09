@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Cms.Core.Security
 {
@@ -11,9 +11,6 @@ namespace Umbraco.Cms.Core.Security
         public HybridUmbracoWebsiteSecurityAccessor(IRequestCache requestCache)
             : base(requestCache)
         { }
-
-        /// <inheritdoc />
-        protected override string ItemKey => "Umbraco.Web.HybridUmbracoWebsiteSecurityAccessor";
 
         /// <summary>
         /// Gets or sets the <see cref="IUmbracoWebsiteSecurity"/> object.

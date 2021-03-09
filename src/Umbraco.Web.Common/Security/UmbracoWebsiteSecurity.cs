@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,9 +11,8 @@ using Umbraco.Cms.Core.Models.Security;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Web.Website.Security
+namespace Umbraco.Cms.Web.Common.Security
 {
     public class UmbracoWebsiteSecurity : IUmbracoWebsiteSecurity
     {
@@ -36,7 +35,7 @@ namespace Umbraco.Cms.Web.Website.Security
         /// <inheritdoc/>
         public RegisterModel CreateRegistrationModel(string memberTypeAlias = null)
         {
-            var providedOrDefaultMemberTypeAlias = memberTypeAlias ?? Constants.Conventions.MemberTypes.DefaultAlias;
+            var providedOrDefaultMemberTypeAlias = memberTypeAlias ?? Core.Constants.Conventions.MemberTypes.DefaultAlias;
             var memberType = _memberTypeService.Get(providedOrDefaultMemberTypeAlias);
             if (memberType == null)
             {
@@ -114,7 +113,7 @@ namespace Umbraco.Cms.Web.Website.Security
 
         public Task<RegisterMemberStatus> RegisterMemberAsync(RegisterModel model, bool logMemberIn = true)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
 
         /// <inheritdoc/>

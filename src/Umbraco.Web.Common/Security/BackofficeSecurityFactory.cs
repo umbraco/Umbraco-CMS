@@ -1,11 +1,10 @@
 ﻿using Microsoft.AspNetCore.Http;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Web.Common.Security
 {
-    // TODO: This is only for the back office, does it need to be in common?
+    // TODO: This is only for the back office, does it need to be in common?  YES currently UmbracoContext has an transitive dependency on this which needs to be fixed/reviewed.
 
     public class BackOfficeSecurityFactory: IBackOfficeSecurityFactory
     {
@@ -14,11 +13,11 @@ namespace Umbraco.Cms.Web.Common.Security
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public BackOfficeSecurityFactory(
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IUserService userService,
             IHttpContextAccessor httpContextAccessor)
         {
-            _backOfficeSecurityAccessor = backofficeSecurityAccessor;
+            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _userService = userService;
             _httpContextAccessor = httpContextAccessor;
         }

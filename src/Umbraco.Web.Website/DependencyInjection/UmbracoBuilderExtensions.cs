@@ -2,8 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Website.Collections;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Cms.Web.Website.Routing;
@@ -40,7 +42,7 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<IUmbracoRenderingDefaults, UmbracoRenderingDefaults>();
             builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
 
-            builder.Services.AddSingleton<FrontEndRoutes>();
+            builder.Services.AddSingleton<FrontEndRoutes>();            
 
             builder
                 .AddDistributedCache()
