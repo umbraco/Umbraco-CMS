@@ -93,6 +93,7 @@ namespace Umbraco.Web.Services
                 return null;
             }
         }
+
         private IEnumerable<FileInfo> GetAllIconsFiles()
         {
             var icons = new HashSet<FileInfo>(new CaseInsensitiveFileInfoComparer());
