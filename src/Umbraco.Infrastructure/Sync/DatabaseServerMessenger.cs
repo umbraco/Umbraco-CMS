@@ -168,28 +168,87 @@ namespace Umbraco.Cms.Infrastructure.Sync
 
             ReadLastSynced(); // get _lastId
 
-            CacheInstructionServiceInitializationResult result = CacheInstructionService.EnsureInitialized(_released, _lastId);
-
-            if (result.ColdBootRequired)
+            if (CacheInstructionService.IsColdBootRequired(_lastId))
             {
-                // If there is a max currently, or if we've never synced.
-                if (result.MaxId > 0 || result.LastId < 0)
-                {
-                    SaveLastSynced(result.MaxId);
-                }
-
-                // Execute initializing callbacks.
-                if (Callbacks.InitializingCallbacks != null)
-                {
-                    foreach (Action callback in Callbacks.InitializingCallbacks)
-                    {
-                        callback();
-                    }
-                }
+                _lastId = -1;   // reset _lastId if instructions are missing
             }
 
-            return result.Initialized;
-        }        
+            return Initialize(); // boot
+        }
+
+        // <summary>
+        /// Initializes a server that has never synchronized before.
+        /// </summary>
+        /// <remarks>
+        /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
+        /// Callers MUST ensure thread-safety.
+        /// </remarks>
+        private bool Initialize()
+        {
+            lock (_locko)
+            {
+                if (_released)
+                {
+                    return false;
+                }
+
+                var coldboot = false;
+
+                // Never synced before.
+                if (_lastId < 0)
+                {
+                    // We haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
+                    // server and it will need to rebuild it's own caches, e.g. Lucene or the XML cache file.
+                    Logger.LogWarning("No last synced Id found, this generally means this is a new server/install."
+                        + " The server will build its caches and indexes, and then adjust its last synced Id to the latest found in"
+                        + " the database and maintain cache updates based on that Id.");
+
+                    coldboot = true;
+                }
+                else
+                {
+                    // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
+                    // row so we will sum these numbers to get the actual count.
+                    var limit = GlobalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount;
+                    if (CacheInstructionService.IsInstructionCountOverLimit(_lastId, limit, out int count))
+                    {
+                        // Too many instructions, proceed to cold boot.
+                        Logger.LogWarning(
+                            "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
+                            + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
+                            + " to the latest found in the database and maintain cache updates based on that Id.",
+                            count, limit);
+
+                        coldboot = true;
+                    }
+                }
+
+                if (coldboot)
+                {
+                    // Get the last id in the db and store it.
+                    // Note: Do it BEFORE initializing otherwise some instructions might get lost
+                    // when doing it before. Some instructions might run twice but this is not an issue.
+                    var maxId = CacheInstructionService.GetMaxInstructionId();
+
+                    // If there is a max currently, or if we've never synced.
+                    if (maxId > 0 || _lastId < 0)
+                    {
+                        SaveLastSynced(maxId);
+                    }
+
+                    // Execute initializing callbacks.
+                    if (Callbacks.InitializingCallbacks != null)
+                    {
+                        foreach (Action callback in Callbacks.InitializingCallbacks)
+                        {
+                            callback();
+                        }
+                    }
+                }
+
+                return true;
+            }
+        }
 
         /// <summary>
         /// Synchronize the server (throttled).

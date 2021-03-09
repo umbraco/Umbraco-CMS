@@ -55,105 +55,51 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc/>
-        public CacheInstructionServiceInitializationResult EnsureInitialized(bool released, int lastId)
+        public bool IsColdBootRequired(int lastId)
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                lastId = EnsureInstructions(lastId); // reset _lastId if instructions are missing
-                return Initialize(released, lastId); // boot
-            }
-        }
-
-        /// <summary>
-        /// Ensure that the last instruction that was processed is still in the database.
-        /// </summary>
-        /// <remarks>
-        /// If the last instruction is not in the database anymore, then the messenger
-        /// should not try to process any instructions, because some instructions might be lost,
-        /// and it should instead cold-boot.
-        /// However, if the last synced instruction id is '0' and there are '0' records, then this indicates
-        /// that it's a fresh site and no user actions have taken place, in this circumstance we do not want to cold
-        /// boot. See: http://issues.umbraco.org/issue/U4-8627
-        /// </remarks>
-        private int EnsureInstructions(int lastId)
-        {
-            if (lastId == 0)
-            {
-                var count = _cacheInstructionRepository.CountAll();
-
-                // If there are instructions but we haven't synced, then a cold boot is necessary.
-                if (count > 0)
+                if (lastId == 0)
                 {
-                    lastId = -1;
-                }
-            }
-            else
-            {
-                // If the last synced instruction is not found in the db, then a cold boot is necessary.
-                if (!_cacheInstructionRepository.Exists(lastId))
-                {
-                    lastId = -1;
-                }
-            }
+                    var count = _cacheInstructionRepository.CountAll();
 
-            return lastId;
-        }
-
-        /// <summary>
-        /// Initializes a server that has never synchronized before.
-        /// </summary>
-        /// <remarks>
-        /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
-        /// Callers MUST ensure thread-safety.
-        /// </remarks>
-        private CacheInstructionServiceInitializationResult Initialize(bool released, int lastId)
-        {
-            lock (_locko)
-            {
-                if (released)
-                {
-                    return CacheInstructionServiceInitializationResult.AsUninitialized();
-                }
-
-                var coldboot = false;
-
-                // Never synced before.
-                if (lastId < 0)
-                {
-                    // We haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
-                    // server and it will need to rebuild it's own caches, e.g. Lucene or the XML cache file.
-                    _logger.LogWarning("No last synced Id found, this generally means this is a new server/install."
-                        + " The server will build its caches and indexes, and then adjust its last synced Id to the latest found in"
-                        + " the database and maintain cache updates based on that Id.");
-
-                    coldboot = true;
+                    // If there are instructions but we haven't synced, then a cold boot is necessary.
+                    if (count > 0)
+                    {
+                        return true;
+                    }
                 }
                 else
                 {
-                    // Check for how many instructions there are to process. Each row contains a count of the number of instructions contained in each
-                    // row so we will sum these numbers to get the actual count.
-                    var count = _cacheInstructionRepository.CountPendingInstructions(lastId);
-                    if (count > _globalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount)
+                    // If the last synced instruction is not found in the db, then a cold boot is necessary.
+                    if (!_cacheInstructionRepository.Exists(lastId))
                     {
-                        // Too many instructions, proceed to cold boot
-                        _logger.LogWarning(
-                            "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
-                            + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
-                            + " to the latest found in the database and maintain cache updates based on that Id.",
-                            count, _globalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount);
-
-                        coldboot = true;
+                        return true;
                     }
                 }
 
-                // If cold boot is required, go get the last id in the db and store it.
-                // Note: do it BEFORE initializing otherwise some instructions might get lost.
-                // When doing it before, some instructions might run twice - not an issue.
-                var maxId = coldboot
-                    ? _cacheInstructionRepository.GetMaxId()
-                    : 0;
+                return false;
+            }
+        }
 
-                return CacheInstructionServiceInitializationResult.AsInitialized(coldboot, maxId, lastId);
+        /// <inheritdoc/>
+        public bool IsInstructionCountOverLimit(int lastId, int limit, out int count)
+        {
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
+                // row so we will sum these numbers to get the actual count.
+                count = _cacheInstructionRepository.CountPendingInstructions(lastId);
+                return count > limit;
+            }
+        }
+
+        /// <inheritdoc/>
+        public int GetMaxInstructionId()
+        {
+            using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                return _cacheInstructionRepository.GetMaxId();
             }
         }
 

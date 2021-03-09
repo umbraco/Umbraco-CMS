@@ -27,66 +27,68 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private const string AlternateIdentity = "alternateIdentity";
 
         [Test]
-        public void Can_Ensure_Initialized_With_No_Instructions()
-        {
-            var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
-
-            CacheInstructionServiceInitializationResult result = sut.EnsureInitialized(false, 0);
-
-            Assert.Multiple(() =>
-            {
-                Assert.IsTrue(result.Initialized);
-                Assert.IsFalse(result.ColdBootRequired);
-                Assert.AreEqual(0, result.MaxId);
-                Assert.AreEqual(0, result.LastId);
-            });
-        }
-
-        [Test]
-        public void Is_Not_Initialized_When_Released()
-        {
-            var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
-
-            CacheInstructionServiceInitializationResult result = sut.EnsureInitialized(true, 0);
-
-            Assert.IsFalse(result.Initialized);
-        }
-
-        [Test]
-        public void Can_Ensure_Initialized_With_UnSynced_Instructions()
+        public void Confirms_Cold_Boot_Required_When_Instructions_Exist_And_None_Have_Been_Synced()
         {
             var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
 
             List<RefreshInstruction> instructions = CreateInstructions();
             sut.DeliverInstructions(instructions, LocalIdentity);
 
-            CacheInstructionServiceInitializationResult result = sut.EnsureInitialized(false, 0);
+            var result = sut.IsColdBootRequired(0);
 
-            Assert.Multiple(() =>
-            {
-                Assert.IsTrue(result.Initialized);
-                Assert.IsTrue(result.ColdBootRequired);
-                Assert.AreEqual(1, result.MaxId);
-                Assert.AreEqual(-1, result.LastId);
-            });
+            Assert.IsTrue(result);
         }
 
         [Test]
-        public void Can_Ensure_Initialized_With_Synced_Instructions()
+        public void Confirms_Cold_Boot_Required_When_Last_Synced_Instruction_Not_Found()
         {
             var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
 
             List<RefreshInstruction> instructions = CreateInstructions();
-            sut.DeliverInstructions(instructions, LocalIdentity);
+            sut.DeliverInstructions(instructions, LocalIdentity); // will create with Id = 1
 
-            CacheInstructionServiceInitializationResult result = sut.EnsureInitialized(false, 1);
+            var result = sut.IsColdBootRequired(2);
 
-            Assert.Multiple(() =>
-            {
-                Assert.IsTrue(result.Initialized);
-                Assert.IsFalse(result.ColdBootRequired);
-                Assert.AreEqual(1, result.LastId);
-            });
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public void Confirms_Cold_Boot_Not_Required_When_Last_Synced_Instruction_Found()
+        {
+            var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
+
+            List<RefreshInstruction> instructions = CreateInstructions();
+            sut.DeliverInstructions(instructions, LocalIdentity); // will create with Id = 1
+
+            var result = sut.IsColdBootRequired(1);
+
+            Assert.IsFalse(result);
+        }
+
+        [TestCase(1, 10, false, 4)]
+        [TestCase(1, 3, true, 4)]
+        public void Confirms_Instruction_Count_Over_Limit(int lastId, int limit, bool expectedResult, int expectedCount)
+        {
+            var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
+
+            CreateAndDeliveryMultipleInstructions(sut); // 3 records, each with 2 instructions = 6.
+
+            var result = sut.IsInstructionCountOverLimit(lastId, limit, out int count);
+
+            Assert.AreEqual(expectedResult, result);
+            Assert.AreEqual(expectedCount, count);
+        }
+
+        [Test]
+        public void Can_Get_Max_Instruction_Id()
+        {
+            var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
+
+            CreateAndDeliveryMultipleInstructions(sut);
+
+            var result = sut.GetMaxInstructionId();
+
+            Assert.AreEqual(3, result);
         }
 
         [Test]
@@ -148,7 +150,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
 
             // Create three instruction records, each with two instructions.  First two records are for a different identity.
-            CreateMultipleInstructions(sut);
+            CreateAndDeliveryMultipleInstructions(sut);
 
             CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1));
 
@@ -167,7 +169,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             EnsureServerRegistered();
             var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
 
-            CreateMultipleInstructions(sut);
+            CreateAndDeliveryMultipleInstructions(sut);
 
             CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddHours(-1));
 
@@ -179,7 +181,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         {
             var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
 
-            CreateMultipleInstructions(sut);
+            CreateAndDeliveryMultipleInstructions(sut);
 
             CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(true, LocalIdentity, DateTime.UtcNow.AddSeconds(-1));
 
@@ -191,7 +193,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             });
         }
 
-        private void CreateMultipleInstructions(CacheInstructionService sut)
+        private void CreateAndDeliveryMultipleInstructions(CacheInstructionService sut)
         {
             for (int i = 0; i < 3; i++)
             {

@@ -7,9 +7,21 @@ namespace Umbraco.Cms.Core.Services
     public interface ICacheInstructionService
     {
         /// <summary>
-        /// Ensures that the cache instruction service is initialized and can be used for syncing messages.
+        /// Checks to see if a cold boot is required, either because instructions exist and none have been synced or
+        /// because the last recorded synced instruction can't be found in the database.
         /// </summary>
-        CacheInstructionServiceInitializationResult EnsureInitialized(bool released, int lastId);
+        bool IsColdBootRequired(int lastId);
+
+        /// <summary>
+        /// Checks to see if the number of pending instructions are over the configured limit.
+        /// </summary>
+        bool IsInstructionCountOverLimit(int lastId, int limit, out int count);
+
+        /// <summary>
+        /// Gets the most recent cache instruction record Id.
+        /// </summary>
+        /// <returns></returns>
+        int GetMaxInstructionId();
 
         /// <summary>
         /// Creates a cache instruction record from a set of individual instructions and saves it.
