@@ -319,7 +319,10 @@ namespace Umbraco.Web.Scheduling
             // create a new token source since this is a new process
             _shutdownTokenSource = new CancellationTokenSource();
             _shutdownToken = _shutdownTokenSource.Token;
-            _runningTask = Task.Run(async () => await Pump().ConfigureAwait(false), _shutdownToken);
+            using (ExecutionContext.SuppressFlow())
+            {
+                _runningTask = Task.Run(async () => await Pump().ConfigureAwait(false), _shutdownToken);
+            }   
 
             _logger.Debug<BackgroundTaskRunner>("{LogPrefix} Starting", _logPrefix);
         }
@@ -544,10 +547,14 @@ namespace Umbraco.Web.Scheduling
                     try
                     {
                         if (bgTask.IsAsync)
+                        {
                             // configure await = false since we don't care about the context, we're on a background thread.
                             await bgTask.RunAsync(token).ConfigureAwait(false);
+                        }
                         else
+                        {
                             bgTask.Run();
+                        }
                     }
                     finally // ensure we disposed - unless latched again ie wants to re-run
                     {
@@ -710,14 +717,20 @@ namespace Umbraco.Web.Scheduling
             // with a single aspnet thread during shutdown and we don't want to delay other calls to IRegisteredObject.Stop.
             if (!immediate)
             {
-                return Task.Run(StopInitial, CancellationToken.None);
+                using (ExecutionContext.SuppressFlow())
+                {
+                    return Task.Run(StopInitial, CancellationToken.None);
+                }   
             }
             else
             {
                 lock (_locker)
                 {
                     if (_terminated) return Task.CompletedTask;
-                    return Task.Run(StopImmediate, CancellationToken.None);
+                    using (ExecutionContext.SuppressFlow())
+                    {
+                        return Task.Run(StopImmediate, CancellationToken.None);
+                    }
                 }
             }
         }

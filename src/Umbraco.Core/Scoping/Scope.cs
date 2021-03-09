@@ -333,6 +333,8 @@ namespace Umbraco.Core.Scoping
 
             if (this != _scopeProvider.AmbientScope)
             {
+                var failedMessage = $"The {nameof(Scope)} {this.InstanceId} being disposed is not the Ambient {nameof(Scope)} {_scopeProvider.AmbientScope.InstanceId}. This typically indicates that a child {nameof(Scope)} was not disposed, or flowed to a child thread that was not awaited, or concurrent threads are accessing the same {nameof(Scope)} (Ambient context) which is not supported. If using Task.Run (or similar) as a fire and forget tasks or to run threads in parallel you must suppress execution context flow with ExecutionContext.SuppressFlow() and ExecutionContext.RestoreFlow().";
+
 #if DEBUG_SCOPES
                 var ambient = _scopeProvider.AmbientScope;
                 _logger.Debug<Scope>("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
@@ -344,7 +346,7 @@ namespace Umbraco.Core.Scoping
                     + "- ambient ctor ->\r\n" + ambientInfos.CtorStack + "\r\n"
                     + "- dispose ctor ->\r\n" + disposeInfos.CtorStack + "\r\n");
 #else
-                throw new InvalidOperationException("Not the ambient scope.");
+                throw new InvalidOperationException(failedMessage);
 #endif
             }
 

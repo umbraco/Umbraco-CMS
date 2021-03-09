@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Data;
 using System.Runtime.Remoting.Messaging;
 using System.Web;
@@ -240,6 +241,9 @@ namespace Umbraco.Core.Scoping
                 var value = GetHttpContextObject<ScopeContext>(ContextItemKey, false);
                 return value ?? GetCallContextObject<ScopeContext>(ContextItemKey);
             }
+
+            [Obsolete("This setter is not used and will be removed in future versions")]
+            [EditorBrowsable(EditorBrowsableState.Never)]
             set
             {
                 // clear both
