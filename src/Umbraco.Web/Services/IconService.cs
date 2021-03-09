@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Ganss.XSS;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
@@ -12,31 +13,24 @@ namespace Umbraco.Web.Services
     public class IconService : IIconService
     {
         private readonly IGlobalSettings _globalSettings;
+        private readonly IHtmlSanitizer _htmlSanitizer;
 
-        public IconService(IGlobalSettings globalSettings)
+        public IconService(IGlobalSettings globalSettings, IHtmlSanitizer htmlSanitizer)
         {
             _globalSettings = globalSettings;
+            _htmlSanitizer = htmlSanitizer;
         }
 
 
         /// <inheritdoc />
         public IList<IconModel> GetAllIcons()
         {
-            var icons = new List<IconModel>();
             var directory = new DirectoryInfo(IOHelper.MapPath($"{_globalSettings.IconsPath}/"));
             var iconNames = directory.GetFiles("*.svg");
 
-            iconNames.OrderBy(f => f.Name).ToList().ForEach(iconInfo =>
-            {
-                var icon = GetIcon(iconInfo);
+            return iconNames.OrderBy(f => f.Name)
+                .Select(iconInfo => GetIcon(iconInfo)).WhereNotNull().ToList();
 
-                if (icon != null)
-                {
-                    icons.Add(icon);
-                }
-            });
-
-            return icons;
         }
 
         /// <inheritdoc />
@@ -70,10 +64,12 @@ namespace Umbraco.Web.Services
             try
             {
                 var svgContent = System.IO.File.ReadAllText(iconPath);
+                var sanitizedString = _htmlSanitizer.Sanitize(svgContent);
+
                 var svg = new IconModel
                 {
                     Name = iconName,
-                    SvgString = svgContent
+                    SvgString = sanitizedString
                 };
 
                 return svg;
