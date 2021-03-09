@@ -602,11 +602,11 @@ namespace Umbraco.Core.Scoping
                     {
                         if (WriteLocks.ContainsKey(lockId))
                         {
-                            WriteLocks[lockId] = 1;
+                            WriteLocks[lockId] += 1;
                         }
                         else
                         {
-                            WriteLocks[lockId] += 1;
+                            WriteLocks[lockId] = 1;
                         }
                     }
                 }
