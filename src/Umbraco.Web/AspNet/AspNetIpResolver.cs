@@ -1,6 +1,5 @@
 using System.Web;
 using Umbraco.Cms.Core.Net;
-using Umbraco.Core;
 
 namespace Umbraco.Web
 {

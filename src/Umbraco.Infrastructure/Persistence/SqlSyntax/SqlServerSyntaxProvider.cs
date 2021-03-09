@@ -278,16 +278,31 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         public override void WriteLock(IDatabase db, params int[] lockIds)
         {
+            WriteLock(db, TimeSpan.FromSeconds(5), lockIds);
+        }
+
+        public void WriteLock(IDatabase db, TimeSpan timeout, params int[] lockIds)
+        {
+            if (db is null)
+            {
+                throw new ArgumentNullException(nameof(db));
+            }
+
+            if (db.Transaction is null)
+            {
+                throw new ArgumentException(nameof(db) + "." + nameof(db.Transaction) + " is null");
+            }
+
             // soon as we get Database, a transaction is started
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+            {
                 throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
-
-            var timeout = _globalSettings.Value.SqlWriteLockTimeOut;
+            }
 
             foreach (var lockId in lockIds)
             {
-                ObtainWriteLock(db, timeout, lockId);
+                ObtainWriteLock(db, _globalSettings.Value.SqlWriteLockTimeOut, lockId);
             }
         }
 
@@ -298,7 +313,9 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
                 @"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id",
                 new {id = lockId});
             if (i == 0) // ensure we are actually locking!
-                throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+            {
+               throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+            }
         }
 
         public override void ReadLock(IDatabase db, TimeSpan timeout, int lockId)
@@ -313,10 +330,22 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         public override void ReadLock(IDatabase db, params int[] lockIds)
         {
+            if (db is null)
+            {
+                throw new ArgumentNullException(nameof(db));
+            }
+
+            if (db.Transaction is null)
+            {
+                throw new ArgumentException(nameof(db) + "." + nameof(db.Transaction) + " is null");
+            }
+
             // soon as we get Database, a transaction is started
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+            {
                 throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+            }
 
             foreach (var lockId in lockIds)
             {
@@ -332,9 +361,10 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
             }
 
             var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WITH (REPEATABLEREAD) WHERE id=@id", new {id = lockId});
-
             if (i == null) // ensure we are actually locking!
-                throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+            {
+                throw new ArgumentException($"LockObject with id={lockId} does not exist.", nameof(lockId));
+            }
         }
 
         public override string FormatColumnRename(string tableName, string oldName, string newName)

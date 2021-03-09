@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -19,27 +19,57 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
     {
         [Test]
         [AutoMoqData]
-        public void RunBackgroundTask__must_run_func([Frozen] ILogger<TaskHelper> logger, TaskHelper sut)
+        public void RunBackgroundTask__Suppress_Execution_Context(
+            [Frozen] ILogger<TaskHelper> logger,
+            TaskHelper sut)
+        {
+            var local = new AsyncLocal<string>
+            {
+                Value = "hello"
+            };
+
+            string taskResult = null;
+            
+            Task t = sut.ExecuteBackgroundTask(() =>
+            {
+                // FireAndForgetTasks ensure that flow is suppressed therefore this value will be null
+                taskResult = local.Value;
+                return Task.CompletedTask;
+            });
+
+            Task.WaitAll(t);
+
+            Assert.IsNull(taskResult);
+        }
+
+        [Test]
+        [AutoMoqData]
+        public void RunBackgroundTask__Must_Run_Func(
+            [Frozen] ILogger<TaskHelper> logger,
+            TaskHelper sut)
         {
             var i = 0;
-            sut.RunBackgroundTask(() =>
+            Task t = sut.ExecuteBackgroundTask(() =>
             {
                 Interlocked.Increment(ref i);
                 return Task.CompletedTask;
             });
 
-            Thread.Sleep(5); // Wait for background task to execute
+            Task.WaitAll(t);
 
             Assert.AreEqual(1, i);
         }
 
         [Test]
         [AutoMoqData]
-        public void RunBackgroundTask__Log_error_when_exception_happen_in_background_task([Frozen] ILogger<TaskHelper> logger, Exception exception, TaskHelper sut)
+        public void RunBackgroundTask__Log_Error_When_Exception_Happen_In_Background_Task(
+            [Frozen] ILogger<TaskHelper> logger,
+            Exception exception,
+            TaskHelper sut)
         {
-            sut.RunBackgroundTask(() => throw exception);
+            Task t = sut.ExecuteBackgroundTask(() => throw exception);
 
-            Thread.Sleep(5); // Wait for background task to execute
+            Task.WaitAll(t);
 
             Mock.Get(logger).VerifyLogError(exception, "Exception thrown in a background thread", Times.Once());
         }

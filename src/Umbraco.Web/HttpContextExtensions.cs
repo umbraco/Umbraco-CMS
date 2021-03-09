@@ -1,7 +1,7 @@
 using System.Web;
 using Umbraco.Cms.Core;
 
-namespace Umbraco.Core
+namespace Umbraco.Web
 {
     public static class HttpContextExtensions
     {
