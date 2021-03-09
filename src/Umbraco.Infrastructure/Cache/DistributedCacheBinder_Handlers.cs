@@ -49,18 +49,6 @@ namespace Umbraco.Cms.Core.Cache
 
             _logger.LogInformation("Initializing Umbraco internal event handlers for cache refreshing.");
 
-            // bind to user and user group events
-            Bind(() => UserService.SavedUserGroup += UserService_SavedUserGroup,
-                () => UserService.SavedUserGroup -= UserService_SavedUserGroup);
-            Bind(() => UserService.DeletedUserGroup += UserService_DeletedUserGroup,
-                () => UserService.DeletedUserGroup -= UserService_DeletedUserGroup);
-            Bind(() => UserService.SavedUser += UserService_SavedUser,
-                () => UserService.SavedUser -= UserService_SavedUser);
-            Bind(() => UserService.DeletedUser += UserService_DeletedUser,
-                () => UserService.DeletedUser -= UserService_DeletedUser);
-            Bind(() => UserService.UserGroupPermissionsAssigned += UserService_UserGroupPermissionsAssigned,
-                () => UserService.UserGroupPermissionsAssigned -= UserService_UserGroupPermissionsAssigned);
-
             // bind to dictionary events
             Bind(() => LocalizationService.DeletedDictionaryItem += LocalizationService_DeletedDictionaryItem,
                 () => LocalizationService.DeletedDictionaryItem -= LocalizationService_DeletedDictionaryItem);
@@ -112,10 +100,6 @@ namespace Umbraco.Cms.Core.Cache
                 () => MacroService.Deleted -= MacroService_Deleted);
 
             // bind to member events
-            Bind(() => MemberService.Saved += MemberService_Saved,
-                () => MemberService.Saved -= MemberService_Saved);
-            Bind(() => MemberService.Deleted += MemberService_Deleted,
-                () => MemberService.Deleted -= MemberService_Deleted);
             Bind(() => MemberGroupService.Saved += MemberGroupService_Saved,
                 () => MemberGroupService.Saved -= MemberGroupService_Saved);
             Bind(() => MemberGroupService.Deleted += MemberGroupService_Deleted,
@@ -135,33 +119,12 @@ namespace Umbraco.Cms.Core.Cache
             //Bind(() => ContentService.DeletedBlueprint += ContentService_DeletedBlueprint,
             //    () => ContentService.DeletedBlueprint -= ContentService_DeletedBlueprint);
 
-            // bind to public access events
-            Bind(() => PublicAccessService.Saved += PublicAccessService_Saved,
-                () => PublicAccessService.Saved -= PublicAccessService_Saved);
-            Bind(() => PublicAccessService.Deleted += PublicAccessService_Deleted,
-                () => PublicAccessService.Deleted -= PublicAccessService_Deleted);
-
             // bind to relation type events
             Bind(() => RelationService.SavedRelationType += RelationService_SavedRelationType,
                 () => RelationService.SavedRelationType -= RelationService_SavedRelationType);
             Bind(() => RelationService.DeletedRelationType += RelationService_DeletedRelationType,
                 () => RelationService.DeletedRelationType -= RelationService_DeletedRelationType);
         }
-
-        #region PublicAccessService
-
-        private void PublicAccessService_Saved(IPublicAccessService sender, SaveEventArgs<PublicAccessEntry> e)
-        {
-
-            _distributedCache.RefreshPublicAccess();
-        }
-
-        private void PublicAccessService_Deleted(IPublicAccessService sender, DeleteEventArgs<PublicAccessEntry> e)
-        {
-            _distributedCache.RefreshPublicAccess();
-        }
-
-        #endregion
 
         #region ContentService
 
@@ -296,45 +259,6 @@ namespace Umbraco.Cms.Core.Cache
 
         #endregion
 
-        #region UserService
-
-        private void UserService_UserGroupPermissionsAssigned(IUserService sender, SaveEventArgs<EntityPermission> e)
-        {
-            // TODO: Not sure if we need this yet depends if we start caching permissions
-            //var groupIds = e.SavedEntities.Select(x => x.UserGroupId).Distinct();
-            //foreach (var groupId in groupIds)
-            //{
-            //    DistributedCache.Instance.RefreshUserGroupPermissionsCache(groupId);
-            //}
-        }
-
-        private void UserService_SavedUser(IUserService sender, SaveEventArgs<IUser> e)
-        {
-            foreach (var entity in e.SavedEntities)
-                _distributedCache.RefreshUserCache(entity.Id);
-        }
-
-        private void UserService_DeletedUser(IUserService sender, DeleteEventArgs<IUser> e)
-        {
-            foreach (var entity in e.DeletedEntities)
-                _distributedCache.RemoveUserCache(entity.Id);
-        }
-
-        private void UserService_SavedUserGroup(IUserService sender, SaveEventArgs<UserGroupWithUsers> e)
-        {
-            foreach (var entity in e.SavedEntities)
-                _distributedCache.RefreshUserGroupCache(entity.UserGroup.Id);
-        }
-
-        private void UserService_DeletedUserGroup(IUserService sender, DeleteEventArgs<IUserGroup> e)
-        {
-
-            foreach (var entity in e.DeletedEntities)
-                _distributedCache.RemoveUserGroupCache(entity.Id);
-        }
-
-        #endregion
-
         #region FileService
 
         /// <summary>
@@ -386,20 +310,6 @@ namespace Umbraco.Cms.Core.Cache
         private void MediaService_TreeChanged(IMediaService sender, TreeChange<IMedia>.EventArgs args)
         {
             _distributedCache.RefreshMediaCache(args.Changes.ToArray());
-        }
-
-        #endregion
-
-        #region MemberService
-
-        private void MemberService_Deleted(IMemberService sender, DeleteEventArgs<IMember> e)
-        {
-            _distributedCache.RemoveMemberCache(e.DeletedEntities.ToArray());
-        }
-
-        private void MemberService_Saved(IMemberService sender, SaveEventArgs<IMember> e)
-        {
-            _distributedCache.RefreshMemberCache(e.SavedEntities.ToArray());
         }
 
         #endregion

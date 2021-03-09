@@ -34,7 +34,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         Icon = "icon-crop")]
     public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         INotificationHandler<CopiedNotification<IContent>>, INotificationHandler<DeletedNotification<IContent>>,
-        INotificationHandler<DeletedNotification<IMedia>>, INotificationHandler<SavingNotification<IMedia>>
+        INotificationHandler<DeletedNotification<IMedia>>, INotificationHandler<SavingNotification<IMedia>>,
+        INotificationHandler<DeletedNotification<IMember>>
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ContentSettings _contentSettings;
@@ -131,10 +132,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// The paths to all image cropper property files contained within a collection of content entities
         /// </summary>
         /// <param name="entities"></param>
-        /// <remarks>
-        /// This method must be made private once MemberService events have been replaced by notifications
-        /// </remarks>
-        internal IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
+        private IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
             .SelectMany(x => x.Properties)
             .Where(IsCropperField)
             .SelectMany(GetFilePathsFromPropertyValues)
@@ -217,6 +215,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public void Handle(DeletedNotification<IContent> notification) => DeleteContainedFiles(notification.DeletedEntities);
 
         public void Handle(DeletedNotification<IMedia> notification) => DeleteContainedFiles(notification.DeletedEntities);
+
+        public void Handle(DeletedNotification<IMember> notification) => DeleteContainedFiles(notification.DeletedEntities);
 
         private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
         {

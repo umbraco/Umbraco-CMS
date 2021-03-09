@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
@@ -129,8 +130,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     return OperationResult.Attempt.Succeed(evtMsgs, entry);
                 }
 
-                var saveEventArgs = new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs);
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                var savingNotifiation = new SavingNotification<PublicAccessEntry>(entry, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingNotifiation))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs, entry);
@@ -140,8 +141,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 scope.Complete();
 
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs);
+                scope.Notifications.Publish(new SavedNotification<PublicAccessEntry>(entry, evtMsgs).WithStateFrom(savingNotifiation));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs, entry);
@@ -167,8 +167,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 entry.RemoveRule(existingRule);
 
-                var saveEventArgs = new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs);
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                var savingNotifiation = new SavingNotification<PublicAccessEntry>(entry, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingNotifiation))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -177,8 +177,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 _publicAccessRepository.Save(entry);
                 scope.Complete();
 
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs);
+                scope.Notifications.Publish(new SavedNotification<PublicAccessEntry>(entry, evtMsgs).WithStateFrom(savingNotifiation));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);
@@ -194,8 +193,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<PublicAccessEntry>(entry, evtMsgs);
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                var savingNotifiation = new SavingNotification<PublicAccessEntry>(entry, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingNotifiation))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -204,8 +203,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 _publicAccessRepository.Save(entry);
                 scope.Complete();
 
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs);
+                scope.Notifications.Publish(new SavedNotification<PublicAccessEntry>(entry, evtMsgs).WithStateFrom(savingNotifiation));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);
@@ -221,8 +219,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<PublicAccessEntry>(entry, evtMsgs);
-                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                var deletingNotification = new DeletingNotification<PublicAccessEntry>(entry, evtMsgs);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -231,33 +229,10 @@ namespace Umbraco.Cms.Core.Services.Implement
                 _publicAccessRepository.Delete(entry);
                 scope.Complete();
 
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Deleted, this, deleteEventArgs);
+                scope.Notifications.Publish(new DeletedNotification<PublicAccessEntry>(entry, evtMsgs).WithStateFrom(deletingNotification));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IPublicAccessService, SaveEventArgs<PublicAccessEntry>> Saving;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IPublicAccessService, SaveEventArgs<PublicAccessEntry>> Saved;
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IPublicAccessService, DeleteEventArgs<PublicAccessEntry>> Deleting;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IPublicAccessService, DeleteEventArgs<PublicAccessEntry>> Deleted;
-
-
     }
 }

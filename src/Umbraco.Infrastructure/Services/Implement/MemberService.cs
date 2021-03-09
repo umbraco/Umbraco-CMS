@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
@@ -22,7 +23,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
         private readonly IAuditRepository _auditRepository;
-        private readonly IMemberTypeService _memberTypeService;
 
         private readonly IMemberGroupService _memberGroupService;
 
@@ -773,10 +773,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             member.Username = member.Username.Trim();
             member.Email = member.Email.Trim();
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IMember>(member);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                var savingNotification = new SavingNotification<IMember>(member, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -793,8 +795,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
+                    scope.Notifications.Publish(new SavedNotification<IMember>(member, evtMsgs).WithStateFrom(savingNotification));
                 }
 
                 Audit(AuditType.Save, 0, member.Id);
@@ -808,10 +809,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             var membersA = members.ToArray();
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IMember>(membersA);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                var savingNotification = new SavingNotification<IMember>(membersA, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -830,8 +833,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
+                    scope.Notifications.Publish(new SavedNotification<IMember>(membersA, evtMsgs).WithStateFrom(savingNotification));
                 }
                 Audit(AuditType.Save, 0, -1, "Save multiple Members");
 
@@ -849,32 +851,30 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="member"><see cref="IMember"/> to Delete</param>
         public void Delete(IMember member)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<IMember>(member);
-                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                var deletingNotification = new DeletingNotification<IMember>(member, evtMsgs);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
                 }
 
                 scope.WriteLock(Constants.Locks.MemberTree);
-                DeleteLocked(scope, member, deleteEventArgs);
+                DeleteLocked(scope, member, evtMsgs, deletingNotification.State);
 
                 Audit(AuditType.Delete, 0, member.Id);
                 scope.Complete();
             }
         }
 
-        private void DeleteLocked(IScope scope, IMember member, DeleteEventArgs<IMember> args = null)
+        private void DeleteLocked(IScope scope, IMember member, EventMessages evtMsgs, IDictionary<string, object> notificationState = null)
         {
             // a member has no descendants
             _memberRepository.Delete(member);
-            if (args == null)
-                args = new DeleteEventArgs<IMember>(member, false); // raise event & get flagged files
-            else
-                args.CanCancel = false;
-            scope.Events.Dispatch(Deleted, this, args);
+            scope.Notifications.Publish(new DeletedNotification<IMember>(member, evtMsgs).WithState(notificationState));
 
             // media files deleted by QueuingEventDispatcher
         }
@@ -1017,8 +1017,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
                 int[] ids = _memberGroupRepository.GetMemberIds(usernames);
                 _memberGroupRepository.AssignRoles(ids, roleNames);
-                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(ids, roleNames), nameof(AssignedRoles));
-                scope.Complete();
+                scope.Notifications.Publish(new AssignedMemberRolesNotification(ids, roleNames));
             }
         }
 
@@ -1031,8 +1030,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
                 int[] ids = _memberGroupRepository.GetMemberIds(usernames);
                 _memberGroupRepository.DissociateRoles(ids, roleNames);
-                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(ids, roleNames), nameof(RemovedRoles));
-                scope.Complete();
+                scope.Notifications.Publish(new RemovedMemberRolesNotification(ids, roleNames));
             }
         }
 
@@ -1044,8 +1042,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.AssignRoles(memberIds, roleNames);
-                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(memberIds, roleNames), nameof(AssignedRoles));
-                scope.Complete();
+                scope.Notifications.Publish(new AssignedMemberRolesNotification(memberIds, roleNames));
             }
         }
 
@@ -1057,8 +1054,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.DissociateRoles(memberIds, roleNames);
-                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(memberIds, roleNames), nameof(RemovedRoles));
-                scope.Complete();
+                scope.Notifications.Publish(new RemovedMemberRolesNotification(memberIds, roleNames));
             }
         }
 
@@ -1071,36 +1067,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         #endregion
 
         #region Event Handlers
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleting;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleted;
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saving;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
-
-        /// <summary>
-        /// Occurs after roles have been assigned.
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, RolesEventArgs> AssignedRoles;
-
-        /// <summary>
-        /// Occurs after roles have been removed.
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, RolesEventArgs> RemovedRoles;
 
         /// <summary>
         /// Occurs after members have been exported.
@@ -1145,7 +1111,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     Properties = new List<MemberExportProperty>(GetPropertyExportItems(member))
                 };
 
-                scope.Events.Dispatch(Exported, this, new ExportedMemberEventArgs(member, model));
+                scope.Notifications.Publish(new ExportedMemberNotification(member, model));
 
                 return model;
             }
@@ -1187,6 +1153,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="memberTypeId">Id of the MemberType</param>
         public void DeleteMembersOfType(int memberTypeId)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             // note: no tree to manage here
             using (IScope scope = ScopeProvider.CreateScope())
             {
@@ -1196,9 +1164,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                 IQuery<IMember> query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
 
                 IMember[] members = _memberRepository.Get(query).ToArray();
-                var deleteEventArgs = new DeleteEventArgs<IMember>(members);
 
-                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                if (scope.Notifications.PublishCancelable(new DeletingNotification<IMember>(members, evtMsgs)))
                 {
                     scope.Complete();
                     return;
@@ -1208,7 +1175,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 {
                     // delete media
                     // triggers the deleted event (and handles the files)
-                    DeleteLocked(scope, member);
+                    DeleteLocked(scope, member, evtMsgs);
                 }
 
                 scope.Complete();

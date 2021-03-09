@@ -29,7 +29,9 @@ namespace Umbraco.Cms.Core.Events
         INotificationHandler<CopiedNotification<IContent>>,
         INotificationHandler<RolledBackNotification<IContent>>,
         INotificationHandler<SentToPublishNotification<IContent>>,
-        INotificationHandler<UnpublishedNotification<IContent>>
+        INotificationHandler<UnpublishedNotification<IContent>>,
+        INotificationHandler<AssignedUserGroupPermissionsNotification>,
+        INotificationHandler<SavedNotification<PublicAccessEntry>>
     {
         private readonly Notifier _notifier;
         private readonly ActionCollection _actions;
@@ -210,6 +212,27 @@ namespace Umbraco.Cms.Core.Events
                 }
             }
 
+        }
+
+        public void Handle(AssignedUserGroupPermissionsNotification notification)
+        {
+            var entities = _contentService.GetByIds(notification.EntityPermissions.Select(e => e.EntityId)).ToArray();
+            if (entities.Any() == false)
+            {
+                return;
+            }
+            _notifier.Notify(_actions.GetAction<ActionRights>(), entities);
+
+        }
+
+        public void Handle(SavedNotification<PublicAccessEntry> notification)
+        {
+            var entities = _contentService.GetByIds(notification.SavedEntities.Select(e => e.ProtectedNodeId)).ToArray();
+            if (entities.Any() == false)
+            {
+                return;
+            }
+            _notifier.Notify(_actions.GetAction<ActionProtect>(), entities);
         }
     }
 }
