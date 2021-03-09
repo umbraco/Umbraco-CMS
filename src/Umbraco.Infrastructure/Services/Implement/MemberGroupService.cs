@@ -130,25 +130,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-
-        public void GetByRole(IMemberGroup memberGroup)
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                var deleteEventArgs = new DeleteEventArgs<IMemberGroup>(memberGroup);
-                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
-                {
-                    scope.Complete();
-                    return;
-                }
-
-                _memberGroupRepository.Delete(memberGroup);
-                scope.Complete();
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Deleted, this, deleteEventArgs);
-            }
-        }
-
         /// <summary>
         /// Occurs before Delete of a member group
         /// </summary>
