@@ -131,20 +131,6 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
         }
 
-        protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs> onComplete)
-        {
-            if (CanInitialize())
-            {
-                // Use SafeCallContext to prevent the current Execution Context (AsyncLocal) flow to child
-                // tasks executed in the base class so we don't leak Scopes.
-                // TODO: See notes at the top of this class
-                using (ExecutionContext.SuppressFlow())
-                {
-                    base.PerformIndexItems(values, onComplete);
-                }
-            }
-        }
-
         /// <summary>
         /// Returns true if the Umbraco application is in a state that we can initialize the examine indexes
         /// </summary>
