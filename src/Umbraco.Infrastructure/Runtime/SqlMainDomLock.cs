@@ -80,6 +80,7 @@ _hostingEnvironment = hostingEnvironment;
             {
                 db = _dbFactory.CreateDatabase();
 
+
                 _hasTable = db.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
                 if (!_hasTable)
                 {

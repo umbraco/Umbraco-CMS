@@ -2,13 +2,8 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <LangVersion>8</LangVersion>
         <RootNamespace>Umbraco.Cms.Core</RootNamespace>
-        <AssemblyVersion>0.5.0</AssemblyVersion>
-        <InformationalVersion>0.5.0</InformationalVersion>
-        <FileVersion>0.5.0</FileVersion>
         <Product>Umbraco CMS</Product>
-        <RootNamespace>Umbraco.Core</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -21,6 +16,7 @@
         <PackageReference Include="Microsoft.Extensions.Logging" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options" Version="5.0.0" />
         <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="5.0.0" />
+        <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="5.0.0" />
         <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
         <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
         <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.7.0" />

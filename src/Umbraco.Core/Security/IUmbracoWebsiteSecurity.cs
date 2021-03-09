@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Models.Security;
 
 namespace Umbraco.Cms.Core.Security
 {
+    // TODO: I think we can kill this whole thing, the logic can just be in the controllers
     public interface IUmbracoWebsiteSecurity
     {
         /// <summary>
@@ -35,18 +36,10 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>Result of update profile operation.</returns>
         Task<UpdateMemberProfileResult> UpdateMemberProfileAsync(ProfileModel model);
 
-        /// <summary>
-        /// A helper method to perform the validation and logging in of a member.
-        /// </summary>
-        /// <param name="username">The username.</param>
-        /// <param name="password">The password.</param>
-        /// <returns>Result of login operation.</returns>
+        // TODO: Kill this, we will just use the MemberManager / MemberSignInManager
         Task<bool> LoginAsync(string username, string password);
 
-        /// <summary>
-        /// Check if a member is logged in
-        /// </summary>
-        /// <returns>True if logged in, false if not.</returns>
+        // TODO: Kill this, we will just use the MemberManager
         bool IsLoggedIn();
 
         /// <summary>
@@ -55,9 +48,7 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>Instance of <see cref="LoginStatusModel"/></returns>
         Task<LoginStatusModel> GetCurrentLoginStatusAsync();
 
-        /// <summary>
-        /// Logs out the current member.
-        /// </summary>
+        // TODO: Kill this, we will just use the MemberManager
         Task LogOutAsync();
 
         /// <summary>

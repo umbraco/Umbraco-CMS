@@ -1,13 +1,27 @@
-﻿using System;
+using System;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
-using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions
 {
     public static class HttpContextExtensions
     {
+        /// <summary>
+        /// Get the value in the request form or query string for the key
+        /// </summary>
+        public static string GetRequestValue(this HttpContext context, string key)
+        {
+            HttpRequest request = context.Request;
+            if (!request.HasFormContentType)
+            {
+                return request.Query[key];
+            }
+
+            string value = request.Form[key];
+            return value ?? request.Query[key];
+        }
+
         public static void SetPrincipalForRequest(this HttpContext context, ClaimsPrincipal principal)
         {
             context.User = principal;
