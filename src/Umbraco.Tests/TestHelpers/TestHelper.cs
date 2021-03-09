@@ -38,7 +38,6 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.SqlCe;
 using Umbraco.Cms.Tests.Common;
-using Umbraco.Core;
 using Umbraco.Extensions;
 using Umbraco.Web;
 using Umbraco.Web.Hosting;

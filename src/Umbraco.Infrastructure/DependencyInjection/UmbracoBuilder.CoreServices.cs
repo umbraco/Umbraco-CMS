@@ -77,6 +77,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
             builder.Services.AddUnique<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddUnique<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
             builder.Services.AddUnique<IJsonSerializer, JsonNetSerializer>();
             builder.Services.AddUnique<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();

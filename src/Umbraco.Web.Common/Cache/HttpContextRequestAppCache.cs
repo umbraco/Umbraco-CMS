@@ -1,36 +1,38 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
-    /// Implements a fast <see cref="IAppCache"/> on top of HttpContext.Items.
+    /// Implements a <see cref="IAppCache"/> on top of <see cref="IHttpContextAccessor"/>
     /// </summary>
     /// <remarks>
-    /// <para>If no current HttpContext items can be found (no current HttpContext,
-    /// or no Items...) then this cache acts as a pass-through and does not cache
-    /// anything.</para>
+    /// <para>The HttpContext is not thread safe and no part of it is which means we need to include our own thread
+    /// safety mechanisms. This relies on notifications: <see cref="UmbracoRequestBegin"/> and <see cref="UmbracoRequestEnd"/>
+    /// in order to facilitate the correct locking and releasing allocations.
+    /// </para>
     /// </remarks>
-    public class GenericDictionaryRequestAppCache : FastDictionaryAppCacheBase, IRequestCache
+    public class HttpContextRequestAppCache : FastDictionaryAppCacheBase, IRequestCache
     {
+        private readonly IHttpContextAccessor _httpContextAccessor;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="HttpRequestAppCache"/> class with a context, for unit tests!
         /// </summary>
-        public GenericDictionaryRequestAppCache(Func<IDictionary<object, object>> requestItems) : base()
-        {
-            ContextItems = requestItems;
-        }
-
-        private Func<IDictionary<object, object>> ContextItems { get; }
+        public HttpContextRequestAppCache(IHttpContextAccessor httpContextAccessor) => _httpContextAccessor = httpContextAccessor;
 
         public bool IsAvailable => TryGetContextItems(out _);
 
         private bool TryGetContextItems(out IDictionary<object, object> items)
         {
-            items = ContextItems?.Invoke();
+            items = _httpContextAccessor.HttpContext?.Items;
             return items != null;
         }
 
@@ -38,7 +40,10 @@ namespace Umbraco.Cms.Core.Cache
         public override object Get(string key, Func<object> factory)
         {
             //no place to cache so just return the callback result
-            if (!TryGetContextItems(out var items)) return factory();
+            if (!TryGetContextItems(out var items))
+            {
+                return factory();
+            }
 
             key = GetCacheKey(key);
 
@@ -72,14 +77,22 @@ namespace Umbraco.Cms.Core.Cache
             //return result.Value;
 
             var value = result.Value; // will not throw (safe lazy)
-            if (value is SafeLazy.ExceptionHolder eh) eh.Exception.Throw(); // throw once!
+            if (value is SafeLazy.ExceptionHolder eh)
+            {
+                eh.Exception.Throw(); // throw once!
+            }
+
             return value;
         }
 
         public bool Set(string key, object value)
         {
             //no place to cache so just return the callback result
-            if (!TryGetContextItems(out var items)) return false;
+            if (!TryGetContextItems(out var items))
+            {
+                return false;
+            }
+
             key = GetCacheKey(key);
             try
             {
@@ -97,7 +110,11 @@ namespace Umbraco.Cms.Core.Cache
         public bool Remove(string key)
         {
             //no place to cache so just return the callback result
-            if (!TryGetContextItems(out var items)) return false;
+            if (!TryGetContextItems(out var items))
+            {
+                return false;
+            }
+
             key = GetCacheKey(key);
             try
             {
@@ -118,7 +135,8 @@ namespace Umbraco.Cms.Core.Cache
         {
             const string prefix = CacheItemPrefix + "-";
 
-            if (!TryGetContextItems(out var items)) return Enumerable.Empty<KeyValuePair<object, object>>();
+            if (!TryGetContextItems(out var items))
+                return Enumerable.Empty<KeyValuePair<object, object>>();
 
             return items.Cast<KeyValuePair<object, object>>()
                 .Where(x => x.Key is string s && s.StartsWith(prefix));
@@ -126,7 +144,8 @@ namespace Umbraco.Cms.Core.Cache
 
         protected override void RemoveEntry(string key)
         {
-            if (!TryGetContextItems(out var items)) return;
+            if (!TryGetContextItems(out var items))
+                return;
 
             items.Remove(key);
         }
@@ -140,50 +159,103 @@ namespace Umbraco.Cms.Core.Cache
 
         #region Lock
 
-        private const string ContextItemsLockKey = "Umbraco.Core.Cache.HttpRequestCache::LockEntered";
-
-        protected override void EnterReadLock() => EnterWriteLock();
+        protected override void EnterReadLock()
+        {
+            object locker = GetLock();
+            if (locker == null)
+            {
+                return;
+            }
+            Monitor.Enter(locker);
+        }
 
         protected override void EnterWriteLock()
         {
-            if (!TryGetContextItems(out var items)) return;
-
-            // note: cannot keep 'entered' as a class variable here,
-            // since there is one per request - so storing it within
-            // ContextItems - which is locked, so this should be safe
-
-            var entered = false;
-            Monitor.Enter(items, ref entered);
-            items[ContextItemsLockKey] = entered;
+            object locker = GetLock();
+            if (locker == null)
+            {
+                return;
+            }
+            Monitor.Enter(locker);
         }
 
-        protected override void ExitReadLock() => ExitWriteLock();
+        protected override void ExitReadLock()
+        {
+            object locker = GetLock();
+            if (locker == null)
+            {
+                return;
+            }
+            if (Monitor.IsEntered(locker))
+            {
+                Monitor.Exit(locker);
+            }
+        }
 
         protected override void ExitWriteLock()
         {
-            if (!TryGetContextItems(out var items)) return;
-
-            var entered = (bool?)items[ContextItemsLockKey] ?? false;
-            if (entered)
-                Monitor.Exit(items);
-            items.Remove(ContextItemsLockKey);
+            object locker = GetLock();
+            if (locker == null)
+            {
+                return;
+            }
+            if (Monitor.IsEntered(locker))
+            {
+                Monitor.Exit(locker);
+            }
         }
 
         #endregion
 
         public IEnumerator<KeyValuePair<string, object>> GetEnumerator()
         {
-            if (!TryGetContextItems(out var items))
+            if (!TryGetContextItems(out IDictionary<object, object> items))
             {
                 yield break;
             }
 
-            foreach (var item in items)
+            foreach (KeyValuePair<object, object> item in items)
             {
                 yield return new KeyValuePair<string, object>(item.Key.ToString(), item.Value);
             }
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        /// <summary>
+        /// Ensures and returns the current lock
+        /// </summary>
+        /// <returns></returns>
+        private object GetLock()
+        {
+            HttpContext httpContext = _httpContextAccessor.HttpContext;
+            if (httpContext == null)
+            {
+                return null;
+            }
+
+            RequestLock requestLock = httpContext.Features.Get<RequestLock>();
+            if (requestLock != null)
+            {
+                return requestLock.SyncRoot;
+            }
+
+            IFeatureCollection features = httpContext.Features;
+            
+            lock (httpContext)
+            {
+                requestLock = new RequestLock();
+                features.Set(requestLock);
+                return requestLock.SyncRoot;
+            }
+        }
+
+        /// <summary>
+        /// Used as Scoped instance to allow locking within a request
+        /// </summary>
+        private class RequestLock
+        {
+            public object SyncRoot { get; } = new object();
+        }
     }
 }

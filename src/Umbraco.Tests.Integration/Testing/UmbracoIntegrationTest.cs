@@ -87,8 +87,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             }
 
             _testTeardown = null;
-            FirstTestInFixture = false;
-            FirstTestInSession = false;
+            _firstTestInFixture = false;
+            s_firstTestInSession = false;
 
             // Ensure CoreRuntime stopped (now it's a HostedService)
             IHost host = Services.GetRequiredService<IHost>();
@@ -102,12 +102,12 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
         [SetUp]
         public virtual void SetUp_Logging() =>
-            TestContext.Progress.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.Name}");
+            TestContext.Progress.Write($"Start test {s_testCount++}: {TestContext.CurrentContext.Test.Name}");
 
         [SetUp]
         public virtual void Setup()
         {
-            InMemoryConfiguration[Constants.Configuration.ConfigGlobal + ":" + nameof(GlobalSettings.InstallUnattended)] = "true";
+            InMemoryConfiguration[Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
             IHostBuilder hostBuilder = CreateHostBuilder();
 
             IHost host = hostBuilder.Build();
@@ -244,7 +244,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing
         {
             if (TestOptions.Boot)
             {
-                Services.GetRequiredService<IBackOfficeSecurityFactory>().EnsureBackOfficeSecurity();
                 Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
             }
 
@@ -347,7 +346,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                     // Only attach schema once per fixture
                     // Doing it more than once will block the process since the old db hasn't been detached
                     // and it would be the same as NewSchemaPerTest even if it didn't block
-                    if (FirstTestInFixture)
+                    if (_firstTestInFixture)
                     {
                         // New DB + Schema
                         TestDbMeta newSchemaFixtureDbMeta = db.AttachSchema();
@@ -364,7 +363,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                     // Only attach schema once per fixture
                     // Doing it more than once will block the process since the old db hasn't been detached
                     // and it would be the same as NewSchemaPerTest even if it didn't block
-                    if (FirstTestInFixture)
+                    if (_firstTestInFixture)
                     {
                         // New DB + Schema
                         TestDbMeta newEmptyFixtureDbMeta = db.AttachEmpty();
@@ -437,12 +436,11 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
         protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
 
-        protected UserBuilder UserBuilderInstance = new UserBuilder();
-        protected UserGroupBuilder UserGroupBuilderInstance = new UserGroupBuilder();
+        protected UserBuilder UserBuilderInstance { get; } = new UserBuilder();
+        protected UserGroupBuilder UserGroupBuilderInstance { get; } = new UserGroupBuilder();
 
-        protected static bool FirstTestInSession = true;
-
-        protected bool FirstTestInFixture = true;
-        protected static int TestCount = 1;
+        private static bool s_firstTestInSession = true;
+        private bool _firstTestInFixture = true;
+        private static int s_testCount = 1;
     }
 }

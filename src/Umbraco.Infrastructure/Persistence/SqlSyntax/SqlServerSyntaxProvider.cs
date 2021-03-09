@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -263,10 +263,22 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
 
         public void WriteLock(IDatabase db, TimeSpan timeout, params int[] lockIds)
         {
+            if (db is null)
+            {
+                throw new ArgumentNullException(nameof(db));
+            }
+
+            if (db.Transaction is null)
+            {
+                throw new ArgumentException(nameof(db) + "." + nameof(db.Transaction) + " is null");
+            }
+
             // soon as we get Database, a transaction is started
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+            {
                 throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+            }
 
 
             // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
@@ -275,24 +287,40 @@ where tbl.[name]=@0 and col.[name]=@1;", tableName, columnName)
                 db.Execute($"SET LOCK_TIMEOUT {timeout.TotalMilliseconds};");
                 var i = db.Execute(@"UPDATE umbracoLock WITH (REPEATABLEREAD) SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
                 if (i == 0) // ensure we are actually locking!
+                {
                     throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+                }
             }
         }
 
 
         public override void ReadLock(IDatabase db, params int[] lockIds)
         {
+            if (db is null)
+            {
+                throw new ArgumentNullException(nameof(db));
+            }
+
+            if (db.Transaction is null)
+            {
+                throw new ArgumentException(nameof(db) + "." + nameof(db.Transaction) + " is null");
+            }
+
             // soon as we get Database, a transaction is started
 
             if (db.Transaction.IsolationLevel < IsolationLevel.ReadCommitted)
+            {
                 throw new InvalidOperationException("A transaction with minimum ReadCommitted isolation level is required.");
+            }
 
             // *not* using a unique 'WHERE IN' query here because the *order* of lockIds is important to avoid deadlocks
             foreach (var lockId in lockIds)
             {
                 var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WITH (REPEATABLEREAD) WHERE id=@id", new { id = lockId });
                 if (i == null) // ensure we are actually locking!
+                {
                     throw new ArgumentException($"LockObject with id={lockId} does not exist.", nameof(lockIds));
+                }
             }
         }
 
