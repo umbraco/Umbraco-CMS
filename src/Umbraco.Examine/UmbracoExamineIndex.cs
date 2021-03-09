@@ -99,7 +99,7 @@ namespace Umbraco.Examine
         {
             if (CanInitialize())
             {
-                // Use SafeCallContext to prevent the current Execution Context (AsyncLocal) flow to child
+                // Use SafeCallContext to prevent the current CallContext flow to child
                 // tasks executed in the base class so we don't leak Scopes.
                 // TODO: See notes at the top of this class
                 using (new SafeCallContext())
@@ -113,7 +113,7 @@ namespace Umbraco.Examine
         {
             if (CanInitialize())
             {
-                // Use SafeCallContext to prevent the current Execution Context (AsyncLocal) flow to child
+                // Use SafeCallContext to prevent the current CallContext flow to child
                 // tasks executed in the base class so we don't leak Scopes.
                 // TODO: See notes at the top of this class
                 using (new SafeCallContext())
