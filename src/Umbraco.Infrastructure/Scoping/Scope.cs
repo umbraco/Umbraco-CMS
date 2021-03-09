@@ -433,7 +433,7 @@ namespace Umbraco.Cms.Core.Scoping
 
             if (this != _scopeProvider.AmbientScope)
             {
-                var failedMessage = $"The {nameof(Scope)} {this.GetDebugInfo()} being disposed is not the Ambient {nameof(Scope)} {_scopeProvider.AmbientScope.GetDebugInfo()}. This typically indicates that a child {nameof(Scope)} was not disposed or flowed to a child thread that was not re-joined to the thread that the parent originated (i.e. Task.Run used as a fire and forget task without ExecutionContext.SuppressFlow()).";
+                var failedMessage = $"The {nameof(Scope)} {this.GetDebugInfo()} being disposed is not the Ambient {nameof(Scope)} {_scopeProvider.AmbientScope.GetDebugInfo()}. This typically indicates that a child {nameof(Scope)} was not disposed, or flowed to a child thread that was not awaited, or concurrent threads are accessing the same {nameof(Scope)} (Ambient context) which is not supported. If using Task.Run (or similar) as a fire and forget tasks or to run threads in parallel you must suppress execution context flow with ExecutionContext.SuppressFlow() and ExecutionContext.RestoreFlow().";
 
 #if DEBUG_SCOPES
                 Scope ambient = _scopeProvider.AmbientScope;

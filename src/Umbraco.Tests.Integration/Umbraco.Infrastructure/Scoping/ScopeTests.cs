@@ -129,12 +129,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 Console.WriteLine("Child Task after disposed: " + scopeProvider.AmbientScope.InstanceId);
             });
 
-            Thread.Sleep(2000); // block for a bit to ensure the child task is disposed first
+            Console.WriteLine("Parent Task waiting: " + scopeProvider.AmbientScope?.InstanceId);
+            Task.WaitAll(t);
             Console.WriteLine("Parent Task disposing: " + scopeProvider.AmbientScope.InstanceId);
             mainScope.Dispose();
             Console.WriteLine("Parent Task disposed: " + scopeProvider.AmbientScope?.InstanceId);
 
-            Task.WaitAll(t);
             Assert.Pass();
         }
 
