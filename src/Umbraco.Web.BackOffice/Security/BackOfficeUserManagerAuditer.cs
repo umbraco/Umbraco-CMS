@@ -47,11 +47,11 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         {
             if (!int.TryParse(userId, out int asInt))
             {
-                return AuditEventsComponent.UnknownUser(_globalSettings);
+                return AuditNotificationsHandler.UnknownUser(_globalSettings);
             }
 
             IUser found = asInt >= 0 ? _userService.GetUserById(asInt) : null;
-            return found ?? AuditEventsComponent.UnknownUser(_globalSettings);
+            return found ?? AuditNotificationsHandler.UnknownUser(_globalSettings);
         }
 
         private static string FormatEmail(IMembershipUser user) => user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? "" : $"<{user.Email}>";
