@@ -398,6 +398,26 @@
                 return tab.inherited !== true;
             };
 
+            scope.tabHasValidationError = function ({id}) {
+                if (!scope.model.ModelState) {
+                    return;
+                }
+
+                let hasValidationError = false;
+
+                for (const [key] of Object.entries(scope.model.ModelState)) {
+                    const groupIndex = key.match(/\d+/)[0];
+                    const group = groupIndex ? scope.model.groups[groupIndex] : null;
+                    hasValidationError = group && group.tabId === id;
+
+                    if (hasValidationError) {
+                        break;
+                    }
+                }
+
+                return hasValidationError;
+            };
+
             scope.addNewProperty = function (group) {
                 let newProperty = {
                     label: null,

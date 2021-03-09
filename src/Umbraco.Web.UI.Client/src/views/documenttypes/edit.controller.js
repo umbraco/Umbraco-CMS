@@ -320,6 +320,7 @@
                     infiniteMode: infiniteMode,
                     // we need to rebind... the IDs that have been created!
                     rebindCallback: function (origContentType, savedContentType) {
+                        vm.contentType.ModelState = savedContentType.ModelState;
                         vm.contentType.id = savedContentType.id;
                         vm.contentType.groups.forEach(function (group) {
                             if (!group.name) return;
@@ -348,6 +349,9 @@
                         });
                     }
                 }).then(function (data) {
+                    // allow UI to access server validation state
+                    vm.contentType.ModelState = data.ModelState;
+                    
                     //success
                     // we don't need to sync the tree in infinite mode
                     if (!infiniteMode) {
@@ -374,6 +378,8 @@
                 }, function (err) {
                     //error
                     if (err) {
+                        // allow UI to access server validation state
+                        vm.contentType.ModelState = err.data.ModelState;
                         editorState.set($scope.content);
                     }
                     else {

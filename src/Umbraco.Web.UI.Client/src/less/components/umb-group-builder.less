@@ -33,6 +33,22 @@
     }
   }
 
+  .badge {
+    background-color: @red;
+    animation-duration: 1.4s;
+    animation-iteration-count: infinite;
+    animation-name: umb-group-builder-tab--badge-bounce;
+    animation-timing-function: ease;
+    @keyframes umb-group-builder-tab--badge-bounce {
+        0%   { transform: translateY(0); }
+        20%  { transform: translateY(-6px); }
+        40%  { transform: translateY(0); }
+        55%  { transform: translateY(-3px); }
+        70%  { transform: translateY(0); }
+        100% { transform: translateY(0); }
+    }
+  }
+
   &::before {
     content: "";
     position: absolute;

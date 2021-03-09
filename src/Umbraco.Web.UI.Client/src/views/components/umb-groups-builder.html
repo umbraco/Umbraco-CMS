@@ -41,7 +41,7 @@
     <!-- WITH TABS --->
     <div ng-if="model.hasTabs">
         <ul class="umb-group-builder__tabs" ui-sortable="sortableOptionsTab" ng-model="model.tabs">
-            <li ng-repeat="tab in model.tabs" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-id="{{tab.id}}">
+            <li ng-repeat="tab in model.tabs track by tab.id" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-id="{{tab.id}}">
                 <div ng-click="changeTab(tab)" class="umb-group-builder__tab" ng-class="{'is-active': tab.id === openTabId, 'is-inherited': tab.inherited, 'umb-group-builder__tab-handle -sortable': sortingMode && !tab.inherited}">
                     <div>
                         <div class="umb-group-builder__tab-inherited-label" ng-if="tab.inherited">
@@ -69,7 +69,6 @@
                                     ng-disabled="tab.id !== openTabId"
                                     umb-auto-focus
                                     umb-auto-resize
-                                    required
                                     val-server-field="{{'Tabs[' + $index + '].Name'}}"
                                     data-lpignore="true" />
                                 
@@ -78,6 +77,8 @@
                                     <div class="umb-validation-label -arrow-bottom" ng-message="required"><localize key="required"></localize></div>
                                 </div>
                             </ng-form>
+
+                            <div ng-show="tabHasValidationError(tab) && tab.id !== openTabId" class="badge">!</div>
 
                             <ng-form name="tabSortOrderForm" class="umb-group-builder__tab-sort-order">
                                 <div ng-if="sortingMode">
@@ -113,7 +114,7 @@
         </ul>
 
         <div class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
-            <div ng-repeat="(groupIndex, group) in model.groups" ng-show="group.tabId === openTabId" ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}" data-group-id="{{group.id}}">
+            <div ng-repeat="(groupIndex, group) in model.groups track by group.id" ng-show="group.tabId === openTabId" ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}" data-group-id="{{group.id}}">
                 <umb-content-type-group
                     ng-if="group.tabState !== 'init'"
                     allow-name="true"
@@ -124,7 +125,7 @@
                     name-val-server-field="{{'Groups[' + $index + '].Name'}}">
                     
                     <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties">
-                        <li ng-repeat="(propertyIndex, property) in group.properties" data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
+                        <li ng-repeat="(propertyIndex, property) in group.properties track by property.alias" data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
                             <umb-content-type-property
                                 ng-if="property.propertyState !== 'init'"
                                 property="property"
