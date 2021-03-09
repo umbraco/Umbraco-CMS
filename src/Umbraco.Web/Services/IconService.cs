@@ -93,44 +93,47 @@ namespace Umbraco.Web.Services
                 return null;
             }
         }
-
-        /// <summary>
-        ///
-        /// </summary>
-        /// <returns></returns>
-        private IEnumerable<FileInfo> GetAllIconNames()
+        private IEnumerable<FileInfo> GetAllIconsFiles()
         {
+            var icons = new HashSet<FileInfo>(new CaseInsensitiveFileInfoComparer());
+
             // add icons from plugins
-            var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
-            var pluginIcons = new List<FileInfo>();
-
-            // iterate sub directories of app plugins
-            foreach (var dir in appPlugins.EnumerateDirectories())
+            var appPluginsDirectoryPath = IOHelper.MapPath(SystemDirectories.AppPlugins);
+            if (Directory.Exists(appPluginsDirectoryPath))
             {
-                var iconPath = dir.FullName + SystemDirectories.AppPluginIcons;
-                if (Directory.Exists(iconPath))
-                {
-                    var dirIcons = new DirectoryInfo(iconPath).EnumerateFiles("*.svg", SearchOption.TopDirectoryOnly)
-                        .Where(x => !pluginIcons.Any(i => string.Equals(i.Name, x.Name, StringComparison.InvariantCultureIgnoreCase)));
+                var appPlugins = new DirectoryInfo(appPluginsDirectoryPath);
 
-                    pluginIcons.AddRange(dirIcons);
+                // iterate sub directories of app plugins
+                foreach (var dir in appPlugins.EnumerateDirectories())
+                {
+                    var iconPath = IOHelper.MapPath($"{SystemDirectories.AppPlugins}/{dir.Name}{SystemDirectories.AppPluginIcons}");
+                    if (Directory.Exists(iconPath))
+                    {
+                        var dirIcons = new DirectoryInfo(iconPath).EnumerateFiles("*.svg", SearchOption.TopDirectoryOnly);
+                        icons.UnionWith(dirIcons);
+                    }
                 }
             }
 
             // add icons from IconsPath if not already added from plugins
-            var directory = new DirectoryInfo(IOHelper.MapPath($"{_globalSettings.IconsPath}/"));
-            var iconNames = directory.GetFiles("*.svg")
-                .Where(x => !pluginIcons.Any(i => string.Equals(i.Name, x.Name, StringComparison.InvariantCultureIgnoreCase)))
-                .ToList();
+            var coreIconsDirectory = new DirectoryInfo(IOHelper.MapPath($"{_globalSettings.IconsPath}/"));
+            var coreIcons = coreIconsDirectory.GetFiles("*.svg");
 
-            iconNames.AddRange(pluginIcons);
+            icons.UnionWith(coreIcons);
 
-            return iconNames;
+            return icons;
+        }
+
+        private class CaseInsensitiveFileInfoComparer : IEqualityComparer<FileInfo>
+        {
+            public bool Equals(FileInfo one, FileInfo two) => StringComparer.InvariantCultureIgnoreCase.Equals(one.Name, two.Name);
+
+            public int GetHashCode(FileInfo item) => StringComparer.InvariantCultureIgnoreCase.GetHashCode(item.Name);
         }
 
         private IReadOnlyDictionary<string, string> GetIconDictionary() => _cache.GetCacheItem(
             $"{typeof(IconService).FullName}.{nameof(GetIconDictionary)}",
-            () => GetAllIconNames()
+            () => GetAllIconsFiles()
                 .Select(GetIcon)
                 .Where(i => i != null)
                 .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
