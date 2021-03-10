@@ -365,16 +365,10 @@ namespace Umbraco.Extensions
                 policy.Requirements.Add(new TreeRequirement(Constants.Trees.Languages));
             });
 
-            options.AddPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, policy =>
-            {
-                policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
-                policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary));
-            });
-
             options.AddPolicy(AuthorizationPolicies.TreeAccessDictionary, policy =>
             {
                 policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
-                policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary, Constants.Trees.Dictionary));
+                policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary));
             });
 
             options.AddPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, policy =>
