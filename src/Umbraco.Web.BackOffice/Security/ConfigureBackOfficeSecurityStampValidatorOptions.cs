@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     {
         public void Configure(BackOfficeSecurityStampValidatorOptions options)
         {
-            options.ValidationInterval = TimeSpan.FromMinutes(3);
+            options.ValidationInterval = TimeSpan.FromMinutes(30);
 
             // When refreshing the principal, ensure custom claims that
             // might have been set with an external identity continue
