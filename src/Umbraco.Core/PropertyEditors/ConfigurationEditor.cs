@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// <summary>
     /// Represents a data type configuration editor.
     /// </summary>
+    [DataContract]
     public class ConfigurationEditor : IConfigurationEditor
     {
         private IDictionary<string, object> _defaultConfiguration;
