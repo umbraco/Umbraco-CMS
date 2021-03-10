@@ -138,7 +138,6 @@ angular.module("umbraco")
                         ($scope.onlyFolders && !media.isFolder)) {
                         return;
                     }
-                    media.selected = false;
                     setDefaultData(media);
                     vm.clipboardImages.push(media);
                 });
