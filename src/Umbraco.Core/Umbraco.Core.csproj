@@ -3,7 +3,7 @@
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
         <RootNamespace>Umbraco.Cms.Core</RootNamespace>
-        <Product>Umbraco CMS</Product>
+        <Product>Umbraco CMS</Product>      
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">

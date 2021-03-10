@@ -35,6 +35,12 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
+        private static readonly JsonSerializerSettings ImageCropperValueJsonSerializerSettings = new JsonSerializerSettings
+        {
+            Culture = CultureInfo.InvariantCulture,
+            FloatParseHandling = FloatParseHandling.Decimal
+        };
+
         /// <inheritdoc />
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
@@ -44,11 +50,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
             ImageCropperValue value;
             try
             {
-                value = JsonConvert.DeserializeObject<ImageCropperValue>(sourceString, new JsonSerializerSettings
-                {
-                    Culture = CultureInfo.InvariantCulture,
-                    FloatParseHandling = FloatParseHandling.Decimal
-                });
+                value = JsonConvert.DeserializeObject<ImageCropperValue>(sourceString, ImageCropperValueJsonSerializerSettings);
             }
             catch (Exception ex)
             {

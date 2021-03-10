@@ -47,7 +47,7 @@ namespace Umbraco.Extensions
             var matches = AnchorRegex.Matches(rteContent);
             foreach (Match match in matches)
             {
-                result.Add(match.Value.Split('\"')[1]);
+                result.Add(match.Value.Split(Constants.CharArrays.DoubleQuote)[1]);
             }
             return result;
         }

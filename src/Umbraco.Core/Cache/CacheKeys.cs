@@ -14,5 +14,10 @@
         public const string MacroFromAliasCacheKey = "macroFromAlias_";
 
         public const string UserGroupGetByAliasCacheKeyPrefix = "UserGroupRepository_GetByAlias_";
+
+        public const string UserAllContentStartNodesPrefix = "AllContentStartNodes";
+        public const string UserAllMediaStartNodesPrefix = "AllMediaStartNodes";
+        public const string UserMediaStartNodePathsPrefix = "MediaStartNodePaths";
+        public const string UserContentStartNodePathsPrefix = "ContentStartNodePaths";
     }
 }

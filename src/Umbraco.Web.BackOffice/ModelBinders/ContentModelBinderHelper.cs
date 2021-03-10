@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
             {
                    //The name that has been assigned in JS has 2 or more parts. The second part indicates the property id
                 // for which the file belongs, the remaining parts are just metadata that can be used by the property editor.
-                var parts = formFile.Name.Trim('\"').Split('_');
+                var parts = formFile.Name.Trim(Constants.CharArrays.DoubleQuote).Split(Constants.CharArrays.Underscore);
                 if (parts.Length < 2)
                 {
                     bindingContext.HttpContext.SetReasonPhrase( "The request was not formatted correctly the file name's must be underscore delimited");
@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
 
                 // TODO: anything after 4 parts we can put in metadata
 
-                var fileName = formFile.FileName.Trim('\"');
+                var fileName = formFile.FileName.Trim(Constants.CharArrays.DoubleQuote);
 
                 var tempFileUploadFolder = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
                 Directory.CreateDirectory(tempFileUploadFolder);

@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Ganss.XSS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -180,6 +181,14 @@ namespace Umbraco.Extensions
             });
 
             builder.Services.AddUnique<IIconService, IconService>();
+            builder.Services.AddUnique<IHtmlSanitizer>(_ =>
+            {
+                var sanitizer = new HtmlSanitizer();
+                sanitizer.AllowedAttributes.UnionWith(Constants.SvgSanitizer.Attributes);
+                sanitizer.AllowedCssProperties.UnionWith(Constants.SvgSanitizer.Attributes);
+                sanitizer.AllowedTags.UnionWith(Constants.SvgSanitizer.Tags);
+                return sanitizer;
+            });
             builder.Services.AddUnique<UnhandledExceptionLoggerMiddleware>();
 
             return builder;
