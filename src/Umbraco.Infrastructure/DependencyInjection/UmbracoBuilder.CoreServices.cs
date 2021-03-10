@@ -125,8 +125,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
 
-            builder.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
-
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
 

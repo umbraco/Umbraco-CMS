@@ -1,85 +1,46 @@
 ﻿using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Newtonsoft.Json;
-using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Routing;
-using Formatting = Newtonsoft.Json.Formatting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Logging.Viewer
 {
     public class LogViewerConfig : ILogViewerConfig
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
-        private static readonly string _pathToSearches = WebPath.Combine(Cms.Core.Constants.SystemDirectories.Config, "logviewer.searches.config.js");
-        private readonly FileInfo _searchesConfig;
+        private readonly ILogViewerQueryRepository _logViewerQueryRepository;
+        private readonly IScopeProvider _scopeProvider;
 
-        public LogViewerConfig(IHostingEnvironment hostingEnvironment)
+        public LogViewerConfig(ILogViewerQueryRepository logViewerQueryRepository, IScopeProvider scopeProvider)
         {
-            _hostingEnvironment = hostingEnvironment;
-            var trimmedPath = _pathToSearches.TrimStart('~', '/').Replace('/', Path.DirectorySeparatorChar);
-            var absolutePath = Path.Combine(_hostingEnvironment.ApplicationPhysicalPath, trimmedPath);
-            _searchesConfig = new FileInfo(absolutePath);
+            _logViewerQueryRepository = logViewerQueryRepository;
+            _scopeProvider = scopeProvider;
         }
 
         public IReadOnlyList<SavedLogSearch> GetSavedSearches()
         {
-            //Our default implementation
-
-            //If file does not exist - lets create it with an empty array
-            EnsureFileExists();
-
-            var rawJson = System.IO.File.ReadAllText(_searchesConfig.FullName);
-            return JsonConvert.DeserializeObject<SavedLogSearch[]>(rawJson);
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var logViewerQueries =  _logViewerQueryRepository.GetMany();
+            var result = logViewerQueries.Select(x => new SavedLogSearch() { Name = x.Name, Query = x.Query }).ToArray();
+            return result;
         }
 
         public IReadOnlyList<SavedLogSearch> AddSavedSearch(string name, string query)
         {
-            //Get the existing items
-            var searches = GetSavedSearches().ToList();
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            _logViewerQueryRepository.Save(new LogViewerQuery(name, query));
 
-            //Add the new item to the bottom of the list
-            searches.Add(new SavedLogSearch { Name = name, Query = query });
-
-            //Serialize to JSON string
-            var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
-
-            //If file does not exist - lets create it with an empty array
-            EnsureFileExists();
-
-            //Write it back down to file
-            System.IO.File.WriteAllText(_searchesConfig.FullName, rawJson);
-
-            //Return the updated object - so we can instantly reset the entire array from the API response
-            //As opposed to push a new item into the array
-            return searches;
+            return GetSavedSearches();
         }
 
         public IReadOnlyList<SavedLogSearch> DeleteSavedSearch(string name, string query)
         {
-            //Get the existing items
-            var searches = GetSavedSearches().ToList();
-
-            //Removes the search
-            searches.RemoveAll(s => s.Name.Equals(name) && s.Query.Equals(query));
-
-            //Serialize to JSON string
-            var rawJson = JsonConvert.SerializeObject(searches, Formatting.Indented);
-
-            //Write it back down to file
-            System.IO.File.WriteAllText(_searchesConfig.FullName, rawJson);
-
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var item = _logViewerQueryRepository.GetByName(name);
+            _logViewerQueryRepository.Delete(item);
             //Return the updated object - so we can instantly reset the entire array from the API response
-            return searches;
+            return GetSavedSearches();
         }
 
-        private void EnsureFileExists()
-        {
-            if (_searchesConfig.Exists) return;
-            using (var writer = _searchesConfig.CreateText())
-            {
-                writer.Write("[]");
-            }
-        }
     }
 }
