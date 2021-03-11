@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -35,12 +36,19 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         private readonly Type _outgoingType;
         private readonly IEntityService _entityService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly AppCaches _appCaches;
         private readonly string _propertyName;
 
-        public FilterAllowedOutgoingMediaFilter(IEntityService entityService, IBackOfficeSecurityAccessor backofficeSecurityAccessor, Type outgoingType, string propertyName)
+        public FilterAllowedOutgoingMediaFilter(
+            IEntityService entityService,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            AppCaches appCaches,
+            Type outgoingType,
+            string propertyName)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
+            _appCaches = appCaches;
 
             _propertyName = propertyName;
             _outgoingType = outgoingType;
@@ -48,7 +56,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
         protected virtual int[] GetUserStartNodes(IUser user)
         {
-            return user.CalculateMediaStartNodeIds(_entityService);
+            return user.CalculateMediaStartNodeIds(_entityService, _appCaches);
         }
 
         protected virtual int RecycleBinId => Constants.System.RecycleBinMedia;

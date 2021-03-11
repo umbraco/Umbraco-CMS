@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Extensions
 {
@@ -23,7 +24,7 @@ namespace Umbraco.Extensions
             var builder = new StringBuilder();
             foreach (var i in items.Where(i => keysToIgnore.InvariantContains(i.Key) == false))
                 builder.Append(string.Format("{0}={1}&", i.Key, i.Value));
-            return builder.ToString().TrimEnd('&');
+            return builder.ToString().TrimEnd(Constants.CharArrays.Ampersand);
         }
 
         /// <summary>

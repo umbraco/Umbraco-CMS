@@ -151,7 +151,7 @@ namespace Umbraco.Extensions
                     // got a URL, deal with collisions, add URL
                     default:
                         // detect collisions, etc
-                        Attempt<UrlInfo> hasCollision = await DetectCollisionAsync(content, url, culture, umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility);
+                        Attempt<UrlInfo> hasCollision = await DetectCollisionAsync(logger, content, url, culture, umbracoContext, publishedRouter, textService, variationContextAccessor, uriUtility);
                         if (hasCollision)
                         {
                             result.Add(hasCollision.Result);
@@ -187,7 +187,7 @@ namespace Umbraco.Extensions
             else if (!parent.Published)
             {
                 // totally not published
-                return UrlInfo.Message(textService.Localize("content/parentNotPublished", new[] {parent.Name}), culture);
+                return UrlInfo.Message(textService.Localize("content/parentNotPublished", new[] { parent.Name }), culture);
             }
             else
             {
@@ -196,10 +196,10 @@ namespace Umbraco.Extensions
             }
         }
 
-        private static async Task<Attempt<UrlInfo>> DetectCollisionAsync(IContent content, string url, string culture, IUmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, IVariationContextAccessor variationContextAccessor, UriUtility uriUtility)
+        private static async Task<Attempt<UrlInfo>> DetectCollisionAsync(ILogger logger, IContent content, string url, string culture, IUmbracoContext umbracoContext, IPublishedRouter publishedRouter, ILocalizedTextService textService, IVariationContextAccessor variationContextAccessor, UriUtility uriUtility)
         {
             // test for collisions on the 'main' URL
-            var uri = new Uri(url.TrimEnd('/'), UriKind.RelativeOrAbsolute);
+            var uri = new Uri(url.TrimEnd(Constants.CharArrays.ForwardSlash), UriKind.RelativeOrAbsolute);
             if (uri.IsAbsoluteUri == false)
             {
                 uri = uri.MakeAbsolute(umbracoContext.CleanedUmbracoUrl);
@@ -211,6 +211,16 @@ namespace Umbraco.Extensions
 
             if (!pcr.HasPublishedContent())
             {
+                var logMsg = nameof(DetectCollisionAsync) + " did not resolve a content item for original url: {Url}, translated to {TranslatedUrl} and culture: {Culture}";
+                if (pcr.IgnorePublishedContentCollisions)
+                {
+                    logger.LogDebug(logMsg, url, uri, culture);
+                }
+                else
+                {
+                    logger.LogDebug(logMsg, url, uri, culture);
+                }
+
                 var urlInfo = UrlInfo.Message(textService.Localize("content/routeErrorCannotRoute"), culture);
                 return Attempt.Succeed(urlInfo);
             }

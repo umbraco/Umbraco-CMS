@@ -10,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Extensions
 {
@@ -257,7 +258,7 @@ namespace Umbraco.Extensions
             {
                 builder.Append(String.Format("{0}={1}&", WebUtility.UrlEncode(i.Key), i.Value == null ? string.Empty : WebUtility.UrlEncode(i.Value.ToString())));
             }
-            return builder.ToString().TrimEnd('&');
+            return builder.ToString().TrimEnd(Constants.CharArrays.Ampersand);
         }
 
         /// <summary>The get entry ignore case.</summary>

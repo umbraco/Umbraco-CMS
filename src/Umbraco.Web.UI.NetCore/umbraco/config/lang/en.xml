@@ -268,6 +268,7 @@
     <key alias="statistics">Statistics</key>
     <key alias="titleOptional">Title (optional)</key>
     <key alias="altTextOptional">Alternative text (optional)</key>
+    <key alias="captionTextOptional">Caption (optional)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Unpublish</key>
     <key alias="unpublished">Unpublished</key>
@@ -370,6 +371,16 @@
     <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
     <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>
     <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
+    <key alias="documentTypeWithTemplate">Document Type with Template</key>
+    <key alias="documentTypeWithTemplateDescription">The data definition for a content page that can be created by editors in the content tree and is directly accessible via a URL.</key>
+    <key alias="documentType">Document Type</key>
+    <key alias="documentTypeDescription">The data definition for a content component that can be created by editors in the content tree and be picked on other pages but has no direct URL.</key>
+    <key alias="elementType">Element Type</key>
+    <key alias="elementTypeDescription">Defines the schema for a repeating set of properties, for example, in a 'Block List' or 'Nested Content' property editor.</key>
+    <key alias="composition">Composition</key>
+    <key alias="compositionDescription">Defines a re-usable set of properties that can be included in the definition of multiple other Document Types. For example, a set of 'Common Page Settings'.</key>
+    <key alias="folder">Folder</key>
+    <key alias="folderDescription">Used to organise the Document Types, Compositions and Element Types created in this Document Type tree.</key>
     <key alias="newFolder">New folder</key>
     <key alias="newDataType">New data type</key>
     <key alias="newJavascriptFile">New JavaScript file</key>
@@ -798,6 +809,7 @@
     <key alias="articles">Articles</key>
     <key alias="videos">Videos</key>
     <key alias="installing">Installing</key>
+    <key alias="avatar">Avatar for</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>

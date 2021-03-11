@@ -6,8 +6,10 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence;
@@ -154,7 +156,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Queryin
         [Test]
         public void Equals_Method_For_Value_Gets_Escaped()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider();
+            var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
             Expression<Func<IUser, bool>> predicate = user => user.Username.Equals("hello@world.com");
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>(SqlContext.SqlSyntax, Mappers);
             var result = modelToSqlExpressionHelper.Visit(predicate);

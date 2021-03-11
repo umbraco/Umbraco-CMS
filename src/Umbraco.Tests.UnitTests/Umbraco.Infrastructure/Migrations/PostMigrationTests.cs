@@ -4,9 +4,11 @@
 using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -49,7 +51,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 .Returns(database);
 
             var sqlContext = new SqlContext(
-                new SqlServerSyntaxProvider(),
+                new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
                 DatabaseType.SQLCe,
                 Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
@@ -99,7 +101,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 .Returns(database);
 
             var sqlContext = new SqlContext(
-                new SqlServerSyntaxProvider(),
+                new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())),
                 DatabaseType.SQLCe,
                 Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };

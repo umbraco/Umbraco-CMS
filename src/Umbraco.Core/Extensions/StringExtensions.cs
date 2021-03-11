@@ -40,7 +40,7 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static int[] GetIdsFromPathReversed(this string path)
         {
-            var nodeIds = path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var nodeIds = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.TryConvertTo<int>())
                 .Where(x => x.Success)
                 .Select(x => x.Result)
@@ -190,7 +190,7 @@ namespace Umbraco.Extensions
             //remove any prefixed '&' or '?'
             for (var i = 0; i < queryStrings.Length; i++)
             {
-                queryStrings[i] = queryStrings[i].TrimStart('?', '&').TrimEnd('&');
+                queryStrings[i] = queryStrings[i].TrimStart(Constants.CharArrays.QuestionMarkAmpersand).TrimEnd(Constants.CharArrays.Ampersand);
             }
 
             var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
@@ -1100,7 +1100,7 @@ namespace Umbraco.Extensions
             {
                 return false;
             }
-            var idCheckList = csv.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            var idCheckList = csv.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
             return idCheckList.Contains(value);
         }
 
@@ -1115,7 +1115,7 @@ namespace Umbraco.Extensions
             fileName = fileName.StripFileExtension();
 
             // underscores and dashes to spaces
-            fileName = fileName.ReplaceMany(new[] { '_', '-' }, ' ');
+            fileName = fileName.ReplaceMany(Constants.CharArrays.UnderscoreDash, ' ');
 
             // any other conversions ?
 
@@ -1123,7 +1123,7 @@ namespace Umbraco.Extensions
             fileName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(fileName);
 
             // Replace multiple consecutive spaces with a single space
-            fileName = string.Join(" ", fileName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+            fileName = string.Join(" ", fileName.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries));
 
             return fileName;
         }

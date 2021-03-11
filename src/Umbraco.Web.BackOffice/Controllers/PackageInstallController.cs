@@ -21,8 +21,7 @@ using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
-
+using Umbraco.Cms.Core;
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
@@ -162,7 +161,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //get the files
             foreach (var formFile in file)
             {
-                var fileName = formFile.FileName.Trim('\"');
+                var fileName = formFile.FileName.Trim(Constants.CharArrays.DoubleQuote);
                 var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
                 if (ext.InvariantEquals("zip") || ext.InvariantEquals("umb"))

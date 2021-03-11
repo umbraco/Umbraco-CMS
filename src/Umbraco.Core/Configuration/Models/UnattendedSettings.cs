@@ -20,6 +20,12 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool InstallUnattended { get; set; } = false;
 
         /// <summary>
+        /// Gets or sets a value indicating whether unattended upgrades are enabled.
+        /// </summary>
+        public bool UpgradeUnattended { get; set; } = false;
+
+
+        /// <summary>
         /// Gets or sets a value to use for creating a user with a name for Unattended Installs
         /// </summary>
         public string UnattendedUserName { get; set; } = null;

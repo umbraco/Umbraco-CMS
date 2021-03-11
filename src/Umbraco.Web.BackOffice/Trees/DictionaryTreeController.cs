@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                             id,
                             queryStrings,
                             x.ItemKey,
-                            "icon-book-alt",
+                            Constants.Icons.Dictionary,
                             _localizationService.GetDictionaryItemChildren(x.Key).Any())));
             }
             else
@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                         id,
                         queryStrings,
                         x.ItemKey,
-                        "icon-book-alt",
+                        Constants.Icons.Dictionary,
                         _localizationService.GetDictionaryItemChildren(x.Key).Any())));
             }
 

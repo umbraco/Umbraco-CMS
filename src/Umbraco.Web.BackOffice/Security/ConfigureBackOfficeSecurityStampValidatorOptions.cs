@@ -1,5 +1,9 @@
-﻿using System;
+using System;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
 {
@@ -11,6 +15,19 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         public void Configure(BackOfficeSecurityStampValidatorOptions options)
         {
             options.ValidationInterval = TimeSpan.FromMinutes(30);
+
+            // When refreshing the principal, ensure custom claims that
+            // might have been set with an external identity continue
+            // to flow through to this new one.
+            options.OnRefreshingPrincipal = refreshingPrincipal =>
+            {
+                ClaimsIdentity newIdentity = refreshingPrincipal.NewPrincipal.Identities.First();
+                ClaimsIdentity currentIdentity = refreshingPrincipal.CurrentPrincipal.Identities.First();
+
+                newIdentity.MergeClaimsFromBackOfficeIdentity(currentIdentity);
+
+                return Task.CompletedTask;
+            };
         }
     }
 
