@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
@@ -39,8 +40,8 @@ namespace Umbraco.Core.Scoping
 
         // ReadLocks and WriteLocks if we're the outer most scope it's those owned by the entire chain
         // If we're a child scope it's those that we have requested.
-        internal readonly Dictionary<int, int> ReadLocks;
-        internal readonly Dictionary<int, int> WriteLocks;
+        internal readonly Dictionary<Guid, Dictionary<int, int>> ReadLocks;
+        internal readonly Dictionary<Guid, Dictionary<int, int>> WriteLocks;
 
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
@@ -67,8 +68,8 @@ namespace Umbraco.Core.Scoping
             Detachable = detachable;
 
             _dictionaryLocker = new object();
-            ReadLocks = new Dictionary<int, int>();
-            WriteLocks = new Dictionary<int, int>();
+            ReadLocks = new Dictionary<Guid, Dictionary<int, int>>();
+            WriteLocks = new Dictionary<Guid, Dictionary<int, int>>();
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
@@ -361,18 +362,17 @@ namespace Umbraco.Core.Scoping
             }
 
             // Decrement the lock counters on the parent if any.
-            if (ParentScope != null)
+            lock (_dictionaryLocker)
             {
-                lock (_dictionaryLocker)
-                {
-                    foreach (var readLockPair in ReadLocks)
-                    {
-                        DecrementReadLock(readLockPair.Key, readLockPair.Value);
-                    }
+                ClearReadLocks(InstanceId);
+                ClearWriteLocks(InstanceId);
 
-                    foreach (var writeLockPair in WriteLocks)
+                if (ParentScope is null)
+                {
+                    // We're the parent scope, make sure that locks of all scopes has been cleared
+                    if (ReadLocks.Count != 0 || WriteLocks.Count != 0)
                     {
-                        DecrementWriteLock(writeLockPair.Key, writeLockPair.Value);
+                        throw new Exception($"All scopes has not been disposed from parent scope {InstanceId}");
                     }
                 }
             }
@@ -515,130 +515,122 @@ namespace Umbraco.Core.Scoping
         private static bool LogUncompletedScopes => (_logUncompletedScopes
             ?? (_logUncompletedScopes = Current.Configs.CoreDebug().LogUncompletedScopes)).Value;
 
-        /// <summary>
-        /// Decrements the count of the ReadLocks with a specific lock object identifier we currently hold
-        /// </summary>
-        /// <param name="lockId">Lock object identifier to decrement</param>
-        /// <param name="amountToDecrement">Amount to decrement the lock count with</param>
-        public void DecrementReadLock(int lockId, int amountToDecrement)
+        private void IncrementWriteLock(int lockId, Guid instanceId)
         {
-            // If we aren't the outermost scope, pass it on to the parent.
-            if (ParentScope != null)
+            if (ParentScope is null)
             {
-                ParentScope.DecrementReadLock(lockId, amountToDecrement);
-                return;
+                WriteLocks[instanceId][lockId]++;
             }
-
-            lock (_dictionaryLocker)
+            else
             {
-                ReadLocks[lockId] -= amountToDecrement;
+                ParentScope.IncrementWriteLock(lockId, instanceId);
             }
         }
 
-        /// <summary>
-        /// Decrements the count of the WriteLocks with a specific lock object identifier we currently hold.
-        /// </summary>
-        /// <param name="lockId">Lock object identifier to decrement.</param>
-        /// <param name="amountToDecrement">Amount to decrement the lock count with</param>
-        public void DecrementWriteLock(int lockId, int amountToDecrement)
+        private void DecrementWriteLock(int lockId, Guid instanceId)
         {
-            // If we aren't the outermost scope, pass it on to the parent.
-            if (ParentScope != null)
+            if (ParentScope is null)
             {
-                ParentScope.DecrementWriteLock(lockId, amountToDecrement);
-                return;
+                WriteLocks[instanceId][lockId]--;
             }
-
-            lock (_dictionaryLocker)
+            else
             {
-                WriteLocks[lockId] -= amountToDecrement;
+                ParentScope.DecrementWriteLock(lockId, instanceId);
             }
         }
 
-        /// <summary>
-        /// Increment the count of the read locks we've requested
-        /// </summary>
-        /// <remarks>
-        /// This should only be done on child scopes since it's then used to decrement the count later.
-        /// </remarks>
-        /// <param name="lockIds"></param>
-        private void IncrementRequestedReadLock(params int[] lockIds)
+        private void IncrementReadLock(int lockId, Guid instanceId)
         {
-            // We need to keep track of what lockIds we have requested locks for to be able to decrement them.
-            if (ParentScope != null)
+            if (ParentScope is null)
             {
-                foreach (var lockId in lockIds)
-                {
-                    lock (_dictionaryLocker)
-                    {
-                        if (ReadLocks.ContainsKey(lockId))
-                        {
-                            ReadLocks[lockId] += 1;
-                        }
-                        else
-                        {
-                            ReadLocks[lockId] = 1;
-                        }
-                    }
-                }
+                ReadLocks[instanceId][lockId]++;
+            }
+            else
+            {
+                ParentScope.IncrementReadLock(lockId, instanceId);
             }
         }
 
-        /// <summary>
-        /// Increment the count of the write locks we've requested
-        /// </summary>
-        /// <remarks>
-        /// This should only be done on child scopes since it's then used to decrement the count later.
-        /// </remarks>
-        /// <param name="lockIds"></param>
-        private void IncrementRequestedWriteLock(params int[] lockIds)
+        private void DecrementReadLock(int lockId, Guid instanceId)
         {
-            // We need to keep track of what lockIds we have requested locks for to be able to decrement them.
+            if (ParentScope is null)
+            {
+                ReadLocks[instanceId][lockId]--;
+            }
+            else
+            {
+                ParentScope.DecrementReadLock(lockId, instanceId);
+            }
+        }
+
+        private void ClearReadLocks(Guid instanceId)
+        {
             if (ParentScope != null)
             {
-                foreach (var lockId in lockIds)
-                {
-                    lock (_dictionaryLocker)
-                    {
-                        if (WriteLocks.ContainsKey(lockId))
-                        {
-                            WriteLocks[lockId] += 1;
-                        }
-                        else
-                        {
-                            WriteLocks[lockId] = 1;
-                        }
-                    }
-                }
+                ParentScope.ClearReadLocks(instanceId);
+            }
+            else
+            {
+                ReadLocks.Remove(instanceId);
+            }
+        }
+
+        private void ClearWriteLocks(Guid instanceID)
+        {
+            if (ParentScope != null)
+            {
+                ParentScope.ClearWriteLocks(instanceID);
+            }
+            else
+            {
+                WriteLocks.Remove(instanceID);
             }
         }
 
         /// <inheritdoc />
         public void ReadLock(params int[] lockIds)
         {
-            IncrementRequestedReadLock(lockIds);
-            ReadLockInner(null, lockIds);
+            ReadLockInner(InstanceId, null, lockIds);
         }
 
         /// <inheritdoc />
         public void ReadLock(TimeSpan timeout, int lockId)
         {
-            IncrementRequestedReadLock(lockId);
-            ReadLockInner(timeout, lockId);
+            ReadLockInner(InstanceId, timeout, lockId);
         }
 
         /// <inheritdoc />
         public void WriteLock(params int[] lockIds)
         {
-            IncrementRequestedWriteLock(lockIds);
-            WriteLockInner(null, lockIds);
+            WriteLockInner(InstanceId, null, lockIds);
         }
 
         /// <inheritdoc />
         public void WriteLock(TimeSpan timeout, int lockId)
         {
-            IncrementRequestedWriteLock(lockId);
-            WriteLockInner(timeout, lockId);
+            WriteLockInner(InstanceId, timeout, lockId);
+        }
+
+        /// <summary>
+        /// Determine if a read lock with the specified ID has already been obtained.
+        /// </summary>
+        /// <param name="lockId">Id to test.</param>
+        /// <returns>True if no scopes has obtained a read lock with the specific ID yet.</returns>
+        private bool HasReadLock(int lockId)
+        {
+            // Check if there is any dictionary<int,int> with a key equal to lockId
+            // And check that the value associated with that key is greater than 0, if not it could be because a lock was requested but it failed.
+            return  ReadLocks.Values.Where(x => x.ContainsKey(lockId)).Any(x => x[lockId] > 0);
+        }
+
+        /// <summary>
+        /// Determine if a write lock with the specified ID has already been obtained.
+        /// </summary>
+        /// <param name="lockId">Id to test</param>
+        /// <returns>>True if no scopes has obtained a write lock with the specific ID yet.</returns>
+        private bool HasWriteLock(int lockId)
+        {
+            return WriteLocks.Values.Where(x => x.ContainsKey(lockId)).Any(x => x[lockId] > 0);
         }
 
         /// <summary>
@@ -646,38 +638,49 @@ namespace Umbraco.Core.Scoping
         /// </summary>
         /// <param name="timeout">Optional database timeout in milliseconds.</param>
         /// <param name="lockIds">Array of lock object identifiers.</param>
-        internal void ReadLockInner(TimeSpan? timeout = null, params int[] lockIds)
+        private void ReadLockInner(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
         {
             if (ParentScope != null)
             {
                 // Delegate acquiring the lock to the parent if any.
-                ParentScope.ReadLockInner(timeout, lockIds);
+                ParentScope.ReadLockInner(instanceId, timeout, lockIds);
                 return;
             }
 
-            // If we are the parent, then handle the lock request.
-            foreach (var lockId in lockIds)
+            lock (_dictionaryLocker)
             {
-                lock (_dictionaryLocker)
+                // If we are the parent, then handle the lock request.
+                foreach (var lockId in lockIds)
                 {
                     // Only acquire the lock if we haven't done so yet.
-                    if (!ReadLocks.ContainsKey(lockId))
+                    if (!HasReadLock(lockId))
                     {
-                        if (timeout is null)
+                        IncrementReadLock(lockId, instanceId);
+                        try
                         {
-                            // We want a lock with a custom timeout
-                            ObtainReadLock(lockId);
+                            if (timeout is null)
+                            {
+                                // We just want an ordinary lock.
+                                ObtainReadLock(lockId);
+                            }
+                            else
+                            {
+                                // We want a lock with a custom timeout
+                                ObtainTimoutReadLock(lockId, timeout.Value);
+                            }
                         }
-                        else
+                        catch
                         {
-                            // We just want an ordinary lock.
-                            ObtainTimoutReadLock(lockId, timeout.Value);
+                            // Something went wrong and we didn't get the lock, decrement the count and throw.
+                            DecrementReadLock(lockId, instanceId);
+                            throw;
                         }
-                        // Add the lockId as a key to the dict.
-                        ReadLocks[lockId] = 0;
                     }
-
-                    ReadLocks[lockId] += 1;
+                    else
+                    {
+                        // We already have a lock, but need to update the readlock dictionary for debugging purposes.
+                        IncrementReadLock(lockId, instanceId);
+                    }
                 }
             }
         }
@@ -687,36 +690,43 @@ namespace Umbraco.Core.Scoping
         /// </summary>
         /// <param name="timeout">Optional database timeout in milliseconds.</param>
         /// <param name="lockIds">Array of lock object identifiers.</param>
-        internal void WriteLockInner(TimeSpan? timeout = null, params int[] lockIds)
+        internal void WriteLockInner(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
         {
             if (ParentScope != null)
             {
                 // If we have a parent we delegate lock creation to parent.
-                ParentScope.WriteLockInner(timeout, lockIds);
+                ParentScope.WriteLockInner(instanceId, timeout, lockIds);
                 return;
             }
 
-            foreach (var lockId in lockIds)
+            lock (_dictionaryLocker)
             {
-                lock (_dictionaryLocker)
+                foreach (var lockId in lockIds)
                 {
                     // Only acquire lock if we haven't yet (WriteLocks not containing the key)
-                    if (!WriteLocks.ContainsKey(lockId))
+                    if (!HasWriteLock(lockId))
                     {
-                        if (timeout is null)
+                        IncrementWriteLock(lockId, instanceId);
+                        try
                         {
-                            ObtainWriteLock(lockId);
+                            if (timeout is null)
+                            {
+                                ObtainWriteLock(lockId);
+                            }
+                            else
+                            {
+                                ObtainTimeoutWriteLock(lockId, timeout.Value);
+                            }
                         }
-                        else
+                        catch
                         {
-                            ObtainTimeoutWriteLock(lockId, timeout.Value);
+                            DecrementWriteLock(lockId, instanceId);
                         }
-                        // Add the lockId as a key to the dict.
-                        WriteLocks[lockId] = 0;
                     }
-
-                    // Increment count of the lock by 1.
-                    WriteLocks[lockId] += 1;
+                    else
+                    {
+                        DecrementWriteLock(lockId, instanceId);
+                    }
                 }
             }
         }
