@@ -387,7 +387,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 files.AddRange(
                     fileInfo.Select(file =>
-                        prefixVirtualPath.TrimEnd('/') + "/" + (path.Replace(orgPath, string.Empty).Trim('/') + "/" + file.Name).Trim('/')));
+                        prefixVirtualPath.TrimEnd(Constants.CharArrays.ForwardSlash) + "/" + (path.Replace(orgPath, string.Empty).Trim(Constants.CharArrays.ForwardSlash) + "/" + file.Name).Trim(Constants.CharArrays.ForwardSlash)));
 
             }
 

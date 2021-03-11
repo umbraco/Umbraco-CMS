@@ -30,6 +30,7 @@ namespace Umbraco.Cms.Core
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
+        /// The initial <see cref="RuntimeState"/>
         /// </summary>
         public static RuntimeState Booting() => new RuntimeState() { Level = RuntimeLevel.Boot };
 
@@ -115,7 +116,8 @@ namespace Umbraco.Cms.Core
 
                         // else it is bad enough that we want to throw
                         Reason = RuntimeLevelReason.BootFailedCannotConnectToDatabase;
-                        throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
+                        BootFailedException =new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
+                        throw BootFailedException;
                     }
                 case UmbracoDatabaseState.NotInstalled:
                     {
@@ -132,7 +134,7 @@ namespace Umbraco.Cms.Core
                         // although the files version matches the code version, the database version does not
                         // which means the local files have been upgraded but not the database - need to upgrade
                         _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
-                        Level = RuntimeLevel.Upgrade;
+                        Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Run : RuntimeLevel.Upgrade;
                         Reason = RuntimeLevelReason.UpgradeMigrations;
                     }
                     break;
@@ -191,7 +193,8 @@ namespace Umbraco.Cms.Core
 
                 // else it is bad enough that we want to throw
                 Reason = RuntimeLevelReason.BootFailedCannotCheckUpgradeState;
-                throw new BootFailedException("Could not check the upgrade state.", e);
+                BootFailedException = new BootFailedException("Could not check the upgrade state.", e);
+                throw BootFailedException;
             }
         }
 
@@ -250,9 +253,12 @@ namespace Umbraco.Cms.Core
                     _logger.LogInformation(ex, "Error during unattended install.");
                     database.AbortTransaction();
 
-                    throw new UnattendedInstallException(
+                    var innerException = new UnattendedInstallException(
                         "The database configuration failed with the following message: " + ex.Message
                         + "\n Please check log file for additional information (can be found in '/App_Data/Logs/')");
+                    BootFailedException = new BootFailedException(innerException.Message, innerException);
+
+                    throw BootFailedException;
                 }
             }
         }

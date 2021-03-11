@@ -213,7 +213,7 @@ ORDER BY colName";
                 return false;
 
             //now detect if there's been a timeout
-            if (DateTime.UtcNow - found.LastValidatedUtc > TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes))
+            if (DateTime.UtcNow - found.LastValidatedUtc > _globalSettings.TimeOut)
             {
                 //timeout detected, update the record
                 ClearLoginSession(sessionId);

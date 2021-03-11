@@ -413,6 +413,15 @@ namespace Umbraco.Cms.Core.Routing
                     _logger.LogDebug("Finder {ContentFinderType}", finder.GetType().FullName);
                     return finder.TryFindContent(request);
                 });
+
+                _logger.LogDebug(
+                    "Found? {Found}, Content: {PublishedContentId}, Template: {TemplateAlias}, Domain: {Domain}, Culture: {Culture}, StatusCode: {StatusCode}",
+                    found,
+                    request.HasPublishedContent() ? request.PublishedContent.Id : "NULL",
+                    request.HasTemplate() ? request.Template?.Alias : "NULL",
+                    request.HasDomain() ? request.Domain.ToString() : "NULL",
+                    request.Culture ?? "NULL",
+                    request.ResponseStatusCode);
             }
         }
 

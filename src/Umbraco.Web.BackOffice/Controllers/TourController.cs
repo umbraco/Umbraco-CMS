@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 foreach (var plugin in Directory.EnumerateDirectories(appPlugins))
                 {
-                    var pluginName = Path.GetFileName(plugin.TrimEnd('\\'));
+                    var pluginName = Path.GetFileName(plugin.TrimEnd(Constants.CharArrays.Backslash));
                     var pluginFilters = _filters.Where(x => x.PluginName != null && x.PluginName.IsMatch(pluginName))
                         .ToList();
 
@@ -171,7 +171,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {
                             return false;
                         }
-                        var contentTypes = x.ContentType.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
+                        var contentTypes = x.ContentType.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
                         return contentTypes.Intersect(doctypeAliasWithCompositions).Any();
                     });
         }

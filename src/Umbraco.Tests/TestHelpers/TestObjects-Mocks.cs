@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -36,7 +37,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <remarks>This is just a void factory that has no actual database.</remarks>
         public IUmbracoDatabaseFactory GetDatabaseFactoryMock(bool configured = true, bool canConnect = true)
         {
-            var sqlSyntax = new SqlCeSyntaxProvider();
+            var sqlSyntax = new SqlCeSyntaxProvider(Options.Create(new GlobalSettings()));
             var sqlContext = Mock.Of<ISqlContext>();
             Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(sqlSyntax);
 

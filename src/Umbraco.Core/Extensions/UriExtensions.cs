@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Extensions
 {
@@ -129,12 +130,12 @@ namespace Umbraco.Extensions
             if (uri.IsAbsoluteUri)
             {
                 if (path != "/")
-                    uri = new Uri(uri.GetLeftPart(UriPartial.Authority) + path.TrimEnd('/') + uri.Query);
+                    uri = new Uri(uri.GetLeftPart(UriPartial.Authority) + path.TrimEnd(Constants.CharArrays.ForwardSlash) + uri.Query);
             }
             else
             {
                 if (path != "/")
-                    uri = new Uri(path.TrimEnd('/') + uri.Query, UriKind.Relative);
+                    uri = new Uri(path.TrimEnd(Constants.CharArrays.ForwardSlash) + uri.Query, UriKind.Relative);
             }
             return uri;
         }

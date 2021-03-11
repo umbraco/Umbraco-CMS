@@ -11,12 +11,12 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     /// </summary>
     internal class BackOfficeSecureDataFormat : ISecureDataFormat<AuthenticationTicket>
     {
-        private readonly int _loginTimeoutMinutes;
+        private readonly TimeSpan _loginTimeout;
         private readonly ISecureDataFormat<AuthenticationTicket> _ticketDataFormat;
 
-        public BackOfficeSecureDataFormat(int loginTimeoutMinutes, ISecureDataFormat<AuthenticationTicket> ticketDataFormat)
+        public BackOfficeSecureDataFormat(TimeSpan loginTimeout, ISecureDataFormat<AuthenticationTicket> ticketDataFormat)
         {
-            _loginTimeoutMinutes = loginTimeoutMinutes;
+            _loginTimeout = loginTimeout;
             _ticketDataFormat = ticketDataFormat ?? throw new ArgumentNullException(nameof(ticketDataFormat));
         }
 
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 new AuthenticationProperties(data.Properties.Items)
                 {
                     IssuedUtc = data.Properties.IssuedUtc,
-                    ExpiresUtc = data.Properties.ExpiresUtc ?? DateTimeOffset.UtcNow.AddMinutes(_loginTimeoutMinutes),
+                    ExpiresUtc = data.Properties.ExpiresUtc ?? DateTimeOffset.UtcNow.Add(_loginTimeout),
                     AllowRefresh = data.Properties.AllowRefresh,
                     IsPersistent = data.Properties.IsPersistent,
                     RedirectUri = data.Properties.RedirectUri

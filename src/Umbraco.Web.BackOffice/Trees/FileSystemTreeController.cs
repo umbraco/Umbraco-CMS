@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                 if (Extensions.Contains("*"))
                     return true;
 
-                return extension != null && Extensions.Contains(extension.Trim('.'), StringComparer.InvariantCultureIgnoreCase);
+                return extension != null && Extensions.Contains(extension.Trim(Constants.CharArrays.Period), StringComparer.InvariantCultureIgnoreCase);
             });
 
             foreach (var file in files)

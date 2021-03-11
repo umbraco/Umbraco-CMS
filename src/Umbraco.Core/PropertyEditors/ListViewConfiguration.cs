@@ -68,6 +68,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
         [ConfigurationField("showContentFirst", "Show Content App First", "boolean", Description = "Enable this to show the content app by default instead of the list view app")]
         public bool ShowContentFirst { get; set; }
 
+        [ConfigurationField("useInfiniteEditor", "Edit in Infinite Editor", "boolean", Description = "Enable this to use infinite editing to edit the content of the list view")]
+        public bool UseInfiniteEditor { get; set; }
+
         [DataContract]
         public class Property
         {

@@ -50,18 +50,20 @@ Use this directive to render an avatar.
 (function() {
     'use strict';
 
-    function AvatarDirective() {
+    function AvatarDirective(localizationService) {
 
         function link(scope, element, attrs, ctrl) {
             
             var eventBindings = [];
             scope.initials = "";
+            scope.avatarAlt = "";
 
             function onInit() {
                 if (!scope.unknownChar) {
                     scope.unknownChar = "?";
                 }
                 scope.initials = getNameInitials(scope.name);
+                setAvatarAlt(scope.name);
             }
 
             function getNameInitials(name) {
@@ -77,10 +79,23 @@ Use this directive to render an avatar.
                 return null;
             }
 
+            function setAvatarAlt(name) {
+                if (name) {
+                    localizationService
+                        .localize('general_avatar')
+                        .then(function(data) {
+                                scope.avatarAlt = data + ' ' + name;
+                            }
+                        );
+                }
+                scope.avatarAlt = null;
+            }
+
             eventBindings.push(scope.$watch('name', function (newValue, oldValue) {
                 if (newValue === oldValue) { return; }
                 if (oldValue === undefined || newValue === undefined) { return; }
                 scope.initials = getNameInitials(newValue);
+                setAvatarAlt(newValue);
             }));
 
             onInit();
