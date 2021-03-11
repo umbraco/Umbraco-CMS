@@ -81,7 +81,6 @@ namespace Umbraco.Extensions
 
             builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
 
-            builder.Services.AddUnique<PreviewAuthenticationMiddleware>();
             builder.Services.AddUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
             builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
 
