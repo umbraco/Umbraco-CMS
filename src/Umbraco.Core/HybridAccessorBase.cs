@@ -17,10 +17,6 @@ namespace Umbraco.Cms.Core
         where T : class
     {
         private readonly IRequestCache _requestCache;
-
-        private readonly object _locker = new object();
-        private readonly bool _registered;
-
         private string _itemKey;
 
         protected string ItemKey => _itemKey ??= GetType().FullName;
@@ -47,41 +43,7 @@ namespace Umbraco.Cms.Core
         }
 
         protected HybridAccessorBase(IRequestCache requestCache)
-        {
-            _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
-
-            lock (_locker)
-            {
-                // register the itemKey once with SafeCallContext
-                if (_registered)
-                {
-                    return;
-                }
-
-                _registered = true;
-            }
-
-            // ReSharper disable once VirtualMemberCallInConstructor
-            var itemKey = ItemKey; // virtual
-            SafeCallContext.Register(() =>
-            {
-                T value = CallContext<T>.GetData(itemKey);
-                return value;
-            }, o =>
-            {
-                if (o == null)
-                {
-                    return;
-                }
-
-                if (o is not T value)
-                {
-                    throw new ArgumentException($"Expected type {typeof(T).FullName}, got {o.GetType().FullName}", nameof(o));
-                }
-
-                CallContext<T>.SetData(itemKey, value);
-            });
-        }
+            => _requestCache = requestCache ?? throw new ArgumentNullException(nameof(requestCache));
 
         protected T Value
         {

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -32,6 +33,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly IMediaService _mediaService;
+        private readonly AppCaches _appCaches;
         private readonly IEntityService _entityService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
@@ -47,11 +49,13 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             IDataTypeService dataTypeService,
             UmbracoTreeSearcher treeSearcher,
             IMediaService mediaService,
-            IEventAggregator eventAggregator)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService, eventAggregator)
+            IEventAggregator eventAggregator,
+            AppCaches appCaches)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService, eventAggregator, appCaches)
         {
             _treeSearcher = treeSearcher;
             _mediaService = mediaService;
+            _appCaches = appCaches;
             _entityService = entityService;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
         }
@@ -62,7 +66,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         private int[] _userStartNodes;
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService));
+            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService, _appCaches));
 
         /// <summary>
         /// Creates a tree node for a content item based on an UmbracoEntity
@@ -113,7 +117,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
                 // root actions
                 menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add<ActionSort>(LocalizedTextService, true);
+                menu.Items.Add<ActionSort>(LocalizedTextService, true, opensDialog: true);
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
             }
@@ -129,7 +133,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasMediaPathAccess(item, _entityService))
+            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasMediaPathAccess(item, _entityService, _appCaches))
             {
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
                 return menu;
@@ -137,7 +141,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
 
             //if the media item is in the recycle bin, we don't have a default menu and we need to show a limited menu
-            if (item.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
+            if (item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 menu.Items.Add<ActionRestore>(LocalizedTextService, opensDialog: true);
                 menu.Items.Add<ActionMove>(LocalizedTextService, opensDialog: true);

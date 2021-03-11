@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
@@ -447,7 +448,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             {
                 WriteNonGenericClrType(sb, type.Substring(0, p));
                 sb.Append("<");
-                var args = type.Substring(p + 1).TrimEnd('>').Split(','); // fixme will NOT work with nested generic types
+                var args = type.Substring(p + 1).TrimEnd(Constants.CharArrays.GreaterThan).Split(Constants.CharArrays.Comma); // fixme will NOT work with nested generic types
                 for (var i = 0; i < args.Length; i++)
                 {
                     if (i > 0) sb.Append(", ");

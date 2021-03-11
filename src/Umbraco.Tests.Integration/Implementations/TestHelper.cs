@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Tests.Integration.Implementations
         public IWebHostEnvironment GetWebHostEnvironment() => _hostEnvironment;
 
         public override IDbProviderFactoryCreator DbProviderFactoryCreator =>
-            new SqlServerDbProviderFactoryCreator(DbProviderFactories.GetFactory);
+            new SqlServerDbProviderFactoryCreator(DbProviderFactories.GetFactory, Options.Create(new GlobalSettings()));
 
         public override IBulkSqlInsertProvider BulkSqlInsertProvider => new SqlServerBulkSqlInsertProvider();
 

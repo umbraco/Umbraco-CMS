@@ -310,7 +310,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (id != Constants.System.RootString)
             {
-                codeFileDisplay.VirtualPath += id.TrimStart("/").EnsureEndsWith("/");
+                codeFileDisplay.VirtualPath += id.TrimStart(Constants.CharArrays.ForwardSlash).EnsureEndsWith("/");
                 //if it's not new then it will have a path, otherwise it won't
                 codeFileDisplay.Path = Url.GetTreePathFromFilePath(id);
             }
@@ -503,7 +503,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 data.Content = StylesheetHelper.ReplaceRule(data.Content, rule.Name, null);
             }
 
-            data.Content = data.Content.TrimEnd('\n', '\r');
+            data.Content = data.Content.TrimEnd(Constants.CharArrays.LineFeedCarriageReturn);
 
             // now add all the posted rules
             if (data.Rules != null && data.Rules.Any())

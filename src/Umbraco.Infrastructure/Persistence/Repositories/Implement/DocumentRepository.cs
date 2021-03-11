@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -916,7 +917,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             if (content.ParentId == -1)
                 return content.Published;
 
-            var ids = content.Path.Split(',').Skip(1).Select(int.Parse);
+            var ids = content.Path.Split(Constants.CharArrays.Comma).Skip(1).Select(int.Parse);
 
             var sql = SqlContext.Sql()
                 .SelectCount<NodeDto>(x => x.NodeId)
