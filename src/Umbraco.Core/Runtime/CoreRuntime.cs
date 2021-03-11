@@ -8,6 +8,7 @@ using System.Web.Hosting;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Events;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
@@ -191,9 +192,6 @@ namespace Umbraco.Core.Runtime
                 // create the factory
                 _factory = Current.Factory = composition.CreateFactory();
 
-                // Create unattended user, we have to this after factory is created since we use UserService.
-                CreateUnattendedUser();
-
                 // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
                 if (_state.Reason == RuntimeLevelReason.UpgradeMigrations && _state.Level == RuntimeLevel.Run)
                 {
@@ -354,6 +352,11 @@ namespace Umbraco.Core.Runtime
                     var creator = new DatabaseSchemaCreator(database, Logger);
                     creator.InitializeDatabaseSchema();
                     database.CompleteTransaction();
+
+                    // Emit an event that unattended install completed
+                    // Then this event can be listened for and create an unattended user
+                    UnattendedInstalled.RaiseEvent(new UnattendedInstallEventArgs(), this);
+
                     Logger.Info<CoreRuntime>("Unattended install completed.");
                 }
                 catch (Exception ex)
@@ -473,7 +476,14 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         public virtual void Compose(Composition composition)
         {
-            // nothing
+            // Listen for when 
+            UnattendedInstalled += CoreRuntime_UnattendedInstalled;
+
+        }
+
+        private void CoreRuntime_UnattendedInstalled(IRuntime sender, UnattendedInstallEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         #region Getters
@@ -534,5 +544,12 @@ namespace Umbraco.Core.Runtime
         }
 
         #endregion
+
+        /// <summary>
+        /// Event to be used to notify when the Unattended Install has finished
+        /// </summary>
+        public static event TypedEventHandler<IRuntime, UnattendedInstallEventArgs> UnattendedInstalled;
+
+
     }
 }
