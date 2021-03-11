@@ -35,10 +35,10 @@ services:
     # https://docs.microsoft.com/en-us/aspnet/core/fundamentals/configuration/?view=aspnetcore-5.0#environment-variables
     environment:
     - ConnectionStrings__umbracoDbDSN=server=localhost;database=UmbracoUnicore;user id=sa;password='P@ssw0rd'
-    - Umbraco__CMS__Global__InstallUnattended=true
-    - Umbraco__CMS__Global__UnattendedUserName=Admin
-    - Umbraco__CMS__Global__UnattendedUserEmail=test@umbraco.com
-    - Umbraco__CMS__Global__UnattendedUserPassword=password1234
+    - Umbraco__CMS__Unattended__InstallUnattended=true
+    - Umbraco__CMS__Unattended__UnattendedUserName=Admin
+    - Umbraco__CMS__Unattended__UnattendedUserEmail=test@umbraco.com
+    - Umbraco__CMS__Unattended__UnattendedUserPassword=password1234
     - Umbraco__CMS__Global__Smtp__Host=localhost
     - Umbraco__CMS__Global__Smtp__Port=25
     - Umbraco__CMS__Global__Smtp__From=warren-env@umbraco.com
