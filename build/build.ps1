@@ -194,14 +194,12 @@
 
     # remove extra files
     $webAppBin = "$($this.BuildTemp)\WebApp\bin"
-    $excludeDirs = @("$($webAppBin)\Config","$($webAppBin)\refs","$($webAppBin)\runtimes","$($webAppBin)\Umbraco","$($webAppBin)\wwwroot")
+    $excludeDirs = @("$($webAppBin)\refs","$($webAppBin)\runtimes","$($webAppBin)\Umbraco","$($webAppBin)\wwwroot")
     $excludeFiles = @("$($webAppBin)\appsettings.*","$($webAppBin)\*.deps.json","$($webAppBin)\*.exe","$($webAppBin)\*.config","$($webAppBin)\*.runtimeconfig.json")
     $this.RemoveDirectory($excludeDirs)
     $this.RemoveFile($excludeFiles)
 
     # copy rest of the files into WebApp
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\config")
-    $this.RemoveFile("$($this.BuildTemp)\WebApp\Config\*.Release.*")
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
     $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\lib")
     $this.RemoveDirectory($excludeUmbracoDirs)
@@ -300,8 +298,6 @@
 
     # create directories
     Write-Host "Create directories"
-    mkdir "$tmp\Configs" > $null
-    mkdir "$tmp\Configs\Lang" > $null
     mkdir "$tmp\WebApp\App_Data" > $null
     mkdir "$tmp\Templates" > $null
     #mkdir "$tmp\WebApp\Media" > $null
@@ -310,14 +306,6 @@
     # copy various files
     Write-Host "Copy xml documentation"
     Copy-Item -force "$tmp\bin\*.xml" "$tmp\WebApp\bin"
-
-    Write-Host "Copy transformed configs and langs"
-    # note: exclude imageprocessor/*.config as imageprocessor pkg installs them
-    $this.CopyFiles("$tmp\WebApp\config", "*.config", "$tmp\Configs", `
-      { -not $_.RelativeName.StartsWith("imageprocessor") })
-    $this.CopyFiles("$tmp\WebApp\config", "*.js", "$tmp\Configs")
-    $this.CopyFiles("$tmp\WebApp\config\lang", "*.xml", "$tmp\Configs\Lang")
-    #$this.CopyFile("$tmp\WebApp\web.config", "$tmp\Configs\web.config.transform")
 
     # Write-Host "Copy transformed web.config"
     # $this.CopyFile("$src\Umbraco.Web.UI\web.$buildConfiguration.Config.transformed", "$tmp\WebApp\web.config")
