@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
@@ -50,6 +50,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
             Add<UmbracoEntityMapper>();
             Add<UserMapper>();
             Add<ExternalLoginMapper>();
+            Add<ExternalLoginTokenMapper>();
             Add<UserGroupMapper>();
             Add<AuditEntryMapper>();
             Add<ConsentMapper>();

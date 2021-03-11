@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -118,11 +118,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected override IEnumerable<string> GetDeleteClauses()
         {
             return new List<string>();
-        }
-
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
         }
 
         #endregion

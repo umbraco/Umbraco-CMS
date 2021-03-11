@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ExternalLoginServiceTests : UmbracoIntegrationTest
     {
         private IUserService UserService => GetRequiredService<IUserService>();
@@ -25,6 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IExternalLoginService ExternalLoginService => GetRequiredService<IExternalLoginService>();
 
         [Test]
+        [Ignore("We don't support duplicates anymore, this removing on save was a breaking change work around, this needs to be ported to a migration")]
         public void Removes_Existing_Duplicates_On_Save()
         {
             var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
@@ -63,7 +64,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             ExternalLoginService.Save(user.Id, externalLogins);
 
-            var logins = ExternalLoginService.GetAll(user.Id).ToList();
+            var logins = ExternalLoginService.GetExternalLogins(user.Id).ToList();
 
             // duplicates will be removed, keeping the latest entries
             Assert.AreEqual(2, logins.Count);
@@ -87,7 +88,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             ExternalLoginService.Save(user.Id, externalLogins);
 
-            var logins = ExternalLoginService.GetAll(user.Id).ToList();
+            var logins = ExternalLoginService.GetExternalLogins(user.Id).ToList();
             Assert.AreEqual(1, logins.Count);
         }
 
@@ -103,7 +104,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             };
             ExternalLoginService.Save(extLogin);
 
-            IEnumerable<IIdentityUserLogin> found = ExternalLoginService.GetAll(user.Id);
+            IEnumerable<IIdentityUserLogin> found = ExternalLoginService.GetExternalLogins(user.Id);
 
             Assert.AreEqual(1, found.Count());
             Assert.IsTrue(extLogin.HasIdentity);
@@ -125,7 +126,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             extLogin.UserData = "world";
             ExternalLoginService.Save(extLogin);
 
-            var found = ExternalLoginService.GetAll(user.Id).ToList();
+            var found = ExternalLoginService.GetExternalLogins(user.Id).ToList();
             Assert.AreEqual(1, found.Count);
             Assert.AreEqual("world", found[0].UserData);
         }
@@ -152,7 +153,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             };
             ExternalLoginService.Save(user.Id, extLogins);
 
-            var found = ExternalLoginService.GetAll(user.Id).OrderBy(x => x.LoginProvider).ToList();
+            var found = ExternalLoginService.GetExternalLogins(user.Id).OrderBy(x => x.LoginProvider).ToList();
             Assert.AreEqual(2, found.Count);
             Assert.AreEqual("123456", found[0].UserData);
             Assert.AreEqual("987654", found[1].UserData);
@@ -193,13 +194,38 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             ExternalLoginService.Save(user.Id, externalLogins);
 
-            var logins = ExternalLoginService.GetAll(user.Id).OrderBy(x => x.LoginProvider).ToList();
+            var logins = ExternalLoginService.GetExternalLogins(user.Id).OrderBy(x => x.LoginProvider).ToList();
             Assert.AreEqual(2, logins.Count);
             for (int i = 0; i < logins.Count; i++)
             {
                 Assert.AreEqual(logins[i].ProviderKey, externalLogins[i].ProviderKey);
                 Assert.AreEqual(logins[i].LoginProvider, externalLogins[i].LoginProvider);
             }
+        }
+
+        [Test]
+        public void Add_Tokens()
+        {
+            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
+            UserService.Save(user);
+
+            ExternalLogin[] externalLogins = new[]
+            {
+                new ExternalLogin("test1", Guid.NewGuid().ToString("N"))
+            };
+
+            ExternalLoginService.Save(user.Id, externalLogins);
+
+            ExternalLoginToken[] externalTokens = new[]
+            {
+                new ExternalLoginToken(externalLogins[0].LoginProvider, "hello1", "world1"),
+                new ExternalLoginToken(externalLogins[0].LoginProvider, "hello2", "world2")
+            };
+
+            ExternalLoginService.Save(user.Id, externalTokens);
+
+            var tokens = ExternalLoginService.GetExternalLoginTokens(user.Id).ToList();
+            Assert.AreEqual(2, tokens.Count);
         }
 
         [Test]
@@ -218,19 +244,64 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             ExternalLoginService.Save(user.Id, externalLogins);
 
-            var logins = ExternalLoginService.GetAll(user.Id).OrderBy(x => x.LoginProvider).ToList();
+            var logins = ExternalLoginService.GetExternalLogins(user.Id).OrderBy(x => x.LoginProvider).ToList();
 
             logins.RemoveAt(0); // remove the first one
             logins.Add(new IdentityUserLogin("test5", Guid.NewGuid().ToString("N"), user.Id.ToString())); // add a new one
+            logins[0].ProviderKey = "abcd123"; // update
 
             // save new list
             ExternalLoginService.Save(user.Id, logins.Select(x => new ExternalLogin(x.LoginProvider, x.ProviderKey)));
 
-            var updatedLogins = ExternalLoginService.GetAll(user.Id).OrderBy(x => x.LoginProvider).ToList();
+            var updatedLogins = ExternalLoginService.GetExternalLogins(user.Id).OrderBy(x => x.LoginProvider).ToList();
             Assert.AreEqual(4, updatedLogins.Count);
             for (int i = 0; i < updatedLogins.Count; i++)
             {
                 Assert.AreEqual(logins[i].LoginProvider, updatedLogins[i].LoginProvider);
+                Assert.AreEqual(logins[i].ProviderKey, updatedLogins[i].ProviderKey);
+            }
+        }
+
+        [Test]
+        public void Add_Update_Delete_Tokens()
+        {
+            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
+            UserService.Save(user);
+
+            ExternalLogin[] externalLogins = new[]
+            {
+                new ExternalLogin("test1", Guid.NewGuid().ToString("N")),
+                new ExternalLogin("test2", Guid.NewGuid().ToString("N"))
+            };
+
+            ExternalLoginService.Save(user.Id, externalLogins);
+
+            ExternalLoginToken[] externalTokens = new[]
+            {
+                new ExternalLoginToken(externalLogins[0].LoginProvider, "hello1", "world1"),
+                new ExternalLoginToken(externalLogins[0].LoginProvider, "hello1a", "world1a"),
+                new ExternalLoginToken(externalLogins[1].LoginProvider, "hello2", "world2"),
+                new ExternalLoginToken(externalLogins[1].LoginProvider, "hello2a", "world2a")
+            };
+
+            ExternalLoginService.Save(user.Id, externalTokens);
+
+            var tokens = ExternalLoginService.GetExternalLoginTokens(user.Id).OrderBy(x => x.LoginProvider).ToList();
+
+            tokens.RemoveAt(0); // remove the first one
+            tokens.Add(new IdentityUserToken(externalLogins[1].LoginProvider, "hello2b", "world2b", user.Id.ToString())); // add a new one
+            tokens[0].Value = "abcd123"; // update
+
+            // save new list
+            ExternalLoginService.Save(user.Id, tokens.Select(x => new ExternalLoginToken(x.LoginProvider, x.Name, x.Value)));
+
+            var updatedTokens = ExternalLoginService.GetExternalLoginTokens(user.Id).OrderBy(x => x.LoginProvider).ToList();
+            Assert.AreEqual(4, updatedTokens.Count);
+            for (int i = 0; i < updatedTokens.Count; i++)
+            {
+                Assert.AreEqual(tokens[i].LoginProvider, updatedTokens[i].LoginProvider);
+                Assert.AreEqual(tokens[i].Name, updatedTokens[i].Name);
+                Assert.AreEqual(tokens[i].Value, updatedTokens[i].Value);
             }
         }
 
@@ -247,7 +318,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             ExternalLoginService.Save(user.Id, externalLogins);
 
-            var logins = ExternalLoginService.GetAll(user.Id).ToList();
+            var logins = ExternalLoginService.GetExternalLogins(user.Id).ToList();
 
             Assert.AreEqual("hello world", logins[0].UserData);
         }

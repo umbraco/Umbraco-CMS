@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Models.Identity
         string UserId { get; set; } // TODO: This should be able to be used by both users and members
 
         /// <summary>
-        /// Gets or sets any arbitrary data for the user and external provider - like user tokens returned from the provider
+        /// Gets or sets any arbitrary data for the user and external provider
         /// </summary>
         string UserData { get; set; }
     }

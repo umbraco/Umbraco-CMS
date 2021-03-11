@@ -20,12 +20,24 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IEnumerable<IIdentityUserLogin> GetAll(int userId)
+        public IEnumerable<IIdentityUserLogin> GetExternalLogins(int userId)
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                var asString = userId.ToString(); // TODO: This is temp until we update the external service to support guids for both users and members
+                // TODO: This is temp until we update the external service to support guids for both users and members
+                var asString = userId.ToString();
                 return _externalLoginRepository.Get(Query<IIdentityUserLogin>().Where(x => x.UserId == asString))
+                    .ToList();
+            }
+        }
+
+        public IEnumerable<IIdentityUserToken> GetExternalLoginTokens(int userId)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                // TODO: This is temp until we update the external service to support guids for both users and members
+                var asString = userId.ToString();
+                return _externalLoginRepository.Get(Query<IIdentityUserToken>().Where(x => x.UserId == asString))
                     .ToList();
             }
         }
@@ -51,6 +63,15 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
+        public void Save(int userId, IEnumerable<IExternalLoginToken> tokens)
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                _externalLoginRepository.Save(userId, tokens);
+                scope.Complete();
+            }
+        }
+
         /// <inheritdoc />
         public void Save(IIdentityUserLogin login)
         {
@@ -70,7 +91,5 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.Complete();
             }
         }
-
-
     }
 }
