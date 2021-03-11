@@ -41,6 +41,5 @@ namespace Umbraco.Cms.Core.Logging.Viewer
             //Return the updated object - so we can instantly reset the entire array from the API response
             return GetSavedSearches();
         }
-
     }
 }
