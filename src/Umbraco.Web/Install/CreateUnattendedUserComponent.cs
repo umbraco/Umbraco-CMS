@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Runtime;
@@ -29,10 +30,10 @@ namespace Umbraco.Web.Install
 
         private void CoreRuntime_UnattendedInstalled(IRuntime sender, Core.Events.UnattendedInstallEventArgs e)
         {
-            var unattendedName = Environment.GetEnvironmentVariable("unattendedName");
-            var unattendedEmail = Environment.GetEnvironmentVariable("unattendedEmail");
-            var unattendedPassword = Environment.GetEnvironmentVariable("unattendedPass");
-
+            // TODO: Should AppSettings be read directly or need to be moved into main settings/config class ?
+            var unattendedName = ConfigurationManager.AppSettings["Umbraco.Core.UnattendedUserName"];
+            var unattendedEmail = ConfigurationManager.AppSettings["Umbraco.Core.UnattendedUserEmail"]; 
+            var unattendedPassword = ConfigurationManager.AppSettings["Umbraco.Core.UnattendedUserPassword"];
 
             // Missing values
             if (unattendedName.IsNullOrWhiteSpace()
