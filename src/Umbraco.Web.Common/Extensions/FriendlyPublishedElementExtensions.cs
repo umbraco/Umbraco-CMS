@@ -1,9 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.Common.DependencyInjection;
-using Umbraco.Extensions;
 
-namespace Umbraco.FriendlyExtensions
+namespace Umbraco.Extensions
 {
     public static class FriendlyPublishedElementExtensions
     {

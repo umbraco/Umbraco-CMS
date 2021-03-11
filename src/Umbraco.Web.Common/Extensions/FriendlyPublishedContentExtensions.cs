@@ -8,9 +8,8 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.DependencyInjection;
-using Umbraco.Extensions;
 
-namespace Umbraco.FriendlyExtensions
+namespace Umbraco.Extensions
 {
     public static class FriendlyPublishedContentExtensions
     {
