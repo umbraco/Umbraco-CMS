@@ -5,6 +5,7 @@
         <RootNamespace>Umbraco.Cms.Infrastructure.Examine</RootNamespace>
         <Product>Umbraco CMS</Product>
         <Title>Umbraco.Examine.Lucene</Title>
+        <!--TODO: Remove this and the specific nuspec file when examine.Lucene is netstandard compatible.-->
         <!--We have a specific nuspec file for this, do not pack. -->
         <IsPackable>false</IsPackable>
         <!-- But we still need to have PackageId for the depdents to know the actual name of the package. -->
