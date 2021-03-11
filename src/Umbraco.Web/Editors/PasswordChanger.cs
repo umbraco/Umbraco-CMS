@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http.ModelBinding;
@@ -82,6 +83,11 @@ namespace Umbraco.Web.Editors
                 if (currentUser.HasSectionAccess(Umbraco.Core.Constants.Applications.Users) == false)
                 {
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user is not authorized", new[] { "resetPassword" }) });
+                }
+
+                if (!currentUser.IsAdmin() && savingUser.IsAdmin())
+                {
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user cannot change the password for the specified user", new[] { "resetPassword" }) });
                 }
 
                 //ok, we should be able to reset it
@@ -246,7 +252,7 @@ namespace Umbraco.Web.Editors
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
             }
 
-            //without being able to retrieve the original password, 
+            //without being able to retrieve the original password,
             //we cannot arbitrarily change the password without knowing the old one and no old password was supplied - need to return an error
             if (passwordModel.OldPassword.IsNullOrWhiteSpace() && membershipProvider.EnablePasswordRetrieval == false)
             {
