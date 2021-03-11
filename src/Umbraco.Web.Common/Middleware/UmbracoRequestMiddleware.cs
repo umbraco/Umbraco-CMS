@@ -4,12 +4,14 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
@@ -36,7 +38,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
-        private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
         private readonly PublishedSnapshotServiceEventHandler _publishedSnapshotServiceEventHandler;
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -52,7 +53,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
             ILogger<UmbracoRequestMiddleware> logger,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache,
-            IBackOfficeSecurityFactory backofficeSecurityFactory,
             PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler,
             IEventAggregator eventAggregator,
             IProfiler profiler,
@@ -61,7 +61,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
             _requestCache = requestCache;
-            _backofficeSecurityFactory = backofficeSecurityFactory;
             _publishedSnapshotServiceEventHandler = publishedSnapshotServiceEventHandler;
             _eventAggregator = eventAggregator;
             _hostingEnvironment = hostingEnvironment;
@@ -84,11 +83,6 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
             EnsureContentCacheInitialized();
 
-            // TODO: This dependency chain is broken and needs to be fixed.
-            // This is required to be called before EnsureUmbracoContext else the UmbracoContext's IBackOfficeSecurity instance is null
-            // This is ugly Temporal Coupling which also means that developers can no longer just use IUmbracoContextFactory the
-            // way it was intended.
-            _backofficeSecurityFactory.EnsureBackOfficeSecurity();
             UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
             Uri currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);
@@ -133,10 +127,11 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
                 try
                 {
-                    DisposeRequestCacheItems(_logger, _requestCache, context.Request);
+                    DisposeHttpContextItems(context.Request);
                 }
                 finally
                 {
+                    // Dispose the umbraco context reference which will in turn dispose the UmbracoContext itself.
                     umbracoContextReference.Dispose();
                 }
             }
@@ -159,9 +154,9 @@ namespace Umbraco.Cms.Web.Common.Middleware
         }
 
         /// <summary>
-        /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
+        /// Dispose some request scoped objects that we are maintaining the lifecycle for.
         /// </summary>
-        private static void DisposeRequestCacheItems(ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, HttpRequest request)
+        private void DisposeHttpContextItems(HttpRequest request)
         {
             // do not process if client-side request
             if (request.IsClientSideRequest())
@@ -169,37 +164,9 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 return;
             }
 
-            // get a list of keys to dispose
-            var keys = new HashSet<string>();
-            foreach (var i in requestCache)
-            {
-                if (i.Value is IDisposeOnRequestEnd || i.Key is IDisposeOnRequestEnd)
-                {
-                    keys.Add(i.Key);
-                }
-            }
-
-            // dispose each item and key that was found as disposable.
-            foreach (var k in keys)
-            {
-                try
-                {
-                    requestCache.Get(k).DisposeIfDisposable();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError("Could not dispose item with key " + k, ex);
-                }
-
-                try
-                {
-                    k.DisposeIfDisposable();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError("Could not dispose item key " + k, ex);
-                }
-            }
+            // ensure this is disposed by DI at the end of the request
+            IHttpScopeReference httpScopeReference = request.HttpContext.RequestServices.GetRequiredService<IHttpScopeReference>();            
+            httpScopeReference.Register();
         }
 
         /// <summary>

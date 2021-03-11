@@ -25,12 +25,12 @@
                 -->
                 <dependency id="Umbraco.Cms.Core" version="[$version$]" />
                 <dependency id="HtmlSanitizer" version="[5.0.376,5.999999)" />
-                <dependency id="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" version="[5.0.2,5.999999)" />
+                <dependency id="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" version="[5.0.3,5.999999)" />
                 <dependency id="Serilog.AspNetCore" version="[3.4.0,3.999999)" />
-                <dependency id="Microsoft.AspNetCore.Mvc.NewtonsoftJson" version="[5.0.2,5.999999)" />
+                <dependency id="Microsoft.AspNetCore.Mvc.NewtonsoftJson" version="[5.0.3,5.999999)" />
                 <dependency id="MiniProfiler.AspNetCore.Mvc" version="[4.2.22,4.999999)" />
                 <dependency id="NETStandard.Library" version="[2.0.3,2.999999)" />
-                <dependency id="SixLabors.ImageSharp.Web" version="[1.0.1,1.999999)" />
+                <dependency id="SixLabors.ImageSharp.Web" version="[1.0.2,1.999999)" />
                 <dependency id="Smidge" version="[3.2.0,3.999999)" />
                 <dependency id="Smidge.Nuglify" version="[3.2.0,3.999999)" />
                 <dependency id="Microsoft.CodeAnalysis.CSharp" version="[3.8.0,3.999999)" />

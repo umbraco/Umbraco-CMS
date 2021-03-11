@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     {
         private readonly IDbProviderFactoryCreator _dbProviderFactoryCreator;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly Lazy<IMapperCollection> _mappers;
         private readonly ILogger<UmbracoDatabaseFactory> _logger;
         private readonly ILoggerFactory _loggerFactory;
@@ -73,18 +73,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
         /// </summary>
-        /// <remarks>Used by core runtime.</remarks>
-        public UmbracoDatabaseFactory(ILogger<UmbracoDatabaseFactory> logger, ILoggerFactory loggerFactory, IOptions<GlobalSettings> globalSettings, IOptions<ConnectionStrings> connectionStrings, Lazy<IMapperCollection> mappers,IDbProviderFactoryCreator dbProviderFactoryCreator, DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
-            : this(logger, loggerFactory, globalSettings.Value, connectionStrings.Value, mappers, dbProviderFactoryCreator, databaseSchemaCreatorFactory)
-        {
-
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
-        /// </summary>
         /// <remarks>Used by the other ctor and in tests.</remarks>
-        public UmbracoDatabaseFactory(ILogger<UmbracoDatabaseFactory> logger, ILoggerFactory loggerFactory, GlobalSettings globalSettings, ConnectionStrings connectionStrings,  Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator, DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
+        public UmbracoDatabaseFactory(
+            ILogger<UmbracoDatabaseFactory> logger,
+            ILoggerFactory loggerFactory,
+            IOptions<GlobalSettings> globalSettings,
+            IOptions<ConnectionStrings> connectionStrings,
+            Lazy<IMapperCollection> mappers,
+            IDbProviderFactoryCreator dbProviderFactoryCreator,
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
         {
 
             _globalSettings = globalSettings;
@@ -94,7 +91,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory;
 
-            var settings = connectionStrings.UmbracoConnectionString;
+            var settings = connectionStrings.Value.UmbracoConnectionString;
 
             if (settings == null)
             {
@@ -166,7 +163,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         {
             // replace NPoco database type by a more efficient one
 
-            var setting = _globalSettings.DatabaseFactoryServerVersion;
+            var setting = _globalSettings.Value.DatabaseFactoryServerVersion;
             var fromSettings = false;
 
             if (setting.IsNullOrWhiteSpace() || !setting.StartsWith("SqlServer.")

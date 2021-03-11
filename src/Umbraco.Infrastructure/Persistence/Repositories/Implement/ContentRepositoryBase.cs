@@ -525,7 +525,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 currentParentIds.Add(node.NodeId);
 
                 // paths parts without the roots
-                var pathParts = node.Path.Split(',').Where(x => !rootIds.Contains(int.Parse(x))).ToArray();
+                var pathParts = node.Path.Split(Constants.CharArrays.Comma).Where(x => !rootIds.Contains(int.Parse(x))).ToArray();
 
                 if (!prevParentIds.Contains(node.ParentId))
                 {

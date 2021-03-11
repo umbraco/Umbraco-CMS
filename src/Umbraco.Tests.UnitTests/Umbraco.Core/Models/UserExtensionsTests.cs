@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Services;
@@ -44,7 +45,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
                 .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns<UmbracoObjectTypes, int[]>((type, ids) => new[] { new TreeEntityPath { Id = startNodeId, Path = startNodePath } });
 
-            Assert.AreEqual(outcome, user.HasPathAccess(content, esmock.Object));
+            Assert.AreEqual(outcome, user.HasPathAccess(content, esmock.Object, AppCaches.Disabled));
         }
 
         [TestCase("", "1", "1")] // single user start, top level

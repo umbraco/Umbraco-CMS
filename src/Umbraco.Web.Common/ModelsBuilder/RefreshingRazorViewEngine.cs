@@ -69,9 +69,10 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
     /// This is used so that when new PureLive models are built, the entire razor stack is re-constructed so all razor
     /// caches and assembly references, etc... are cleared.
     /// </remarks>
-    internal class RefreshingRazorViewEngine : IRazorViewEngine
+    internal class RefreshingRazorViewEngine : IRazorViewEngine, IDisposable
     {
         private IRazorViewEngine _current;
+        private bool _disposedValue;
         private readonly PureLiveModelFactory _pureLiveModelFactory;
         private readonly Func<IRazorViewEngine> _defaultRazorViewEngineFactory;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
@@ -171,6 +172,25 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             {
                 _locker.ExitReadLock();
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _locker.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }

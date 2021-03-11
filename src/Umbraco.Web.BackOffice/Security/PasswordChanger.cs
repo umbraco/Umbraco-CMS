@@ -64,6 +64,11 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user is not authorized", new[] { "value" }) });
                 }
 
+                if (!currentUser.IsAdmin() && savingUser.IsAdmin())
+                {
+                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user cannot change the password for the specified user", new[] { "resetPassword" }) });
+                }
+
                 //ok, we should be able to reset it
                 var resetToken = await userMgr.GeneratePasswordResetTokenAsync(backOfficeIdentityUser);
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
@@ -34,6 +35,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
+                AppCaches.Disabled,
                 Mock.Of<IBackOfficeSecurityAccessor>());
 
             dynamic result = att.GetValueFromResponse(new ObjectResult(expected));
@@ -53,6 +55,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
+                AppCaches.Disabled,
                 Mock.Of<IBackOfficeSecurityAccessor>());
 
             dynamic result = att.GetValueFromResponse(new ObjectResult(container));
@@ -72,6 +75,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
+                AppCaches.Disabled,
                 Mock.Of<IBackOfficeSecurityAccessor>());
 
             dynamic actual = att.GetValueFromResponse(new ObjectResult(container));
@@ -97,6 +101,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 ActionBrowse.ActionLetter,
                 userService,
                 entityService,
+                AppCaches.Disabled,
                 Mock.Of<IBackOfficeSecurityAccessor>());
 
             var path = string.Empty;
@@ -148,6 +153,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 ActionBrowse.ActionLetter,
                 userService,
                 Mock.Of<IEntityService>(),
+                AppCaches.Disabled,
                 Mock.Of<IBackOfficeSecurityAccessor>());
             att.FilterBasedOnPermissions(list, user);
 
