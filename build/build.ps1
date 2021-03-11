@@ -412,7 +412,7 @@
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
 	$params = "-Source", $nugetsourceUmbraco
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\umbraco-netcore-only.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
     if (-not $?) { throw "Failed to restore NuGet packages." }
   })
 
@@ -423,23 +423,24 @@
 
     Write-Host "Create NuGet packages"
 
-    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Core.nuspec" `
-        -Properties BuildTmp="$($this.BuildTemp)" `
-        -Version "$($this.Version.Semver.ToString())" `
-        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
-    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Core." }
-
-    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Web.nuspec" `
-        -Properties BuildTmp="$($this.BuildTemp)" `
-        -Version "$($this.Version.Semver.ToString())" `
-        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsweb.log"
-    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Web." }
+    &dotnet pack "$($this.SolutionRoot)\src\umbraco-netcore-only.sln" `
+        --output "$($this.BuildOutput)" `
+        --verbosity detailed `
+        -c Release `
+        -p:PackageVersion="$($this.Version.Semver.ToString())" > "$($this.BuildTemp)\pack.umbraco.log"
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
+
+    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Examine.Lucene.nuspec" `
+        -Properties BuildTmp="$($this.BuildTemp)" `
+        -Version "$($this.Version.Semver.ToString())" `
+        -Verbosity detailed  `
+        -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.examine.lucene.log"
+    if (-not $?) { throw "Failed to pack Nuget UmbracoCms.Lucene.nuspec"}
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.SqlCe.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
@@ -465,7 +466,7 @@
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
-      ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Web"),
+      ("UmbracoCms"),
       ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI.NetCore", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Persistence.SqlCe"))
     if ($this.OnError()) { return }
   })
