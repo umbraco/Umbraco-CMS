@@ -30,7 +30,6 @@
         <!-- Content -->
         <file src="$BuildTmp$\WebApp\wwwroot\umbraco\**\*.*" target="content\wwwroot\umbraco" />
         <file src="$BuildTmp$\WebApp\umbraco\**\*.*" target="content\umbraco" />
-        <file src="$BuildTmp$\WebApp\config\**\*.*" target="content\config" />
 
         <!-- Readme -->
         <file src="tools\Readme.txt" target="Readme.txt" />
