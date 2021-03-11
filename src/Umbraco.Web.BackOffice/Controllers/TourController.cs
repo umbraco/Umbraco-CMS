@@ -59,11 +59,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var nonPluginFilters = _filters.Where(x => x.PluginName == null).ToList();
 
             //add core tour files
-            // var coreToursPath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.Config), "BackOfficeTours");
-            // if (Directory.Exists(coreToursPath))
-            // {
-            //
-            // }
             var embeddedTourNames = GetType()
                 .Assembly
                 .GetManifestResourceNames()
