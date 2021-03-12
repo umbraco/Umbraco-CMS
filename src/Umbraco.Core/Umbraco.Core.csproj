@@ -51,8 +51,4 @@
     <ItemGroup>
       <EmbeddedResource Include="EmbeddedResources\**\*" />
     </ItemGroup>
-
-    <ItemGroup>
-      <Compile Remove="Cache\CacheRefresherEventArgs.cs" />
-    </ItemGroup>
 </Project>
