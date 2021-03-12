@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
@@ -201,7 +201,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             To<AddPropertyTypeLabelOnTopColumn>("{D6A8D863-38EC-44FB-91EC-ACD6A668BD18}");
 
             // to 9.0.0
-
+            To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}");
             To<ExternalLoginTableIndexes>("{50A43237-A6F4-49E2-A7A6-5DAD65C84669}");
             To<ExternalLoginTokenTable>("{3D8DADEF-0FDA-4377-A5F0-B52C2110E8F2}");
 

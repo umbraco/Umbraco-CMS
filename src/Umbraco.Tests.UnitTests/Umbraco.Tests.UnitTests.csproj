@@ -26,7 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Content Include="TestHelpers\Assets\logviewer.searches.config.js" />
     <Content Include="TestHelpers\Assets\UmbracoTraceLog.UNITTEST.20181112.json" />
   </ItemGroup>
 

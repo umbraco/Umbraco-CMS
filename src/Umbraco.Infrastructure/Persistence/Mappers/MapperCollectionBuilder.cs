@@ -54,6 +54,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
             Add<UserGroupMapper>();
             Add<AuditEntryMapper>();
             Add<ConsentMapper>();
+            Add<LogViewerQueryMapper>();
             return this;
         }
     }

@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) =>
             app =>
             {
+                StaticServiceProvider.Instance = app.ApplicationServices;
                 _options.Value.PreUmbracoPipeline(app);
 
                 app.UseUmbraco();
