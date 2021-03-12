@@ -519,7 +519,26 @@ namespace Umbraco.Core.Scoping
         {
             if (ParentScope is null)
             {
-                WriteLocks[instanceId][lockId]++;
+                // Try and get the dict associated with the scope id.
+                var locksDictFound = WriteLocks.TryGetValue(instanceId, out var locksDict);
+                if (locksDictFound)
+                {
+                    var lockFound = locksDict.TryGetValue(lockId, out var value);
+                    if (lockFound)
+                    {
+                        WriteLocks[instanceId][lockId] = value+1;
+                    }
+                    else
+                    {
+                        WriteLocks[instanceId][lockId] = 1;
+                    }
+                }
+                else
+                {
+                    // The scope hasn't requested a lock yet, so we have to create a dict for it.
+                    WriteLocks[instanceId] = new Dictionary<int, int>();
+                    WriteLocks[instanceId][lockId] = 1;
+                }
             }
             else
             {
@@ -543,7 +562,25 @@ namespace Umbraco.Core.Scoping
         {
             if (ParentScope is null)
             {
-                ReadLocks[instanceId][lockId]++;
+                var locksDictFound = ReadLocks.TryGetValue(instanceId, out var locksDict);
+                if (locksDictFound)
+                {
+                    var lockFound = locksDict.TryGetValue(lockId, out var value);
+                    if (lockFound)
+                    {
+                        ReadLocks[instanceId][lockId] = value + 1;
+                    }
+                    else
+                    {
+                        ReadLocks[instanceId][lockId] = 1;
+                    }
+                }
+                else
+                {
+                    // The scope hasn't requested a lock yet, so we have to create a dict for it.
+                    ReadLocks[instanceId] = new Dictionary<int, int>();
+                    ReadLocks[instanceId][lockId] = 1;
+                }
             }
             else
             {
@@ -721,11 +758,13 @@ namespace Umbraco.Core.Scoping
                         catch
                         {
                             DecrementWriteLock(lockId, instanceId);
+                            throw;
                         }
                     }
                     else
                     {
-                        DecrementWriteLock(lockId, instanceId);
+                        // We already have a lock, so just increment the count for debugging purposes
+                        IncrementWriteLock(lockId, instanceId);
                     }
                 }
             }
