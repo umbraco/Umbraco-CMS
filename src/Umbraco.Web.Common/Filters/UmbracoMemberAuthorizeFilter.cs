@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Web.Common.Filters
             }
 
             var members = new List<int>();
-            foreach (var s in AllowMembers.Split(','))
+            foreach (var s in AllowMembers.Split(Core.Constants.CharArrays.Comma))
             {
                 if (int.TryParse(s, out var id))
                 {
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Web.Common.Filters
                 }
             }
 
-            return _websiteSecurity.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members);
+            return _websiteSecurity.IsMemberAuthorized(AllowType.Split(Core.Constants.CharArrays.Comma), AllowGroup.Split(Core.Constants.CharArrays.Comma), members);
         }
     }
 }

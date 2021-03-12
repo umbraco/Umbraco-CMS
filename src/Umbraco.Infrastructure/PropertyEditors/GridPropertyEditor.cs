@@ -202,7 +202,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     _richTextPropertyValueEditor.GetReferences(x.Value)))
                     yield return umbracoEntityReference;
 
-                foreach (var umbracoEntityReference in mediaValues.SelectMany(x =>
+                foreach (var umbracoEntityReference in mediaValues.Where(x=>x.Value.HasValues).SelectMany(x =>
                     _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
                     yield return umbracoEntityReference;
             }

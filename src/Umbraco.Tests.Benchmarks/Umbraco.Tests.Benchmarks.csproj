@@ -53,6 +53,7 @@
     <Compile Include="CtorInvokeBenchmarks.cs" />
     <Compile Include="HexStringBenchmarks.cs" />
     <Compile Include="EnumeratorBenchmarks.cs" />
+    <Compile Include="JsonSerializerSettingsBenchmarks.cs" />
     <Compile Include="LinqCastBenchmarks.cs" />
     <Compile Include="ModelToSqlExpressionHelperBenchmarks.cs" />
     <Compile Include="Program.cs" />

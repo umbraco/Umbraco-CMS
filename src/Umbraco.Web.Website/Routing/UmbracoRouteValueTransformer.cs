@@ -13,6 +13,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -48,6 +49,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         private readonly IRoutableDocumentFilter _routableDocumentFilter;
         private readonly IDataProtectionProvider _dataProtectionProvider;
         private readonly IControllerActionSearcher _controllerActionSearcher;
+        private readonly IEventAggregator _eventAggregator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValueTransformer"/> class.
@@ -62,7 +64,8 @@ namespace Umbraco.Cms.Web.Website.Routing
             IUmbracoRouteValuesFactory routeValuesFactory,
             IRoutableDocumentFilter routableDocumentFilter,
             IDataProtectionProvider dataProtectionProvider,
-            IControllerActionSearcher controllerActionSearcher)
+            IControllerActionSearcher controllerActionSearcher,
+            IEventAggregator eventAggregator)
         {
             if (globalSettings is null)
             {
@@ -79,6 +82,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             _routableDocumentFilter = routableDocumentFilter ?? throw new ArgumentNullException(nameof(routableDocumentFilter));
             _dataProtectionProvider = dataProtectionProvider;
             _controllerActionSearcher = controllerActionSearcher;
+            _eventAggregator = eventAggregator;
         }
 
         /// <inheritdoc/>

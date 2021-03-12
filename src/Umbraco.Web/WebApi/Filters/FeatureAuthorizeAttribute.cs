@@ -1,7 +1,6 @@
-﻿using System.Web.Http;
+using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Web.Composing;
-using Umbraco.Core;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Features;
 

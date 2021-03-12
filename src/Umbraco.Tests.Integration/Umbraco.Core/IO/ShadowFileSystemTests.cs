@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,7 +34,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
         [SetUp]
         public void SetUp()
         {
-            SafeCallContext.Clear();
             ClearFiles(HostingEnvironment);
             FileSystems.ResetShadowId();
         }
@@ -42,7 +41,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
         [TearDown]
         public void TearDown()
         {
-            SafeCallContext.Clear();
             ClearFiles(HostingEnvironment);
             FileSystems.ResetShadowId();
         }

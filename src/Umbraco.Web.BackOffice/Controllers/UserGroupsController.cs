@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
@@ -31,11 +32,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly UmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly AppCaches _appCaches;
 
-        public UserGroupsController(IUserService userService, IContentService contentService,
-            IEntityService entityService, IMediaService mediaService, IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            UmbracoMapper umbracoMapper, ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper)
+        public UserGroupsController(
+            IUserService userService,
+            IContentService contentService,
+            IEntityService entityService,
+            IMediaService mediaService,
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            UmbracoMapper umbracoMapper,
+            ILocalizedTextService localizedTextService,
+            IShortStringHelper shortStringHelper,
+            AppCaches appCaches)
         {
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
@@ -46,6 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _localizedTextService =
                 localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
             _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
+            _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
         }
 
         [UserGroupValidate]
@@ -55,14 +64,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             //authorize that the user has access to save this user group
             var authHelper = new UserGroupEditorAuthorizationHelper(
-                _userService, _contentService, _mediaService, _entityService);
+                _userService, _contentService, _mediaService, _entityService, _appCaches);
 
             var isAuthorized = authHelper.AuthorizeGroupAccess(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, userGroupSave.Alias);
             if (isAuthorized == false)
                 return Unauthorized(isAuthorized.Result);
 
             //if sections were added we need to check that the current user has access to that section
-            isAuthorized = authHelper.AuthorizeSectionChanges(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
+            isAuthorized = authHelper.AuthorizeSectionChanges(
+                _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser,
                 userGroupSave.PersistedUserGroup.AllowedSections,
                 userGroupSave.Sections);
             if (isAuthorized == false)
@@ -78,7 +88,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return Unauthorized(isAuthorized.Result);
 
             //need to ensure current user is in a group if not an admin to avoid a 401
-            EnsureNonAdminUserIsInSavedUserGroup(userGroupSave);
+             EnsureNonAdminUserIsInSavedUserGroup(userGroupSave);
+
+            //map the model to the persisted instance
+            _umbracoMapper.Map(userGroupSave, userGroupSave.PersistedUserGroup);
 
             //save the group
             _userService.Save(userGroupSave.PersistedUserGroup, userGroupSave.Users.ToArray());

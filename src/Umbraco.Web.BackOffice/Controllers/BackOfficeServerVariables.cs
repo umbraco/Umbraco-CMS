@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
@@ -49,6 +50,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly PreviewRoutes _previewRoutes;
+        private readonly IEmailSender _emailSender;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
@@ -65,7 +67,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IRuntimeMinifier runtimeMinifier,
             IBackOfficeExternalLoginProviders externalLogins,
             IImageUrlGenerator imageUrlGenerator,
-            PreviewRoutes previewRoutes)
+            PreviewRoutes previewRoutes,
+            IEmailSender emailSender)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -82,6 +85,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _externalLogins = externalLogins;
             _imageUrlGenerator = imageUrlGenerator;
             _previewRoutes = previewRoutes;
+            _emailSender = emailSender;
         }
 
         /// <summary>
@@ -374,8 +378,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     "umbracoSettings", new Dictionary<string, object>
                     {
                         {"umbracoPath", _globalSettings.GetBackOfficePath(_hostingEnvironment)},
-                        {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath).TrimEnd('/')},
-                        {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
+                        {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath).TrimEnd(Constants.CharArrays.ForwardSlash)},
+                        {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {
                             "imageFileTypes",
                             string.Join(",", _imageUrlGenerator.SupportedImageFileTypes)
@@ -394,12 +398,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {"keepUserLoggedIn", _securitySettings.KeepUserLoggedIn},
                         {"usernameIsEmail", _securitySettings.UsernameIsEmail},
-                        {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd('/')},
+                        {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
                         {"loginLogoImage", _contentSettings.LoginLogoImage },
-                        {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
-                        {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},
+                        {"showUserInvite", _emailSender.CanSendRequiredEmail()},
+                        {"canSendRequiredEmail", _emailSender.CanSendRequiredEmail()},
                         {"showAllowSegmentationForDocumentTypes", false},
                     }
                 },

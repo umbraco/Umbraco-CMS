@@ -36,12 +36,6 @@ namespace Umbraco.Cms.Core.Security
 
             ClaimsIdentity baseIdentity = await base.GenerateClaimsAsync(user);
 
-            // now we can flow any custom claims that the actual user has currently assigned which could be done in the OnExternalLogin callback
-            foreach (IdentityUserClaim<string> claim in user.Claims)
-            {
-                baseIdentity.AddClaim(new Claim(claim.ClaimType, claim.ClaimValue));
-            }
-
             baseIdentity.AddRequiredClaims(
                 user.Id,
                 user.UserName,
@@ -52,6 +46,10 @@ namespace Umbraco.Cms.Core.Security
                 user.SecurityStamp,
                 user.AllowedSections,
                 user.Roles.Select(x => x.RoleId).ToArray());
+
+            // now we can flow any custom claims that the actual user has currently
+            // assigned which could be done in the OnExternalLogin callback
+            baseIdentity.MergeClaimsFromBackOfficeIdentity(user);
 
             return new ClaimsPrincipal(baseIdentity);
         }

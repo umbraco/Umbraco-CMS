@@ -8,10 +8,14 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Examine;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -24,18 +28,27 @@ namespace Umbraco.Cms.Infrastructure.Examine
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IEntityService _entityService;
         private readonly IUmbracoTreeSearcherFields _treeSearcherFields;
+        private readonly AppCaches _appCaches;
+        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
 
         public BackOfficeExamineSearcher(IExamineManager examineManager,
-           ILocalizationService languageService,
-           IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-           IEntityService entityService,
-           IUmbracoTreeSearcherFields treeSearcherFields)
+            ILocalizationService languageService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IEntityService entityService,
+            IUmbracoTreeSearcherFields treeSearcherFields,
+            AppCaches appCaches,
+            UmbracoMapper umbracoMapper,
+            IPublishedUrlProvider publishedUrlProvider)
         {
             _examineManager = examineManager;
             _languageService = languageService;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _entityService = entityService;
             _treeSearcherFields = treeSearcherFields;
+            _appCaches = appCaches;
+            _umbracoMapper = umbracoMapper;
+            _publishedUrlProvider = publishedUrlProvider;
         }
 
         public IEnumerable<ISearchResult> Search(string query, UmbracoEntityTypes entityType, int pageSize, long pageIndex, out long totalFound, string searchFrom = null, bool ignoreUserStartNodes = false)
@@ -71,7 +84,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                     type = "media";
                     fields.AddRange(_treeSearcherFields.GetBackOfficeMediaFields());
                     var allMediaStartNodes = currentUser != null
-                        ? currentUser.CalculateMediaStartNodeIds(_entityService)
+                        ? currentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)
                         : Array.Empty<int>();
                     AppendPath(sb, UmbracoObjectTypes.Media, allMediaStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
@@ -79,7 +92,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                     type = "content";
                     fields.AddRange(_treeSearcherFields.GetBackOfficeDocumentFields());
                     var allContentStartNodes = currentUser != null
-                        ? currentUser.CalculateContentStartNodeIds(_entityService)
+                        ? currentUser.CalculateContentStartNodeIds(_entityService, _appCaches)
                         : Array.Empty<int>();
                     AppendPath(sb, UmbracoObjectTypes.Document, allContentStartNodes, searchFrom, ignoreUserStartNodes, _entityService);
                     break;
@@ -128,7 +141,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             if (surroundedByQuotes)
             {
                 //strip quotes, escape string, the replace again
-                query = query.Trim('\"', '\'');
+                query = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
 
                 query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
@@ -162,7 +175,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
             else
             {
-                var trimmed = query.Trim(new[] { '\"', '\'' });
+                var trimmed = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
 
                 //nothing to search
                 if (searchFrom.IsNullOrWhiteSpace() && trimmed.IsNullOrWhiteSpace())
@@ -175,7 +188,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 {
                     query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
 
-                    var querywords = query.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    var querywords = query.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries);
 
                     sb.Append("+(");
 
@@ -341,5 +354,85 @@ namespace Umbraco.Cms.Infrastructure.Examine
             sb.Append(path);
             sb.Append("\\,*");
         }
+
+        /// <summary>
+        /// Returns a collection of entities for media based on search results
+        /// </summary>
+        /// <param name="results"></param>
+        /// <returns></returns>
+        private IEnumerable<SearchResultEntity> MemberFromSearchResults(IEnumerable<ISearchResult> results)
+        {
+            //add additional data
+            foreach (var result in results)
+            {
+                var m = _umbracoMapper.Map<SearchResultEntity>(result);
+
+                //if no icon could be mapped, it will be set to document, so change it to picture
+                if (m.Icon == Constants.Icons.DefaultIcon)
+                {
+                    m.Icon = Constants.Icons.Member;
+                }
+
+                if (result.Values.ContainsKey("email") && result.Values["email"] != null)
+                {
+                    m.AdditionalData["Email"] = result.Values["email"];
+                }
+                if (result.Values.ContainsKey(UmbracoExamineFieldNames.NodeKeyFieldName) && result.Values[UmbracoExamineFieldNames.NodeKeyFieldName] != null)
+                {
+                    if (Guid.TryParse(result.Values[UmbracoExamineFieldNames.NodeKeyFieldName], out var key))
+                    {
+                        m.Key = key;
+                    }
+                }
+
+                yield return m;
+            }
+        }
+
+        /// <summary>
+        /// Returns a collection of entities for media based on search results
+        /// </summary>
+        /// <param name="results"></param>
+        /// <returns></returns>
+        private IEnumerable<SearchResultEntity> MediaFromSearchResults(IEnumerable<ISearchResult> results)
+            => _umbracoMapper.Map<IEnumerable<SearchResultEntity>>(results);
+
+        /// <summary>
+        /// Returns a collection of entities for content based on search results
+        /// </summary>
+        /// <param name="results"></param>
+        /// <returns></returns>
+        private IEnumerable<SearchResultEntity> ContentFromSearchResults(IEnumerable<ISearchResult> results, string culture = null)
+        {
+            var defaultLang = _languageService.GetDefaultLanguageIsoCode();
+            foreach (var result in results)
+            {
+                var entity = _umbracoMapper.Map<SearchResultEntity>(result, context =>
+                {
+                    if (culture != null)
+                    {
+                        context.SetCulture(culture);
+                    }
+                }
+                );
+
+                var intId = entity.Id.TryConvertTo<int>();
+                if (intId.Success)
+                {
+                    //if it varies by culture, return the default language URL
+                    if (result.Values.TryGetValue(UmbracoExamineFieldNames.VariesByCultureFieldName, out var varies) && varies == "y")
+                    {
+                        entity.AdditionalData["Url"] = _publishedUrlProvider.GetUrl(intId.Result, culture: culture ?? defaultLang);
+                    }
+                    else
+                    {
+                        entity.AdditionalData["Url"] = _publishedUrlProvider.GetUrl(intId.Result);
+                    }
+                }
+
+                yield return entity;
+            }
+        }
+
     }
 }

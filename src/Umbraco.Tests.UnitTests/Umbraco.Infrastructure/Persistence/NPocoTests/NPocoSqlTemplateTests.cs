@@ -2,9 +2,11 @@
 // See LICENSE for more details.
 
 using System;
+using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -19,7 +21,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTe
         [Test]
         public void SqlTemplates()
         {
-            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SqlServer2012, Mock.Of<IPocoDataFactory>());
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())), DatabaseType.SqlServer2012, Mock.Of<IPocoDataFactory>());
             var sqlTemplates = new SqlTemplates(sqlContext);
 
             // this can be used for queries that we know we'll use a *lot* and
@@ -42,7 +44,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTe
             var mappers = new NPoco.MapperCollection { new PocoMapper() };
             var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init());
 
-            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SQLCe, factory);
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())), DatabaseType.SQLCe, factory);
             var sqlTemplates = new SqlTemplates(sqlContext);
 
             const string sqlBase = "SELECT [zbThing1].[id] AS [Id], [zbThing1].[name] AS [Name] FROM [zbThing1] WHERE ";

@@ -22,14 +22,16 @@ namespace Umbraco.Cms.Core.Cache
         public class JsonPayload
         {
             //[JsonConstructor]
-            public JsonPayload(int id, string username)
+            public JsonPayload(int id, string username, bool removed)
             {
                 Id = id;
                 Username = username;
+                Removed = removed;
             }
 
             public int Id { get; }
             public string Username { get; }
+            public bool Removed { get; }
         }
 
         #region Define
@@ -54,13 +56,13 @@ namespace Umbraco.Cms.Core.Cache
 
         public override void Refresh(int id)
         {
-            ClearCache(new JsonPayload(id, null));
+            ClearCache(new JsonPayload(id, null, false));
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            ClearCache(new JsonPayload(id, null));
+            ClearCache(new JsonPayload(id, null, false));
             base.Remove(id);
         }
 

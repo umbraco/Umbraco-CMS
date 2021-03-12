@@ -1,6 +1,7 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewComponents;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Models;
@@ -20,13 +21,17 @@ namespace Umbraco.Cms.Web.Common.Macros
 
         public PartialViewMacroViewComponent(
             MacroModel macro,
-            IPublishedContent content)
+            IPublishedContent content,
+            ViewComponentContext viewComponentContext)
         {
             _macro = macro;
             _content = content;
+            // This must be set before Invoke is called else the call to View will end up
+            // using an empty ViewData instance because this hasn't been set yet.
+            ViewComponentContext = viewComponentContext;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync()
+        public IViewComponentResult Invoke()
         {
             var model = new PartialViewMacroModel(
                 _content,
@@ -34,7 +39,8 @@ namespace Umbraco.Cms.Web.Common.Macros
                 _macro.Alias,
                 _macro.Name,
                 _macro.Properties.ToDictionary(x => x.Key, x => (object)x.Value));
-            var result =  View(_macro.MacroSource, model);
+
+            ViewViewComponentResult result =  View(_macro.MacroSource, model);
 
             return result;
         }
