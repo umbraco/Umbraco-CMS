@@ -73,6 +73,31 @@ namespace Umbraco.Tests.Scoping
         }
 
         [Test]
+        public void WriteLock_Acquired_Only_Once_When_InnerScope_Disposed()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (var outerScope = scopeProvider.CreateScope())
+            {
+                outerScope.WriteLock(Constants.Locks.Languages);
+
+                using (var innerScope = scopeProvider.CreateScope())
+                {
+                    innerScope.WriteLock(Constants.Locks.Languages);
+                    innerScope.WriteLock(Constants.Locks.ContentTree);
+                    innerScope.Complete();
+                }
+
+                outerScope.WriteLock(Constants.Locks.ContentTree);
+                outerScope.Complete();
+            }
+
+            // Since we request the ReadLock after the innerScope has been dispose, the key has been removed from the dictionary, and we fetch it again.
+            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
+            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.ContentTree), Times.Once);
+        }
+
+        [Test]
         public void WriteLock_With_Timeout_Acquired_Only_Once_Per_Key(){
             var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
             var timeout = TimeSpan.FromMilliseconds(10000);
@@ -174,6 +199,31 @@ namespace Umbraco.Tests.Scoping
 
             syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), timeOut, Constants.Locks.Domains), Times.Once);
             syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), timeOut, Constants.Locks.Languages), Times.Once);
+        }
+
+        [Test]
+        public void ReadLock_Acquired_Only_Once_When_InnerScope_Disposed()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (var outerScope = scopeProvider.CreateScope())
+            {
+                outerScope.ReadLock(Constants.Locks.Languages);
+
+                using (var innerScope = scopeProvider.CreateScope())
+                {
+                    innerScope.ReadLock(Constants.Locks.Languages);
+                    innerScope.ReadLock(Constants.Locks.ContentTree);
+                    innerScope.Complete();
+                }
+
+                outerScope.ReadLock(Constants.Locks.ContentTree);
+                outerScope.Complete();
+            }
+
+            // Since we request the ReadLock after the innerScope has been dispose, the key has been removed from the dictionary, and we fetch it again.
+            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
+            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.ContentTree), Times.Once);
         }
 
         [Test]
@@ -358,6 +408,38 @@ namespace Umbraco.Tests.Scoping
                 Assert.IsFalse(realParentScope.ReadLocks.ContainsKey(innerScope1Id));
 
                 parentScope.Complete();
+            }
+        }
+
+        [Test]
+        public void WriteLock_Doesnt_Increment_On_Error()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+            syntaxProviderMock.Setup(x => x.WriteLock(It.IsAny<IDatabase>(), It.IsAny<int[]>())).Throws(new Exception("Boom"));
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                var realScope = (Scope) scope;
+
+                Assert.Throws<Exception>(() => scope.WriteLock(Constants.Locks.Languages));
+                Assert.AreEqual(0, realScope.WriteLocks[scope.InstanceId][Constants.Locks.Languages]);
+                scope.Complete();
+            }
+        }
+
+        [Test]
+        public void ReadLock_Doesnt_Increment_On_Error()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+            syntaxProviderMock.Setup(x => x.ReadLock(It.IsAny<IDatabase>(), It.IsAny<int[]>())).Throws(new Exception("Boom"));
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                var realScope = (Scope) scope;
+
+                Assert.Throws<Exception>(() => scope.ReadLock(Constants.Locks.Languages));
+                Assert.AreEqual(0, realScope.ReadLocks[scope.InstanceId][Constants.Locks.Languages]);
+                scope.Complete();
             }
         }
     }
