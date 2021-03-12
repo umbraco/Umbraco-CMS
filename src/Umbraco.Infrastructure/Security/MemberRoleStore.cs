@@ -69,12 +69,12 @@ namespace Umbraco.Cms.Core.Security
             try
             {
                 cancellationToken.ThrowIfCancellationRequested();
+                ThrowIfDisposed();
+
                 if (role == null)
                 {
                     throw new ArgumentNullException(nameof(role));
                 }
-
-                ThrowIfDisposed();
 
                 if (!int.TryParse(role.Id, out int roleId))
                 {
@@ -205,36 +205,10 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public Task<string> GetNormalizedRoleNameAsync(TRole role, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-
-            if (role == null)
-            {
-                throw new ArgumentNullException(nameof(role));
-            }
-
-            //TODO: are we utilising NormalizedRoleName?
-            return Task.FromResult(role.NormalizedName);
-        }
+        public Task<string> GetNormalizedRoleNameAsync(TRole role, CancellationToken cancellationToken = default) => GetRoleNameAsync(role, cancellationToken);
 
         /// <inheritdoc />
-        public Task SetNormalizedRoleNameAsync(TRole role, string normalizedName, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-
-            if (role == null)
-            {
-                throw new ArgumentNullException(nameof(role));
-            }
-
-            //TODO: are we utilising NormalizedRoleName and do we need to set it in the memberGroupService?
-            role.NormalizedName = normalizedName;
-
-            return Task.CompletedTask;
-        }
+        public Task SetNormalizedRoleNameAsync(TRole role, string normalizedName, CancellationToken cancellationToken = default) => SetRoleNameAsync(role, normalizedName, cancellationToken);
 
         /// <inheritdoc />
         public Task<TRole> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
@@ -280,8 +254,6 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(name));
             }
             IMemberGroup memberGroup = _memberGroupService.GetByName(name);
-            //TODO: throw exception when not found?
-
             return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
         }
 
