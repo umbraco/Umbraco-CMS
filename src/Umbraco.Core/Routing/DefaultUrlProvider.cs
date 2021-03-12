@@ -180,8 +180,8 @@ namespace Umbraco.Cms.Core.Routing
 
         string CombinePaths(string path1, string path2)
         {
-            string path = path1.TrimEnd('/') + path2;
-            return path == "/" ? path : path.TrimEnd('/');
+            string path = path1.TrimEnd(Constants.CharArrays.ForwardSlash) + path2;
+            return path == "/" ? path : path.TrimEnd(Constants.CharArrays.ForwardSlash);
         }
 
         #endregion

@@ -570,7 +570,7 @@ context('Content', () => {
 
         // Create content with content picker
         cy.get('.umb-tree-root-link').rightclick();
-        cy.get('.-opens-dialog > .umb-action-link').click();
+        cy.get('[data-element="action-create"]').click();
         cy.get('[data-element="action-create-' + pickerDocTypeAlias + '"] > .umb-action-link').click();
         // Fill out content
         cy.umbracoEditorHeaderName('ContentPickerContent');

@@ -3,6 +3,9 @@
   <PropertyGroup>
       <TargetFramework>netstandard2.0</TargetFramework>
       <RootNamespace>Umbraco.Cms.Tests.Common</RootNamespace>
+      <PackageId>Umbraco.Cms.Tests</PackageId>
+      <Title>Umbraco CMS Test Tools</Title>
+      <Description>Contains commonly used tools to write tests for Umbraco CMS, such as various builders for content etc.</Description>
   </PropertyGroup>
 
   <ItemGroup>

@@ -62,7 +62,7 @@ namespace Umbraco.Web
             var url = "http" + ssl + "://" + request.ServerVariables["SERVER_NAME"] + port +
                       _ioHelper.ResolveUrl(_globalSettings.UmbracoPath);
 
-            return url.TrimEnd('/');
+            return url.TrimEnd(Constants.CharArrays.ForwardSlash);
         }
     }
 }

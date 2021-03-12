@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <metadata minClientVersion="4.1.0">
+        <id>Umbraco.Cms.Examine.Lucene</id>
+        <version>9.0.0</version>
+        <title>Umbraco CMS Examine Binaries</title>
+        <authors>Umbraco HQ</authors>
+        <owners>Umbraco HQ</owners>
+        <license type="expression">MIT</license>
+        <projectUrl>https://umbraco.com/</projectUrl>
+        <iconUrl>https://umbraco.com/dist/nuget/logo-small.png</iconUrl>
+        <requireLicenseAcceptance>false</requireLicenseAcceptance>
+        <description>Contains the Examine assemblies needed to run Umbraco Cms. This package only contains assemblies and can be used for package development. Use the UmbracoCms package to setup Umbraco in Visual Studio as an ASP.NET Core project.</description>
+        <summary>Contains dll files required to run Examine.</summary>
+        <language>en-US</language>
+        <tags>umbraco</tags>
+        <repository type="git" url="https://github.com/umbraco/umbraco-cms" />
+        <dependencies>
+
+            <group targetFramework="netstandard2.0">
+                <dependency id="Umbraco.Cms.Core" version="[$version$]" />
+                <dependency id="Umbraco.Cms.Infrastructure" version="[$version$]" />
+                <dependency id="Newtonsoft.Json" version="[12.0.3,12.999999)" />
+                <dependency id="NPoco" version="[4.0.2,4.999999)" />
+                <dependency id="System.Configuration.ConfigurationManager" version="[5.0.0,5.999999)" />
+            </group>
+
+        </dependencies>
+    </metadata>
+
+    <files>
+        <!-- Umbraco.Examine.Lucene HACK remove this when Examine lucene is a real netstandard dependency -->
+        <file src="$BuildTmp$\bin\Examine.Lucene.dll" target="lib\netstandard2.0\Examine.Lucene.dll" />
+        <file src="$BuildTmp$\bin\Lucene.Net.dll" target="lib\netstandard2.0\Lucene.Net.dll" />
+
+        <!-- Libs -->
+        <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.dll" target="lib\net472\Umbraco.Examine.Lucene.dll" />
+        <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.dll" target="lib\netstandard2.0\Umbraco.Examine.Lucene.dll" />
+
+
+        <!-- Docs -->
+        <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.xml" target="lib\net472\Umbraco.Examine.Lucene.xml" />
+        <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.xml" target="lib\netstandard2.0\Umbraco.Examine.Lucene.xml" />
+
+        <!-- Symbols -->
+        <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.pdb" target="lib\net472\Umbraco.Examine.Lucene.pdb" />
+        <file src="$BuildTmp$\bin\Umbraco.Examine.Lucene.pdb" target="lib\netstandard2.0\Umbraco.Examine.Lucene.pdb" />
+    </files>
+</package>

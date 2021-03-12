@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
@@ -1339,7 +1340,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         /// <inheritdoc />
         public bool HasContainerInPath(string contentPath)
         {
-            var ids = contentPath.Split(',').Select(int.Parse).ToArray();
+            var ids = contentPath.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray();
             return HasContainerInPath(ids);
         }
 

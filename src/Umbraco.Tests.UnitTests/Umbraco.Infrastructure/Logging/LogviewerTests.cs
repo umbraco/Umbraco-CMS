@@ -16,6 +16,11 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Logging.Viewer;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using File = System.IO.File;
 
@@ -27,17 +32,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Logging
         private ILogViewer _logViewer;
 
         private const string LogfileName = "UmbracoTraceLog.UNITTEST.20181112.json";
-        private const string SearchfileName = "logviewer.searches.config.js";
 
         private string _newLogfilePath;
         private string _newLogfileDirPath;
 
-        private string _newSearchfilePath;
-        private string _newSearchfileDirPath;
-
         private readonly LogTimePeriod _logTimePeriod = new LogTimePeriod(
             new DateTime(year: 2018, month: 11, day: 12, hour: 0, minute: 0, second: 0),
             new DateTime(year: 2018, month: 11, day: 13, hour: 0, minute: 0, second: 0));
+
+        private ILogViewerQueryRepository LogViewerQueryRepository { get; } = new TestLogViewerQueryRepository();
 
         [OneTimeSetUp]
         public void Setup()
@@ -55,20 +58,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Logging
             _newLogfileDirPath = loggingConfiguration.LogDirectory;
             _newLogfilePath = Path.Combine(_newLogfileDirPath, LogfileName);
 
-            var exampleSearchfilePath = Path.Combine(testRoot, "TestHelpers", "Assets", SearchfileName);
-            _newSearchfileDirPath = Path.Combine(hostingEnv.ApplicationPhysicalPath, @"config");
-            _newSearchfilePath = Path.Combine(_newSearchfileDirPath, SearchfileName);
-
             // Create/ensure Directory exists
             ioHelper.EnsurePathExists(_newLogfileDirPath);
-            ioHelper.EnsurePathExists(_newSearchfileDirPath);
 
             // Copy the sample files
             File.Copy(exampleLogfilePath, _newLogfilePath, true);
-            File.Copy(exampleSearchfilePath, _newSearchfilePath, true);
 
             ILogger<SerilogJsonLogViewer> logger = Mock.Of<ILogger<SerilogJsonLogViewer>>();
-            var logViewerConfig = new LogViewerConfig(hostingEnv);
+            var logViewerConfig = new LogViewerConfig(LogViewerQueryRepository, Mock.Of<IScopeProvider>());
             _logViewer = new SerilogJsonLogViewer(logger, logViewerConfig, loggingConfiguration, Log.Logger);
         }
 
@@ -80,11 +77,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Logging
             if (File.Exists(_newLogfilePath))
             {
                 File.Delete(_newLogfilePath);
-            }
-
-            if (File.Exists(_newSearchfilePath))
-            {
-                File.Delete(_newSearchfilePath);
             }
         }
 
@@ -237,5 +229,56 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Logging
             findItem = searches.Where(x => x.Name == "Unit Test Example" && x.Query == "Has(UnitTest)");
             Assert.IsEmpty(findItem, "The search item should no longer exist");
         }
+    }
+
+    internal class TestLogViewerQueryRepository : ILogViewerQueryRepository
+    {
+        public TestLogViewerQueryRepository()
+        {
+            Store = new List<ILogViewerQuery>(MigrateLogViewerQueriesFromFileToDb.DefaultLogQueries
+                .Select(LogViewerQueryModelFactory.BuildEntity));
+        }
+
+        private IList<ILogViewerQuery> Store { get; }
+        private LogViewerQueryRepository.LogViewerQueryModelFactory LogViewerQueryModelFactory { get; } = new LogViewerQueryRepository.LogViewerQueryModelFactory();
+
+
+        public ILogViewerQuery Get(int id) => Store.FirstOrDefault(x => x.Id == id);
+
+        public IEnumerable<ILogViewerQuery> GetMany(params int[] ids) =>
+            ids.Any() ? Store.Where(x => ids.Contains(x.Id)) : Store;
+
+        public bool Exists(int id) => Get(id) is not null;
+
+        public void Save(ILogViewerQuery entity)
+        {
+            var item = Get(entity.Id);
+
+            if (item is null)
+            {
+               Store.Add(entity);
+            }
+            else
+            {
+                item.Name = entity.Name;
+                item.Query = entity.Query;
+            }
+        }
+
+        public void Delete(ILogViewerQuery entity)
+        {
+            var item = Get(entity.Id);
+
+            if (item is not null)
+            {
+                Store.Remove(item);
+            }
+        }
+
+        public IEnumerable<ILogViewerQuery> Get(IQuery<ILogViewerQuery> query) => throw new NotImplementedException();
+
+        public int Count(IQuery<ILogViewerQuery> query) => throw new NotImplementedException();
+
+        public ILogViewerQuery GetByName(string name) => Store.FirstOrDefault(x => x.Name == name);
     }
 }

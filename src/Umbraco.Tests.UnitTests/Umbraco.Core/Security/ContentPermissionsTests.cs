@@ -3,6 +3,7 @@
 
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
@@ -31,7 +32,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             IEntityService entityService = entityServiceMock.Object;
             var userServiceMock = new Mock<IUserService>();
             IUserService userService = userServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent);
@@ -58,7 +59,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             IUserService userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             IEntityService entityService = entityServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
@@ -87,7 +88,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 9876 && entity.Path == "-1,9876") });
             IEntityService entityService = entityServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
@@ -117,7 +118,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             IUserService userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             IEntityService entityService = entityServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
@@ -147,7 +148,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             IUserService userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             IEntityService entityService = entityServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(1234, user, out IContent foundContent, new[] { 'F' });
@@ -167,7 +168,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             IUserService userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             IEntityService entityService = entityServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(-1, user, out IContent _);
@@ -187,7 +188,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             IUserService userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             IEntityService entityService = entityServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(-20, user, out IContent _);
@@ -209,7 +210,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             IEntityService entityService = entityServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(-20, user, out IContent foundContent);
@@ -232,7 +233,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             IEntityService entityService = entityServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(-1, user, out IContent foundContent);
@@ -259,7 +260,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             IUserService userService = userServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             IEntityService entityService = entityServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(-1, user, out IContent foundContent, new[] { 'A' });
@@ -286,7 +287,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             IEntityService entityService = entityServiceMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             IContentService contentService = contentServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(-1, user, out IContent foundContent, new[] { 'B' });
@@ -314,7 +315,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             IEntityService entityService = entityServiceMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             IContentService contentService = contentServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(-20, user, out IContent foundContent, new[] { 'A' });
@@ -341,7 +342,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
             IEntityService entityService = entityServiceMock.Object;
             var contentServiceMock = new Mock<IContentService>();
             IContentService contentService = contentServiceMock.Object;
-            var contentPermissions = new ContentPermissions(userService, contentService, entityService);
+            var contentPermissions = new ContentPermissions(userService, contentService, entityService, AppCaches.Disabled);
 
             // Act
             ContentPermissions.ContentAccess result = contentPermissions.CheckPermissions(-20, user, out IContent foundContent, new[] { 'B' });

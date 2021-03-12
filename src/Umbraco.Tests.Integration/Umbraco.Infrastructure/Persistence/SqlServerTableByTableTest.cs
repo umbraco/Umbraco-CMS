@@ -221,6 +221,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence
         }
 
         [Test]
+        public void Can_Create_umbracoLogViewerQuery_Table()
+        {
+            using (var scope = ScopeProvider.CreateScope())
+            {
+                var helper = new DatabaseSchemaCreator(scope.Database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, UmbracoVersion);
+
+                helper.CreateTable<LogViewerQueryDto>();
+
+                scope.Complete();
+            }
+        }
+
+        [Test]
         public void Can_Create_umbracoLanguage_Table()
         {
             using (var scope = ScopeProvider.CreateScope())

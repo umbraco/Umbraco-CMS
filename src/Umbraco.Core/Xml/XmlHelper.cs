@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.Xml
         public static bool IsXmlWhitespace(string s)
         {
             // as per xml 1.1 specs - anything else is significant whitespace
-            s = s.Trim(' ', '\t', '\r', '\n');
+            s = s.Trim(Constants.CharArrays.XmlWhitespaceChars);
             return s.Length == 0;
         }
 

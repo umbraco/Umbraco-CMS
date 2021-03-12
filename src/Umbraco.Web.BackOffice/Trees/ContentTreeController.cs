@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Models;
@@ -41,6 +42,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
         private readonly IEmailSender _emailSender;
+        private readonly AppCaches _appCaches;
 
         public ContentTreeController(
             ILocalizedTextService localizedTextService,
@@ -58,8 +60,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             IPublicAccessService publicAccessService,
             ILocalizationService localizationService,
             IEventAggregator eventAggregator,
-            IEmailSender emailSender)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService, eventAggregator)
+            IEmailSender emailSender,
+            AppCaches appCaches)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService, eventAggregator, appCaches)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
@@ -71,6 +74,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _userService = userService;
             _localizationService = localizationService;
             _emailSender = emailSender;
+            _appCaches = appCaches;
         }
 
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
@@ -80,7 +84,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private int[] _userStartNodes;
 
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService));
+            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService, _appCaches));
 
 
 
@@ -164,7 +168,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
                 //these two are the standard items
                 menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add<ActionSort>(LocalizedTextService, true);
+                menu.Items.Add<ActionSort>(LocalizedTextService, true, opensDialog: true);
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -194,7 +198,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(item, _entityService))
+            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(item, _entityService, _appCaches))
             {
                 var menu = _menuItemCollectionFactory.Create();
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
@@ -204,7 +208,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var nodeMenu = GetAllNodeMenuItems(item);
 
             //if the content node is in the recycle bin, don't have a default menu, just show the regular menu
-            if (item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
+            if (item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 nodeMenu.DefaultMenuAlias = null;
                 nodeMenu = GetNodeMenuItemsForDeletedContent(item);
@@ -270,7 +274,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             AddActionNode<ActionCreateBlueprintFromContent>(item, menu, opensDialog: true);
             AddActionNode<ActionMove>(item, menu, true, opensDialog: true);
             AddActionNode<ActionCopy>(item, menu, opensDialog: true);
-            AddActionNode<ActionSort>(item, menu, true);
+            AddActionNode<ActionSort>(item, menu, true, opensDialog: true);
             AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true);
             AddActionNode<ActionRights>(item, menu, opensDialog: true);
             AddActionNode<ActionProtect>(item, menu, true, opensDialog: true);

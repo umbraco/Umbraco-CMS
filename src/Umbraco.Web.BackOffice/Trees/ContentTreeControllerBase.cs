@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
@@ -28,6 +29,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         private readonly ActionCollection _actionCollection;
         private readonly IUserService _userService;
         private readonly IDataTypeService _dataTypeService;
+        private readonly AppCaches _appCaches;
         public IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
 
 
@@ -41,7 +43,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             ActionCollection actionCollection,
             IUserService userService,
             IDataTypeService dataTypeService,
-            IEventAggregator eventAggregator
+            IEventAggregator eventAggregator,
+            AppCaches appCaches
             )
             : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
@@ -51,6 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             _actionCollection = actionCollection;
             _userService = userService;
             _dataTypeService = dataTypeService;
+            _appCaches = appCaches;
             MenuItemCollectionFactory = menuItemCollectionFactory;
         }
 
@@ -151,12 +155,12 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             switch (RecycleBinId)
             {
                 case Constants.System.RecycleBinMedia:
-                    startNodeIds = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService);
-                    startNodePaths = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetMediaStartNodePaths(_entityService);
+                    startNodeIds = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService, _appCaches);
+                    startNodePaths = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetMediaStartNodePaths(_entityService, _appCaches);
                     break;
                 case Constants.System.RecycleBinContent:
-                    startNodeIds = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService);
-                    startNodePaths = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetContentStartNodePaths(_entityService);
+                    startNodeIds = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService, _appCaches);
+                    startNodePaths = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetContentStartNodePaths(_entityService, _appCaches);
                     break;
                 default:
                     throw new NotSupportedException("Path access is only determined on content or media");
@@ -322,8 +326,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         {
             if (entity == null) return false;
             return RecycleBinId == Constants.System.RecycleBinContent
-                ? _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(entity, _entityService)
-                : _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasMediaPathAccess(entity, _entityService);
+                ? _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(entity, _entityService, _appCaches)
+                : _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasMediaPathAccess(entity, _entityService, _appCaches);
         }
 
         /// <summary>
@@ -406,7 +410,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
                 if (startNodes.Any(x =>
                 {
-                    var pathParts = x.Path.Split(',');
+                    var pathParts = x.Path.Split(Constants.CharArrays.Comma);
                     return pathParts.Contains(e.Id.ToInvariantString());
                 }))
                 {

@@ -39,7 +39,7 @@ namespace Umbraco.Tests.TestHelpers
         /// that can begin a transaction.</remarks>
         public UmbracoDatabase GetUmbracoSqlCeDatabase(ILogger<UmbracoDatabase> logger)
         {
-            var syntax = new SqlCeSyntaxProvider();
+            var syntax = new SqlCeSyntaxProvider(Options.Create(new GlobalSettings()));
             var connection = GetDbConnection();
             var sqlContext = new SqlContext(syntax, DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             return new UmbracoDatabase(connection, sqlContext, logger, TestHelper.BulkSqlInsertProvider);
@@ -54,7 +54,7 @@ namespace Umbraco.Tests.TestHelpers
         /// that can begin a transaction.</remarks>
         public UmbracoDatabase GetUmbracoSqlServerDatabase(ILogger<UmbracoDatabase> logger)
         {
-            var syntax = new SqlServerSyntaxProvider(); // do NOT try to get the server's version!
+            var syntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())); // do NOT try to get the server's version!
             var connection = GetDbConnection();
             var sqlContext = new SqlContext(syntax, DatabaseType.SqlServer2008, Mock.Of<IPocoDataFactory>());
             return new UmbracoDatabase(connection, sqlContext, logger, TestHelper.BulkSqlInsertProvider);
@@ -62,9 +62,9 @@ namespace Umbraco.Tests.TestHelpers
 
         public IScopeProvider GetScopeProvider(ILoggerFactory loggerFactory, FileSystems fileSystems = null, IUmbracoDatabaseFactory databaseFactory = null)
         {
-            var globalSettings = new GlobalSettings();
+            var globalSettings = Options.Create(new GlobalSettings());
             var connectionString = ConfigurationManager.ConnectionStrings[Constants.System.UmbracoConnectionName].ConnectionString;
-            var connectionStrings = new ConnectionStrings { UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, connectionString) };
+            var connectionStrings = Options.Create(new ConnectionStrings { UmbracoConnectionString = new ConfigConnectionString(Constants.System.UmbracoConnectionName, connectionString) });
             var coreDebugSettings = new CoreDebugSettings();
 
             if (databaseFactory == null)
@@ -83,7 +83,7 @@ namespace Umbraco.Tests.TestHelpers
                     new DatabaseSchemaCreatorFactory(Mock.Of<ILogger<DatabaseSchemaCreator>>(),loggerFactory, new UmbracoVersion()));
             }
 
-            fileSystems ??= new FileSystems(Current.Factory, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, TestHelper.IOHelper, Options.Create(globalSettings), TestHelper.GetHostingEnvironment());
+            fileSystems ??= new FileSystems(Current.Factory, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, TestHelper.IOHelper, globalSettings, TestHelper.GetHostingEnvironment());
             var coreDebug = TestHelper.CoreDebugSettings;
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
             return new ScopeProvider(databaseFactory, fileSystems, Options.Create(coreDebugSettings), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance);

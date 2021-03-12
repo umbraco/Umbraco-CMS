@@ -144,7 +144,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual ISqlSyntaxProvider GetSyntaxProvider()
         {
-            return new SqlCeSyntaxProvider();
+            return new SqlCeSyntaxProvider(Microsoft.Extensions.Options.Options.Create(new GlobalSettings()));
         }
 
         protected virtual string GetDbProviderName()
