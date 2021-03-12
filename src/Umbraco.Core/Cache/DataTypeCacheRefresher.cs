@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -9,14 +10,20 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeCacheRefresher, DataTypeCacheRefresher.JsonPayload>
+    public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeCacheRefresherNotification, DataTypeCacheRefresher.JsonPayload>
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IIdKeyMap _idKeyMap;
 
-        public DataTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IIdKeyMap idKeyMap)
-            : base(appCaches, serializer)
+        public DataTypeCacheRefresher(
+            AppCaches appCaches,
+            IJsonSerializer serializer,
+            IPublishedSnapshotService publishedSnapshotService,
+            IPublishedModelFactory publishedModelFactory,
+            IIdKeyMap idKeyMap,
+            IEventAggregator eventAggregator)
+            : base(appCaches, serializer, eventAggregator)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _publishedModelFactory = publishedModelFactory;
@@ -24,8 +31,6 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         #region Define
-
-        protected override DataTypeCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("35B16C25-A17E-45D7-BC8F-EDAB1DCC28D2");
 

@@ -1,6 +1,7 @@
 //using Newtonsoft.Json;
 
 using System;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Serialization;
@@ -9,12 +10,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresher, MemberCacheRefresher.JsonPayload>
+    public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresherNotification, MemberCacheRefresher.JsonPayload>
     {
         private readonly IIdKeyMap _idKeyMap;
 
-        public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap)
-            : base(appCaches, serializer)
+        public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap, IEventAggregator eventAggregator)
+            : base(appCaches, serializer, eventAggregator)
         {
             _idKeyMap = idKeyMap;
         }
@@ -35,8 +36,6 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         #region Define
-
-        protected override MemberCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("E285DF34-ACDC-4226-AE32-C0CB5CF388DA");
 

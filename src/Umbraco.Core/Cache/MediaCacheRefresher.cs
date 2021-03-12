@@ -1,4 +1,5 @@
 ﻿using System;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
@@ -9,21 +10,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresher, MediaCacheRefresher.JsonPayload>
+    public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresherNotification, MediaCacheRefresher.JsonPayload>
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IIdKeyMap _idKeyMap;
 
-        public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdKeyMap idKeyMap)
-            : base(appCaches, serializer)
+        public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdKeyMap idKeyMap, IEventAggregator eventAggregator)
+            : base(appCaches, serializer, eventAggregator)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idKeyMap = idKeyMap;
         }
 
         #region Define
-
-        protected override MediaCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("B29286DD-2D40-4DDB-B325-681226589FEC");
 

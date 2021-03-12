@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -102,9 +103,14 @@ namespace Umbraco.Extensions
             builder.AddNotificationHandler<ModelBindingError, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<UmbracoApplicationStarting, LiveModelsProvider>();
             builder.AddNotificationHandler<UmbracoRequestEnd, LiveModelsProvider>();
-            builder.AddNotificationHandler<UmbracoApplicationStarting, OutOfDateModelsStatus>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, LiveModelsProvider>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, LiveModelsProvider>();
+
             builder.Services.AddSingleton<ModelsGenerator>();
             builder.Services.AddSingleton<LiveModelsProvider>();
+            builder.Services.AddSingleton<OutOfDateModelsStatus>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
             builder.Services.AddSingleton<OutOfDateModelsStatus>();
             builder.Services.AddSingleton<ModelsGenerationError>();
 

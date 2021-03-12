@@ -25,7 +25,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
@@ -217,6 +216,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()
+                .AddExamine()
                 .AddTestServices(TestHelper, GetAppCaches());
 
             if (TestOptions.Mapper)

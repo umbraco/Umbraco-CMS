@@ -10,32 +10,20 @@ namespace Umbraco.Cms.Core.Cache
     /// </summary>
     /// <typeparam name="TInstanceType">The actual cache refresher type.</typeparam>
     /// <remarks>The actual cache refresher type is used for strongly typed events.</remarks>
-    public abstract class CacheRefresherBase<TInstanceType> : ICacheRefresher
-        where TInstanceType : class, ICacheRefresher
+    public abstract class CacheRefresherBase< TNotification> : ICacheRefresher
+        where TNotification : CacheRefresherNotificationBase, new()
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CacheRefresherBase{TInstanceType}"/>.
         /// </summary>
         /// <param name="appCaches">A cache helper.</param>
-        protected CacheRefresherBase(AppCaches appCaches)
+        protected CacheRefresherBase(AppCaches appCaches, IEventAggregator eventAggregator)
         {
             AppCaches = appCaches;
+            EventAggregator = eventAggregator;
         }
 
-        /// <summary>
-        /// Triggers when the cache is updated on the server.
-        /// </summary>
-        /// <remarks>
-        /// Triggers on each server configured for an Umbraco project whenever a cache refresher is updated.
-        /// </remarks>
-        public static event TypedEventHandler<TInstanceType, CacheRefresherEventArgs> CacheUpdated;
-
         #region Define
-
-        /// <summary>
-        /// Gets the typed 'this' for events.
-        /// </summary>
-        protected abstract TInstanceType This { get; }
 
         /// <summary>
         /// Gets the unique identifier of the refresher.
@@ -56,7 +44,7 @@ namespace Umbraco.Cms.Core.Cache
         /// </summary>
         public virtual void RefreshAll()
         {
-            OnCacheUpdated(This, new CacheRefresherEventArgs(null, MessageType.RefreshAll));
+            OnCacheUpdated(new TNotification().Init(null, MessageType.RefreshAll));
         }
 
         /// <summary>
@@ -65,7 +53,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="id">The entity's identifier.</param>
         public virtual void Refresh(int id)
         {
-            OnCacheUpdated(This, new CacheRefresherEventArgs(id, MessageType.RefreshById));
+            OnCacheUpdated(new TNotification().Init(id, MessageType.RefreshById));
         }
 
         /// <summary>
@@ -74,7 +62,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="id">The entity's identifier.</param>
         public virtual void Refresh(Guid id)
         {
-            OnCacheUpdated(This, new CacheRefresherEventArgs(id, MessageType.RefreshById));
+            OnCacheUpdated(new TNotification().Init(id, MessageType.RefreshById));
         }
 
         /// <summary>
@@ -83,7 +71,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="id">The entity's identifier.</param>
         public virtual void Remove(int id)
         {
-            OnCacheUpdated(This, new CacheRefresherEventArgs(id, MessageType.RemoveById));
+            OnCacheUpdated(new TNotification().Init(id, MessageType.RemoveById));
         }
 
         #endregion
@@ -94,6 +82,8 @@ namespace Umbraco.Cms.Core.Cache
         /// Gets the cache helper.
         /// </summary>
         protected AppCaches AppCaches { get; }
+
+        protected IEventAggregator EventAggregator { get; }
 
         /// <summary>
         /// Clears the cache for all repository entities of a specified type.
@@ -110,9 +100,9 @@ namespace Umbraco.Cms.Core.Cache
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
-        protected static void OnCacheUpdated(TInstanceType sender, CacheRefresherEventArgs args)
+        protected void OnCacheUpdated(CacheRefresherNotificationBase notification)
         {
-            CacheUpdated?.Invoke(sender, args);
+            EventAggregator.Publish(notification);
         }
 
         #endregion

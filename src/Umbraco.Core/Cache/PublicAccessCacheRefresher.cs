@@ -1,17 +1,16 @@
 ﻿using System;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class PublicAccessCacheRefresher : CacheRefresherBase<PublicAccessCacheRefresher>
+    public sealed class PublicAccessCacheRefresher : CacheRefresherBase<PublicAccessCacheRefresherNotification>
     {
-        public PublicAccessCacheRefresher(AppCaches appCaches)
-            : base(appCaches)
+        public PublicAccessCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator)
+            : base(appCaches, eventAggregator)
         { }
 
         #region Define
-
-        protected override PublicAccessCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("1DB08769-B104-4F8B-850E-169CAC1DF2EC");
 
