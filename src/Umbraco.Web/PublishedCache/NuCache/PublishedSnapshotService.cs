@@ -1492,9 +1492,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 scope.ReadLock(Constants.Locks.ContentTree);
                 scope.ReadLock(Constants.Locks.MediaTree);
                 scope.ReadLock(Constants.Locks.MemberTree);
-                RebuildContentDbCacheLocked(serializer, scope, GetSqlPagingSize(), null);
-                RebuildMediaDbCacheLocked(serializer, scope, GetSqlPagingSize(), null);
-                RebuildMemberDbCacheLocked(serializer, scope, GetSqlPagingSize(), null);
+
+                var groupSize = GetSqlPagingSize();
+
+                RebuildContentDbCacheLocked(serializer, scope, groupSize, null);
+                RebuildMediaDbCacheLocked(serializer, scope, groupSize, null);
+                RebuildMemberDbCacheLocked(serializer, scope, groupSize, null);
                 scope.Complete();
             }
         }
