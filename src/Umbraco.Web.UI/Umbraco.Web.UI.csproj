@@ -88,7 +88,7 @@
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="ClientDependency" Version="1.9.9" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.9.3" />
-    <PackageReference Include="Examine" Version="1.0.2" />
+    <PackageReference Include="Examine" Version="1.1.0" />
     <PackageReference Include="ImageProcessor.Web" Version="4.10.0.100" />
     <PackageReference Include="ImageProcessor.Web.Config" Version="2.5.0.100" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
@@ -347,9 +347,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8111</DevelopmentServerPort>
+          <DevelopmentServerPort>8120</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8111</IISUrl>
+          <IISUrl>http://localhost:8120</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
