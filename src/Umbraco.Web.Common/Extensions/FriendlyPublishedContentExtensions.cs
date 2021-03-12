@@ -50,9 +50,7 @@ namespace Umbraco.Extensions
         private static IPublishedValueFallback PublishedValueFallback { get; } =
             StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>();
 
-        private static IPublishedSnapshot PublishedSnapshot { get; } =
-            StaticServiceProvider.Instance.GetRequiredService<IPublishedSnapshot>();
-
+        private static IPublishedSnapshot PublishedSnapshot => UmbracoContextAccessor.UmbracoContext?.PublishedSnapshot;
 
         private static IMediaTypeService MediaTypeService { get; } =
             StaticServiceProvider.Instance.GetRequiredService<IMediaTypeService>();
