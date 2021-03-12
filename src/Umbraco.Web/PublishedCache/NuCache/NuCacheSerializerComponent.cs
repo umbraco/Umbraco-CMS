@@ -17,13 +17,15 @@ namespace Umbraco.Web.PublishedCache.NuCache
     {
         private const string Nucache_Serializer_Key = "Umbraco.Web.PublishedCache.NuCache.Serializer";
         private const string JSON_SERIALIZER_VALUE = "JSON";
-        private readonly IPublishedSnapshotService _service;
+        private readonly Lazy<IPublishedSnapshotService> _service;
         private readonly IKeyValueService _keyValueService;
         private readonly IProfilingLogger _profilingLogger;
 
-        public NuCacheSerializerComponent(IPublishedSnapshotService service, IKeyValueService keyValueService,IProfilingLogger profilingLogger)
+        public NuCacheSerializerComponent(Lazy<IPublishedSnapshotService> service, IKeyValueService keyValueService, IProfilingLogger profilingLogger)
         {
-            // service: nothing - this just ensures that the service is created at boot time
+            // We are using lazy here as a work around because the service does quite a lot of initialization in the ctor which
+            // we want to avoid where possible. Since we only need the service if we are rebuilding, we don't want to eagerly
+            // initialize anything unless we need to.
             _service = service;
             _keyValueService = keyValueService;
             _profilingLogger = profilingLogger;
@@ -50,11 +52,11 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             if (serializer != currentSerializer)
             {
-                _profilingLogger.Info<NuCacheSerializerComponent>($"Database NuCache was serialized using {currentSerializer}. Currently configured NuCache serializer {serializer}. Rebuilding Nucache");
+                _profilingLogger.Warn<NuCacheSerializerComponent>($"Database NuCache was serialized using {currentSerializer}. Currently configured NuCache serializer {serializer}. Rebuilding Nucache");
+
                 using (_profilingLogger.TraceDuration<NuCacheSerializerComponent>($"Rebuilding NuCache database with {currentSerializer} serializer"))
                 {
-
-                    _service.Rebuild();
+                    _service.Value.Rebuild();
                     _keyValueService.SetValue(Nucache_Serializer_Key, serializer);
                 }
             }
