@@ -409,26 +409,34 @@ namespace Umbraco.Core.Configuration
             {
                 if (_sqlWriteLockTimeOut != default) return _sqlWriteLockTimeOut;
 
-                var timeOut = 5000; // 5 seconds
-                var appSettingSqlWriteLockTimeOut = ConfigurationManager.AppSettings[Constants.AppSettings.SqlWriteLockTimeOut];
-                if(int.TryParse(appSettingSqlWriteLockTimeOut, out var configuredTimeOut))
-                {
-                    // Only apply this setting if it's not excessively high or low
-                    const int minimumTimeOut = 100;
-                    const int maximumTimeOut = 20000;
-                    if (configuredTimeOut >= minimumTimeOut && configuredTimeOut <= maximumTimeOut) // between 0.1 and 20 seconds
-                    {
-                        timeOut = configuredTimeOut;
-                    }
-                    else
-                    {
-                      Current.Logger.Warn<GlobalSettings>($"The `{Constants.AppSettings.SqlWriteLockTimeOut}` setting in web.config is not between the minimum of {minimumTimeOut} ms and maximum of {maximumTimeOut} ms, defaulting back to {timeOut}");
-                    }
-                }
+                var timeOut = GetSqlWriteLockTimeoutFromConfigFile(Current.Logger);
 
                 _sqlWriteLockTimeOut = timeOut;
                 return _sqlWriteLockTimeOut;
             }
+        }
+
+        internal static int GetSqlWriteLockTimeoutFromConfigFile(ILogger logger)
+        {
+            var timeOut = 5000; // 5 seconds
+            var appSettingSqlWriteLockTimeOut = ConfigurationManager.AppSettings[Constants.AppSettings.SqlWriteLockTimeOut];
+            if (int.TryParse(appSettingSqlWriteLockTimeOut, out var configuredTimeOut))
+            {
+                // Only apply this setting if it's not excessively high or low
+                const int minimumTimeOut = 100;
+                const int maximumTimeOut = 20000;
+                if (configuredTimeOut >= minimumTimeOut && configuredTimeOut <= maximumTimeOut) // between 0.1 and 20 seconds
+                {
+                    timeOut = configuredTimeOut;
+                }
+                else
+                {
+                    logger.Warn<GlobalSettings>(
+                        $"The `{Constants.AppSettings.SqlWriteLockTimeOut}` setting in web.config is not between the minimum of {minimumTimeOut} ms and maximum of {maximumTimeOut} ms, defaulting back to {timeOut}");
+                }
+            }
+
+            return timeOut;
         }
     }
 }
