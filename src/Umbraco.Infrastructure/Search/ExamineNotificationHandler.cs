@@ -129,7 +129,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         {
             if (s_deactivate_handlers)
             {
-                return;;
+                return;
             }
             if (Suspendable.ExamineEvents.CanIndex == false)
             {
@@ -237,7 +237,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         {
             if (s_deactivate_handlers)
             {
-                return;;
+                return;
             }
 
             if (Suspendable.ExamineEvents.CanIndex == false)
@@ -305,7 +305,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         {
             if (s_deactivate_handlers)
             {
-                return;;
+                return;
             }
 
             if (Suspendable.ExamineEvents.CanIndex == false)
@@ -374,7 +374,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         {
             if (s_deactivate_handlers)
             {
-                return;;
+                return;
             }
 
             if (!(args.MessageObject is LanguageCacheRefresher.JsonPayload[] payloads))
@@ -408,7 +408,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         {
             if (s_deactivate_handlers)
             {
-                return;;
+                return;
             }
 
             if (Suspendable.ExamineEvents.CanIndex == false)
