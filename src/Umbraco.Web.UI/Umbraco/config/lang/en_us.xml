@@ -680,6 +680,7 @@
     <key alias="clear">Clear</key>
     <key alias="close">Close</key>
     <key alias="closewindow">Close Window</key>
+    <key alias="closepane">Close Pane</key>
     <key alias="comment">Comment</key>
     <key alias="confirm">Confirm</key>
     <key alias="constrain">Constrain</key>

@@ -636,6 +636,7 @@
     <key alias="choose">Choisir</key>
     <key alias="close">Fermer</key>
     <key alias="closewindow">Fermer la fenêtre</key>
+    <key alias="closepane">Fermer le panel</key>
     <key alias="comment">Commenter</key>
     <key alias="confirm">Confirmer</key>
     <key alias="constrain">Conserver</key>
