@@ -53,30 +53,7 @@ namespace Umbraco.Cms.Core.Security
         public override Task<string> GetNormalizedUserNameAsync(MemberIdentityUser user, CancellationToken cancellationToken = default) => GetUserNameAsync(user, cancellationToken);
 
         /// <inheritdoc />
-        public override Task SetNormalizedUserNameAsync(MemberIdentityUser user, string normalizedName,
-            CancellationToken cancellationToken = default)
-        {
-            try
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-                ThrowIfDisposed();
-                if (user == null)
-                {
-                    throw new ArgumentNullException(nameof(user));
-                }
-
-                if (normalizedName == null)
-                {
-                    throw new ArgumentNullException(nameof(normalizedName));
-                }
-
-                return SetUserNameAsync(user, normalizedName, cancellationToken);
-            }
-            catch (Exception ex)
-            {
-                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = genericIdentityErrorCode, Description = ex.Message }));
-            }
-        }
+        public override Task SetNormalizedUserNameAsync(MemberIdentityUser user, string normalizedName, CancellationToken cancellationToken = default) => SetUserNameAsync(user, normalizedName, cancellationToken);
 
         /// <inheritdoc />
         public override Task<IdentityResult> CreateAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
