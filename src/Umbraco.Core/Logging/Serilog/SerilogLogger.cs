@@ -119,6 +119,30 @@ namespace Umbraco.Core.Logging.Serilog
         }
 
         /// <inheritdoc/>
+        public void Fatal<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0)
+        {
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Fatal, exception, ref messageTemplate);
+            logger.Fatal(exception, messageTemplate, propertyValue0);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal<T0,T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+        {
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Fatal, exception, ref messageTemplate);
+            logger.Fatal(exception, messageTemplate, propertyValue0, propertyValue1);
+        }
+
+        /// <inheritdoc/>
+        public void Fatal<T0, T1,T2>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+        {
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Fatal, exception, ref messageTemplate);
+            logger.Fatal(exception, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
+        }
+
+        /// <inheritdoc/>
         public void Error(Type reporting, Exception exception, string message)
         {
             var logger = LoggerFor(reporting);
@@ -153,6 +177,29 @@ namespace Umbraco.Core.Logging.Serilog
             var logger = LoggerFor(reporting);
             DumpThreadAborts(logger, LogEventLevel.Error, exception, ref messageTemplate);
             logger.Error(exception, messageTemplate, propertyValues);
+        }
+        /// <inheritdoc/>
+        public void Error<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0)
+        {
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Error, exception, ref messageTemplate);
+            logger.Error(exception, messageTemplate, propertyValue0);
+        }
+
+        /// <inheritdoc/>
+        public void Error<T0, T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+        {
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Error, exception, ref messageTemplate);
+            logger.Error(exception, messageTemplate, propertyValue0, propertyValue1);
+        }
+
+        /// <inheritdoc/>
+        public void Error<T0, T1, T2>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+        {
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Error, exception, ref messageTemplate);
+            logger.Error(exception, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
         }
 
         private static void DumpThreadAborts(global::Serilog.ILogger logger, LogEventLevel level, Exception exception, ref string messageTemplate)
@@ -225,6 +272,12 @@ namespace Umbraco.Core.Logging.Serilog
         }
 
         /// <inheritdoc/>
+        public void Warn<T0>(Type reporting, string message, T0 propertyValue0)
+        {
+            LoggerFor(reporting).Warning(message, propertyValue0);
+        }
+
+        /// <inheritdoc/>
         public void Warn(Type reporting, Exception exception, string message)
         {
             LoggerFor(reporting).Warning(exception, message);
@@ -234,6 +287,29 @@ namespace Umbraco.Core.Logging.Serilog
         public void Warn(Type reporting, Exception exception, string messageTemplate, params object[] propertyValues)
         {
             LoggerFor(reporting).Warning(exception, messageTemplate, propertyValues);
+        }
+        /// <inheritdoc/>
+        public void Warn<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0)
+        {
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Warning, exception, ref messageTemplate);
+            logger.Warning(exception, messageTemplate, propertyValue0);
+        }
+
+        /// <inheritdoc/>
+        public void Warn<T0, T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+        {
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Warning, exception, ref messageTemplate);
+            logger.Warning(exception, messageTemplate, propertyValue0, propertyValue1);
+        }
+
+        /// <inheritdoc/>
+        public void Warn<T0, T1, T2>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+        {
+            var logger = LoggerFor(reporting);
+            DumpThreadAborts(logger, LogEventLevel.Warning, exception, ref messageTemplate);
+            logger.Warning(exception, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
         }
 
         /// <inheritdoc/>
@@ -248,6 +324,23 @@ namespace Umbraco.Core.Logging.Serilog
             LoggerFor(reporting).Information(messageTemplate, propertyValues);
         }
 
+
+        /// <inheritdoc/>
+        public void Info<T0>(Type reporting, string messageTemplate, T0 propertyValue0)
+        {
+            LoggerFor(reporting).Information(messageTemplate, propertyValue0);
+        }
+        /// <inheritdoc/>
+        public void Info<T0,T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+        {
+            LoggerFor(reporting).Information(messageTemplate, propertyValue0, propertyValue1);
+        }
+        /// <inheritdoc/>
+        public void Info<T0,T1,T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+        {
+            LoggerFor(reporting).Information(messageTemplate, propertyValue0, propertyValue1, propertyValue2);
+        }
+
         /// <inheritdoc/>
         public void Debug(Type reporting, string message)
         {
@@ -258,6 +351,21 @@ namespace Umbraco.Core.Logging.Serilog
         public void Debug(Type reporting, string messageTemplate, params object[] propertyValues)
         {
             LoggerFor(reporting).Debug(messageTemplate, propertyValues);
+        }
+        /// <inheritdoc/>
+        public void Debug<T0>(Type reporting, string messageTemplate, T0 propertyValue0)
+        {
+            LoggerFor(reporting).Debug(messageTemplate, propertyValue0);
+        }
+        /// <inheritdoc/>
+        public void Debug<T0, T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+        {
+            LoggerFor(reporting).Debug(messageTemplate, propertyValue0, propertyValue1);
+        }
+        /// <inheritdoc/>
+        public void Debug<T0, T1, T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+        {
+            LoggerFor(reporting).Debug(messageTemplate, propertyValue0, propertyValue1, propertyValue2);
         }
 
         /// <inheritdoc/>
@@ -270,6 +378,22 @@ namespace Umbraco.Core.Logging.Serilog
         public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
         {
             LoggerFor(reporting).Verbose(messageTemplate, propertyValues);
+        }
+
+        /// <inheritdoc/>
+        public void Verbose<T0>(Type reporting, string messageTemplate, T0 propertyValue0)
+        {
+            LoggerFor(reporting).Verbose(messageTemplate, propertyValue0);
+        }
+        /// <inheritdoc/>
+        public void Verbose<T0, T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+        {
+            LoggerFor(reporting).Verbose(messageTemplate, propertyValue0, propertyValue1);
+        }
+        /// <inheritdoc/>
+        public void Verbose<T0, T1, T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+        {
+            LoggerFor(reporting).Verbose(messageTemplate, propertyValue0, propertyValue1, propertyValue2);
         }
 
         public void Dispose()

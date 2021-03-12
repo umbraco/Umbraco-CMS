@@ -115,7 +115,7 @@ namespace Umbraco.Web.PropertyEditors
             }
             catch (Exception ex)
             {
-                _logger.Error<MultiUrlPickerValueEditor>("Error getting links", ex);
+                _logger.Error<MultiUrlPickerValueEditor>(ex, "Error getting links");
             }
 
             return base.ToEditor(property, dataTypeService, culture, segment);
@@ -151,7 +151,7 @@ namespace Umbraco.Web.PropertyEditors
             }
             catch (Exception ex)
             {
-                _logger.Error<MultiUrlPickerValueEditor>("Error saving links", ex);
+                _logger.Error<MultiUrlPickerValueEditor>(ex, "Error saving links");
             }
 
             return base.FromEditor(editorValue, currentValue);

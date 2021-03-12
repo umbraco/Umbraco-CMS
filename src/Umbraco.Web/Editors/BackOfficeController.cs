@@ -1,4 +1,8 @@
-﻿using System;
+﻿using Microsoft.AspNet.Identity;
+using Microsoft.AspNet.Identity.Owin;
+using Microsoft.Owin.Security;
+using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -6,24 +10,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Mvc;
 using System.Web.UI;
-using Microsoft.AspNet.Identity;
-using Microsoft.AspNet.Identity.Owin;
-using Microsoft.Owin.Security;
-using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
 using Umbraco.Core.Models.Identity;
-using Umbraco.Web.Models;
-using Umbraco.Web.Mvc;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 using Umbraco.Web.JavaScript;
+using Umbraco.Web.Models;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
-using Umbraco.Web.Services;
 using Constants = Umbraco.Core.Constants;
 using JArray = Newtonsoft.Json.Linq.JArray;
 
@@ -40,11 +39,9 @@ namespace Umbraco.Web.Editors
         private readonly ManifestParser _manifestParser;
         private readonly UmbracoFeatures _features;
         private readonly IRuntimeState _runtimeState;
-        private readonly IIconService _iconService;
         private BackOfficeUserManager<BackOfficeIdentityUser> _userManager;
         private BackOfficeSignInManager _signInManager;
 
-        [Obsolete("Use the constructor that injects IIconService.")]
         public BackOfficeController(
             ManifestParser manifestParser,
             UmbracoFeatures features,
@@ -55,37 +52,11 @@ namespace Umbraco.Web.Editors
             IProfilingLogger profilingLogger,
             IRuntimeState runtimeState,
             UmbracoHelper umbracoHelper)
-            : this(manifestParser,
-                features,
-                globalSettings,
-                umbracoContextAccessor,
-                services,
-                appCaches,
-                profilingLogger,
-                runtimeState,
-                umbracoHelper,
-                Current.IconService)
-        {
-
-        }
-
-        public BackOfficeController(
-            ManifestParser manifestParser,
-            UmbracoFeatures features,
-            IGlobalSettings globalSettings,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ServiceContext services,
-            AppCaches appCaches,
-            IProfilingLogger profilingLogger,
-            IRuntimeState runtimeState,
-            UmbracoHelper umbracoHelper,
-            IIconService iconService)
             : base(globalSettings, umbracoContextAccessor, services, appCaches, profilingLogger, umbracoHelper)
         {
             _manifestParser = manifestParser;
             _features = features;
             _runtimeState = runtimeState;
-            _iconService = iconService;
         }
 
         protected BackOfficeSignInManager SignInManager => _signInManager ?? (_signInManager = OwinContext.GetBackOfficeSignInManager());
@@ -100,7 +71,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         public async Task<ActionResult> Default()
         {
-            var backofficeModel = new BackOfficeModel(_features, GlobalSettings, _iconService);
+            var backofficeModel = new BackOfficeModel(_features, GlobalSettings);
             return await RenderDefaultOrProcessExternalLoginAsync(
                 () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", backofficeModel),
                 () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/Default.cshtml", backofficeModel));
@@ -129,7 +100,7 @@ namespace Umbraco.Web.Editors
 
             if (parts.Length != 2)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                Logger.Warn<BackOfficeController, string>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
@@ -138,7 +109,7 @@ namespace Umbraco.Web.Editors
             var decoded = token.FromUrlBase64();
             if (decoded.IsNullOrWhiteSpace())
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                Logger.Warn<BackOfficeController, string>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
@@ -146,14 +117,14 @@ namespace Umbraco.Web.Editors
             int intId;
             if (int.TryParse(id, out intId) == false)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
+                Logger.Warn<BackOfficeController, string>("VerifyUser endpoint reached with invalid token: {Invite}", invite);
                 return RedirectToAction("Default");
             }
 
             var identityUser = await UserManager.FindByIdAsync(intId);
             if (identityUser == null)
             {
-                Logger.Warn<BackOfficeController>("VerifyUser endpoint reached with non existing user: {UserId}", id);
+                Logger.Warn<BackOfficeController, string>("VerifyUser endpoint reached with non existing user: {UserId}", id);
                 return RedirectToAction("Default");
             }
 
@@ -161,7 +132,7 @@ namespace Umbraco.Web.Editors
 
             if (result.Succeeded == false)
             {
-                Logger.Warn<BackOfficeController>("Could not verify email, Error: {Errors}, Token: {Invite}", string.Join(",", result.Errors), invite);
+                Logger.Warn<BackOfficeController, string, string>("Could not verify email, Error: {Errors}, Token: {Invite}", string.Join(",", result.Errors), invite);
                 return new RedirectResult(Url.Action("Default") + "#/login/false?invite=3");
             }
 
@@ -186,7 +157,7 @@ namespace Umbraco.Web.Editors
         {
             return await RenderDefaultOrProcessExternalLoginAsync(
                 //The default view to render when there is no external login info or errors
-                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings, _iconService)),
+                () => View(GlobalSettings.Path.EnsureEndsWith('/') + "Views/AuthorizeUpgrade.cshtml", new BackOfficeModel(_features, GlobalSettings)),
                 //The ActionResult to perform if external login is successful
                 () => Redirect("/"));
         }
@@ -351,6 +322,7 @@ namespace Umbraco.Web.Editors
             return RedirectToLocal(Url.Action("Default", "BackOffice"));
         }
 
+        [UmbracoAuthorize]
         [HttpGet]
         public async Task<ActionResult> ExternalLinkLoginCallback()
         {
@@ -433,7 +405,7 @@ namespace Umbraco.Web.Editors
             var authType = OwinContext.Authentication.GetExternalAuthenticationTypes().FirstOrDefault(x => x.AuthenticationType == loginInfo.Login.LoginProvider);
             if (authType == null)
             {
-                Logger.Warn<BackOfficeController>("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
+                Logger.Warn<BackOfficeController, string>("Could not find external authentication provider registered: {LoginProvider}", loginInfo.Login.LoginProvider);
             }
             else
             {
@@ -450,7 +422,7 @@ namespace Umbraco.Web.Editors
                     shouldSignIn = autoLinkOptions.OnExternalLogin(user, loginInfo);
                     if (shouldSignIn == false)
                     {
-                        Logger.Warn<BackOfficeController>("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
+                        Logger.Warn<BackOfficeController, string,int>("The AutoLinkOptions of the external authentication provider '{LoginProvider}' have refused the login based on the OnExternalLogin method. Affected user id: '{UserId}'", loginInfo.Login.LoginProvider, user.Id);
                     }
                 }
 

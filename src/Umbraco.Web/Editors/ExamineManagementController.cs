@@ -131,7 +131,7 @@ namespace Umbraco.Web.Editors
             if (!validate.IsSuccessStatusCode)
                 return validate;
 
-            _logger.Info<ExamineManagementController>("Rebuilding index '{IndexName}'", indexName);
+            _logger.Info<ExamineManagementController, string>("Rebuilding index '{IndexName}'", indexName);
 
             //remove it in case there's a handler there already
             index.IndexOperationComplete -= Indexer_IndexOperationComplete;
@@ -253,7 +253,7 @@ namespace Umbraco.Web.Editors
         {
             var indexer = (IIndex)sender;
 
-            _logger.Debug<ExamineManagementController>("Logging operation completed for index {IndexName}", indexer.Name);
+            _logger.Debug<ExamineManagementController, string>("Logging operation completed for index {IndexName}", indexer.Name);
 
             //ensure it's not listening anymore
             indexer.IndexOperationComplete -= Indexer_IndexOperationComplete;

@@ -263,6 +263,8 @@
     <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
@@ -1315,8 +1317,7 @@
     </PropertyGroup>
     <ItemGroup>
       <!-- we want to exclude all facade references ?! -->
-      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'Microsoft.Bcl.AsyncInterfaces' and '%(ReferencePath.FileName)' != 'System.Buffers' and '%(ReferencePath.FileName)' != 'System.Numerics.Vectors' and '%(ReferencePath.FileName)' != 'System.Runtime.CompilerServices.Unsafe'" />
-      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'System.Text.Encoding.CodePages'" />
+      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'Microsoft.Bcl.AsyncInterfaces' and '%(ReferencePath.FileName)' != 'System.Buffers' and '%(ReferencePath.FileName)' != 'System.Numerics.Vectors' and '%(ReferencePath.FileName)' != 'System.Runtime.CompilerServices.Unsafe' and '%(ReferencePath.FileName)' != 'System.Text.Encoding.CodePages'" />
     </ItemGroup>
     <Delete Files="$(TargetDir)$(TargetName).XmlSerializers.dll" ContinueOnError="true" />
     <!--

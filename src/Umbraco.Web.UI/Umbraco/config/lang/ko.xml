@@ -815,7 +815,7 @@
     <key alias="administrators">관리자</key>
     <key alias="categoryField">카테고리 필드</key>
     <key alias="changePassword">Change Your Password</key>
-    <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
+    <key alias="changePasswordDescription">You can change your password for accessing the Umbraco backoffice by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">컨텐츠 채널</key>
     <key alias="descriptionField">설명 필드</key>
     <key alias="disabled">사용자 비활성화</key>
