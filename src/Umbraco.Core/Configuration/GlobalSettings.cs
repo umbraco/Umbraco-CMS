@@ -409,14 +409,14 @@ namespace Umbraco.Core.Configuration
             {
                 if (_sqlWriteLockTimeOut != default) return _sqlWriteLockTimeOut;
 
-                var timeOut = GetSqlWriteLockTimeoutFromConfigFile();
+                var timeOut = GetSqlWriteLockTimeoutFromConfigFile(Current.Logger);
 
                 _sqlWriteLockTimeOut = timeOut;
                 return _sqlWriteLockTimeOut;
             }
         }
 
-        internal static int GetSqlWriteLockTimeoutFromConfigFile()
+        internal static int GetSqlWriteLockTimeoutFromConfigFile(ILogger logger)
         {
             var timeOut = 5000; // 5 seconds
             var appSettingSqlWriteLockTimeOut = ConfigurationManager.AppSettings[Constants.AppSettings.SqlWriteLockTimeOut];
@@ -431,7 +431,7 @@ namespace Umbraco.Core.Configuration
                 }
                 else
                 {
-                    Current.Logger.Warn<GlobalSettings>(
+                    logger.Warn<GlobalSettings>(
                         $"The `{Constants.AppSettings.SqlWriteLockTimeOut}` setting in web.config is not between the minimum of {minimumTimeOut} ms and maximum of {maximumTimeOut} ms, defaulting back to {timeOut}");
                 }
             }

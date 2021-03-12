@@ -44,7 +44,7 @@ namespace Umbraco.Core.Runtime
                _logger,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
 
-            _lockTimeout = TimeSpan.FromMilliseconds(GlobalSettings.GetSqlWriteLockTimeoutFromConfigFile());
+            _lockTimeout = TimeSpan.FromMilliseconds(GlobalSettings.GetSqlWriteLockTimeoutFromConfigFile(logger));
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
