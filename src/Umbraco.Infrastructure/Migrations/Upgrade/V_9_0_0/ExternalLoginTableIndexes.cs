@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
@@ -14,7 +16,27 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
         /// </summary>
         public override void Migrate()
         {
-            // TODO: Before adding these indexes we need to remove duplicate data
+            // Before adding these indexes we need to remove duplicate data.
+            // Get all logins by latest
+            var logins = Database.Fetch<ExternalLoginDto>()
+                .OrderByDescending(x => x.CreateDate)
+                .ToList();
+
+            var toDelete = new List<int>();
+            // used to track duplicates so they can be removed
+            var keys = new HashSet<(string, string)>();
+            foreach(ExternalLoginDto login in logins)
+            {
+                if (!keys.Add((login.ProviderKey, login.LoginProvider)))
+                {
+                    // if it already exists we need to remove this one
+                    toDelete.Add(login.Id);
+                }
+            }
+            if (toDelete.Count > 0)
+            {
+                Database.DeleteMany<ExternalLoginDto>().Where(x => toDelete.Contains(x.Id)).Execute();
+            }   
 
             var indexName1 = "IX_" + ExternalLoginDto.TableName + "_LoginProvider";
 

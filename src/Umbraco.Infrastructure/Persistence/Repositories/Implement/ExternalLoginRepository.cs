@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var toDelete = new List<int>();
             var toInsert = new List<IExternalLogin>(logins);
 
-            var existingLogins = Database.Query<ExternalLoginDto>(sql).OrderByDescending(x => x.CreateDate).ToList();
+            var existingLogins = Database.Fetch<ExternalLoginDto>(sql);
             
             foreach (var existing in existingLogins)
             {
@@ -236,7 +236,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var toDelete = new List<int>();
             var toInsert = new List<IExternalLoginToken>(tokens);
 
-            var existingTokens = Database.Query<ExternalLoginTokenDto>(sql).OrderByDescending(x => x.CreateDate).ToList();
+            var existingTokens = Database.Fetch<ExternalLoginTokenDto>(sql);
             
             foreach (ExternalLoginTokenDto existing in existingTokens)
             {
