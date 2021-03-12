@@ -25,7 +25,7 @@
                             "\t@foreach (var item in selection)\n" +
                             "\t{\n" +
                                 "\t\t<li>\n" +
-                                    "\t\t\t<a href=\"@item.Url\">@item.Name</a>\n" +
+                                    "\t\t\t<a href=\"@item.Url()\">@item.Name()</a>\n" +
                                 "\t\t</li>\n" +
                             "\t}\n" +
                         "</ul>\n\n";
@@ -43,11 +43,11 @@
         function getAddSectionSnippet(sectionName) {
             return "@section " + sectionName + "\r\n{\r\n\r\n\t{0}\r\n\r\n}\r\n";
         }
-        
+
         function getGeneralShortcuts(){
             var keys = [
-                "shortcuts_generalHeader", 
-                "buttons_undo", 
+                "shortcuts_generalHeader",
+                "buttons_undo",
                 "buttons_redo",
                 "buttons_save"
             ];
@@ -61,7 +61,7 @@
                 labels.save = data[3];
 
                 return {
-			        "name": labels.header, 
+			        "name": labels.header,
 			        "shortcuts": [
                         {
                             "description": labels.undo,
@@ -77,14 +77,14 @@
                         }
 			        ]
 			    };
-            });            
+            });
         }
 
         function getEditorShortcuts(){
 
             var keys = [
-                "shortcuts_editorHeader", 
-                "shortcuts_commentLine", 
+                "shortcuts_editorHeader",
+                "shortcuts_commentLine",
                 "shortcuts_removeLine",
                 "shortcuts_copyLineUp",
                 "shortcuts_copyLineDown",
@@ -126,7 +126,7 @@
                             "keys": {
                                 "win": [{ "key": "alt" }, { "key": "shift" }, { "key": "down" }],
                                 "mac": [{ "key": "cmd" }, { "key": "alt" }, { "key": "down" }]
-                            } 
+                            }
                         },
                         {
                             "description": labels.movelineup,
@@ -138,13 +138,13 @@
                         }
                     ]
 			    };
-            });            
+            });
         }
 
         function getTemplateEditorShortcuts(){
             var keys = [
-                "template_insert", 
-                "template_insertPageField", 
+                "template_insert",
+                "template_insertPageField",
                 "template_insertPartialView",
                 "template_insertDictionaryItem",
                 "template_insertMacro",
@@ -198,13 +198,13 @@
                         }
                     ]
 			    };
-            });            
+            });
         }
 
         function getPartialViewEditorShortcuts(){
             var keys = [
-                "template_insert", 
-                "template_insertPageField", 
+                "template_insert",
+                "template_insertPageField",
                 "template_insertDictionaryItem",
                 "template_insertMacro",
                 "template_queryBuilder"
@@ -242,7 +242,7 @@
 			    };
             });
 
-            
+
         }
 
         ////////////
