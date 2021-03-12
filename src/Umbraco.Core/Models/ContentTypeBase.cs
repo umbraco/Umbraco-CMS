@@ -262,7 +262,10 @@ namespace Umbraco.Core.Models
             set
             {
                 if (_noGroupPropertyTypes != null)
-                    _noGroupPropertyTypes.CollectionChanged -= PropertyTypesChanged;
+                {
+                    _noGroupPropertyTypes.ClearCollectionChangedEvents();
+                }
+
                 _noGroupPropertyTypes = new PropertyTypeCollection(SupportsPublishing, value);
                 _noGroupPropertyTypes.CollectionChanged += PropertyTypesChanged;
                 PropertyTypesChanged(_noGroupPropertyTypes, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
@@ -480,14 +483,14 @@ namespace Umbraco.Core.Models
                 // its ignored from the auto-clone process because its return values are unions, not raw and
                 // we end up with duplicates, see: http://issues.umbraco.org/issue/U4-4842
 
-                clonedEntity._noGroupPropertyTypes.CollectionChanged -= PropertyTypesChanged;                    //clear this event handler if any
+                clonedEntity._noGroupPropertyTypes.ClearCollectionChangedEvents();                    //clear this event handler if any
                 clonedEntity._noGroupPropertyTypes = (PropertyTypeCollection) _noGroupPropertyTypes.DeepClone(); //manually deep clone
                 clonedEntity._noGroupPropertyTypes.CollectionChanged += clonedEntity.PropertyTypesChanged;              //re-assign correct event handler
             }
 
             if (clonedEntity._propertyGroups != null)
             {
-                clonedEntity._propertyGroups.CollectionChanged -= PropertyGroupsChanged;              //clear this event handler if any
+                clonedEntity._propertyGroups.ClearCollectionChangedEvents();              //clear this event handler if any
                 clonedEntity._propertyGroups = (PropertyGroupCollection) _propertyGroups.DeepClone(); //manually deep clone
                 clonedEntity._propertyGroups.CollectionChanged += clonedEntity.PropertyGroupsChanged;        //re-assign correct event handler
             }

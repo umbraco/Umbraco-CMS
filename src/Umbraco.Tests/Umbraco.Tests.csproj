@@ -79,7 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.3.1" />
-    <PackageReference Include="Examine" Version="1.0.2" />
+    <PackageReference Include="Examine" Version="1.1.0" />
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.8.14</Version>
     </PackageReference>
@@ -132,6 +132,7 @@
     <Compile Include="Logging\LogviewerTests.cs" />
     <Compile Include="Manifest\ManifestContentAppTests.cs" />
     <Compile Include="Mapping\MappingTests.cs" />
+    <Compile Include="Membership\MembersMembershipProviderTests.cs" />
     <Compile Include="Migrations\MigrationPlanTests.cs" />
     <Compile Include="Migrations\MigrationTests.cs" />
     <Compile Include="ModelsBuilder\BuilderTests.cs" />
@@ -143,6 +144,8 @@
     <Compile Include="Models\ImageProcessorImageUrlGeneratorTest.cs" />
     <Compile Include="Models\PathValidationTests.cs" />
     <Compile Include="Models\PropertyTests.cs" />
+    <Compile Include="Models\RangeTests.cs" />
+    <Compile Include="Models\UserGroupTests.cs" />
     <Compile Include="Models\VariationTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="Persistence\Repositories\DocumentRepositoryTest.cs" />
@@ -171,6 +174,7 @@
     <Compile Include="Services\MemberGroupServiceTests.cs" />
     <Compile Include="Services\MediaTypeServiceTests.cs" />
     <Compile Include="Services\PropertyValidationServiceTests.cs" />
+    <Compile Include="Services\RedirectUrlServiceTests.cs" />
     <Compile Include="Templates\HtmlLocalLinkParserTests.cs" />
     <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />

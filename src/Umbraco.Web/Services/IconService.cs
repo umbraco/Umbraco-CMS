@@ -1,8 +1,10 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Ganss.XSS;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.IO;
 using Umbraco.Core.Models;
@@ -13,45 +15,52 @@ namespace Umbraco.Web.Services
     public class IconService : IIconService
     {
         private readonly IGlobalSettings _globalSettings;
+        private readonly IHtmlSanitizer _htmlSanitizer;
+        private readonly IAppPolicyCache _cache;
 
-        public IconService(IGlobalSettings globalSettings)
+        public IconService(IGlobalSettings globalSettings, IHtmlSanitizer htmlSanitizer, AppCaches appCaches)
         {
             _globalSettings = globalSettings;
+            _htmlSanitizer = htmlSanitizer;
+            _cache = appCaches.RuntimeCache;
         }
 
         /// <inheritdoc />
-        public IList<IconModel> GetAllIcons()
-        {
-            var icons = new List<IconModel>();
-            var iconNames = GetAllIconNames();
+        public IReadOnlyDictionary<string, string> GetIcons() => GetIconDictionary();
 
-            iconNames.OrderBy(f => f.Name).ToList().ForEach(iconInfo =>
-            {
-                var icon = GetIcon(iconInfo);
-
-                if (icon != null)
-                {
-                    icons.Add(icon);
-                }
-            });
-
-            return icons;
-        }
+        /// <inheritdoc />
+        public IList<IconModel> GetAllIcons() =>
+            GetIconDictionary()
+                .Select(x => new IconModel { Name = x.Key, SvgString = x.Value })
+                .ToList();
 
         /// <inheritdoc />
         public IconModel GetIcon(string iconName)
         {
-            return string.IsNullOrWhiteSpace(iconName)
-                ? null
-                : CreateIconModel(iconName.StripFileExtension());
+            if (iconName.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            var allIconModels = GetIconDictionary();
+            if (allIconModels.ContainsKey(iconName))
+            {
+                return new IconModel
+                {
+                    Name = iconName,
+                    SvgString = allIconModels[iconName]
+                };
+            }
+
+            return null;
         }
 
         /// <summary>
         /// Gets an IconModel using values from a FileInfo model
         /// </summary>
         /// <param name="fileInfo"></param>
-        /// <returns><see cref="IconModel"/></returns>
-        private IconModel GetIcon(FileSystemInfo fileInfo)
+        /// <returns></returns>
+        private IconModel GetIcon(FileInfo fileInfo)
         {
             return fileInfo == null || string.IsNullOrWhiteSpace(fileInfo.Name)
                 ? null
@@ -62,39 +71,14 @@ namespace Umbraco.Web.Services
         /// Gets an IconModel containing the icon name and SvgString
         /// </summary>
         /// <param name="iconName"></param>
-        /// <returns><see cref="IconModel"/></returns>
-        private IconModel CreateIconModel(string iconName)
-        {
-            if (string.IsNullOrWhiteSpace(iconName))
-                return null;
-
-            var iconNames = GetAllIconNames();
-            var iconPath = iconNames.FirstOrDefault(x => x.Name.InvariantEquals($"{iconName}.svg"))?.FullName;
-            return iconPath == null
-                ? null
-                : CreateIconModel(iconName, iconPath);
-        }
-
-        /// <summary>
-        /// Gets an IconModel containing the icon name and SvgString
-        /// </summary>
-        /// <param name="iconName"></param>
         /// <param name="iconPath"></param>
-        /// <returns><see cref="IconModel"/></returns>
-        private static IconModel CreateIconModel(string iconName, string iconPath)
+        /// <returns></returns>
+        private IconModel CreateIconModel(string iconName, string iconPath)
         {
-            if (string.IsNullOrWhiteSpace(iconPath))
-                return null;
-
             try
             {
-                var sanitizer = new HtmlSanitizer();
-                sanitizer.AllowedAttributes.UnionWith(Constants.SvgSanitizer.Attributes);
-                sanitizer.AllowedCssProperties.UnionWith(Constants.SvgSanitizer.Attributes);
-                sanitizer.AllowedTags.UnionWith(Constants.SvgSanitizer.Tags);
-
                 var svgContent = System.IO.File.ReadAllText(iconPath);
-                var sanitizedString = sanitizer.Sanitize(svgContent);
+                var sanitizedString = _htmlSanitizer.Sanitize(svgContent);
 
                 var svg = new IconModel
                 {
@@ -110,25 +94,51 @@ namespace Umbraco.Web.Services
             }
         }
 
-        private IEnumerable<FileInfo> GetAllIconNames()
+        private IEnumerable<FileInfo> GetAllIconsFiles()
         {
+            var icons = new HashSet<FileInfo>(new CaseInsensitiveFileInfoComparer());
+
             // add icons from plugins
-            var appPlugins = new DirectoryInfo(IOHelper.MapPath(SystemDirectories.AppPlugins));
-            var pluginIcons = appPlugins.Exists == false
-                ? new List<FileInfo>()
-                : appPlugins.GetDirectories()
-                    // Find all directories in App_Plugins that are named "Icons" and get a list of SVGs from them
-                    .SelectMany(x => x.GetDirectories("Icons", SearchOption.AllDirectories))
-                    .SelectMany(x => x.GetFiles("*.svg", SearchOption.TopDirectoryOnly));
+            var appPluginsDirectoryPath = IOHelper.MapPath(SystemDirectories.AppPlugins);
+            if (Directory.Exists(appPluginsDirectoryPath))
+            {
+                var appPlugins = new DirectoryInfo(appPluginsDirectoryPath);
+
+                // iterate sub directories of app plugins
+                foreach (var dir in appPlugins.EnumerateDirectories())
+                {
+                    var iconPath = IOHelper.MapPath($"{SystemDirectories.AppPlugins}/{dir.Name}{SystemDirectories.AppPluginIcons}");
+                    if (Directory.Exists(iconPath))
+                    {
+                        var dirIcons = new DirectoryInfo(iconPath).EnumerateFiles("*.svg", SearchOption.TopDirectoryOnly);
+                        icons.UnionWith(dirIcons);
+                    }
+                }
+            }
 
             // add icons from IconsPath if not already added from plugins
-            var directory = new DirectoryInfo(IOHelper.MapPath($"{_globalSettings.IconsPath}/"));
-            var iconNames = directory.GetFiles("*.svg")
-                .Where(x => pluginIcons.Any(i => i.Name == x.Name) == false);
+            var coreIconsDirectory = new DirectoryInfo(IOHelper.MapPath($"{_globalSettings.IconsPath}/"));
+            var coreIcons = coreIconsDirectory.GetFiles("*.svg");
 
-            iconNames = iconNames.Concat(pluginIcons).ToList();
+            icons.UnionWith(coreIcons);
 
-            return iconNames;
+            return icons;
         }
+
+        private class CaseInsensitiveFileInfoComparer : IEqualityComparer<FileInfo>
+        {
+            public bool Equals(FileInfo one, FileInfo two) => StringComparer.InvariantCultureIgnoreCase.Equals(one.Name, two.Name);
+
+            public int GetHashCode(FileInfo item) => StringComparer.InvariantCultureIgnoreCase.GetHashCode(item.Name);
+        }
+
+        private IReadOnlyDictionary<string, string> GetIconDictionary() => _cache.GetCacheItem(
+            $"{typeof(IconService).FullName}.{nameof(GetIconDictionary)}",
+            () => GetAllIconsFiles()
+                .Select(GetIcon)
+                .Where(i => i != null)
+                .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First().SvgString, StringComparer.OrdinalIgnoreCase)
+        );
     }
 }

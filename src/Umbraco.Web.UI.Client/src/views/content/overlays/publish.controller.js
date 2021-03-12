@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PublishController($scope, localizationService) {
+    function PublishController($scope, localizationService, contentEditingHelper) {
 
         var vm = this;
         vm.loading = true;
@@ -143,25 +143,7 @@
             });
 
             if (vm.availableVariants.length !== 0) {
-                vm.availableVariants.sort((a, b) => {
-                    if (a.language && b.language) {
-                        if (a.language.name < b.language.name) {
-                            return -1;
-                        }
-                        if (a.language.name > b.language.name) {
-                            return 1;
-                        }
-                    }
-                    if (a.segment && b.segment) {
-                        if (a.segment < b.segment) {
-                            return -1;
-                        }
-                        if (a.segment > b.segment) {
-                            return 1;
-                        }
-                    }
-                    return 0;
-                });
+                vm.availableVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.availableVariants);
             }
 
             $scope.model.disableSubmitButton = !canPublish();

@@ -88,7 +88,7 @@
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="ClientDependency" Version="1.9.9" />
     <PackageReference Include="ClientDependency-Mvc5" Version="1.9.3" />
-    <PackageReference Include="Examine" Version="1.0.2" />
+    <PackageReference Include="Examine" Version="1.1.0" />
     <PackageReference Include="ImageProcessor.Web" Version="4.10.0.100" />
     <PackageReference Include="ImageProcessor.Web.Config" Version="2.5.0.100" />
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
@@ -347,9 +347,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8900</DevelopmentServerPort>
+          <DevelopmentServerPort>8120</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8900</IISUrl>
+          <IISUrl>http://localhost:8120</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>
@@ -377,6 +377,7 @@
     <!-- Create ClientDependency.config file from Template if it doesn't exist -->
     <Message Text="Copy ClientDependency.$(Configuration).config to ClientDependency.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
     <Copy SourceFiles="$(ProjectDir)Config\ClientDependency.Release.config" DestinationFiles="$(ProjectDir)Config\ClientDependency.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\ClientDependency.config')" />
+    <Copy SourceFiles="$(ProjectDir)Config\umbracoSettings.Release.config" DestinationFiles="$(ProjectDir)Config\umbracoSettings.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\umbracoSettings.config')" />
     <!-- Create Serilog.config & serilog.user.config file from Templates if it doesn't exist -->
     <Message Text="Copy serilog.$(Configuration).config to serilog.config" Importance="high" Condition="!Exists('$(ProjectDir)Config\serilog.config')" />
     <Copy SourceFiles="$(ProjectDir)Config\serilog.Release.config" DestinationFiles="$(ProjectDir)Config\serilog.config" OverwriteReadOnlyFiles="true" SkipUnchangedFiles="false" Condition="!Exists('$(ProjectDir)Config\serilog.config')" />
