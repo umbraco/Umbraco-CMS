@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
@@ -20,18 +20,19 @@ namespace Umbraco.Cms.Web.Common.Security
     {
         private const string ClaimType = "amr";
         private const string PasswordValue = "pwd";
+        private readonly IIpResolver _ipResolver;
 
         public MemberSignInManager(
             MemberManager memberManager,
+            IIpResolver ipResolver,
             IHttpContextAccessor contextAccessor,
             IUserClaimsPrincipalFactory<MemberIdentityUser> claimsFactory,
             IOptions<IdentityOptions> optionsAccessor,
             ILogger<SignInManager<MemberIdentityUser>> logger,
             IAuthenticationSchemeProvider schemes,
             IUserConfirmation<MemberIdentityUser> confirmation) :
-            base(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
-        {
-        }
+            base(memberManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation) =>
+                _ipResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
 
         /// <inheritdoc />
         public override async Task<SignInResult> PasswordSignInAsync(MemberIdentityUser user, string password, bool isPersistent, bool lockoutOnFailure)
@@ -184,6 +185,7 @@ namespace Umbraco.Cms.Web.Common.Security
             // TODO: More TODO notes in BackOfficeSignInManager
             if (username.IsNullOrWhiteSpace())
             {
+                //TODO: this might have unwanted effects if the member is called this
                 username = "UNKNOWN";
             }
 
@@ -198,7 +200,7 @@ namespace Umbraco.Cms.Web.Common.Security
                 }
                 await UserManager.UpdateAsync(user);
 
-                Logger.LogInformation("User: {UserName} logged in from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
+                Logger.LogInformation("User: {UserName} logged in from IP address {IpAddress}", username, _ipResolver.GetCurrentRequestIpAddress());
                 if (user != null)
                 {
                     //TODO: what events do we want for members?
@@ -209,17 +211,17 @@ namespace Umbraco.Cms.Web.Common.Security
             {
                 //TODO: what events do we want for members?
                 //_memberManager.RaiseAccountLockedEvent(Context.User, user.Id);
-                Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}, the user is locked", username, Context.Connection.RemoteIpAddress);
+                Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}, the user is locked", username, _ipResolver.GetCurrentRequestIpAddress());
             }
             else if (result.RequiresTwoFactor)
             {
                 //TODO: what events do we want for members?
                 //_memberManager.RaiseLoginRequiresVerificationEvent(Context.User, user.Id);
-                Logger.LogInformation("Login attempt requires verification for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
+                Logger.LogInformation("Login attempt requires verification for username {UserName} from IP address {IpAddress}", username, _ipResolver.GetCurrentRequestIpAddress());
             }
             else if (!result.Succeeded || result.IsNotAllowed)
             {
-                Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}", username, Context.Connection.RemoteIpAddress);
+                Logger.LogInformation("Login attempt failed for username {UserName} from IP address {IpAddress}", username, _ipResolver.GetCurrentRequestIpAddress());
             }
             else
             {
