@@ -32,11 +32,7 @@ namespace Umbraco.Cms.Web.Common.Security
             IHttpContextAccessor httpContextAccessor,
             ILogger<UserManager<MemberIdentityUser>> logger,
             IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
-            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors, services, logger, passwordConfiguration)
-        {
-            _httpContextAccessor = httpContextAccessor;
-        }
-
+            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors, services, logger, passwordConfiguration) => _httpContextAccessor = httpContextAccessor;
         private string GetCurrentUserId(IPrincipal currentUser)
         {
             ClaimsIdentity umbIdentity = currentUser?.GetUmbracoIdentity();
@@ -52,7 +48,6 @@ namespace Umbraco.Cms.Web.Common.Security
         }
 
         //TODO: have removed all other member audit events - can revisit if we need member auditing on a user level in future
-
         public void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, string userId) => throw new NotImplementedException();
 
         public void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, string userId) => throw new NotImplementedException();

@@ -17,7 +17,7 @@ using Umbraco.Cms.Web.Common.Security;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 {
     [TestFixture]
-    public class MemberIdentityUserManagerTests
+    public class MemberManagerTests
     {
         private Mock<IUserStore<MemberIdentityUser>> _mockMemberStore;
         private Mock<IOptions<MemberIdentityOptions>> _mockIdentityOptions;
