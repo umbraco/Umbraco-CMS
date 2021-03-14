@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core
             var pos = Math.Min(pos1, pos2);
 
             var path = pos > 0 ? uri.Substring(0, pos) : uri;
-            path = path.TrimEnd('/');
+            path = path.TrimEnd(Constants.CharArrays.ForwardSlash);
 
             if (pos > 0)
                 path += uri.Substring(pos);

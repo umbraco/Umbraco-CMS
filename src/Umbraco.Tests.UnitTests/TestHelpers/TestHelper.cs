@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
         public static Lazy<ISqlContext> GetMockSqlContext()
         {
             ISqlContext sqlContext = Mock.Of<ISqlContext>();
-            var syntax = new SqlServerSyntaxProvider();
+            var syntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
             Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(syntax);
             return new Lazy<ISqlContext>(() => sqlContext);
         }

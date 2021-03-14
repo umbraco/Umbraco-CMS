@@ -4,6 +4,9 @@
         <TargetFramework>net5.0</TargetFramework>
         <OutputType>Library</OutputType>
         <RootNamespace>Umbraco.Cms.Web.BackOffice</RootNamespace>
+        <PackageId>Umbraco.Cms.Web.BackOffice</PackageId>
+        <Title>Umbraco CMS Back Office</Title>
+        <Description>Contains the Back Office assembly needed to run the back office of Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -16,7 +19,7 @@
 
     <ItemGroup>
       <PackageReference Include="HtmlSanitizer" Version="5.0.376" />
-      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.2" />
+      <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="5.0.3" />
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
       <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
     </ItemGroup>
@@ -35,5 +38,9 @@
         <ProjectReference Include="..\Umbraco.Examine.Lucene\Umbraco.Examine.Lucene.csproj" Condition="'$(OS)' == 'Windows_NT'" />
         <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
         <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="EmbeddedResources\**\*" />
     </ItemGroup>
 </Project>

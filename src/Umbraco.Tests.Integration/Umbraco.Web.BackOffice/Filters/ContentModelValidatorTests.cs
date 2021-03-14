@@ -138,8 +138,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters
         public void Validating_ContentItemSave()
         {
             ILogger<ContentSaveModelValidator> logger = Services.GetRequiredService<ILogger<ContentSaveModelValidator>>();
-            IBackOfficeSecurityFactory backofficeSecurityFactory = Services.GetRequiredService<IBackOfficeSecurityFactory>();
-            backofficeSecurityFactory.EnsureBackOfficeSecurity();
             IPropertyValidationService propertyValidationService = Services.GetRequiredService<IPropertyValidationService>();
             UmbracoMapper umbracoMapper = Services.GetRequiredService<UmbracoMapper>();
 

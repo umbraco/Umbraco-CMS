@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         private const string UmbracoSignInMgrXsrfKey = "XsrfId";
 
-        private BackOfficeUserManager _userManager;
+        private readonly BackOfficeUserManager _userManager;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly GlobalSettings _globalSettings;
 

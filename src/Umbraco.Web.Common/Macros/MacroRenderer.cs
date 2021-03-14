@@ -375,7 +375,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             if (attributeValue.StartsWith("[") == false)
                 return attributeValue;
 
-            var tokens = attributeValue.Split(',').Select(x => x.Trim()).ToArray();
+            var tokens = attributeValue.Split(Core.Constants.CharArrays.Comma).Select(x => x.Trim()).ToArray();
 
             // ensure we only process valid input ie each token must be [?x] and not eg a json array
             // like [1,2,3] which we don't want to parse - however the last one can be a literal, so

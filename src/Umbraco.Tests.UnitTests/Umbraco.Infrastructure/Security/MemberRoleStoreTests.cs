@@ -30,16 +30,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             // arrange
             MemberRoleStore<IdentityRole> sut = CreateSut();
-            CancellationToken fakeCancellationToken = new CancellationToken() { };
+            var fakeCancellationToken = new CancellationToken();
 
             // act
-            Task<IdentityResult> actual = sut.CreateAsync(null, fakeCancellationToken);
+            Action actual = () => sut.CreateAsync(null, fakeCancellationToken);
 
             // assert
-            Assert.IsTrue(actual.Result.Succeeded == false);
-            Assert.IsTrue(actual.Result.Errors.Any(x => x.Code == "IdentityMemberGroupNotFound" && x.Description == "Member group not found"));
+            Assert.That(actual, Throws.ArgumentNullException);
+            _mockMemberGroupService.VerifyNoOtherCalls();
         }
-
 
         [Test]
         public async Task GivenICreateAMemberRole_AndTheGroupIsPopulatedCorrectly_ThenIShouldGetASuccessResultAsync()
@@ -167,6 +166,21 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             // assert
             Assert.IsTrue(identityResult.Succeeded == false);
             Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "IdentityIdParseError" && x.Description == "Cannot parse ID to int"));
+            _mockMemberGroupService.VerifyNoOtherCalls();
+        }
+
+        [Test]
+        public void GivenIUpdateAMemberRole_AndTheRoleIsNull_ThenAnExceptionShouldBeThrown()
+        {
+            // arrange
+            MemberRoleStore<IdentityRole> sut = CreateSut();
+            var fakeCancellationToken = new CancellationToken() { };
+
+            // act
+            Action actual = () => sut.UpdateAsync(null, fakeCancellationToken);
+
+            // assert
+            Assert.That(actual, Throws.ArgumentNullException);
             _mockMemberGroupService.VerifyNoOtherCalls();
         }
 

@@ -1,9 +1,11 @@
 ﻿using System;
+using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
@@ -75,6 +77,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
 
             if (tableName.Equals(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue))
                 CreateKeyValueData();
+
+            if (tableName.Equals(Cms.Core.Constants.DatabaseSchema.Tables.LogViewerQuery))
+                CreateLogViewerQueryData();
 
             _logger.LogInformation("Done creating table {TableName} data.", tableName);
         }
@@ -344,6 +349,18 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             var finalState = upgrader.Plan.FinalState;
 
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue, "key", false, new KeyValueDto { Key = stateValueKey, Value = finalState, UpdateDate = DateTime.Now });
+        }
+
+        private void CreateLogViewerQueryData()
+        {
+            var defaultData = MigrateLogViewerQueriesFromFileToDb.DefaultLogQueries.ToArray();
+
+            for (int i = 0; i < defaultData.Length; i++)
+            {
+                var dto = defaultData[i];
+                dto.Id = i+1;
+                _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.LogViewerQuery, "id", false, dto);
+            }
         }
     }
 }

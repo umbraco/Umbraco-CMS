@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Core.Security
         //TODO: How revealing can the error messages be?
         private readonly IdentityError _intParseError = new IdentityError { Code = "IdentityIdParseError", Description = "Cannot parse ID to int" };
         private readonly IdentityError _memberGroupNotFoundError = new IdentityError { Code = "IdentityMemberGroupNotFound", Description = "Member group not found" };
+        private const string genericIdentityErrorCode = "IdentityErrorUserStore";
 
         public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
         {
@@ -34,110 +35,89 @@ namespace Umbraco.Cms.Core.Security
         /// <inheritdoc />
         public Task<IdentityResult> CreateAsync(TRole role, CancellationToken cancellationToken = default)
         {
-            try
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (role == null)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                ThrowIfDisposed();
-
-                if (role == null)
-                {
-                    throw new ArgumentNullException(nameof(role));
-                }
-
-                var memberGroup = new MemberGroup
-                {
-                    Name = role.Name
-                };
-
-                _memberGroupService.Save(memberGroup);
-
-                role.Id = memberGroup.Id.ToString();
-
-                return Task.FromResult(IdentityResult.Success);
+                throw new ArgumentNullException(nameof(role));
             }
-            catch (Exception ex)
+
+            var memberGroup = new MemberGroup
             {
-                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = ex.Message, Description = ex.Message }));
-            }
+                Name = role.Name
+            };
+
+            _memberGroupService.Save(memberGroup);
+
+            role.Id = memberGroup.Id.ToString();
+
+            return Task.FromResult(IdentityResult.Success);
         }
 
 
         /// <inheritdoc />
         public Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = default)
         {
-            try
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (role == null)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                if (role == null)
-                {
-                    throw new ArgumentNullException(nameof(role));
-                }
-
-                ThrowIfDisposed();
-
-                if (!int.TryParse(role.Id, out int roleId))
-                {
-                    return Task.FromResult(IdentityResult.Failed(_intParseError));
-                }
-
-                IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
-                if (memberGroup != null)
-                {
-                    if (MapToMemberGroup(role, memberGroup))
-                    {
-                        _memberGroupService.Save(memberGroup);
-                    }
-                    //TODO: if nothing changed, do we need to report this?
-                    return Task.FromResult(IdentityResult.Success);
-                }
-                else
-                {
-                    //TODO: throw exception when not found, or return failure?
-                    return Task.FromResult(IdentityResult.Failed(_memberGroupNotFoundError));
-                }
-
+                throw new ArgumentNullException(nameof(role));
             }
-            catch (Exception ex)
+
+            if (!int.TryParse(role.Id, out int roleId))
             {
-                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = ex.Message, Description = ex.Message }));
+                return Task.FromResult(IdentityResult.Failed(_intParseError));
             }
+
+            IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
+            if (memberGroup != null)
+            {
+                if (MapToMemberGroup(role, memberGroup))
+                {
+                    _memberGroupService.Save(memberGroup);
+                }
+                //TODO: if nothing changed, do we need to report this?
+                return Task.FromResult(IdentityResult.Success);
+            }
+            else
+            {
+                //TODO: throw exception when not found, or return failure?
+                return Task.FromResult(IdentityResult.Failed(_memberGroupNotFoundError));
+            }
+
         }
 
         /// <inheritdoc />
         public Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = default)
         {
-            try
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (role == null)
             {
-                cancellationToken.ThrowIfCancellationRequested();
-                ThrowIfDisposed();
-
-                if (role == null)
-                {
-                    throw new ArgumentNullException(nameof(role));
-                }
-
-                if (!int.TryParse(role.Id, out int roleId))
-                {
-                    //TODO: what identity error should we return in this case?
-                    return Task.FromResult(IdentityResult.Failed(_intParseError));
-                }
-
-                IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
-                if (memberGroup != null)
-                {
-                    _memberGroupService.Delete(memberGroup);
-                }
-                else
-                {
-                    return Task.FromResult(IdentityResult.Failed(_memberGroupNotFoundError));
-                }
-
-                return Task.FromResult(IdentityResult.Success);
+                throw new ArgumentNullException(nameof(role));
             }
-            catch (Exception ex)
+
+            if (!int.TryParse(role.Id, out int roleId))
             {
-                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = ex.Message, Description = ex.Message }));
+                //TODO: what identity error should we return in this case?
+                return Task.FromResult(IdentityResult.Failed(_intParseError));
             }
+
+            IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
+            if (memberGroup != null)
+            {
+                _memberGroupService.Delete(memberGroup);
+            }
+            else
+            {
+                return Task.FromResult(IdentityResult.Failed(_memberGroupNotFoundError));
+            }
+
+            return Task.FromResult(IdentityResult.Success);
         }
 
         /// <inheritdoc />
@@ -204,36 +184,10 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public Task<string> GetNormalizedRoleNameAsync(TRole role, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-
-            if (role == null)
-            {
-                throw new ArgumentNullException(nameof(role));
-            }
-
-            //TODO: are we utilising NormalizedRoleName?
-            return Task.FromResult(role.NormalizedName);
-        }
+        public Task<string> GetNormalizedRoleNameAsync(TRole role, CancellationToken cancellationToken = default) => GetRoleNameAsync(role, cancellationToken);
 
         /// <inheritdoc />
-        public Task SetNormalizedRoleNameAsync(TRole role, string normalizedName, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-
-            if (role == null)
-            {
-                throw new ArgumentNullException(nameof(role));
-            }
-
-            //TODO: are we utilising NormalizedRoleName and do we need to set it in the memberGroupService?
-            role.NormalizedName = normalizedName;
-
-            return Task.CompletedTask;
-        }
+        public Task SetNormalizedRoleNameAsync(TRole role, string normalizedName, CancellationToken cancellationToken = default) => SetRoleNameAsync(role, normalizedName, cancellationToken);
 
         /// <inheritdoc />
         public Task<TRole> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
@@ -279,8 +233,6 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(name));
             }
             IMemberGroup memberGroup = _memberGroupService.GetByName(name);
-            //TODO: throw exception when not found?
-
             return Task.FromResult(memberGroup == null ? null : MapFromMemberGroup(memberGroup));
         }
 

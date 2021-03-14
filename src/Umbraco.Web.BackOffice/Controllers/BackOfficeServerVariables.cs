@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -378,8 +378,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     "umbracoSettings", new Dictionary<string, object>
                     {
                         {"umbracoPath", _globalSettings.GetBackOfficePath(_hostingEnvironment)},
-                        {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath).TrimEnd('/')},
-                        {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
+                        {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath).TrimEnd(Constants.CharArrays.ForwardSlash)},
+                        {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {
                             "imageFileTypes",
                             string.Join(",", _imageUrlGenerator.SupportedImageFileTypes)
@@ -398,7 +398,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {"keepUserLoggedIn", _securitySettings.KeepUserLoggedIn},
                         {"usernameIsEmail", _securitySettings.UsernameIsEmail},
-                        {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd('/')},
+                        {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
                         {"loginLogoImage", _contentSettings.LoginLogoImage },
