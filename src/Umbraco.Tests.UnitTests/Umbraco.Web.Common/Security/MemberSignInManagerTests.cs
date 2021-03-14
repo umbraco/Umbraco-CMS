@@ -31,8 +31,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
         private Mock<IServiceProvider> _mockServiceProviders;
         private Mock<ILogger<IMemberManager>> _mockLogger;
         private Mock<IOptions<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
-        private MemberManager _userManager;
-        private Mock<IIpResolver> _mockIpResolver = new Mock<IIpResolver>();
+        private Mock<IMemberManager> _memberManager;
+        private readonly Mock<IIpResolver> _mockIpResolver = new Mock<IIpResolver>();
 
         public MemberSignInManager CreateSut()
         {
@@ -68,26 +68,27 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
                 new PasswordValidator<MemberIdentityUser>()
             };
 
-            _userManager = new MemberManager(
-                _mockIpResolver.Object,
-                _fakeMemberStore,
-                _mockIdentityOptions.Object,
-                _mockPasswordHasher.Object,
-                userValidators,
-                pwdValidators,
-                new BackOfficeIdentityErrorDescriber(),
-                _mockServiceProviders.Object,
-                new Mock<IHttpContextAccessor>().Object,
-                new Mock<ILogger<UserManager<MemberIdentityUser>>>().Object,
-                _mockPasswordConfiguration.Object);
+            //_memberManager = new MemberManager(
+            //    _mockIpResolver.Object,
+            //    _fakeMemberStore,
+            //    _mockIdentityOptions.Object,
+            //    _mockPasswordHasher.Object,
+            //    userValidators,
+            //    pwdValidators,
+            //    new BackOfficeIdentityErrorDescriber(),
+            //    _mockServiceProviders.Object,
+            //    new Mock<IHttpContextAccessor>().Object,
+            //    new Mock<ILogger<UserManager<MemberIdentityUser>>>().Object,
+            //    _mockPasswordConfiguration.Object);
 
-            validator.Setup(v => v.ValidateAsync(
-                    _userManager,
-                    It.IsAny<MemberIdentityUser>()))
-                .Returns(Task.FromResult(IdentityResult.Success)).Verifiable();
+            //validator.Setup(v => v.ValidateAsync(
+            //        _memberManager,
+            //        It.IsAny<MemberIdentityUser>()))
+            //    .Returns(Task.FromResult(IdentityResult.Success)).Verifiable();
 
+            _memberManager = new Mock<IMemberManager>();
             return new MemberSignInManager(
-                    _userManager,
+                    _memberManager.As<MemberManager>().Object,
                     Mock.Of<IIpResolver>(),
                     Mock.Of<IHttpContextAccessor>(),
                     Mock.Of<IUserClaimsPrincipalFactory<MemberIdentityUser>>(),
@@ -109,6 +110,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
             string password = "testPassword";
             bool lockoutOnfailure = false;
             bool isPersistent = true;
+            _memberManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(fakeUser);
 
             //act
             SignInResult actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnfailure);
