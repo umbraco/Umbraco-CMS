@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +16,7 @@ using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 {
     [TestFixture]
-    public class MemberIdentityUserStoreTests
+    public class MemberUserStoreTests
     {
         private Mock<IMemberService> _mockMemberService;
 
@@ -70,17 +69,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             var fakeCancellationToken = new CancellationToken() { };
 
             // act
-            var actual = (Task<IdentityResult>)sut.SetNormalizedUserNameAsync(null, "username", fakeCancellationToken);
+            Action actual = () => sut.SetNormalizedUserNameAsync(null, "username", fakeCancellationToken);
 
             // assert
-            Assert.IsFalse(actual.Result.Succeeded);
-            Assert.IsTrue(actual.Result.Errors.Any(x => x.Code == "IdentityErrorUserStore" && x.Description == "Value cannot be null. (Parameter 'user')"));
+            Assert.That(actual, Throws.ArgumentNullException);
             _mockMemberService.VerifyNoOtherCalls();
         }
 
 
         [Test]
-        public void GivenISetNormalizedUserName_AndTheUserNameIsNull_ThenIShouldGetANull()
+        public void GivenISetNormalizedUserName_AndTheUserNameIsNull_ThenAnExceptionShouldBeThrown()
         {
             // arrange
             MemberUserStore sut = CreateSut();
@@ -88,11 +86,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             var fakeUser = new MemberIdentityUser() { };
 
             // act
-            var actual = (Task<IdentityResult>)sut.SetNormalizedUserNameAsync(fakeUser, null, fakeCancellationToken);
+            Action actual = () => sut.SetNormalizedUserNameAsync(fakeUser, null, fakeCancellationToken);
 
             // assert
-            Assert.IsFalse(actual.Result.Succeeded);
-            Assert.IsTrue(actual.Result.Errors.Any(x => x.Code == "IdentityErrorUserStore" && x.Description == "Value cannot be null. (Parameter 'normalizedName')"));
             _mockMemberService.VerifyNoOtherCalls();
         }
 
