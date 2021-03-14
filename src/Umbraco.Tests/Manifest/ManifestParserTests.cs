@@ -187,6 +187,8 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
 
             var editor = manifest.PropertyEditors[1];
             Assert.IsTrue((editor.Type & EditorType.MacroParameter) > 0);
+            Assert.IsNotEmpty(editor.DefaultConfiguration);
+            Assert.AreEqual("some default val", editor.DefaultConfiguration["key1"]);
 
             editor = manifest.PropertyEditors[0];
             Assert.AreEqual("Test.Test1", editor.Alias);

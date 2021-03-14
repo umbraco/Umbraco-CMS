@@ -78,7 +78,7 @@ namespace Umbraco.Core.Services.Implement
             if (entitiesL.Count == 0) return;
 
             //put all entity's paths into a list with the same indices
-            var paths = entitiesL.Select(x => x.Path.Split(',').Select(int.Parse).ToArray()).ToArray();
+            var paths = entitiesL.Select(x => x.Path.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray()).ToArray();
 
             // lazily get versions
             var prevVersionDictionary = new Dictionary<int, IContentBase>();
@@ -176,7 +176,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public IEnumerable<Notification> FilterUserNotificationsByPath(IEnumerable<Notification> userNotifications, string path)
         {
-            var pathParts = path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries);
+            var pathParts = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
             return userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();
         }
 
@@ -517,7 +517,7 @@ namespace Umbraco.Core.Services.Implement
                             try
                             {
                                 if (Sendmail != null) Sendmail(s, request.Mail, _logger); else s.Send(request.Mail);
-                                _logger.Debug<NotificationService>("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
+                                _logger.Debug<NotificationService, string, string, string>("Notification '{Action}' sent to {Username} ({Email})", request.Action, request.UserName, request.Email);
                             }
                             catch (Exception ex)
                             {

@@ -15,7 +15,7 @@ Simple icon
 
 Icon with additional attribute. It can be treated like any other dom element
 <pre>
-    <umb-icon icon="icon-alert" class="another-class"></umb-icon>
+    <umb-icon icon="icon-alert" class="icon-class"></umb-icon>
 </pre>
 @example
  **/
@@ -75,9 +75,8 @@ Icon with additional attribute. It can be treated like any other dom element
 
                     iconHelper.getIcon(icon)
                         .then(data => {
-                            if (data !== null && data.svgString !== undefined) {
+                            if (data && data.svgString) {
                                 // Watch source SVG string
-                                //icon.svgString.$$unwrapTrustedValue();
                                 scope.svgString = data.svgString;
                             }
                         });

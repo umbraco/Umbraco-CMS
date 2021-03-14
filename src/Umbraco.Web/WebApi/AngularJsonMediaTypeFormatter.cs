@@ -47,8 +47,8 @@ namespace Umbraco.Web.WebApi
             {
                 //write the special encoding for angular json to the start
                 // (see: http://docs.angularjs.org/api/ng.$http)
-                streamWriter.Write(XsrfPrefix);
-                streamWriter.Flush();
+                await streamWriter.WriteAsync(XsrfPrefix);
+                await streamWriter.FlushAsync();
                 await base.WriteToStreamAsync(type, value, writeStream, content, transportContext);
             }
         }

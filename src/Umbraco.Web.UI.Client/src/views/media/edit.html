@@ -23,7 +23,8 @@
             <umb-editor-container>
                 <div class="umb-editor-sub-views" ng-if="!page.loading">
                     <div id="sub-view-{{$index}}" ng-repeat="app in content.apps track by app.alias">
-                        <umb-editor-sub-view model="app" content="content"  />
+                        <umb-editor-sub-view model="app" content="content">
+                        </umb-editor-sub-view>
                     </div>
                 </div>
             </umb-editor-container>
@@ -59,7 +60,7 @@
 
                     <!-- label-key="buttons_save" -->
                     <umb-button alias="save"
-                                type="button"
+                                type="submit"
                                 button-style="success"
                                 state="page.saveButtonState"
                                 label-key="{{page.submitButtonLabelKey}}"

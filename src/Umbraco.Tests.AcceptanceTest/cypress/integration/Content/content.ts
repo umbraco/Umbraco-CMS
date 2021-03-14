@@ -321,7 +321,7 @@ context('Content', () => {
         cy.get('.umb-box-content > div > .input-block-level')
             .find('option[label*=' + new Date().getDate() + ']')
             .then(elements => {
-                const option = elements[[elements.length - 1]].getAttribute('value');
+                const option = elements[elements.length - 1].getAttribute('value');
                 cy.get('.umb-box-content > div > .input-block-level')
                     .select(option);
             });
@@ -521,7 +521,7 @@ context('Content', () => {
                 .done()
             .done()
             .build();
-            
+
         cy.saveDocumentType(pickedDocType).then((generatedType) => {
             const pickedContentNode = new ContentBuilder()
                 .withContentTypeAlias(generatedType["alias"])
@@ -563,7 +563,7 @@ context('Content', () => {
         @{
             Layout = null;
         }
-        
+
         @{
             IPublishedContent typedContentPicker = Model.Value<IPublishedContent>("picker");
             if (typedContentPicker != null)
@@ -574,7 +574,7 @@ context('Content', () => {
 
         // Create content with content picker
         cy.get('.umb-tree-root-link').rightclick();
-        cy.get('.-opens-dialog > .umb-action-link').click();
+        cy.get('[data-element="action-create"]').click();
         cy.get('[data-element="action-create-' + pickerDocTypeAlias + '"] > .umb-action-link').click();
         // Fill out content
         cy.umbracoEditorHeaderName('ContentPickerContent');

@@ -249,7 +249,7 @@ namespace Umbraco.Web
         private void RewriteToBackOfficeHandler(HttpContextBase context)
         {
             // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
-            var rewritePath = _globalSettings.Path.TrimEnd('/') + "/Default";
+            var rewritePath = _globalSettings.Path.TrimEnd(Constants.CharArrays.ForwardSlash) + "/Default";
             // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
             context.RewritePath(rewritePath, "", "", false);
 
@@ -279,10 +279,10 @@ namespace Umbraco.Web
             // rewritten URL, but this is not what we want!
             // read: http://forums.iis.net/t/1146511.aspx
 
-            var query = pcr.Uri.Query.TrimStart('?');
+            var query = pcr.Uri.Query.TrimStart(Constants.CharArrays.QuestionMark);
 
             // GlobalSettings.Path has already been through IOHelper.ResolveUrl() so it begins with / and vdir (if any)
-            var rewritePath = _globalSettings.Path.TrimEnd('/') + "/RenderMvc";
+            var rewritePath = _globalSettings.Path.TrimEnd(Constants.CharArrays.ForwardSlash) + "/RenderMvc";
             // rewrite the path to the path of the handler (i.e. /umbraco/RenderMvc)
             context.RewritePath(rewritePath, "", query, false);
 
@@ -328,7 +328,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<UmbracoModule>("Could not dispose item with key " + k, ex);
+                    _logger.Error<UmbracoModule>(ex, "Could not dispose item with key {Key}", k);
                 }
                 try
                 {
@@ -336,7 +336,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<UmbracoModule>("Could not dispose item key " + k, ex);
+                    _logger.Error<UmbracoModule>(ex, "Could not dispose item key {Key}", k);
                 }
             }
         }
@@ -357,15 +357,13 @@ namespace Umbraco.Web
                 // there's nothing we can do really
                 app.BeginRequest += (sender, args) =>
                 {
-                    // would love to avoid throwing, and instead display a customized Umbraco 500
-                    // page - however if we don't throw here, something else might go wrong, and
-                    // it's this later exception that would be reported. could not figure out how
-                    // to prevent it, either with httpContext.Response.End() or .ApplicationInstance
-                    // .CompleteRequest()
+                    // if we don't throw here, something else might go wrong,
+                    // and it's this later exception that would be reported.
 
                     // also, if something goes wrong with our DI setup, the logging subsystem may
                     // not even kick in, so here we try to give as much detail as possible
 
+                    // the exception is handled in UmbracoApplication which shows a custom error page
                     BootFailedException.Rethrow(Core.Composing.Current.RuntimeState.BootFailedException);
                 };
                 return;

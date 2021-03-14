@@ -263,6 +263,7 @@
     <key alias="statistics">Statistiques</key>
     <key alias="titleOptional">Titre (optionnel)</key>
     <key alias="altTextOptional">Texte alternatif (optionnel)</key>
+    <key alias="captionTextOptional">Légende (optionnel)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Dépublier</key>
     <key alias="unpublished">Dépublié</key>
@@ -635,6 +636,7 @@
     <key alias="choose">Choisir</key>
     <key alias="close">Fermer</key>
     <key alias="closewindow">Fermer la fenêtre</key>
+    <key alias="closepane">Fermer le panel</key>
     <key alias="comment">Commenter</key>
     <key alias="confirm">Confirmer</key>
     <key alias="constrain">Conserver</key>
@@ -762,6 +764,7 @@
     <key alias="current">actuel</key>
     <key alias="embed">Intégrer</key>
     <key alias="selected">sélectionné</key>
+    <key alias="avatar">Avatar de</key>
   </area>
   <area alias="colors">
     <key alias="blue">Bleu</key>
@@ -979,7 +982,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 															Une réinitialisation de votre mot de passe a été demandée
 														</h1>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															Votre nom d'utilisateur pour vous connecter au back-office Umbraco est : <strong>%0%</strong>
+															Votre nom d'utilisateur pour vous connecter au backoffice Umbraco est : <strong>%0%</strong>
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
@@ -1352,7 +1355,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="tabs">Onglets</key>
     <key alias="contentTypeEnabled">Type de contenu de base activé</key>
     <key alias="contentTypeUses">Ce type de contenu utilise</key>
-    <key alias="asAContentMasterType">en tant que type de contenu de base. Les onglets du type de contenu de base ne sont pas affichés et peuvent seulement être modifiés à partir du type de contenu de base lui-même.</key>
     <key alias="noPropertiesDefinedOnTab">Aucune propriété définie dans cet onglet. Cliquez sur le lien "Ajouter une nouvelle propriété" en-haut pour créer une nouvelle propriété.</key>
     <key alias="createMatchingTemplate">Créer le template correspondant</key>
     <key alias="addIcon">Ajouter une icône</key>
@@ -1805,7 +1807,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="noLockouts">n'a pas été bloqué</key>
     <key alias="noPasswordChange">Le mot de passe n'a pas été modifié</key>
     <key alias="confirmNewPassword">Confirmez votre nouveau mot de passe</key>
-    <key alias="changePasswordDescription">Vous pouvez changer votre mot de passe d'accès au Back Office Umbraco en remplissant le formulaire ci-dessous puis en cliquant sur le bouton "Changer le mot de passe"</key>
+    <key alias="changePasswordDescription">Vous pouvez changer votre mot de passe d'accès au backoffice Umbraco en remplissant le formulaire ci-dessous puis en cliquant sur le bouton "Changer le mot de passe"</key>
     <key alias="contentChannel">Canal de contenu</key>
     <key alias="createAnotherUser">Créer un autre utilisateur</key>
     <key alias="createUserHelp">Créer de nouveaux utilisateurs pour leur donner accès à Umbraco. Lors de la création d'un nouvel utilisateur, un mot de passe est généré que vous pouvez partager avec ce dernier.</key>
