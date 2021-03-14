@@ -11,7 +11,6 @@
         vm.cancelChange = cancelChange;
         vm.showOldPass = showOldPass;
         vm.showCancelBtn = showCancelBtn;
-        vm.newPasswordKeyUp = newPasswordKeyUp;
 
         var unsubscribe = [];
 
@@ -59,19 +58,6 @@
             // Check non-alpha pwd settings for tooltip display
             if (vm.config.minNonAlphaNumericChars === undefined) {
                 vm.config.minNonAlphaNumericChars = 0;
-            }
-
-            if (vm.config.minNonAlphaNumericChars > 0) {
-                localizationService.localize("user_newPasswordFormatNonAlphaTip",
-                    [
-                        vm.config.minNonAlphaNumericChars
-                    ]).then(function(data) {
-                        vm.passwordNonAlphaTip = data;
-                        updatePasswordTip(0);
-                });
-            } else {
-                vm.passwordNonAlphaTip = "";
-                updatePasswordTip(0);
             }
 
             //set the model defaults
@@ -170,27 +156,6 @@
         function showCancelBtn() {
             return vm.config.disableToggle !== true && vm.config.hasPassword;
         };
-
-        function newPasswordKeyUp(event) {
-            updatePasswordTip(event.target.value.length);
-        }
-
-        function updatePasswordTip(passwordLength) {
-            var remainingLength = vm.config.minPasswordLength - passwordLength;
-            if (remainingLength > 0) {
-                localizationService.localize("user_newPasswordFormatLengthTip", [
-                    remainingLength
-                ]).then(function (data) {
-                    vm.passwordTip = data;
-                    if (vm.passwordNonAlphaTip) {
-                        vm.passwordTip += "<br/>" + vm.passwordNonAlphaTip;
-                    }
-                });
-            } else {
-                vm.passwordTip = vm.passwordNonAlphaTip;
-            }
-        };
-
     }
 
     var component = {

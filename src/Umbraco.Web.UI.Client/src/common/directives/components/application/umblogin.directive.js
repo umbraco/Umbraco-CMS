@@ -16,7 +16,7 @@
     function UmbLoginController($scope, $location, currentUserResource, formHelper,
         mediaHelper, umbRequestHelper, Upload, localizationService,
         userService, externalLoginInfo, externalLoginInfoService,
-        resetPasswordCodeInfo, $timeout, authResource, $q, $route) {
+        resetPasswordCodeInfo, authResource, $q) {
 
         const vm = this;
 
