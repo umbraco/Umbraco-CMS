@@ -86,7 +86,7 @@ namespace Umbraco.Core.Runtime
                     // wait to get a write lock
                     _sqlServerSyntax.WriteLock(db, TimeSpan.FromMilliseconds(millisecondsTimeout), Constants.Locks.MainDom);
                 }
-                catch(SqlException ex)
+                catch (SqlException ex)
                 {
                     if (IsLockTimeoutException(ex))
                     {
@@ -228,12 +228,30 @@ namespace Umbraco.Core.Runtime
                         }
                     }
                     finally
+                    {
+                        // Even if any of the above fail like BeginTransaction, or even a query after the
+                        // Transaction is started, the calls below will not throw. I've tried all sorts of
+                        // combinations to see if I can make this throw but I can't. In any case, we'll be
+                        // extra safe and try/catch/log
+                        try
                         {
                             db?.CompleteTransaction();
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.Error<SqlMainDomLock>(ex, "Unexpected error completing transaction.");
+                        }
+
+                        try
+                        {
                             db?.Dispose();
                         }
+                        catch (Exception ex)
+                        {
+                            _logger.Error<SqlMainDomLock>(ex, "Unexpected error completing disposing.");
+                        }
+                    }
                 }
-
             }
         }
 
