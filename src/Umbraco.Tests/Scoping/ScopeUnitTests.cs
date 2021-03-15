@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Moq;
 using NPoco;
 using NUnit.Framework;
@@ -453,6 +454,40 @@ namespace Umbraco.Tests.Scoping
                 Assert.IsFalse(realScope.ReadLocks[scope.InstanceId].ContainsKey(Constants.Locks.Languages));
                 scope.Complete();
             }
+        }
+
+        [Test]
+        public void Scope_Throws_If_ReadLocks_Not_Cleared()
+        {
+            var scopeprovider = GetScopeProvider(out var syntaxProviderMock);
+            var scope = (Scope) scopeprovider.CreateScope();
+
+            var readDict = new Dictionary<int, int>();
+            readDict[Constants.Locks.Languages] = 1;
+            scope.ReadLocks[Guid.NewGuid()] = readDict;
+
+            Assert.Throws<Exception>(() => scope.Dispose());
+
+            // We have to clear so we can properly dispose the scope, otherwise it'll mess with other tests.
+            scope.ReadLocks.Clear();
+            scope.Dispose();
+        }
+
+        [Test]
+        public void Scope_Throws_If_WriteLocks_Not_Cleared()
+        {
+            var scopeprovider = GetScopeProvider(out var syntaxProviderMock);
+            var scope = (Scope) scopeprovider.CreateScope();
+
+            var writeDict = new Dictionary<int, int>();
+            writeDict[Constants.Locks.Languages] = 1;
+            scope.WriteLocks[Guid.NewGuid()] = writeDict;
+
+            Assert.Throws<Exception>(() => scope.Dispose());
+
+            // We have to clear so we can properly dispose the scope, otherwise it'll mess with other tests.
+            scope.WriteLocks.Clear();
+            scope.Dispose();
         }
     }
 }

@@ -365,15 +365,16 @@ namespace Umbraco.Core.Scoping
             // Lock on parent
             ClearReadLocks(InstanceId);
             ClearWriteLocks(InstanceId);
-            // if (ParentScope is null)
-            // {
-            //     // We're the parent scope, make sure that locks of all scopes has been cleared
-            //     // Since we're only reading we don't have to be in a lock
-            //     if (ReadLocks.Count != 0 || WriteLocks.Count != 0)
-            //     {
-            //         throw new Exception($"All scopes has not been disposed from parent scope {InstanceId}");
-            //     }
-            // }
+            if (ParentScope is null)
+            {
+                // We're the parent scope, make sure that locks of all scopes has been cleared
+                // Since we're only reading we don't have to be in a lock
+                if (ReadLocks.Values.Any(x => x.Values.Any(value => value != 0))
+                    || WriteLocks.Values.Any(x => x.Values.Any(value => value != 0)))
+                {
+                    throw new Exception($"All scopes has not been disposed from parent scope {InstanceId}");
+                }
+            }
 
             var parent = ParentScope;
             _scopeProvider.AmbientScope = parent; // might be null = this is how scopes are removed from context objects
