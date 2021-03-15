@@ -44,8 +44,6 @@
         };
 
         vm.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
-        vm.minPwdLength = Umbraco.Sys.ServerVariables.umbracoSettings.minimumPasswordLength;
-        vm.minPwdNonAlphaNum = Umbraco.Sys.ServerVariables.umbracoSettings.minimumPasswordNonAlphaNum;
 
         vm.errorMsg = "";
         vm.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
@@ -75,7 +73,6 @@
         vm.loginSubmit = loginSubmit;
         vm.requestPasswordResetSubmit = requestPasswordResetSubmit;
         vm.setPasswordSubmit = setPasswordSubmit;
-        vm.newPasswordKeyUp = newPasswordKeyUp;
 
         vm.labels = {};
         localizationService.localizeMany([
@@ -135,19 +132,6 @@
 
             // show the correct panel
             if (vm.resetPasswordCodeInfo.resetCodeModel) {
-                if (vm.minPwdNonAlphaNum > 0) {
-                    localizationService.localize("user_newPasswordFormatNonAlphaTip",
-                        [
-                            vm.minPwdNonAlphaNum
-                        ]).then(function (data) {
-                        vm.passwordNonAlphaTip = data;
-                        updatePasswordTip(0);
-                    });
-                } else {
-                    vm.passwordNonAlphaTip = "";
-                    updatePasswordTip(0);
-                }
-
                 vm.showSetPassword();
             }
             else if (vm.resetPasswordCodeInfo.errors.length > 0) {
@@ -378,27 +362,6 @@
                 }
             });
         }
-
-        function newPasswordKeyUp(event) {
-            updatePasswordTip(event.target.value.length);
-        }
-
-        function updatePasswordTip(passwordLength) {
-            var remainingLength = vm.minPwdLength - passwordLength;
-            if (remainingLength > 0) {
-                localizationService.localize("user_newPasswordFormatLengthTip", [
-                    remainingLength
-                ]).then(function (data) {
-                    vm.passwordTip = data;
-                    if (vm.passwordNonAlphaTip) {
-                        vm.passwordTip += "<br/>" + vm.passwordNonAlphaTip;
-                    }
-                });
-            } else {
-                vm.passwordTip = vm.passwordNonAlphaTip;
-            }
-        };
-
 
         ////
 
