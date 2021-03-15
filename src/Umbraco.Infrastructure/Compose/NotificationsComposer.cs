@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.Compose
 
             // add handlers for building content relations
             builder
-                .AddNotificationHandler<CopiedNotification<IContent>, RelateOnCopyNotifcationHandler>()
+                .AddNotificationHandler<CopiedNotification<IContent>, RelateOnCopyNotificationHandler>()
                 .AddNotificationHandler<MovedNotification<IContent>, RelateOnTrashNotificationHandler>()
                 .AddNotificationHandler<MovedToRecycleBinNotification<IContent>, RelateOnTrashNotificationHandler>()
                 .AddNotificationHandler<MovedNotification<IMedia>, RelateOnTrashNotificationHandler>()
