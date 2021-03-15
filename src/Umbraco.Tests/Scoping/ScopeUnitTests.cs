@@ -466,7 +466,7 @@ namespace Umbraco.Tests.Scoping
             readDict[Constants.Locks.Languages] = 1;
             scope.ReadLocks[Guid.NewGuid()] = readDict;
 
-            Assert.Throws<Exception>(() => scope.Dispose());
+            Assert.Throws<InvalidOperationException>(() => scope.Dispose());
 
             // We have to clear so we can properly dispose the scope, otherwise it'll mess with other tests.
             scope.ReadLocks.Clear();
@@ -483,7 +483,7 @@ namespace Umbraco.Tests.Scoping
             writeDict[Constants.Locks.Languages] = 1;
             scope.WriteLocks[Guid.NewGuid()] = writeDict;
 
-            Assert.Throws<Exception>(() => scope.Dispose());
+            Assert.Throws<InvalidOperationException>(() => scope.Dispose());
 
             // We have to clear so we can properly dispose the scope, otherwise it'll mess with other tests.
             scope.WriteLocks.Clear();
