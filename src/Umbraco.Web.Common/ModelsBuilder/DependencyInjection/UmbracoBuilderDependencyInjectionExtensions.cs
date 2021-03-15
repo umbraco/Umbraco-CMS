@@ -111,7 +111,6 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<OutOfDateModelsStatus>();
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
             builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
-            builder.Services.AddSingleton<OutOfDateModelsStatus>();
             builder.Services.AddSingleton<ModelsGenerationError>();
 
             builder.Services.AddSingleton<PureLiveModelFactory>();
