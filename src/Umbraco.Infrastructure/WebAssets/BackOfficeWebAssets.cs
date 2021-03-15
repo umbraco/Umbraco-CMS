@@ -19,7 +19,8 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         public const string UmbracoPreviewCssBundleName = "umbraco-preview-css";
         public const string UmbracoCssBundleName = "umbraco-backoffice-css";
         public const string UmbracoInitCssBundleName = "umbraco-backoffice-init-css";
-        public const string UmbracoJsBundleName = "umbraco-backoffice-js";
+        public const string UmbracoCoreJsBundleName = "umbraco-backoffice-js";
+        public const string UmbracoExtensionsJsBundleName = "umbraco-backoffice-extensions-js";
         public const string UmbracoTinyMceJsBundleName = "umbraco-tinymce-js";
         public const string UmbracoUpgradeCssBundleName = "umbraco-authorize-upgrade-css";
 
@@ -60,20 +61,23 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
             _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName,
                 FormatPaths("assets/css/canvasdesigner.css"));
 
-            _runtimeMinifier.CreateJsBundle(UmbracoPreviewJsBundleName,
+            _runtimeMinifier.CreateJsBundle(UmbracoPreviewJsBundleName, false,
                 FormatPaths(GetScriptsForPreview()));
 
-            _runtimeMinifier.CreateJsBundle(UmbracoTinyMceJsBundleName,
+            _runtimeMinifier.CreateJsBundle(UmbracoTinyMceJsBundleName, false,
                 FormatPaths(GetScriptsForTinyMce()));
+
+            _runtimeMinifier.CreateJsBundle(UmbracoCoreJsBundleName, false,
+                FormatPaths(GetScriptsForBackOfficeCore()));
 
             var propertyEditorAssets = ScanPropertyEditors()
                 .GroupBy(x => x.AssetType)
                 .ToDictionary(x => x.Key, x => x.Select(c => c.FilePath));
 
             _runtimeMinifier.CreateJsBundle(
-                UmbracoJsBundleName,
+                UmbracoExtensionsJsBundleName, true,
                 FormatPaths(
-                    GetScriptsForBackOffice(
+                    GetScriptsForBackOfficeExtensions(
                         propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>())));
 
             _runtimeMinifier.CreateCssBundle(
@@ -87,12 +91,9 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         /// Returns scripts used to load the back office
         /// </summary>
         /// <returns></returns>
-        private string[] GetScriptsForBackOffice(IEnumerable<string> propertyEditorScripts)
+        private string[] GetScriptsForBackOfficeExtensions(IEnumerable<string> propertyEditorScripts)
         {
-            var umbracoInit = GetInitBackOfficeScripts();
             var scripts = new HashSet<string>();
-            foreach (var script in umbracoInit)
-                scripts.Add(script);
             foreach (var script in _parser.Manifest.Scripts)
                 scripts.Add(script);
             foreach (var script in propertyEditorScripts)
@@ -105,10 +106,10 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         /// Returns the list of scripts for back office initialization
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<string> GetInitBackOfficeScripts()
+        private string[] GetScriptsForBackOfficeCore()
         {
             var resources = JsonConvert.DeserializeObject<JArray>(Resources.JsInitialize);
-            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
+            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString()).ToArray();
         }
 
         /// <summary>

@@ -4,15 +4,18 @@ module.exports = {
     compile: {
         build: {
             sourcemaps: false,
-            embedtemplates: true
+            embedtemplates: true,
+            minify: true
         },
         dev: {
             sourcemaps: true,
-            embedtemplates: true
+            embedtemplates: true,
+            minify: false
         },
         test: {
             sourcemaps: false,
-            embedtemplates: true
+            embedtemplates: true,
+            minify: true
         }
     },
     sources: {
