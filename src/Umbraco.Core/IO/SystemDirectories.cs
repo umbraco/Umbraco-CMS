@@ -25,6 +25,8 @@ namespace Umbraco.Core.IO
 
         public static string AppPlugins => "~/App_Plugins";
 
+        public static string AppPluginIcons => "/Backoffice/Icons";
+
         public static string MvcViews => "~/Views";
 
         public static string PartialViews => MvcViews + "/Partials/";
