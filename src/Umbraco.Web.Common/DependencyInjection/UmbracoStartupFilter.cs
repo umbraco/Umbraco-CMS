@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Options;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.DependencyInjection
@@ -11,10 +12,16 @@ namespace Umbraco.Cms.Web.Common.DependencyInjection
     /// </summary>
     public sealed class UmbracoStartupFilter : IStartupFilter
     {
+        private readonly IOptions<UmbracoStartupFilterOptions> _options;
+        public UmbracoStartupFilter(IOptions<UmbracoStartupFilterOptions> options) => _options = options;
+
         /// <inheritdoc/>
         public Action<IApplicationBuilder> Configure(Action<IApplicationBuilder> next) =>
             app =>
             {
+                StaticServiceProvider.Instance = app.ApplicationServices;
+                _options.Value.PreUmbracoPipeline(app);
+
                 app.UseUmbraco();
                 next(app);
             };

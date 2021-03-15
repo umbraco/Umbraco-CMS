@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -42,6 +43,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly UriUtility _uriUtility;
+        private readonly AppCaches _appCaches;
         private readonly TabsAndPropertiesMapper<IContent> _tabsAndPropertiesMapper;
         private readonly ContentSavedStateMapper<ContentPropertyDisplay> _stateMapper;
         private readonly ContentBasicSavedStateMapper<ContentPropertyBasic> _basicStateMapper;
@@ -66,7 +68,8 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             UriUtility uriUtility,
             IPublishedUrlProvider publishedUrlProvider,
             IEntityService entityService,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            AppCaches appCaches)
         {
             _commonMapper = commonMapper;
             _commonTreeNodeMapper = commonTreeNodeMapper;
@@ -85,6 +88,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             _variationContextAccessor = variationContextAccessor;
             _uriUtility = uriUtility;
             _publishedUrlProvider = publishedUrlProvider;
+            _appCaches = appCaches;
 
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IContent>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
             _stateMapper = new ContentSavedStateMapper<ContentPropertyDisplay>();
@@ -282,7 +286,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             // false here.
             if (context.HasItems && context.Items.TryGetValue("CurrentUser", out var usr) && usr is IUser currentUser)
             {
-                userStartNodes = currentUser.CalculateContentStartNodeIds(_entityService);
+                userStartNodes = currentUser.CalculateContentStartNodeIds(_entityService, _appCaches);
                 if (!userStartNodes.Contains(Constants.System.Root))
                 {
                     // return false if this is the user's actual start node, the node will be rendered in the tree
@@ -297,7 +301,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             if (parent == null)
                 return false;
 
-            var pathParts = parent.Path.Split(',').Select(x => int.TryParse(x, out var i) ? i : 0).ToList();
+            var pathParts = parent.Path.Split(Constants.CharArrays.Comma).Select(x => int.TryParse(x, out var i) ? i : 0).ToList();
 
             // reduce the path parts so we exclude top level content items that
             // are higher up than a user's start nodes

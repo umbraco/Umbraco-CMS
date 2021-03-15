@@ -276,10 +276,20 @@ namespace Umbraco.Cms.Infrastructure.Search
                     break;
                 case MessageType.RefreshByPayload:
                     var payload = (MemberCacheRefresher.JsonPayload[])args.MessageObject;
-                    var members = payload.Select(x => _services.MemberService.GetById(x.Id));
-                    foreach (var m in members)
+                    foreach (var p in payload)
                     {
-                        ReIndexForMember(m);
+                        if (p.Removed)
+                        {
+                            DeleteIndexForEntity(p.Id, false);
+                        }
+                        else
+                        {
+                            var m = _services.MemberService.GetById(p.Id);
+                            if (m != null)
+                            {
+                                ReIndexForMember(m);
+                            }
+                        }
                     }
                     break;
                 case MessageType.RefreshAll:
@@ -693,6 +703,7 @@ namespace Umbraco.Cms.Infrastructure.Search
                         List<ValueSet> valueSet = builders[index.PublishedValuesOnly].Value;
                         index.IndexItems(valueSet);
                     }
+
                     return Task.CompletedTask;
                 });
         }

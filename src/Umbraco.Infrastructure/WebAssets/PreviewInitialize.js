@@ -1,14 +1,14 @@
-﻿[
+[
     'lib/jquery/jquery.min.js',
-    'lib/angular/angular.js',
+    'lib/angular/angular.min.js',
     'lib/underscore/underscore-min.js',
     'lib/umbraco/Extensions.js',
-    'js/utilities.js',
-    'js/app.js',
-    'js/umbraco.resources.js',
-    'js/umbraco.services.js',
-    'js/umbraco.interceptors.js',
+    'js/utilities.min.js',
+    'js/app.min.js',
+    'js/umbraco.resources.min.js',
+    'js/umbraco.services.min.js',
+    'js/umbraco.interceptors.min.js',
     'ServerVariables',
     'lib/signalr/signalr.min.js',
-    'js/umbraco.preview.js'
+    'js/umbraco.preview.min.js'
 ]

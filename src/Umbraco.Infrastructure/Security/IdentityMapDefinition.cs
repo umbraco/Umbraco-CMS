@@ -3,7 +3,7 @@
 
 using System;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -17,13 +17,19 @@ namespace Umbraco.Cms.Core.Security
     {
         private readonly ILocalizedTextService _textService;
         private readonly IEntityService _entityService;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptions<GlobalSettings> _globalSettings;
+        private readonly AppCaches _appCaches;
 
-        public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IOptions<GlobalSettings> globalSettings)
+        public IdentityMapDefinition(
+            ILocalizedTextService textService,
+            IEntityService entityService,
+            IOptions<GlobalSettings> globalSettings,
+            AppCaches appCaches)
         {
             _textService = textService;
             _entityService = entityService;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings;
+            _appCaches = appCaches;
         }
 
         public void DefineMaps(UmbracoMapper mapper)
@@ -31,7 +37,7 @@ namespace Umbraco.Cms.Core.Security
             mapper.Define<IUser, BackOfficeIdentityUser>(
                 (source, context) =>
                 {
-                    var target = new BackOfficeIdentityUser(_globalSettings, source.Id, source.Groups);
+                    var target = new BackOfficeIdentityUser(_globalSettings.Value, source.Id, source.Groups);
                     target.DisableChangeTracking();
                     return target;
                 },
@@ -67,8 +73,8 @@ namespace Umbraco.Cms.Core.Security
             target.Groups = source.Groups.ToArray();
             */
 
-            target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService);
-            target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService);
+            target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
+            target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
             target.Email = source.Email;
             target.UserName = source.Username;
             target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
@@ -80,7 +86,7 @@ namespace Umbraco.Cms.Core.Security
             target.PasswordConfig = source.PasswordConfiguration;
             target.StartContentIds = source.StartContentIds;
             target.StartMediaIds = source.StartMediaIds;
-            target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string
+            target.Culture = source.GetUserCulture(_textService, _globalSettings.Value).ToString(); // project CultureInfo to string
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;

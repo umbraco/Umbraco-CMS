@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.Dictionary;
@@ -23,6 +24,7 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -69,6 +71,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IJsonSerializer _serializer;
         private readonly IAuthorizationService _authorizationService;
+        private readonly AppCaches _appCaches;
         private readonly ILogger<MediaController> _logger;
 
         public MediaController(
@@ -92,7 +95,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IJsonSerializer serializer,
-            IAuthorizationService authorizationService)
+            IAuthorizationService authorizationService,
+            AppCaches appCaches)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _shortStringHelper = shortStringHelper;
@@ -114,6 +118,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _imageUrlGenerator = imageUrlGenerator;
             _serializer = serializer;
             _authorizationService = authorizationService;
+            _appCaches = appCaches;
         }
 
         /// <summary>
@@ -291,7 +296,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         protected int[] UserStartNodes
         {
-            get { return _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService)); }
+            get { return _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)); }
         }
 
         /// <summary>
@@ -726,7 +731,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (!string.IsNullOrEmpty(path))
             {
 
-                var folders = path.Split('/');
+                var folders = path.Split(Constants.CharArrays.ForwardSlash);
 
                 for (int i = 0; i < folders.Length - 1; i++)
                 {
@@ -775,7 +780,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //get the files
             foreach (var formFile in file)
             {
-                var fileName =  formFile.FileName.Trim(new[] { '\"' }).TrimEnd();
+                var fileName =  formFile.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
                 var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
@@ -974,6 +979,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             return new ActionResult<IMedia>(toMove);
         }
+
 
         public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {

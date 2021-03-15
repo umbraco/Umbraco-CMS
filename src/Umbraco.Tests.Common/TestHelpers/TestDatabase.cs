@@ -8,10 +8,12 @@ using System.Data;
 using System.Data.Common;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using NPoco.DatabaseTypes;
 using NPoco.Linq;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
@@ -37,7 +39,7 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
         public TestDatabase(DatabaseType databaseType = null, ISqlSyntaxProvider syntaxProvider = null)
         {
             DatabaseType = databaseType ?? new SqlServerDatabaseType();
-            SqlContext = new SqlContext(syntaxProvider ?? new SqlServerSyntaxProvider(), DatabaseType, Mock.Of<IPocoDataFactory>());
+            SqlContext = new SqlContext(syntaxProvider ?? new SqlServerSyntaxProvider(Options.Create((new GlobalSettings()))), DatabaseType, Mock.Of<IPocoDataFactory>());
         }
 
         /// <summary>

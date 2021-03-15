@@ -186,9 +186,14 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<WebProfilerHtml>();
 
             builder.Services.AddMiniProfiler(options =>
-
+            {
                 // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
-                options.ShouldProfile = request => false);
+                options.ShouldProfile = request => false;
+
+                // this is a default path and by default it performs a 'contains' check which will match our content controller
+                // (and probably other requests) and ignore them.
+                options.IgnoredPaths.Remove("/content/");
+            });
 
             builder.AddNotificationHandler<UmbracoApplicationStarting, InitializeWebProfiling>();
             return builder;
@@ -275,6 +280,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<InstallAreaRoutes>();
 
             builder.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
+            builder.Services.AddUnique<PreviewAuthenticationMiddleware>();
             builder.Services.AddUnique<UmbracoRequestMiddleware>();
             builder.Services.AddUnique<BootFailedMiddleware>();
 

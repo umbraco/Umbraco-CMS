@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Core.Routing
         public string ToAbsolute(string url)
         {
             //return ResolveUrl(url);
-            url = url.TrimStart('~');
+            url = url.TrimStart(Constants.CharArrays.Tilde);
             return _appPathPrefix + url;
         }
 
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Routing
 
             if (path != "/")
             {
-                path = path.TrimEnd('/');
+                path = path.TrimEnd(Constants.CharArrays.ForwardSlash);
             }
 
             return uri.Rewrite(path);

@@ -5,6 +5,7 @@ using System.Globalization;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -53,20 +54,18 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
     }
     internal sealed class FilterAllowedOutgoingContentFilter : FilterAllowedOutgoingMediaFilter
     {
+        private readonly char _permissionToCheck;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
-        private readonly char _permissionToCheck;
+        private readonly AppCaches _appCaches;
 
-
-
-        public FilterAllowedOutgoingContentFilter(Type outgoingType, string propertyName, char permissionToCheck,  IUserService userService, IEntityService entityService, IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-            : base(entityService, backofficeSecurityAccessor, outgoingType, propertyName)
+        public FilterAllowedOutgoingContentFilter(Type outgoingType, string propertyName, char permissionToCheck,  IUserService userService, IEntityService entityService, AppCaches appCaches, IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+            : base(entityService, backofficeSecurityAccessor, appCaches, outgoingType, propertyName)
         {
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+            _permissionToCheck = permissionToCheck;
             _userService = userService;
             _entityService = entityService;
-            _permissionToCheck = permissionToCheck;
+            _appCaches = appCaches;
         }
 
         protected override void FilterItems(IUser user, IList items)
@@ -78,7 +77,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
         protected override int[] GetUserStartNodes(IUser user)
         {
-            return user.CalculateContentStartNodeIds(_entityService);
+            return user.CalculateContentStartNodeIds(_entityService, _appCaches);
         }
 
         protected override int RecycleBinId

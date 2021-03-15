@@ -56,6 +56,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             AddOptions<WebRoutingSettings>(builder, Constants.Configuration.ConfigWebRouting);
             AddOptions<UmbracoPluginSettings>(builder, Constants.Configuration.ConfigPlugins);
             AddOptions<UnattendedSettings>(builder, Constants.Configuration.ConfigUnattended);
+            AddOptions<RichTextEditorSettings>(builder, Constants.Configuration.ConfigRichTextEditor);
 
             return builder;
         }

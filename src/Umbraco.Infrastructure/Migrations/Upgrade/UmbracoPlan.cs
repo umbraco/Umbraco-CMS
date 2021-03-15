@@ -9,6 +9,7 @@ using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_10_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_7_0;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_9_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
@@ -197,6 +198,9 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             To<ExternalLoginTableUserData>("{B5838FF5-1D22-4F6C-BCEB-F83ACB14B575}");
 // to 8.10.0
             To<AddPropertyTypeLabelOnTopColumn>("{D6A8D863-38EC-44FB-91EC-ACD6A668BD18}");
+
+            // to 8.10.0
+            To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}");
             //FINAL
         }
     }

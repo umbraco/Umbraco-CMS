@@ -30,6 +30,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         var element = $(args.element);
         element.addClass('above-backdrop');
     });
+    
 
     //A list of query strings defined that when changed will not cause a reload of the route
     var nonRoutingQueryStrings = ["mculture", "cculture", "csegment", "lq", "sr"];
