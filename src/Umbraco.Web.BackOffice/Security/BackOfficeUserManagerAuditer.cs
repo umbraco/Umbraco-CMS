@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         private readonly IAuditService _auditService;
         private readonly IUserService _userService;
 
-        public BackOfficeUserManagerAuditer(IAuditService auditService, IUserService userService/*, GlobalSettings globalSettings*/)
+        public BackOfficeUserManagerAuditer(IAuditService auditService, IUserService userService)
         {
             _auditService = auditService;
             _userService = userService;
