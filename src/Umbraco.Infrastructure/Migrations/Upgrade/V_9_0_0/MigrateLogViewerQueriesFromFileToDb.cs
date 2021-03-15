@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Newtonsoft.Json;
@@ -66,8 +65,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
 
         public override void Migrate()
         {
-            Debugger.Launch();
-            Debugger.Break();
             CreateDatabaseTable();
             MigrateFileContentToDB();
         }
