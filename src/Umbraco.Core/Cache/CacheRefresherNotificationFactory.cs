@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Umbraco.Extensions;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Cache
