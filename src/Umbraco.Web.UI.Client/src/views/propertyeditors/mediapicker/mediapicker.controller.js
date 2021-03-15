@@ -176,7 +176,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         function clearNodeForCopy(item) {
-            delete item.selected;
+            delete item.media.selected;
+            delete item.media.selectable;
         }
 
         function editItem(item) {
