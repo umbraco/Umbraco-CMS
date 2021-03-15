@@ -477,6 +477,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 {
                     return new ValidationErrorResult("The current user is not authorized");
                 }
+
                 var changingPasswordModel = new ChangingPasswordModel
                 {
                     Id = intId.Result,

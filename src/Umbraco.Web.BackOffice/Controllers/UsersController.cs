@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -720,6 +721,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (currentUser.HasSectionAccess(Constants.Applications.Users) == false)
             {
                 return new ValidationErrorResult("The current user is not authorized");
+            }
+
+            if (!currentUser.IsAdmin() && found.IsAdmin())
+            {
+                return new ValidationErrorResult("The current user cannot change the password for the specified user");
             }
 
             Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);
