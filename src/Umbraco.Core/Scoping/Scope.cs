@@ -362,20 +362,18 @@ namespace Umbraco.Core.Scoping
             }
 
             // Decrement the lock counters on the parent if any.
-            lock (_dictionaryLocker)
-            {
-                ClearReadLocks(InstanceId);
-                ClearWriteLocks(InstanceId);
-
-                if (ParentScope is null)
-                {
-                    // We're the parent scope, make sure that locks of all scopes has been cleared
-                    if (ReadLocks.Count != 0 || WriteLocks.Count != 0)
-                    {
-                        throw new Exception($"All scopes has not been disposed from parent scope {InstanceId}");
-                    }
-                }
-            }
+            // Lock on parent
+            ClearReadLocks(InstanceId);
+            ClearWriteLocks(InstanceId);
+            // if (ParentScope is null)
+            // {
+            //     // We're the parent scope, make sure that locks of all scopes has been cleared
+            //     // Since we're only reading we don't have to be in a lock
+            //     if (ReadLocks.Count != 0 || WriteLocks.Count != 0)
+            //     {
+            //         throw new Exception($"All scopes has not been disposed from parent scope {InstanceId}");
+            //     }
+            // }
 
             var parent = ParentScope;
             _scopeProvider.AmbientScope = parent; // might be null = this is how scopes are removed from context objects
@@ -546,18 +544,6 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        private void DecrementWriteLock(int lockId, Guid instanceId)
-        {
-            if (ParentScope is null)
-            {
-                WriteLocks[instanceId][lockId]--;
-            }
-            else
-            {
-                ParentScope.DecrementWriteLock(lockId, instanceId);
-            }
-        }
-
         private void IncrementReadLock(int lockId, Guid instanceId)
         {
             if (ParentScope is null)
@@ -588,18 +574,6 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        private void DecrementReadLock(int lockId, Guid instanceId)
-        {
-            if (ParentScope is null)
-            {
-                ReadLocks[instanceId][lockId]--;
-            }
-            else
-            {
-                ParentScope.DecrementReadLock(lockId, instanceId);
-            }
-        }
-
         private void ClearReadLocks(Guid instanceId)
         {
             if (ParentScope != null)
@@ -608,7 +582,17 @@ namespace Umbraco.Core.Scoping
             }
             else
             {
-                ReadLocks.Remove(instanceId);
+                lock (_dictionaryLocker)
+                {
+                    // Rest all values to 0 since the scope has been disposed
+                    if (ReadLocks.ContainsKey(instanceId))
+                    {
+                        foreach (var key in ReadLocks[instanceId].Keys.ToList())
+                        {
+                            ReadLocks[instanceId][key] = 0;
+                        }
+                    }
+                }
             }
         }
 
@@ -620,7 +604,17 @@ namespace Umbraco.Core.Scoping
             }
             else
             {
-                WriteLocks.Remove(instanceID);
+                lock (_dictionaryLocker)
+                {
+                    if (WriteLocks.ContainsKey(instanceID))
+                    {
+                        foreach (var key in WriteLocks[instanceID].Keys.ToList())
+                        {
+                            WriteLocks[instanceID][key] = 0;
+                        }
+                    }
+                }
+
             }
         }
 
@@ -657,7 +651,7 @@ namespace Umbraco.Core.Scoping
         {
             // Check if there is any dictionary<int,int> with a key equal to lockId
             // And check that the value associated with that key is greater than 0, if not it could be because a lock was requested but it failed.
-            return  ReadLocks.Values.Where(x => x.ContainsKey(lockId)).Any(x => x[lockId] > 0);
+            return  ReadLocks.Values.Any(x => x.ContainsKey(lockId));
         }
 
         /// <summary>
@@ -667,7 +661,7 @@ namespace Umbraco.Core.Scoping
         /// <returns>>True if no scopes has obtained a write lock with the specific ID yet.</returns>
         private bool HasWriteLock(int lockId)
         {
-            return WriteLocks.Values.Where(x => x.ContainsKey(lockId)).Any(x => x[lockId] > 0);
+            return WriteLocks.Values.Any(x => x.ContainsKey(lockId));
         }
 
         /// <summary>
@@ -708,8 +702,9 @@ namespace Umbraco.Core.Scoping
                         }
                         catch
                         {
-                            // Something went wrong and we didn't get the lock, decrement the count and throw.
-                            DecrementReadLock(lockId, instanceId);
+                            // Something went wrong and we didn't get the lock
+                            // Since we at this point have determined that we haven't got any key of LockID, it's safe to completely remove it instead of decrementing.
+                            ReadLocks[instanceId].Remove(lockId);
                             throw;
                         }
                     }
@@ -757,7 +752,9 @@ namespace Umbraco.Core.Scoping
                         }
                         catch
                         {
-                            DecrementWriteLock(lockId, instanceId);
+                            // Something went wrong and we didn't get the lock
+                            // Since we at this point have determined that we haven't got any key of LockID, it's safe to completely remove it instead of decrementing.
+                            WriteLocks[instanceId].Remove(lockId);
                             throw;
                         }
                     }

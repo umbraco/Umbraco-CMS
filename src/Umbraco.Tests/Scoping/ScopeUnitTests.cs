@@ -222,8 +222,8 @@ namespace Umbraco.Tests.Scoping
             }
 
             // Since we request the ReadLock after the innerScope has been dispose, the key has been removed from the dictionary, and we fetch it again.
-            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
-            syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.ContentTree), Times.Once);
+            syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
+            syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), Constants.Locks.ContentTree), Times.Once);
         }
 
         [Test]
@@ -252,8 +252,9 @@ namespace Umbraco.Tests.Scoping
                     Assert.AreEqual(2, realOuterScope.WriteLocks[innerScope.InstanceId][Constants.Locks.Languages]);
                     innerScope.Complete();
                 }
-                Assert.IsFalse(realOuterScope.WriteLocks.ContainsKey(innerscopeId));
                 Assert.AreEqual(2, realOuterScope.WriteLocks[realOuterScope.InstanceId][Constants.Locks.ContentTree]);
+                Assert.AreEqual(0, realOuterScope.WriteLocks[innerscopeId][Constants.Locks.Languages]);
+                Assert.AreEqual(0, realOuterScope.WriteLocks[innerscopeId][Constants.Locks.ContentTree]);
                 outerscope.Complete();
             }
         }
@@ -284,8 +285,11 @@ namespace Umbraco.Tests.Scoping
                     Assert.AreEqual(2, realOuterScope.ReadLocks[innerScope.InstanceId][Constants.Locks.Languages]);
                     innerScope.Complete();
                 }
-                Assert.IsFalse(realOuterScope.ReadLocks.ContainsKey(innerscopeId));
                 Assert.AreEqual(2, realOuterScope.ReadLocks[outerscope.InstanceId][Constants.Locks.ContentTree]);
+                Assert.AreEqual(0, realOuterScope.ReadLocks[innerscopeId][Constants.Locks.Languages]);
+                Assert.AreEqual(0, realOuterScope.ReadLocks[innerscopeId][Constants.Locks.ContentTree]);
+
+
                 outerscope.Complete();
             }
         }
@@ -334,18 +338,23 @@ namespace Umbraco.Tests.Scoping
 
                         innerScope2.Complete();
                     }
-                    Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"innerScope2, parent instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTree)}");
-                    Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"innerScope2, parent instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTypes)}");
-                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTree], $"innerScope2, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTree)}");
-                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTypes], $"innerScope2, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTypes)}");
-                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.Languages], $"innerScope2, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.Languages)}");
-                    Assert.IsFalse(realParentScope.WriteLocks.ContainsKey(innerScope2Id));
+                    Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"innerScope1, parent instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTree)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, parent instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTypes)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTree], $"innerScope1, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTree)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTypes)}");
+                    Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.Languages], $"innerScope1, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.Languages)}");
+                    Assert.AreEqual(0, realParentScope.WriteLocks[innerScope2Id][Constants.Locks.ContentTree], $"innerScope1, innerScope2 instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTree)}");
+                    Assert.AreEqual(0, realParentScope.WriteLocks[innerScope2Id][Constants.Locks.MediaTypes], $"innerScope1, innerScope2 instance, after innserScope2 disposed: {nameof(Constants.Locks.MediaTypes)}");
 
                     innerScope1.Complete();
                 }
                 Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTree)}");
-                Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"parentScope after inner scopes disposed {nameof(Constants.Locks.ContentTypes)}");
-                Assert.IsFalse(realParentScope.WriteLocks.ContainsKey(innerScope1Id));
+                Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTypes)}");
+                Assert.AreEqual(0, realParentScope.WriteLocks[innerScope2Id][Constants.Locks.ContentTree], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTree)}");
+                Assert.AreEqual(0, realParentScope.WriteLocks[innerScope2Id][Constants.Locks.MediaTypes], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.MediaTypes)}");
+                Assert.AreEqual(0, realParentScope.WriteLocks[innerScope1Id][Constants.Locks.ContentTree], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTree)}");
+                Assert.AreEqual(0, realParentScope.WriteLocks[innerScope1Id][Constants.Locks.ContentTypes], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTypes)}");
+                Assert.AreEqual(0, realParentScope.WriteLocks[innerScope1Id][Constants.Locks.Languages], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.Languages)}");
 
                 parentScope.Complete();
             }
@@ -398,14 +407,17 @@ namespace Umbraco.Tests.Scoping
                     Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.ContentTree], $"innerScope1, innerScope1 instance, after innerScope2 disposed: {nameof(Constants.Locks.ContentTree)}");
                     Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, innerScope1 instance, after innerScope2 disposed: {nameof(Constants.Locks.ContentTypes)}");
                     Assert.AreEqual(1, realParentScope.ReadLocks[innserScope1.InstanceId][Constants.Locks.Languages], $"innerScope1, innerScope1 instance, after innerScope2 disposed: {nameof(Constants.Locks.Languages)}");
-                    Assert.IsFalse(realParentScope.ReadLocks.ContainsKey(innerScope2Id));
+                    Assert.AreEqual(0, realParentScope.ReadLocks[innerScope2Id][Constants.Locks.ContentTree]);
+                    Assert.AreEqual(0, realParentScope.ReadLocks[innerScope2Id][Constants.Locks.MediaTypes]);
 
                     innserScope1.Complete();
                 }
 
                 Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"parentScope after innerScope1 disposed: {nameof(Constants.Locks.ContentTree)}");
                 Assert.AreEqual(1, realParentScope.ReadLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"parentScope after innerScope1 disposed: {nameof(Constants.Locks.ContentTypes)}");
-                Assert.IsFalse(realParentScope.ReadLocks.ContainsKey(innerScope1Id));
+                Assert.AreEqual(0, realParentScope.ReadLocks[innerScope1Id][Constants.Locks.ContentTree]);
+                Assert.AreEqual(0, realParentScope.ReadLocks[innerScope1Id][Constants.Locks.ContentTypes]);
+                Assert.AreEqual(0, realParentScope.ReadLocks[innerScope1Id][Constants.Locks.Languages]);
 
                 parentScope.Complete();
             }
@@ -422,7 +434,7 @@ namespace Umbraco.Tests.Scoping
                 var realScope = (Scope) scope;
 
                 Assert.Throws<Exception>(() => scope.WriteLock(Constants.Locks.Languages));
-                Assert.AreEqual(0, realScope.WriteLocks[scope.InstanceId][Constants.Locks.Languages]);
+                Assert.IsFalse(realScope.WriteLocks[scope.InstanceId].ContainsKey(Constants.Locks.Languages));
                 scope.Complete();
             }
         }
@@ -438,7 +450,7 @@ namespace Umbraco.Tests.Scoping
                 var realScope = (Scope) scope;
 
                 Assert.Throws<Exception>(() => scope.ReadLock(Constants.Locks.Languages));
-                Assert.AreEqual(0, realScope.ReadLocks[scope.InstanceId][Constants.Locks.Languages]);
+                Assert.IsFalse(realScope.ReadLocks[scope.InstanceId].ContainsKey(Constants.Locks.Languages));
                 scope.Complete();
             }
         }
