@@ -1,5 +1,6 @@
 ﻿using NPoco;
 using System;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -7,6 +8,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
+using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
@@ -18,6 +20,7 @@ namespace Umbraco.Core.Runtime
 {
     internal class SqlMainDomLock : IMainDomLock
     {
+        private readonly TimeSpan _lockTimeout;
         private string _lockId;
         private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
@@ -40,6 +43,8 @@ namespace Umbraco.Core.Runtime
                Constants.System.UmbracoConnectionName,
                _logger,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())));
+
+            _lockTimeout = TimeSpan.FromMilliseconds(GlobalSettings.GetSqlWriteLockTimeoutFromConfigFile(logger));
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
@@ -200,7 +205,7 @@ namespace Umbraco.Core.Runtime
 
                         db.BeginTransaction(IsolationLevel.ReadCommitted);
                         // get a read lock
-                        _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+                        _sqlServerSyntax.ReadLock(db, _lockTimeout, Constants.Locks.MainDom);
 
                         if (!IsMainDomValue(_lockId, db))
                         {
@@ -289,7 +294,7 @@ namespace Umbraco.Core.Runtime
             {
                 transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
                 // get a read lock
-                _sqlServerSyntax.ReadLock(db, Constants.Locks.MainDom);
+                _sqlServerSyntax.ReadLock(db, _lockTimeout, Constants.Locks.MainDom);
 
                 // the row
                 var mainDomRows = db.Fetch<KeyValueDto>("SELECT * FROM umbracoKeyValue WHERE [key] = @key", new { key = MainDomKey });
@@ -301,7 +306,7 @@ namespace Umbraco.Core.Runtime
                     // which indicates that we
                     // can acquire it and it has shutdown.
 
-                    _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+                    _sqlServerSyntax.WriteLock(db, _lockTimeout, Constants.Locks.MainDom);
 
                     // so now we update the row with our appdomain id
                     InsertLockRecord(_lockId, db);
@@ -360,7 +365,7 @@ namespace Umbraco.Core.Runtime
             {
                 transaction = db.GetTransaction(IsolationLevel.ReadCommitted);
 
-                _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+                _sqlServerSyntax.WriteLock(db, _lockTimeout, Constants.Locks.MainDom);
 
                 // so now we update the row with our appdomain id
                 InsertLockRecord(_lockId, db);
@@ -443,7 +448,7 @@ namespace Umbraco.Core.Runtime
                                 db.BeginTransaction(IsolationLevel.ReadCommitted);
 
                                 // get a write lock
-                                _sqlServerSyntax.WriteLock(db, Constants.Locks.MainDom);
+                                _sqlServerSyntax.WriteLock(db, _lockTimeout, Constants.Locks.MainDom);
 
                                 // When we are disposed, it means we have released the MainDom lock
                                 // and called all MainDom release callbacks, in this case
