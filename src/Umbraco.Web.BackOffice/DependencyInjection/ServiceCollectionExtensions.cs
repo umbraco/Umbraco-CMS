@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
@@ -11,7 +12,6 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Extensions
 {
@@ -364,16 +364,10 @@ namespace Umbraco.Extensions
                 policy.Requirements.Add(new TreeRequirement(Constants.Trees.Languages));
             });
 
-            options.AddPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, policy =>
-            {
-                policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
-                policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary));
-            });
-
             options.AddPolicy(AuthorizationPolicies.TreeAccessDictionary, policy =>
             {
                 policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
-                policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary, Constants.Trees.Dictionary));
+                policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary));
             });
 
             options.AddPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, policy =>

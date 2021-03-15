@@ -42,9 +42,6 @@ namespace Umbraco.Extensions
 
         public static IApplicationBuilder UseUmbracoPreview(this IApplicationBuilder app)
         {
-            // TODO: I'm unsure this middleware will execute before the endpoint, we'll have to see
-            app.UseMiddleware<PreviewAuthenticationMiddleware>();
-
             app.UseEndpoints(endpoints =>
             {
                 PreviewRoutes previewRoutes = app.ApplicationServices.GetRequiredService<PreviewRoutes>();

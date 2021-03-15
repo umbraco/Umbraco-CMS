@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Cms.Core.Scoping
 {
@@ -11,5 +11,6 @@ namespace Umbraco.Cms.Core.Scoping
         /// Gets the instance unique identifier.
         /// </summary>
         Guid InstanceId { get; }
+        int CreatedThreadId { get; }
     }
 }

@@ -373,12 +373,11 @@ angular.module("umbraco")
             function openDetailsDialog() {
 
                 const dialog = {
-                    view: "views/common/infiniteeditors/mediapicker/overlays/mediacropdetails.html",
                     size: "small",
                     cropSize: $scope.cropSize,
                     target: $scope.target,
                     disableFocalPoint: $scope.disableFocalPoint,
-                    submit: function (model) {
+                    submit: function () {
 
                         $scope.model.selection.push($scope.target);
                         $scope.model.submit($scope.model);
@@ -392,7 +391,7 @@ angular.module("umbraco")
 
                 localizationService.localize("defaultdialogs_editSelectedMedia").then(value => {
                     dialog.title = value;
-                    editorService.open(dialog);
+                    editorService.mediaCropDetails(dialog);
                 });
             };
 

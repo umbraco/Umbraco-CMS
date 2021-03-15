@@ -48,11 +48,15 @@
                 }
             });
         }
-
-        eventsService.on("toggleValue", function (e, args) {
+        var evts = [];
+        evts.push(eventsService.on("toggleValue", function (e, args) {
             vm.labelEnabled = args.value;
+        }));
+        $scope.$on('$destroy', function () {
+            for (var e in evts) {
+                eventsService.unsubscribe(evts[e]);
+            }
         });
-
         if (!Utilities.isArray($scope.model.value)) {
             //make an array from the dictionary
             var items = [];

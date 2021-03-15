@@ -34,7 +34,7 @@ function eventsService($q, $rootScope) {
 		
         /** pass in the result of 'on' to this method, or just call the method returned from 'on' to unsubscribe */
 		unsubscribe: function(handle) {
-		    if (angular.isFunction(handle)) {
+		    if (Utilities.isFunction(handle)) {
 		        handle();
 		    }		    
 		}

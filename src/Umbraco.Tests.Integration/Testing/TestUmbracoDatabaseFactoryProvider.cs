@@ -46,8 +46,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             return new UmbracoDatabaseFactory(
                 _loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 _loggerFactory,
-                _globalSettings.Value,
-                _connectionStrings.Value,
+                _globalSettings,
+                _connectionStrings,
                 _mappers,
                 _dbProviderFactoryCreator,
                 _databaseSchemaCreatorFactory);

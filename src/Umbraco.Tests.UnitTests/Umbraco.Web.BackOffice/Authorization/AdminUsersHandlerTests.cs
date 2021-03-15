@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Models.Membership;
@@ -197,7 +198,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
             var mockContentService = new Mock<IContentService>();
             var mockMediaService = new Mock<IMediaService>();
             var mockEntityService = new Mock<IEntityService>();
-            return new UserEditorAuthorizationHelper(mockContentService.Object, mockMediaService.Object, mockEntityService.Object);
+            return new UserEditorAuthorizationHelper(mockContentService.Object, mockMediaService.Object, mockEntityService.Object, AppCaches.Disabled);
         }
     }
 }

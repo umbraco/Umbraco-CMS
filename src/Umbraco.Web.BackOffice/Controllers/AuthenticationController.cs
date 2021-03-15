@@ -603,7 +603,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var userDetail = _umbracoMapper.Map<UserDetail>(user);
             // update the userDetail and set their remaining seconds
-            userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes).TotalSeconds;
+            userDetail.SecondsUntilTimeout = _globalSettings.TimeOut.TotalSeconds;
 
             return userDetail;
         }

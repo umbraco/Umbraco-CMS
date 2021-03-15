@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
@@ -127,7 +128,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
                 .Setup(x => x.GetById(It.Is<int>(y => y == nodeId)))
                 .Returns(CreateContent(nodeId));
 
-            return new ContentPermissions(userService, mockContentService.Object, entityService);
+            return new ContentPermissions(userService, mockContentService.Object, entityService, AppCaches.Disabled);
         }
 
         private static IContent CreateContent(int nodeId)

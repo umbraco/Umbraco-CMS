@@ -161,7 +161,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
 
             if (string.IsNullOrEmpty(attribute.ForColumns) == false)
             {
-                var columns = attribute.ForColumns.Split(',').Select(p => p.Trim());
+                var columns = attribute.ForColumns.Split(Constants.CharArrays.Comma).Select(p => p.Trim());
                 foreach (var column in columns)
                 {
                     definition.Columns.Add(new IndexColumnDefinition {Name = column, Direction = Direction.Ascending});

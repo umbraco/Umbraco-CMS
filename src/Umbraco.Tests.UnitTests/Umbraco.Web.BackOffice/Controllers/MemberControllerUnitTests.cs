@@ -34,6 +34,7 @@ using Umbraco.Cms.Tests.UnitTests.Umbraco.Core.ShortStringHelper;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Mapping;
 using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Security;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 using MemberMapDefinition = Umbraco.Cms.Web.BackOffice.Mapping.MemberMapDefinition;
 
@@ -330,6 +331,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
         {
+            var httpContextAccessor = new HttpContextAccessor();
+
             var mockShortStringHelper = new MockShortStringHelper();
 
             var textService = new Mock<ILocalizedTextService>();
@@ -337,7 +340,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             contentTypeBaseServiceProvider.Setup(x => x.GetContentTypeOf(It.IsAny<IContentBase>())).Returns(new ContentType(mockShortStringHelper, 123));
             var contentAppFactories = new Mock<List<IContentAppFactory>>();
             var mockContentAppFactoryCollection = new Mock<ILogger<ContentAppFactoryCollection>>();
-            var hybridBackOfficeSecurityAccessor = new HybridBackofficeSecurityAccessor(new DictionaryAppCache());
+            var hybridBackOfficeSecurityAccessor = new BackOfficeSecurityAccessor(httpContextAccessor);
             var contentAppFactoryCollection = new ContentAppFactoryCollection(
                 contentAppFactories.Object,
                 mockContentAppFactoryCollection.Object,
@@ -358,7 +361,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Mock.Get(dataEditor).Setup(x => x.GetValueEditor()).Returns(new TextOnlyValueEditor(Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"), textService.Object, Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>()));
 
             var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(new[] { dataEditor }));
-
+            
             IMapDefinition memberMapDefinition = new MemberMapDefinition(
                 commonMapper,
                 new CommonTreeNodeMapper(Mock.Of<LinkGenerator>()),
@@ -372,7 +375,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                     mockPasswordConfig.Object,
                     contentTypeBaseServiceProvider.Object,
                     propertyEditorCollection),
-                new HttpContextAccessor());
+                httpContextAccessor);
 
             var map = new MapDefinitionCollection(new List<IMapDefinition>()
             {
@@ -396,7 +399,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             return new MemberController(
                 new DefaultCultureDictionary(
                     new Mock<ILocalizationService>().Object,
-                    new HttpRequestAppCache(() => null)),
+                    NoAppCache.Instance),
                 new LoggerFactory(),
                 mockShortStringHelper,
                 new DefaultEventMessagesFactory(

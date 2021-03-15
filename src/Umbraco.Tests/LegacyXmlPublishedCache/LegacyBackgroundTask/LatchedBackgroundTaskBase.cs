@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
 
 namespace Umbraco.Web.Scheduling
 {

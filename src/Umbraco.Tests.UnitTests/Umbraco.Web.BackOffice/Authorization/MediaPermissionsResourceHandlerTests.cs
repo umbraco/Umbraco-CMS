@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -111,7 +112,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
                 .Returns(CreateMedia(nodeId));
 
             var mockEntityService = new Mock<IEntityService>();
-            return new MediaPermissions(mockMediaService.Object, mockEntityService.Object);
+            return new MediaPermissions(mockMediaService.Object, mockEntityService.Object, AppCaches.Disabled);
         }
     }
 }

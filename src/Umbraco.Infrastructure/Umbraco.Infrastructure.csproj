@@ -2,16 +2,19 @@
 
     <PropertyGroup>
         <TargetFramework>netstandard2.0</TargetFramework>
-        <LangVersion>8</LangVersion>
         <RootNamespace>Umbraco.Cms.Infrastructure</RootNamespace>
+        <PackageId>Umbraco.Cms.Infrastructure</PackageId>
+        <Title>Umbraco CMS Infrastructure</Title>
+        <Description>Contains the infrastructure assembly needed to run Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
         <DocumentationFile>bin\Release\Umbraco.Infrastructure.xml</DocumentationFile>
     </PropertyGroup>
 
+
     <ItemGroup>
-      <PackageReference Include="HtmlAgilityPack" Version="1.11.30" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.31" />
       <PackageReference Include="MailKit" Version="2.10.1" />
       <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
@@ -20,7 +23,7 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.2" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.3" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
       <PackageReference Include="MiniProfiler.Shared" Version="4.2.22" />
       <PackageReference Include="ncrontab" Version="3.3.1" />
@@ -39,7 +42,7 @@
       <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.2" />
       <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-      <PackageReference Include="System.Drawing.Common" Version="5.0.0" />
+      <PackageReference Include="System.Drawing.Common" Version="5.0.1" />
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
       <PackageReference Include="System.Threading.Tasks.Dataflow" Version="5.0.0" />
       <PackageReference Include="Examine.Core" Version="2.0.0-alpha.20200128.15" />

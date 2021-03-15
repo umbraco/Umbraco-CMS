@@ -694,7 +694,7 @@ namespace Umbraco.Cms.Core.Media.Exif
                 if (s == null)
                     throw new ArgumentNullException("s");
 
-                string[] sa = s.Split('/');
+                string[] sa = s.Split(Constants.CharArrays.ForwardSlash);
                 int numerator = 1;
                 int denominator = 1;
 
@@ -1322,7 +1322,7 @@ namespace Umbraco.Cms.Core.Media.Exif
                 if (s == null)
                     throw new ArgumentNullException("s");
 
-                string[] sa = s.Split('/');
+                string[] sa = s.Split(Constants.CharArrays.ForwardSlash);
                 uint numerator = 1;
                 uint denominator = 1;
 

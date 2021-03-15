@@ -13,7 +13,7 @@ namespace Umbraco.Web
 {
     // NOTE: has all been ported to netcore but exists here just to keep the build working for tests
 
-    public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
+    public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;

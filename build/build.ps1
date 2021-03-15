@@ -194,14 +194,12 @@
 
     # remove extra files
     $webAppBin = "$($this.BuildTemp)\WebApp\bin"
-    $excludeDirs = @("$($webAppBin)\Config","$($webAppBin)\refs","$($webAppBin)\runtimes","$($webAppBin)\Umbraco","$($webAppBin)\wwwroot")
+    $excludeDirs = @("$($webAppBin)\refs","$($webAppBin)\runtimes","$($webAppBin)\Umbraco","$($webAppBin)\wwwroot")
     $excludeFiles = @("$($webAppBin)\appsettings.*","$($webAppBin)\*.deps.json","$($webAppBin)\*.exe","$($webAppBin)\*.config","$($webAppBin)\*.runtimeconfig.json")
     $this.RemoveDirectory($excludeDirs)
     $this.RemoveFile($excludeFiles)
 
     # copy rest of the files into WebApp
-    $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Config", "*", "$($this.BuildTemp)\WebApp\config")
-    $this.RemoveFile("$($this.BuildTemp)\WebApp\Config\*.Release.*")
     $this.CopyFiles("$($this.SolutionRoot)\src\Umbraco.Web.UI.NetCore\Umbraco", "*", "$($this.BuildTemp)\WebApp\umbraco")
     $excludeUmbracoDirs = @("$($this.BuildTemp)\WebApp\umbraco\lib")
     $this.RemoveDirectory($excludeUmbracoDirs)
@@ -300,8 +298,6 @@
 
     # create directories
     Write-Host "Create directories"
-    mkdir "$tmp\Configs" > $null
-    mkdir "$tmp\Configs\Lang" > $null
     mkdir "$tmp\WebApp\App_Data" > $null
     mkdir "$tmp\Templates" > $null
     #mkdir "$tmp\WebApp\Media" > $null
@@ -310,14 +306,6 @@
     # copy various files
     Write-Host "Copy xml documentation"
     Copy-Item -force "$tmp\bin\*.xml" "$tmp\WebApp\bin"
-
-    Write-Host "Copy transformed configs and langs"
-    # note: exclude imageprocessor/*.config as imageprocessor pkg installs them
-    $this.CopyFiles("$tmp\WebApp\config", "*.config", "$tmp\Configs", `
-      { -not $_.RelativeName.StartsWith("imageprocessor") })
-    $this.CopyFiles("$tmp\WebApp\config", "*.js", "$tmp\Configs")
-    $this.CopyFiles("$tmp\WebApp\config\lang", "*.xml", "$tmp\Configs\Lang")
-    #$this.CopyFile("$tmp\WebApp\web.config", "$tmp\Configs\web.config.transform")
 
     # Write-Host "Copy transformed web.config"
     # $this.CopyFile("$src\Umbraco.Web.UI\web.$buildConfiguration.Config.transformed", "$tmp\WebApp\web.config")
@@ -424,7 +412,7 @@
     Write-Host "Restore NuGet"
     Write-Host "Logging to $($this.BuildTemp)\nuget.restore.log"
 	$params = "-Source", $nugetsourceUmbraco
-    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\Umbraco.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
+    &$this.BuildEnv.NuGet restore "$($this.SolutionRoot)\src\umbraco-netcore-only.sln" > "$($this.BuildTemp)\nuget.restore.log" @params
     if (-not $?) { throw "Failed to restore NuGet packages." }
   })
 
@@ -435,23 +423,24 @@
 
     Write-Host "Create NuGet packages"
 
-    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Core.nuspec" `
-        -Properties BuildTmp="$($this.BuildTemp)" `
-        -Version "$($this.Version.Semver.ToString())" `
-        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmscore.log"
-    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Core." }
-
-    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Web.nuspec" `
-        -Properties BuildTmp="$($this.BuildTemp)" `
-        -Version "$($this.Version.Semver.ToString())" `
-        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsweb.log"
-    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.Web." }
+    &dotnet pack "$($this.SolutionRoot)\src\umbraco-netcore-only.sln" `
+        --output "$($this.BuildOutput)" `
+        --verbosity detailed `
+        -c Release `
+        -p:PackageVersion="$($this.Version.Semver.ToString())" > "$($this.BuildTemp)\pack.umbraco.log"
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
+
+    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Examine.Lucene.nuspec" `
+        -Properties BuildTmp="$($this.BuildTemp)" `
+        -Version "$($this.Version.Semver.ToString())" `
+        -Verbosity detailed  `
+        -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.examine.lucene.log"
+    if (-not $?) { throw "Failed to pack Nuget UmbracoCms.Lucene.nuspec"}
 
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.SqlCe.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
@@ -477,7 +466,7 @@
   $ubuild.DefineMethod("VerifyNuGet",
   {
     $this.VerifyNuGetConsistency(
-      ("UmbracoCms", "UmbracoCms.Core", "UmbracoCms.Web"),
+      ("UmbracoCms"),
       ("Umbraco.Core", "Umbraco.Infrastructure", "Umbraco.Web.UI.NetCore", "Umbraco.Examine.Lucene", "Umbraco.PublishedCache.NuCache", "Umbraco.Web.Common", "Umbraco.Web.Website", "Umbraco.Web.BackOffice", "Umbraco.Persistence.SqlCe"))
     if ($this.OnError()) { return }
   })
