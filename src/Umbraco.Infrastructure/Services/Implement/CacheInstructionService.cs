@@ -29,8 +29,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly ILogger<CacheInstructionService> _logger;
         private readonly GlobalSettings _globalSettings;
 
-        private readonly object _locko = new object();
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CacheInstructionService"/> class.
         /// </summary>
