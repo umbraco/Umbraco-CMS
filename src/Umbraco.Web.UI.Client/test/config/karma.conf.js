@@ -34,12 +34,12 @@ module.exports = function (config) {
             'test/config/app.unit.js',
 
             //application files
-            '../Umbraco.Web.UI/Umbraco/js/*.controllers.min.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.directives.min.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.filters.min.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.services.min.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.interceptors.min.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.resources.min.js',
+            '../Umbraco.Web.UI/umbraco/js/*.controllers.min.js',
+            '../Umbraco.Web.UI/umbraco/js/*.directives.min.js',
+            '../Umbraco.Web.UI/umbraco/js/*.filters.min.js',
+            '../Umbraco.Web.UI/umbraco/js/*.services.min.js',
+            '../Umbraco.Web.UI/umbraco/js/*.interceptors.min.js',
+            '../Umbraco.Web.UI/umbraco/js/*.resources.min.js',
 
             //mocked data and routing
             'src/common/mocks/umbraco.servervariables.js',
