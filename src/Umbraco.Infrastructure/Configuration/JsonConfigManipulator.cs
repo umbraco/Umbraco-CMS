@@ -5,12 +5,12 @@ using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Cms.Core.Configuration
 {
     public class JsonConfigManipulator : IConfigManipulator
     {
+        private static readonly object s_locker = new object();
         private readonly IConfiguration _configuration;
 
         public JsonConfigManipulator(IConfiguration configuration)
@@ -162,22 +162,26 @@ namespace Umbraco.Cms.Core.Configuration
             token?.Parent?.Remove();
         }
 
+
+
         private static void SaveJson(JsonConfigurationProvider provider, JObject json)
         {
-            if (provider.Source.FileProvider is PhysicalFileProvider physicalFileProvider)
+            lock (s_locker)
             {
-                var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
+                if (provider.Source.FileProvider is PhysicalFileProvider physicalFileProvider)
+                {
+                    var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
 
-                using (var sw = new StreamWriter(jsonFilePath, false))
-                using (var jsonTextWriter = new JsonTextWriter(sw)
-                {
-                    Formatting = Formatting.Indented,
-                })
-                {
-                    json?.WriteTo(jsonTextWriter);
+                    using (var sw = new StreamWriter(jsonFilePath, false))
+                    using (var jsonTextWriter = new JsonTextWriter(sw)
+                    {
+                        Formatting = Formatting.Indented,
+                    })
+                    {
+                        json?.WriteTo(jsonTextWriter);
+                    }
                 }
             }
-
         }
 
         private static JObject GetJson(JsonConfigurationProvider provider)
