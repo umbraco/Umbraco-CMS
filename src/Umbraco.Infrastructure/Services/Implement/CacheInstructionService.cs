@@ -308,11 +308,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 return result;
             }
-            //catch (ThreadAbortException ex)
-            //{
-            //    //This will occur if the instructions processing is taking too long since this is occurring on a request thread.
-            //    // Or possibly if IIS terminates the appdomain. In any case, we should deal with this differently perhaps...
-            //}
             catch (Exception ex)
             {
                 _logger.LogError(
