@@ -650,7 +650,6 @@
     <key alias="tableColMergeLeft">Plaats de cursor links van de twee cellen die je wilt samenvoegen</key>
     <key alias="tableSplitNotSplittable">Je kunt een cel die is samengevoegd niet delen</key>
     <key alias="propertyHasErrors">Deze eigenschap is ongeldig</key>
-    <key alias="errorPropertyEditorNotSupportedInElementTypes">Eigenschap '%0%' gebruikt editor '%1%' die niet ondersteund wordt in Element Types.</key>
   </area>
   <area alias="general">
     <key alias="options">Opties</key>
@@ -806,6 +805,7 @@
     <key alias="articles">Artikels</key>
     <key alias="videos">Videos</key>
     <key alias="installing">Installeren</key>
+    <key alias="avatar">Avatar van</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blauw</key>
@@ -902,7 +902,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="theEndHeader">Umbraco %0% is geïnstalleerd en klaar voor gebruik.</key>
     <key alias="theEndInstallFailed"><![CDATA[Om de installatie af te sluiten, moet u de handmatig het <strong>/web.config bestand</strong> aanpassen, en de Appsetting key <strong>UmbracoConfigurationStatus</strong> onder in het bestand veranderen naar <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Je kunt <strong>meteen beginnen</strong> door de "Launch Umbraco" knop hieronder te klikken. <br />Als je een <strong>beginnende Umbraco gebruiker</strong> bent, dan kun je you can find veel informatie op onze "getting started" pagina's vinden.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3> Om je website te beheren open je simpelweg de Umbraco back office en begin je inhoud toe te voegen, templates en stylesheets aan te passen of nieuwe functionaliteit toe te voegen]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3> Om je website te beheren open je simpelweg de Umbraco backoffice en begin je inhoud toe te voegen, templates en stylesheets aan te passen of nieuwe functionaliteit toe te voegen]]></key>
     <key alias="Unavailable">Verbinding met de database mislukt.</key>
     <key alias="Version3">Umbraco versie 3</key>
     <key alias="Version4">Umbraco versie 4</key>
@@ -1229,7 +1229,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="tabs">Tabs</key>
     <key alias="contentTypeEnabled">Basis inhoudstype ingeschakeld</key>
     <key alias="contentTypeUses">Dit inhoudstype gebruikt</key>
-    <key alias="asAContentMasterType">als basis inhoudstype. Tabs van basis inhoudstypes worden niet getoond en kunnen alleen worden aangepast op het basis inhoudstype zelf</key>
     <key alias="noPropertiesDefinedOnTab">Geen eigenschappen gedefinieerd op dit tabblad. Klik op de link "voeg een nieuwe eigenschap" aan de bovenkant om een ​​nieuwe eigenschap te creëren.</key>
     <key alias="createMatchingTemplate">Maak een bijpassende sjabloon</key>
     <key alias="addIcon">Icoon toevoegen</key>
@@ -2361,6 +2360,7 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
       <key alias="confirmCancelBlockCreationMessage"><![CDATA[Ben je zeker dat je deze wijzigingen wil verwerpen?]]></key>
       <key alias="elementTypeDoesNotExistHeadline">Fout!</key>
       <key alias="elementTypeDoesNotExistDescription">Het Elementtype van dit blok bestaat niet meer</key>
+      <key alias="propertyEditorNotSupported">Eigenschap '%0%' gebruikt editor '%1%' die niet ondersteund wordt in blokken.</key>
     </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">Wat zijn Inhoudssjablonen?</key>

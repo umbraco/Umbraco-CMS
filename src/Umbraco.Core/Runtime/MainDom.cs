@@ -101,14 +101,14 @@ namespace Umbraco.Core.Runtime
 
             lock (_locko)
             {
-                _logger.Debug<MainDom>("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
+                _logger.Debug<MainDom, string, string>("Signaled ({Signaled}) ({SignalSource})", _signaled ? "again" : "first", source);
                 if (_signaled) return;
                 if (_isMainDom == false) return; // probably not needed
                 _signaled = true;
 
                 try
                 {
-                    _logger.Info<MainDom>("Stopping ({SignalSource})", source);
+                    _logger.Info<MainDom, string>("Stopping ({SignalSource})", source);
                     foreach (var callback in _callbacks.OrderBy(x => x.Key).Select(x => x.Value))
                     {
                         try
@@ -122,14 +122,14 @@ namespace Umbraco.Core.Runtime
                         }
                     }
                         
-                    _logger.Debug<MainDom>("Stopped ({SignalSource})", source);
+                    _logger.Debug<MainDom, string>("Stopped ({SignalSource})", source);
                 }
                 finally
                 {
                     // in any case...
                     _isMainDom = false;
                     _mainDomLock.Dispose();
-                    _logger.Info<MainDom>("Released ({SignalSource})", source);
+                    _logger.Info<MainDom, string>("Released ({SignalSource})", source);
                 }
 
             }

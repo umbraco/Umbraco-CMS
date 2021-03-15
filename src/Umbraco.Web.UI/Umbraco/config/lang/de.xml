@@ -1388,7 +1388,6 @@
     <key alias="tabs">Registerkarten</key>
     <key alias="contentTypeEnabled">Masterdokumenttyp aktiviert</key>
     <key alias="contentTypeUses">Dieser Dokumenttyp verwendet</key>
-    <key alias="asAContentMasterType">als Masterdokumenttyp. Register vom Masterdokumenttyp werden nicht angezeigt und können nur im Masterdokumenttyp selbst bearbeitet werden</key>
     <key alias="noPropertiesDefinedOnTab">Für dieses Register sind keine Eigenschaften definiert. Klicken Sie oben auf "neue Eigenschaft hinzufügen", um eine neue Eigenschaft hinzuzufügen.</key>
     <key alias="createMatchingTemplate">Zugehörige Vorlage anlegen</key>
     <key alias="addIcon">Bildsymbol hinzufügen</key>

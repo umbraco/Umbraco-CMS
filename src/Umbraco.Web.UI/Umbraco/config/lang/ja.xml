@@ -804,7 +804,6 @@ Runwayをインストールして作られた新しいウェブサイトがど�
     <key alias="tabs">タブ</key>
     <key alias="contentTypeEnabled">マスターコンテンツタイプが有効</key>
     <key alias="contentTypeUses">このコンテンツタイプの使用</key>
-    <key alias="asAContentMasterType">マスターコンテンツタイプについては、マスターコンテンツタイプからのタブは表示されず、マスターコンテンツタイプでのみ編集することができます。</key>
     <key alias="noPropertiesDefinedOnTab">このタブにはプロパティが定義されていません、上部のリンクから新しいプロパティを作成してください</key>
     <key alias="addIcon">アイコンの追加</key>
   </area>
