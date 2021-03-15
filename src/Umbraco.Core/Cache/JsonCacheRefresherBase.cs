@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Sync;
 
@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Cache
     /// <typeparam name="TInstanceType">The actual cache refresher type.</typeparam>
     /// <remarks>The actual cache refresher type is used for strongly typed events.</remarks>
     public abstract class JsonCacheRefresherBase<TNotification, TJsonPayload> : CacheRefresherBase<TNotification>, IJsonCacheRefresher
-        where TNotification : CacheRefresherNotificationBase, new()
+        where TNotification : CacheRefresherNotification
     {
         protected IJsonSerializer JsonSerializer { get; }
 
@@ -21,8 +21,9 @@ namespace Umbraco.Cms.Core.Cache
         protected JsonCacheRefresherBase(
             AppCaches appCaches,
             IJsonSerializer jsonSerializer,
-            IEventAggregator eventAggregator)
-            : base(appCaches, eventAggregator)
+            IEventAggregator eventAggregator,
+            ICacheRefresherNotificationFactory factory)
+            : base(appCaches, eventAggregator, factory)
         {
             JsonSerializer = jsonSerializer;
         }
@@ -33,7 +34,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="json">The json payload.</param>
         public virtual void Refresh(string json)
         {
-            OnCacheUpdated(new TNotification().Init(json, MessageType.RefreshByJson));
+            OnCacheUpdated(NotificationFactory.Create<TNotification>(json, MessageType.RefreshByJson));
         }
 
         #region Json

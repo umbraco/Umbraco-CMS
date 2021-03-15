@@ -1,13 +1,14 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Core.Cache
 {
     public sealed class ApplicationCacheRefresher : CacheRefresherBase<ApplicationCacheRefresherNotification>
     {
-        public ApplicationCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator)
-            : base(appCaches, eventAggregator)
-        { }
+        public ApplicationCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, eventAggregator, factory)
+        {
+        }
 
         #region Define
 

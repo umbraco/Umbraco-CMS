@@ -1,4 +1,4 @@
-﻿using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Sync;
 
@@ -11,8 +11,7 @@ namespace Umbraco.Cms.Core.Cache
     /// <typeparam name="TPayload">The payload type.</typeparam>
     /// <remarks>The actual cache refresher type is used for strongly typed events.</remarks>
     public abstract class PayloadCacheRefresherBase<TNotification, TPayload> : JsonCacheRefresherBase<TNotification, TPayload>, IPayloadCacheRefresher<TPayload>
-        where TNotification : CacheRefresherNotificationBase, new()
-
+        where TNotification : CacheRefresherNotification
     {
 
         /// <summary>
@@ -20,8 +19,8 @@ namespace Umbraco.Cms.Core.Cache
         /// </summary>
         /// <param name="appCaches">A cache helper.</param>
         /// <param name="serializer"></param>
-        protected PayloadCacheRefresherBase(AppCaches appCaches, IJsonSerializer serializer, IEventAggregator eventAggregator)
-            : base(appCaches, serializer, eventAggregator)
+        protected PayloadCacheRefresherBase(AppCaches appCaches, IJsonSerializer serializer, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
         }
 
@@ -40,7 +39,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="payloads">The payload.</param>
         public virtual void Refresh(TPayload[] payloads)
         {
-            OnCacheUpdated(new TNotification().Init(payloads, MessageType.RefreshByPayload));
+            OnCacheUpdated(NotificationFactory.Create<TNotification>(payloads, MessageType.RefreshByPayload));
         }
 
         #endregion

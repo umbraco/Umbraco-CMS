@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -15,8 +15,8 @@ namespace Umbraco.Cms.Core.Cache
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IIdKeyMap _idKeyMap;
 
-        public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdKeyMap idKeyMap, IEventAggregator eventAggregator)
-            : base(appCaches, serializer, eventAggregator)
+        public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdKeyMap idKeyMap, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idKeyMap = idKeyMap;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -13,8 +13,8 @@ namespace Umbraco.Cms.Core.Cache
     /// </remarks>
     public sealed class UserGroupCacheRefresher : CacheRefresherBase<UserGroupCacheRefresherNotification>
     {
-        public UserGroupCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator)
-            : base(appCaches, eventAggregator)
+        public UserGroupCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, eventAggregator, factory)
         { }
 
         #region Define

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Sync;
@@ -10,17 +10,18 @@ namespace Umbraco.Cms.Core.Cache
     /// </summary>
     /// <typeparam name="TInstanceType">The actual cache refresher type.</typeparam>
     /// <remarks>The actual cache refresher type is used for strongly typed events.</remarks>
-    public abstract class CacheRefresherBase< TNotification> : ICacheRefresher
-        where TNotification : CacheRefresherNotificationBase, new()
+    public abstract class CacheRefresherBase<TNotification> : ICacheRefresher
+        where TNotification : CacheRefresherNotification
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="CacheRefresherBase{TInstanceType}"/>.
         /// </summary>
         /// <param name="appCaches">A cache helper.</param>
-        protected CacheRefresherBase(AppCaches appCaches, IEventAggregator eventAggregator)
+        protected CacheRefresherBase(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
         {
             AppCaches = appCaches;
             EventAggregator = eventAggregator;
+            NotificationFactory = factory;
         }
 
         #region Define
@@ -35,6 +36,11 @@ namespace Umbraco.Cms.Core.Cache
         /// </summary>
         public abstract string Name { get; }
 
+        /// <summary>
+        /// Gets the <see cref="TNotificationFactory"/> for <see cref="TNotification"/>
+        /// </summary>
+        protected ICacheRefresherNotificationFactory NotificationFactory { get; }
+
         #endregion
 
         #region Refresher
@@ -44,7 +50,7 @@ namespace Umbraco.Cms.Core.Cache
         /// </summary>
         public virtual void RefreshAll()
         {
-            OnCacheUpdated(new TNotification().Init(null, MessageType.RefreshAll));
+            OnCacheUpdated(NotificationFactory.Create<TNotification>(null, MessageType.RefreshAll));
         }
 
         /// <summary>
@@ -53,7 +59,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="id">The entity's identifier.</param>
         public virtual void Refresh(int id)
         {
-            OnCacheUpdated(new TNotification().Init(id, MessageType.RefreshById));
+            OnCacheUpdated(NotificationFactory.Create<TNotification>(id, MessageType.RefreshById));
         }
 
         /// <summary>
@@ -62,7 +68,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="id">The entity's identifier.</param>
         public virtual void Refresh(Guid id)
         {
-            OnCacheUpdated(new TNotification().Init(id, MessageType.RefreshById));
+            OnCacheUpdated(NotificationFactory.Create<TNotification>(id, MessageType.RefreshById));
         }
 
         /// <summary>
@@ -71,7 +77,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <param name="id">The entity's identifier.</param>
         public virtual void Remove(int id)
         {
-            OnCacheUpdated(new TNotification().Init(id, MessageType.RemoveById));
+            OnCacheUpdated(NotificationFactory.Create<TNotification>(id, MessageType.RemoveById));
         }
 
         #endregion
@@ -100,7 +106,7 @@ namespace Umbraco.Cms.Core.Cache
         /// </summary>
         /// <param name="sender">The event sender.</param>
         /// <param name="args">The event arguments.</param>
-        protected void OnCacheUpdated(CacheRefresherNotificationBase notification)
+        protected void OnCacheUpdated(CacheRefresherNotification notification)
         {
             EventAggregator.Publish(notification);
         }

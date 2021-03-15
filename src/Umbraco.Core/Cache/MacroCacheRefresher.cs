@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -12,8 +12,9 @@ namespace Umbraco.Cms.Core.Cache
         public MacroCacheRefresher(
             AppCaches appCaches,
             IJsonSerializer jsonSerializer,
-            IEventAggregator eventAggregator)
-            : base(appCaches, jsonSerializer, eventAggregator)
+            IEventAggregator eventAggregator,
+            ICacheRefresherNotificationFactory factory)
+            : base(appCaches, jsonSerializer, eventAggregator, factory)
         {
 
         }

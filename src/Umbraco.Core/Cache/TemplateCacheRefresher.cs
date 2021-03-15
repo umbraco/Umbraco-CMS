@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -11,8 +11,8 @@ namespace Umbraco.Cms.Core.Cache
         private readonly IIdKeyMap _idKeyMap;
         private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
 
-        public TemplateCacheRefresher(AppCaches appCaches, IIdKeyMap idKeyMap, IContentTypeCommonRepository contentTypeCommonRepository, IEventAggregator eventAggregator)
-            : base(appCaches, eventAggregator)
+        public TemplateCacheRefresher(AppCaches appCaches, IIdKeyMap idKeyMap, IContentTypeCommonRepository contentTypeCommonRepository, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, eventAggregator, factory)
         {
             _idKeyMap = idKeyMap;
             _contentTypeCommonRepository = contentTypeCommonRepository;

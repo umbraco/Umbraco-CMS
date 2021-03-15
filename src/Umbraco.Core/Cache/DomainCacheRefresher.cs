@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
@@ -15,8 +15,9 @@ namespace Umbraco.Cms.Core.Cache
             AppCaches appCaches,
             IJsonSerializer serializer,
             IPublishedSnapshotService publishedSnapshotService,
-            IEventAggregator eventAggregator)
-            : base(appCaches, serializer, eventAggregator)
+            IEventAggregator eventAggregator,
+            ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _publishedSnapshotService = publishedSnapshotService;
         }

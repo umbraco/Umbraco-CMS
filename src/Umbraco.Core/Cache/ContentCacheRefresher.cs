@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Events;
@@ -24,8 +24,9 @@ namespace Umbraco.Cms.Core.Cache
             IPublishedSnapshotService publishedSnapshotService,
             IIdKeyMap idKeyMap,
             IDomainService domainService,
-            IEventAggregator eventAggregator)
-            : base(appCaches, serializer, eventAggregator)
+            IEventAggregator eventAggregator,
+            ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idKeyMap = idKeyMap;

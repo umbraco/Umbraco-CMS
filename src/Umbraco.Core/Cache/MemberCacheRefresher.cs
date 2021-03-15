@@ -14,8 +14,8 @@ namespace Umbraco.Cms.Core.Cache
     {
         private readonly IIdKeyMap _idKeyMap;
 
-        public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap, IEventAggregator eventAggregator)
-            : base(appCaches, serializer, eventAggregator)
+        public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _idKeyMap = idKeyMap;
         }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
@@ -26,8 +26,9 @@ namespace Umbraco.Cms.Core.Cache
             IPublishedModelFactory publishedModelFactory,
             IIdKeyMap idKeyMap,
             IContentTypeCommonRepository contentTypeCommonRepository,
-            IEventAggregator eventAggregator)
-            : base(appCaches, serializer, eventAggregator)
+            IEventAggregator eventAggregator,
+            ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _publishedModelFactory = publishedModelFactory;
