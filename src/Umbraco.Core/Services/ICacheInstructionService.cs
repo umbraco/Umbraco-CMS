@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Services
         void DeliverInstructions(IEnumerable<RefreshInstruction> instructions, string localIdentity);
 
         /// <summary>
-        /// Creates one or more cache instruction records base on the configured batch size from a set of individual instructions and saves them.
+        /// Creates one or more cache instruction records based on the configured batch size from a set of individual instructions and saves them.
         /// </summary>
         void DeliverInstructionsInBatches(IEnumerable<RefreshInstruction> instructions, string localIdentity);
 
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Services
         /// Processes and then prunes pending database cache instructions.
         /// </summary>
         /// <param name="released">Flag indicating if process is shutting now and operations should exit.</param>
-        /// <param name="localIdentity">Local local identity of the executing AppDomain.</param>
+        /// <param name="localIdentity">Local identity of the executing AppDomain.</param>
         /// <param name="lastPruned">Date of last prune operation.</param>
         CacheInstructionServiceProcessInstructionsResult ProcessInstructions(bool released, string localIdentity, DateTime lastPruned);
     }
