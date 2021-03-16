@@ -41,31 +41,24 @@ namespace Umbraco.Web
                 var valueConverted = value.TryConvertTo<T>();
                 if (valueConverted) return valueConverted.Result;
 
-                // cannot cast nor convert the value, nothing we can return but 'defaultValue'
+                // cannot cast nor convert the value, nothing we can return but 'default'
                 // note: we don't want to fallback in that case - would make little sense
-                return defaultValue;
+                return default;
             }
 
             // we don't have a value, try fallback
             if (PublishedValueFallback.TryGetValue(property, culture, segment, fallback, defaultValue, out var fallbackValue))
-            {
                 return fallbackValue;
-            }
 
             // we don't have a value - neither direct nor fallback
             // give a chance to the converter to return something (eg empty enumerable)
             var noValue = property.GetValue(culture, segment);
-            if (noValue == null)
-            {
-                return defaultValue;
-            }
             if (noValue is T noValueAsT) return noValueAsT;
-
             var noValueConverted = noValue.TryConvertTo<T>();
             if (noValueConverted) return noValueConverted.Result;
 
-            // cannot cast noValue nor convert it, nothing we can return but 'defaultValue'
-            return defaultValue;
+            // cannot cast noValue nor convert it, nothing we can return but 'default'
+            return default;
         }
 
         #endregion
