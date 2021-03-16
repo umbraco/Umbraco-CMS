@@ -209,7 +209,7 @@ namespace Umbraco.Core.Mapping
             if (ctor != null && map != null)
             {
                 var target = ctor(source, context);
-                using (var scope = _scopeProvider.CreateScope())
+                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
                 {
                     map(source, target, context);
                 }
@@ -257,7 +257,7 @@ namespace Umbraco.Core.Mapping
         {
             var targetList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(targetGenericArg));
 
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {
                 foreach (var sourceItem in source)
                 {
@@ -306,7 +306,7 @@ namespace Umbraco.Core.Mapping
             var context = new MapperContext(this);
 
             TTarget targetInstance;
-            using (var scope = _scopeProvider.CreateScope())
+            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {
                 f(context);
                 targetInstance = Map(source, target, context);
@@ -334,7 +334,7 @@ namespace Umbraco.Core.Mapping
             // if there is a direct map, map
             if (map != null)
             {
-                using (var scope = _scopeProvider.CreateScope())
+                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
                 {
                     map(source, target, context);
                 }
