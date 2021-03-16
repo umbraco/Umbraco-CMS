@@ -118,31 +118,29 @@ namespace Umbraco.Cms.Web.Common.Views
             // ASP.NET default value is text/html
             if (Context.Response.ContentType.InvariantContains("text/html"))
             {
-                if (UmbracoContext.IsDebug || UmbracoContext.InPreviewMode)
+                if ((UmbracoContext.IsDebug || UmbracoContext.InPreviewMode)
+                    && tagHelperOutput.TagName != null
+                    && tagHelperOutput.TagName.Equals("body", StringComparison.InvariantCultureIgnoreCase))
                 {
+                    string markupToInject;
 
-                    if (tagHelperOutput.TagName.Equals("body", StringComparison.InvariantCultureIgnoreCase))
+                    if (UmbracoContext.InPreviewMode)
                     {
-                        string markupToInject;
-
-                        if (UmbracoContext.InPreviewMode)
-                        {
-                            // creating previewBadge markup
-                            markupToInject =
-                                string.Format(
-                                    ContentSettings.PreviewBadge,
-                                    IOHelper.ResolveUrl(GlobalSettings.UmbracoPath),
-                                    Context.Request.GetEncodedUrl(),
-                                    UmbracoContext.PublishedRequest.PublishedContent.Id);
-                        }
-                        else
-                        {
-                            // creating mini-profiler markup
-                            markupToInject = ProfilerHtml.Render();
-                        }
-
-                        tagHelperOutput.Content.AppendHtml(markupToInject);
+                        // creating previewBadge markup
+                        markupToInject =
+                            string.Format(
+                                ContentSettings.PreviewBadge,
+                                IOHelper.ResolveUrl(GlobalSettings.UmbracoPath),
+                                Context.Request.GetEncodedUrl(),
+                                UmbracoContext.PublishedRequest.PublishedContent.Id);
                     }
+                    else
+                    {
+                        // creating mini-profiler markup
+                        markupToInject = ProfilerHtml.Render();
+                    }
+
+                    tagHelperOutput.Content.AppendHtml(markupToInject);
                 }
             }
         }
