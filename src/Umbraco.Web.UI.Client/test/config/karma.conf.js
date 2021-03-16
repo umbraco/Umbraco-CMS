@@ -15,15 +15,15 @@ module.exports = function (config) {
             
             //libraries
             'node_modules/jquery/dist/jquery.min.js',
-            'node_modules/angular/angular.js',
-            'node_modules/angular-animate/angular-animate.js',
-            'node_modules/angular-cookies/angular-cookies.js',
+            'node_modules/angular/angular.min.js',
+            'node_modules/angular-animate/angular-animate.min.js',
+            'node_modules/angular-cookies/angular-cookies.min.js',
             'node_modules/angular-aria/angular-aria.min.js',
             'node_modules/angular-local-storage/dist/angular-local-storage.min.js',
-            'node_modules/angular-route/angular-route.js',
-            'node_modules/angular-sanitize/angular-sanitize.js',
+            'node_modules/angular-route/angular-route.min.js',
+            'node_modules/angular-sanitize/angular-sanitize.min.js',
             'node_modules/angular-mocks/angular-mocks.js',
-            'node_modules/angular-ui-sortable/dist/sortable.js',
+            'node_modules/angular-ui-sortable/dist/sortable.min.js',
             'node_modules/underscore/underscore-min.js',
             'node_modules/moment/min/moment-with-locales.js',
             'lib/umbraco/Extensions.js',
@@ -34,12 +34,12 @@ module.exports = function (config) {
             'test/config/app.unit.js',
 
             //application files
-            '../Umbraco.Web.UI/Umbraco/js/*.controllers.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.directives.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.filters.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.services.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.interceptors.js',
-            '../Umbraco.Web.UI/Umbraco/js/*.resources.js',
+            '../Umbraco.Web.UI/umbraco/js/*.controllers.min.js',
+            '../Umbraco.Web.UI/umbraco/js/*.directives.min.js',
+            '../Umbraco.Web.UI/umbraco/js/*.filters.min.js',
+            '../Umbraco.Web.UI/umbraco/js/*.services.min.js',
+            '../Umbraco.Web.UI/umbraco/js/*.interceptors.min.js',
+            '../Umbraco.Web.UI/umbraco/js/*.resources.min.js',
 
             //mocked data and routing
             'src/common/mocks/umbraco.servervariables.js',

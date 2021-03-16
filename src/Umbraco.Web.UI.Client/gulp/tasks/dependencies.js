@@ -46,7 +46,7 @@ function dependencies() {
         },
         {
             "name": "angular",
-            "src":  ["./node_modules/angular/angular.js"],
+            "src":  ["./node_modules/angular/angular.min.js"],
             "base": "./node_modules/angular"
         },
         {
@@ -57,7 +57,7 @@ function dependencies() {
         },
         {
             "name": "angular-cookies",
-            "src":  ["./node_modules/angular-cookies/angular-cookies.js"],
+            "src":  ["./node_modules/angular-cookies/angular-cookies.min.js"],
             "base": "./node_modules/angular-cookies"
         },
         {
@@ -70,27 +70,27 @@ function dependencies() {
         },
         {
             "name": "angular-sanitize",
-            "src":  ["./node_modules/angular-sanitize/angular-sanitize.js"],
+            "src":  ["./node_modules/angular-sanitize/angular-sanitize.min.js"],
             "base": "./node_modules/angular-sanitize"
         },
         {
             "name": "angular-touch",
-            "src":  ["./node_modules/angular-touch/angular-touch.js"],
+            "src":  ["./node_modules/angular-touch/angular-touch.min.js"],
             "base": "./node_modules/angular-touch"
         },
         {
             "name": "angular-ui-sortable",
-            "src":  ["./node_modules/angular-ui-sortable/dist/sortable.js"],
+            "src":  ["./node_modules/angular-ui-sortable/dist/sortable.min.js"],
             "base": "./node_modules/angular-ui-sortable/dist"
         },
         {
             "name": "angular-route",
-            "src":  ["./node_modules/angular-route/angular-route.js"],
+            "src":  ["./node_modules/angular-route/angular-route.min.js"],
             "base": "./node_modules/angular-route"
         },
         {
             "name": "angular-animate",
-            "src":  ["./node_modules/angular-animate/angular-animate.js"],
+            "src":  ["./node_modules/angular-animate/angular-animate.min.js"],
             "base": "./node_modules/angular-animate"
         },
         {
@@ -111,7 +111,7 @@ function dependencies() {
         },
         {
             "name": "angular-messages",
-            "src":  ["./node_modules/angular-messages/angular-messages.js"],
+            "src":  ["./node_modules/angular-messages/angular-messages.min.js"],
             "base": "./node_modules/angular-messages"
         },        
         {
@@ -153,7 +153,7 @@ function dependencies() {
         {
             "name": "flatpickr",
             "src":  [
-                "./node_modules/flatpickr/dist/flatpickr.js",
+                "./node_modules/flatpickr/dist/flatpickr.min.js",
                 "./node_modules/flatpickr/dist/flatpickr.css",
                 "./node_modules/flatpickr/dist/l10n/*.js"
             ],

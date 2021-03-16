@@ -564,6 +564,13 @@ namespace Umbraco.Cms.Core.Services.Implement
                 new XAttribute("path", contentBase.Path),
                 new XAttribute("isDoc", ""));
 
+
+            // Add culture specific node names
+            foreach (var culture in contentBase.AvailableCultures)
+            {
+                xml.Add(new XAttribute("nodeName-" + culture, contentBase.GetCultureName(culture)));
+            }
+
             foreach (var property in contentBase.Properties)
                 xml.Add(SerializeProperty(property, published));
 

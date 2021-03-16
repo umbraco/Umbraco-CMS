@@ -21,15 +21,15 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Events
 {
     public sealed class UserNotificationsHandler :
-        INotificationHandler<SavedNotification<IContent>>,
-        INotificationHandler<SortedNotification<IContent>>,
-        INotificationHandler<PublishedNotification<IContent>>,
-        INotificationHandler<MovedNotification<IContent>>,
-        INotificationHandler<MovedToRecycleBinNotification<IContent>>,
-        INotificationHandler<CopiedNotification<IContent>>,
-        INotificationHandler<RolledBackNotification<IContent>>,
-        INotificationHandler<SentToPublishNotification<IContent>>,
-        INotificationHandler<UnpublishedNotification<IContent>>,
+        INotificationHandler<ContentSavedNotification>,
+        INotificationHandler<ContentSortedNotification>,
+        INotificationHandler<ContentPublishedNotification>,
+        INotificationHandler<ContentMovedNotification>,
+        INotificationHandler<ContentMovedToRecycleBinNotification>,
+        INotificationHandler<ContentCopiedNotification>,
+        INotificationHandler<ContentRolledBackNotification>,
+        INotificationHandler<ContentSentToPublishNotification>,
+        INotificationHandler<ContentUnpublishedNotification>,
         INotificationHandler<AssignedUserGroupPermissionsNotification>,
         INotificationHandler<SavedNotification<PublicAccessEntry>>
     {
@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.Events
             _contentService = contentService;
         }
 
-        public void Handle(SavedNotification<IContent> notification)
+        public void Handle(ContentSavedNotification notification)
         {
             var newEntities = new List<IContent>();
             var updatedEntities = new List<IContent>();
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.Events
             _notifier.Notify(_actions.GetAction<ActionUpdate>(), updatedEntities.ToArray());
         }
 
-        public void Handle(SortedNotification<IContent> notification)
+        public void Handle(ContentSortedNotification notification)
         {
             var parentId = notification.SortedEntities.Select(x => x.ParentId).Distinct().ToList();
             if (parentId.Count != 1)
@@ -86,9 +86,9 @@ namespace Umbraco.Cms.Core.Events
             _notifier.Notify(_actions.GetAction<ActionSort>(), new[] { parent });
         }
 
-        public void Handle(PublishedNotification<IContent> notification) => _notifier.Notify(_actions.GetAction<ActionPublish>(), notification.PublishedEntities.ToArray());
+        public void Handle(ContentPublishedNotification notification) => _notifier.Notify(_actions.GetAction<ActionPublish>(), notification.PublishedEntities.ToArray());
 
-        public void Handle(MovedNotification<IContent> notification)
+        public void Handle(ContentMovedNotification notification)
         {
             // notify about the move for all moved items
             _notifier.Notify(_actions.GetAction<ActionMove>(), notification.MoveInfoCollection.Select(m => m.Entity).ToArray());
@@ -104,15 +104,15 @@ namespace Umbraco.Cms.Core.Events
             }
         }
 
-        public void Handle(MovedToRecycleBinNotification<IContent> notification) => _notifier.Notify(_actions.GetAction<ActionDelete>(), notification.MoveInfoCollection.Select(m => m.Entity).ToArray());
+        public void Handle(ContentMovedToRecycleBinNotification notification) => _notifier.Notify(_actions.GetAction<ActionDelete>(), notification.MoveInfoCollection.Select(m => m.Entity).ToArray());
 
-        public void Handle(CopiedNotification<IContent> notification) => _notifier.Notify(_actions.GetAction<ActionCopy>(), notification.Original);
+        public void Handle(ContentCopiedNotification notification) => _notifier.Notify(_actions.GetAction<ActionCopy>(), notification.Original);
 
-        public void Handle(RolledBackNotification<IContent> notification) => _notifier.Notify(_actions.GetAction<ActionRollback>(), notification.Entity);
+        public void Handle(ContentRolledBackNotification notification) => _notifier.Notify(_actions.GetAction<ActionRollback>(), notification.Entity);
 
-        public void Handle(SentToPublishNotification<IContent> notification) => _notifier.Notify(_actions.GetAction<ActionToPublish>(), notification.Entity);
+        public void Handle(ContentSentToPublishNotification notification) => _notifier.Notify(_actions.GetAction<ActionToPublish>(), notification.Entity);
 
-        public void Handle(UnpublishedNotification<IContent> notification) => _notifier.Notify(_actions.GetAction<ActionUnpublish>(), notification.UnpublishedEntities.ToArray());
+        public void Handle(ContentUnpublishedNotification notification) => _notifier.Notify(_actions.GetAction<ActionUnpublish>(), notification.UnpublishedEntities.ToArray());
 
         /// <summary>
         /// This class is used to send the notifications

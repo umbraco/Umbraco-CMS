@@ -50,14 +50,14 @@ namespace Umbraco.Tests.Scoping
             Builder.Services.AddUnique(f => Mock.Of<IServerRoleAccessor>());
             Builder.WithCollectionBuilder<CacheRefresherCollectionBuilder>()
                 .Add(() => Builder.TypeLoader.GetCacheRefreshers());
-            Builder.AddNotificationHandler<PublishedNotification<IContent>, NotificationHandler>();
+            Builder.AddNotificationHandler<ContentPublishedNotification, NotificationHandler>();
         }
 
-        public class NotificationHandler : INotificationHandler<PublishedNotification<IContent>>
+        public class NotificationHandler : INotificationHandler<ContentPublishedNotification>
         {
-            public void Handle(PublishedNotification<IContent> notification) => PublishedContent?.Invoke(notification);
+            public void Handle(ContentPublishedNotification notification) => PublishedContent?.Invoke(notification);
 
-            public static Action<PublishedNotification<IContent>> PublishedContent { get; set; }
+            public static Action<ContentPublishedNotification> PublishedContent { get; set; }
         }
 
         public override void TearDown()

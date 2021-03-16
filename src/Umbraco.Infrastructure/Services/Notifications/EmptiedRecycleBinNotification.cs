@@ -5,9 +5,9 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public sealed class EmptiedRecycleBinNotification<T> : StatefulNotification where T : class
+    public abstract class EmptiedRecycleBinNotification<T> : StatefulNotification where T : class
     {
-        public EmptiedRecycleBinNotification(EventMessages messages) => Messages = messages;
+        protected EmptiedRecycleBinNotification(EventMessages messages) => Messages = messages;
 
         public EventMessages Messages { get; }
     }

@@ -26,8 +26,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = "icon-download-alt")]
     public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
-        INotificationHandler<CopiedNotification<IContent>>, INotificationHandler<DeletedNotification<IContent>>,
-        INotificationHandler<DeletedNotification<IMedia>>, INotificationHandler<SavingNotification<IMedia>>,
+        INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
+        INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
         INotificationHandler<DeletedNotification<IMember>>
     {
         private readonly IMediaFileSystem _mediaFileSystem;
@@ -124,7 +124,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
         }
 
-        public void Handle(CopiedNotification<IContent> notification)
+        public void Handle(ContentCopiedNotification notification)
         {
             // get the upload field properties with a value
             var properties = notification.Original.Properties.Where(IsUploadField);
@@ -156,9 +156,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
         }
 
-        public void Handle(DeletedNotification<IContent> notification) => DeleteContainedFiles(notification.DeletedEntities);
+        public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
-        public void Handle(DeletedNotification<IMedia> notification) => DeleteContainedFiles(notification.DeletedEntities);
+        public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
         public void Handle(DeletedNotification<IMember> notification) => DeleteContainedFiles(notification.DeletedEntities);
 
@@ -168,7 +168,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _mediaFileSystem.DeleteMediaFiles(filePathsToDelete);
         }
 
-        public void Handle(SavingNotification<IMedia> notification)
+        public void Handle(MediaSavingNotification notification)
         {
             foreach (var entity in notification.SavedEntities)
             {

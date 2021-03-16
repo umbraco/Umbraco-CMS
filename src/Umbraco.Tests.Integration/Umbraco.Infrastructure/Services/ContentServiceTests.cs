@@ -76,9 +76,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void Setup() => ContentRepositoryBase.ThrowOnWarning = true;
 
         protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
-            .AddNotificationHandler<PublishingNotification<IContent>, ContentNotificationHandler>()
-            .AddNotificationHandler<CopyingNotification<IContent>, ContentNotificationHandler>()
-            .AddNotificationHandler<CopiedNotification<IContent>, ContentNotificationHandler>();
+            .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentCopyingNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentCopiedNotification, ContentNotificationHandler>();
 
         [TearDown]
         public void Teardown() => ContentRepositoryBase.ThrowOnWarning = false;
@@ -3296,21 +3296,21 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         public class ContentNotificationHandler :
-            INotificationHandler<CopyingNotification<IContent>>,
-            INotificationHandler<CopiedNotification<IContent>>,
-            INotificationHandler<PublishingNotification<IContent>>
+            INotificationHandler<ContentCopyingNotification>,
+            INotificationHandler<ContentCopiedNotification>,
+            INotificationHandler<ContentPublishingNotification>
         {
-            public void Handle(PublishingNotification<IContent> notification) => PublishingContent?.Invoke(notification);
+            public void Handle(ContentPublishingNotification notification) => PublishingContent?.Invoke(notification);
 
-            public void Handle(CopyingNotification<IContent> notification) => CopyingContent?.Invoke(notification);
+            public void Handle(ContentCopyingNotification notification) => CopyingContent?.Invoke(notification);
 
-            public void Handle(CopiedNotification<IContent> notification) => CopiedContent?.Invoke(notification);
+            public void Handle(ContentCopiedNotification notification) => CopiedContent?.Invoke(notification);
 
-            public static Action<PublishingNotification<IContent>> PublishingContent { get; set; }
+            public static Action<ContentPublishingNotification> PublishingContent { get; set; }
 
-            public static Action<CopyingNotification<IContent>> CopyingContent { get; set; }
+            public static Action<ContentCopyingNotification> CopyingContent { get; set; }
 
-            public static Action<CopiedNotification<IContent>> CopiedContent { get; set; }
+            public static Action<ContentCopiedNotification> CopiedContent { get; set; }
         }
     }
 }

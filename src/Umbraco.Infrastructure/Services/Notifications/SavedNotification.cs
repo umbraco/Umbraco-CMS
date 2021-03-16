@@ -6,13 +6,13 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public sealed class SavedNotification<T> : EnumerableObjectNotification<T>
+    public abstract class SavedNotification<T> : EnumerableObjectNotification<T>
     {
-        public SavedNotification(T target, EventMessages messages) : base(target, messages)
+        protected SavedNotification(T target, EventMessages messages) : base(target, messages)
         {
         }
 
-        public SavedNotification(IEnumerable<T> target, EventMessages messages) : base(target, messages)
+        protected SavedNotification(IEnumerable<T> target, EventMessages messages) : base(target, messages)
         {
         }
 

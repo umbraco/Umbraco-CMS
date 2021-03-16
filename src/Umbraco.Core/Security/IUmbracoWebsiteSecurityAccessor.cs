@@ -1,7 +1,7 @@
-﻿namespace Umbraco.Cms.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     public interface IUmbracoWebsiteSecurityAccessor
     {
-        IUmbracoWebsiteSecurity WebsiteSecurity { get; set; }
+        IUmbracoWebsiteSecurity WebsiteSecurity { get; }
     }
 }

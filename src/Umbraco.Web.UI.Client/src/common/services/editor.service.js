@@ -179,8 +179,7 @@ When building a custom infinite editor view you can use the same components as a
             } else {
                 focus();
             }
-        });
-
+        });      
 
         /**
          * @ngdoc method
@@ -590,6 +589,23 @@ When building a custom infinite editor view you can use the same components as a
             editor.view = "views/common/infiniteeditors/mediapicker/mediapicker.html";
             if (!editor.size) editor.size = "medium";
             editor.updatedMediaNodes = [];
+            open(editor);
+        }
+
+        /**
+         * @ngdoc method
+         * @name umbraco.services.editorService#mediaCropDetails
+         * @methodOf umbraco.services.editorService
+         *
+         * @description
+         * Opens the media crop details editor in infinite editing, the submit callback returns the updated media object.
+         * @param {object} editor rendering options.
+         * @param {function} editor.submit Submits the editor.
+         * @param {function} editor.close Closes the editor.
+         * @returns {object} editor object
+         */
+        function mediaCropDetails(editor) {
+            editor.view = "views/common/infiniteeditors/mediapicker/overlays/mediacropdetails.html";
             open(editor);
         }
 
@@ -1055,7 +1071,8 @@ When building a custom infinite editor view you can use the same components as a
             macroPicker: macroPicker,
             memberGroupPicker: memberGroupPicker,
             memberPicker: memberPicker,
-            memberEditor: memberEditor
+            memberEditor: memberEditor,
+            mediaCropDetails
         };
 
         return service;

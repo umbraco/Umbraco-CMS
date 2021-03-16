@@ -6,13 +6,13 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public sealed class DeletingNotification<T> : CancelableEnumerableObjectNotification<T>
+    public abstract class DeletingNotification<T> : CancelableEnumerableObjectNotification<T>
     {
-        public DeletingNotification(T target, EventMessages messages) : base(target, messages)
+        protected DeletingNotification(T target, EventMessages messages) : base(target, messages)
         {
         }
 
-        public DeletingNotification(IEnumerable<T> target, EventMessages messages) : base(target, messages)
+        protected DeletingNotification(IEnumerable<T> target, EventMessages messages) : base(target, messages)
         {
         }
 

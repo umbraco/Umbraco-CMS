@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         public void Configure(CookieAuthenticationOptions options)
         {
             options.SlidingExpiration = true;
-            options.ExpireTimeSpan = TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes);
+            options.ExpireTimeSpan = _globalSettings.TimeOut;
             options.Cookie.Domain = _securitySettings.AuthCookieDomain;
             options.Cookie.Name = _securitySettings.AuthCookieName;
             options.Cookie.HttpOnly = true;
@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
             IDataProtector dataProtector = options.DataProtectionProvider.CreateProtector("Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware", Constants.Security.BackOfficeAuthenticationType, "v2");
             var ticketDataFormat = new TicketDataFormat(dataProtector);
 
-            options.TicketDataFormat = new BackOfficeSecureDataFormat(_globalSettings.TimeOutInMinutes, ticketDataFormat);
+            options.TicketDataFormat = new BackOfficeSecureDataFormat(_globalSettings.TimeOut, ticketDataFormat);
 
             // Custom cookie manager so we can filter requests
             options.CookieManager = new BackOfficeCookieManager(

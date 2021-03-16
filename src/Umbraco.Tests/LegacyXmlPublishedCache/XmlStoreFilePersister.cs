@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
 using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache

@@ -12,7 +12,9 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Primitives;
 using Serilog;
 using Smidge;
 using Smidge.Nuglify;
@@ -54,6 +56,7 @@ using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
 using Umbraco.Core.Events;
+using static Umbraco.Cms.Core.Cache.HttpContextRequestAppCache;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
@@ -86,15 +89,18 @@ namespace Umbraco.Extensions
 
             IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 
-            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles);
+            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
             var loggingConfig = new LoggingConfiguration(loggingDir);
 
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
 
+            // Manually create and register the HttpContextAccessor. In theory this should not be registered
+            // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
+            // is just based on AsyncLocal, see https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             services.AddSingleton(httpContextAccessor);
 
-            var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext?.Items);
+            var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
             var appCaches = AppCaches.Create(requestCache);
             services.AddUnique(appCaches);
 
@@ -182,9 +188,14 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<WebProfilerHtml>();
 
             builder.Services.AddMiniProfiler(options =>
-
+            {
                 // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
-                options.ShouldProfile = request => false);
+                options.ShouldProfile = request => false;
+
+                // this is a default path and by default it performs a 'contains' check which will match our content controller
+                // (and probably other requests) and ignore them.
+                options.IgnoredPaths.Remove("/content/");
+            });
 
             builder.AddNotificationHandler<UmbracoApplicationStarting, InitializeWebProfiling>();
             return builder;
@@ -208,9 +219,11 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Add runtime minifier support for Umbraco
         /// </summary>
-        public static IUmbracoBuilder AddRuntimeMinifier(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder AddRuntimeMinifier(this IUmbracoBuilder builder, IWebHostEnvironment webHostEnvironment)
         {
-            builder.Services.AddSmidge(builder.Config.GetSection(Cms.Core.Constants.Configuration.ConfigRuntimeMinification));
+            var smidgePhysicalFileProvider = new SmidgePhysicalFileProvider(webHostEnvironment.ContentRootFileProvider, webHostEnvironment.WebRootFileProvider);
+
+            builder.Services.AddSmidge(builder.Config.GetSection(Cms.Core.Constants.Configuration.ConfigRuntimeMinification), smidgePhysicalFileProvider);
             builder.Services.AddSmidgeNuglify();
 
             return builder;
@@ -238,7 +251,6 @@ namespace Umbraco.Extensions
             builder.Services.AddUmbracoImageSharp(builder.Config);
 
             // AspNetCore specific services
-            builder.Services.AddUnique<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
             builder.AddNotificationHandler<UmbracoRequestBegin, AspNetCoreRequestAccessor>();
 
@@ -262,10 +274,8 @@ namespace Umbraco.Extensions
             // register the umbraco context factory
 
             builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            builder.Services.AddUnique<IBackOfficeSecurityFactory, BackOfficeSecurityFactory>();
-            builder.Services.AddUnique<IBackOfficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
-            builder.AddNotificationHandler<UmbracoRoutedRequest, UmbracoWebsiteSecurityFactory>();
-            builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, HybridUmbracoWebsiteSecurityAccessor>();
+            builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
+            builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, UmbracoWebsiteSecurityAccessor>();
 
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
             builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
@@ -274,6 +284,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<InstallAreaRoutes>();
 
             builder.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
+            builder.Services.AddUnique<PreviewAuthenticationMiddleware>();
             builder.Services.AddUnique<UmbracoRequestMiddleware>();
             builder.Services.AddUnique<BootFailedMiddleware>();
 
@@ -285,6 +296,8 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<ContentModelBinder>();
 
             builder.Services.AddScoped<UmbracoHelper>();
+            builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
+            builder.Services.AddScoped<IUmbracoWebsiteSecurity, UmbracoWebsiteSecurity>();
 
             builder.AddHttpClients();
 
@@ -402,6 +415,30 @@ namespace Umbraco.Extensions
             var wrappedWebRoutingSettings = new OptionsMonitorAdapter<WebRoutingSettings>(webRoutingSettings);
 
             return new AspNetCoreHostingEnvironment(wrappedHostingSettings,wrappedWebRoutingSettings, webHostEnvironment);
+        }
+
+        /// <summary>
+        /// This file provider lets us serve physical files to Smidge for minification from both wwwroot and App_Plugins (which is outside wwwroot).
+        /// This file provider is NOT intended for use anywhere else, as it exposes files from the content root.
+        /// </summary>
+        private class SmidgePhysicalFileProvider : IFileProvider
+        {
+            private readonly IFileProvider _contentRootFileProvider;
+            private readonly IFileProvider _webRooFileProvider;
+
+            public SmidgePhysicalFileProvider(IFileProvider contentRootFileProvider, IFileProvider webRooFileProvider)
+            {
+                _contentRootFileProvider = contentRootFileProvider;
+                _webRooFileProvider = webRooFileProvider;
+            }
+
+            public IFileInfo GetFileInfo(string subpath) => subpath.InvariantStartsWith(Constants.SystemDirectories.AppPlugins)
+                ? _contentRootFileProvider.GetFileInfo(subpath)
+                : _webRooFileProvider.GetFileInfo(subpath);
+
+            public IDirectoryContents GetDirectoryContents(string subpath) => throw new NotSupportedException();
+
+            public IChangeToken Watch(string filter) => throw new NotSupportedException();
         }
     }
 }

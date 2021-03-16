@@ -6,13 +6,13 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public sealed class MovedToRecycleBinNotification<T> : ObjectNotification<IEnumerable<MoveEventInfo<T>>>
+    public abstract class MovedToRecycleBinNotification<T> : ObjectNotification<IEnumerable<MoveEventInfo<T>>>
     {
-        public MovedToRecycleBinNotification(MoveEventInfo<T> target, EventMessages messages) : base(new[] { target }, messages)
+        protected MovedToRecycleBinNotification(MoveEventInfo<T> target, EventMessages messages) : base(new[] { target }, messages)
         {
         }
 
-        public MovedToRecycleBinNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages) : base(target, messages)
+        protected MovedToRecycleBinNotification(IEnumerable<MoveEventInfo<T>> target, EventMessages messages) : base(target, messages)
         {
         }
 

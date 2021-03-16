@@ -11,6 +11,7 @@ using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -195,7 +196,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
                 .Setup(x => x.GetById(It.Is<int>(y => y == nodeId)))
                 .Returns(CreateMedia(nodeId));
 
-            return new MediaPermissions(mockMediaService.Object, entityService);
+            return new MediaPermissions(mockMediaService.Object, entityService, AppCaches.Disabled);
         }
 
         private static IMedia CreateMedia(int nodeId)

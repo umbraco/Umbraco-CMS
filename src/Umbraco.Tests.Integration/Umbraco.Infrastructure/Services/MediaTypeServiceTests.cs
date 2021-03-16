@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
 
         protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
-            .AddNotificationHandler<MovedToRecycleBinNotification<IMedia>, ContentNotificationHandler>();
+            .AddNotificationHandler<MediaMovedToRecycleBinNotification, ContentNotificationHandler>();
 
         [Test]
         public void Get_With_Missing_Guid()
@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             }
         }
 
-        private void MovedMediaToRecycleBin(MovedToRecycleBinNotification<IMedia> notification)
+        private void MovedMediaToRecycleBin(MediaMovedToRecycleBinNotification notification)
         {
             foreach (MoveEventInfo<IMedia> item in notification.MoveInfoCollection)
             {
@@ -220,11 +220,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         public class ContentNotificationHandler :
-            INotificationHandler<MovedToRecycleBinNotification<IMedia>>
+            INotificationHandler<MediaMovedToRecycleBinNotification>
         {
-            public void Handle(MovedToRecycleBinNotification<IMedia> notification) => MovedMediaToRecycleBin?.Invoke(notification);
+            public void Handle(MediaMovedToRecycleBinNotification notification) => MovedMediaToRecycleBin?.Invoke(notification);
 
-            public static Action<MovedToRecycleBinNotification<IMedia>> MovedMediaToRecycleBin { get; set; }
+            public static Action<MediaMovedToRecycleBinNotification> MovedMediaToRecycleBin { get; set; }
         }
     }
 }

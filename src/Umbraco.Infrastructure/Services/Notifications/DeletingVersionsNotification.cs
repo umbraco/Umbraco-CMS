@@ -6,9 +6,9 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public sealed class DeletingVersionsNotification<T> : DeletedVersionsNotificationBase<T>, ICancelableNotification where T : class
+    public abstract class DeletingVersionsNotification<T> : DeletedVersionsNotificationBase<T>, ICancelableNotification where T : class
     {
-        public DeletingVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
+        protected DeletingVersionsNotification(int id, EventMessages messages, int specificVersion = default, bool deletePriorVersions = false, DateTime dateToRetain = default)
             : base(id, messages, specificVersion, deletePriorVersions, dateToRetain)
         {
         }
