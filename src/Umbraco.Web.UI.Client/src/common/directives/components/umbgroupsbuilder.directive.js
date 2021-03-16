@@ -362,8 +362,6 @@
             };
 
             /* ---------- TABS ---------- */
-            scope.model.hasTabs = true;
-
             scope.changeTab = function ({ id }) {
                 scope.openTabId = id;
             };
