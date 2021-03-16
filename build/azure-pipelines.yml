@@ -250,7 +250,7 @@ stages:
             timeoutInMinutes: 60
             displayName: Generate C# Docs
             pool:
-                vmImage: windows-latest
+                vmImage: vs2017-win2016
             steps:
                 - task: UseDotNet@2
                   displayName: Use .Net Core sdk 5.x
@@ -265,7 +265,9 @@ stages:
                         if ($lastexitcode -ne 0){
                            throw ("Error installing DocFX")
                         }
-                        docfx metadata --loglevel Verbose --shouldSkipMarkup --disableGitFeatures "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                        # Set MSBUILD to avoid error
+                        # $Env:MSBUILD_EXE_PATH =
+                        docfx metadata --loglevel Verbose "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
                         if ($lastexitcode -ne 0){
                            throw ("Error generating docs.")
                         }
