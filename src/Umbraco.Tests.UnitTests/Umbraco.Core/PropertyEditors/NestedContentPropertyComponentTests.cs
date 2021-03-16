@@ -4,7 +4,7 @@
 using System;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Compose;
+using Umbraco.Cms.Core.PropertyEditors;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {
@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void Invalid_Json()
         {
-            var component = new NestedContentPropertyComponent();
+            var component = new NestedContentPropertyHandler();
 
             Assert.DoesNotThrow(() => component.CreateNestedContentKeys("this is not json", true));
         }
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 .Replace("04a6dba8-813c-4144-8aca-86a3f24ebf08", guids[0].ToString())
                 .Replace("d8e214d8-c5a5-4b45-9b51-4050dd47f5fa", guids[1].ToString());
 
-            var component = new NestedContentPropertyComponent();
+            var component = new NestedContentPropertyHandler();
             var result = component.CreateNestedContentKeys(json, false, GuidFactory);
 
             Assert.AreEqual(JsonConvert.DeserializeObject(expected).ToString(), JsonConvert.DeserializeObject(result).ToString());
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 .Replace("dccf550c-3a05-469e-95e1-a8f560f788c2", guids[2].ToString())
                 .Replace("fbde4288-8382-4e13-8933-ed9c160de050", guids[3].ToString());
 
-            var component = new NestedContentPropertyComponent();
+            var component = new NestedContentPropertyHandler();
             var result = component.CreateNestedContentKeys(json, false, GuidFactory);
 
             Assert.AreEqual(JsonConvert.DeserializeObject(expected).ToString(), JsonConvert.DeserializeObject(result).ToString());
@@ -126,7 +126,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 .Replace("dccf550c-3a05-469e-95e1-a8f560f788c2", guids[2].ToString())
                 .Replace("fbde4288-8382-4e13-8933-ed9c160de050", guids[3].ToString());
 
-            var component = new NestedContentPropertyComponent();
+            var component = new NestedContentPropertyHandler();
             var result = component.CreateNestedContentKeys(json, false, GuidFactory);
 
             Assert.AreEqual(JsonConvert.DeserializeObject(expected).ToString(), JsonConvert.DeserializeObject(result).ToString());
@@ -230,7 +230,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 .Replace("dccf550c-3a05-469e-95e1-a8f560f788c2", guids[2].ToString())
                 .Replace("fbde4288-8382-4e13-8933-ed9c160de050", guids[3].ToString());
 
-            var component = new NestedContentPropertyComponent();
+            var component = new NestedContentPropertyHandler();
             var result = component.CreateNestedContentKeys(json, false, GuidFactory);
 
             Assert.AreEqual(JsonConvert.DeserializeObject(expected).ToString(), JsonConvert.DeserializeObject(result).ToString());
@@ -248,7 +248,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
   {""name"":""Item 2 was copied and has no key prop"",""ncContentTypeAlias"":""nested"",""text"":""zoot""}
 ]";
 
-            var component = new NestedContentPropertyComponent();
+            var component = new NestedContentPropertyHandler();
             var result = component.CreateNestedContentKeys(json, true, GuidFactory);
 
             // Ensure the new GUID is put in a key into the JSON
@@ -291,7 +291,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 	}
 ]";
 
-            var component = new NestedContentPropertyComponent();
+            var component = new NestedContentPropertyHandler();
             var result = component.CreateNestedContentKeys(json, true, GuidFactory);
 
             // Ensure the new GUID is put in a key into the JSON for each item
@@ -390,7 +390,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 	}
 ]";
 
-            var component = new NestedContentPropertyComponent();
+            var component = new NestedContentPropertyHandler();
             var result = component.CreateNestedContentKeys(json, true, GuidFactory);
 
             // Ensure the new GUID is put in a key into the JSON for each item

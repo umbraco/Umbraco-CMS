@@ -447,7 +447,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
-            if (!_emailSender.CanSendRequiredEmail() && !_userManager.HasSendingUserInviteEventHandler)
+            if (!_emailSender.CanSendRequiredEmail())
             {
                 return new ValidationErrorResult("No Email server is configured");
             }
@@ -486,39 +486,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _userService.Save(user);
             var display = _umbracoMapper.Map<UserDisplay>(user);
 
-            UserInviteEventArgs inviteArgs;
-
-            try
-            {
-                inviteArgs = _userManager.RaiseSendingUserInvite(User, userSave, user);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred in a custom event handler while inviting the user");
-                return ValidationErrorResult.CreateNotificationValidationErrorResult($"An error occurred inviting the user (check logs for more info): {ex.Message}");
-            }
-
-            // If the event is handled then no need to send the email
-            if (inviteArgs.InviteHandled)
-            {
-                // if no user result was created then map the minimum args manually for the UI
-                if (!inviteArgs.ShowUserResult)
-                {
-                    display = new UserDisplay
-                    {
-                        Name = userSave.Name,
-                        Email = userSave.Email,
-                        Username = userSave.Username
-                    };
-                }
-            }
-            else
-            {
-                //send the email
-
-                await SendUserInviteEmailAsync(display, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Email, user, userSave.Message);
-
-            }
+            //send the email
+            await SendUserInviteEmailAsync(display, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Email, user, userSave.Message);
 
             display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/resendInviteHeader"), _localizedTextService.Localize("speechBubbles/resendInviteSuccess", new[] { user.Name }));
             return display;
