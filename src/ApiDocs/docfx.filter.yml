@@ -4,6 +4,8 @@ apiRules:
   - include:
       uidRegex: ^Umbraco\.Extensions
   - exclude:
+      uidRegex: ^Umbraco\.Cms\.Infrastructure
+  - exclude:
       hasAttribute:
       uid: System.ComponentModel.EditorBrowsableAttribute
       ctorArguments:
