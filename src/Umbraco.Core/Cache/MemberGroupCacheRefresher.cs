@@ -1,20 +1,19 @@
-﻿using System;
+using System;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class MemberGroupCacheRefresher : PayloadCacheRefresherBase<MemberGroupCacheRefresher, MemberGroupCacheRefresher.JsonPayload>
+    public sealed class MemberGroupCacheRefresher : PayloadCacheRefresherBase<MemberGroupCacheRefresherNotification, MemberGroupCacheRefresher.JsonPayload>
     {
-        public MemberGroupCacheRefresher(AppCaches appCaches, IJsonSerializer jsonSerializer)
-            : base(appCaches, jsonSerializer)
+        public MemberGroupCacheRefresher(AppCaches appCaches, IJsonSerializer jsonSerializer, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, jsonSerializer, eventAggregator, factory)
         {
 
         }
 
         #region Define
-
-        protected override MemberGroupCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("187F236B-BD21-4C85-8A7C-29FBA3D6C00C");
 

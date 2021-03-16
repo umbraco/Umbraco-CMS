@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core
                 public const string Consent = TableNamePrefix + "Consent";
                 public const string UserLogin = TableNamePrefix + "UserLogin";
 
-                public const string LogViewerQuery = "cms" + "LogViewerQuery";
+                public const string LogViewerQuery = TableNamePrefix + "LogViewerQuery";
             }
         }
     }
