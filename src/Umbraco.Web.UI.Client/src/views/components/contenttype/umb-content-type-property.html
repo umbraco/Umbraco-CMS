@@ -12,7 +12,7 @@
                   locked="locked"
                   ng-model="vm.property.alias"
                   placeholder-text="'Alias...'"
-                  server-validation-field="{{ vm.aliasValServerField }}">
+                  server-validation-field="{{ vm.valServerFieldAlias }}">
               </umb-locked-field>
 
               <div class="umb-group-builder__property-meta-label">
@@ -23,7 +23,7 @@
                             name="groupName"
                             umb-auto-resize
                             required
-                            val-server-field="{{ vm.labelValServerField }}">
+                            val-server-field="{{ vm.valServerFieldLabel }}">
                   </textarea>
 
                   <div ng-messages="propertyTypeForm.groupName.$error" show-validation-on-submit>

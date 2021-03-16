@@ -63,7 +63,7 @@
       allowRemove: '<',
       onRemove: '&',
       sorting: '<',
-      nameValServerField: '@',
+      valServerFieldName: '@',
       onNameFocus: '&',
       onFocus: '&'
     },

@@ -76,7 +76,7 @@
                     allow-remove="canRemoveGroup(group) && !sortingMode"
                     on-remove="removeGroup(groupIndex)"
                     sorting="sortingMode"
-                    name-val-server-field="{{'Groups[' + $index + '].Name'}}">
+                    val-server-field-name="{{'Groups[' + $index + '].Name'}}">
                     
                     <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties">
                         <li ng-repeat="(propertyIndex, property) in group.properties track by property.alias" data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
@@ -86,8 +86,8 @@
                                 sortable="sortingMode"
                                 on-edit="editPropertyTypeSettings(property)"
                                 on-remove="deleteProperty(group.properties, property)"
-                                alias-val-server-field="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Alias'}}"
-                                label-val-server-field="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Label'}}">
+                                val-server-field-alias="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Alias'}}"
+                                val-server-field-label="{{'Groups[' + groupIndex + '].Properties[' + propertyIndex + '].Label'}}">
                             </umb-content-type-property>
                         </li>
                     </ul>

@@ -46,8 +46,8 @@
       sortable: '<',
       onEdit: '&',
       onRemove: '&',
-      aliasValServerField: '@',
-      labelValServerField: '@'
+      valServerFieldAlias: '@',
+      valServerFieldLabel: '@'
     },
     controllerAs: 'vm',
     controller: umbContentTypePropertyController
