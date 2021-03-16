@@ -104,9 +104,6 @@ angular.module("umbraco")
          */
         function updateControlValue(selectedImage) {
 
-            const doGetThumbnail = $scope.control.value.focalPoint !== selectedImage.focalPoint 
-                || $scope.control.value.image !== selectedImage.image;
-
             // we could apply selectedImage directly to $scope.control.value,
             // but this allows excluding fields in future if needed
             $scope.control.value = {
@@ -119,8 +116,8 @@ angular.module("umbraco")
                 altText: selectedImage.altText
             };
 
-
-            if (doGetThumbnail) {
+            // only update the thumbnail if the image or focal point have changed
+            if ($scope.control.value.focalPoint !== selectedImage.focalPoint || $scope.control.value.image !== selectedImage.image) {
                 $scope.thumbnailUrl = getThumbnailUrl();
             }
         }       
