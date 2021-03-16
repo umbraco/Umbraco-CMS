@@ -121,10 +121,12 @@ namespace Umbraco.Extensions
 
             if (!app.UmbracoCanBoot())
             {
+                app.UseStaticFiles(); // We need static files to show the nice error page.
                 app.UseMiddleware<BootFailedMiddleware>();
             }
             else
             {
+                app.UseMiddleware<PreviewAuthenticationMiddleware>();
                 app.UseMiddleware<UmbracoRequestMiddleware>();
                 app.UseMiddleware<MiniProfilerMiddleware>();
             }

@@ -20,8 +20,6 @@ namespace Umbraco.Extensions
                 throw new ArgumentNullException(nameof(app));
             }
 
-            app.UseBackOfficeUserManagerAuditing();
-
             if (!app.UmbracoCanBoot())
             {
                 return app;
@@ -44,22 +42,12 @@ namespace Umbraco.Extensions
 
         public static IApplicationBuilder UseUmbracoPreview(this IApplicationBuilder app)
         {
-            // TODO: I'm unsure this middleware will execute before the endpoint, we'll have to see
-            app.UseMiddleware<PreviewAuthenticationMiddleware>();
-
             app.UseEndpoints(endpoints =>
             {
                 PreviewRoutes previewRoutes = app.ApplicationServices.GetRequiredService<PreviewRoutes>();
                 previewRoutes.CreateRoutes(endpoints);
             });
 
-            return app;
-        }
-
-        private static IApplicationBuilder UseBackOfficeUserManagerAuditing(this IApplicationBuilder app)
-        {
-            var auditer = app.ApplicationServices.GetRequiredService<BackOfficeUserManagerAuditer>();
-            auditer.Start();
             return app;
         }
     }

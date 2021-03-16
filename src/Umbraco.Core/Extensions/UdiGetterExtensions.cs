@@ -158,7 +158,7 @@ namespace Umbraco.Extensions
         public static StringUdi GetUdi(this Stylesheet entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new StringUdi(Constants.UdiEntityType.Stylesheet, entity.Path.TrimStart('/')).EnsureClosed();
+            return new StringUdi(Constants.UdiEntityType.Stylesheet, entity.Path.TrimStart(Constants.CharArrays.ForwardSlash)).EnsureClosed();
         }
 
         /// <summary>
@@ -169,7 +169,7 @@ namespace Umbraco.Extensions
         public static StringUdi GetUdi(this Script entity)
         {
             if (entity == null) throw new ArgumentNullException("entity");
-            return new StringUdi(Constants.UdiEntityType.Script, entity.Path.TrimStart('/')).EnsureClosed();
+            return new StringUdi(Constants.UdiEntityType.Script, entity.Path.TrimStart(Constants.CharArrays.ForwardSlash)).EnsureClosed();
         }
 
         /// <summary>
@@ -208,7 +208,7 @@ namespace Umbraco.Extensions
                 ? Constants.UdiEntityType.PartialViewMacro
                 : Constants.UdiEntityType.PartialView;
 
-            return new StringUdi(entityType, entity.Path.TrimStart('/')).EnsureClosed();
+            return new StringUdi(entityType, entity.Path.TrimStart(Constants.CharArrays.ForwardSlash)).EnsureClosed();
         }
 
         /// <summary>

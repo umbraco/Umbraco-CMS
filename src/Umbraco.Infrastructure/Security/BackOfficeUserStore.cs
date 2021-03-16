@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -33,6 +34,7 @@ namespace Umbraco.Cms.Core.Security
         private readonly IExternalLoginService _externalLoginService;
         private readonly GlobalSettings _globalSettings;
         private readonly UmbracoMapper _mapper;
+        private readonly AppCaches _appCaches;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeUserStore"/> class.
@@ -44,7 +46,8 @@ namespace Umbraco.Cms.Core.Security
             IExternalLoginService externalLoginService,
             IOptions<GlobalSettings> globalSettings,
             UmbracoMapper mapper,
-            IdentityErrorDescriber describer)
+            IdentityErrorDescriber describer,
+            AppCaches appCaches)
             : base(describer)
         {
             _scopeProvider = scopeProvider;
@@ -53,6 +56,7 @@ namespace Umbraco.Cms.Core.Security
             _externalLoginService = externalLoginService ?? throw new ArgumentNullException(nameof(externalLoginService));
             _globalSettings = globalSettings.Value;
             _mapper = mapper;
+            _appCaches = appCaches;
             _userService = userService;
             _externalLoginService = externalLoginService;
         }
@@ -685,8 +689,8 @@ namespace Umbraco.Cms.Core.Security
             }
 
             // we should re-set the calculated start nodes
-            identityUser.CalculatedMediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService);
-            identityUser.CalculatedContentStartNodeIds = user.CalculateContentStartNodeIds(_entityService);
+            identityUser.CalculatedMediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+            identityUser.CalculatedContentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
 
             // reset all changes
             identityUser.ResetDirtyProperties(false);

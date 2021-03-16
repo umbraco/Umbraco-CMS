@@ -106,22 +106,39 @@ namespace Umbraco.Cms.Core.Packaging
 
         private IEnumerable<string> RunPackageActions(PackageDefinition packageDefinition, IEnumerable<PackageAction> actions)
         {
-            foreach (var n in actions)
+            var actionsElement = XElement.Parse(packageDefinition.Actions);
+            foreach (PackageAction action in actions)
             {
                 //if there is an undo section then save it to the definition so we can run it at uninstallation
-                var undo = n.Undo;
+                var undo = action.Undo;
                 if (undo)
-                    packageDefinition.Actions += n.XmlData.ToString();
+                {
+                    actionsElement.Add(action.XmlData);
+                }
+
 
                 //Run the actions tagged only for 'install'
-                if (n.RunAt != ActionRunAt.Install) continue;
+                if (action.RunAt != ActionRunAt.Install)
+                {
+                    continue;
+                }
 
-                if (n.Alias.IsNullOrWhiteSpace()) continue;
+                if (action.Alias.IsNullOrWhiteSpace())
+                {
+                    continue;
+                }
 
                 //run the actions and report errors
-                if (!_packageActionRunner.RunPackageAction(packageDefinition.Name, n.Alias, n.XmlData, out var err))
-                    foreach (var e in err) yield return e;
+                if (!_packageActionRunner.RunPackageAction(packageDefinition.Name, action.Alias, action.XmlData, out var err))
+                {
+                    foreach (var e in err)
+                    {
+                        yield return e;
+                    }
+                }
             }
+
+            packageDefinition.Actions = actionsElement.ToString();
         }
 
         private IEnumerable<string> UndoPackageActions(IPackageInfo packageDefinition, IEnumerable<PackageAction> actions)

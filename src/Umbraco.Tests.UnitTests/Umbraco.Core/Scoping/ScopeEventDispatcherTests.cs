@@ -87,7 +87,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
                 Mock.Of<IMediaFileSystem>(),
                 Mock.Of<ILogger<ScopeProvider>>(),
                 instance,
-                Mock.Of<IRequestCache>()
+                Mock.Of<IRequestCache>(),
+                Mock.Of<IEventAggregator>()
                 );
         }
 

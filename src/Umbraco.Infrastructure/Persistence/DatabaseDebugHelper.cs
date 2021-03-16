@@ -1,4 +1,4 @@
-﻿#if DEBUG_DATABASES
+#if DEBUG_DATABASES
 using System;
 using System.Collections.Generic;
 using System.Data;

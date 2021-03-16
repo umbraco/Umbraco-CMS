@@ -506,7 +506,7 @@ context('Content', () => {
         const pickerDocTypeName = 'Content picker doc type';
         const pickerDocTypeAlias = AliasHelper.toAlias(pickerDocTypeName);
         const pickedDocTypeName = 'Picked content document type';
-
+        const pickedDocTypeAlias = AliasHelper.toAlias(pickedDocTypeName);
         cy.deleteAllContent();
         cy.umbracoEnsureDocumentTypeNameNotExists(pickerDocTypeName);
         cy.umbracoEnsureTemplateNameNotExists(pickerDocTypeName);
@@ -515,6 +515,7 @@ context('Content', () => {
         // Create the content type and content we'll be picking from.
         const pickedDocType = new DocumentTypeBuilder()
             .withName(pickedDocTypeName)
+            .withAlias(pickedDocTypeAlias)
             .withAllowAsRoot(true)
             .addGroup()
                 .addTextBoxProperty()
@@ -559,23 +560,17 @@ context('Content', () => {
         cy.saveDocumentType(pickerDocType);
 
         // Edit it the template to allow us to verify the rendered view.
-        cy.editTemplate(pickerDocTypeName, `@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentModels.ContentPickerDocType>
-        @using ContentModels = Umbraco.Web.PublishedModels;
+        cy.editTemplate(pickerDocTypeName, `@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<ContentPickerDocType>
         @{
             Layout = null;
+            var pickedItem = Model.Picker as PickedContentDocumentType;
         }
 
-        @{
-            IPublishedContent typedContentPicker = Model.Value<IPublishedContent>("picker");
-            if (typedContentPicker != null)
-            {
-                <p>@typedContentPicker.Value("text")</p>
-            }
-        }`);
+        <p>@pickedItem.Text</p>`);
 
         // Create content with content picker
         cy.get('.umb-tree-root-link').rightclick();
-        cy.get('.-opens-dialog > .umb-action-link').click();
+        cy.get('[data-element="action-create"]').click();
         cy.get('[data-element="action-create-' + pickerDocTypeAlias + '"] > .umb-action-link').click();
         // Fill out content
         cy.umbracoEditorHeaderName('ContentPickerContent');

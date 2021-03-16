@@ -11,12 +11,12 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -138,8 +138,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters
         public void Validating_ContentItemSave()
         {
             ILogger<ContentSaveModelValidator> logger = Services.GetRequiredService<ILogger<ContentSaveModelValidator>>();
-            IBackOfficeSecurityFactory backofficeSecurityFactory = Services.GetRequiredService<IBackOfficeSecurityFactory>();
-            backofficeSecurityFactory.EnsureBackOfficeSecurity();
             IPropertyValidationService propertyValidationService = Services.GetRequiredService<IPropertyValidationService>();
             UmbracoMapper umbracoMapper = Services.GetRequiredService<UmbracoMapper>();
 

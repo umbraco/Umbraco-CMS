@@ -77,6 +77,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
             builder.Services.AddUnique<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddUnique<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
             builder.Services.AddUnique<IJsonSerializer, JsonNetSerializer>();
             builder.Services.AddUnique<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
@@ -123,8 +124,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .Remove<SimpleTinyMceValueConverter>();
 
             builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
-
-            builder.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
@@ -191,8 +190,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         {
             builder.Services.AddUnique<IMainDomLock>(factory =>
             {
-                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
-                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>().Value;
+                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
+                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>();
                 var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
@@ -200,7 +199,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
 
-                return globalSettings.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
+                return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
                     ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbCreator, hostingEnvironment, databaseSchemaCreatorFactory)
                     : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
             });

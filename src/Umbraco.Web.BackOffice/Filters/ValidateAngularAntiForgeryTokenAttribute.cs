@@ -50,6 +50,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                     if (userIdentity.HasClaim(x => x.Type == ClaimTypes.CookiePath) == false)
                     {
                         await next();
+                        return;
                     }
                 }
 

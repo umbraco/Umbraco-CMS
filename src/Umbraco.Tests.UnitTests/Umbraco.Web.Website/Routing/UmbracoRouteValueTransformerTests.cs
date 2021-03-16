@@ -13,6 +13,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -56,7 +57,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
                 routeValuesFactory ?? Mock.Of<IUmbracoRouteValuesFactory>(),
                 filter ?? Mock.Of<IRoutableDocumentFilter>(x => x.IsDocumentRequest(It.IsAny<string>()) == true),
                 Mock.Of<IDataProtectionProvider>(),
-                Mock.Of<IControllerActionSearcher>());
+                Mock.Of<IControllerActionSearcher>(),
+                Mock.Of<IEventAggregator>());
 
             return transformer;
         }

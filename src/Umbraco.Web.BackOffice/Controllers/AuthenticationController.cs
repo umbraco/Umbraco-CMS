@@ -390,7 +390,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     await _emailSender.SendAsync(mailMessage);
 
-                    _userManager.RaiseForgotPasswordRequestedEvent(User, user.Id.ToString());
+                    _userManager.NotifyForgotPasswordRequested(User, user.Id.ToString());
                 }
             }
 
@@ -554,7 +554,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                 }
 
-                _userManager.RaiseForgotPasswordChangedSuccessEvent(User, model.UserId.ToString());
+                _userManager.NotifyForgotPasswordChanged(User, model.UserId.ToString());
                 return Ok();
             }
 
@@ -578,7 +578,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
             var userId = result.Principal.Identity.GetUserId();
-            var args = _userManager.RaiseLogoutSuccessEvent(User, userId);
+            var args = _userManager.NotifyLogoutSuccess(User, userId);
             if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
             {
                 return new ObjectResult(new
@@ -603,7 +603,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var userDetail = _umbracoMapper.Map<UserDetail>(user);
             // update the userDetail and set their remaining seconds
-            userDetail.SecondsUntilTimeout = TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes).TotalSeconds;
+            userDetail.SecondsUntilTimeout = _globalSettings.TimeOut.TotalSeconds;
 
             return userDetail;
         }

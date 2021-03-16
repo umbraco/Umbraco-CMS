@@ -1,20 +1,20 @@
 LazyLoad.js([
     'lib/jquery/jquery.min.js',
 
-    'lib/angular/angular.js',
-    'lib/angular-cookies/angular-cookies.js',
-    'lib/angular-touch/angular-touch.js',
-    'lib/angular-sanitize/angular-sanitize.js',
-    'lib/angular-messages/angular-messages.js',
+    'lib/angular/angular.min.js',
+    'lib/angular-cookies/angular-cookies.min.js',
+    'lib/angular-touch/angular-touch.min.js',
+    'lib/angular-sanitize/angular-sanitize.min.js',
+    'lib/angular-messages/angular-messages.min.js',
     'lib/angular-aria/angular-aria.min.js',
     'lib/underscore/underscore-min.js',
-    'lib/angular-ui-sortable/sortable.js',
+    'lib/angular-ui-sortable/sortable.min.js',
 
-    'js/utilities.js',
+    'js/utilities.min.js',
 
-    'js/installer.app.js',
-    'js/umbraco.directives.js',
-    'js/umbraco.installer.js'
+    'js/installer.app.min.js',
+    'js/umbraco.directives.min.js',
+    'js/umbraco.installer.min.js'
 
 ], function () {
     jQuery(document).ready(function () {

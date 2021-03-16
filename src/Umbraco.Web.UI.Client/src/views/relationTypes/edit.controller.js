@@ -54,10 +54,13 @@ function RelationTypeEditController($scope, $routeParams, relationTypeResource, 
         });
 
         // load references when the 'relations' tab is first activated/switched to
-        eventsService.on("app.tabChange", function (event, args) {
+        var appTabChange =  eventsService.on("app.tabChange", function (event, args) {
             if (args.alias === "relations") {
                 loadRelations();
             }
+        });
+        $scope.$on('$destroy', function () {
+            appTabChange();
         });
 
         // Inital page/overview API call of relation type
