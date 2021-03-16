@@ -331,8 +331,6 @@ namespace Umbraco.Core.Runtime
             admin.Username = unattendedPassword.Trim();
 
             Current.Services.UserService.Save(admin);
-            //_userService.Save(admin);
-
 
             // Delete JSON file if it existed to tidy 
             if (fileExists)
