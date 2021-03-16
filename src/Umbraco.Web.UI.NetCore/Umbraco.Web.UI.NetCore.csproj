@@ -81,6 +81,7 @@
 
   <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
 
 </Project>
