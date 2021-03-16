@@ -39,7 +39,7 @@
     <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>
     <a ng-if="!sortingMode" hotkey="alt+shift+g" ng-click="addGroupToActiveTab()"></a>
 
-    <ul class="umb-group-builder__tabs" ui-sortable="sortableOptionsTab" ng-model="model.tabs">
+    <ul ng-if="(sortingMode && model.tabs.length > 0) || (!sortingMode)" class="umb-group-builder__tabs" ui-sortable="sortableOptionsTab" ng-model="model.tabs">
         <li ng-repeat="(tabIndex, tab) in model.tabs track by tab.id" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-id="{{tab.id}}" val-groups-in-tab="{ tab: tab, groups: model.groups }">
             <umb-content-type-tab
                 tab="tab"
