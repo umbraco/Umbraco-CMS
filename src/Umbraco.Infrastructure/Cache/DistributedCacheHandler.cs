@@ -1,7 +1,5 @@
 using System.Linq;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 

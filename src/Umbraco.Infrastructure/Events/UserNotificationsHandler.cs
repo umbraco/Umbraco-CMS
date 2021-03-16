@@ -211,7 +211,6 @@ namespace Umbraco.Cms.Core.Events
                                 }));
                 }
             }
-
         }
 
         public void Handle(AssignedUserGroupPermissionsNotification notification)
@@ -222,7 +221,6 @@ namespace Umbraco.Cms.Core.Events
                 return;
             }
             _notifier.Notify(_actions.GetAction<ActionRights>(), entities);
-
         }
 
         public void Handle(PublicAccessEntrySavedNotification notification)
