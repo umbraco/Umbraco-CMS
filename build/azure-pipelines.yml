@@ -265,7 +265,7 @@ stages:
                         if ($lastexitcode -ne 0){
                            throw ("Error installing DocFX")
                         }
-                        docfx metadata --loglevel Verbose "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                        docfx metadata --loglevel Verbose --shouldSkipMarkup --disableGitFeatures "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
                         if ($lastexitcode -ne 0){
                            throw ("Error generating docs.")
                         }
