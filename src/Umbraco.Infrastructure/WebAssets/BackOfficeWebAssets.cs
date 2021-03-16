@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
@@ -94,10 +94,15 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         private string[] GetScriptsForBackOfficeExtensions(IEnumerable<string> propertyEditorScripts)
         {
             var scripts = new HashSet<string>();
-            foreach (var script in _parser.Manifest.Scripts)
+            foreach (string script in _parser.Manifest.Scripts)
+            {
                 scripts.Add(script);
-            foreach (var script in propertyEditorScripts)
+            }
+
+            foreach (string script in propertyEditorScripts)
+            {
                 scripts.Add(script);
+            }
 
             return scripts.ToArray();
         }
@@ -120,10 +125,15 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         {
             var stylesheets = new HashSet<string>();
 
-            foreach (var script in _parser.Manifest.Stylesheets)
+            foreach (string script in _parser.Manifest.Stylesheets)
+            {
                 stylesheets.Add(script);
-            foreach (var stylesheet in propertyEditorStyles)
+            }
+
+            foreach (string stylesheet in propertyEditorStyles)
+            {
                 stylesheets.Add(stylesheet);
+            }
 
             return stylesheets.ToArray();
         }

@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Dazinator.Extensions.FileProviders.GlobPatternFilter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -219,9 +220,21 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Add runtime minifier support for Umbraco
         /// </summary>
-        public static IUmbracoBuilder AddRuntimeMinifier(this IUmbracoBuilder builder, IWebHostEnvironment webHostEnvironment)
+        public static IUmbracoBuilder AddRuntimeMinifier(this IUmbracoBuilder builder)
         {
-            var smidgePhysicalFileProvider = new SmidgePhysicalFileProvider(webHostEnvironment.ContentRootFileProvider, webHostEnvironment.WebRootFileProvider);
+            // Add custom ISmidgeFileProvider to include the additional App_Plugins location
+            // to load assets from.
+            builder.Services.AddSingleton<ISmidgeFileProvider>(f =>
+            {
+                IWebHostEnvironment hostEnv = f.GetRequiredService<IWebHostEnvironment>();
+
+                return new SmidgeFileProvider(
+                    hostEnv.WebRootFileProvider,
+                    new GlobPatternFilterFileProvider(
+                        hostEnv.ContentRootFileProvider,
+                        // only include js or css files within App_Plugins
+                        new[] { "App_Plugins/**/*.js", "App_Plugins/**/*.css" }));
+            });
             builder.Services.AddSmidge(builder.Config.GetSection(Constants.Configuration.ConfigRuntimeMinification));
             builder.Services.AddSmidgeNuglify();
 
@@ -416,28 +429,5 @@ namespace Umbraco.Extensions
             return new AspNetCoreHostingEnvironment(wrappedHostingSettings,wrappedWebRoutingSettings, webHostEnvironment);
         }
 
-        /// <summary>
-        /// This file provider lets us serve physical files to Smidge for minification from both wwwroot and App_Plugins (which is outside wwwroot).
-        /// This file provider is NOT intended for use anywhere else, as it exposes files from the content root.
-        /// </summary>
-        private class SmidgePhysicalFileProvider : IFileProvider
-        {
-            private readonly IFileProvider _contentRootFileProvider;
-            private readonly IFileProvider _webRooFileProvider;
-
-            public SmidgePhysicalFileProvider(IFileProvider contentRootFileProvider, IFileProvider webRooFileProvider)
-            {
-                _contentRootFileProvider = contentRootFileProvider;
-                _webRooFileProvider = webRooFileProvider;
-            }
-
-            public IFileInfo GetFileInfo(string subpath) => subpath.InvariantStartsWith(Constants.SystemDirectories.AppPlugins)
-                ? _contentRootFileProvider.GetFileInfo(subpath)
-                : _webRooFileProvider.GetFileInfo(subpath);
-
-            public IDirectoryContents GetDirectoryContents(string subpath) => throw new NotSupportedException();
-
-            public IChangeToken Watch(string filter) => throw new NotSupportedException();
-        }
     }
 }

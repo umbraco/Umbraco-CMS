@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
@@ -33,6 +33,8 @@
       <PackageReference Include="Smidge" Version="4.0.0-beta.*" />
       <PackageReference Include="Smidge.Nuglify" Version="4.0.0-beta.*" />
       <PackageReference Include="Smidge.InMemory" Version="4.0.0-beta.*" />
+      <PackageReference Include="Smidge.InMemory" Version="4.0.0-beta.*" />
+      <PackageReference Include="Dazinator.Extensions.FileProviders" Version="2.0.0" />
     </ItemGroup>
 
     <ItemGroup>

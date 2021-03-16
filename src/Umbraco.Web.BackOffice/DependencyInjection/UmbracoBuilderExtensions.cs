@@ -35,11 +35,11 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds all required components to run the Umbraco back office
         /// </summary>
-        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, IWebHostEnvironment webHostEnvironment) => builder
+        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder) => builder
                 .AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
-                .AddRuntimeMinifier(webHostEnvironment)
+                .AddRuntimeMinifier()
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
