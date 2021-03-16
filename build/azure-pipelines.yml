@@ -265,9 +265,13 @@ stages:
                         if ($lastexitcode -ne 0){
                            throw ("Error installing DocFX")
                         }
-                        docfx "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                        docfx metadata --loglevel Verbose "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
                         if ($lastexitcode -ne 0){
-                            throw ("Error generating docs.")
+                           throw ("Error generating docs.")
+                        }
+                        docfx build --loglevel Verbose "$(Build.SourcesDirectory)\src\ApiDocs\docfx.json"
+                        if ($lastexitcode -ne 0){
+                             throw ("Error generating docs.")
                         }
                       errorActionPreference: continue
                       workingDirectory: build
