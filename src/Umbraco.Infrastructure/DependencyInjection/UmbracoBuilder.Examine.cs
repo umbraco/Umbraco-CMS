@@ -1,25 +1,25 @@
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Infrastructure.Search
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     /// <summary>
-    /// Configures and installs Examine.
+    /// Provides extension methods to the <see cref="IUmbracoBuilder"/> class.
     /// </summary>
-    public sealed class ExamineComposer : ComponentComposer<ExamineComponent>, ICoreComposer
+    public static partial class UmbracoBuilderExtensions
     {
-        public override void Compose(IUmbracoBuilder builder)
+        public static IUmbracoBuilder AddExamine(this IUmbracoBuilder builder)
         {
-            base.Compose(builder);
-
             // populators are not a collection: one cannot remove ours, and can only add more
             // the container can inject IEnumerable<IIndexPopulator> and get them all
             builder.Services.AddSingleton<IIndexPopulator, MemberIndexPopulator>();
@@ -49,6 +49,15 @@ namespace Umbraco.Cms.Infrastructure.Search
             builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
             builder.Services.AddUnique<BackgroundIndexRebuilder>();
+
+            builder.AddNotificationHandler<UmbracoApplicationStarting, ExamineNotificationHandler>();
+            builder.AddNotificationHandler<ContentCacheRefresherNotification, ExamineNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ExamineNotificationHandler>();
+            builder.AddNotificationHandler<MediaCacheRefresherNotification, ExamineNotificationHandler>();
+            builder.AddNotificationHandler<MemberCacheRefresherNotification, ExamineNotificationHandler>();
+            builder.AddNotificationHandler<LanguageCacheRefresherNotification, ExamineNotificationHandler>();
+
+            return builder;
         }
     }
 }

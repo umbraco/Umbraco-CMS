@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
@@ -19,9 +19,11 @@ using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
+using Umbraco.Cms.Web.BackOffice.SignalR;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
+using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
 
 namespace Umbraco.Extensions
 {
@@ -33,11 +35,11 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds all required components to run the Umbraco back office
         /// </summary>
-        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder) => builder
+        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, IWebHostEnvironment webHostEnvironment) => builder
                 .AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
-                .AddRuntimeMinifier()
+                .AddRuntimeMinifier(webHostEnvironment)
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
@@ -50,7 +52,8 @@ namespace Umbraco.Extensions
                 .AddHostedServices()
                 .AddDistributedCache()
                 .AddModelsBuilderDashboard()
-                .AddUnattedInstallCreateUser();
+                .AddUnattedInstallCreateUser()
+                .AddExamine();
 
         /// <summary>
         /// Adds Umbraco back office authentication requirements
@@ -162,6 +165,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<ServerVariablesParser>();
             builder.Services.AddUnique<BackOfficeAreaRoutes>();
             builder.Services.AddUnique<PreviewRoutes>();
+            builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
             builder.Services.AddUnique<BackOfficeServerVariables>();
             builder.Services.AddScoped<BackOfficeSessionIdValidator>();
             builder.Services.AddScoped<BackOfficeSecurityStampValidator>();

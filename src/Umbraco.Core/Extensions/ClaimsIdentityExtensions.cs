@@ -101,6 +101,12 @@ namespace Umbraco.Extensions
         /// <returns>True if ClaimsIdentity</returns>
         public static bool VerifyBackOfficeIdentity(this ClaimsIdentity identity, out ClaimsIdentity verifiedIdentity)
         {
+            if (identity is null)
+            {
+                verifiedIdentity = null;
+                return false;
+            }
+
             // Validate that all required claims exist
             foreach (var claimType in RequiredBackOfficeClaimTypes)
             {
@@ -112,7 +118,7 @@ namespace Umbraco.Extensions
                 }
             }
 
-            verifiedIdentity = new ClaimsIdentity(identity.Claims, Constants.Security.BackOfficeAuthenticationType);
+            verifiedIdentity =  identity.AuthenticationType == Constants.Security.BackOfficeAuthenticationType ? identity : new ClaimsIdentity(identity.Claims, Constants.Security.BackOfficeAuthenticationType);
             return true;
         }
 

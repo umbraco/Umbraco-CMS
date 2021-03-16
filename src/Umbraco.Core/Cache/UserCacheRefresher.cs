@@ -1,18 +1,17 @@
-﻿using System;
+using System;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Repositories;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class UserCacheRefresher : CacheRefresherBase<UserCacheRefresher>
+    public sealed class UserCacheRefresher : CacheRefresherBase<UserCacheRefresherNotification>
     {
-        public UserCacheRefresher(AppCaches appCaches)
-            : base(appCaches)
+        public UserCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, eventAggregator, factory)
         { }
 
         #region Define
-
-        protected override UserCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("E057AF6D-2EE6-41F4-8045-3694010F0AA6");
 
@@ -47,7 +46,7 @@ namespace Umbraco.Cms.Core.Cache
                 userCache.Result.ClearByKey(CacheKeys.UserAllContentStartNodesPrefix + id);
                 userCache.Result.ClearByKey(CacheKeys.UserAllMediaStartNodesPrefix + id);
             }
-                
+
 
             base.Remove(id);
         }

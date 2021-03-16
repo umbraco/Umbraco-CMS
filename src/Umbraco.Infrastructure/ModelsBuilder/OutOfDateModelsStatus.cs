@@ -11,7 +11,8 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
     /// <summary>
     /// Used to track if ModelsBuilder models are out of date/stale
     /// </summary>
-    public sealed class OutOfDateModelsStatus : INotificationHandler<UmbracoApplicationStarting>
+    public sealed class OutOfDateModelsStatus : INotificationHandler<ContentTypeCacheRefresherNotification>,
+        INotificationHandler<DataTypeCacheRefresherNotification>
     {
         private readonly ModelsBuilderSettings _config;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -47,22 +48,6 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             }
         }
 
-        /// <summary>
-        /// Handles the <see cref="UmbracoApplicationStarting"/> notification
-        /// </summary>
-        public void Handle(UmbracoApplicationStarting notification) => Install();
-
-        private void Install()
-        {
-            // don't run if not configured
-            if (!IsEnabled)
-            {
-                return;
-            }
-
-            ContentTypeCacheRefresher.CacheUpdated += (sender, args) => Write();
-            DataTypeCacheRefresher.CacheUpdated += (sender, args) => Write();
-        }
 
         private string GetFlagPath()
         {
@@ -77,6 +62,12 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 
         private void Write()
         {
+            // don't run if not configured
+            if (!IsEnabled)
+            {
+                return;
+            }
+
             var path = GetFlagPath();
             if (path == null || File.Exists(path))
             {
@@ -101,5 +92,9 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 
             File.Delete(path);
         }
+
+        public void Handle(ContentTypeCacheRefresherNotification notification) => Write();
+
+        public void Handle(DataTypeCacheRefresherNotification notification) => Write();
     }
 }

@@ -1,38 +1,26 @@
 ﻿using System;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.SignalR;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Web.BackOffice.SignalR
 {
-    public class PreviewHubComponent : IComponent
+    public class PreviewHubUpdater :INotificationAsyncHandler<ContentCacheRefresherNotification>
     {
         private readonly Lazy<IHubContext<PreviewHub, IPreviewHub>> _hubContext;
 
         // using a lazy arg here means that we won't create the hub until necessary
         // and therefore we won't have too bad an impact on boot time
-        public PreviewHubComponent(Lazy<IHubContext<PreviewHub, IPreviewHub>> hubContext)
+        public PreviewHubUpdater(Lazy<IHubContext<PreviewHub, IPreviewHub>> hubContext)
         {
             _hubContext = hubContext;
         }
 
-        public void Initialize()
-        {
-            // ContentService.Saved is too soon - the content cache is not ready yet,
-            // so use the content cache refresher event, because when it triggers
-            // the cache has already been notified of the changes
 
-            ContentCacheRefresher.CacheUpdated += HandleCacheUpdated;
-        }
-
-        public void Terminate()
-        {
-            ContentCacheRefresher.CacheUpdated -= HandleCacheUpdated;
-        }
-
-        private async void HandleCacheUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
-        {
+        public async Task HandleAsync(ContentCacheRefresherNotification args, CancellationToken cancellationToken) {
             if (args.MessageType != MessageType.RefreshByPayload) return;
             var payloads = (ContentCacheRefresher.JsonPayload[])args.MessageObject;
             var hubContextInstance = _hubContext.Value;
