@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -22,6 +22,7 @@ namespace Umbraco.Cms.Core.Services.Implement
     {
         private readonly IPackageInstallation _packageInstallation;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IEventAggregator _eventAggregator;
         private readonly IAuditService _auditService;
         private readonly ICreatedPackagesRepository _createdPackages;
         private readonly IInstalledPackagesRepository _installedPackages;
@@ -32,13 +33,15 @@ namespace Umbraco.Cms.Core.Services.Implement
             ICreatedPackagesRepository createdPackages,
             IInstalledPackagesRepository installedPackages,
             IPackageInstallation packageInstallation,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IEventAggregator eventAggregator)
         {
             _auditService = auditService;
             _createdPackages = createdPackages;
             _installedPackages = installedPackages;
             _packageInstallation = packageInstallation;
             _hostingEnvironment = hostingEnvironment;
+            _eventAggregator = eventAggregator;
         }
 
         #region Package Files
@@ -168,7 +171,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
 
             // trigger the UninstalledPackage event
-            UninstalledPackage.RaiseEvent(new UninstallPackageEventArgs(allSummaries, false), this);
+            _eventAggregator.Publish(new UninstallPackageNotification(allSummaries));
 
             return summary;
         }
@@ -249,11 +252,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </summary>
         public static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
 
-        /// <summary>
-        /// Occurs after a package is uninstalled
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs> UninstalledPackage;
-
+       
         #endregion
 
 
