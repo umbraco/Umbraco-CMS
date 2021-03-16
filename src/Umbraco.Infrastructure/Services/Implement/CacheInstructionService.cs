@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 if (lastId == 0)
                 {
-                    var count = _cacheInstructionRepository.CountAll();
+                    var count = _cacheInstructionRepository.CountAll(scope);
 
                     // If there are instructions but we haven't synced, then a cold boot is necessary.
                     if (count > 0)
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 else
                 {
                     // If the last synced instruction is not found in the db, then a cold boot is necessary.
-                    if (!_cacheInstructionRepository.Exists(lastId))
+                    if (!_cacheInstructionRepository.Exists(scope, lastId))
                     {
                         return true;
                     }
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
                 // row so we will sum these numbers to get the actual count.
-                count = _cacheInstructionRepository.CountPendingInstructions(lastId);
+                count = _cacheInstructionRepository.CountPendingInstructions(scope, lastId);
                 return count > limit;
             }
         }
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                return _cacheInstructionRepository.GetMaxId();
+                return _cacheInstructionRepository.GetMaxId(scope);
             }
         }
 
@@ -108,7 +108,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                _cacheInstructionRepository.Add(entity);
+                _cacheInstructionRepository.Add(scope, entity);
                 scope.Complete();
             }
         }
@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 foreach (IEnumerable<RefreshInstruction> instructionsBatch in instructions.InGroupsOf(_globalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount))
                 {
                     CacheInstruction entity = CreateCacheInstruction(instructionsBatch, localIdentity);
-                    _cacheInstructionRepository.Add(entity);
+                    _cacheInstructionRepository.Add(scope, entity);
                 }
 
                 scope.Complete();
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (_profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var numberOfInstructionsProcessed = ProcessDatabaseInstructions(released, localIdentity, out int lastId);
+                var numberOfInstructionsProcessed = ProcessDatabaseInstructions(scope, released, localIdentity, out int lastId);
 
                 // Check for pruning throttling.
                 if (released || (DateTime.UtcNow - lastPruned) <= _globalSettings.DatabaseServerMessenger.TimeBetweenPruneOperations)
@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 {
                     case ServerRole.Single:
                     case ServerRole.Master:
-                        PruneOldInstructions();
+                        PruneOldInstructions(scope);
                         instructionsWerePruned = true;
                         break;
                 }
@@ -172,7 +172,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// </remarks>
         /// <returns>Number of instructions processed.</returns>
-        private int ProcessDatabaseInstructions(bool released, string localIdentity, out int lastId)
+        private int ProcessDatabaseInstructions(IScope scope, bool released, string localIdentity, out int lastId)
         {
             // NOTE:
             // We 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
@@ -200,7 +200,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             // some memory however we cannot do that because inside of this loop the cache refreshers are also
             // performing some lookups which cannot be done with an active reader open.
             lastId = 0;
-            foreach (CacheInstruction instruction in _cacheInstructionRepository.GetPendingInstructions(lastId, MaxInstructionsToRetrieve))
+            foreach (CacheInstruction instruction in _cacheInstructionRepository.GetPendingInstructions(scope, lastId, MaxInstructionsToRetrieve))
             {
                 // If this flag gets set it means we're shutting down! In this case, we need to exit asap and cannot
                 // continue processing anything otherwise we'll hold up the app domain shutdown.
@@ -443,10 +443,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// the site to cold boot if there's been no instruction activity for more than TimeToRetainInstructions.
         /// See: http://issues.umbraco.org/issue/U4-7643#comment=67-25085
         /// </remarks>
-        private void PruneOldInstructions()
+        private void PruneOldInstructions(IScope scope)
         {
             DateTime pruneDate = DateTime.UtcNow - _globalSettings.DatabaseServerMessenger.TimeToRetainInstructions;
-            _cacheInstructionRepository.DeleteInstructionsOlderThan(pruneDate);
+            _cacheInstructionRepository.DeleteInstructionsOlderThan(scope, pruneDate);
         }
     }
 }

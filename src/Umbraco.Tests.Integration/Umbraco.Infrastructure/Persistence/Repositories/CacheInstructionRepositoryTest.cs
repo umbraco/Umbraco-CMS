@@ -4,13 +4,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -32,16 +28,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             const int Count = 5;
 
-            IScopeProvider sp = ScopeProvider;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repo = new CacheInstructionRepository((IScopeAccessor)sp);
+                var repo = new CacheInstructionRepository();
                 for (var i = 0; i < Count; i++)
                 {
-                    repo.Add(new CacheInstruction(0, _date, Instructions, OriginIdentiy, InstructionCount));
+                    repo.Add(scope, new CacheInstruction(0, _date, Instructions, OriginIdentiy, InstructionCount));
                 }
 
-                var count = repo.CountAll();
+                var count = repo.CountAll(scope);
 
                 Assert.That(count, Is.EqualTo(Count));
             }
@@ -50,16 +45,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Count_Pending_Instructions()
         {
-            IScopeProvider sp = ScopeProvider;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repo = new CacheInstructionRepository((IScopeAccessor)sp);
+                var repo = new CacheInstructionRepository();
                 for (var i = 0; i < 5; i++)
                 {
-                    repo.Add(new CacheInstruction(0, _date, Instructions, OriginIdentiy, InstructionCount));
+                    repo.Add(scope, new CacheInstruction(0, _date, Instructions, OriginIdentiy, InstructionCount));
                 }
 
-                var count = repo.CountPendingInstructions(2);
+                var count = repo.CountPendingInstructions(scope, 2);
 
                 Assert.That(count, Is.EqualTo(3));
             }
@@ -68,16 +62,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Check_Exists()
         {
-            IScopeProvider sp = ScopeProvider;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repo = new CacheInstructionRepository((IScopeAccessor)sp);
+                var repo = new CacheInstructionRepository();
 
-                var existsBefore = repo.Exists(1);
+                var existsBefore = repo.Exists(scope, 1);
 
-                repo.Add(new CacheInstruction(0, _date, Instructions, OriginIdentiy, InstructionCount));
+                repo.Add(scope, new CacheInstruction(0, _date, Instructions, OriginIdentiy, InstructionCount));
 
-                var existsAfter = repo.Exists(1);
+                var existsAfter = repo.Exists(scope, 1);
 
                 Assert.That(existsBefore, Is.False);
                 Assert.That(existsAfter, Is.True);
@@ -92,11 +85,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             var date = new DateTime(2021, 7, 3, 10, 30, 0);
             const int InstructionCount = 1;
 
-            IScopeProvider sp = ScopeProvider;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repo = new CacheInstructionRepository((IScopeAccessor)sp);
-                repo.Add(new CacheInstruction(0, date, Instructions, OriginIdentiy, InstructionCount));
+                var repo = new CacheInstructionRepository();
+                repo.Add(scope, new CacheInstruction(0, date, Instructions, OriginIdentiy, InstructionCount));
 
                 List<CacheInstructionDto> dtos = scope.Database.Fetch<CacheInstructionDto>("WHERE id > -1");
 
@@ -113,16 +105,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Get_Pending_Instructions()
         {
-            IScopeProvider sp = ScopeProvider;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repo = new CacheInstructionRepository((IScopeAccessor)sp);
+                var repo = new CacheInstructionRepository();
                 for (var i = 0; i < 5; i++)
                 {
-                    repo.Add(new CacheInstruction(0, _date, Instructions, OriginIdentiy, InstructionCount));
+                    repo.Add(scope, new CacheInstruction(0, _date, Instructions, OriginIdentiy, InstructionCount));
                 }
 
-                IEnumerable<CacheInstruction> instructions = repo.GetPendingInstructions(2, 2);
+                IEnumerable<CacheInstruction> instructions = repo.GetPendingInstructions(scope, 2, 2);
 
                 Assert.That(instructions.Count(), Is.EqualTo(2));
 
@@ -133,19 +124,18 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void Can_Delete_Old_Instructions()
         {
-            IScopeProvider sp = ScopeProvider;
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repo = new CacheInstructionRepository((IScopeAccessor)sp);
+                var repo = new CacheInstructionRepository();
                 for (var i = 0; i < 5; i++)
                 {
                     DateTime date = i == 0 ? DateTime.UtcNow.AddDays(-2) : DateTime.UtcNow;
-                    repo.Add(new CacheInstruction(0, date, Instructions, OriginIdentiy, InstructionCount));
+                    repo.Add(scope, new CacheInstruction(0, date, Instructions, OriginIdentiy, InstructionCount));
                 }
 
-                repo.DeleteInstructionsOlderThan(DateTime.UtcNow.AddDays(-1));
+                repo.DeleteInstructionsOlderThan(scope, DateTime.UtcNow.AddDays(-1));
 
-                var count = repo.CountAll();
+                var count = repo.CountAll(scope);
                 Assert.That(count, Is.EqualTo(4));  // 5 have been added, 1 is older and deleted.
             }
         }
