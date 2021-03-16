@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
