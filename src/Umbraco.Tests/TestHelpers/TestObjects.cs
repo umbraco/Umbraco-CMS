@@ -8,6 +8,7 @@ using NPoco;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -86,7 +87,8 @@ namespace Umbraco.Tests.TestHelpers
             fileSystems ??= new FileSystems(Current.Factory, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, TestHelper.IOHelper, globalSettings, TestHelper.GetHostingEnvironment());
             var coreDebug = TestHelper.CoreDebugSettings;
             var mediaFileSystem = Mock.Of<IMediaFileSystem>();
-            return new ScopeProvider(databaseFactory, fileSystems, Options.Create(coreDebugSettings), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance);
+            var eventAggregator = Mock.Of<IEventAggregator>();
+            return new ScopeProvider(databaseFactory, fileSystems, Options.Create(coreDebugSettings), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance, eventAggregator);
         }
 
     }

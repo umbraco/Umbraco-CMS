@@ -7,7 +7,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Compose;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void Cannot_Have_Null_Udi()
         {
-            var component = new BlockEditorComponent();
+            var component = new BlockEditorPropertyHandler();
             var json = GetBlockListJson(null, string.Empty);
             Assert.Throws<FormatException>(() => component.ReplaceBlockListUdis(json));
         }
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 
             var expected = ReplaceGuids(json, guids, ContentGuid1, ContentGuid2, SettingsGuid1);
 
-            var component = new BlockEditorComponent();
+            var component = new BlockEditorPropertyHandler();
             var result = component.ReplaceBlockListUdis(json, GuidFactory);
 
             var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
             // get the json with the subFeatures as escaped
             var json = GetBlockListJson(innerJsonEscaped);
 
-            var component = new BlockEditorComponent();
+            var component = new BlockEditorPropertyHandler();
             var result = component.ReplaceBlockListUdis(json, GuidFactory);
 
             // the expected result is that the subFeatures data is no longer escaped
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 SubContentGuid2,
                 SubSettingsGuid1);
 
-            var component = new BlockEditorComponent();
+            var component = new BlockEditorPropertyHandler();
             var result = component.ReplaceBlockListUdis(json, GuidFactory);
 
             var expectedJson = JsonConvert.SerializeObject(JsonConvert.DeserializeObject(expected, _serializerSettings), _serializerSettings);
@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 
             var json = GetBlockListJson(complexEditorJsonEscaped);
 
-            var component = new BlockEditorComponent();
+            var component = new BlockEditorPropertyHandler();
             var result = component.ReplaceBlockListUdis(json, GuidFactory);
 
             // the expected result is that the subFeatures data is no longer escaped
