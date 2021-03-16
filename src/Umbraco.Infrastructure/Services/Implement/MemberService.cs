@@ -777,7 +777,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var savingNotification = new SavingNotification<IMember>(member, evtMsgs);
+                var savingNotification = new MemberSavingNotification(member, evtMsgs);
                 if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
@@ -795,7 +795,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    scope.Notifications.Publish(new SavedNotification<IMember>(member, evtMsgs).WithStateFrom(savingNotification));
+                    scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
                 }
 
                 Audit(AuditType.Save, 0, member.Id);
@@ -813,7 +813,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var savingNotification = new SavingNotification<IMember>(membersA, evtMsgs);
+                var savingNotification = new MemberSavingNotification(membersA, evtMsgs);
                 if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
@@ -833,7 +833,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    scope.Notifications.Publish(new SavedNotification<IMember>(membersA, evtMsgs).WithStateFrom(savingNotification));
+                    scope.Notifications.Publish(new MemberSavedNotification(membersA, evtMsgs).WithStateFrom(savingNotification));
                 }
                 Audit(AuditType.Save, 0, -1, "Save multiple Members");
 
@@ -855,7 +855,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var deletingNotification = new DeletingNotification<IMember>(member, evtMsgs);
+                var deletingNotification = new MemberDeletingNotification(member, evtMsgs);
                 if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
@@ -874,7 +874,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             // a member has no descendants
             _memberRepository.Delete(member);
-            scope.Notifications.Publish(new DeletedNotification<IMember>(member, evtMsgs).WithState(notificationState));
+            scope.Notifications.Publish(new MemberDeletedNotification(member, evtMsgs).WithState(notificationState));
 
             // media files deleted by QueuingEventDispatcher
         }
@@ -1165,7 +1165,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 IMember[] members = _memberRepository.Get(query).ToArray();
 
-                if (scope.Notifications.PublishCancelable(new DeletingNotification<IMember>(members, evtMsgs)))
+                if (scope.Notifications.PublishCancelable(new MemberDeletingNotification(members, evtMsgs)))
                 {
                     scope.Complete();
                     return;

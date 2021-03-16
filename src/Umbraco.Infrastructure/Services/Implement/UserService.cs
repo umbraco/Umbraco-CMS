@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     IsApproved = isApproved
                 };
 
-                var savingNotification = new SavingNotification<IUser>(user, evtMsgs);
+                var savingNotification = new UserSavingNotification(user, evtMsgs);
                 if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _userRepository.Save(user);
 
-                scope.Notifications.Publish(new SavedNotification<IUser>(user, evtMsgs).WithStateFrom(savingNotification));
+                scope.Notifications.Publish(new UserSavedNotification(user, evtMsgs).WithStateFrom(savingNotification));
                 scope.Complete();
             }
 
@@ -245,7 +245,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var deletingNotification = new DeletingNotification<IUser>(user, evtMsgs);
+                    var deletingNotification = new UserDeletingNotification(user, evtMsgs);
                     if (scope.Notifications.PublishCancelable(deletingNotification))
                     {
                         scope.Complete();
@@ -254,7 +254,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                     _userRepository.Delete(user);
 
-                    scope.Notifications.Publish(new DeletedNotification<IUser>(user, evtMsgs).WithStateFrom(deletingNotification));
+                    scope.Notifications.Publish(new UserDeletedNotification(user, evtMsgs).WithStateFrom(deletingNotification));
                     scope.Complete();
                 }
             }
@@ -279,7 +279,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var savingNotification = new SavingNotification<IUser>(entity, evtMsgs);
+                var savingNotification = new UserSavingNotification(entity, evtMsgs);
                 if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
@@ -297,7 +297,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _userRepository.Save(entity);
                     if (raiseEvents)
                     {
-                        scope.Notifications.Publish(new SavedNotification<IUser>(entity, evtMsgs).WithStateFrom(savingNotification));
+                        scope.Notifications.Publish(new UserSavedNotification(entity, evtMsgs).WithStateFrom(savingNotification));
                     }
 
                     scope.Complete();
@@ -329,7 +329,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var savingNotification = new SavingNotification<IUser>(entitiesA, evtMsgs);
+                var savingNotification = new UserSavingNotification(entitiesA, evtMsgs);
                 if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
@@ -350,7 +350,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    scope.Notifications.Publish(new SavedNotification<IUser>(entitiesA, evtMsgs).WithStateFrom(savingNotification));
+                    scope.Notifications.Publish(new UserSavedNotification(entitiesA, evtMsgs).WithStateFrom(savingNotification));
                 }
 
                 //commit the whole lot in one go
@@ -840,7 +840,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var userGroupWithUsers = new UserGroupWithUsers(userGroup, addedUsers, removedUsers);
 
                 // this is the default/expected notification for the IUserGroup entity being saved
-                var savingNotification = new SavingNotification<IUserGroup>(userGroup, evtMsgs);
+                var savingNotification = new UserGroupSavingNotification(userGroup, evtMsgs);
                 if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
@@ -848,7 +848,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
 
                 // this is an additional notification for special auditing
-                var savingUserGroupWithUsersNotification = new SavingNotification<UserGroupWithUsers>(userGroupWithUsers, evtMsgs);
+                var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, evtMsgs);
                 if (raiseEvents && scope.Notifications.PublishCancelable(savingUserGroupWithUsersNotification))
                 {
                     scope.Complete();
@@ -859,8 +859,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    scope.Notifications.Publish(new SavedNotification<IUserGroup>(userGroup, evtMsgs).WithStateFrom(savingNotification));
-                    scope.Notifications.Publish(new SavedNotification<UserGroupWithUsers>(userGroupWithUsers, evtMsgs).WithStateFrom(savingUserGroupWithUsersNotification));
+                    scope.Notifications.Publish(new UserGroupSavedNotification(userGroup, evtMsgs).WithStateFrom(savingNotification));
+                    scope.Notifications.Publish(new UserGroupWithUsersSavedNotification(userGroupWithUsers, evtMsgs).WithStateFrom(savingUserGroupWithUsersNotification));
                 }
 
                 scope.Complete();
@@ -877,7 +877,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var deletingNotification = new DeletingNotification<IUserGroup>(userGroup, evtMsgs);
+                var deletingNotification = new UserGroupDeletingNotification(userGroup, evtMsgs);
                 if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
@@ -886,7 +886,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _userGroupRepository.Delete(userGroup);
 
-                scope.Notifications.Publish(new DeletedNotification<IUserGroup>(userGroup, evtMsgs).WithStateFrom(deletingNotification));
+                scope.Notifications.Publish(new UserGroupDeletedNotification(userGroup, evtMsgs).WithStateFrom(deletingNotification));
 
                 scope.Complete();
             }

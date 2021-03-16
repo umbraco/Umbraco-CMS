@@ -8,24 +8,24 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Cache
 {
     internal class DistributedCacheHandler :
-        INotificationHandler<SavedNotification<IMember>>,
-        INotificationHandler<DeletedNotification<IMember>>,
-        INotificationHandler<SavedNotification<IUser>>,
-        INotificationHandler<DeletedNotification<IUser>>,
-        INotificationHandler<SavedNotification<IUserGroup>>,
-        INotificationHandler<DeletedNotification<IUserGroup>>,
-        INotificationHandler<SavedNotification<PublicAccessEntry>>,
-        INotificationHandler<DeletedNotification<PublicAccessEntry>>
+        INotificationHandler<MemberSavedNotification>,
+        INotificationHandler<MemberDeletedNotification>,
+        INotificationHandler<UserSavedNotification>,
+        INotificationHandler<UserDeletedNotification>,
+        INotificationHandler<UserGroupSavedNotification>,
+        INotificationHandler<UserGroupDeletedNotification>,
+        INotificationHandler<PublicAccessEntrySavedNotification>,
+        INotificationHandler<PublicAccessEntryDeletedNotification>
     {
         private readonly DistributedCache _distributedCache;
 
         public DistributedCacheHandler(DistributedCache distributedCache) => _distributedCache = distributedCache;
 
-        public void Handle(SavedNotification<IMember> notification) => _distributedCache.RefreshMemberCache(notification.SavedEntities.ToArray());
+        public void Handle(MemberSavedNotification notification) => _distributedCache.RefreshMemberCache(notification.SavedEntities.ToArray());
 
-        public void Handle(DeletedNotification<IMember> notification) => _distributedCache.RemoveMemberCache(notification.DeletedEntities.ToArray());
+        public void Handle(MemberDeletedNotification notification) => _distributedCache.RemoveMemberCache(notification.DeletedEntities.ToArray());
 
-        public void Handle(SavedNotification<IUser> notification)
+        public void Handle(UserSavedNotification notification)
         {
             foreach (var entity in notification.SavedEntities)
             {
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Cache
             }
         }
 
-        public void Handle(DeletedNotification<IUser> notification)
+        public void Handle(UserDeletedNotification notification)
         {
             foreach (var entity in notification.DeletedEntities)
             {
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Core.Cache
             }
         }
 
-        public void Handle(SavedNotification<IUserGroup> notification)
+        public void Handle(UserGroupSavedNotification notification)
         {
             foreach (var entity in notification.SavedEntities)
             {
@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Cache
             }
         }
 
-        public void Handle(DeletedNotification<IUserGroup> notification)
+        public void Handle(UserGroupDeletedNotification notification)
         {
             foreach (var entity in notification.DeletedEntities)
             {
@@ -57,8 +57,8 @@ namespace Umbraco.Cms.Core.Cache
             }
         }
 
-        public void Handle(SavedNotification<PublicAccessEntry> notification) => _distributedCache.RefreshPublicAccess();
+        public void Handle(PublicAccessEntrySavedNotification notification) => _distributedCache.RefreshPublicAccess();
 
-        public void Handle(DeletedNotification<PublicAccessEntry> notification) => _distributedCache.RefreshPublicAccess();
+        public void Handle(PublicAccessEntryDeletedNotification notification) => _distributedCache.RefreshPublicAccess();
     }
 }

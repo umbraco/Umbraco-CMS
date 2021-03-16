@@ -15,14 +15,14 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Compose
 {
     public sealed class AuditNotificationsHandler :
-        INotificationHandler<SavedNotification<IMember>>,
-        INotificationHandler<DeletedNotification<IMember>>,
+        INotificationHandler<MemberSavedNotification>,
+        INotificationHandler<MemberDeletedNotification>,
         INotificationHandler<AssignedMemberRolesNotification>,
         INotificationHandler<RemovedMemberRolesNotification>,
         INotificationHandler<ExportedMemberNotification>,
-        INotificationHandler<SavedNotification<IUser>>,
-        INotificationHandler<DeletedNotification<IUser>>,
-        INotificationHandler<SavedNotification<UserGroupWithUsers>>,
+        INotificationHandler<UserSavedNotification>,
+        INotificationHandler<UserDeletedNotification>,
+        INotificationHandler<UserGroupWithUsersSavedNotification>,
         INotificationHandler<AssignedUserGroupPermissionsNotification>
     {
         private readonly IAuditService _auditService;
@@ -69,7 +69,7 @@ namespace Umbraco.Cms.Core.Compose
 
         private string FormatEmail(IUser user) => user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? "" : $"<{user.Email}>";
 
-        public void Handle(SavedNotification<IMember> notification)
+        public void Handle(MemberSavedNotification notification)
         {
             var performingUser = CurrentPerformingUser;
             var members = notification.SavedEntities;
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.Compose
             }
         }
 
-        public void Handle(DeletedNotification<IMember> notification)
+        public void Handle(MemberDeletedNotification notification)
         {
             var performingUser = CurrentPerformingUser;
             var members = notification.DeletedEntities;
@@ -138,7 +138,7 @@ namespace Umbraco.Cms.Core.Compose
                 "umbraco/member/exported", "exported member data");
         }
 
-        public void Handle(SavedNotification<IUser> notification)
+        public void Handle(UserSavedNotification notification)
         {
             var performingUser = CurrentPerformingUser;
             var affectedUsers = notification.SavedEntities;
@@ -157,7 +157,7 @@ namespace Umbraco.Cms.Core.Compose
             }
         }
 
-        public void Handle(DeletedNotification<IUser> notification)
+        public void Handle(UserDeletedNotification notification)
         {
             var performingUser = CurrentPerformingUser;
             var affectedUsers = notification.DeletedEntities;
@@ -168,7 +168,7 @@ namespace Umbraco.Cms.Core.Compose
                     "umbraco/user/delete", "delete user");
         }
 
-        public void Handle(SavedNotification<UserGroupWithUsers> notification)
+        public void Handle(UserGroupWithUsersSavedNotification notification)
         {
             var performingUser = CurrentPerformingUser;
             foreach (var groupWithUser in notification.SavedEntities)

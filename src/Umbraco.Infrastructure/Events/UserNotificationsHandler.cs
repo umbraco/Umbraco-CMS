@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Events
         INotificationHandler<ContentSentToPublishNotification>,
         INotificationHandler<ContentUnpublishedNotification>,
         INotificationHandler<AssignedUserGroupPermissionsNotification>,
-        INotificationHandler<SavedNotification<PublicAccessEntry>>
+        INotificationHandler<PublicAccessEntrySavedNotification>
     {
         private readonly Notifier _notifier;
         private readonly ActionCollection _actions;
@@ -225,7 +225,7 @@ namespace Umbraco.Cms.Core.Events
 
         }
 
-        public void Handle(SavedNotification<PublicAccessEntry> notification)
+        public void Handle(PublicAccessEntrySavedNotification notification)
         {
             var entities = _contentService.GetByIds(notification.SavedEntities.Select(e => e.ProtectedNodeId)).ToArray();
             if (entities.Any() == false)

@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
         INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
-        INotificationHandler<DeletedNotification<IMember>>
+        INotificationHandler<MemberDeletedNotification>
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ContentSettings _contentSettings;
@@ -216,7 +216,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
-        public void Handle(DeletedNotification<IMember> notification) => DeleteContainedFiles(notification.DeletedEntities);
+        public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
         private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
         {
