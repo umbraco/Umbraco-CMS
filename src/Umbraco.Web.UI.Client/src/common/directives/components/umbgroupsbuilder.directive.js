@@ -453,12 +453,17 @@
                 };
 
                 scope.model.groups = [...scope.model.groups, group];
+
+                scope.activateGroup(group);
             };
 
             scope.activateGroup = function (selectedGroup) {
+                if (!selectedGroup) {
+                    return;
+                }
 
                 // set all other groups that are inactive to active
-                angular.forEach(scope.model.groups, function (group) {
+                scope.model.groups.forEach(group => {
                     // skip init tab
                     if (group.tabState !== "init") {
                         group.tabState = "inActive";
@@ -466,7 +471,6 @@
                 });
 
                 selectedGroup.tabState = "active";
-
             };
 
             scope.canRemoveGroup = function (group) {
@@ -475,6 +479,10 @@
 
             scope.removeGroup = function (groupIndex) {
                 scope.model.groups.splice(groupIndex, 1);
+            };
+
+            scope.addGroupToActiveTab = function () {
+                scope.addGroup(scope.openTabId);
             };
 
             scope.changeSortOrderValue = function (group) {
@@ -487,23 +495,15 @@
             };
 
             /* ---------- PROPERTIES ---------- */
-
             scope.addPropertyToActiveGroup = function () {
-                var group = _.find(scope.model.groups, group => group.tabState === "active");
-                if (!group && scope.model.groups.length) {
-                    group = scope.model.groups[0];
+                let activeGroup = scope.model.groups.find(group => group.tabState === "active");
+
+                if (!activeGroup && scope.model.groups.length) {
+                    activeGroup = scope.model.groups[0];
                 }
 
-                if (!group || !group.name) {
-                    return;
-                }
-
-                var property = _.find(group.properties, property => property.propertyState === "init");
-                if (!property) {
-                    return;
-                }
-                scope.addProperty(property, group);
-            }
+                scope.addNewProperty(activeGroup);
+            };
 
             scope.addProperty = function (property, group) {
 

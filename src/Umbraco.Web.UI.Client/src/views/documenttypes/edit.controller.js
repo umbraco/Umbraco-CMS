@@ -50,6 +50,7 @@
             "treeHeaders_templates",
             "main_sections",
             "shortcuts_navigateSections",
+            "shortcuts_addTab",
             "shortcuts_addGroup",
             "shortcuts_addProperty",
             "defaultdialogs_selectEditor",
@@ -86,15 +87,16 @@
             // keyboard shortcuts
             vm.labels.sections = values[4];
             vm.labels.navigateSections = values[5];
-            vm.labels.addGroup = values[6];
-            vm.labels.addProperty = values[7];
-            vm.labels.addEditor = values[8];
-            vm.labels.editDataType = values[9];
-            vm.labels.toggleListView = values[10];
-            vm.labels.allowAsRoot = values[11];
-            vm.labels.addChildNode = values[12];
-            vm.labels.addTemplate = values[13];
-            vm.labels.allowCultureVariants = values[14];
+            vm.labels.addTab = values[6]
+            vm.labels.addGroup = values[7];
+            vm.labels.addProperty = values[8];
+            vm.labels.addEditor = values[9];
+            vm.labels.editDataType = values[10];
+            vm.labels.toggleListView = values[11];
+            vm.labels.allowAsRoot = values[12];
+            vm.labels.addChildNode = values[13];
+            vm.labels.addTemplate = values[14];
+            vm.labels.allowCultureVariants = values[15];
 
             vm.page.keyboardShortcutsOverview = [
                 {
@@ -110,6 +112,10 @@
                 {
                     "name": vm.labels.design,
                     "shortcuts": [
+                        {
+                            "description": vm.labels.addTab,
+                            "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "a" }]
+                        },
                         {
                             "description": vm.labels.addGroup,
                             "keys": [{ "key": "alt" }, { "key": "shift" }, { "key": "g" }]

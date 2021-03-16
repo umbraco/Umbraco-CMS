@@ -16,6 +16,7 @@
     vm.togglePrompt = togglePrompt;
     vm.hidePrompt = hidePrompt;
     vm.whenNameFocus = whenNameFocus;
+    vm.whenFocus = whenFocus;
 
     function togglePrompt () {
       vm.removePromptIsVisible = !vm.removePromptIsVisible;
@@ -43,6 +44,12 @@
         vm.onNameFocus();
       }
     }
+
+    function whenFocus () {
+      if (vm.onFocus) {
+        vm.onFocus();
+      }
+    }
   }
 
   const umbContentTypeGroupComponent = {
@@ -57,7 +64,8 @@
       onRemove: '&',
       sorting: '<',
       nameValServerField: '@',
-      onNameFocus: '&'
+      onNameFocus: '&',
+      onFocus: '&'
     },
     controller: umbContentTypeGroupController
   };

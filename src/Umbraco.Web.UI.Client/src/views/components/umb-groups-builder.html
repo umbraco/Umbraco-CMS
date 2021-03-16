@@ -37,6 +37,7 @@
     </div>
 
     <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>
+    <a ng-if="!sortingMode" hotkey="alt+shift+g" ng-click="addGroupToActiveTab()"></a>
 
     <!-- WITH TABS --->
     <div ng-if="model.hasTabs">
@@ -55,7 +56,6 @@
                             <i class="umb-group-builder__tab-title-icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
                             <ng-form name="tabNameForm" data-element="group-name">
                                 <div class="umb-group-builder__tab-name" ng-if="tab.inherited || sortingMode">{{ tab.name }}</div>
-                                <!-- ng-focus="activateGroup(tab)" -->
                                 <input
                                     ng-if="!tab.inherited && !sortingMode"
                                     class="umb-group-builder__group-title-input"
@@ -107,7 +107,7 @@
                 </div>
             </li>
             <li>
-                <button ng-if="!sortingMode" type="button" hotkey="alt+shift+t" ng-click="addTab(tab)" data-element="group-add" class="btn-reset umb-group-builder__tab umb-group-builder__tab--placeholder">
+                <button ng-if="!sortingMode" type="button" hotkey="alt+shift+a" ng-click="addTab(tab)" data-element="group-add" class="btn-reset umb-group-builder__tab umb-group-builder__tab--placeholder">
                     Add tab
                 </button>
             </li>
@@ -117,6 +117,7 @@
             <div ng-repeat="(groupIndex, group) in model.groups track by group.id" ng-show="group.tabId === openTabId" ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}" data-group-id="{{group.id}}">
                 <umb-content-type-group
                     ng-if="group.tabState !== 'init'"
+                    on-focus="activateGroup(group)"
                     allow-name="true"
                     group="group"
                     allow-remove="!sortingMode"
@@ -137,19 +138,24 @@
                             </umb-content-type-property>
                         </li>
                     </ul>
-
-                    <umb-content-type-property-placeholder
-                        ng-if="!sortingMode"
-                        on-click="addNewProperty(group, group.id)">
-                    </umb-content-type-property-placeholder>
+                    <button 
+                        type="button"
+                        data-element="property-add"
+                        class="umb-group-builder__group-add-property"
+                        ng-click="addNewProperty(group, group.id)">
+                        <localize key="contentTypeEditor_addProperty"></localize>
+                    </button>
                 </umb-content-type-group>
             </div>
         </div>
-        <umb-content-type-group-placeholder
+        <button
             ng-if="!sortingMode"
-            on-click="addGroup(openTabId)">
+            type="button"
+            class="umb-group-builder__group -placeholder"
+            ng-click="addGroup(openTabId)"
+            data-element="group-add">
             <localize key="contentTypeEditor_addGroup"></localize>
-        </umb-content-type-group-placeholder>
+        </button>
     </div>
 
     <!-- WITHOUT TABS -->

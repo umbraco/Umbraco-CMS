@@ -1,4 +1,4 @@
-<div class="umb-group-builder__group" ng-class="{'-inherited': vm.group.inherited, 'umb-group-builder__group-handle -sortable': vm.sorting && !vm.group.inherited}">
+<div class="umb-group-builder__group" ng-class="{'-inherited': vm.group.inherited, 'umb-group-builder__group-handle -sortable': vm.sorting && !vm.group.inherited}" tabindex="0" ng-focus="vm.whenFocus()">
     <ng-form name="groupForm{{vm.group.id}}">
         <div class="umb-group-builder__group-title-wrapper" ng-if="vm.allowName">
 
