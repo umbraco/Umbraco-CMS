@@ -73,16 +73,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public void Save(IIdentityUserLogin login)
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                _externalLoginRepository.Save(login);
-                scope.Complete();
-            }
-        }
-
-        /// <inheritdoc />
         public void DeleteUserLogins(int userId)
         {
             using (var scope = ScopeProvider.CreateScope())

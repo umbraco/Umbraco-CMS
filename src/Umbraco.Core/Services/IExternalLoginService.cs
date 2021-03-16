@@ -56,12 +56,6 @@ namespace Umbraco.Cms.Core.Services
         void Save(int userId, IEnumerable<IExternalLoginToken> tokens);
 
         /// <summary>
-        /// Save a single external login record
-        /// </summary>
-        /// <param name="login"></param>
-        void Save(IIdentityUserLogin login); // TODO: This is unused apart from tests, perhaps remove it?
-
-        /// <summary>
         /// Deletes all user logins - normally used when a member is deleted
         /// </summary>
         /// <param name="userId"></param>

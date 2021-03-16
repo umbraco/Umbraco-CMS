@@ -2,14 +2,13 @@
 // See LICENSE for more details.
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.Identity;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -22,13 +21,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
     {
         private IUserService UserService => GetRequiredService<IUserService>();
 
-        private IExternalLoginService ExternalLoginService => GetRequiredService<IExternalLoginService>();
+        private IExternalLoginService ExternalLoginService => (IExternalLoginService)GetRequiredService<IExternalLoginService>();
 
         [Test]
         [Ignore("We don't support duplicates anymore, this removing on save was a breaking change work around, this needs to be ported to a migration")]
         public void Removes_Existing_Duplicates_On_Save()
         {
-            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
+            var user = new UserBuilder().Build();
             UserService.Save(user);
 
             string providerKey = Guid.NewGuid().ToString("N");
@@ -76,7 +75,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Does_Not_Persist_Duplicates()
         {
-            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
+            var user = new UserBuilder().Build();
             UserService.Save(user);
 
             string providerKey = Guid.NewGuid().ToString("N");
@@ -93,48 +92,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
-        public void Single_Create()
-        {
-            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
-            UserService.Save(user);
-
-            var extLogin = new IdentityUserLogin("test1", Guid.NewGuid().ToString("N"), user.Id.ToString())
-            {
-                UserData = "hello"
-            };
-            ExternalLoginService.Save(extLogin);
-
-            IEnumerable<IIdentityUserLogin> found = ExternalLoginService.GetExternalLogins(user.Id);
-
-            Assert.AreEqual(1, found.Count());
-            Assert.IsTrue(extLogin.HasIdentity);
-            Assert.IsTrue(extLogin.Id > 0);
-        }
-
-        [Test]
-        public void Single_Update()
-        {
-            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
-            UserService.Save(user);
-
-            var extLogin = new IdentityUserLogin("test1", Guid.NewGuid().ToString("N"), user.Id.ToString())
-            {
-                UserData = "hello"
-            };
-            ExternalLoginService.Save(extLogin);
-
-            extLogin.UserData = "world";
-            ExternalLoginService.Save(extLogin);
-
-            var found = ExternalLoginService.GetExternalLogins(user.Id).ToList();
-            Assert.AreEqual(1, found.Count);
-            Assert.AreEqual("world", found[0].UserData);
-        }
-
-        [Test]
         public void Multiple_Update()
         {
-            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
+            var user = new UserBuilder().Build();
             UserService.Save(user);
 
             string providerKey1 = Guid.NewGuid().ToString("N");
@@ -162,7 +122,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Can_Find_As_Extended_Type()
         {
-            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
+            var user = new UserBuilder().Build();
             UserService.Save(user);
 
             string providerKey1 = Guid.NewGuid().ToString("N");
@@ -183,7 +143,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Add_Logins()
         {
-            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
+            var user = new UserBuilder().Build();
             UserService.Save(user);
 
             ExternalLogin[] externalLogins = new[]
@@ -206,7 +166,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Add_Tokens()
         {
-            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
+            var user = new UserBuilder().Build();
             UserService.Save(user);
 
             ExternalLogin[] externalLogins = new[]
@@ -231,7 +191,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Add_Update_Delete_Logins()
         {
-            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
+            var user = new UserBuilder().Build();
             UserService.Save(user);
 
             ExternalLogin[] externalLogins = new[]
@@ -265,7 +225,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Add_Update_Delete_Tokens()
         {
-            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
+            var user = new UserBuilder().Build();
             UserService.Save(user);
 
             ExternalLogin[] externalLogins = new[]
@@ -308,7 +268,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Add_Retrieve_User_Data()
         {
-            var user = new User(GlobalSettings, "Test", "test@test.com", "test", "helloworldtest");
+            var user = new UserBuilder().Build();
             UserService.Save(user);
 
             ExternalLogin[] externalLogins = new[]

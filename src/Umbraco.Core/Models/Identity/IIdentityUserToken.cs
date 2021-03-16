@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Models.Identity
     /// <summary>
     /// An external login provider token
     /// </summary>
-    public interface IIdentityUserToken : IEntity, IRememberBeingDirty
+    public interface IIdentityUserToken : IEntity
     {
         /// <summary>
         /// Gets or sets user Id for the user who owns this token

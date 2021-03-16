@@ -190,7 +190,7 @@ namespace Umbraco.Cms.Core.Models.Identity
             get
             {
                 // return if it exists
-                if (_tokens != null)
+                if (_tokens is not null)
                 {
                     return _tokens;
                 }
@@ -198,7 +198,8 @@ namespace Umbraco.Cms.Core.Models.Identity
                 _tokens = new ObservableCollection<IIdentityUserToken>();
 
                 // if the callback is there and hasn't been created yet then execute it and populate the logins
-                if (_getTokens != null && !_getTokens.IsValueCreated)
+               // if (_getTokens != null && !_getTokens.IsValueCreated)
+                    if (_getTokens?.IsValueCreated != true)
                 {
                     foreach (IIdentityUserToken l in _getTokens.Value)
                     {
