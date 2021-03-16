@@ -172,8 +172,7 @@ namespace Umbraco.Core.Runtime
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
 
-                // determines if unattended install is enabled and performs it if required
-                DoUnattendedInstall(databaseFactory);
+                
 
                 // register runtime-level services
                 // there should be none, really - this is here "just in case"
@@ -200,6 +199,9 @@ namespace Umbraco.Core.Runtime
                 // create the factory
                 _factory = Current.Factory = composition.CreateFactory();
 
+                // determines if unattended install is enabled and performs it if required
+                DoUnattendedInstall(databaseFactory);
+
                 // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
                 if (_state.Reason == RuntimeLevelReason.UpgradeMigrations && _state.Level == RuntimeLevel.Run)
                 {
@@ -213,8 +215,6 @@ namespace Umbraco.Core.Runtime
                 // create & initialize the components
                 _components = _factory.GetInstance<ComponentCollection>();
                 _components.Initialize();
-
-
             }
             catch (Exception e)
             {
@@ -302,7 +302,6 @@ namespace Umbraco.Core.Runtime
             // Update user details
             var currentProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
             var admin = Current.Services.UserService.GetUserById(Constants.Security.SuperUserId);
-            //var admin = _userService.GetUserById(Constants.Security.SuperUserId);
             if (admin == null)
             {
                 throw new InvalidOperationException("Could not find the super user!");
