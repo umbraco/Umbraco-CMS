@@ -1,7 +1,10 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Web;
 using System.Web.Hosting;
@@ -18,6 +21,7 @@ using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Scoping;
+using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Core.Sync;
 
@@ -122,6 +126,9 @@ namespace Umbraco.Core.Runtime
 
             try
             {
+                // Setup event listener
+                UnattendedInstalled += CoreRuntime_UnattendedInstalled;
+
                 // throws if not full-trust
                 new AspNetHostingPermission(AspNetHostingPermissionLevel.Unrestricted).Demand();
 
@@ -243,6 +250,96 @@ namespace Umbraco.Core.Runtime
             }
 
             return _factory;
+        }
+
+        private void CoreRuntime_UnattendedInstalled(IRuntime sender, UnattendedInstallEventArgs e)
+        {
+            var unattendedName = Environment.GetEnvironmentVariable("UnattendedUserName");
+            var unattendedEmail = Environment.GetEnvironmentVariable("UnattendedUserEmail");
+            var unattendedPassword = Environment.GetEnvironmentVariable("UnattendedUserPassword");
+
+            var fileExists = false;
+            var filePath = IOHelper.MapPath("~/App_Data/unattended.user.json");
+
+            // No values store in ENV vars - try fallback file of /app_data/unattended.user.json
+            if (unattendedName.IsNullOrWhiteSpace()
+                || unattendedEmail.IsNullOrWhiteSpace()
+                || unattendedPassword.IsNullOrWhiteSpace())
+            {
+                
+                fileExists = File.Exists(filePath);
+                if (fileExists == false)
+                {
+                    return;
+                }
+
+                // Attempt to deserialize JSON
+                try
+                {
+                    var fileContents = File.ReadAllText(filePath);
+                    var credentials = JsonConvert.DeserializeObject<UnattenedUserConfig>(fileContents);
+
+                    unattendedName = credentials.Name;
+                    unattendedEmail = credentials.Email;
+                    unattendedPassword = credentials.Password;
+                }
+                catch (Exception ex)
+                {
+
+                    throw;
+                }
+            }
+
+            // ENV Variables & JSON still empty
+            if (unattendedName.IsNullOrWhiteSpace()
+                || unattendedEmail.IsNullOrWhiteSpace()
+                || unattendedPassword.IsNullOrWhiteSpace())
+            {
+                return;
+            }
+
+
+            // Update user details
+            var currentProvider = MembershipProviderExtensions.GetUsersMembershipProvider();
+            var admin = Current.Services.UserService.GetUserById(Constants.Security.SuperUserId);
+            //var admin = _userService.GetUserById(Constants.Security.SuperUserId);
+            if (admin == null)
+            {
+                throw new InvalidOperationException("Could not find the super user!");
+            }
+
+            var membershipUser = currentProvider.GetUser(Constants.Security.SuperUserId, true);
+            if (membershipUser == null)
+            {
+                throw new InvalidOperationException($"No user found in membership provider with id of {Constants.Security.SuperUserId}.");
+            }
+
+            try
+            {
+                var success = membershipUser.ChangePassword("default", unattendedPassword.Trim());
+                if (success == false)
+                {
+                    throw new FormatException("Password must be at least " + currentProvider.MinRequiredPasswordLength + " characters long and contain at least " + currentProvider.MinRequiredNonAlphanumericCharacters + " symbols");
+                }
+            }
+            catch (Exception)
+            {
+                throw new FormatException("Password must be at least " + currentProvider.MinRequiredPasswordLength + " characters long and contain at least " + currentProvider.MinRequiredNonAlphanumericCharacters + " symbols");
+            }
+
+            admin.Email = unattendedEmail.Trim();
+            admin.Name = unattendedName.Trim();
+            admin.Username = unattendedPassword.Trim();
+
+            Current.Services.UserService.Save(admin);
+            //_userService.Save(admin);
+
+
+            // Delete JSON file if it existed to tidy 
+            if (fileExists)
+            {
+                File.Delete(filePath);
+            }
         }
 
         private void DoUnattendedInstall(IUmbracoDatabaseFactory databaseFactory)
@@ -405,6 +502,7 @@ namespace Umbraco.Core.Runtime
         public virtual void Terminate()
         {
             _components?.Terminate();
+            UnattendedInstalled -= CoreRuntime_UnattendedInstalled;
         }
 
         /// <summary>
@@ -479,6 +577,17 @@ namespace Umbraco.Core.Runtime
         /// </summary>
         public static event TypedEventHandler<IRuntime, UnattendedInstallEventArgs> UnattendedInstalled;
 
+        [DataContract]
+        public class UnattenedUserConfig
+        {
+            [DataMember(Name = "name")]
+            public string Name { get; set; }
 
+            [DataMember(Name = "email")]
+            public string Email { get; set; }
+
+            [DataMember(Name = "password")]
+            public string Password { get; set; }
+        }
     }
 }
