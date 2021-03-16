@@ -8,7 +8,10 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
@@ -18,7 +21,6 @@ using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
@@ -34,6 +36,40 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         #region Setup
 
+        private class TestNotificationHandler : INotificationHandler<ContentCacheRefresherNotification>
+        {
+            public void Handle(ContentCacheRefresherNotification args)
+            {
+                // reports the event as: "ContentCache/<action>,<action>.../X
+                // where
+                // <action> is(are) the action(s)
+                // X is the event content ID
+                if (args.MessageType != MessageType.RefreshByPayload)
+                {
+                    throw new NotSupportedException();
+                }
+
+                foreach (ContentCacheRefresher.JsonPayload payload in (ContentCacheRefresher.JsonPayload[])args.MessageObject)
+                {
+                    var e = new EventInstance
+                    {
+                        Message = _msgCount,
+                        Sender = "ContentCacheRefresher",
+                        EventArgs = payload,
+                        Name = payload.ChangeTypes.ToString().Replace(" ", string.Empty),
+                        Args = payload.Id.ToInvariantString()
+                    };
+                    _events.Add(e);
+                }
+
+                _msgCount++;
+            }
+        }
+        protected override void CustomTestSetup(IUmbracoBuilder builder)
+        {
+            builder.AddNotificationHandler<ContentCacheRefresherNotification, TestNotificationHandler>();
+        }
+
         [SetUp]
         public void SetUp()
         {
@@ -45,7 +81,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             DocumentRepository.ScopedEntityRefresh += ContentRepositoryRefreshed;
             DocumentRepository.ScopeEntityRemove += ContentRepositoryRemoved;
             DocumentRepository.ScopeVersionRemove += ContentRepositoryRemovedVersion;
-            ContentCacheRefresher.CacheUpdated += ContentCacheUpdated;
 
             // prepare content type
             Template template = TemplateBuilder.CreateTextPageTemplate();
@@ -66,12 +101,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             DocumentRepository.ScopedEntityRefresh -= ContentRepositoryRefreshed;
             DocumentRepository.ScopeEntityRemove -= ContentRepositoryRemoved;
             DocumentRepository.ScopeVersionRemove -= ContentRepositoryRemovedVersion;
-            ContentCacheRefresher.CacheUpdated -= ContentCacheUpdated;
         }
 
         private DistributedCacheBinder _distributedCacheBinder;
-        private IList<EventInstance> _events;
-        private int _msgCount;
+        private static IList<EventInstance> _events;
+        private static int _msgCount;
         private IContentType _contentType;
 
         private void ResetEvents()
@@ -324,32 +358,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             _events.Add(e);
         }
 
-        private void ContentCacheUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
-        {
-            // reports the event as: "ContentCache/<action>,<action>.../X
-            // where
-            // <action> is(are) the action(s)
-            // X is the event content ID
-            if (args.MessageType != MessageType.RefreshByPayload)
-            {
-                throw new NotSupportedException();
-            }
 
-            foreach (ContentCacheRefresher.JsonPayload payload in (ContentCacheRefresher.JsonPayload[])args.MessageObject)
-            {
-                var e = new EventInstance
-                {
-                    Message = _msgCount,
-                    Sender = sender.Name,
-                    EventArgs = payload,
-                    Name = payload.ChangeTypes.ToString().Replace(" ", string.Empty),
-                    Args = payload.Id.ToInvariantString()
-                };
-                _events.Add(e);
-            }
-
-            _msgCount++;
-        }
 
         private void WriteEvents()
         {

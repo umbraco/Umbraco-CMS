@@ -70,7 +70,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 pwdValidators,
                 new BackOfficeIdentityErrorDescriber(),
                 _mockServiceProviders.Object,
-                new Mock<IHttpContextAccessor>().Object,
                 new Mock<ILogger<UserManager<MembersIdentityUser>>>().Object,
                 _mockPasswordConfiguration.Object);
 

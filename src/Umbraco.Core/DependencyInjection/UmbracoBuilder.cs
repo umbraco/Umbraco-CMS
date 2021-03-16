@@ -189,6 +189,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // register distributed cache
             Services.AddUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(), f.GetRequiredService<CacheRefresherCollection>()));
+            Services.AddUnique<ICacheRefresherNotificationFactory, CacheRefresherNotificationFactory>();
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
