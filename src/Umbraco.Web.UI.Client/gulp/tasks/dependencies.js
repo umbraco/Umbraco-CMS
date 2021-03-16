@@ -46,7 +46,10 @@ function dependencies() {
         },
         {
             "name": "angular",
-            "src":  ["./node_modules/angular/angular.min.js"],
+            "src":  [
+                "./node_modules/angular/angular.min.js",
+                "./node_modules/angular/angular.min.js.map"
+            ],
             "base": "./node_modules/angular"
         },
         {
@@ -57,7 +60,10 @@ function dependencies() {
         },
         {
             "name": "angular-cookies",
-            "src":  ["./node_modules/angular-cookies/angular-cookies.min.js"],
+            "src":  [
+                "./node_modules/angular-cookies/angular-cookies.min.js",
+                "./node_modules/angular-cookies/angular-cookies.min.js.map"
+            ],
             "base": "./node_modules/angular-cookies"
         },
         {
@@ -70,12 +76,18 @@ function dependencies() {
         },
         {
             "name": "angular-sanitize",
-            "src":  ["./node_modules/angular-sanitize/angular-sanitize.min.js"],
+            "src":  [
+                "./node_modules/angular-sanitize/angular-sanitize.min.js",
+                "./node_modules/angular-sanitize/angular-sanitize.min.js.map"
+            ],
             "base": "./node_modules/angular-sanitize"
         },
         {
             "name": "angular-touch",
-            "src":  ["./node_modules/angular-touch/angular-touch.min.js"],
+            "src":  [
+                "./node_modules/angular-touch/angular-touch.min.js",
+                "./node_modules/angular-touch/angular-touch.min.js.map"
+            ],
             "base": "./node_modules/angular-touch"
         },
         {
@@ -85,12 +97,18 @@ function dependencies() {
         },
         {
             "name": "angular-route",
-            "src":  ["./node_modules/angular-route/angular-route.min.js"],
+            "src":  [
+                "./node_modules/angular-route/angular-route.min.js",
+                "./node_modules/angular-route/angular-route.min.js.map"
+            ],
             "base": "./node_modules/angular-route"
         },
         {
             "name": "angular-animate",
-            "src":  ["./node_modules/angular-animate/angular-animate.min.js"],
+            "src":  [
+                "./node_modules/angular-animate/angular-animate.min.js",
+                "./node_modules/angular-animate/angular-animate.min.js.map"
+            ],
             "base": "./node_modules/angular-animate"
         },
         {
@@ -111,7 +129,10 @@ function dependencies() {
         },
         {
             "name": "angular-messages",
-            "src":  ["./node_modules/angular-messages/angular-messages.min.js"],
+            "src":  [
+                "./node_modules/angular-messages/angular-messages.min.js",
+                "./node_modules/angular-messages/angular-messages.min.js.map"
+            ],
             "base": "./node_modules/angular-messages"
         },        
         {
@@ -132,7 +153,10 @@ function dependencies() {
 
         {
             "name": "angular-chart.js",
-            "src":  ["./node_modules/angular-chart.js/dist/angular-chart.min.js"],
+            "src":  [
+                "./node_modules/angular-chart.js/dist/angular-chart.min.js",
+                "./node_modules/angular-chart.js/dist/angular-chart.min.js.map"
+            ],
             "base": "./node_modules/angular-chart.js/dist"
         },
         {
