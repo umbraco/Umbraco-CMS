@@ -42,72 +42,25 @@
     <!-- WITH TABS --->
     <div ng-if="model.hasTabs">
         <ul class="umb-group-builder__tabs" ui-sortable="sortableOptionsTab" ng-model="model.tabs">
-            <li ng-repeat="tab in model.tabs track by tab.id" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-id="{{tab.id}}" val-groups-in-tab="{ tab: tab, groups: model.groups }">
-                <div ng-click="changeTab(tab)" class="umb-group-builder__tab" ng-class="{'is-active': tab.id === openTabId, 'is-inherited': tab.inherited, 'umb-group-builder__tab-handle -sortable': sortingMode && !tab.inherited}">
-                    <div>
-                        <div class="umb-group-builder__tab-inherited-label" ng-if="tab.inherited">
-                            <localize key="contentTypeEditor_inheritedFrom"></localize>: {{ tab.inheritedFromName }}
-                            <span ng-repeat="contentTypeName in tab.parentTabContentTypeNames">
-                                <button type="button" class="btn-link btn-small p0" ng-click="openDocumentType(tab.parentTabContentTypes[$index])">{{ contentTypeName }}</button>
-                                <span ng-if="!$last">, </span>
-                            </span>
-                        </div>
-                        <div class="umb-group-builder__tab-title-wrapper">
-                            <i class="umb-group-builder__tab-title-icon icon-navigation" ng-if="sortingMode && !tab.inherited"></i>
-                            <ng-form name="tabNameForm" data-element="group-name">
-                                <div class="umb-group-builder__tab-name" ng-if="tab.inherited || sortingMode">{{ tab.name }}</div>
-                                <input
-                                    ng-if="!tab.inherited && !sortingMode"
-                                    class="umb-group-builder__group-title-input"
-                                    data-element="tab-name-field"
-                                    type="text"
-                                    localize="placeholder"
-                                    placeholder="@placeholders_entername"
-                                    name="tabName"
-                                    ng-model="tab.name"
-                                    ng-class="{'-placeholder': tab.name == ''}"
-                                    ng-disabled="tab.id !== openTabId"
-                                    umb-auto-focus
-                                    umb-auto-resize
-                                    val-server-field="{{'Tabs[' + $index + '].Name'}}"
-                                    data-lpignore="true" />
-                                
-                                <div class="umb-group-builder__tab-val-message" ng-messages="tabNameForm.tabName.$error" show-validation-on-submit>
-                                    <div class="umb-validation-label -arrow-bottom" ng-message="valServerField">{{tabNameForm.tabName.errorMsg}}</div>
-                                    <div class="umb-validation-label -arrow-bottom" ng-message="required"><localize key="required"></localize></div>
-                                </div>
-                            </ng-form>
-
-                            <div ng-show="tab.hasError && tab.id !== openTabId" class="badge">!</div>
-
-                            <ng-form name="tabSortOrderForm" class="umb-group-builder__tab-sort-order">
-                                <div ng-if="sortingMode">
-                                    <input name="tabSortOrder" type="number" class="umb-property-editor-tiny" style="margin-bottom: 0;" ng-model="tab.sortOrder" ng-disabled="tab.inherited" ng-blur="changeSortOrderValue(tab)" required />
-        
-                                    <!-- This is a manual validation message not bound to a validator -->
-                                    <div class="umb-validation-label -arrow-left" ng-if="tabSortOrderForm.tabSortOrder.$error.required && tab.showSortOrderMissing"><localize key="required"></localize></div>
-                                    <div ng-messages="tabSortOrderForm.tabSortOrder.$error" show-validation-on-submit>
-                                        <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required"></localize></div>
-                                    </div>
-                                </div>
-                            </ng-form>
-                        </div>
-                    </div>
-                    <div class="umb-group-builder__tab-remove" ng-if="!sortingMode && canRemoveTab(tab)">
-                        <button type="button" class="btn-reset" ng-click="togglePrompt(tab)">
-                            <i class="icon-trash"></i>
-                        </button>
-                        <umb-confirm-action
-                            ng-if="tab.deletePrompt"
-                            direction="left"
-                            on-confirm="removeTab($index)"
-                            on-cancel="hidePrompt(tab)">
-                        </umb-confirm-action>
-                    </div>
-                </div>
+            <li ng-repeat="(tabIndex, tab) in model.tabs track by tab.id" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-id="{{tab.id}}" val-groups-in-tab="{ tab: tab, groups: model.groups }">
+                <umb-content-type-tab
+                    tab="tab"
+                    is-open="tab.id === openTabId"
+                    on-click="changeTab(tab)"
+                    sorting="sortingMode"
+                    allow-remove="canRemoveTab(tab) && !sortingMode"
+                    on-remove="removeTab(tabIndex)"
+                    val-server-field-name="{{'Tabs[' + $index + '].Name'}}">
+                </umb-content-type-tab>
             </li>
             <li>
-                <button ng-if="!sortingMode" type="button" hotkey="alt+shift+a" ng-click="addTab(tab)" data-element="group-add" class="btn-reset umb-group-builder__tab umb-group-builder__tab--placeholder">
+                <button
+                    ng-if="!sortingMode"
+                    type="button"
+                    hotkey="alt+shift+a"
+                    ng-click="addTab(tab)"
+                    data-element="group-add"
+                    class="btn-reset umb-group-builder__tab umb-group-builder__tab--placeholder">
                     Add tab
                 </button>
             </li>
@@ -120,7 +73,7 @@
                     on-focus="activateGroup(group)"
                     allow-name="true"
                     group="group"
-                    allow-remove="!sortingMode"
+                    allow-remove="canRemoveGroup(group) && !sortingMode"
                     on-remove="removeGroup(groupIndex)"
                     sorting="sortingMode"
                     name-val-server-field="{{'Groups[' + $index + '].Name'}}">
