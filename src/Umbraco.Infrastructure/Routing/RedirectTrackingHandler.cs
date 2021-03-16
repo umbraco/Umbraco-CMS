@@ -24,10 +24,10 @@ namespace Umbraco.Cms.Core.Routing
     /// </para>
     /// <para>recycle bin = moving to and from does nothing: to = the node is gone, where would we redirect? from = same</para>
     public sealed class RedirectTrackingHandler :
-        INotificationHandler<PublishingNotification<IContent>>,
-        INotificationHandler<PublishedNotification<IContent>>,
-        INotificationHandler<MovingNotification<IContent>>,
-        INotificationHandler<MovedNotification<IContent>>
+        INotificationHandler<ContentPublishingNotification>,
+        INotificationHandler<ContentPublishedNotification>,
+        INotificationHandler<ContentMovingNotification>,
+        INotificationHandler<ContentMovedNotification>
     {
         private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
@@ -44,13 +44,13 @@ namespace Umbraco.Cms.Core.Routing
             _variationContextAccessor = variationContextAccessor;
         }
 
-        public void Handle(PublishingNotification<IContent> notification) => StoreOldRoutes(notification.PublishedEntities, notification);
+        public void Handle(ContentPublishingNotification notification) => StoreOldRoutes(notification.PublishedEntities, notification);
 
-        public void Handle(PublishedNotification<IContent> notification) => CreateRedirectsForOldRoutes(notification);
+        public void Handle(ContentPublishedNotification notification) => CreateRedirectsForOldRoutes(notification);
 
-        public void Handle(MovingNotification<IContent> notification) => StoreOldRoutes(notification.MoveInfoCollection.Select(m => m.Entity), notification);
+        public void Handle(ContentMovingNotification notification) => StoreOldRoutes(notification.MoveInfoCollection.Select(m => m.Entity), notification);
 
-        public void Handle(MovedNotification<IContent> notification) => CreateRedirectsForOldRoutes(notification);
+        public void Handle(ContentMovedNotification notification) => CreateRedirectsForOldRoutes(notification);
 
         private void StoreOldRoutes(IEnumerable<IContent> entities, IStatefulNotification notification)
         {

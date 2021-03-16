@@ -6,9 +6,9 @@ using Umbraco.Cms.Core.Events;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public sealed class DeletedNotification<T> : EnumerableObjectNotification<T>
+    public abstract class DeletedNotification<T> : EnumerableObjectNotification<T>
     {
-        public DeletedNotification(T target, EventMessages messages) : base(target, messages)
+        protected DeletedNotification(T target, EventMessages messages) : base(target, messages)
         {
         }
 

@@ -12,10 +12,10 @@ namespace Umbraco.Cms.Core.Events
 {
     // TODO: lots of duplicate code in this one, refactor
     public sealed class RelateOnTrashNotificationHandler :
-        INotificationHandler<MovedNotification<IContent>>,
-        INotificationHandler<MovedToRecycleBinNotification<IContent>>,
-        INotificationHandler<MovedNotification<IMedia>>,
-        INotificationHandler<MovedToRecycleBinNotification<IMedia>>
+        INotificationHandler<ContentMovedNotification>,
+        INotificationHandler<ContentMovedToRecycleBinNotification>,
+        INotificationHandler<MediaMovedNotification>,
+        INotificationHandler<MediaMovedToRecycleBinNotification>
     {
         private readonly IRelationService _relationService;
         private readonly IEntityService _entityService;
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Events
             _scopeProvider = scopeProvider;
         }
 
-        public void Handle(MovedNotification<IContent> notification)
+        public void Handle(ContentMovedNotification notification)
         {
             foreach (var item in notification.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinContentString)))
             {
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.Events
             }
         }
 
-        public void Handle(MovedToRecycleBinNotification<IContent> notification)
+        public void Handle(ContentMovedToRecycleBinNotification notification)
         {
             using (var scope = _scopeProvider.CreateScope())
             {
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.Events
             }
         }
 
-        public void Handle(MovedNotification<IMedia> notification)
+        public void Handle(MediaMovedNotification notification)
         {
             foreach (var item in notification.MoveInfoCollection.Where(x => x.OriginalPath.Contains(Constants.System.RecycleBinMediaString)))
             {
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Core.Events
 
         }
 
-        public void Handle(MovedToRecycleBinNotification<IMedia> notification)
+        public void Handle(MediaMovedToRecycleBinNotification notification)
         {
             using (var scope = _scopeProvider.CreateScope())
             {

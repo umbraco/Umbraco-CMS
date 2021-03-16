@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private ContentTypeService ContentTypeService => (ContentTypeService)GetRequiredService<IContentTypeService>();
 
         protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
-            .AddNotificationHandler<MovedToRecycleBinNotification<IContent>, ContentNotificationHandler>();
+            .AddNotificationHandler<ContentMovedToRecycleBinNotification, ContentNotificationHandler>();
 
         [Test]
         public void CanSaveAndGetIsElement()
@@ -203,7 +203,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             }
         }
 
-        private void MovedContentToRecycleBin(MovedToRecycleBinNotification<IContent> notification)
+        private void MovedContentToRecycleBin(ContentMovedToRecycleBinNotification notification)
         {
             foreach (MoveEventInfo<IContent> item in notification.MoveInfoCollection)
             {
@@ -1736,11 +1736,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         public class ContentNotificationHandler :
-            INotificationHandler<MovedToRecycleBinNotification<IContent>>
+            INotificationHandler<ContentMovedToRecycleBinNotification>
         {
-            public void Handle(MovedToRecycleBinNotification<IContent> notification) => MovedContentToRecycleBin?.Invoke(notification);
+            public void Handle(ContentMovedToRecycleBinNotification notification) => MovedContentToRecycleBin?.Invoke(notification);
 
-            public static Action<MovedToRecycleBinNotification<IContent>> MovedContentToRecycleBin { get; set; }
+            public static Action<ContentMovedToRecycleBinNotification> MovedContentToRecycleBin { get; set; }
         }
     }
 }

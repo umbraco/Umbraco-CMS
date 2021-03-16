@@ -10,14 +10,14 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.PropertyEditors
 {
     public abstract class ComplexPropertyEditorContentNotificationHandler :
-        INotificationHandler<SavingNotification<IContent>>,
-        INotificationHandler<CopyingNotification<IContent>>
+        INotificationHandler<ContentSavingNotification>,
+        INotificationHandler<ContentCopyingNotification>
     {
         protected abstract string EditorAlias { get; }
 
         protected abstract string FormatPropertyValue(string rawJson, bool onlyMissingKeys);
 
-        public void Handle(SavingNotification<IContent> notification)
+        public void Handle(ContentSavingNotification notification)
         {
             foreach (var entity in notification.SavedEntities)
             {
@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
         }
 
-        public void Handle(CopyingNotification<IContent> notification)
+        public void Handle(ContentCopyingNotification notification)
         {
             var props = notification.Copy.GetPropertiesByEditor(EditorAlias);
             UpdatePropertyValues(props, false);

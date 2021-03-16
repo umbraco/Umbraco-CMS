@@ -50,12 +50,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
-            .AddNotificationHandler<SavingNotification<IContent>, ContentNotificationHandler>()
-            .AddNotificationHandler<SavedNotification<IContent>, ContentNotificationHandler>()
-            .AddNotificationHandler<PublishingNotification<IContent>, ContentNotificationHandler>()
-            .AddNotificationHandler<PublishedNotification<IContent>, ContentNotificationHandler>()
-            .AddNotificationHandler<UnpublishingNotification<IContent>, ContentNotificationHandler>()
-            .AddNotificationHandler<UnpublishedNotification<IContent>, ContentNotificationHandler>();
+            .AddNotificationHandler<ContentSavingNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentSavedNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentPublishingNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentPublishedNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentUnpublishingNotification, ContentNotificationHandler>()
+            .AddNotificationHandler<ContentUnpublishedNotification, ContentNotificationHandler>();
 
         private void CreateTestData()
         {
@@ -421,36 +421,36 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         public class ContentNotificationHandler :
-            INotificationHandler<SavingNotification<IContent>>,
-            INotificationHandler<SavedNotification<IContent>>,
-            INotificationHandler<PublishingNotification<IContent>>,
-            INotificationHandler<PublishedNotification<IContent>>,
-            INotificationHandler<UnpublishingNotification<IContent>>,
-            INotificationHandler<UnpublishedNotification<IContent>>
+            INotificationHandler<ContentSavingNotification>,
+            INotificationHandler<ContentSavedNotification>,
+            INotificationHandler<ContentPublishingNotification>,
+            INotificationHandler<ContentPublishedNotification>,
+            INotificationHandler<ContentUnpublishingNotification>,
+            INotificationHandler<ContentUnpublishedNotification>
         {
-            public void Handle(SavingNotification<IContent> notification) => SavingContent?.Invoke(notification);
+            public void Handle(ContentSavingNotification notification) => SavingContent?.Invoke(notification);
 
-            public void Handle(SavedNotification<IContent> notification) => SavedContent?.Invoke(notification);
+            public void Handle(ContentSavedNotification notification) => SavedContent?.Invoke(notification);
 
-            public void Handle(PublishingNotification<IContent> notification) => PublishingContent?.Invoke(notification);
+            public void Handle(ContentPublishingNotification notification) => PublishingContent?.Invoke(notification);
 
-            public void Handle(PublishedNotification<IContent> notification) => PublishedContent?.Invoke(notification);
+            public void Handle(ContentPublishedNotification notification) => PublishedContent?.Invoke(notification);
 
-            public void Handle(UnpublishingNotification<IContent> notification) => UnpublishingContent?.Invoke(notification);
+            public void Handle(ContentUnpublishingNotification notification) => UnpublishingContent?.Invoke(notification);
 
-            public void Handle(UnpublishedNotification<IContent> notification) => UnpublishedContent?.Invoke(notification);
+            public void Handle(ContentUnpublishedNotification notification) => UnpublishedContent?.Invoke(notification);
 
-            public static Action<SavingNotification<IContent>> SavingContent { get; set; }
+            public static Action<ContentSavingNotification> SavingContent { get; set; }
 
-            public static Action<SavedNotification<IContent>> SavedContent { get; set; }
+            public static Action<ContentSavedNotification> SavedContent { get; set; }
 
-            public static Action<PublishingNotification<IContent>> PublishingContent { get; set; }
+            public static Action<ContentPublishingNotification> PublishingContent { get; set; }
 
-            public static Action<PublishedNotification<IContent>> PublishedContent { get; set; }
+            public static Action<ContentPublishedNotification> PublishedContent { get; set; }
 
-            public static Action<UnpublishingNotification<IContent>> UnpublishingContent { get; set; }
+            public static Action<ContentUnpublishingNotification> UnpublishingContent { get; set; }
 
-            public static Action<UnpublishedNotification<IContent>> UnpublishedContent { get; set; }
+            public static Action<ContentUnpublishedNotification> UnpublishedContent { get; set; }
         }
     }
 }

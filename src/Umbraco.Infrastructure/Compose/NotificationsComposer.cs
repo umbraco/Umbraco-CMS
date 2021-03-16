@@ -23,45 +23,45 @@ namespace Umbraco.Cms.Core.Compose
             // add handlers for sending user notifications (i.e. emails)
             builder.Services.AddUnique<UserNotificationsHandler.Notifier>();
             builder
-                .AddNotificationHandler<SavedNotification<IContent>, UserNotificationsHandler>()
-                .AddNotificationHandler<SortedNotification<IContent>, UserNotificationsHandler>()
-                .AddNotificationHandler<PublishedNotification<IContent>, UserNotificationsHandler>()
-                .AddNotificationHandler<MovedNotification<IContent>, UserNotificationsHandler>()
-                .AddNotificationHandler<MovedToRecycleBinNotification<IContent>, UserNotificationsHandler>()
-                .AddNotificationHandler<CopiedNotification<IContent>, UserNotificationsHandler>()
-                .AddNotificationHandler<RolledBackNotification<IContent>, UserNotificationsHandler>()
-                .AddNotificationHandler<SentToPublishNotification<IContent>, UserNotificationsHandler>()
-                .AddNotificationHandler<UnpublishedNotification<IContent>, UserNotificationsHandler>();
+                .AddNotificationHandler<ContentSavedNotification, UserNotificationsHandler>()
+                .AddNotificationHandler<ContentSortedNotification, UserNotificationsHandler>()
+                .AddNotificationHandler<ContentPublishedNotification, UserNotificationsHandler>()
+                .AddNotificationHandler<ContentMovedNotification, UserNotificationsHandler>()
+                .AddNotificationHandler<ContentMovedToRecycleBinNotification, UserNotificationsHandler>()
+                .AddNotificationHandler<ContentCopiedNotification, UserNotificationsHandler>()
+                .AddNotificationHandler<ContentRolledBackNotification, UserNotificationsHandler>()
+                .AddNotificationHandler<ContentSentToPublishNotification, UserNotificationsHandler>()
+                .AddNotificationHandler<ContentUnpublishedNotification, UserNotificationsHandler>();
 
             // add handlers for building content relations
             builder
-                .AddNotificationHandler<CopiedNotification<IContent>, RelateOnCopyNotificationHandler>()
-                .AddNotificationHandler<MovedNotification<IContent>, RelateOnTrashNotificationHandler>()
-                .AddNotificationHandler<MovedToRecycleBinNotification<IContent>, RelateOnTrashNotificationHandler>()
-                .AddNotificationHandler<MovedNotification<IMedia>, RelateOnTrashNotificationHandler>()
-                .AddNotificationHandler<MovedToRecycleBinNotification<IMedia>, RelateOnTrashNotificationHandler>();
+                .AddNotificationHandler<ContentCopiedNotification, RelateOnCopyNotificationHandler>()
+                .AddNotificationHandler<ContentMovedNotification, RelateOnTrashNotificationHandler>()
+                .AddNotificationHandler<ContentMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>()
+                .AddNotificationHandler<MediaMovedNotification, RelateOnTrashNotificationHandler>()
+                .AddNotificationHandler<MediaMovedToRecycleBinNotification, RelateOnTrashNotificationHandler>();
 
             // add notification handlers for property editors
             builder
-                .AddNotificationHandler<SavingNotification<IContent>, BlockEditorPropertyHandler>()
-                .AddNotificationHandler<CopyingNotification<IContent>, BlockEditorPropertyHandler>()
-                .AddNotificationHandler<SavingNotification<IContent>, NestedContentPropertyHandler>()
-                .AddNotificationHandler<CopyingNotification<IContent>, NestedContentPropertyHandler>()
-                .AddNotificationHandler<CopiedNotification<IContent>, FileUploadPropertyEditor>()
-                .AddNotificationHandler<DeletedNotification<IContent>, FileUploadPropertyEditor>()
-                .AddNotificationHandler<DeletedNotification<IMedia>, FileUploadPropertyEditor>()
-                .AddNotificationHandler<SavingNotification<IMedia>, FileUploadPropertyEditor>()
-                .AddNotificationHandler<CopiedNotification<IContent>, ImageCropperPropertyEditor>()
-                .AddNotificationHandler<DeletedNotification<IContent>, ImageCropperPropertyEditor>()
-                .AddNotificationHandler<DeletedNotification<IMedia>, ImageCropperPropertyEditor>()
-                .AddNotificationHandler<SavingNotification<IMedia>, ImageCropperPropertyEditor>();
+                .AddNotificationHandler<ContentSavingNotification, BlockEditorPropertyHandler>()
+                .AddNotificationHandler<ContentCopyingNotification, BlockEditorPropertyHandler>()
+                .AddNotificationHandler<ContentSavingNotification, NestedContentPropertyHandler>()
+                .AddNotificationHandler<ContentCopyingNotification, NestedContentPropertyHandler>()
+                .AddNotificationHandler<ContentCopiedNotification, FileUploadPropertyEditor>()
+                .AddNotificationHandler<ContentDeletedNotification, FileUploadPropertyEditor>()
+                .AddNotificationHandler<MediaDeletedNotification, FileUploadPropertyEditor>()
+                .AddNotificationHandler<MediaSavingNotification, FileUploadPropertyEditor>()
+                .AddNotificationHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
+                .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
+                .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
+                .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>();
 
             // add notification handlers for redirect tracking
             builder
-                .AddNotificationHandler<PublishingNotification<IContent>, RedirectTrackingHandler>()
-                .AddNotificationHandler<PublishedNotification<IContent>, RedirectTrackingHandler>()
-                .AddNotificationHandler<MovingNotification<IContent>, RedirectTrackingHandler>()
-                .AddNotificationHandler<MovedNotification<IContent>, RedirectTrackingHandler>();
+                .AddNotificationHandler<ContentPublishingNotification, RedirectTrackingHandler>()
+                .AddNotificationHandler<ContentPublishedNotification, RedirectTrackingHandler>()
+                .AddNotificationHandler<ContentMovingNotification, RedirectTrackingHandler>()
+                .AddNotificationHandler<ContentMovedNotification, RedirectTrackingHandler>();
         }
     }
 }
