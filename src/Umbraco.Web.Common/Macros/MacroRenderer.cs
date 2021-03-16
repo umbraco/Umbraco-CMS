@@ -4,21 +4,22 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Macros;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Macros;
-using Umbraco.Core.Hosting;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Macros;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Macros
+namespace Umbraco.Cms.Web.Common.Macros
 {
     public class MacroRenderer : IMacroRenderer
     {
@@ -36,6 +37,7 @@ namespace Umbraco.Web.Macros
         private readonly ISessionManager _sessionManager;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly PartialViewMacroEngine _partialViewMacroEngine;
 
         public MacroRenderer(
             IProfilingLogger profilingLogger,
@@ -51,7 +53,8 @@ namespace Umbraco.Web.Macros
             IMemberUserKeyProvider memberUserKeyProvider,
             ISessionManager sessionManager,
             IRequestAccessor requestAccessor,
-             IHttpContextAccessor httpContextAccessor)
+            IHttpContextAccessor httpContextAccessor,
+            PartialViewMacroEngine partialViewMacroEngine)
         {
             _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
             _logger = logger;
@@ -67,6 +70,7 @@ namespace Umbraco.Web.Macros
             _sessionManager = sessionManager;
             _requestAccessor = requestAccessor;
             _httpContextAccessor = httpContextAccessor;
+            _partialViewMacroEngine = partialViewMacroEngine;
         }
 
         #region MacroContent cache
@@ -337,37 +341,26 @@ namespace Umbraco.Web.Macros
         private Attempt<MacroContent> ExecuteMacroOfType(MacroModel model, IPublishedContent content)
         {
             if (model == null)
+            {
                 throw new ArgumentNullException(nameof(model));
+            }
 
             // ensure that we are running against a published node (ie available in XML)
             // that may not be the case if the macro is embedded in a RTE of an unpublished document
 
             if (content == null)
+            {
                 return Attempt.Fail(new MacroContent { Text = "[macro failed (no content)]" });
+            }
 
-            var textService = _textService;
 
             return ExecuteMacroWithErrorWrapper(model,
                           $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
                           "Executed PartialView.",
-                          () => ExecutePartialView(model, content),
-                          () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
+                          () => _partialViewMacroEngine.Execute(model, content),
+                          () => _textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
         }
 
-
-        #endregion
-
-        #region Execute engines
-
-        /// <summary>
-        /// Renders a PartialView Macro.
-        /// </summary>
-        /// <returns>The text output of the macro execution.</returns>
-        private MacroContent ExecutePartialView(MacroModel macro, IPublishedContent content)
-        {
-            var engine = new PartialViewMacroEngine(_httpContextAccessor, _hostingEnvironment);
-            return engine.Execute(macro, content);
-        }
 
         #endregion
 
@@ -382,7 +375,7 @@ namespace Umbraco.Web.Macros
             if (attributeValue.StartsWith("[") == false)
                 return attributeValue;
 
-            var tokens = attributeValue.Split(',').Select(x => x.Trim()).ToArray();
+            var tokens = attributeValue.Split(Core.Constants.CharArrays.Comma).Select(x => x.Trim()).ToArray();
 
             // ensure we only process valid input ie each token must be [?x] and not eg a json array
             // like [1,2,3] which we don't want to parse - however the last one can be a literal, so

@@ -3,16 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     public class EntityService : ScopeRepositoryService, IEntityService
     {
@@ -318,7 +319,7 @@ namespace Umbraco.Core.Services.Implement
                 var objectTypeGuid = objectType.GetGuid();
                 var query = Query<IUmbracoEntity>();
 
-                if (id != Constants.System.Root)
+                if (id != Cms.Core.Constants.System.Root)
                 {
                     // lookup the path so we can use it in the prefix query below
                     var paths = _entityRepository.GetAllPaths(objectTypeGuid, id).ToArray();
@@ -350,7 +351,7 @@ namespace Umbraco.Core.Services.Implement
                 var objectTypeGuid = objectType.GetGuid();
                 var query = Query<IUmbracoEntity>();
 
-                if (idsA.All(x => x != Constants.System.Root))
+                if (idsA.All(x => x != Cms.Core.Constants.System.Root))
                 {
                     var paths = _entityRepository.GetAllPaths(objectTypeGuid, idsA).ToArray();
                     if (paths.Length == 0)
@@ -362,7 +363,7 @@ namespace Umbraco.Core.Services.Implement
                     foreach (var id in idsA)
                     {
                         // if the id is root then don't add any clauses
-                        if (id == Constants.System.Root) continue;
+                        if (id == Cms.Core.Constants.System.Root) continue;
 
                         var entityPath = paths.FirstOrDefault(x => x.Id == id);
                         if (entityPath == null) continue;
@@ -488,7 +489,7 @@ namespace Umbraco.Core.Services.Implement
                 var sql = scope.SqlContext.Sql()
                     .Select<NodeDto>()
                     .From<NodeDto>()
-                    .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == Constants.ObjectTypes.IdReservation);
+                    .Where<NodeDto>(x => x.UniqueId == key && x.NodeObjectType == Cms.Core.Constants.ObjectTypes.IdReservation);
 
                 node = scope.Database.SingleOrDefault<NodeDto>(sql);
                 if (node != null)
@@ -498,7 +499,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     UniqueId = key,
                     Text = "RESERVED.ID",
-                    NodeObjectType = Constants.ObjectTypes.IdReservation,
+                    NodeObjectType = Cms.Core.Constants.ObjectTypes.IdReservation,
 
                     CreateDate = DateTime.Now,
                     UserId = null,

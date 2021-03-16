@@ -1,11 +1,10 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using System.Collections.Generic;
-using Umbraco.Core;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Filters
+namespace Umbraco.Cms.Web.Common.Filters
 {
 
     /// <summary>
@@ -70,7 +69,7 @@ namespace Umbraco.Web.Common.Filters
             }
 
             var members = new List<int>();
-            foreach (var s in AllowMembers.Split(','))
+            foreach (var s in AllowMembers.Split(Core.Constants.CharArrays.Comma))
             {
                 if (int.TryParse(s, out var id))
                 {
@@ -78,7 +77,7 @@ namespace Umbraco.Web.Common.Filters
                 }
             }
 
-            return _websiteSecurity.IsMemberAuthorized(AllowType.Split(','), AllowGroup.Split(','), members);
+            return _websiteSecurity.IsMemberAuthorized(AllowType.Split(Core.Constants.CharArrays.Comma), AllowGroup.Split(Core.Constants.CharArrays.Comma), members);
         }
     }
 }

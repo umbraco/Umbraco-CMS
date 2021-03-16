@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Used to propagate hardcoded internal Field lists

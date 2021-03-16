@@ -1,10 +1,14 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// Represents a value converter for the image cropper value editor.
@@ -21,7 +25,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         /// <inheritdoc />
         public override bool IsConverter(IPublishedPropertyType propertyType)
-            => propertyType.EditorAlias.InvariantEquals(Constants.PropertyEditors.Aliases.ImageCropper);
+            => propertyType.EditorAlias.InvariantEquals(Cms.Core.Constants.PropertyEditors.Aliases.ImageCropper);
 
         /// <inheritdoc />
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType)
@@ -30,6 +34,12 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         /// <inheritdoc />
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
+
+        private static readonly JsonSerializerSettings ImageCropperValueJsonSerializerSettings = new JsonSerializerSettings
+        {
+            Culture = CultureInfo.InvariantCulture,
+            FloatParseHandling = FloatParseHandling.Decimal
+        };
 
         /// <inheritdoc />
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
@@ -40,11 +50,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             ImageCropperValue value;
             try
             {
-                value = JsonConvert.DeserializeObject<ImageCropperValue>(sourceString, new JsonSerializerSettings
-                {
-                    Culture = CultureInfo.InvariantCulture,
-                    FloatParseHandling = FloatParseHandling.Decimal
-                });
+                value = JsonConvert.DeserializeObject<ImageCropperValue>(sourceString, ImageCropperValueJsonSerializerSettings);
             }
             catch (Exception ex)
             {

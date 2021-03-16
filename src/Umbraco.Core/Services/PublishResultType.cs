@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Services
+﻿namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// A value indicating the result of publishing or unpublishing a document.
@@ -120,15 +120,15 @@
         /// <summary>
         /// The document could not be published because it has no publishing flags or values or if its a variant document, no cultures were specified to be published.
         /// </summary>
-        FailedPublishNothingToPublish = FailedPublish | 9, 
+        FailedPublishNothingToPublish = FailedPublish | 9,
 
         /// <summary>
         /// The document could not be published because some mandatory cultures are missing.
         /// </summary>
-        FailedPublishMandatoryCultureMissing = FailedPublish | 10, // in ContentService.SavePublishing 
+        FailedPublishMandatoryCultureMissing = FailedPublish | 10, // in ContentService.SavePublishing
 
         /// <summary>
-        /// The document could not be published because it has been modified by another user. 
+        /// The document could not be published because it has been modified by another user.
         /// </summary>
         FailedPublishConcurrencyViolation = FailedPublish | 11,
 

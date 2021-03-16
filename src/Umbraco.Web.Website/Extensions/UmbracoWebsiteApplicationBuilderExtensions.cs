@@ -1,7 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
-using Umbraco.Web.Website.Routing;
+using Umbraco.Cms.Web.Website.Routing;
 
 namespace Umbraco.Extensions
 {

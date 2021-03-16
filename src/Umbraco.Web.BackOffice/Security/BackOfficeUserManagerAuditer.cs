@@ -1,81 +1,55 @@
 using System;
-using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Compose;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     /// <summary>
-    /// Binds to events to write audit logs for the <see cref="IBackOfficeUserManager"/>
+    /// Binds to notifications to write audit logs for the <see cref="BackOfficeUserManager"/>
     /// </summary>
-    internal class BackOfficeUserManagerAuditer : IDisposable
+    internal class BackOfficeUserManagerAuditer :
+        INotificationHandler<UserLoginSuccessNotification>,
+        INotificationHandler<UserLogoutSuccessNotification>,
+        INotificationHandler<UserLoginFailedNotification>,
+        INotificationHandler<UserForgotPasswordRequestedNotification>,
+        INotificationHandler<UserForgotPasswordChangedNotification>,
+        INotificationHandler<UserPasswordChangedNotification>,
+        INotificationHandler<UserPasswordResetNotification>
     {
         private readonly IAuditService _auditService;
         private readonly IUserService _userService;
-        private readonly GlobalSettings _globalSettings;
-        private bool _disposedValue;
 
-        public BackOfficeUserManagerAuditer(IAuditService auditService, IUserService userService, IOptions<GlobalSettings> globalSettings)
+        public BackOfficeUserManagerAuditer(IAuditService auditService, IUserService userService)
         {
             _auditService = auditService;
             _userService = userService;
-            _globalSettings = globalSettings.Value;
         }
 
-        /// <summary>
-        /// Binds to events to start auditing
-        /// </summary>
-        public void Start()
-        {
-            // NOTE: This was migrated as-is from v8 including these missing entries
-            // TODO: See note about static events in BackOfficeUserManager
-            BackOfficeUserManager.ForgotPasswordRequested += OnForgotPasswordRequest;
-            BackOfficeUserManager.ForgotPasswordChangedSuccess += OnForgotPasswordChange;
-            BackOfficeUserManager.LoginFailed += OnLoginFailed;
-            BackOfficeUserManager.LoginSuccess += OnLoginSuccess;
-            BackOfficeUserManager.LogoutSuccess += OnLogoutSuccess;
-            BackOfficeUserManager.PasswordChanged += OnPasswordChanged;
-            BackOfficeUserManager.PasswordReset += OnPasswordReset;
-        }
+        public void Handle(UserLoginSuccessNotification notification)
+            => WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/sign-in/login", "login success");
 
-        private IUser GetPerformingUser(string userId)
-        {
-            if (!int.TryParse(userId, out int asInt))
-            {
-                return AuditEventsComponent.UnknownUser(_globalSettings);
-            }
+        public void Handle(UserLogoutSuccessNotification notification)
+            => WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/sign-in/logout", "logout success");
 
-            IUser found = asInt >= 0 ? _userService.GetUserById(asInt) : null;
-            return found ?? AuditEventsComponent.UnknownUser(_globalSettings);
-        }
+        public void Handle(UserLoginFailedNotification notification) =>
+            WriteAudit(notification.PerformingUserId, "0", notification.IpAddress, "umbraco/user/sign-in/failed", "login failed", "");
+
+        public void Handle(UserForgotPasswordRequestedNotification notification) =>
+            WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/password/forgot/request", "password forgot/request");
+
+        public void Handle(UserForgotPasswordChangedNotification notification) =>
+            WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/password/forgot/change", "password forgot/change");
+
+        public void Handle(UserPasswordChangedNotification notification) =>
+            WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/password/change", "password change");
+
+        public void Handle(UserPasswordResetNotification notification) =>
+            WriteAudit(notification.PerformingUserId, notification.AffectedUserId, notification.IpAddress, "umbraco/user/password/reset", "password reset");
 
         private static string FormatEmail(IMembershipUser user) => user == null ? string.Empty : user.Email.IsNullOrWhiteSpace() ? "" : $"<{user.Email}>";
-
-        private void OnLoginSuccess(object sender, IdentityAuditEventArgs args)
-        {
-            var performingUser = GetPerformingUser(args.PerformingUser);
-            WriteAudit(performingUser, args.AffectedUser, args.IpAddress, "umbraco/user/sign-in/login", "login success");
-        }
-
-        private void OnLogoutSuccess(object sender, IdentityAuditEventArgs args)
-        {
-            IUser performingUser = GetPerformingUser(args.PerformingUser);
-            WriteAudit(performingUser, args.AffectedUser, args.IpAddress, "umbraco/user/sign-in/logout", "logout success");
-        }
-
-        private void OnPasswordReset(object sender, IdentityAuditEventArgs args) => WriteAudit(args.PerformingUser, args.AffectedUser, args.IpAddress, "umbraco/user/password/reset", "password reset");
-
-        private void OnPasswordChanged(object sender, IdentityAuditEventArgs args) => WriteAudit(args.PerformingUser, args.AffectedUser, args.IpAddress, "umbraco/user/password/change", "password change");
-
-        private void OnLoginFailed(object sender, IdentityAuditEventArgs args) => WriteAudit(args.PerformingUser, "0", args.IpAddress, "umbraco/user/sign-in/failed", "login failed", affectedDetails: "");
-
-        private void OnForgotPasswordChange(object sender, IdentityAuditEventArgs args) => WriteAudit(args.PerformingUser, args.AffectedUser, args.IpAddress, "umbraco/user/password/forgot/change", "password forgot/change");
-
-        private void OnForgotPasswordRequest(object sender, IdentityAuditEventArgs args) => WriteAudit(args.PerformingUser, args.AffectedUser, args.IpAddress, "umbraco/user/password/forgot/request", "password forgot/request");
 
         private void WriteAudit(string performingId, string affectedId, string ipAddress, string eventType, string eventDetails, string affectedDetails = null)
         {
@@ -102,20 +76,6 @@ namespace Umbraco.Web.Common.Security
             WriteAudit(performingIdAsInt, performingDetails, affectedIdAsInt, ipAddress, eventType, eventDetails, affectedDetails);
         }
 
-        private void WriteAudit(IUser performingUser, string affectedId, string ipAddress, string eventType, string eventDetails)
-        {
-            var performingDetails = performingUser == null
-                ? $"User UNKNOWN"
-                : $"User \"{performingUser.Name}\" {FormatEmail(performingUser)}";
-
-            if (!int.TryParse(affectedId, out int affectedIdInt))
-            {
-                affectedIdInt = 0;
-            }
-
-            WriteAudit(performingUser?.Id ?? 0, performingDetails, affectedIdInt, ipAddress, eventType, eventDetails);
-        }
-
         private void WriteAudit(int performingId, string performingDetails, int affectedId, string ipAddress, string eventType, string eventDetails, string affectedDetails = null)
         {
             if (affectedDetails == null)
@@ -135,31 +95,6 @@ namespace Umbraco.Web.Common.Security
                 affectedDetails,
                 eventType,
                 eventDetails);
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    BackOfficeUserManager.ForgotPasswordRequested -= OnForgotPasswordRequest;
-                    BackOfficeUserManager.ForgotPasswordChangedSuccess -= OnForgotPasswordChange;
-                    BackOfficeUserManager.LoginFailed -= OnLoginFailed;
-                    BackOfficeUserManager.LoginSuccess -= OnLoginSuccess;
-                    BackOfficeUserManager.LogoutSuccess -= OnLogoutSuccess;
-                    BackOfficeUserManager.PasswordChanged -= OnPasswordChanged;
-                    BackOfficeUserManager.PasswordReset -= OnPasswordReset;
-                }
-                _disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }

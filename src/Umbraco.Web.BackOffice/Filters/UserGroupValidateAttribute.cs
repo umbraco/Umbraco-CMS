@@ -2,15 +2,16 @@ using System;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Umbraco.Core;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-using Umbraco.Web.BackOffice.ActionResults;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.BackOffice.ActionResults;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Web.BackOffice.Filters
 {
     internal sealed class UserGroupValidateAttribute : TypeFilterAttribute
     {
@@ -20,15 +21,15 @@ namespace Umbraco.Web.BackOffice.Filters
 
         private class UserGroupValidateFilter : IActionFilter
         {
-            private readonly UmbracoMapper _umbracoMapper;
+            private readonly IShortStringHelper _shortStringHelper;
             private readonly IUserService _userService;
 
             public UserGroupValidateFilter(
                 IUserService userService,
-                UmbracoMapper umbracoMapper)
+                IShortStringHelper shortStringHelper)
             {
                 _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-                _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
+                _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
             }
 
             public void OnActionExecuting(ActionExecutingContext context)
@@ -58,13 +59,9 @@ namespace Umbraco.Web.BackOffice.Filters
                             return;
                         }
 
-                        //map the model to the persisted instance
-                        _umbracoMapper.Map(userGroupSave, persisted);
                         break;
                     case ContentSaveAction.SaveNew:
-                        //create the persisted model from mapping the saved model
-                        persisted = _umbracoMapper.Map<IUserGroup>(userGroupSave);
-                        ((UserGroup) persisted).ResetIdentity();
+                        persisted =  new UserGroup(_shortStringHelper);
                         break;
                     default:
                         context.Result =

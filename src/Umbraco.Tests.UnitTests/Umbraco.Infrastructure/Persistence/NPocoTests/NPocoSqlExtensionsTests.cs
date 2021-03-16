@@ -4,13 +4,15 @@
 using System.Collections.Generic;
 using NPoco;
 using NUnit.Framework;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Tests.TestHelpers;
-using static Umbraco.Core.Persistence.SqlExtensionsStatics;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Tests.Common.TestHelpers;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
+using Umbraco.Extensions;
+using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.NPocoTests
 {
     [TestFixture]
     public class NPocoSqlExtensionsTests : BaseUsingSqlSyntax

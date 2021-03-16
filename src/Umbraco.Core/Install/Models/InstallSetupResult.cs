@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Umbraco.Web.Install.Models
+namespace Umbraco.Cms.Core.Install.Models
 {
     /// <summary>
     /// The object returned from each installation step

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Core.Persistence
 {
     /// <summary>
     /// Provides a mean to express aliases in SELECT Sql statements.

@@ -10,15 +10,17 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Web.BackOffice.Authorization;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Web.BackOffice.Authorization;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 {
     public class ContentPermissionsQueryStringHandlerTests
     {
@@ -228,7 +230,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
                 .Setup(x => x.GetById(It.Is<int>(y => y == nodeId)))
                 .Returns(CreateContent(nodeId));
 
-            return new ContentPermissions(mockUserService.Object, mockContentService.Object, entityService);
+            return new ContentPermissions(mockUserService.Object, mockContentService.Object, entityService, AppCaches.Disabled);
         }
 
         private static IContent CreateContent(int nodeId)

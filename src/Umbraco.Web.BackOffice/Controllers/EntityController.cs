@@ -5,31 +5,29 @@ using System.Reflection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
-using Umbraco.Core;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Core.Trees;
-using Umbraco.Core.Xml;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.TemplateQuery;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Core.Xml;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Web.BackOffice.ModelBinders;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.Models.TemplateQuery;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Search;
-using Umbraco.Web.Services;
-using Umbraco.Web.Trees;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// The API controller used for getting entity objects, basic name, icon, id representation of umbraco objects that are based on CMSNode
@@ -70,6 +68,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IMacroService _macroService;
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
+        private readonly AppCaches _appCaches;
 
         public EntityController(
             ITreeService treeService,
@@ -90,7 +89,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IMediaTypeService mediaTypeService,
             IMacroService macroService,
             IUserService userService,
-            ILocalizationService localizationService)
+            ILocalizationService localizationService,
+            AppCaches appCaches)
         {
             _treeService = treeService ?? throw new ArgumentNullException(nameof(treeService));
             _treeSearcher = treeSearcher ?? throw new ArgumentNullException(nameof(treeSearcher));
@@ -115,6 +115,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
             _userService = userService ?? throw new ArgumentNullException(nameof(userService));
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
+            _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
         }
 
         /// <summary>
@@ -216,7 +217,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return foundContentResult;
             }
 
-            return new ActionResult<IEnumerable<int>>(foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
+            return new ActionResult<IEnumerable<int>>(foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
         }
 
         /// <summary>
@@ -234,7 +235,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 return foundContentResult;
             }
 
-            return new ActionResult<IEnumerable<int>>(foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
+            return new ActionResult<IEnumerable<int>>(foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse));
         }
 
         /// <summary>
@@ -358,7 +359,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                 getPath: nodeid =>
                 {
                     var ent = _entityService.Get(nodeid);
-                    return ent.Path.Split(',').Reverse();
+                    return ent.Path.Split(Constants.CharArrays.Comma).Reverse();
                 },
                 publishedContentExists: i => _publishedContentQuery.Content(i) != null);
         }
@@ -718,9 +719,9 @@ namespace Umbraco.Web.BackOffice.Controllers
             switch (type)
             {
                 case UmbracoEntityTypes.Document:
-                    return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService);
+                    return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService, _appCaches);
                 case UmbracoEntityTypes.Media:
-                    return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService);
+                    return _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService, _appCaches);
                 default:
                     return Array.Empty<int>();
             }
@@ -850,7 +851,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             {
                 // TODO: Need to check for Object types that support hierarchic here, some might not.
 
-                var ids = _entityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
+                var ids = _entityService.Get(id).Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Distinct().ToArray();
 
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(queryStrings?.GetValue<Guid?>("dataTypeId"));
                 if (ignoreUserStartNodes == false)
@@ -859,10 +860,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                     switch (entityType)
                     {
                         case UmbracoEntityTypes.Document:
-                            aids = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService);
+                            aids = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService, _appCaches);
                             break;
                         case UmbracoEntityTypes.Media:
-                            aids = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService);
+                            aids = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService, _appCaches);
                             break;
                     }
 
@@ -1162,7 +1163,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         {
             if (postFilter.IsNullOrWhiteSpace()) return entities;
 
-            var postFilterConditions = postFilter.Split('&');
+            var postFilterConditions = postFilter.Split(Constants.CharArrays.Ampersand);
 
             foreach (var postFilterCondition in postFilterConditions)
             {
@@ -1179,9 +1180,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             return entities;
         }
 
-        private static QueryCondition BuildQueryCondition<T>(string postFilter)
-        {
-            var postFilterParts = postFilter.Split(new[]
+        private static readonly string[] _postFilterSplitStrings = new[]
             {
                 "=",
                 "==",
@@ -1191,7 +1190,10 @@ namespace Umbraco.Web.BackOffice.Controllers
                 "<",
                 ">=",
                 "<="
-            }, 2, StringSplitOptions.RemoveEmptyEntries);
+            };
+        private static QueryCondition BuildQueryCondition<T>(string postFilter)
+        {
+            var postFilterParts = postFilter.Split(_postFilterSplitStrings, 2, StringSplitOptions.RemoveEmptyEntries);
 
             if (postFilterParts.Length != 2)
             {

@@ -1,10 +1,8 @@
-﻿using BenchmarkDotNet.Attributes;
-using System;
-using System.Linq;
-using Microsoft.Extensions.Logging;
+﻿using System.Linq;
+using BenchmarkDotNet.Attributes;
 using Microsoft.Extensions.Logging.Abstractions;
-using Umbraco.Core.Composing;
-using Umbraco.Tests.Benchmarks.Config;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Benchmarks
 {
@@ -16,14 +14,14 @@ namespace Umbraco.Tests.Benchmarks
         [Benchmark(Baseline = true)]
         public void WithGetReferencingAssembliesCheck()
         {
-            var typeFinder1 = new TypeFinder(new NullLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            var typeFinder1 = new TypeFinder(new NullLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance), new VaryingRuntimeHash());
             var found = typeFinder1.FindClassesOfType<IDiscoverable>().Count();
         }
 
         [Benchmark]
         public void WithoutGetReferencingAssembliesCheck()
         {
-            var typeFinder2 = new TypeFinder(new NullLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly), new VaryingRuntimeHash());
+            var typeFinder2 = new TypeFinder(new NullLogger<TypeFinder>(), new DefaultUmbracoAssemblyProvider(GetType().Assembly, NullLoggerFactory.Instance), new VaryingRuntimeHash());
             typeFinder2.QueryWithReferencingAssemblies = false;
             var found = typeFinder2.FindClassesOfType<IDiscoverable>().Count();
         }

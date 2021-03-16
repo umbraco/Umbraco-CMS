@@ -1,12 +1,13 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using Microsoft.Data.SqlClient;
 using NPoco;
 using NPoco.SqlServer;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods to NPoco Database class.

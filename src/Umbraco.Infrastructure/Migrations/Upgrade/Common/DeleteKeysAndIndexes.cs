@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations.Upgrade.Common
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common
 {
     public class DeleteKeysAndIndexes : MigrationBase
     {

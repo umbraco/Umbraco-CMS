@@ -1,10 +1,11 @@
-﻿using Umbraco.Core;
-using Umbraco.Core.IO;
-using Umbraco.Core.Services;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     [CoreTree]
     [Tree(Constants.Applications.Settings, Constants.Trees.Stylesheets, TreeTitle = "Stylesheets", SortOrder = 9, TreeGroup = Constants.Trees.Groups.Templating)]
@@ -22,8 +23,9 @@ namespace Umbraco.Web.BackOffice.Trees
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
-            IFileSystems fileSystems)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory)
+            IFileSystems fileSystems,
+            IEventAggregator eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator)
         {
             FileSystem = fileSystems.StylesheetsFileSystem;
         }

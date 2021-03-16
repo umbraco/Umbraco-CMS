@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Contains culture specific values for <see cref="IPublishedContent"/>.

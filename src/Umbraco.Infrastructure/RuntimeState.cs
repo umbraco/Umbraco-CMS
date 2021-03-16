@@ -1,29 +1,35 @@
-﻿using System;
+using System;
 using System.Threading;
-using Semver;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Migrations.Upgrade;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Semver;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Core.Events;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Represents the state of the Umbraco runtime.
     /// </summary>
     public class RuntimeState : IRuntimeState
     {
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptions<GlobalSettings> _globalSettings;
+        private readonly IOptions<UnattendedSettings> _unattendedSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly ILogger<RuntimeState> _logger;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
+        private readonly IEventAggregator _eventAggregator;
 
         /// <summary>
+        /// The initial <see cref="RuntimeState"/>
         /// The initial <see cref="RuntimeState"/>
         /// </summary>
         public static RuntimeState Booting() => new RuntimeState() { Level = RuntimeLevel.Boot };
@@ -37,21 +43,25 @@ namespace Umbraco.Core
         /// </summary>
         public RuntimeState(
             IOptions<GlobalSettings> globalSettings,
+            IOptions<UnattendedSettings> unattendedSettings,
             IUmbracoVersion umbracoVersion,
             IUmbracoDatabaseFactory databaseFactory,
             ILogger<RuntimeState> logger,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
+            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
+            IEventAggregator eventAggregator)
         {
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings;
+            _unattendedSettings = unattendedSettings;
             _umbracoVersion = umbracoVersion;
             _databaseFactory = databaseFactory;
             _logger = logger;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
+            _eventAggregator = eventAggregator;
         }
 
 
         /// <inheritdoc />
-        public Version Version => _umbracoVersion.Current;
+        public Version Version => _umbracoVersion.Version;
 
         /// <inheritdoc />
         public string VersionComment => _umbracoVersion.Comment;
@@ -96,7 +106,7 @@ namespace Umbraco.Core
                         // cannot connect to configured database, this is bad, fail
                         _logger.LogDebug("Could not connect to database.");
 
-                        if (_globalSettings.InstallMissingDatabase)
+                        if (_globalSettings.Value.InstallMissingDatabase)
                         {
                             // ok to install on a configured but missing database
                             Level = RuntimeLevel.Install;
@@ -106,7 +116,8 @@ namespace Umbraco.Core
 
                         // else it is bad enough that we want to throw
                         Reason = RuntimeLevelReason.BootFailedCannotConnectToDatabase;
-                        throw new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
+                        BootFailedException =new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
+                        throw BootFailedException;
                     }
                 case UmbracoDatabaseState.NotInstalled:
                     {
@@ -123,7 +134,7 @@ namespace Umbraco.Core
                         // although the files version matches the code version, the database version does not
                         // which means the local files have been upgraded but not the database - need to upgrade
                         _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
-                        Level = RuntimeLevel.Upgrade;
+                        Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Run : RuntimeLevel.Upgrade;
                         Reason = RuntimeLevelReason.UpgradeMigrations;
                     }
                     break;
@@ -182,7 +193,8 @@ namespace Umbraco.Core
 
                 // else it is bad enough that we want to throw
                 Reason = RuntimeLevelReason.BootFailedCannotCheckUpgradeState;
-                throw new BootFailedException("Could not check the upgrade state.", e);
+                BootFailedException = new BootFailedException("Could not check the upgrade state.", e);
+                throw BootFailedException;
             }
         }
 
@@ -195,13 +207,13 @@ namespace Umbraco.Core
         public void DoUnattendedInstall()
         {
              // unattended install is not enabled
-            if (_globalSettings.InstallUnattended == false) return;
+            if (_unattendedSettings.Value.InstallUnattended == false) return;
 
             // no connection string set
             if (_databaseFactory.Configured == false) return;
 
             var connect = false;
-            var tries = _globalSettings.InstallMissingDatabase ? 2 : 5;
+            var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
             for (var i = 0;;)
             {
                 connect = _databaseFactory.CanConnect;
@@ -230,15 +242,23 @@ namespace Umbraco.Core
                     creator.InitializeDatabaseSchema();
                     database.CompleteTransaction();
                     _logger.LogInformation("Unattended install completed.");
+
+                    // Emit an event with EventAggregator that unattended install completed
+                    // Then this event can be listened for and create an unattended user
+                    _eventAggregator.Publish(new UnattendedInstallNotification());
+
                 }
                 catch (Exception ex)
                 {
                     _logger.LogInformation(ex, "Error during unattended install.");
                     database.AbortTransaction();
 
-                    throw new UnattendedInstallException(
+                    var innerException = new UnattendedInstallException(
                         "The database configuration failed with the following message: " + ex.Message
                         + "\n Please check log file for additional information (can be found in '/App_Data/Logs/')");
+                    BootFailedException = new BootFailedException(innerException.Message, innerException);
+
+                    throw BootFailedException;
                 }
             }
         }
@@ -277,7 +297,7 @@ namespace Umbraco.Core
             // anything other than install wants a database - see if we can connect
             // (since this is an already existing database, assume localdb is ready)
             bool canConnect;
-            var tries = _globalSettings.InstallMissingDatabase ? 2 : 5;
+            var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
             for (var i = 0; ;)
             {
                 canConnect = databaseFactory.CanConnect;

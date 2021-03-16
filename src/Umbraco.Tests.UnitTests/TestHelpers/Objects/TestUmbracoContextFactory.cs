@@ -4,18 +4,16 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Moq;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Routing;
-using Umbraco.Core.Security;
-using Umbraco.Tests.Common;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
-using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.UmbracoContext;
 
-namespace Umbraco.Tests.UnitTests.TestHelpers.Objects
+namespace Umbraco.Cms.Tests.UnitTests.TestHelpers.Objects
 {
     /// <summary>
     /// Simplify creating test UmbracoContext's
@@ -58,9 +56,6 @@ namespace Umbraco.Tests.UnitTests.TestHelpers.Objects
 
             IHostingEnvironment hostingEnvironment = TestHelper.GetHostingEnvironment();
 
-            var backofficeSecurityAccessorMock = new Mock<IBackOfficeSecurityAccessor>();
-            backofficeSecurityAccessorMock.Setup(x => x.BackOfficeSecurity).Returns(Mock.Of<IBackOfficeSecurity>());
-
             var umbracoContextFactory = new UmbracoContextFactory(
                 umbracoContextAccessor,
                 snapshotService.Object,
@@ -70,8 +65,7 @@ namespace Umbraco.Tests.UnitTests.TestHelpers.Objects
                 hostingEnvironment,
                 new UriUtility(hostingEnvironment),
                 new AspNetCoreCookieManager(httpContextAccessor),
-                Mock.Of<IRequestAccessor>(),
-                backofficeSecurityAccessorMock.Object);
+                httpContextAccessor);
 
             return umbracoContextFactory;
         }

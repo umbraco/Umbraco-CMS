@@ -6,15 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Tests.Services
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     [TestFixture]
     [Apartment(ApartmentState.STA)]
@@ -35,7 +34,7 @@ namespace Umbraco.Tests.Services
             DateTime latest = DateTime.Now.AddDays(-1);
             DateTime oldest = DateTime.Now.AddDays(-10);
 
-            using (Core.Scoping.IScope scope = ScopeProvider.CreateScope())
+            using (global::Umbraco.Cms.Core.Scoping.IScope scope = ScopeProvider.CreateScope())
             {
                 // insert duplicates manuall
                 scope.Database.Insert(new ExternalLoginDto

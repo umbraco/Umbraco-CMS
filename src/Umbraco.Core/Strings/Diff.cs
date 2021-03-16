@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Umbraco.Core.Strings
+namespace Umbraco.Cms.Core.Strings
 {
     /// <summary>
     /// This Class implements the Difference Algorithm published in
@@ -232,7 +229,7 @@ namespace Umbraco.Core.Strings
 
             // strip off all cr, only use lf as text line separator.
             aText = aText.Replace("\r", "");
-            var lines = aText.Split('\n');
+            var lines = aText.Split(Constants.CharArrays.LineFeed);
 
             var codes = new int[lines.Length];
 

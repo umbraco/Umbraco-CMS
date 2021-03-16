@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq.Expressions;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -7,7 +7,7 @@ using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
 using BenchmarkDotNet.Jobs;
 using Perfolizer.Horology;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Tests.Benchmarks
 {

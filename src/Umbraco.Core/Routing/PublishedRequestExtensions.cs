@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
 
     public static class PublishedRequestExtensions

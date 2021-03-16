@@ -1,25 +1,32 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Changes;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCacheRefresher, ContentCacheRefresher.JsonPayload>
+    public sealed class ContentCacheRefresher : PayloadCacheRefresherBase<ContentCacheRefresherNotification, ContentCacheRefresher.JsonPayload>
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IIdKeyMap _idKeyMap;
         private readonly IDomainService _domainService;
 
-        public ContentCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdKeyMap idKeyMap, IDomainService domainService)
-            : base(appCaches, serializer)
+        public ContentCacheRefresher(
+            AppCaches appCaches,
+            IJsonSerializer serializer,
+            IPublishedSnapshotService publishedSnapshotService,
+            IIdKeyMap idKeyMap,
+            IDomainService domainService,
+            IEventAggregator eventAggregator,
+            ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idKeyMap = idKeyMap;
@@ -27,8 +34,6 @@ namespace Umbraco.Web.Cache
         }
 
         #region Define
-
-        protected override ContentCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("900A4FBE-DF3C-41E6-BB77-BE896CD158EA");
 

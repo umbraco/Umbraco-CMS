@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.RegularExpressions;
 using HtmlAgilityPack;
-using Umbraco.Core.Xml;
+using Umbraco.Cms.Core.Xml;
 
-namespace Umbraco.Web.Macros
+namespace Umbraco.Cms.Infrastructure.Macros
 {
     /// <summary>
     /// Parses the macro syntax in a string and renders out it's contents

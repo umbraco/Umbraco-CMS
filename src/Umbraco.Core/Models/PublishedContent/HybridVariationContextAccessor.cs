@@ -1,7 +1,6 @@
-﻿using Umbraco.Core.Cache;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Cache;
 
-namespace Umbraco.Web.Models.PublishedContent
+namespace Umbraco.Cms.Core.Models.PublishedContent
 {
     /// <summary>
     /// Implements a hybrid <see cref="IVariationContextAccessor"/>.
@@ -11,9 +10,6 @@ namespace Umbraco.Web.Models.PublishedContent
         public HybridVariationContextAccessor(IRequestCache requestCache)
             : base(requestCache)
         { }
-
-        /// <inheritdoc />
-        protected override string ItemKey => "Umbraco.Web.HybridVariationContextAccessor";
 
         /// <summary>
         /// Gets or sets the <see cref="VariationContext"/> object.

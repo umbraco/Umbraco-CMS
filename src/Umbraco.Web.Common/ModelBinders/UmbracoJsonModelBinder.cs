@@ -6,9 +6,9 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.ObjectPool;
-using Umbraco.Web.Common.Formatters;
+using Umbraco.Cms.Web.Common.Formatters;
 
-namespace Umbraco.Web.Common.ModelBinders
+namespace Umbraco.Cms.Web.Common.ModelBinders
 {
     /// <summary>
     /// A custom body model binder that only uses a <see cref="NewtonsoftJsonInputFormatter"/> to bind body action parameters

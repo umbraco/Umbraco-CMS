@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Http;
-using Umbraco.Net;
+using Umbraco.Cms.Core.Net;
 
-namespace Umbraco.Web.Common.AspNetCore
+namespace Umbraco.Cms.Web.Common.AspNetCore
 {
     public class AspNetCoreUserAgentProvider : IUserAgentProvider
     {

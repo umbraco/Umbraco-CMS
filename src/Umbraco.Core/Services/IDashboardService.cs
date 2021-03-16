@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Dashboards;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Cms.Core.Services
 {
     public interface IDashboardService
     {

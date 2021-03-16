@@ -1,9 +1,9 @@
-﻿using System;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Persistence;
+using System;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// Represents a scope.
@@ -29,6 +29,11 @@ namespace Umbraco.Core.Scoping
         /// Gets the scope event dispatcher.
         /// </summary>
         IEventDispatcher Events { get; }
+
+        /// <summary>
+        /// Gets the scope notification publisher
+        /// </summary>
+        IScopedNotificationPublisher Notifications { get; }
 
         /// <summary>
         /// Gets the repositories cache mode.
@@ -58,5 +63,19 @@ namespace Umbraco.Core.Scoping
         /// </summary>
         /// <param name="lockIds">The lock object identifiers.</param>
         void WriteLock(params int[] lockIds);
+
+        /// <summary>
+        /// Write-locks some lock objects.
+        /// </summary>
+        /// <param name="timeout">The database timeout in milliseconds</param>
+        /// <param name="lockId">The lock object identifier.</param>
+        void WriteLock(TimeSpan timeout, int lockId);
+
+        /// <summary>
+        /// Read-locks some lock objects.
+        /// </summary>
+        /// <param name="timeout">The database timeout in milliseconds</param>
+        /// <param name="lockId">The lock object identifier.</param>
+        void ReadLock(TimeSpan timeout, int lockId);
     }
 }

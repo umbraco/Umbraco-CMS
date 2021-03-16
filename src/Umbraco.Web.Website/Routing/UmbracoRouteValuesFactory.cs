@@ -1,19 +1,17 @@
 using System;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
-using Microsoft.AspNetCore.Routing;
-using Umbraco.Core;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Features;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Website.Controllers;
 
-namespace Umbraco.Web.Website.Routing
+namespace Umbraco.Cms.Web.Website.Routing
 {
-
     /// <summary>
     /// Used to create <see cref="UmbracoRouteValues"/>
     /// </summary>
@@ -95,9 +93,9 @@ namespace Umbraco.Web.Website.Routing
                 _defaultControllerDescriptor.Value,
                 templateName: customActionName);
 
-            def = CheckHijackedRoute(httpContext, def);
+            def = CheckHijackedRoute(httpContext, def, out bool hasHijackedRoute);
 
-            def = CheckNoTemplate(httpContext, def);
+            def = CheckNoTemplate(httpContext, def, hasHijackedRoute);
 
             return def;
         }
@@ -105,7 +103,7 @@ namespace Umbraco.Web.Website.Routing
         /// <summary>
         /// Check if the route is hijacked and return new route values
         /// </summary>
-        private UmbracoRouteValues CheckHijackedRoute(HttpContext httpContext, UmbracoRouteValues def)
+        private UmbracoRouteValues CheckHijackedRoute(HttpContext httpContext, UmbracoRouteValues def, out bool hasHijackedRoute)
         {
             IPublishedRequest request = def.PublishedRequest;
 
@@ -115,21 +113,23 @@ namespace Umbraco.Web.Website.Routing
                 ControllerActionDescriptor descriptor = _controllerActionSearcher.Find<IRenderController>(httpContext, customControllerName, def.TemplateName);
                 if (descriptor != null)
                 {
+                    hasHijackedRoute = true;
+
                     return new UmbracoRouteValues(
                         request,
                         descriptor,
-                        def.TemplateName,
-                        true);
+                        def.TemplateName);
                 }
             }
 
+            hasHijackedRoute = false;
             return def;
         }
 
         /// <summary>
         /// Special check for when no template or hijacked route is done which needs to re-run through the routing pipeline again for last chance finders
         /// </summary>
-        private UmbracoRouteValues CheckNoTemplate(HttpContext httpContext, UmbracoRouteValues def)
+        private UmbracoRouteValues CheckNoTemplate(HttpContext httpContext, UmbracoRouteValues def, bool hasHijackedRoute)
         {
             IPublishedRequest request = def.PublishedRequest;
 
@@ -140,9 +140,9 @@ namespace Umbraco.Web.Website.Routing
             if (request.HasPublishedContent()
                 && !request.HasTemplate()
                 && !_umbracoFeatures.Disabled.DisableTemplates
-                && !def.HasHijackedRoute)
+                && !hasHijackedRoute)
             {
-                Core.Models.PublishedContent.IPublishedContent content = request.PublishedContent;
+                IPublishedContent content = request.PublishedContent;
 
                 // This is basically a 404 even if there is content found.
                 // We then need to re-run this through the pipeline for the last
@@ -164,7 +164,7 @@ namespace Umbraco.Web.Website.Routing
                 // if the content has changed, we must then again check for hijacked routes
                 if (content != request.PublishedContent)
                 {
-                    def = CheckHijackedRoute(httpContext, def);
+                    def = CheckHijackedRoute(httpContext, def, out _);
                 }
             }
 

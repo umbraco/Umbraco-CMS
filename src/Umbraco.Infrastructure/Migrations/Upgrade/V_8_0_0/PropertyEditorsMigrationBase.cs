@@ -3,12 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Umbraco.Core.IO;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public abstract class PropertyEditorsMigrationBase : MigrationBase
     {
@@ -31,7 +32,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         protected int[] ConvertStringValues(string val)
         {
-            var splitVals = val.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var splitVals = val.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
             var intVals = splitVals
                 .Select(x => int.TryParse(x, out var i) ? i : int.MinValue)

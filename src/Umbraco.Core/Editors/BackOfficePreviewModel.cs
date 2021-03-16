@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Web.Features;
+using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Web.Editors
+namespace Umbraco.Cms.Core.Editors
 {
     public class BackOfficePreviewModel
     {

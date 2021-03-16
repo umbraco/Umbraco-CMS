@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.WebAssets;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.WebAssets;
 
-namespace Umbraco.Web.WebAssets
+namespace Umbraco.Extensions
 {
     public static class RuntimeMinifierExtensions
     {
@@ -15,8 +17,9 @@ namespace Umbraco.Web.WebAssets
         /// <returns></returns>
         public static async Task<string> GetScriptForLoadingBackOfficeAsync(this IRuntimeMinifier minifier, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
-            var files = await minifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoJsBundleName);
-            var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(files, "umbraco", globalSettings, hostingEnvironment);
+            var coreScripts = await minifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoCoreJsBundleName);
+            var extensionsScripts = await minifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoExtensionsJsBundleName);
+            var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(coreScripts.Union(extensionsScripts), "umbraco", globalSettings, hostingEnvironment);
             result += await GetStylesheetInitializationAsync(minifier);
 
             return result;

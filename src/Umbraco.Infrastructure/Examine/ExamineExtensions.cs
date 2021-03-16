@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Examine;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Examine;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Infrastructure.Examine;
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for Examine.

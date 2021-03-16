@@ -1,18 +1,16 @@
-﻿using System;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
+using System;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class PublicAccessCacheRefresher : CacheRefresherBase<PublicAccessCacheRefresher>
+    public sealed class PublicAccessCacheRefresher : CacheRefresherBase<PublicAccessCacheRefresherNotification>
     {
-        public PublicAccessCacheRefresher(AppCaches appCaches)
-            : base(appCaches)
+        public PublicAccessCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, eventAggregator, factory)
         { }
 
         #region Define
-
-        protected override PublicAccessCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("1DB08769-B104-4F8B-850E-169CAC1DF2EC");
 

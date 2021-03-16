@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel;
-using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Migrations.Expressions.Update.Expressions;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Update.Expressions;
 
-namespace Umbraco.Core.Migrations.Expressions.Update
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update
 {
     public class UpdateDataBuilder : ExpressionBuilderBase<UpdateDataExpression>,
         IUpdateTableBuilder, IUpdateWhereBuilder, IExecutableBuilder

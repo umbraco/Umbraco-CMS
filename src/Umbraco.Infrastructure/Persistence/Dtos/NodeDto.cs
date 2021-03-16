@@ -1,16 +1,16 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     [TableName(TableName)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     public class NodeDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.Node;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.Node;
         public const int NodeIdSeed = 1060;
         private int? _userId;
 

@@ -4,10 +4,12 @@ using System.Reflection;
 using System.Web;
 using System.Web.Hosting;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web.Hosting
 {
@@ -55,7 +57,7 @@ namespace Umbraco.Web.Hosting
 
             // this will be the case in unit tests, we'll manually map the path
             var newPath = path.Replace('/', Path.DirectorySeparatorChar).Replace('\\', Path.DirectorySeparatorChar);
-            return newPath.StartsWith(ApplicationPhysicalPath) ? newPath : Path.Combine(ApplicationPhysicalPath, newPath.TrimStart('~', '/'));
+            return newPath.StartsWith(ApplicationPhysicalPath) ? newPath : Path.Combine(ApplicationPhysicalPath, newPath.TrimStart(Constants.CharArrays.TildeForwardSlash));
         }
 
         public string MapPathContentRoot(string path) => MapPathWebRoot(path);

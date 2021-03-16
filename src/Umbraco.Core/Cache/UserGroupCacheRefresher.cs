@@ -1,10 +1,9 @@
-﻿using System;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
+using System;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Repositories;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Handles User group cache invalidation/refreshing
@@ -12,15 +11,13 @@ namespace Umbraco.Web.Cache
     /// <remarks>
     /// This also needs to clear the user cache since IReadOnlyUserGroup's are attached to IUser objects
     /// </remarks>
-    public sealed class UserGroupCacheRefresher : CacheRefresherBase<UserGroupCacheRefresher>
+    public sealed class UserGroupCacheRefresher : CacheRefresherBase<UserGroupCacheRefresherNotification>
     {
-        public UserGroupCacheRefresher(AppCaches appCaches)
-            : base(appCaches)
+        public UserGroupCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, eventAggregator, factory)
         { }
 
         #region Define
-
-        protected override UserGroupCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("45178038-B232-4FE8-AA1A-F2B949C44762");
 

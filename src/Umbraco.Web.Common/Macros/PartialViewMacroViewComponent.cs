@@ -1,14 +1,13 @@
-﻿using System.Collections.Generic;
-using Umbraco.Web.Models;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewEngines;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.PublishedContent;
+using Microsoft.AspNetCore.Mvc.ViewComponents;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Macros;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Web.Macros
+namespace Umbraco.Cms.Web.Common.Macros
 {
     /// <summary>
     /// Controller to render macro content for Partial View Macros
@@ -22,13 +21,17 @@ namespace Umbraco.Web.Macros
 
         public PartialViewMacroViewComponent(
             MacroModel macro,
-            IPublishedContent content)
+            IPublishedContent content,
+            ViewComponentContext viewComponentContext)
         {
             _macro = macro;
             _content = content;
+            // This must be set before Invoke is called else the call to View will end up
+            // using an empty ViewData instance because this hasn't been set yet.
+            ViewComponentContext = viewComponentContext;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync()
+        public IViewComponentResult Invoke()
         {
             var model = new PartialViewMacroModel(
                 _content,
@@ -36,7 +39,8 @@ namespace Umbraco.Web.Macros
                 _macro.Alias,
                 _macro.Name,
                 _macro.Properties.ToDictionary(x => x.Key, x => (object)x.Value));
-            var result =  View(_macro.MacroSource, model);
+
+            ViewViewComponentResult result =  View(_macro.MacroSource, model);
 
             return result;
         }

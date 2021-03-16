@@ -1,17 +1,16 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Infrastructure.HostedServices;
+using Newtonsoft.Json;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Telemetry
+namespace Umbraco.Cms.Infrastructure.HostedServices
 {
     public class ReportSiteTask : RecurringHostedServiceBase
     {

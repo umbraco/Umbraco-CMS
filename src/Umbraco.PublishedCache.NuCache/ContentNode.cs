@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Web.PublishedCache.NuCache.DataSource;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.PublishedCache.NuCache
+namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     // represents a content "node" ie a pair of draft + published versions
     // internal, never exposed, to be accessed from ContentStore (only!)

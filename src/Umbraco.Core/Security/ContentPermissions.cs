@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
 
     /// <summary>
@@ -18,6 +19,7 @@ namespace Umbraco.Core.Security
         private readonly IUserService _userService;
         private readonly IContentService _contentService;
         private readonly IEntityService _entityService;
+        private readonly AppCaches _appCaches;
 
         public enum ContentAccess
         {
@@ -29,11 +31,13 @@ namespace Umbraco.Core.Security
         public ContentPermissions(
             IUserService userService,
             IContentService contentService,
-            IEntityService entityService)
+            IEntityService entityService,
+            AppCaches appCaches)
         {
             _userService = userService;
             _contentService = contentService;
             _entityService = entityService;
+            _appCaches = appCaches;
         }
 
         public ContentAccess CheckPermissions(
@@ -50,7 +54,7 @@ namespace Umbraco.Core.Security
 
             if (content == null) return ContentAccess.NotFound;
 
-            var hasPathAccess = user.HasPathAccess(content, _entityService);
+            var hasPathAccess = user.HasPathAccess(content, _entityService, _appCaches);
 
             if (hasPathAccess == false)
                 return ContentAccess.Denied;
@@ -78,7 +82,7 @@ namespace Umbraco.Core.Security
 
             if (entity == null) return ContentAccess.NotFound;
 
-            var hasPathAccess = user.HasContentPathAccess(entity, _entityService);
+            var hasPathAccess = user.HasContentPathAccess(entity, _entityService, _appCaches);
 
             if (hasPathAccess == false)
                 return ContentAccess.Denied;
@@ -119,16 +123,16 @@ namespace Umbraco.Core.Security
             entity = null;
 
             if (nodeId == Constants.System.Root)
-                hasPathAccess = user.HasContentRootAccess(_entityService);
+                hasPathAccess = user.HasContentRootAccess(_entityService, _appCaches);
             else if (nodeId == Constants.System.RecycleBinContent)
-                hasPathAccess = user.HasContentBinAccess(_entityService);
+                hasPathAccess = user.HasContentBinAccess(_entityService, _appCaches);
 
             if (hasPathAccess.HasValue)
                 return hasPathAccess.Value ? ContentAccess.Granted : ContentAccess.Denied;
 
             entity = _entityService.Get(nodeId, UmbracoObjectTypes.Document);
             if (entity == null) return ContentAccess.NotFound;
-            hasPathAccess = user.HasContentPathAccess(entity, _entityService);
+            hasPathAccess = user.HasContentPathAccess(entity, _entityService, _appCaches);
 
             if (hasPathAccess == false)
                 return ContentAccess.Denied;
@@ -155,7 +159,7 @@ namespace Umbraco.Core.Security
         /// <returns></returns>
         public ContentAccess CheckPermissions(
             int nodeId,
-            IUser user,            
+            IUser user,
             out IContent contentItem,
             IReadOnlyList<char> permissionsToCheck = null)
         {
@@ -170,16 +174,16 @@ namespace Umbraco.Core.Security
             contentItem = null;
 
             if (nodeId == Constants.System.Root)
-                hasPathAccess = user.HasContentRootAccess(_entityService);
+                hasPathAccess = user.HasContentRootAccess(_entityService, _appCaches);
             else if (nodeId == Constants.System.RecycleBinContent)
-                hasPathAccess = user.HasContentBinAccess(_entityService);
+                hasPathAccess = user.HasContentBinAccess(_entityService, _appCaches);
 
             if (hasPathAccess.HasValue)
                 return hasPathAccess.Value ? ContentAccess.Granted : ContentAccess.Denied;
 
             contentItem = _contentService.GetById(nodeId);
             if (contentItem == null) return ContentAccess.NotFound;
-            hasPathAccess = user.HasPathAccess(contentItem, _entityService);
+            hasPathAccess = user.HasPathAccess(contentItem, _entityService, _appCaches);
 
             if (hasPathAccess == false)
                 return ContentAccess.Denied;

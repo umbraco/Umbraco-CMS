@@ -6,11 +6,11 @@ using System.Linq;
 using System.Xml;
 using System.Xml.XPath;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Xml;
-using Umbraco.Tests.Common.Builders;
+using Umbraco.Cms.Core.Xml;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Xml
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Xml
 {
     [TestFixture]
     public class XmlHelperTests

@@ -5,18 +5,18 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Common.Builders;
 
-namespace Umbraco.Tests.Scoping
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
 {
     [TestFixture]
     public class ScopeEventDispatcherTests
@@ -87,7 +87,8 @@ namespace Umbraco.Tests.Scoping
                 Mock.Of<IMediaFileSystem>(),
                 Mock.Of<ILogger<ScopeProvider>>(),
                 instance,
-                Mock.Of<IRequestCache>()
+                Mock.Of<IRequestCache>(),
+                Mock.Of<IEventAggregator>()
                 );
         }
 

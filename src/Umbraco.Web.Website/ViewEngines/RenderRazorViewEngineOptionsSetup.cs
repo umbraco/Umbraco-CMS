@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.Options;
 
-namespace Umbraco.Web.Website.ViewEngines
+namespace Umbraco.Cms.Web.Website.ViewEngines
 {
     /// <summary>
     /// Configure view engine locations for front-end rendering

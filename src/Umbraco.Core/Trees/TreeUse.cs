@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Web.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     /// <summary>
     /// Defines tree uses.

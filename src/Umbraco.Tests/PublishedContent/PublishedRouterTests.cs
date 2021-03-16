@@ -1,15 +1,13 @@
 using System;
-using System.Collections;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.PublishedContent
 {

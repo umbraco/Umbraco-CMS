@@ -10,7 +10,7 @@
 
         <umb-editor-container>
 
-            <div class="umb-control-group" ng-if="vm.shouldShowUrl()">
+            <div class="umb-control-group" ng-if="vm.shouldShowUrl">
                 <h5>
                     <localize key="@general_url"></localize>
                 </h5>
@@ -22,6 +22,13 @@
                     <localize key="@content_altTextOptional"></localize>
                 </h5>
                 <input type="text" class="umb-property-editor umb-textstring" ng-model="model.target.altText" umb-auto-focus />
+            </div>
+
+            <div class="umb-control-group" ng-if="model.target">
+                <h5>
+                    <localize key="@content_captionTextOptional"></localize>
+                </h5>
+                <input type="text" class="umb-property-editor umb-textstring" ng-model="model.target.caption" />
             </div>
 
             <div class="umb-control-group" ng-if="model.target">

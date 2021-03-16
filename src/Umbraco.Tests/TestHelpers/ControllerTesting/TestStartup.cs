@@ -5,8 +5,8 @@ using System.Web.Http.Dispatcher;
 using System.Web.Http.ExceptionHandling;
 using System.Web.Http.Tracing;
 using Owin;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Web;
-using Umbraco.Web.Editors;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.WebApi;
 

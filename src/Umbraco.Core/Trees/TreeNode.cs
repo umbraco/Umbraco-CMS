@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Models.Trees
+namespace Umbraco.Cms.Core.Trees
 {
     /// <summary>
     /// Represents a model in the tree
@@ -104,8 +103,19 @@ namespace Umbraco.Web.Models.Trees
         {
             get
             {
-                // TODO: Is this ever actually used? If not remove, if so, add setter.
                 return string.Empty;
+
+                //TODO Figure out how to do this, without the model has to know a bout services and config.
+                //
+                // if (IconIsClass)
+                //     return string.Empty;
+                //
+                // //absolute path with or without tilde
+                // if (Icon.StartsWith("~") || Icon.StartsWith("/"))
+                //     return IOHelper.ResolveUrl("~" + Icon.TrimStart(Constants.CharArrays.Tilde));
+                //
+                // //legacy icon path
+                // return string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);
             }
         }
 

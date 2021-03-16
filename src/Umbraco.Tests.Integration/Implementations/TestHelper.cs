@@ -18,24 +18,25 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Diagnostics;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Runtime;
-using Umbraco.Net;
-using Umbraco.Tests.Common;
-using Umbraco.Web.Common.AspNetCore;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Diagnostics;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Extensions;
 using File = System.IO.File;
-using IHostingEnvironment = Umbraco.Core.Hosting.IHostingEnvironment;
+using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Tests.Integration.Implementations
+namespace Umbraco.Cms.Tests.Integration.Implementations
 {
     public class TestHelper : TestHelperBase
     {
@@ -120,7 +121,7 @@ namespace Umbraco.Tests.Integration.Implementations
         public IWebHostEnvironment GetWebHostEnvironment() => _hostEnvironment;
 
         public override IDbProviderFactoryCreator DbProviderFactoryCreator =>
-            new SqlServerDbProviderFactoryCreator(DbProviderFactories.GetFactory);
+            new SqlServerDbProviderFactoryCreator(DbProviderFactories.GetFactory, Options.Create(new GlobalSettings()));
 
         public override IBulkSqlInsertProvider BulkSqlInsertProvider => new SqlServerBulkSqlInsertProvider();
 

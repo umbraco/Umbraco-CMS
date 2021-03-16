@@ -1,14 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.ContentApps
+namespace Umbraco.Cms.Core.ContentApps
 {
     public class ListViewContentAppFactory : IContentAppFactory
     {
@@ -36,14 +35,14 @@ namespace Umbraco.Web.ContentApps
                 case IContent content:
                     contentTypeAlias = content.ContentType.Alias;
                     entityType = "content";
-                    dtdId = Core.Constants.DataTypes.DefaultContentListView;
+                    dtdId = Constants.DataTypes.DefaultContentListView;
                     break;
-                case IMedia media when !media.ContentType.IsContainer && media.ContentType.Alias != Core.Constants.Conventions.MediaTypes.Folder:
+                case IMedia media when !media.ContentType.IsContainer && media.ContentType.Alias != Constants.Conventions.MediaTypes.Folder:
                     return null;
                 case IMedia media:
                     contentTypeAlias = media.ContentType.Alias;
                     entityType = "media";
-                    dtdId = Core.Constants.DataTypes.DefaultMediaListView;
+                    dtdId = Constants.DataTypes.DefaultMediaListView;
                     break;
                 default:
                     return null;
@@ -72,7 +71,7 @@ namespace Umbraco.Web.ContentApps
                 Weight = Weight
             };
 
-            var customDtdName = Core.Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
+            var customDtdName = Constants.Conventions.DataTypes.ListViewPrefix + contentTypeAlias;
 
             //first try to get the custom one if there is one
             var dt = dataTypeService.GetDataType(customDtdName)
@@ -121,7 +120,7 @@ namespace Umbraco.Web.ContentApps
             {
                 new ContentPropertyDisplay
                 {
-                    Alias = $"{Core.Constants.PropertyEditors.InternalGenericPropertiesPrefix}containerView",
+                    Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}containerView",
                     Label = "",
                     Value = null,
                     View = editor.GetValueEditor().View,

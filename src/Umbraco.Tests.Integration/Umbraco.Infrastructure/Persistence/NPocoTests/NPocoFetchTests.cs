@@ -6,12 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using NUnit.Framework;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Scoping;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.Testing;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.NPocoTests
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, WithApplication = true)]

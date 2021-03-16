@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core
+﻿namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Describes the reason for the runtime level.

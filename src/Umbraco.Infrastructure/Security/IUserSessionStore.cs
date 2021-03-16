@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// An IUserStore interface part to implement if the store supports validating user session Ids

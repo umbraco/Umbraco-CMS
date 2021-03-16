@@ -1,7 +1,6 @@
-﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Alter.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Alter.Expressions
 {
     public class AlterColumnExpression : MigrationExpressionBase
     {

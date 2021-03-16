@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace Umbraco.Web.Install.Models
+namespace Umbraco.Cms.Core.Install.Models
 {
     [DataContract(Name = "user", Namespace = "")]
     public class UserModel

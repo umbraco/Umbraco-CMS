@@ -7,7 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using Microsoft.Data.SqlClient;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     /// <summary>
     /// A base implementation of <see cref="IDataReader"/> that is suitable for <see cref="SqlBulkCopy.WriteToServer(IDataReader)"/>.

@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Runtime.Serialization;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Exceptions
+namespace Umbraco.Cms.Core.Exceptions
 {
     /// <summary>
     /// The exception that is thrown when a composition is invalid.

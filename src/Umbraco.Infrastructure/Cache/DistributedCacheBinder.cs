@@ -1,13 +1,17 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Events;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Default <see cref="IDistributedCacheBinder"/> implementation.
@@ -39,7 +43,6 @@ namespace Umbraco.Web.Cache
 
         private static readonly Lazy<MethodInfo[]> CandidateHandlers = new Lazy<MethodInfo[]>(() =>
         {
-            var underscore = new[] { '_' };
 
             return typeof(DistributedCacheBinder)
                 .GetMethods(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
@@ -47,7 +50,7 @@ namespace Umbraco.Web.Cache
                 {
                     if (x.Name.Contains("_") == false) return null;
 
-                    var parts = x.Name.Split(underscore, StringSplitOptions.RemoveEmptyEntries).Length;
+                    var parts = x.Name.Split(Constants.CharArrays.Underscore, StringSplitOptions.RemoveEmptyEntries).Length;
                     if (parts != 2) return null;
 
                     var parameters = x.GetParameters();

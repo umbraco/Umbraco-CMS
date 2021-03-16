@@ -1,17 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Net;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Net;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
-
     /// <summary>
     /// Abstract class for Umbraco User Managers for back office users or front-end members
     /// </summary>
@@ -33,12 +33,11 @@ namespace Umbraco.Core.Security
             IPasswordHasher<TUser> passwordHasher,
             IEnumerable<IUserValidator<TUser>> userValidators,
             IEnumerable<IPasswordValidator<TUser>> passwordValidators,
-            ILookupNormalizer keyNormalizer,
             IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<TUser>> logger,
             IOptions<TPasswordConfig> passwordConfiguration)
-            : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, keyNormalizer, errors, services, logger)
+            : base(store, optionsAccessor, passwordHasher, userValidators, passwordValidators, new NoopLookupNormalizer(), errors, services, logger)
         {
             IpResolver = ipResolver ?? throw new ArgumentNullException(nameof(ipResolver));
             PasswordConfiguration = passwordConfiguration.Value ?? throw new ArgumentNullException(nameof(passwordConfiguration));
@@ -73,8 +72,8 @@ namespace Umbraco.Core.Security
         /// Used to validate a user's session
         /// </summary>
         /// <param name="userId">The user id</param>
-        /// <param name="sessionId">The sesion id</param>
-        /// <returns>True if the sesion is valid, else false</returns>
+        /// <param name="sessionId">The session id</param>
+        /// <returns>True if the session is valid, else false</returns>
         public virtual async Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
         {
             var userSessionStore = Store as IUserSessionStore<TUser>;
@@ -90,25 +89,61 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// This will determine which password hasher to use based on what is defined in config
-        /// </summary>
-        /// <param name="passwordConfiguration">The <see cref="IPasswordConfiguration"/></param>
-        /// <returns>An <see cref="IPasswordHasher{T}"/></returns>
-        protected virtual IPasswordHasher<TUser> GetDefaultPasswordHasher(IPasswordConfiguration passwordConfiguration) => new PasswordHasher<TUser>();
-
-        /// <summary>
         /// Helper method to generate a password for a user based on the current password validator
         /// </summary>
         /// <returns>The generated password</returns>
         public string GeneratePassword()
         {
-            if (_passwordGenerator == null)
+            _passwordGenerator ??= new PasswordGenerator(PasswordConfiguration);
+
+            string password = _passwordGenerator.GeneratePassword();
+            return password;
+        }
+
+        /// <summary>
+        /// Generates a hashed password based on the default password hasher
+        /// No existing identity user is required and this does not validate the password
+        /// </summary>
+        /// <param name="password">The password to hash</param>
+        /// <returns>The hashed password</returns>
+        public string HashPassword(string password)
+        {
+            string hashedPassword = PasswordHasher.HashPassword(null, password);
+            return hashedPassword;
+        }
+
+        /// <summary>
+        /// Used to validate the password without an identity user
+        /// Validation code is based on the default ValidatePasswordAsync code
+        /// Should return <see cref="IdentityResult.Success"/> if validation is successful
+        /// </summary>
+        /// <param name="password">The password.</param>
+        /// <returns>A <see cref="IdentityResult"/> representing whether validation was successful.</returns>
+        public async Task<IdentityResult> ValidatePasswordAsync(string password)
+        {
+            var errors = new List<IdentityError>();
+            var isValid = true;
+            foreach (IPasswordValidator<TUser> v in PasswordValidators)
             {
-                _passwordGenerator = new PasswordGenerator(PasswordConfiguration);
+                IdentityResult result = await v.ValidateAsync(this, null, password);
+                if (!result.Succeeded)
+                {
+                    if (result.Errors.Any())
+                    {
+                        errors.AddRange(result.Errors);
+                    }
+
+                    isValid = false;
+                }
             }
 
-            var password = _passwordGenerator.GeneratePassword();
-            return password;
+            if (!isValid)
+            {
+                Logger.LogWarning(14, "Password validation failed: {errors}.", string.Join(";", errors.Select(e => e.Code)));
+                return IdentityResult.Failed(errors.ToArray());
+            }
+
+            return IdentityResult.Success;
         }
 
         /// <inheritdoc />

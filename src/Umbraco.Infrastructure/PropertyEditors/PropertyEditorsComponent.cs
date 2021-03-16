@@ -1,15 +1,18 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
+    // TODO: delete this component and make the "ContainedFilePaths" methods on FileUploadPropertyEditor and ImageCropperPropertyEditor private once MemberService uses notifications instead of static events
     public sealed class PropertyEditorsComponent : IComponent
     {
         private readonly PropertyEditorCollection _propertyEditors;
@@ -38,40 +41,14 @@ namespace Umbraco.Web.PropertyEditors
 
         private void Initialize(FileUploadPropertyEditor fileUpload)
         {
-            MediaService.Saving += fileUpload.MediaServiceSaving;
-            _terminate.Add(() => MediaService.Saving -= fileUpload.MediaServiceSaving);
-            ContentService.Copied += fileUpload.ContentServiceCopied;
-            _terminate.Add(() => ContentService.Copied -= fileUpload.ContentServiceCopied);
-
-            void mediaServiceDeleted(IMediaService sender, DeleteEventArgs<IMedia> args) => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            MediaService.Deleted += mediaServiceDeleted;
-            _terminate.Add(() => MediaService.Deleted -= mediaServiceDeleted);
-
-            void contentServiceDeleted(IContentService sender, DeleteEventArgs<IContent> args) => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            ContentService.Deleted += contentServiceDeleted;
-            _terminate.Add(() => ContentService.Deleted -= contentServiceDeleted);
-
-            void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(fileUpload.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(fileUpload.ContainedFilePaths(args.DeletedEntities.Cast<ContentBase>()));
             MemberService.Deleted += memberServiceDeleted;
             _terminate.Add(() => MemberService.Deleted -= memberServiceDeleted);
         }
 
         private void Initialize(ImageCropperPropertyEditor imageCropper)
         {
-            MediaService.Saving += imageCropper.MediaServiceSaving;
-            _terminate.Add(() => MediaService.Saving -= imageCropper.MediaServiceSaving);
-            ContentService.Copied += imageCropper.ContentServiceCopied;
-            _terminate.Add(() => ContentService.Copied -= imageCropper.ContentServiceCopied);
-
-            void mediaServiceDeleted(IMediaService sender, DeleteEventArgs<IMedia> args) => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            MediaService.Deleted += mediaServiceDeleted;
-            _terminate.Add(() => MediaService.Deleted -= mediaServiceDeleted);
-
-            void contentServiceDeleted(IContentService sender, DeleteEventArgs<IContent> args) => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
-            ContentService.Deleted += contentServiceDeleted;
-            _terminate.Add(() => ContentService.Deleted -= contentServiceDeleted);
-
-            void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(imageCropper.ServiceDeleted(args.DeletedEntities.Cast<ContentBase>()));
+            void memberServiceDeleted(IMemberService sender, DeleteEventArgs<IMember> args) => args.MediaFilesToDelete.AddRange(imageCropper.ContainedFilePaths(args.DeletedEntities.Cast<ContentBase>()));
             MemberService.Deleted += memberServiceDeleted;
             _terminate.Add(() => MemberService.Deleted -= memberServiceDeleted);
         }

@@ -5,24 +5,25 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Trees;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Search;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     [Authorize(Policy = AuthorizationPolicies.SectionAccessForContentTree)]
     [Tree(Constants.Applications.Content, Constants.Trees.Content)]
@@ -33,7 +34,6 @@ namespace Umbraco.Web.BackOffice.Trees
     {
         private readonly UmbracoTreeSearcher _treeSearcher;
         private readonly ActionCollection _actions;
-        private readonly GlobalSettings _globalSettings;
         private readonly IMenuItemCollectionFactory _menuItemCollectionFactory;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IContentService _contentService;
@@ -41,6 +41,8 @@ namespace Umbraco.Web.BackOffice.Trees
         private readonly IPublicAccessService _publicAccessService;
         private readonly IUserService _userService;
         private readonly ILocalizationService _localizationService;
+        private readonly IEmailSender _emailSender;
+        private readonly AppCaches _appCaches;
 
         public ContentTreeController(
             ILocalizedTextService localizedTextService,
@@ -54,15 +56,16 @@ namespace Umbraco.Web.BackOffice.Trees
             IDataTypeService dataTypeService,
             UmbracoTreeSearcher treeSearcher,
             ActionCollection actions,
-            IOptions<GlobalSettings> globalSettings,
             IContentService contentService,
             IPublicAccessService publicAccessService,
-            ILocalizationService localizationService)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService)
+            ILocalizationService localizationService,
+            IEventAggregator eventAggregator,
+            IEmailSender emailSender,
+            AppCaches appCaches)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, entityService, backofficeSecurityAccessor, logger, actionCollection, userService, dataTypeService, eventAggregator, appCaches)
         {
             _treeSearcher = treeSearcher;
             _actions = actions;
-            _globalSettings = globalSettings.Value;
             _menuItemCollectionFactory = menuItemCollectionFactory;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
             _contentService = contentService;
@@ -70,6 +73,8 @@ namespace Umbraco.Web.BackOffice.Trees
             _publicAccessService = publicAccessService;
             _userService = userService;
             _localizationService = localizationService;
+            _emailSender = emailSender;
+            _appCaches = appCaches;
         }
 
         protected override int RecycleBinId => Constants.System.RecycleBinContent;
@@ -79,7 +84,7 @@ namespace Umbraco.Web.BackOffice.Trees
         private int[] _userStartNodes;
 
         protected override int[] UserStartNodes
-            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService));
+            => _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService, _appCaches));
 
 
 
@@ -163,7 +168,7 @@ namespace Umbraco.Web.BackOffice.Trees
 
                 //these two are the standard items
                 menu.Items.Add<ActionNew>(LocalizedTextService, opensDialog: true);
-                menu.Items.Add<ActionSort>(LocalizedTextService, true);
+                menu.Items.Add<ActionSort>(LocalizedTextService, true, opensDialog: true);
 
                 //filter the standard items
                 FilterUserAllowedMenuItems(menu, nodeActions);
@@ -193,7 +198,7 @@ namespace Umbraco.Web.BackOffice.Trees
             }
 
             //if the user has no path access for this node, all they can do is refresh
-            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(item, _entityService))
+            if (!_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(item, _entityService, _appCaches))
             {
                 var menu = _menuItemCollectionFactory.Create();
                 menu.Items.Add(new RefreshNode(LocalizedTextService, true));
@@ -203,7 +208,7 @@ namespace Umbraco.Web.BackOffice.Trees
             var nodeMenu = GetAllNodeMenuItems(item);
 
             //if the content node is in the recycle bin, don't have a default menu, just show the regular menu
-            if (item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
+            if (item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Contains(RecycleBinId.ToInvariantString()))
             {
                 nodeMenu.DefaultMenuAlias = null;
                 nodeMenu = GetNodeMenuItemsForDeletedContent(item);
@@ -269,12 +274,12 @@ namespace Umbraco.Web.BackOffice.Trees
             AddActionNode<ActionCreateBlueprintFromContent>(item, menu, opensDialog: true);
             AddActionNode<ActionMove>(item, menu, true, opensDialog: true);
             AddActionNode<ActionCopy>(item, menu, opensDialog: true);
-            AddActionNode<ActionSort>(item, menu, true);
+            AddActionNode<ActionSort>(item, menu, true, opensDialog: true);
             AddActionNode<ActionAssignDomain>(item, menu, opensDialog: true);
             AddActionNode<ActionRights>(item, menu, opensDialog: true);
             AddActionNode<ActionProtect>(item, menu, true, opensDialog: true);
 
-            if (EmailSender.CanSendRequiredEmail(_globalSettings))
+            if (_emailSender.CanSendRequiredEmail())
             {
 	            menu.Items.Add(new MenuItem("notify", LocalizedTextService)
 	            {

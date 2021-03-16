@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Examine;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public class IndexRebuildingEventArgs : EventArgs
     {

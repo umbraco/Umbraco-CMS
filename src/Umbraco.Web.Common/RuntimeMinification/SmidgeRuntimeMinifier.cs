@@ -7,14 +7,13 @@ using Smidge.CompositeFiles;
 using Smidge.FileProcessors;
 using Smidge.Models;
 using Smidge.Nuglify;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.WebAssets;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.WebAssets;
 using CssFile = Smidge.Models.CssFile;
 using JavaScriptFile = Smidge.Models.JavaScriptFile;
 
-namespace Umbraco.Web.Common.RuntimeMinification
+namespace Umbraco.Cms.Web.Common.RuntimeMinification
 {
     public class SmidgeRuntimeMinifier : IRuntimeMinifier
     {
@@ -74,7 +73,7 @@ namespace Umbraco.Web.Common.RuntimeMinification
 
         public async Task<string> RenderCssHereAsync(string bundleName) => (await _smidge.SmidgeHelper.CssHereAsync(bundleName, _hostingEnvironment.IsDebugMode)).ToString();
 
-        public void CreateJsBundle(string bundleName, params string[] filePaths)
+        public void CreateJsBundle(string bundleName, bool optimizeOutput, params string[] filePaths)
         {
             if (filePaths.Any(f => !f.StartsWith("/") && !f.StartsWith("~/")))
                 throw new InvalidOperationException("All file paths must be absolute");
@@ -85,7 +84,8 @@ namespace Umbraco.Web.Common.RuntimeMinification
             // Here we could configure bundle options instead of using smidge's global defaults.
             // For example we can use our own custom cache buster for this bundle without having the global one
             // affect this or vice versa.
-            var bundle = _bundles.Create(bundleName, _jsPipeline.Value, WebFileType.Js, filePaths);
+            var pipeline = optimizeOutput ? _jsPipeline.Value : _bundles.PipelineFactory.Create();
+            var bundle = _bundles.Create(bundleName, pipeline, WebFileType.Js, filePaths);
         }
 
         public async Task<string> RenderJsHereAsync(string bundleName) => (await _smidge.SmidgeHelper.JsHereAsync(bundleName, _hostingEnvironment.IsDebugMode)).ToString();
@@ -118,7 +118,7 @@ namespace Umbraco.Web.Common.RuntimeMinification
         public void Reset()
         {
             var version = DateTime.UtcNow.Ticks.ToString();
-            _configManipulator.SaveConfigValue(Core.Constants.Configuration.ConfigRuntimeMinificationVersion, version.ToString());
+            _configManipulator.SaveConfigValue(Cms.Core.Constants.Configuration.ConfigRuntimeMinificationVersion, version.ToString());
         }
 
 

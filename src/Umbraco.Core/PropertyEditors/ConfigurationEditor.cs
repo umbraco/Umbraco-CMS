@@ -2,13 +2,15 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents a data type configuration editor.
     /// </summary>
+    [DataContract]
     public class ConfigurationEditor : IConfigurationEditor
     {
         private IDictionary<string, object> _defaultConfiguration;

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Install
+﻿namespace Umbraco.Cms.Core.Install
 {
     public enum FilePermissionTest
     {

@@ -4,17 +4,19 @@
 using System;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using NUnit.Framework;
-using Umbraco.Core.Composing;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Tests.UnitTests.TestHelpers;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.TestHelpers
+namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 {
     [TestFixture]
     public abstract class BaseUsingSqlSyntax
@@ -41,7 +43,7 @@ namespace Umbraco.Tests.TestHelpers
             IServiceProvider factory = composition.CreateServiceProvider();
             var pocoMappers = new NPoco.MapperCollection { new PocoMapper() };
             var pocoDataFactory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, pocoMappers).Init(), pocoMappers);
-            var sqlSyntax = new SqlServerSyntaxProvider();
+            var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
             SqlContext = new SqlContext(sqlSyntax, DatabaseType.SqlServer2012, pocoDataFactory, new Lazy<IMapperCollection>(() => factory.GetRequiredService<IMapperCollection>()));
             Mappers = factory.GetRequiredService<IMapperCollection>();
         }

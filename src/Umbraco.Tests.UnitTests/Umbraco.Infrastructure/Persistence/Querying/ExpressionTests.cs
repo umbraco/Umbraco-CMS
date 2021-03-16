@@ -6,21 +6,23 @@ using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Serialization;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
 {
     [TestFixture]
     public class ExpressionTests : BaseUsingSqlSyntax
@@ -154,7 +156,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Querying
         [Test]
         public void Equals_Method_For_Value_Gets_Escaped()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider();
+            var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
             Expression<Func<IUser, bool>> predicate = user => user.Username.Equals("hello@world.com");
             var modelToSqlExpressionHelper = new ModelToSqlExpressionVisitor<IUser>(SqlContext.SqlSyntax, Mappers);
             var result = modelToSqlExpressionHelper.Visit(predicate);

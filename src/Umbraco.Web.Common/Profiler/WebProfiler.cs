@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Linq;
 using System.Threading;
 using Microsoft.AspNetCore.Http;
 using StackExchange.Profiling;
-using Umbraco.Core.Logging;
+using Umbraco.Cms.Core.Logging;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.Common.Profiler
+namespace Umbraco.Cms.Web.Common.Profiler
 {
 
     public class WebProfiler : IProfiler

@@ -1,8 +1,8 @@
-﻿namespace Umbraco.Core.Persistence
+﻿namespace Umbraco.Cms.Infrastructure.Persistence
 {
     public class NoopEmbeddedDatabaseCreator : IEmbeddedDatabaseCreator
     {
-        public string ProviderName => Constants.DatabaseProviders.SqlServer;
+        public string ProviderName => Cms.Core.Constants.DatabaseProviders.SqlServer;
 
         public string ConnectionString { get; set; }
 

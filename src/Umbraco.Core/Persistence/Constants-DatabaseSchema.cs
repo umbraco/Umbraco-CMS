@@ -1,5 +1,5 @@
 ﻿// ReSharper disable once CheckNamespace
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -75,6 +75,8 @@ namespace Umbraco.Core
                 public const string AuditEntry = TableNamePrefix + "Audit";
                 public const string Consent = TableNamePrefix + "Consent";
                 public const string UserLogin = TableNamePrefix + "UserLogin";
+
+                public const string LogViewerQuery = TableNamePrefix + "LogViewerQuery";
             }
         }
     }

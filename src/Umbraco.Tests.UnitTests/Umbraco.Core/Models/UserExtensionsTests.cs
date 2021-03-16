@@ -6,13 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
-using User = Umbraco.Core.Models.Membership.User;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using User = Umbraco.Cms.Core.Models.Membership.User;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
 {
     [TestFixture]
     public class UserExtensionsTests
@@ -44,7 +45,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Models
                 .Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns<UmbracoObjectTypes, int[]>((type, ids) => new[] { new TreeEntityPath { Id = startNodeId, Path = startNodePath } });
 
-            Assert.AreEqual(outcome, user.HasPathAccess(content, esmock.Object));
+            Assert.AreEqual(outcome, user.HasPathAccess(content, esmock.Object, AppCaches.Disabled));
         }
 
         [TestCase("", "1", "1")] // single user start, top level

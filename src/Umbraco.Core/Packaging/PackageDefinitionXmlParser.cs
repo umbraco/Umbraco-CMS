@@ -1,12 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Packaging;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Packaging
+namespace Umbraco.Cms.Core.Packaging
 {
     /// <summary>
     /// Converts a <see cref="PackageDefinition"/> to and from XML
@@ -48,14 +48,14 @@ namespace Umbraco.Core.Packaging
                 ContentLoadChildNodes = xml.Element("content")?.AttributeValue<bool>("loadChildNodes") ?? false,
                 MediaUdis = xml.Element("media")?.Elements("nodeUdi").Select(x => (GuidUdi)UdiParser.Parse(x.Value)).ToList() ?? new List<GuidUdi>(),
                 MediaLoadChildNodes = xml.Element("media")?.AttributeValue<bool>("loadChildNodes") ?? false,
-                Macros = xml.Element("macros")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                Templates = xml.Element("templates")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                Stylesheets = xml.Element("stylesheets")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                DocumentTypes = xml.Element("documentTypes")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
+                Macros = xml.Element("macros")?.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
+                Templates = xml.Element("templates")?.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
+                Stylesheets = xml.Element("stylesheets")?.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
+                DocumentTypes = xml.Element("documentTypes")?.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 MediaTypes = xml.Element("mediaTypes")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                Languages = xml.Element("languages")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                DictionaryItems = xml.Element("dictionaryitems")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
-                DataTypes = xml.Element("datatypes")?.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
+                Languages = xml.Element("languages")?.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
+                DictionaryItems = xml.Element("dictionaryitems")?.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
+                DataTypes = xml.Element("datatypes")?.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).ToList() ?? new List<string>(),
                 Files = xml.Element("files")?.Elements("file").Select(x => x.Value).ToList() ?? new List<string>()
             };
 
@@ -81,7 +81,7 @@ namespace Umbraco.Core.Packaging
                 new XAttribute("name", def.Name ?? string.Empty),
                 new XAttribute("packagePath", def.PackagePath ?? string.Empty),
                 new XAttribute("iconUrl", def.IconUrl ?? string.Empty),
-                new XAttribute("umbVersion", def.UmbracoVersion ?? _umbracoVersion.Current),
+                new XAttribute("umbVersion", def.UmbracoVersion ?? _umbracoVersion.Version),
                 new XAttribute("packageGuid", def.PackageId),
                 new XAttribute("view", def.PackageView ?? string.Empty),
 

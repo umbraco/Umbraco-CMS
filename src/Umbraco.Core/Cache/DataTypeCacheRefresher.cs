@@ -1,24 +1,30 @@
-﻿using System;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors.ValueConverters;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Web.PublishedCache;
+using System;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeCacheRefresher, DataTypeCacheRefresher.JsonPayload>
+    public sealed class DataTypeCacheRefresher : PayloadCacheRefresherBase<DataTypeCacheRefresherNotification, DataTypeCacheRefresher.JsonPayload>
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IIdKeyMap _idKeyMap;
 
-        public DataTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IIdKeyMap idKeyMap)
-            : base(appCaches, serializer)
+        public DataTypeCacheRefresher(
+            AppCaches appCaches,
+            IJsonSerializer serializer,
+            IPublishedSnapshotService publishedSnapshotService,
+            IPublishedModelFactory publishedModelFactory,
+            IIdKeyMap idKeyMap,
+            IEventAggregator eventAggregator,
+            ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _publishedModelFactory = publishedModelFactory;
@@ -26,8 +32,6 @@ namespace Umbraco.Web.Cache
         }
 
         #region Define
-
-        protected override DataTypeCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("35B16C25-A17E-45D7-BC8F-EDAB1DCC28D2");
 

@@ -1,15 +1,15 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     [TableName(TableName)]
     [PrimaryKey("sessionId", AutoIncrement = false)]
     [ExplicitColumns]
     internal class UserLoginDto
     {
-        public const string TableName = Constants.DatabaseSchema.Tables.UserLogin;
+        public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.UserLogin;
 
         [Column("sessionId")]
         [PrimaryKeyColumn(AutoIncrement = false)]

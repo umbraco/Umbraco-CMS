@@ -1,26 +1,27 @@
-﻿using System;
-using System.Linq;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Changes;
-using Umbraco.Web.PublishedCache;
-using static Umbraco.Web.Cache.LanguageCacheRefresher.JsonPayload;
+using System;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services.Changes;
+using static Umbraco.Cms.Core.Cache.LanguageCacheRefresher.JsonPayload;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageCacheRefresher, LanguageCacheRefresher.JsonPayload>
+    public sealed class LanguageCacheRefresher : PayloadCacheRefresherBase<LanguageCacheRefresherNotification, LanguageCacheRefresher.JsonPayload>
     {
-        public LanguageCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService)
-            : base(appCaches, serializer)
+        public LanguageCacheRefresher(
+            AppCaches appCaches,
+            IJsonSerializer serializer,
+            IPublishedSnapshotService publishedSnapshotService,
+            IEventAggregator eventAggregator,
+            ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _publishedSnapshotService = publishedSnapshotService;
         }
 
         #region Define
-
-        protected override LanguageCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("3E0F95D8-0BE5-44B8-8394-2B8750B62654");
         private readonly IPublishedSnapshotService _publishedSnapshotService;

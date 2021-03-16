@@ -1,8 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
-using Umbraco.Core.Events;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     // TODO: that one does not add anything = kill
     public abstract class ScopeRepositoryService : RepositoryService

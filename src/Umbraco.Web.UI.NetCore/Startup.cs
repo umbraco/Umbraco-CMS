@@ -3,16 +3,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Umbraco.Core.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
-using Umbraco.ModelsBuilder.Embedded.DependencyInjection;
-using Umbraco.Web.BackOffice.DependencyInjection;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.DependencyInjection;
-using Umbraco.Web.Website.DependencyInjection;
 
-namespace Umbraco.Web.UI.NetCore
+namespace Umbraco.Cms.Web.UI.NetCore
 {
     public class Startup
     {
@@ -46,7 +40,7 @@ namespace Umbraco.Web.UI.NetCore
         {
 #pragma warning disable IDE0022 // Use expression body for methods
             services.AddUmbraco(_env, _config)
-                .AddBackOffice()
+                .AddBackOffice(_env)
                 .AddWebsite()
                 .AddComposers()
                 .Build();
@@ -59,12 +53,6 @@ namespace Umbraco.Web.UI.NetCore
         /// </summary>
         public void Configure(IApplicationBuilder app)
         {
-            if (_env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            app.UseUmbraco();
             app.UseUmbracoBackOffice();
             app.UseUmbracoWebsite();
         }

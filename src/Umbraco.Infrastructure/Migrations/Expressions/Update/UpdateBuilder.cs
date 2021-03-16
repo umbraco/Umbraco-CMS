@@ -1,7 +1,6 @@
-﻿using NPoco;
-using Umbraco.Core.Migrations.Expressions.Update.Expressions;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Update.Expressions;
 
-namespace Umbraco.Core.Migrations.Expressions.Update
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Update
 {
     public class UpdateBuilder : IUpdateBuilder
     {

@@ -1,26 +1,24 @@
-﻿using System;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Services;
+using System;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresher>
+    public sealed class TemplateCacheRefresher : CacheRefresherBase<TemplateCacheRefresherNotification>
     {
         private readonly IIdKeyMap _idKeyMap;
         private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
 
-        public TemplateCacheRefresher(AppCaches appCaches, IIdKeyMap idKeyMap, IContentTypeCommonRepository contentTypeCommonRepository)
-            : base(appCaches)
+        public TemplateCacheRefresher(AppCaches appCaches, IIdKeyMap idKeyMap, IContentTypeCommonRepository contentTypeCommonRepository, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, eventAggregator, factory)
         {
             _idKeyMap = idKeyMap;
             _contentTypeCommonRepository = contentTypeCommonRepository;
         }
 
         #region Define
-
-        protected override TemplateCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("DD12B6A0-14B9-46e8-8800-C154F74047C8");
 

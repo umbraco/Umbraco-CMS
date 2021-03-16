@@ -1,13 +1,12 @@
 ﻿using System;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Media
+namespace Umbraco.Cms.Core.Media
 {
     /// <summary>
     /// Provides methods to manage auto-fill properties for upload fields.
@@ -72,7 +71,7 @@ namespace Umbraco.Web.Media
                 {
                     using (var filestream = _mediaFileSystem.OpenFile(filepath))
                     {
-                        var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
+                        var extension = (Path.GetExtension(filepath) ?? "").TrimStart(Constants.CharArrays.Period);
                         var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (ImageSize?)_imageDimensionExtractor.GetDimensions(filestream) : null;
                         SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
                     }
@@ -106,7 +105,7 @@ namespace Umbraco.Web.Media
             }
             else
             {
-                var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
+                var extension = (Path.GetExtension(filepath) ?? "").TrimStart(Constants.CharArrays.Period);
                 var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (ImageSize?)_imageDimensionExtractor.GetDimensions(filestream) : null;
                 SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
             }

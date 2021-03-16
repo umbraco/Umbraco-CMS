@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Web.BackOffice.Authorization
 {
     /// <summary>
     /// The resource used for the <see cref="ContentPermissionsResourceRequirement"/>

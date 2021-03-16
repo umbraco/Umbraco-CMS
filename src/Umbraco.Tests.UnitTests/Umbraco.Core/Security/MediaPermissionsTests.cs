@@ -3,15 +3,16 @@
 
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Security
 {
     [TestFixture]
     public class MediaPermissionsTests
@@ -29,7 +30,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
             IMediaService mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             IEntityService entityService = entityServiceMock.Object;
-            var mediaPermissions = new MediaPermissions(mediaService, entityService);
+            var mediaPermissions = new MediaPermissions(mediaService, entityService, AppCaches.Disabled);
 
             // Act
             MediaPermissions.MediaAccess result = mediaPermissions.CheckPermissions(user, 1234, out _);
@@ -51,7 +52,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
             IMediaService mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             IEntityService entityService = entityServiceMock.Object;
-            var mediaPermissions = new MediaPermissions(mediaService, entityService);
+            var mediaPermissions = new MediaPermissions(mediaService, entityService, AppCaches.Disabled);
 
             // Act/assert
             MediaPermissions.MediaAccess result = mediaPermissions.CheckPermissions(user, 1234, out _);
@@ -73,7 +74,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 9876 && entity.Path == "-1,9876") });
             IEntityService entityService = entityServiceMock.Object;
-            var mediaPermissions = new MediaPermissions(mediaService, entityService);
+            var mediaPermissions = new MediaPermissions(mediaService, entityService, AppCaches.Disabled);
 
             // Act
             MediaPermissions.MediaAccess result = mediaPermissions.CheckPermissions(user, 1234, out _);
@@ -91,7 +92,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
             IMediaService mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             IEntityService entityService = entityServiceMock.Object;
-            var mediaPermissions = new MediaPermissions(mediaService, entityService);
+            var mediaPermissions = new MediaPermissions(mediaService, entityService, AppCaches.Disabled);
 
             // Act
             MediaPermissions.MediaAccess result = mediaPermissions.CheckPermissions(user, -1, out _);
@@ -111,7 +112,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             IEntityService entityService = entityServiceMock.Object;
-            var mediaPermissions = new MediaPermissions(mediaService, entityService);
+            var mediaPermissions = new MediaPermissions(mediaService, entityService, AppCaches.Disabled);
 
             // Act
             MediaPermissions.MediaAccess result = mediaPermissions.CheckPermissions(user, -1, out _);
@@ -129,7 +130,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
             IMediaService mediaService = mediaServiceMock.Object;
             var entityServiceMock = new Mock<IEntityService>();
             IEntityService entityService = entityServiceMock.Object;
-            var mediaPermissions = new MediaPermissions(mediaService, entityService);
+            var mediaPermissions = new MediaPermissions(mediaService, entityService, AppCaches.Disabled);
 
             // Act
             MediaPermissions.MediaAccess result = mediaPermissions.CheckPermissions(user, -21, out _);
@@ -149,7 +150,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Security
             entityServiceMock.Setup(x => x.GetAllPaths(It.IsAny<UmbracoObjectTypes>(), It.IsAny<int[]>()))
                 .Returns(new[] { Mock.Of<TreeEntityPath>(entity => entity.Id == 1234 && entity.Path == "-1,1234") });
             IEntityService entityService = entityServiceMock.Object;
-            var mediaPermissions = new MediaPermissions(mediaService, entityService);
+            var mediaPermissions = new MediaPermissions(mediaService, entityService, AppCaches.Disabled);
 
             // Act
             MediaPermissions.MediaAccess result = mediaPermissions.CheckPermissions(user, -21, out _);

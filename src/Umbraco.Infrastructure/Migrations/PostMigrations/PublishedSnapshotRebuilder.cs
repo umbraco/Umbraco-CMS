@@ -1,8 +1,8 @@
-﻿using Umbraco.Core.Migrations.PostMigrations;
-using Umbraco.Web.Cache;
-using Umbraco.Web.PublishedCache;
+﻿using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Migrations.PostMigrations
+namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
 {
     /// <summary>
     /// Implements <see cref="IPublishedSnapshotRebuilder"/> in Umbraco.Web (rebuilding).

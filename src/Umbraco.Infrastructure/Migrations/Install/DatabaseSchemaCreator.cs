@@ -3,15 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Install
+namespace Umbraco.Cms.Infrastructure.Migrations.Install
 {
     /// <summary>
     /// Creates the initial database schema during install.
@@ -91,7 +91,8 @@ namespace Umbraco.Core.Migrations.Install
             typeof (AuditEntryDto),
             typeof (ContentVersionCultureVariationDto),
             typeof (DocumentCultureVariationDto),
-            typeof (ContentScheduleDto)
+            typeof (ContentScheduleDto),
+            typeof (LogViewerQueryDto)
         };
 
         /// <summary>

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.XPath;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.Xml
+namespace Umbraco.Cms.Core.Xml
 {
     /// <summary>
     /// The XmlHelper class contains general helper methods for working with xml in umbraco.
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Xml
         public static bool IsXmlWhitespace(string s)
         {
             // as per xml 1.1 specs - anything else is significant whitespace
-            s = s.Trim(' ', '\t', '\r', '\n');
+            s = s.Trim(Constants.CharArrays.XmlWhitespaceChars);
             return s.Length == 0;
         }
 

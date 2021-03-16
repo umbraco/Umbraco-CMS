@@ -3,44 +3,40 @@ using System.IO;
 using System.Linq;
 using Ganss.XSS;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.BackOffice.Services
+namespace Umbraco.Cms.Web.BackOffice.Services
 {
     public class IconService : IIconService
     {
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IHtmlSanitizer _htmlSanitizer;
 
-        public IconService(IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+        public IconService(
+            IOptions<GlobalSettings> globalSettings,
+            IHostingEnvironment hostingEnvironment,
+            IHtmlSanitizer htmlSanitizer)
         {
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
+            _htmlSanitizer = htmlSanitizer;
         }
 
 
         /// <inheritdoc />
         public IList<IconModel> GetAllIcons()
         {
-            var icons = new List<IconModel>();
             var directory = new DirectoryInfo(_hostingEnvironment.MapPathWebRoot($"{_globalSettings.Value.IconsPath}/"));
             var iconNames = directory.GetFiles("*.svg");
 
-            iconNames.OrderBy(f => f.Name).ToList().ForEach(iconInfo =>
-            {
-                var icon = GetIcon(iconInfo);
+            return iconNames.OrderBy(f => f.Name)
+                .Select(iconInfo => GetIcon(iconInfo)).WhereNotNull().ToList();
 
-                if (icon != null)
-                {
-                    icons.Add(icon);
-                }
-            });
-
-            return icons;
         }
 
         /// <inheritdoc />
@@ -71,15 +67,10 @@ namespace Umbraco.Web.BackOffice.Services
         /// <returns></returns>
         private IconModel CreateIconModel(string iconName, string iconPath)
         {
-            var sanitizer = new HtmlSanitizer();
-            sanitizer.AllowedAttributes.UnionWith(Constants.SvgSanitizer.Attributes);
-            sanitizer.AllowedCssProperties.UnionWith(Constants.SvgSanitizer.Attributes);
-            sanitizer.AllowedTags.UnionWith(Constants.SvgSanitizer.Tags);
-
             try
             {
                 var svgContent = System.IO.File.ReadAllText(iconPath);
-                var sanitizedString = sanitizer.Sanitize(svgContent);
+                var sanitizedString = _htmlSanitizer.Sanitize(svgContent);
 
                 var svg = new IconModel
                 {

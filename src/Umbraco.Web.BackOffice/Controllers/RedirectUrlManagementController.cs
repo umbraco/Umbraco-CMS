@@ -1,50 +1,49 @@
-﻿using System;
-using System.Xml;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Security;
+using System.Threading;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Security;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class RedirectUrlManagementController : UmbracoAuthorizedApiController
     {
         private readonly ILogger<RedirectUrlManagementController> _logger;
-        private readonly WebRoutingSettings _webRoutingSettings;
+        private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IConfigManipulator _configManipulator;
 
         public RedirectUrlManagementController(
             ILogger<RedirectUrlManagementController> logger,
-            IOptions<WebRoutingSettings> webRoutingSettings,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IRedirectUrlService redirectUrlService,
             UmbracoMapper umbracoMapper,
-            IHostingEnvironment hostingEnvironment,
             IConfigManipulator configManipulator)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _webRoutingSettings = webRoutingSettings.Value ?? throw new ArgumentNullException(nameof(webRoutingSettings));
+            _webRoutingSettings = webRoutingSettings ?? throw new ArgumentNullException(nameof(webRoutingSettings));
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
             _redirectUrlService = redirectUrlService ?? throw new ArgumentNullException(nameof(redirectUrlService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
-            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _configManipulator = configManipulator ?? throw new ArgumentNullException(nameof(configManipulator));
         }
 
@@ -55,7 +54,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         [HttpGet]
         public IActionResult GetEnableState()
         {
-            var enabled = _webRoutingSettings.DisableRedirectUrlTracking == false;
+            var enabled = _webRoutingSettings.CurrentValue.DisableRedirectUrlTracking == false;
             var userIsAdmin = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.IsAdmin();
             return Ok(new { enabled, userIsAdmin });
         }
@@ -123,6 +122,11 @@ namespace Umbraco.Web.BackOffice.Controllers
             var action = disable ? "disable" : "enable";
 
             _configManipulator.SaveDisableRedirectUrlTracking(disable);
+
+            // TODO this is ridiculous, but we need to ensure the configuration is reloaded, before this request is ended.
+            // otherwise we can read the old value in GetEnableState.
+            // The value is equal to JsonConfigurationSource.ReloadDelay
+            Thread.Sleep(250);
 
             return Ok($"URL tracker is now {action}d.");
         }

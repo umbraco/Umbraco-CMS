@@ -5,18 +5,19 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Mail;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     public class NotificationService : INotificationService
     {
@@ -81,19 +82,19 @@ namespace Umbraco.Core.Services.Implement
             if (entitiesL.Count == 0) return;
 
             //put all entity's paths into a list with the same indices
-            var paths = entitiesL.Select(x => x.Path.Split(',').Select(int.Parse).ToArray()).ToArray();
+            var paths = entitiesL.Select(x => x.Path.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray()).ToArray();
 
             // lazily get versions
             var prevVersionDictionary = new Dictionary<int, IContentBase>();
 
             // see notes above
-            var id = Constants.Security.SuperUserId;
+            var id = Cms.Core.Constants.Security.SuperUserId;
             const int pagesz = 400; // load batches of 400 users
             do
             {
                 // users are returned ordered by id, notifications are returned ordered by user id
                 var users = _userService.GetNextUsers(id, pagesz).Where(x => x.IsApproved).ToList();
-                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Constants.ObjectTypes.Document).ToList();
+                var notifications = GetUsersNotifications(users.Select(x => x.Id), action, Enumerable.Empty<int>(), Cms.Core.Constants.ObjectTypes.Document).ToList();
                 if (notifications.Count == 0) break;
 
                 var i = 0;
@@ -179,7 +180,7 @@ namespace Umbraco.Core.Services.Implement
         /// <returns></returns>
         public IEnumerable<Notification> FilterUserNotificationsByPath(IEnumerable<Notification> userNotifications, string path)
         {
-            var pathParts = path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var pathParts = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
             return userNotifications.Where(r => pathParts.InvariantContains(r.EntityId.ToString(CultureInfo.InvariantCulture))).ToList();
         }
 

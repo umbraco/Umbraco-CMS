@@ -1,17 +1,17 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Extensions;
-using Umbraco.Infrastructure.DependencyInjection;
-using Umbraco.ModelsBuilder.Embedded.DependencyInjection;
-using Umbraco.Web.Common.Routing;
-using Umbraco.Web.Website.Collections;
-using Umbraco.Web.Website.Controllers;
-using Umbraco.Web.Website.Routing;
-using Umbraco.Web.Website.ViewEngines;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Web.Website.Collections;
+using Umbraco.Cms.Web.Website.Controllers;
+using Umbraco.Cms.Web.Website.Routing;
+using Umbraco.Cms.Web.Website.ViewEngines;
 
-namespace Umbraco.Web.Website.DependencyInjection
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// <see cref="IUmbracoBuilder"/> extensions for umbraco front-end website
@@ -42,7 +42,7 @@ namespace Umbraco.Web.Website.DependencyInjection
             builder.Services.AddSingleton<IUmbracoRenderingDefaults, UmbracoRenderingDefaults>();
             builder.Services.AddSingleton<IRoutableDocumentFilter, RoutableDocumentFilter>();
 
-            builder.Services.AddSingleton<FrontEndRoutes>();
+            builder.Services.AddSingleton<FrontEndRoutes>();            
 
             builder
                 .AddDistributedCache()

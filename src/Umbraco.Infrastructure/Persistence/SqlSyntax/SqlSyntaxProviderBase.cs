@@ -6,11 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.SqlSyntax
+namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
     /// <summary>
     /// Represents the Base Sql Syntax provider implementation.
@@ -238,6 +240,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
 
         public abstract void ReadLock(IDatabase db, params int[] lockIds);
         public abstract void WriteLock(IDatabase db, params int[] lockIds);
+        public abstract void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
+
+        public abstract void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
 
         public virtual bool DoesTableExist(IDatabase db, string tableName)
         {
@@ -406,7 +411,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             var columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
                 ? GetQuotedColumnName(columnDefinition.Name)
                 : string.Join(", ", columnDefinition.PrimaryKeyColumns
-                                                    .Split(new[] { ',', ' ' }, StringSplitOptions.RemoveEmptyEntries)
+                                                    .Split(Constants.CharArrays.CommaSpace, StringSplitOptions.RemoveEmptyEntries)
                                                     .Select(GetQuotedColumnName));
 
             var primaryKeyPart = string.Concat("PRIMARY KEY", columnDefinition.IsIndexed ? " CLUSTERED" : " NONCLUSTERED");

@@ -5,22 +5,18 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Routing;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using Umbraco.Net;
-using Umbraco.Web.Common.Security;
 
-namespace Umbraco.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.BackOffice.Security
 {
     /// <summary>
     /// Used to configure <see cref="CookieAuthenticationOptions"/> for the back office authentication type
@@ -93,7 +89,7 @@ namespace Umbraco.Web.BackOffice.Security
         public void Configure(CookieAuthenticationOptions options)
         {
             options.SlidingExpiration = true;
-            options.ExpireTimeSpan = TimeSpan.FromMinutes(_globalSettings.TimeOutInMinutes);
+            options.ExpireTimeSpan = _globalSettings.TimeOut;
             options.Cookie.Domain = _securitySettings.AuthCookieDomain;
             options.Cookie.Name = _securitySettings.AuthCookieName;
             options.Cookie.HttpOnly = true;
@@ -113,13 +109,13 @@ namespace Umbraco.Web.BackOffice.Security
             IDataProtector dataProtector = options.DataProtectionProvider.CreateProtector("Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationMiddleware", Constants.Security.BackOfficeAuthenticationType, "v2");
             var ticketDataFormat = new TicketDataFormat(dataProtector);
 
-            options.TicketDataFormat = new BackOfficeSecureDataFormat(_globalSettings.TimeOutInMinutes, ticketDataFormat);
+            options.TicketDataFormat = new BackOfficeSecureDataFormat(_globalSettings.TimeOut, ticketDataFormat);
 
             // Custom cookie manager so we can filter requests
             options.CookieManager = new BackOfficeCookieManager(
                 _umbracoContextAccessor,
                 _runtimeState,
-                _umbracoRequestPaths); 
+                _umbracoRequestPaths);
 
             options.Events = new CookieAuthenticationEvents
             {
@@ -138,7 +134,7 @@ namespace Umbraco.Web.BackOffice.Security
                     // Same goes for the signinmanager
                     IBackOfficeSignInManager signInManager = ctx.HttpContext.RequestServices.GetRequiredService<IBackOfficeSignInManager>();
 
-                    UmbracoBackOfficeIdentity backOfficeIdentity = ctx.Principal.GetUmbracoIdentity();
+                    ClaimsIdentity backOfficeIdentity = ctx.Principal.GetUmbracoIdentity();
                     if (backOfficeIdentity == null)
                     {
                         ctx.RejectPrincipal();
@@ -152,33 +148,33 @@ namespace Umbraco.Web.BackOffice.Security
                     await securityStampValidator.ValidateAsync(ctx);
                     EnsureTicketRenewalIfKeepUserLoggedIn(ctx);
 
-                    // add a claim to track when the cookie expires, we use this to track time remaining
-                    backOfficeIdentity.AddClaim(new Claim(
+                    // add or update a claim to track when the cookie expires, we use this to track time remaining
+                    backOfficeIdentity.AddOrUpdateClaim(new Claim(
                         Constants.Security.TicketExpiresClaimType,
                         ctx.Properties.ExpiresUtc.Value.ToString("o"),
                         ClaimValueTypes.DateTime,
-                        UmbracoBackOfficeIdentity.Issuer,
-                        UmbracoBackOfficeIdentity.Issuer,
+                        Constants.Security.BackOfficeAuthenticationType,
+                        Constants.Security.BackOfficeAuthenticationType,
                         backOfficeIdentity));
 
                 },
                 OnSigningIn = ctx =>
                 {
                     // occurs when sign in is successful but before the ticket is written to the outbound cookie
-                    UmbracoBackOfficeIdentity backOfficeIdentity = ctx.Principal.GetUmbracoIdentity();
+                    ClaimsIdentity backOfficeIdentity = ctx.Principal.GetUmbracoIdentity();
                     if (backOfficeIdentity != null)
                     {
                         // generate a session id and assign it
                         // create a session token - if we are configured and not in an upgrade state then use the db, otherwise just generate one
                         Guid session = _runtimeState.Level == RuntimeLevel.Run
-                            ? _userService.CreateLoginSession(backOfficeIdentity.Id, _ipResolver.GetCurrentRequestIpAddress())
+                            ? _userService.CreateLoginSession(backOfficeIdentity.GetId(), _ipResolver.GetCurrentRequestIpAddress())
                             : Guid.NewGuid();
 
                         // add our session claim
-                        backOfficeIdentity.AddClaim(new Claim(Constants.Security.SessionIdClaimType, session.ToString(), ClaimValueTypes.String, UmbracoBackOfficeIdentity.Issuer, UmbracoBackOfficeIdentity.Issuer, backOfficeIdentity));
+                        backOfficeIdentity.AddClaim(new Claim(Constants.Security.SessionIdClaimType, session.ToString(), ClaimValueTypes.String, Constants.Security.BackOfficeAuthenticationType, Constants.Security.BackOfficeAuthenticationType, backOfficeIdentity));
 
                         // since it is a cookie-based authentication add that claim
-                        backOfficeIdentity.AddClaim(new Claim(ClaimTypes.CookiePath, "/", ClaimValueTypes.String, UmbracoBackOfficeIdentity.Issuer, UmbracoBackOfficeIdentity.Issuer, backOfficeIdentity));
+                        backOfficeIdentity.AddClaim(new Claim(ClaimTypes.CookiePath, "/", ClaimValueTypes.String, Constants.Security.BackOfficeAuthenticationType, Constants.Security.BackOfficeAuthenticationType, backOfficeIdentity));
                     }
 
                     return Task.CompletedTask;

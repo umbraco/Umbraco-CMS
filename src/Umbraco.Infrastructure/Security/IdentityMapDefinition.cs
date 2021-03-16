@@ -1,25 +1,35 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     public class IdentityMapDefinition : IMapDefinition
     {
         private readonly ILocalizedTextService _textService;
         private readonly IEntityService _entityService;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptions<GlobalSettings> _globalSettings;
+        private readonly AppCaches _appCaches;
 
-        public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IOptions<GlobalSettings> globalSettings)
+        public IdentityMapDefinition(
+            ILocalizedTextService textService,
+            IEntityService entityService,
+            IOptions<GlobalSettings> globalSettings,
+            AppCaches appCaches)
         {
             _textService = textService;
             _entityService = entityService;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings;
+            _appCaches = appCaches;
         }
 
         public void DefineMaps(UmbracoMapper mapper)
@@ -27,7 +37,21 @@ namespace Umbraco.Core.Security
             mapper.Define<IUser, BackOfficeIdentityUser>(
                 (source, context) =>
                 {
-                    var target = new BackOfficeIdentityUser(_globalSettings, source.Id, source.Groups);
+                    var target = new BackOfficeIdentityUser(_globalSettings.Value, source.Id, source.Groups);
+                    target.DisableChangeTracking();
+                    return target;
+                },
+                (source, target, context) =>
+                {
+                    Map(source, target);
+                    target.ResetDirtyProperties(true);
+                    target.EnableChangeTracking();
+                });
+
+            mapper.Define<IMember, MembersIdentityUser>(
+                (source, context) =>
+                {
+                    var target = new MembersIdentityUser(source.Id);
                     target.DisableChangeTracking();
                     return target;
                 },
@@ -49,8 +73,8 @@ namespace Umbraco.Core.Security
             target.Groups = source.Groups.ToArray();
             */
 
-            target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService);
-            target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService);
+            target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
+            target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
             target.Email = source.Email;
             target.UserName = source.Username;
             target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
@@ -62,7 +86,7 @@ namespace Umbraco.Core.Security
             target.PasswordConfig = source.PasswordConfiguration;
             target.StartContentIds = source.StartContentIds;
             target.StartMediaIds = source.StartMediaIds;
-            target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string
+            target.Culture = source.GetUserCulture(_textService, _globalSettings.Value).ToString(); // project CultureInfo to string
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
@@ -76,9 +100,24 @@ namespace Umbraco.Core.Security
             //target.Roles =;
         }
 
-        private static string GetPasswordHash(string storedPass)
+        private void Map(IMember source, MembersIdentityUser target)
         {
-            return storedPass.StartsWith(Constants.Security.EmptyPasswordPrefix) ? null : storedPass;
+            target.Email = source.Email;
+            target.UserName = source.Username;
+            target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
+            target.LastLoginDateUtc = source.LastLoginDate.ToUniversalTime();
+            target.EmailConfirmed = source.EmailConfirmedDate.HasValue;
+            target.Name = source.Name;
+            target.AccessFailedCount = source.FailedPasswordAttempts;
+            target.PasswordHash = GetPasswordHash(source.RawPasswordValue);
+            target.PasswordConfig = source.PasswordConfiguration;
+            target.IsApproved = source.IsApproved;
+            target.SecurityStamp = source.SecurityStamp;
+            target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
+
+            // NB: same comments re AutoMapper as per BackOfficeUser
         }
+
+        private static string GetPasswordHash(string storedPass) => storedPass.StartsWith(Constants.Security.EmptyPasswordPrefix) ? null : storedPass;
     }
 }

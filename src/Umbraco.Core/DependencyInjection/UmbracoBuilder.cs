@@ -3,44 +3,40 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Grid;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Diagnostics;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Mail;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Routing;
-using Umbraco.Core.Runtime;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Sync;
-using Umbraco.Web;
-using Umbraco.Web.Cache;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Features;
-using Umbraco.Web.Install;
-using Umbraco.Web.Models.PublishedContent;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Services;
-using Umbraco.Web.Templates;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Grid;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Diagnostics;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Install;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Mail;
+using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.DependencyInjection
+namespace Umbraco.Cms.Core.DependencyInjection
 {
     public class UmbracoBuilder : IUmbracoBuilder
     {
@@ -193,6 +189,7 @@ namespace Umbraco.Core.DependencyInjection
 
             // register distributed cache
             Services.AddUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(), f.GetRequiredService<CacheRefresherCollection>()));
+            Services.AddUnique<ICacheRefresherNotificationFactory, CacheRefresherNotificationFactory>();
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when

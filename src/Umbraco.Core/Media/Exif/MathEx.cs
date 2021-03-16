@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Contains extended Math functions.
@@ -694,7 +694,7 @@ namespace Umbraco.Web.Media.Exif
                 if (s == null)
                     throw new ArgumentNullException("s");
 
-                string[] sa = s.Split('/');
+                string[] sa = s.Split(Constants.CharArrays.ForwardSlash);
                 int numerator = 1;
                 int denominator = 1;
 
@@ -1322,7 +1322,7 @@ namespace Umbraco.Web.Media.Exif
                 if (s == null)
                     throw new ArgumentNullException("s");
 
-                string[] sa = s.Split('/');
+                string[] sa = s.Split(Constants.CharArrays.ForwardSlash);
                 uint numerator = 1;
                 uint denominator = 1;
 

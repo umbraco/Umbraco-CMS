@@ -1,7 +1,7 @@
 ﻿using Newtonsoft.Json;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 
-namespace Umbraco.Core.Models.Blocks
+namespace Umbraco.Cms.Core.Models.Blocks
 {
     /// <summary>
     /// Used for deserializing the block list layout

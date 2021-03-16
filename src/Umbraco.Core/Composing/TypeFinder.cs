@@ -5,10 +5,11 @@ using System.Linq;
 using System.Reflection;
 using System.Security;
 using System.Text;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Configuration.UmbracoSettings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
 
     /// <inheritdoc cref="ITypeFinder"/>
@@ -21,8 +22,8 @@ namespace Umbraco.Core.Composing
         private readonly object _localFilteredAssemblyCacheLocker = new object();
         private readonly List<string> _notifiedLoadExceptionAssemblies = new List<string>();
         private static readonly ConcurrentDictionary<string, Type> TypeNamesCache = new ConcurrentDictionary<string, Type>();
-        private readonly string[] _assembliesAcceptingLoadExceptions;
 
+        private readonly ITypeFinderConfig _typeFinderConfig;
         // used for benchmark tests
         internal bool QueryWithReferencingAssemblies = true;
 
@@ -31,17 +32,37 @@ namespace Umbraco.Core.Composing
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _assemblyProvider = assemblyProvider;
             _runtimeHash = runtimeHash;
-            _assembliesAcceptingLoadExceptions = typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ?? Array.Empty<string>();
+            _typeFinderConfig = typeFinderConfig;
+     }
+
+        private string[] _assembliesAcceptingLoadExceptions = null;
+
+        private string[] AssembliesAcceptingLoadExceptions
+        {
+            get
+            {
+                if (_assembliesAcceptingLoadExceptions is not null)
+                {
+                    return _assembliesAcceptingLoadExceptions;
+                }
+
+                _assembliesAcceptingLoadExceptions =
+                    _typeFinderConfig?.AssembliesAcceptingLoadExceptions.Where(x => !x.IsNullOrWhiteSpace()).ToArray() ??
+                    Array.Empty<string>();
+
+                return _assembliesAcceptingLoadExceptions;
+            }
         }
+
 
         private bool AcceptsLoadExceptions(Assembly a)
         {
-            if (_assembliesAcceptingLoadExceptions.Length == 0)
+            if (AssembliesAcceptingLoadExceptions.Length == 0)
                 return false;
-            if (_assembliesAcceptingLoadExceptions.Length == 1 && _assembliesAcceptingLoadExceptions[0] == "*")
+            if (AssembliesAcceptingLoadExceptions.Length == 1 && AssembliesAcceptingLoadExceptions[0] == "*")
                 return true;
             var name = a.GetName().Name; // simple name of the assembly
-            return _assembliesAcceptingLoadExceptions.Any(pattern =>
+            return AssembliesAcceptingLoadExceptions.Any(pattern =>
             {
                 if (pattern.Length > name.Length) return false; // pattern longer than name
                 if (pattern.Length == name.Length) return pattern.InvariantEquals(name); // same length, must be identical

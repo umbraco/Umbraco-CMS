@@ -11,38 +11,40 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Media;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.ContentEditing;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Validation;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.ContentApps;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Models.Validation;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Web.BackOffice.ActionResults;
+using Umbraco.Cms.Web.BackOffice.Authorization;
+using Umbraco.Cms.Web.BackOffice.Extensions;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.ModelBinders;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.ActionResults;
-using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.ModelBinders;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.ContentApps;
-using Umbraco.Web.Models.ContentEditing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <remarks>
     /// This controller is decorated with the UmbracoApplicationAuthorizeAttribute which means that any user requesting
@@ -69,6 +71,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IJsonSerializer _serializer;
         private readonly IAuthorizationService _authorizationService;
+        private readonly AppCaches _appCaches;
         private readonly ILogger<MediaController> _logger;
 
         public MediaController(
@@ -92,7 +95,8 @@ namespace Umbraco.Web.BackOffice.Controllers
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IJsonSerializer serializer,
-            IAuthorizationService authorizationService)
+            IAuthorizationService authorizationService,
+            AppCaches appCaches)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _shortStringHelper = shortStringHelper;
@@ -114,6 +118,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _imageUrlGenerator = imageUrlGenerator;
             _serializer = serializer;
             _authorizationService = authorizationService;
+            _appCaches = appCaches;
         }
 
         /// <summary>
@@ -147,7 +152,7 @@ namespace Umbraco.Web.BackOffice.Controllers
         public MediaItemDisplay GetRecycleBin()
         {
             var apps = new List<ContentApp>();
-            apps.Add(ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "media", Core.Constants.DataTypes.DefaultMediaListView));
+            apps.Add(ListViewContentAppFactory.CreateContentApp(_dataTypeService, _propertyEditors, "recycleBin", "media", Constants.DataTypes.DefaultMediaListView));
             apps[0].Active = true;
             var display = new MediaItemDisplay
             {
@@ -291,7 +296,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
         protected int[] UserStartNodes
         {
-            get { return _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService)); }
+            get { return _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)); }
         }
 
         /// <summary>
@@ -726,7 +731,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             if (!string.IsNullOrEmpty(path))
             {
 
-                var folders = path.Split('/');
+                var folders = path.Split(Constants.CharArrays.ForwardSlash);
 
                 for (int i = 0; i < folders.Length - 1; i++)
                 {
@@ -775,7 +780,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             //get the files
             foreach (var formFile in file)
             {
-                var fileName =  formFile.FileName.Trim(new[] { '\"' }).TrimEnd();
+                var fileName =  formFile.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
                 var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
@@ -974,6 +979,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             return new ActionResult<IMedia>(toMove);
         }
+
 
         public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {

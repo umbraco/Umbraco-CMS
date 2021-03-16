@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {

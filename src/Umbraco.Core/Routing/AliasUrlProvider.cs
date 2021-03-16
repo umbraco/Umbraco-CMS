@@ -2,13 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     /// <summary>
     /// Provides URLs using the <c>umbracoUrlAlias</c> property.
@@ -91,7 +90,7 @@ namespace Umbraco.Web.Routing
                     yield break;
 
                 var umbracoUrlName = node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
-                var aliases = umbracoUrlName?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var aliases = umbracoUrlName?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
                 if (aliases == null || aliases.Any() == false)
                     yield break;
@@ -118,7 +117,7 @@ namespace Umbraco.Web.Routing
                         ? node.Value<string>(_publishedValueFallback,Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture)
                         : node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
 
-                    var aliases = umbracoUrlName?.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries);
+                    var aliases = umbracoUrlName?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
                     if (aliases == null || aliases.Any() == false)
                         continue;
@@ -139,8 +138,8 @@ namespace Umbraco.Web.Routing
 
         string CombinePaths(string path1, string path2)
         {
-            string path = path1.TrimEnd('/') + path2;
-            return path == "/" ? path : path.TrimEnd('/');
+            string path = path1.TrimEnd(Constants.CharArrays.ForwardSlash) + path2;
+            return path == "/" ? path : path.TrimEnd(Constants.CharArrays.ForwardSlash);
         }
 
         #endregion

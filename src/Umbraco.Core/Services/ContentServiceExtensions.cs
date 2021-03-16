@@ -1,11 +1,16 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Content service extension methods
@@ -42,7 +47,7 @@ namespace Umbraco.Core.Services
             var matches = AnchorRegex.Matches(rteContent);
             foreach (Match match in matches)
             {
-                result.Add(match.Value.Split('\"')[1]);
+                result.Add(match.Value.Split(Constants.CharArrays.DoubleQuote)[1]);
             }
             return result;
         }

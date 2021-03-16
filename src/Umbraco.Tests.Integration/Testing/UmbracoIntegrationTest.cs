@@ -18,27 +18,27 @@ using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Serilog;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.IO;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.DependencyInjection;
+using Umbraco.Cms.Tests.Integration.Extensions;
+using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.DependencyInjection;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Integration.DependencyInjection;
-using Umbraco.Tests.Integration.Extensions;
-using Umbraco.Tests.Integration.Implementations;
-using Umbraco.Tests.Testing;
-using Umbraco.Web;
-using Umbraco.Web.BackOffice.DependencyInjection;
-using Umbraco.Web.Common.DependencyInjection;
 
-namespace Umbraco.Tests.Integration.Testing
+namespace Umbraco.Cms.Tests.Integration.Testing
 {
     /// <summary>
     /// Abstract class for integration tests
@@ -86,8 +86,8 @@ namespace Umbraco.Tests.Integration.Testing
             }
 
             _testTeardown = null;
-            FirstTestInFixture = false;
-            FirstTestInSession = false;
+            _firstTestInFixture = false;
+            s_firstTestInSession = false;
 
             // Ensure CoreRuntime stopped (now it's a HostedService)
             IHost host = Services.GetRequiredService<IHost>();
@@ -101,12 +101,12 @@ namespace Umbraco.Tests.Integration.Testing
 
         [SetUp]
         public virtual void SetUp_Logging() =>
-            TestContext.Progress.Write($"Start test {TestCount++}: {TestContext.CurrentContext.Test.Name}");
+            TestContext.Progress.Write($"Start test {s_testCount++}: {TestContext.CurrentContext.Test.Name}");
 
         [SetUp]
         public virtual void Setup()
         {
-            InMemoryConfiguration[Constants.Configuration.ConfigGlobal + ":" + nameof(GlobalSettings.InstallUnattended)] = "true";
+            InMemoryConfiguration[Constants.Configuration.ConfigUnattended + ":" + nameof(UnattendedSettings.InstallUnattended)] = "true";
             IHostBuilder hostBuilder = CreateHostBuilder();
 
             IHost host = hostBuilder.Build();
@@ -197,7 +197,7 @@ namespace Umbraco.Tests.Integration.Testing
             services.AddRequiredNetCoreServices(TestHelper, webHostEnvironment);
 
             // Add it!
-            Core.Composing.TypeLoader typeLoader = services.AddTypeLoader(
+            TypeLoader typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
                 webHostEnvironment,
                 TestHelper.GetHostingEnvironment(),
@@ -212,9 +212,11 @@ namespace Umbraco.Tests.Integration.Testing
             builder.AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
-                .AddRuntimeMinifier()
+                .AddRuntimeMinifier(webHostEnvironment)
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
+                .AddMembersIdentity()
+                .AddExamine()
                 .AddTestServices(TestHelper, GetAppCaches());
 
             if (TestOptions.Mapper)
@@ -242,7 +244,6 @@ namespace Umbraco.Tests.Integration.Testing
         {
             if (TestOptions.Boot)
             {
-                Services.GetRequiredService<IBackOfficeSecurityFactory>().EnsureBackOfficeSecurity();
                 Services.GetRequiredService<IUmbracoContextFactory>().EnsureUmbracoContext();
             }
 
@@ -345,7 +346,7 @@ namespace Umbraco.Tests.Integration.Testing
                     // Only attach schema once per fixture
                     // Doing it more than once will block the process since the old db hasn't been detached
                     // and it would be the same as NewSchemaPerTest even if it didn't block
-                    if (FirstTestInFixture)
+                    if (_firstTestInFixture)
                     {
                         // New DB + Schema
                         TestDbMeta newSchemaFixtureDbMeta = db.AttachSchema();
@@ -362,7 +363,7 @@ namespace Umbraco.Tests.Integration.Testing
                     // Only attach schema once per fixture
                     // Doing it more than once will block the process since the old db hasn't been detached
                     // and it would be the same as NewSchemaPerTest even if it didn't block
-                    if (FirstTestInFixture)
+                    if (_firstTestInFixture)
                     {
                         // New DB + Schema
                         TestDbMeta newEmptyFixtureDbMeta = db.AttachEmpty();
@@ -435,12 +436,11 @@ namespace Umbraco.Tests.Integration.Testing
 
         protected IMapperCollection Mappers => Services.GetRequiredService<IMapperCollection>();
 
-        protected UserBuilder UserBuilderInstance = new UserBuilder();
-        protected UserGroupBuilder UserGroupBuilderInstance = new UserGroupBuilder();
+        protected UserBuilder UserBuilderInstance { get; } = new UserBuilder();
+        protected UserGroupBuilder UserGroupBuilderInstance { get; } = new UserGroupBuilder();
 
-        protected static bool FirstTestInSession = true;
-
-        protected bool FirstTestInFixture = true;
-        protected static int TestCount = 1;
+        private static bool s_firstTestInSession = true;
+        private bool _firstTestInFixture = true;
+        private static int s_testCount = 1;
     }
 }

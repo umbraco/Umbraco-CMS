@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Specialized;
 using System.Configuration.Provider;
 using System.Linq;
@@ -6,19 +6,19 @@ using System.Text;
 using System.Web.Configuration;
 using System.Web.Security;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Net;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web.Security.Providers
 {
-
-
+    //TODO: Delete - should not be used
+    [Obsolete("We are now using ASP.NET Core Identity instead of membership providers")]
     /// <summary>
     /// Abstract Membership Provider that users any implementation of IMembershipMemberService{TEntity} service
     /// </summary>
@@ -32,7 +32,7 @@ namespace Umbraco.Web.Security.Providers
         protected IMembershipMemberService<TEntity> MemberService { get; private set; }
 
         protected UmbracoMembershipProvider(IMembershipMemberService<TEntity> memberService, IUmbracoVersion umbracoVersion, IHostingEnvironment hostingEnvironment, IIpResolver ipResolver)
-        :base(hostingEnvironment)
+        : base(hostingEnvironment)
         {
             _umbracoVersion = umbracoVersion;
             _ipResolver = ipResolver;
@@ -55,9 +55,11 @@ namespace Umbraco.Web.Security.Providers
         /// <exception cref="T:System.ArgumentException">The name of the provider has a length of zero.</exception>
         public override void Initialize(string name, NameValueCollection config)
         {
-            if (config == null) { throw new ArgumentNullException("config"); }
+            if (config == null)
+            { throw new ArgumentNullException("config"); }
 
-            if (string.IsNullOrEmpty(name)) name = ProviderName;
+            if (string.IsNullOrEmpty(name))
+                name = ProviderName;
 
             // Initialize base provider class
             base.Initialize(name, config);
@@ -80,7 +82,8 @@ namespace Umbraco.Web.Security.Providers
 
             // in order to support updating passwords from the umbraco core, we can't validate the old password
             var m = MemberService.GetByUsername(username);
-            if (m == null) return false;
+            if (m == null)
+                return false;
 
             string salt;
             var encodedPassword = PasswordSecurity.HashNewPassword(Membership.HashAlgorithmType, newPassword, out salt);
@@ -174,7 +177,8 @@ namespace Umbraco.Web.Security.Providers
         public override bool DeleteUser(string username, bool deleteAllRelatedData)
         {
             var member = MemberService.GetByUsername(username);
-            if (member == null) return false;
+            if (member == null)
+                return false;
 
             MemberService.Delete(member);
             return true;
@@ -321,7 +325,7 @@ namespace Umbraco.Web.Security.Providers
             if (userIsOnline)
             {
                 // when upgrading from 7.2 to 7.3 trying to save will throw
-                if (_umbracoVersion.Current >= new Version(7, 3, 0, 0))
+                if (_umbracoVersion.Version >= new Version(7, 3, 0, 0))
                 {
                     var now = DateTime.Now;
                     // update the database data directly instead of a full member save which requires DB locks
@@ -423,7 +427,8 @@ namespace Umbraco.Web.Security.Providers
             }
 
             // Non need to update
-            if (member.IsLockedOut == false) return true;
+            if (member.IsLockedOut == false)
+                return true;
 
             member.IsLockedOut = false;
             member.FailedPasswordAttempts = 0;
@@ -568,12 +573,21 @@ namespace Umbraco.Web.Security.Providers
             if (requiresFullSave)
             {
                 // when upgrading from 7.2 to 7.3 trying to save will throw
-                if (_umbracoVersion.Current >= new Version(7, 3, 0, 0))
-                    MemberService.Save(member, false);
+                if (_umbracoVersion.Version >= new Version(7, 3, 0, 0))
+                {
+                    // We need to raise event to ensure caches are updated. (e.g. the cache that uses username as key).
+                    // Even that this is a heavy operation, because indexes are updates, we consider that okay, as it
+                    // is still cheap to do a successful login.
+                    MemberService.Save(member, true);
+                }
             }
             else
             {
-                // set the last login date without full save (fast, no locks)
+                // set the last login date without full save (fast, no locks).
+                // We do not update caches. This is to the best of our knowledge okay, as this info are only stored
+                // because it is required by the membership provider.
+                // If we one day have to revisit this, we will most likely need to spilt the events in membership info
+                // saved and umbraco info saved.  We don't want to update indexes etc when it is just membership info that is saved
                 MemberService.SetLastLogin(member.Username, member.LastLoginDate);
             }
 

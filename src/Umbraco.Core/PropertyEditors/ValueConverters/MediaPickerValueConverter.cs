@@ -2,12 +2,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 
-namespace Umbraco.Web.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// The media picker property value converter.
@@ -57,7 +55,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (source == null) return null;
 
             var nodeIds = source.ToString()
-                .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
+                .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(UdiParser.Parse)
                 .ToArray();
             return nodeIds;

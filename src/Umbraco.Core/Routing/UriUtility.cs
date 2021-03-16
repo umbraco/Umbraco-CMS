@@ -1,12 +1,10 @@
 using System;
 using System.Text;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Configuration.UmbracoSettings;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core.Routing
 {
     public sealed class UriUtility
     {
@@ -45,7 +43,7 @@ namespace Umbraco.Web
         public string ToAbsolute(string url)
         {
             //return ResolveUrl(url);
-            url = url.TrimStart('~');
+            url = url.TrimStart(Constants.CharArrays.Tilde);
             return _appPathPrefix + url;
         }
 
@@ -106,7 +104,7 @@ namespace Umbraco.Web
 
             if (path != "/")
             {
-                path = path.TrimEnd('/');
+                path = path.TrimEnd(Constants.CharArrays.ForwardSlash);
             }
 
             return uri.Rewrite(path);

@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     /// <summary>
     /// Routes requests.

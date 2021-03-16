@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Collections.Concurrent;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Mappers
+namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 {
     /// <summary>
     /// Represents a <see cref="RelationType"/> to DTO mapper used to translate the properties of the public api

@@ -1,13 +1,12 @@
-using System;
 using System.Data;
-using Umbraco.Core.Events;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 #if DEBUG_SCOPES
 using System.Collections.Generic;
 #endif
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// Provides scopes.
@@ -52,6 +51,7 @@ namespace Umbraco.Core.Scoping
         /// <para>A detached scope is not ambient and has no parent.</para>
         /// <para>It is meant to be attached by <see cref="AttachScope"/>.</para>
         /// </remarks>
+        // TODO: This is not actually used apart from unit tests - I'm assuming it's maybe used by Deploy?
         IScope CreateDetachedScope(
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,

@@ -4,10 +4,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Tests.TestHelpers;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.Persistence.FaultHandling
 {

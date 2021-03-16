@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
     /// <summary>
     /// Options for routing an Umbraco request

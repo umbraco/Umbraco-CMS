@@ -1,10 +1,10 @@
 ﻿using System;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
-    [TableName(Constants.DatabaseSchema.Tables.UserStartNode)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.UserStartNode)]
     [PrimaryKey("id", AutoIncrement = true)]
     [ExplicitColumns]
     internal class UserStartNodeDto : IEquatable<UserStartNodeDto>

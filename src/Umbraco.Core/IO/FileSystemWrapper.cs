@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     /// <summary>
     /// All custom file systems that are based upon another IFileSystem should inherit from FileSystemWrapper

@@ -1,17 +1,15 @@
 using System;
 using System.IO;
-using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
-using Umbraco.Core;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Models.Editors;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Editors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Exceptions;
-using Umbraco.Web.Models.ContentEditing;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.ModelBinders
+namespace Umbraco.Cms.Web.BackOffice.ModelBinders
 {
     /// <summary>
     /// Helper methods to bind media/member models
@@ -56,7 +54,7 @@ namespace Umbraco.Web.BackOffice.ModelBinders
             {
                    //The name that has been assigned in JS has 2 or more parts. The second part indicates the property id
                 // for which the file belongs, the remaining parts are just metadata that can be used by the property editor.
-                var parts = formFile.Name.Trim('\"').Split('_');
+                var parts = formFile.Name.Trim(Constants.CharArrays.DoubleQuote).Split(Constants.CharArrays.Underscore);
                 if (parts.Length < 2)
                 {
                     bindingContext.HttpContext.SetReasonPhrase( "The request was not formatted correctly the file name's must be underscore delimited");
@@ -90,9 +88,9 @@ namespace Umbraco.Web.BackOffice.ModelBinders
 
                 // TODO: anything after 4 parts we can put in metadata
 
-                var fileName = formFile.FileName.Trim('\"');
+                var fileName = formFile.FileName.Trim(Constants.CharArrays.DoubleQuote);
 
-                var tempFileUploadFolder = hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.TempFileUploads);
+                var tempFileUploadFolder = hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);
                 Directory.CreateDirectory(tempFileUploadFolder);
                 var tempFilePath = Path.Combine(tempFileUploadFolder, Guid.NewGuid().ToString());
 

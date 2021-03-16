@@ -4,7 +4,7 @@
         <OutputType>Exe</OutputType>
         <TargetFramework>net5.0</TargetFramework>
         <IsPackable>false</IsPackable>
-        <LangVersion>8</LangVersion>
+        <RootNamespace>Umbraco.Cms.Tests.Integration</RootNamespace>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
@@ -57,10 +57,10 @@
     <ItemGroup>
         <PackageReference Include="Examine.Lucene" Version="2.0.0-alpha.20200128.15" />
         <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.2" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
-        <PackageReference Include="Moq" Version="4.16.0" />
-        <PackageReference Include="NUnit" Version="3.12.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.3" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.1" />
+        <PackageReference Include="Moq" Version="4.16.1" />
+        <PackageReference Include="NUnit" Version="3.13.1" />
         <PackageReference Include="NUnit3TestAdapter" Version="3.17.0">
             <PrivateAssets>all</PrivateAssets>
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

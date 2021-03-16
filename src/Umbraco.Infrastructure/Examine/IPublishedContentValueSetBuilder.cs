@@ -1,7 +1,7 @@
 ﻿using Examine;
-using Umbraco.Core.Models;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Marker interface for a <see cref="ValueSet"/> builder for only published content

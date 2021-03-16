@@ -3,7 +3,7 @@
 
 using System;
 
-namespace Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for disabled healthcheck settings.

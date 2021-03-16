@@ -1,12 +1,13 @@
-﻿using Microsoft.AspNetCore.Http;
-using Umbraco.Core;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Web.Models.ContentEditing;
-using Umbraco.Web.Models.Mapping;
-using Umbraco.Web.BackOffice.Trees;
+using Microsoft.AspNetCore.Http;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Mapping;
+using Umbraco.Cms.Web.BackOffice.Trees;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Mapping
+namespace Umbraco.Cms.Web.BackOffice.Mapping
 {
     /// <summary>
     /// Declares model mappings for members.
@@ -93,14 +94,11 @@ namespace Umbraco.Web.BackOffice.Mapping
             target.Path = $"-1,{source.Id}";
             target.Udi = Udi.Create(Constants.UdiEntityType.MemberGroup, source.Key);
         }
-
+        
         // Umbraco.Code.MapAll
         private static void Map(IMember source, ContentPropertyCollectionDto target, MapperContext context)
         {
             target.Properties = context.MapEnumerable<IProperty, ContentPropertyDto>(source.Properties);
         }
-
-
-
     }
 }

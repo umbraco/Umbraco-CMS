@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Web.Models.ContentEditing
+namespace Umbraco.Cms.Core.Models.ContentEditing
 {
 
     public interface IContentProperties<T>

@@ -1,26 +1,34 @@
-﻿using System;
+using System;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Changes;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresher, ContentTypeCacheRefresher.JsonPayload>
+    public sealed class ContentTypeCacheRefresher : PayloadCacheRefresherBase<ContentTypeCacheRefresherNotification, ContentTypeCacheRefresher.JsonPayload>
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IContentTypeCommonRepository _contentTypeCommonRepository;
         private readonly IIdKeyMap _idKeyMap;
 
-        public ContentTypeCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IPublishedModelFactory publishedModelFactory, IIdKeyMap idKeyMap, IContentTypeCommonRepository contentTypeCommonRepository)
-            : base(appCaches, serializer)
+        public ContentTypeCacheRefresher(
+            AppCaches appCaches,
+            IJsonSerializer serializer,
+            IPublishedSnapshotService publishedSnapshotService,
+            IPublishedModelFactory publishedModelFactory,
+            IIdKeyMap idKeyMap,
+            IContentTypeCommonRepository contentTypeCommonRepository,
+            IEventAggregator eventAggregator,
+            ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _publishedModelFactory = publishedModelFactory;
@@ -29,8 +37,6 @@ namespace Umbraco.Web.Cache
         }
 
         #region Define
-
-        protected override ContentTypeCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("6902E22C-9C10-483C-91F3-66B7CAE9E2F5");
 

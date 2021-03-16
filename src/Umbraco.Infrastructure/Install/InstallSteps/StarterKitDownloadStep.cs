@@ -1,16 +1,15 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Umbraco.Core.Services;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Packaging;
-using Umbraco.Core.Security;
-using Umbraco.Web.Install.Models;
-using Umbraco.Web.Security;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Web.Install.InstallSteps
+namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall,
         "StarterKitDownload", "starterKit", 30, "Adding a simple website to Umbraco, will make it easier for you to get started",
@@ -68,7 +67,7 @@ namespace Umbraco.Web.Install.InstallSteps
         private async Task<(string packageFile, int packageId)> DownloadPackageFilesAsync(Guid kitGuid)
         {
             //Go get the package file from the package repo
-            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, _umbracoVersion.Current, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            var packageFile = await _packageService.FetchPackageFileAsync(kitGuid, _umbracoVersion.Version, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
             if (packageFile == null) throw new InvalidOperationException("Could not fetch package file " + kitGuid);
 
             //add an entry to the installedPackages.config

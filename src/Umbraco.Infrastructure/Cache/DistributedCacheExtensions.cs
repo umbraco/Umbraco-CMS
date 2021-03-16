@@ -1,8 +1,12 @@
-﻿using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services.Changes;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Web.Cache
+using System.Linq;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.Changes;
+
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for <see cref="DistributedCache"/>.
@@ -129,13 +133,13 @@ namespace Umbraco.Web.Cache
         public static void RefreshMemberCache(this DistributedCache dc, params IMember[] members)
         {
             if (members.Length == 0) return;
-            dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username)));
+            dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, false)));
         }
 
         public static void RemoveMemberCache(this DistributedCache dc, params IMember[] members)
         {
             if (members.Length == 0) return;
-            dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username)));
+            dc.RefreshByPayload(MemberCacheRefresher.UniqueId, members.Select(x => new MemberCacheRefresher.JsonPayload(x.Id, x.Username, true)));
         }
 
         #endregion

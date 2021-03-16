@@ -1,41 +1,66 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
+using System.Runtime.CompilerServices;
+using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Helper class to not repeat common patterns with Task.
     /// </summary>
-    public class TaskHelper
+    public sealed class TaskHelper
     {
         private readonly ILogger<TaskHelper> _logger;
 
-        public TaskHelper(ILogger<TaskHelper> logger)
+        public TaskHelper(ILogger<TaskHelper> logger) => _logger = logger;
+
+        /// <summary>
+        /// Executes a fire and forget task outside of the current execution flow.
+        /// </summary>
+        public void RunBackgroundTask(Func<Task> fn) => ExecuteBackgroundTask(fn);
+
+        // for tests, returning the Task as a public API indicates it can be awaited that is not what we want to do
+        internal Task ExecuteBackgroundTask(Func<Task> fn)
         {
-            _logger = logger;
+            // it is also possible to use UnsafeQueueUserWorkItem which does not flow the execution context,
+            // however that seems more difficult to use for async operations.
+
+            // Do not flow AsyncLocal to the child thread
+            using (ExecutionContext.SuppressFlow())
+            {
+                // NOTE: ConfigureAwait(false) is irrelevant here, it is not needed because this is not being
+                // awaited. ConfigureAwait(false) is only relevant when awaiting to prevent the SynchronizationContext
+                // (very different from the ExecutionContext!) from running the continuation on the calling thread.
+                return Task.Run(LoggingWrapper(fn));
+            }
         }
 
         /// <summary>
-        /// Runs a TPL Task fire-and-forget style, the right way - in the
-        /// background, separate from the current thread, with no risk
-        /// of it trying to rejoin the current thread.
+        /// Executes a fire and forget task outside of the current execution flow on a dedicated (non thread-pool) thread.
         /// </summary>
-        public void RunBackgroundTask(Func<Task> fn) => Task.Run(LoggingWrapper(fn)).ConfigureAwait(false);
+        public void RunLongRunningBackgroundTask(Func<Task> fn) => ExecuteLongRunningBackgroundTask(fn);
 
-        /// <summary>
-        /// Runs a task fire-and-forget style and notifies the TPL that this
-        /// will not need a Thread to resume on for a long time, or that there
-        /// are multiple gaps in thread use that may be long.
-        /// Use for example when talking to a slow webservice.
-        /// </summary>
-        public void RunLongRunningBackgroundTask(Func<Task> fn) =>
-            Task.Factory.StartNew(LoggingWrapper(fn), TaskCreationOptions.LongRunning)
-                .ConfigureAwait(false);
+        // for tests, returning the Task as a public API indicates it can be awaited that is not what we want to do
+        internal Task ExecuteLongRunningBackgroundTask(Func<Task> fn)
+        {
+            // it is also possible to use UnsafeQueueUserWorkItem which does not flow the execution context,
+            // however that seems more difficult to use for async operations.
 
+            // Do not flow AsyncLocal to the child thread
+            using (ExecutionContext.SuppressFlow())
+            {
+                // NOTE: ConfigureAwait(false) is irrelevant here, it is not needed because this is not being
+                // awaited. ConfigureAwait(false) is only relevant when awaiting to prevent the SynchronizationContext
+                // (very different from the ExecutionContext!) from running the continuation on the calling thread.
+                return Task.Factory.StartNew(LoggingWrapper(fn), TaskCreationOptions.LongRunning);
+            }
+        }
+
+        // ensure any exceptions are handled and do not take down the app pool
         private Func<Task> LoggingWrapper(Func<Task> fn) =>
             async () =>
             {

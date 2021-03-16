@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using Umbraco.Core.Composing;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Provides a base class to fast, dictionary-based <see cref="IAppCache"/> implementations.
@@ -88,9 +87,10 @@ namespace Umbraco.Core.Cache
             try
             {
                 EnterWriteLock();
-                foreach (var entry in GetDictionaryEntries()
-                    .ToArray())
+                foreach (var entry in GetDictionaryEntries().ToArray())
+                {
                     RemoveEntry((string) entry.Key);
+                }
             }
             finally
             {
@@ -134,7 +134,9 @@ namespace Umbraco.Core.Cache
                         return value == null || (isInterface ? (type.IsInstanceOfType(value)) : (value.GetType() == type));
                     })
                     .ToArray())
+                {
                     RemoveEntry((string) entry.Key);
+                }
             }
             finally
             {
@@ -164,7 +166,9 @@ namespace Umbraco.Core.Cache
                         return value == null || (isInterface ? (value is T) : (value.GetType() == typeOfT));
                     })
                     .ToArray())
+                {
                     RemoveEntry((string) entry.Key);
+                }
             }
             finally
             {
@@ -197,7 +201,9 @@ namespace Umbraco.Core.Cache
                                // run predicate on the 'public key' part only, ie without prefix
                                && predicate(((string) x.Key).Substring(plen), (T) value);
                     }))
+                {
                     RemoveEntry((string) entry.Key);
+                }
             }
             finally
             {
@@ -215,7 +221,9 @@ namespace Umbraco.Core.Cache
                 foreach (var entry in GetDictionaryEntries()
                     .Where(x => ((string)x.Key).Substring(plen).InvariantStartsWith(keyStartsWith))
                     .ToArray())
+                {
                     RemoveEntry((string) entry.Key);
+                }
             }
             finally
             {
@@ -234,7 +242,9 @@ namespace Umbraco.Core.Cache
                 foreach (var entry in GetDictionaryEntries()
                     .Where(x => compiled.IsMatch(((string)x.Key).Substring(plen)))
                     .ToArray())
+                {
                     RemoveEntry((string) entry.Key);
+                }
             }
             finally
             {
@@ -262,10 +272,7 @@ namespace Umbraco.Core.Cache
         protected abstract void EnterWriteLock();
         protected abstract void ExitWriteLock();
 
-        protected string GetCacheKey(string key)
-        {
-            return $"{CacheItemPrefix}-{key}";
-        }
+        protected string GetCacheKey(string key) => $"{CacheItemPrefix}-{key}";
 
 
 

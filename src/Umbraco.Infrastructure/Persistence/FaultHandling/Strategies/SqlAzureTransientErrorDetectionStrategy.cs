@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.Data.SqlClient;
 
-namespace Umbraco.Core.Persistence.FaultHandling.Strategies
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies
 {
     // See https://docs.microsoft.com/en-us/azure/azure-sql/database/troubleshoot-common-connectivity-issues
     // Also we could just use the nuget package instead https://www.nuget.org/packages/EnterpriseLibrary.TransientFaultHandling/ ?

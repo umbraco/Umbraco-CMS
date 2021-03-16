@@ -6,19 +6,20 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Common.Builders.Extensions;
-using Umbraco.Web.Actions;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
 {
     [TestFixture]
     public class FilterAllowedOutgoingContentAttributeTests
@@ -34,6 +35,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
+                AppCaches.Disabled,
                 Mock.Of<IBackOfficeSecurityAccessor>());
 
             dynamic result = att.GetValueFromResponse(new ObjectResult(expected));
@@ -53,6 +55,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
+                AppCaches.Disabled,
                 Mock.Of<IBackOfficeSecurityAccessor>());
 
             dynamic result = att.GetValueFromResponse(new ObjectResult(container));
@@ -72,6 +75,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 ActionBrowse.ActionLetter,
                 Mock.Of<IUserService>(),
                 Mock.Of<IEntityService>(),
+                AppCaches.Disabled,
                 Mock.Of<IBackOfficeSecurityAccessor>());
 
             dynamic actual = att.GetValueFromResponse(new ObjectResult(container));
@@ -97,6 +101,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 ActionBrowse.ActionLetter,
                 userService,
                 entityService,
+                AppCaches.Disabled,
                 Mock.Of<IBackOfficeSecurityAccessor>());
 
             var path = string.Empty;
@@ -148,6 +153,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Filters
                 ActionBrowse.ActionLetter,
                 userService,
                 Mock.Of<IEntityService>(),
+                AppCaches.Disabled,
                 Mock.Of<IBackOfficeSecurityAccessor>());
             att.FilterBasedOnPermissions(list, user);
 

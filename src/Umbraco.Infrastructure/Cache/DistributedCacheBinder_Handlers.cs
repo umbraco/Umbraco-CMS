@@ -1,15 +1,19 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Changes;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Default <see cref="IDistributedCacheBinder"/> implementation.
@@ -122,10 +126,6 @@ namespace Umbraco.Web.Cache
                 () => MediaService.TreeChanged -= MediaService_TreeChanged);
 
             // bind to content events
-            Bind(() => ContentService.Saved += ContentService_Saved, // needed for permissions
-                () => ContentService.Saved -= ContentService_Saved);
-            Bind(() => ContentService.Copied += ContentService_Copied, // needed for permissions
-                () => ContentService.Copied -= ContentService_Copied);
             Bind(() => ContentService.TreeChanged += ContentService_TreeChanged,// handles all content changes
                 () => ContentService.TreeChanged -= ContentService_TreeChanged);
 
@@ -178,31 +178,10 @@ namespace Umbraco.Web.Cache
         {
         }
 
-        /// <summary>
-        /// Handles cache refreshing for when content is saved (not published)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <remarks>
-        /// When an entity is saved we need to notify other servers about the change in order for the Examine indexes to
-        /// stay up-to-date for unpublished content.
-        /// </remarks>
-        private void ContentService_Saved(IContentService sender, SaveEventArgs<IContent> e)
-        {
-        }
-
         private void ContentService_TreeChanged(IContentService sender, TreeChange<IContent>.EventArgs args)
         {
             _distributedCache.RefreshContentCache(args.Changes.ToArray());
         }
-
-        // TODO: our weird events handling wants this for now
-        private void ContentService_Deleted(IContentService sender, DeleteEventArgs<IContent> e) { }
-        private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e) { }
-        private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e) { }
-        private void ContentService_EmptiedRecycleBin(IContentService sender, RecycleBinEventArgs e) { }
-        private void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e) { }
-        private void ContentService_Unpublished(IContentService sender, PublishEventArgs<IContent> e) { }
 
         //private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
         //{
@@ -408,13 +387,6 @@ namespace Umbraco.Web.Cache
         {
             _distributedCache.RefreshMediaCache(args.Changes.ToArray());
         }
-
-        // TODO: our weird events handling wants this for now
-        private void MediaService_Saved(IMediaService sender, SaveEventArgs<IMedia> e) { }
-        private void MediaService_Deleted(IMediaService sender, DeleteEventArgs<IMedia> e) { }
-        private void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e) { }
-        private void MediaService_Trashed(IMediaService sender, MoveEventArgs<IMedia> e) { }
-        private void MediaService_EmptiedRecycleBin(IMediaService sender, RecycleBinEventArgs e) { }
 
         #endregion
 

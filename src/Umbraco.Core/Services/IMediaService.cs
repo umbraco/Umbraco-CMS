@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
         /// <summary>
     /// Defines the Media Service, which is an easy access to operations involving <see cref="IMedia"/>

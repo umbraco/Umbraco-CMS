@@ -1,10 +1,9 @@
-﻿using System.Configuration;
-using System.IO;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.IO;
+﻿using System.IO;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Extensions
 {
     public static class ModelsBuilderConfigExtensions
     {
@@ -31,7 +30,7 @@ namespace Umbraco.Core.Configuration
             // unless AcceptUnsafeModelsDirectory and then everything is OK.
 
             if (!Path.IsPathRooted(root))
-                throw new ConfigurationErrorsException($"Root is not rooted \"{root}\".");
+                throw new ConfigurationException($"Root is not rooted \"{root}\".");
 
             if (config.StartsWith("~/"))
             {
@@ -44,7 +43,7 @@ namespace Umbraco.Core.Configuration
                 root = Path.GetFullPath(root);
 
                 if (!dir.StartsWith(root) && !acceptUnsafe)
-                    throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
+                    throw new ConfigurationException($"Invalid models directory \"{config}\".");
 
                 return dir;
             }
@@ -52,7 +51,7 @@ namespace Umbraco.Core.Configuration
             if (acceptUnsafe)
                 return Path.GetFullPath(config);
 
-            throw new ConfigurationErrorsException($"Invalid models directory \"{config}\".");
+            throw new ConfigurationException($"Invalid models directory \"{config}\".");
         }
     }
 }

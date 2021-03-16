@@ -2,12 +2,12 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Tests.TestHelpers;
-using MediaModel = Umbraco.Core.Models.Media;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
+using Constants = Umbraco.Cms.Core.Constants;
+using MediaModel = Umbraco.Cms.Core.Models.Media;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
 {
     [TestFixture]
     public class MediaMapperTest

@@ -2,9 +2,9 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.Web;
 
-namespace Umbraco.Web.Website.ActionResults
+namespace Umbraco.Cms.Web.Website.ActionResults
 {
     /// <summary>
     /// Redirects to the current URL rendering an Umbraco page including it's query strings

@@ -1,8 +1,9 @@
 ﻿using System;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Extensions
 {
     public static class GlobalSettingsExtensions
     {
@@ -53,7 +54,7 @@ namespace Umbraco.Core.Configuration
 
             if (path.StartsWith(hostingEnvironment.ApplicationVirtualPath)) // beware of TrimStart, see U4-2518
                 path = path.Substring(hostingEnvironment.ApplicationVirtualPath.Length);
-            return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
+            return path.TrimStart(Constants.CharArrays.Tilde).TrimStart(Constants.CharArrays.ForwardSlash).Replace('/', '-').Trim().ToLower();
         }
     }
 }

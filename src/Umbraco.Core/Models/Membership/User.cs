@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Models.Entities;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Models.Membership
+namespace Umbraco.Cms.Core.Models.Membership
 {
     /// <summary>
     /// Represents a backoffice user
@@ -128,7 +128,7 @@ namespace Umbraco.Core.Models.Membership
                 (enum1, enum2) => enum1.UnsortedSequenceEqual(enum2),
                 enum1 => enum1.GetHashCode());
 
-        
+
         [DataMember]
         public DateTime? EmailConfirmedDate
         {
@@ -383,11 +383,10 @@ namespace Umbraco.Core.Models.Membership
             }
         }
 
-        /// <summary>
-        /// This is used as an internal cache for this entity - specifically for calculating start nodes so we don't re-calculated all of the time
-        /// </summary>
         [IgnoreDataMember]
         [DoNotClone]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This should not be used, it's currently used for only a single edge case - should probably be removed for netcore")]
         internal IDictionary<string, object> AdditionalData
         {
             get

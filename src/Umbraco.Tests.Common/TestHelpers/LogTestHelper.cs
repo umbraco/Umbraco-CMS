@@ -5,7 +5,7 @@ using System;
 using Microsoft.Extensions.Logging;
 using Moq;
 
-namespace Umbraco.Tests.Common.TestHelpers
+namespace Umbraco.Cms.Tests.Common.TestHelpers
 {
     public static class LogTestHelper
     {

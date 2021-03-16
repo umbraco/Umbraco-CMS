@@ -13,31 +13,28 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Grid;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
-using Umbraco.Core.WebAssets;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Grid;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.WebAssets;
+using Umbraco.Cms.Web.BackOffice.ActionResults;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Controllers;
+using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.ActionResults;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Controllers;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Common.Security;
-using Umbraco.Web.Models;
-using Umbraco.Web.WebAssets;
-using Constants = Umbraco.Core.Constants;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [DisableBrowserCache]
     [UmbracoRequireHttps]
@@ -296,7 +293,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             // Configures the redirect URL and user identifier for the specified external login
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
-            
+
             return Challenge(properties, provider);
         }
 
@@ -314,7 +311,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             // Configures the redirect URL and user identifier for the specified external login including xsrf data
             var properties = _signInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl, _userManager.GetUserId(User));
-            
+
             return Challenge(properties, provider);
         }
 
@@ -485,7 +482,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             }
             else if (result == AutoLinkSignInResult.FailedNoEmail)
             {
-                errors.Add($"The requested provider ({loginInfo.LoginProvider}) has not provided the email claim {ClaimTypes.Email}, the account cannot be linked.");                
+                errors.Add($"The requested provider ({loginInfo.LoginProvider}) has not provided the email claim {ClaimTypes.Email}, the account cannot be linked.");
             }
             else if (result is AutoLinkSignInResult autoLinkSignInResult && autoLinkSignInResult.Errors.Count > 0)
             {

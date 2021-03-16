@@ -1,19 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Scoping;
-using Umbraco.Infrastructure.PublishedCache.Persistence;
-using Umbraco.Web;
-using Umbraco.Web.PublishedCache.NuCache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 
 namespace Umbraco.Tests.Testing.Objects
 {
-
     internal class TestDataSource : INuCacheContentService
     {
-
         private IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
 
         public TestDataSource(params ContentNodeKit[] kits)

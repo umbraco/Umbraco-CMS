@@ -1,6 +1,6 @@
-﻿using Umbraco.Web.BackOffice.Filters;
+﻿using Umbraco.Cms.Web.BackOffice.Filters;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// An abstract controller that automatically checks if any request is a non-GET and if the

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core
+﻿namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -23,6 +23,26 @@
             /// System data type icon
             /// </summary>
             public const string DataType = "icon-autofill";
+
+            /// <summary>
+            /// System dictionary icon
+            /// </summary>
+            public const string Dictionary = "icon-book-alt";
+
+            /// <summary>
+            /// System generic folder icon
+            /// </summary>
+            public const string Folder = "icon-folder";
+
+            /// <summary>
+            /// System language icon
+            /// </summary>
+            public const string Language = "icon-globe";
+
+            /// <summary>
+            /// System logviewer icon
+            /// </summary>
+            public const string LogViewer = "icon-box-alt";
 
             /// <summary>
             /// System list view icon
@@ -69,6 +89,11 @@
             /// </summary>
             public const string MemberType = "icon-users";
 
+            /// <summary>
+            /// System packages icon
+            /// </summary>
+            public const string Packages = "icon-box";
+            
             /// <summary>
             /// System property editor icon
             /// </summary>

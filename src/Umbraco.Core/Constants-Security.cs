@@ -1,4 +1,4 @@
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -40,6 +40,9 @@ namespace Umbraco.Core
             public const string BackOfficeTwoFactorRememberMeAuthenticationType = "UmbracoTwoFactorRememberMeCookie";
 
             public const string EmptyPasswordPrefix = "___UIDEMPTYPWORD__";
+
+            public const string DefaultMemberTypeAlias = "Member";
+
 
             /// <summary>
             /// The prefix used for external identity providers for their authentication type

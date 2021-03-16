@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using System.Linq;
 using NPoco;
-using Umbraco.Core;
-using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.KeysAndIndexes
 {
     public class DeleteKeysAndIndexesBuilder : IExecutableBuilder
     {
@@ -42,7 +41,7 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes
             if (DeleteLocal || DeleteForeign)
             {
                 // table, constraint
-                
+
                 if (DeleteForeign)
                 {
                     //In some cases not all FK's are prefixed with "FK" :/ mostly with old upgraded databases so we need to check if it's either:
@@ -54,7 +53,7 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes
                     {
                         Delete.ForeignKey(key.Item2).OnTable(key.Item1).Do();
                     }
-                        
+
                 }
                 if (DeleteLocal)
                 {
@@ -68,7 +67,7 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes
 
             // drop indexes
             if (DeleteLocal)
-            {   
+            {
                 foreach (var index in indexes.Where(x => x.TableName == TableName))
                 {
                     //if this is a unique constraint we need to drop the constraint, else drop the index
@@ -79,7 +78,7 @@ namespace Umbraco.Core.Migrations.Expressions.Delete.KeysAndIndexes
                     else
                         Delete.Index(index.IndexName).OnTable(index.TableName).Do();
                 }
-                    
+
             }
         }
 

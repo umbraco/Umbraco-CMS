@@ -1,14 +1,14 @@
 ﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     [TableName(TableName)]
     [PrimaryKey("id", AutoIncrement = false)]
     [ExplicitColumns]
     public class DocumentVersionDto
     {
-        private const string TableName = Constants.DatabaseSchema.Tables.DocumentVersion;
+        private const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.DocumentVersion;
 
         [Column("id")]
         [PrimaryKeyColumn(AutoIncrement = false)]

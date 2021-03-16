@@ -4,16 +4,17 @@ using System.Data;
 using System.Linq;
 using Microsoft.Data.SqlClient;
 using NPoco;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     /// <summary>
     /// A bulk sql insert provider for Sql Server
     /// </summary>
     public class SqlServerBulkSqlInsertProvider : IBulkSqlInsertProvider
     {
-        public string ProviderName => Constants.DatabaseProviders.SqlServer;
+        public string ProviderName => Cms.Core.Constants.DatabaseProviders.SqlServer;
 
         public int BulkInsertRecords<T>(IUmbracoDatabase database, IEnumerable<T> records)
         {

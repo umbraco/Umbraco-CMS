@@ -4,10 +4,11 @@ using System.Data;
 using System.Data.SqlServerCe;
 using System.Linq;
 using NPoco;
-using Umbraco.Core;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Persistence.SqlCe
+namespace Umbraco.Cms.Persistence.SqlCe
 {
     public class SqlCeBulkSqlInsertProvider : IBulkSqlInsertProvider
     {

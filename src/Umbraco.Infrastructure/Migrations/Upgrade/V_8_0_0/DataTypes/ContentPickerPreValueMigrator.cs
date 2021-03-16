@@ -1,9 +1,9 @@
-﻿namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
 {
     class ContentPickerPreValueMigrator : DefaultPreValueMigrator
     {
         public override bool CanMigrate(string editorAlias)
-            => editorAlias == Constants.PropertyEditors.Legacy.Aliases.ContentPicker2;
+            => editorAlias == Cms.Core.Constants.PropertyEditors.Legacy.Aliases.ContentPicker2;
 
         public override string GetNewAlias(string editorAlias)
             => null;

@@ -1,14 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Manifest;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Configuration.Grid
+namespace Umbraco.Cms.Core.Configuration.Grid
 {
     internal class GridEditorsConfig : IGridEditorsConfig
     {
@@ -49,6 +51,16 @@ namespace Umbraco.Core.Configuration.Grid
                         {
                             _logger.LogError(ex, "Could not parse the contents of grid.editors.config.js into a JSON array '{Json}", sourceString);
                         }
+                    }
+                    else// Read default from embedded file
+                    {
+                        var assembly = GetType().Assembly;
+                        var resourceStream = assembly.GetManifestResourceStream(
+                                "Umbraco.Cms.Core.EmbeddedResources.Grid.grid.editors.config.js");
+
+                        using var reader = new StreamReader(resourceStream, Encoding.UTF8);
+                        var sourceString = reader.ReadToEnd();
+                        editors.AddRange(_jsonSerializer.Deserialize<IEnumerable<GridEditor>>(sourceString));
                     }
 
                     // add manifest editors, skip duplicates

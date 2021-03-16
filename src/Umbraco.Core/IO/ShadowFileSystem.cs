@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     internal class ShadowFileSystem : IFileSystem
     {
@@ -182,7 +182,7 @@ namespace Umbraco.Core.IO
             if (Nodes.TryGetValue(normPath, out sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
                 throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
 
-            var parts = normPath.Split('/');
+            var parts = normPath.Split(Constants.CharArrays.ForwardSlash);
             for (var i = 0; i < parts.Length - 1; i++)
             {
                 var dirPath = string.Join("/", parts.Take(i + 1));
@@ -297,7 +297,7 @@ namespace Umbraco.Core.IO
             if (Nodes.TryGetValue(normPath, out sf) && sf.IsExist && (sf.IsDir || overrideIfExists == false))
                 throw new InvalidOperationException(string.Format("A file at path '{0}' already exists", path));
 
-            var parts = normPath.Split('/');
+            var parts = normPath.Split(Constants.CharArrays.ForwardSlash);
             for (var i = 0; i < parts.Length - 1; i++)
             {
                 var dirPath = string.Join("/", parts.Take(i + 1));

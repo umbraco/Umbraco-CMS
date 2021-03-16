@@ -1,10 +1,13 @@
 ﻿using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Diagnosers;
+using Microsoft.Extensions.Options;
 using NPoco;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Persistence.SqlCe;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Persistence.SqlCe;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Benchmarks
 {
@@ -33,7 +36,7 @@ namespace Umbraco.Tests.Benchmarks
             var mappers = new NPoco.MapperCollection { new PocoMapper() };
             var factory = new FluentPocoDataFactory((type, iPocoDataFactory) => new PocoDataBuilder(type, mappers).Init(), mappers);
 
-            SqlContext = new SqlContext(new SqlCeSyntaxProvider(), DatabaseType.SQLCe, factory);
+            SqlContext = new SqlContext(new SqlCeSyntaxProvider(Options.Create(new GlobalSettings())), DatabaseType.SQLCe, factory);
             SqlTemplates = new SqlTemplates(SqlContext);
         }
 

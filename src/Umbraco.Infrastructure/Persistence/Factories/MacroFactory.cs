@@ -1,10 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Globalization;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Factories
+namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     internal static class MacroFactory
     {

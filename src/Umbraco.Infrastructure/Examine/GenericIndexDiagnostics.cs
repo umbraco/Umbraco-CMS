@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Umbraco.Core;
-using Umbraco.Core.Composing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Extensions;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
 
     /// <summary>

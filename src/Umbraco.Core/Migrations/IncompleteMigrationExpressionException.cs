@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Core.Migrations
+namespace Umbraco.Cms.Core.Migrations
 {
     /// <summary>
     /// The exception that is thrown when a migration expression is not executed.

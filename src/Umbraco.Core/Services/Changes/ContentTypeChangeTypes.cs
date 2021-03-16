@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Services.Changes
+namespace Umbraco.Cms.Core.Services.Changes
 {
     [Flags]
     public enum ContentTypeChangeTypes : byte
@@ -25,6 +25,6 @@ namespace Umbraco.Core.Services.Changes
         /// <summary>
         /// Content type was removed
         /// </summary>
-        Remove = 8 
+        Remove = 8
     }
 }

@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Web;
-using Microsoft.Owin;
-using Newtonsoft.Json;
-using Umbraco.Core;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web
 {
@@ -39,10 +37,10 @@ namespace Umbraco.Web
                 if (cookiesHeaderValue == null)
                     return null;
 
-                var cookieCollection = cookiesHeaderValue.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                var cookieCollection = cookiesHeaderValue.Split(Constants.CharArrays.Semicolon, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var cookieNameValue in cookieCollection)
                 {
-                    var parts = cookieNameValue.Split(new[] { '=' }, StringSplitOptions.RemoveEmptyEntries);
+                    var parts = cookieNameValue.Split(Constants.CharArrays.EqualsChar, StringSplitOptions.RemoveEmptyEntries);
                     if (parts.Length != 2) continue;
                     if (parts[0].Trim().Equals(cookieName, StringComparison.InvariantCultureIgnoreCase))
                         return parts[1].Trim();

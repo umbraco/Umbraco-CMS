@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Factories
+namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     internal static class PropertyFactory
     {
@@ -48,7 +49,7 @@ namespace Umbraco.Core.Persistence.Factories
 
             if (property.ValueStorageType == ValueStorageType.Integer)
             {
-                if (value is bool || property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.Boolean)
+                if (value is bool || property.PropertyType.PropertyEditorAlias == Cms.Core.Constants.PropertyEditors.Aliases.Boolean)
                 {
                     dto.IntegerValue = value != null && string.IsNullOrEmpty(value.ToString()) ? 0 : Convert.ToInt32(value);
                 }

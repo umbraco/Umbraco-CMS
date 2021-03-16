@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.IO
+﻿namespace Umbraco.Cms.Core.IO
 {
     public enum CleanFolderResultStatus
     {

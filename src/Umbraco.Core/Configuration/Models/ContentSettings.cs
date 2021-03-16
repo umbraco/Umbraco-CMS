@@ -3,9 +3,9 @@
 
 using System;
 using System.Collections.Generic;
-using Umbraco.Core.Macros;
+using Umbraco.Cms.Core.Macros;
 
-namespace Umbraco.Core.Configuration.Models
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for content settings.
@@ -145,7 +145,7 @@ namespace Umbraco.Core.Configuration.Models
                     width:1em;
                 }}
             </style>
-            <script type=""text/javascript"" data-umbraco-path=""{0}"" src=""{0}/js/umbraco.websitepreview.js""></script>";
+            <script type=""text/javascript"" data-umbraco-path=""{0}"" src=""{0}/js/umbraco.websitepreview.min.js""></script>";
 
         /// <summary>
         /// Gets or sets a value for the content notification settings.
@@ -180,7 +180,7 @@ namespace Umbraco.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the collection of file extensions that are disallowed for upload.
         /// </summary>
-        public IEnumerable<string> DisallowedUploadFiles { get; set; } = new[] { "ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd" };
+        public IEnumerable<string> DisallowedUploadFiles { get; set; } = new[] { "ashx", "aspx", "ascx", "config", "cshtml", "vbhtml", "asmx", "air", "axd", "xamlx" };
 
         /// <summary>
         /// Gets or sets a value for the collection of file extensions that are allowed for upload.

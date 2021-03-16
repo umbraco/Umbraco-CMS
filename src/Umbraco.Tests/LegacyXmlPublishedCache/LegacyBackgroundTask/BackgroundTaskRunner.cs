@@ -3,9 +3,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Runtime;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -327,8 +327,10 @@ namespace Umbraco.Web.Scheduling
             // create a new token source since this is a new process
             _shutdownTokenSource = new CancellationTokenSource();
             _shutdownToken = _shutdownTokenSource.Token;
-            _runningTask = Task.Run(async () => await Pump().ConfigureAwait(false), _shutdownToken);
-
+            using (ExecutionContext.SuppressFlow()) // Do not flow AsyncLocal to the child thread
+            {
+                _runningTask = Task.Run(async () => await Pump().ConfigureAwait(false), _shutdownToken);
+            }
             _logger.LogDebug("{LogPrefix} Starting", _logPrefix);
         }
 
@@ -350,7 +352,9 @@ namespace Umbraco.Web.Scheduling
             var hasTasks = TaskCount > 0;
 
             if (!force && hasTasks)
+            {
                 _logger.LogInformation("{LogPrefix} Waiting for tasks to complete", _logPrefix);
+            }
 
             // complete the queue
             // will stop waiting on the queue or on a latch
@@ -552,16 +556,21 @@ namespace Umbraco.Web.Scheduling
                     try
                     {
                         if (bgTask.IsAsync)
+                        {
                             // configure await = false since we don't care about the context, we're on a background thread.
                             await bgTask.RunAsync(token).ConfigureAwait(false);
+                        }
                         else
+                        {
                             bgTask.Run();
+                        }
                     }
                     finally // ensure we disposed - unless latched again ie wants to re-run
                     {
-                        var lbgTask = bgTask as ILatchedBackgroundTask;
-                        if (lbgTask == null || lbgTask.IsLatched == false)
+                        if (!(bgTask is ILatchedBackgroundTask lbgTask) || lbgTask.IsLatched == false)
+                        {
                             bgTask.Dispose();
+                        }
                     }
                 }
                 catch (Exception e)
@@ -769,12 +778,12 @@ namespace Umbraco.Web.Scheduling
                             _ => StopImmediate(),
                             // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
                             TaskScheduler.Default);
-                    }   
+                    }
                     else
                     {
                         StopImmediate();
                     }
-                        
+
                 }
             }
 

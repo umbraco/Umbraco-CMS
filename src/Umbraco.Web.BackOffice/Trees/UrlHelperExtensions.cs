@@ -4,11 +4,10 @@ using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Web.BackOffice.Trees;
-using Umbraco.Web.WebApi;
+using Umbraco.Cms.Core;
+using Umbraco.Extensions;
 
-namespace Umbraco.Extensions
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     public static class UrlHelperExtensions
     {
@@ -28,7 +27,7 @@ namespace Umbraco.Extensions
             var sb = new StringBuilder("-1");
 
             //split the virtual path and iterate through it
-            var pathPaths = virtualPath.Split('/');
+            var pathPaths = virtualPath.Split(Constants.CharArrays.ForwardSlash);
 
             for (var p = 0; p < pathPaths.Length; p++)
             {

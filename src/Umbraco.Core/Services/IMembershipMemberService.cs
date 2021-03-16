@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Persistence.Querying;
 
-namespace Umbraco.Core.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Defines part of the MemberService, which is specific to methods used by the membership provider.
@@ -137,7 +137,7 @@ namespace Umbraco.Core.Services
         /// <param name="raiseEvents">Optional parameter to raise events.
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         void Save(IEnumerable<T> entities, bool raiseEvents = true);
-        
+
         /// <summary>
         /// Finds a list of <see cref="IMembershipUser"/> objects by a partial email string
         /// </summary>

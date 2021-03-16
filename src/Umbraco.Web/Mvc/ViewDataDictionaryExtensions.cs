@@ -1,5 +1,5 @@
 ﻿using System.Web.Mvc;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Web.Mvc
 {

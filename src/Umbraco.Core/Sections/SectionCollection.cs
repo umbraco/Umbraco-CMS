@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Models.Sections;
+using Umbraco.Cms.Core.Composing;
 
-namespace Umbraco.Web.Sections
+namespace Umbraco.Cms.Core.Sections
 {
     public class SectionCollection : BuilderCollectionBase<ISection>
     {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Web.Common.Authorization
+﻿namespace Umbraco.Cms.Web.Common.Authorization
 {
     /// <summary>
     /// A list of authorization policy names for use in the back office
@@ -26,7 +26,7 @@
 
         public const string MediaPermissionByResource = nameof(MediaPermissionByResource);
         public const string MediaPermissionPathById = nameof(MediaPermissionPathById);
-        
+
 
         // Single section access
 

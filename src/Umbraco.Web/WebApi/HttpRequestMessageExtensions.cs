@@ -3,7 +3,7 @@ using System.Net;
 using System.Net.Http;
 using System.Web;
 using Microsoft.Owin;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Web.WebApi
 {

@@ -1,7 +1,4 @@
-﻿using System.Collections.Concurrent;
-using Umbraco.Core.Models;
-
-namespace Umbraco.Core.Persistence.Mappers
+﻿namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 {
     //[MapperFor(typeof(UserSection))]
     //public sealed class UserSectionMapper : BaseMapper

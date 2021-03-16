@@ -4,11 +4,11 @@ using System.Threading;
 using Microsoft.Extensions.Options;
 using Serilog.Core;
 using Serilog.Events;
-using Umbraco.Core.Diagnostics;
-using Umbraco.Core.Hosting;
-using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
+using Umbraco.Cms.Core.Diagnostics;
+using Umbraco.Cms.Core.Hosting;
+using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
 
-namespace Umbraco.Infrastructure.Logging.Serilog.Enrichers
+namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
 {
     /// <summary>
     /// Enriches the log if there are ThreadAbort exceptions and will automatically create a minidump if it can

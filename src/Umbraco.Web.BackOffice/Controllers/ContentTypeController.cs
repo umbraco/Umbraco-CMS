@@ -10,25 +10,26 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Dictionary;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Packaging;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
-using Umbraco.Web.Common.ActionsResults;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Editors;
-using Umbraco.Web.Models;
-using Umbraco.Web.Models.ContentEditing;
-using ContentType = Umbraco.Core.Models.ContentType;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Dictionary;
+using Umbraco.Cms.Core.Editors;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Web.Common.ActionsResults;
+using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
+using ContentType = Umbraco.Cms.Core.Models.ContentType;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     /// <summary>
     /// An API controller used for dealing with content types
@@ -311,63 +312,6 @@ namespace Umbraco.Web.BackOffice.Controllers
         }
 
         [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
-        public CreatedContentTypeCollectionResult PostCreateCollection(int parentId, string collectionName, bool collectionCreateTemplate, string collectionItemName, bool collectionItemCreateTemplate, string collectionIcon, string collectionItemIcon)
-        {
-            // create item doctype
-            var itemDocType = new ContentType(_shortStringHelper, parentId);
-            itemDocType.Name = collectionItemName;
-            itemDocType.Alias = collectionItemName.ToSafeAlias(_shortStringHelper, true);
-            itemDocType.Icon = collectionItemIcon;
-
-            // create item doctype template
-            if (collectionItemCreateTemplate)
-            {
-                var template = CreateTemplateForContentType(itemDocType.Alias, itemDocType.Name);
-                itemDocType.SetDefaultTemplate(template);
-            }
-
-            // save item doctype
-            _contentTypeService.Save(itemDocType);
-
-            // create collection doctype
-            var collectionDocType = new ContentType(_shortStringHelper, parentId);
-            collectionDocType.Name = collectionName;
-            collectionDocType.Alias = collectionName.ToSafeAlias(_shortStringHelper, true);
-            collectionDocType.Icon = collectionIcon;
-            collectionDocType.IsContainer = true;
-            collectionDocType.AllowedContentTypes = new List<ContentTypeSort>()
-            {
-                new ContentTypeSort(itemDocType.Id, 0)
-            };
-
-            // create collection doctype template
-            if (collectionCreateTemplate)
-            {
-                var template = CreateTemplateForContentType(collectionDocType.Alias, collectionDocType.Name);
-                collectionDocType.SetDefaultTemplate(template);
-            }
-
-            // save collection doctype
-            _contentTypeService.Save(collectionDocType);
-
-            // test if the parent exist and then allow the collection underneath
-            var parentCt = _contentTypeService.Get(parentId);
-            if (parentCt != null)
-            {
-                var allowedCts = parentCt.AllowedContentTypes.ToList();
-                allowedCts.Add(new ContentTypeSort(collectionDocType.Id, allowedCts.Count()));
-                parentCt.AllowedContentTypes = allowedCts;
-                _contentTypeService.Save(parentCt);
-            }
-
-            return new CreatedContentTypeCollectionResult
-            {
-                CollectionId = collectionDocType.Id,
-                ContainerId = itemDocType.Id
-            };
-        }
-
-        [Authorize(Policy = AuthorizationPolicies.TreeAccessDocumentTypes)]
         public ActionResult<DocumentTypeDisplay> PostSave(DocumentTypeSave contentTypeSave)
         {
             //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.
@@ -641,7 +585,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             foreach (var formFile in file)
             {
-                var fileName = formFile.FileName.Trim('\"');
+                var fileName = formFile.FileName.Trim(Constants.CharArrays.DoubleQuote);
                 var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
                 var root = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempFileUploads);

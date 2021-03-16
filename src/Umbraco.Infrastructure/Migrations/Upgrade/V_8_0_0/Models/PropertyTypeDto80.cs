@@ -1,14 +1,10 @@
-﻿using NPoco;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Dtos;
+﻿using System;
+using NPoco;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models
 {
     /// <summary>
     /// Snapshot of the <see cref="PropertyTypeDto"/> as it was at version 8.0
@@ -16,7 +12,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models
     /// <remarks>
     /// This is required during migrations before 8.6 since the schema has changed and running SQL against the new table would result in errors
     /// </remarks>
-    [TableName(Constants.DatabaseSchema.Tables.PropertyType)]
+    [TableName(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType)]
     [PrimaryKey("id")]
     [ExplicitColumns]
     internal class PropertyTypeDto80

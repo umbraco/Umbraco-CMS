@@ -7,13 +7,14 @@ using System.IO;
 using System.Linq;
 using System.Security.AccessControl;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Install;
-using Umbraco.Core.IO;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Install;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.Install
+namespace Umbraco.Cms.Infrastructure.Install
 {
     /// <inheritdoc />
     public class FilePermissionHelper : IFilePermissionHelper
@@ -26,6 +27,7 @@ namespace Umbraco.Infrastructure.Install
         private readonly string[] _permissionFiles = Array.Empty<string>();
         private readonly GlobalSettings _globalSettings;
         private readonly IIOHelper _ioHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
         private string _basePath;
 
         /// <summary>
@@ -35,6 +37,7 @@ namespace Umbraco.Infrastructure.Install
         {
             _globalSettings = globalSettings.Value;
             _ioHelper = ioHelper;
+            _hostingEnvironment = hostingEnvironment;
             _basePath = hostingEnvironment.MapPathContentRoot("/");
             _permissionDirs = new[]
             {
@@ -67,7 +70,7 @@ namespace Umbraco.Infrastructure.Install
             EnsureFiles(_permissionFiles, out errors);
             report[FilePermissionTest.FileWriting] = errors.ToList();
 
-            EnsureCanCreateSubDirectory(_globalSettings.UmbracoMediaPath, out errors);
+            EnsureCanCreateSubDirectory(_hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoMediaPath), out errors);
             report[FilePermissionTest.MediaFolderCreation] = errors.ToList();
 
             return report.Sum(x => x.Value.Count()) == 0;

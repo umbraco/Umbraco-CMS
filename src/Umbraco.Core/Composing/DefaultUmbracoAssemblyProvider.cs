@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Reflection;
+using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Core.Composing
+namespace Umbraco.Cms.Core.Composing
 {
     /// <summary>
     /// Returns a list of scannable assemblies based on an entry point assembly and it's references
@@ -14,21 +15,22 @@ namespace Umbraco.Core.Composing
     public class DefaultUmbracoAssemblyProvider : IAssemblyProvider
     {
         private readonly Assembly _entryPointAssembly;
+        private readonly ILoggerFactory _loggerFactory;
         private static readonly string[] UmbracoCoreAssemblyNames = new[]
             {
                 "Umbraco.Core",
                 "Umbraco.Infrastructure",
                 "Umbraco.PublishedCache.NuCache",
-                "Umbraco.ModelsBuilder.Embedded",
                 "Umbraco.Examine.Lucene",
                 "Umbraco.Web.Common",
                 "Umbraco.Web.BackOffice",
                 "Umbraco.Web.Website",
             };
 
-        public DefaultUmbracoAssemblyProvider(Assembly entryPointAssembly)
+        public DefaultUmbracoAssemblyProvider(Assembly entryPointAssembly, ILoggerFactory loggerFactory)
         {
             _entryPointAssembly = entryPointAssembly ?? throw new ArgumentNullException(nameof(entryPointAssembly));
+            _loggerFactory = loggerFactory;
         }
 
         // TODO: It would be worth investigating a netcore3 version of this which would use
@@ -41,7 +43,7 @@ namespace Umbraco.Core.Composing
         {
             get
             {
-                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, UmbracoCoreAssemblyNames, true);
+                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, UmbracoCoreAssemblyNames, true, _loggerFactory);
                 return finder.Find();
             }
         }

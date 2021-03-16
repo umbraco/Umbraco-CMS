@@ -2,21 +2,21 @@ using System;
 using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Events;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Security;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Web;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Routing
+namespace Umbraco.Cms.Core.Routing
 {
 
     /// <summary>
@@ -413,6 +413,15 @@ namespace Umbraco.Web.Routing
                     _logger.LogDebug("Finder {ContentFinderType}", finder.GetType().FullName);
                     return finder.TryFindContent(request);
                 });
+
+                _logger.LogDebug(
+                    "Found? {Found}, Content: {PublishedContentId}, Template: {TemplateAlias}, Domain: {Domain}, Culture: {Culture}, StatusCode: {StatusCode}",
+                    found,
+                    request.HasPublishedContent() ? request.PublishedContent.Id : "NULL",
+                    request.HasTemplate() ? request.Template?.Alias : "NULL",
+                    request.HasDomain() ? request.Domain.ToString() : "NULL",
+                    request.Culture ?? "NULL",
+                    request.ResponseStatusCode);
             }
         }
 

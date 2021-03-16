@@ -6,7 +6,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Microsoft.Data.SqlClient;
 
-namespace Umbraco.Core.Persistence.FaultHandling
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
 {
     /// <summary>
     /// Defines the possible throttling modes in SQL Azure.

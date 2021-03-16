@@ -13,15 +13,15 @@ using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Services;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Core.Templates;
+using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Templates;
 
-namespace Umbraco.Web.Common.Templates
+namespace Umbraco.Cms.Web.Common.Templates
 {
     /// <summary>
     /// This is used purely for the RenderTemplate functionality in Umbraco
@@ -36,9 +36,10 @@ namespace Umbraco.Web.Common.Templates
         private readonly IFileService _fileService;
         private readonly ILocalizationService _languageService;
         private readonly WebRoutingSettings _webRoutingSettings;
-        private readonly IShortStringHelper _shortStringHelper;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICompositeViewEngine _viewEngine;
+        private readonly IModelMetadataProvider _modelMetadataProvider;
+        private readonly ITempDataProvider _tempDataProvider;
 
         public TemplateRenderer(
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -46,18 +47,20 @@ namespace Umbraco.Web.Common.Templates
             IFileService fileService,
             ILocalizationService textService,
             IOptions<WebRoutingSettings> webRoutingSettings,
-            IShortStringHelper shortStringHelper,
             IHttpContextAccessor httpContextAccessor,
-            ICompositeViewEngine viewEngine)
+            ICompositeViewEngine viewEngine,
+            IModelMetadataProvider modelMetadataProvider,
+            ITempDataProvider tempDataProvider)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));
             _languageService = textService ?? throw new ArgumentNullException(nameof(textService));
             _webRoutingSettings = webRoutingSettings.Value ?? throw new ArgumentNullException(nameof(webRoutingSettings));
-            _shortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
+            _modelMetadataProvider = modelMetadataProvider;
+            _tempDataProvider = tempDataProvider;
         }
 
         public async Task RenderAsync(int pageId, int? altTemplateId, StringWriter writer)
@@ -156,10 +159,7 @@ namespace Umbraco.Web.Common.Templates
                 throw new InvalidOperationException($"A view with the name {request.GetTemplateAlias()} could not be found");
             }
 
-            var modelMetadataProvider = httpContext.RequestServices.GetRequiredService<IModelMetadataProvider>();
-            var tempDataProvider = httpContext.RequestServices.GetRequiredService<ITempDataProvider>();
-
-            var viewData = new ViewDataDictionary(modelMetadataProvider, new ModelStateDictionary())
+            var viewData = new ViewDataDictionary(_modelMetadataProvider, new ModelStateDictionary())
             {
                 Model = request.PublishedContent
             };
@@ -169,7 +169,7 @@ namespace Umbraco.Web.Common.Templates
                 new ActionContext(httpContext, httpContext.GetRouteData(), new ControllerActionDescriptor()),
                 viewResult.View,
                 viewData,
-                new TempDataDictionary(httpContext, tempDataProvider),
+                new TempDataDictionary(httpContext, _tempDataProvider),
                 writer,
                 new HtmlHelperOptions()
             );
@@ -181,6 +181,9 @@ namespace Umbraco.Web.Common.Templates
 
             sw.Write(output);
         }
+
+        // TODO: I feel like we need to do more than this, pretty sure we need to replace the UmbracoRouteValues
+        // HttpRequest feature too while this renders.
 
         private void SetNewItemsOnContextObjects(IPublishedRequest request)
         {

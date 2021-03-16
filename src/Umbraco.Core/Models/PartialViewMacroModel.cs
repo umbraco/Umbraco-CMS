@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
-namespace Umbraco.Web.Models
+namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// The model used when rendering Partial View Macros
@@ -21,7 +21,7 @@ namespace Umbraco.Web.Models
             MacroAlias = macroAlias;
             MacroId = macroId;
         }
-       
+
         public IPublishedContent Content { get; }
         public string MacroName { get; }
         public string MacroAlias { get; }

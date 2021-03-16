@@ -1,5 +1,5 @@
-﻿using System;
-using Umbraco.Core;
+using System;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Web.Scheduling
 {

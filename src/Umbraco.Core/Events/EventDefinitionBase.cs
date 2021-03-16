@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Reflection;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     public abstract class EventDefinitionBase : IEventDefinition, IEquatable<EventDefinitionBase>
     {

@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     [DefaultPropertyValueConverter]
     public class SliderValueConverter : PropertyValueConverterBase
@@ -34,7 +33,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             if (IsRangeDataType(propertyType.DataType.Id))
             {
-                var rangeRawValues = source.ToString().Split(',');
+                var rangeRawValues = source.ToString().Split(Constants.CharArrays.Comma);
                 var minimumAttempt = rangeRawValues[0].TryConvertTo<decimal>();
                 var maximumAttempt = rangeRawValues[1].TryConvertTo<decimal>();
 

@@ -5,19 +5,21 @@ using System.Linq;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Models.Trees;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
-using Umbraco.Web.Actions;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     public abstract class ContentTreeControllerBase : TreeController, ITreeNodeController
     {
@@ -27,6 +29,7 @@ namespace Umbraco.Web.BackOffice.Trees
         private readonly ActionCollection _actionCollection;
         private readonly IUserService _userService;
         private readonly IDataTypeService _dataTypeService;
+        private readonly AppCaches _appCaches;
         public IMenuItemCollectionFactory MenuItemCollectionFactory { get; }
 
 
@@ -39,9 +42,11 @@ namespace Umbraco.Web.BackOffice.Trees
             ILogger<ContentTreeControllerBase> logger,
             ActionCollection actionCollection,
             IUserService userService,
-            IDataTypeService dataTypeService
+            IDataTypeService dataTypeService,
+            IEventAggregator eventAggregator,
+            AppCaches appCaches
             )
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _entityService = entityService;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
@@ -49,6 +54,7 @@ namespace Umbraco.Web.BackOffice.Trees
             _actionCollection = actionCollection;
             _userService = userService;
             _dataTypeService = dataTypeService;
+            _appCaches = appCaches;
             MenuItemCollectionFactory = menuItemCollectionFactory;
         }
 
@@ -149,12 +155,12 @@ namespace Umbraco.Web.BackOffice.Trees
             switch (RecycleBinId)
             {
                 case Constants.System.RecycleBinMedia:
-                    startNodeIds = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService);
-                    startNodePaths = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetMediaStartNodePaths(_entityService);
+                    startNodeIds = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService, _appCaches);
+                    startNodePaths = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetMediaStartNodePaths(_entityService, _appCaches);
                     break;
                 case Constants.System.RecycleBinContent:
-                    startNodeIds = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService);
-                    startNodePaths = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetContentStartNodePaths(_entityService);
+                    startNodeIds = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateContentStartNodeIds(_entityService, _appCaches);
+                    startNodePaths = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetContentStartNodePaths(_entityService, _appCaches);
                     break;
                 default:
                     throw new NotSupportedException("Path access is only determined on content or media");
@@ -320,8 +326,8 @@ namespace Umbraco.Web.BackOffice.Trees
         {
             if (entity == null) return false;
             return RecycleBinId == Constants.System.RecycleBinContent
-                ? _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(entity, _entityService)
-                : _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasMediaPathAccess(entity, _entityService);
+                ? _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasContentPathAccess(entity, _entityService, _appCaches)
+                : _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.HasMediaPathAccess(entity, _entityService, _appCaches);
         }
 
         /// <summary>
@@ -404,7 +410,7 @@ namespace Umbraco.Web.BackOffice.Trees
 
                 if (startNodes.Any(x =>
                 {
-                    var pathParts = x.Path.Split(',');
+                    var pathParts = x.Path.Split(Constants.CharArrays.Comma);
                     return pathParts.Contains(e.Id.ToInvariantString());
                 }))
                 {

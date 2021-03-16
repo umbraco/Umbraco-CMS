@@ -1,7 +1,7 @@
 ﻿using System;
 using Newtonsoft.Json;
 
-namespace Umbraco.Core.Serialization
+namespace Umbraco.Cms.Infrastructure.Serialization
 {
     public class FuzzyBooleanConverter : JsonConverter
     {

@@ -7,15 +7,16 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Web.BackOffice.Authorization;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Web.BackOffice.Authorization;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
 {
     public class ContentPermissionsResourceHandlerTests
     {
@@ -118,7 +119,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Web.BackOffice.Authorization
                 .Returns(CreateContent(nodeId));
 
             var mockEntityService = new Mock<IEntityService>();
-            return new ContentPermissions(mockUserService.Object, mockContentService.Object, mockEntityService.Object);
+            return new ContentPermissions(mockUserService.Object, mockContentService.Object, mockEntityService.Object, AppCaches.Disabled);
         }
     }
 }

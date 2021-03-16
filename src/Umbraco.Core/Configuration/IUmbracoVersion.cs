@@ -1,14 +1,14 @@
 using System;
-using Semver;
+using Umbraco.Cms.Core.Semver;
 
-namespace Umbraco.Core.Configuration
+namespace Umbraco.Cms.Core.Configuration
 {
     public interface IUmbracoVersion
     {
         /// <summary>
         /// Gets the non-semantic version of the Umbraco code.
         /// </summary>
-        Version Current { get; }
+        Version Version { get; }
 
         /// <summary>
         /// Gets the semantic version comments of the Umbraco code.

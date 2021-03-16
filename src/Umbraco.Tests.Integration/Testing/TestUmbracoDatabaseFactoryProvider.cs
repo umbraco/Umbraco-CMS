@@ -4,12 +4,12 @@
 using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
-namespace Umbraco.Tests.Integration.Testing
+namespace Umbraco.Cms.Tests.Integration.Testing
 {
     /// <summary>
     /// I want to be able to create a database for integration testsing without setting the connection string on the
@@ -46,8 +46,8 @@ namespace Umbraco.Tests.Integration.Testing
             return new UmbracoDatabaseFactory(
                 _loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 _loggerFactory,
-                _globalSettings.Value,
-                _connectionStrings.Value,
+                _globalSettings,
+                _connectionStrings,
                 _mappers,
                 _dbProviderFactoryCreator,
                 _databaseSchemaCreatorFactory);

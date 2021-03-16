@@ -2,19 +2,18 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Umbraco.Core;
-using Umbraco.Core.Security;
-using Umbraco.Core.Serialization;
-using Umbraco.Extensions;
-using Umbraco.Net;
-using Umbraco.Web.Actions;
-using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.Common.AspNetCore;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.Security;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Web.BackOffice.Authorization;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.Common.AspNetCore;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Security;
 
-namespace Umbraco.Web.BackOffice.DependencyInjection
+namespace Umbraco.Extensions
 {
     public static class ServiceCollectionExtensions
     {
@@ -57,19 +56,18 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
             services.TryAddScoped<IUserClaimsPrincipalFactory<BackOfficeIdentityUser>, UserClaimsPrincipalFactory<BackOfficeIdentityUser>>();
 
             // CUSTOM:
-            services.TryAddScoped<BackOfficeLookupNormalizer>();
+            services.TryAddScoped<NoopLookupNormalizer>();
             services.TryAddScoped<BackOfficeIdentityErrorDescriber>();
             services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
             services.TryAddSingleton<IBackOfficeExternalLoginProviders, BackOfficeExternalLoginProviders>();
             services.TryAddSingleton<IBackOfficeTwoFactorOptions, NoopBackOfficeTwoFactorOptions>();
-            services.TryAddSingleton<BackOfficeUserManagerAuditer>();
 
             /*
              * IdentityBuilderExtensions.AddUserManager adds UserManager<BackOfficeIdentityUser> to service collection
              * To validate the container the following registrations are required (dependencies of UserManager<T>)
              * Perhaps we shouldn't be registering UserManager<T> at all and only registering/depending the UmbracoBackOffice prefixed types.
              */
-            services.TryAddScoped<ILookupNormalizer, BackOfficeLookupNormalizer>();
+            services.TryAddScoped<ILookupNormalizer, NoopLookupNormalizer>();
             services.TryAddScoped<IdentityErrorDescriber, BackOfficeIdentityErrorDescriber>();
 
             return new BackOfficeIdentityBuilder(services);
@@ -366,16 +364,10 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
                 policy.Requirements.Add(new TreeRequirement(Constants.Trees.Languages));
             });
 
-            options.AddPolicy(AuthorizationPolicies.TreeAccessDocumentTypes, policy =>
-            {
-                policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
-                policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary));
-            });
-
             options.AddPolicy(AuthorizationPolicies.TreeAccessDictionary, policy =>
             {
                 policy.AuthenticationSchemes.Add(backOfficeAuthenticationScheme);
-                policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary, Constants.Trees.Dictionary));
+                policy.Requirements.Add(new TreeRequirement(Constants.Trees.Dictionary));
             });
 
             options.AddPolicy(AuthorizationPolicies.TreeAccessDictionaryOrTemplates, policy =>

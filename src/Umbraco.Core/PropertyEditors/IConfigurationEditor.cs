@@ -1,7 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Serialization;
+using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents an editor for editing the configuration of editors.
@@ -11,6 +12,7 @@ namespace Umbraco.Core.PropertyEditors
         /// <summary>
         /// Gets the fields.
         /// </summary>
+        [DataMember(Name = "fields")]
         List<ConfigurationField> Fields { get; }
 
         /// <summary>
@@ -22,6 +24,7 @@ namespace Umbraco.Core.PropertyEditors
         /// equivalent of an actual configuration object (ie an instance of <c>TConfiguration</c>, obtained
         /// via <see cref="ToConfigurationEditor"/>.</para>
         /// </remarks>
+        [DataMember(Name = "defaultConfig")]
         IDictionary<string, object> DefaultConfiguration { get; }
 
         /// <summary>

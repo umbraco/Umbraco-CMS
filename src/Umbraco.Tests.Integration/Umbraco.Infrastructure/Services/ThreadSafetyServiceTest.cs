@@ -2,24 +2,23 @@
 // See LICENSE for more details.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Tests.Common.Builders;
-using Umbraco.Tests.Integration.Testing;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
     // these tests tend to fail from time to time esp. on VSTS
     //
@@ -123,12 +122,27 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                 {
                     try
                     {
-                        log.LogInformation("[{0}] Running...", Thread.CurrentThread.ManagedThreadId);
+                        ConcurrentStack<IScope> currentStack = ((ScopeProvider)ScopeProvider).GetCallContextScopeValue();
+                        log.LogInformation("[{ThreadId}] Current Stack? {CurrentStack}", Thread.CurrentThread.ManagedThreadId, currentStack?.Count);
+
+                        // NOTE: This is NULL because we have supressed the execution context flow.
+                        // If we don't do that we will get various exceptions because we're trying to run concurrent threads
+                        // against an ambient context which cannot be done due to the rules of scope creation and completion.
+                        // But this works in v8 without the supression!? Why?
+                        // In v8 the value of the AmbientScope is simply the current CallContext (i.e. AsyncLocal) Value which
+                        // is not a mutable Stack like we are maintaining now. This means that for each child thread
+                        // in v8, that thread will see it's own CallContext Scope value that it set and not the 'true'
+                        // ambient Scope like we do now.
+                        // So although the test passes in v8, there's actually some strange things occuring because Scopes
+                        // are being created and disposed concurrently and out of order.
+                        var currentScope = (Scope)ScopeAccessor.AmbientScope;
+                        log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}", Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
+                        Assert.IsNull(currentScope);
 
                         string name1 = "test-" + Guid.NewGuid();
                         IContent content1 = contentService.Create(name1, -1, "umbTextpage");
 
-                        log.LogInformation("[{0}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
+                        log.LogInformation("[{ThreadId}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content1);
 
                         Thread.Sleep(100); // quick pause for maximum overlap!
@@ -136,11 +150,12 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                         string name2 = "test-" + Guid.NewGuid();
                         IContent content2 = contentService.Create(name2, -1, "umbTextpage");
 
-                        log.LogInformation("[{0}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
+                        log.LogInformation("[{ThreadId}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content2);
                     }
                     catch (Exception e)
                     {
+                        //throw;
                         lock (exceptions)
                         {
                             exceptions.Add(e);
@@ -150,9 +165,14 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                 threads.Add(t);
             }
 
-            // start all threads
-            log.LogInformation("Starting threads");
-            threads.ForEach(x => x.Start());
+            // See NOTE above, we must supress flow here to be able to run concurrent threads,
+            // else the AsyncLocal value from this current context will flow to the child threads.
+            using (ExecutionContext.SuppressFlow())
+            {
+                // start all threads
+                log.LogInformation("Starting threads");
+                threads.ForEach(x => x.Start());
+            }   
 
             // wait for all to complete
             log.LogInformation("Joining threads");
@@ -199,7 +219,22 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                 {
                     try
                     {
-                        log.LogInformation("[{0}] Running...", Thread.CurrentThread.ManagedThreadId);
+                        ConcurrentStack<IScope> currentStack = ((ScopeProvider)ScopeProvider).GetCallContextScopeValue();
+                        log.LogInformation("[{ThreadId}] Current Stack? {CurrentStack}", Thread.CurrentThread.ManagedThreadId, currentStack?.Count);
+
+                        // NOTE: This is NULL because we have supressed the execution context flow.
+                        // If we don't do that we will get various exceptions because we're trying to run concurrent threads
+                        // against an ambient context which cannot be done due to the rules of scope creation and completion.
+                        // But this works in v8 without the supression!? Why?
+                        // In v8 the value of the AmbientScope is simply the current CallContext (i.e. AsyncLocal) Value which
+                        // is not a mutable Stack like we are maintaining now. This means that for each child thread
+                        // in v8, that thread will see it's own CallContext Scope value that it set and not the 'true'
+                        // ambient Scope like we do now.
+                        // So although the test passes in v8, there's actually some strange things occuring because Scopes
+                        // are being created and disposed concurrently and out of order.
+                        var currentScope = (Scope)ScopeAccessor.AmbientScope;
+                        log.LogInformation("[{ThreadId}] Current Scope? {CurrentScope}", Thread.CurrentThread.ManagedThreadId, currentScope?.GetDebugInfo());
+                        Assert.IsNull(currentScope);
 
                         string name1 = "test-" + Guid.NewGuid();
                         IMedia media1 = mediaService.CreateMedia(name1, -1, Constants.Conventions.MediaTypes.Folder);
@@ -224,8 +259,13 @@ namespace Umbraco.Tests.Integration.Umbraco.Infrastructure.Services
                 threads.Add(t);
             }
 
-            // start all threads
-            threads.ForEach(x => x.Start());
+            // See NOTE above, we must supress flow here to be able to run concurrent threads,
+            // else the AsyncLocal value from this current context will flow to the child threads.
+            using (ExecutionContext.SuppressFlow())
+            {
+                // start all threads
+                threads.ForEach(x => x.Start());
+            }
 
             // wait for all to complete
             threads.ForEach(x => x.Join());

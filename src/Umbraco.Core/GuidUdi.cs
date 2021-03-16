@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 
-namespace Umbraco.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Represents a guid-based entity identifier.
@@ -33,7 +33,7 @@ namespace Umbraco.Core
             : base(uriValue)
         {
             Guid guid;
-            if (Guid.TryParse(uriValue.AbsolutePath.TrimStart('/'), out guid) == false)
+            if (Guid.TryParse(uriValue.AbsolutePath.TrimStart(Constants.CharArrays.ForwardSlash), out guid) == false)
                 throw new FormatException("URI \"" + uriValue + "\" is not a GUID entity ID.");
 
             Guid = guid;

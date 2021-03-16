@@ -1,5 +1,6 @@
 ﻿using System;
-using Umbraco.Core.Cache;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Web;
 
 namespace Umbraco.Web
 {

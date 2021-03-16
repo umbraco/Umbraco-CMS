@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Models
+﻿namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
     /// Defines a MemberType, which Member is based on

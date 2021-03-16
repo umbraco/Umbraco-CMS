@@ -1,18 +1,16 @@
-﻿using System;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
+using System;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Web.Cache
+namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class DictionaryCacheRefresher : CacheRefresherBase<DictionaryCacheRefresher>
+    public sealed class DictionaryCacheRefresher : CacheRefresherBase<DictionaryCacheRefresherNotification>
     {
-        public DictionaryCacheRefresher(AppCaches appCaches)
-            : base(appCaches)
+        public DictionaryCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, eventAggregator , factory)
         { }
 
         #region Define
-
-        protected override DictionaryCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("D1D7E227-F817-4816-BFE9-6C39B6152884");
 

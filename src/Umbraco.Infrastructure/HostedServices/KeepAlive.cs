@@ -6,13 +6,15 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Infrastructure.HostedServices
 {
     /// <summary>
     /// Hosted service implementation for keep alive feature.
@@ -95,7 +97,7 @@ namespace Umbraco.Infrastructure.HostedServices
                             return;
                         }
 
-                        keepAlivePingUrl = keepAlivePingUrl.Replace("{umbracoApplicationUrl}", umbracoAppUrl.TrimEnd('/'));
+                        keepAlivePingUrl = keepAlivePingUrl.Replace("{umbracoApplicationUrl}", umbracoAppUrl.TrimEnd(Constants.CharArrays.ForwardSlash));
                     }
 
                     var request = new HttpRequestMessage(HttpMethod.Get, keepAlivePingUrl);

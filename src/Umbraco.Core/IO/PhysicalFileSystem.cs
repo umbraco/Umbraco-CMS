@@ -4,9 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Hosting;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     public interface IPhysicalFileSystem : IFileSystem {}
     public class PhysicalFileSystem : IPhysicalFileSystem
@@ -51,7 +52,7 @@ namespace Umbraco.Core.IO
 
             _rootPath = EnsureDirectorySeparatorChar(rootPath).TrimEnd(Path.DirectorySeparatorChar);
             _rootPathFwd = EnsureUrlSeparatorChar(_rootPath);
-            _rootUrl = EnsureUrlSeparatorChar(rootUrl).TrimEnd('/');
+            _rootUrl = EnsureUrlSeparatorChar(rootUrl).TrimEnd(Constants.CharArrays.ForwardSlash);
         }
 
         /// <summary>
@@ -256,12 +257,12 @@ namespace Umbraco.Core.IO
             // if it starts with the root URL, strip it and trim the starting slash to make it relative
             // eg "/Media/1234/img.jpg" => "1234/img.jpg"
             if (_ioHelper.PathStartsWith(path, _rootUrl, '/'))
-                return path.Substring(_rootUrl.Length).TrimStart('/');
+                return path.Substring(_rootUrl.Length).TrimStart(Constants.CharArrays.ForwardSlash);
 
             // if it starts with the root path, strip it and trim the starting slash to make it relative
             // eg "c:/websites/test/root/Media/1234/img.jpg" => "1234/img.jpg"
             if (_ioHelper.PathStartsWith(path, _rootPathFwd, '/'))
-                return path.Substring(_rootPathFwd.Length).TrimStart('/');
+                return path.Substring(_rootPathFwd.Length).TrimStart(Constants.CharArrays.ForwardSlash);
 
             // unchanged - what else?
             return path;
@@ -323,7 +324,7 @@ namespace Umbraco.Core.IO
         /// <remarks>All separators are forward-slashes.</remarks>
         public string GetUrl(string path)
         {
-            path = EnsureUrlSeparatorChar(path).Trim('/');
+            path = EnsureUrlSeparatorChar(path).Trim(Constants.CharArrays.ForwardSlash);
             return _rootUrl + "/" + path;
         }
 

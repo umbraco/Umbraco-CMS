@@ -1,14 +1,15 @@
 using System;
 using System.Data;
+using System.Threading;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Events;
-using Umbraco.Core.IO;
-using Umbraco.Core.Persistence;
-using CoreDebugSettings = Umbraco.Core.Configuration.Models.CoreDebugSettings;
+using Umbraco.Extensions;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Infrastructure.Persistence;
+using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// Implements <see cref="IScope"/>.
@@ -19,6 +20,7 @@ namespace Umbraco.Core.Scoping
         private readonly ScopeProvider _scopeProvider;
         private readonly CoreDebugSettings _coreDebugSettings;
         private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly IEventAggregator _eventAggregator;
         private readonly ILogger<Scope> _logger;
 
         private readonly IsolationLevel _isolationLevel;
@@ -35,12 +37,15 @@ namespace Umbraco.Core.Scoping
         private EventMessages _messages;
         private ICompletable _fscope;
         private IEventDispatcher _eventDispatcher;
+        // eventually this may need to be injectable - for now we'll create it explicitly and let future needs determine if it should be injectable
+        private IScopedNotificationPublisher _notificationPublisher;
 
         // initializes a new scope
         private Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
+            IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             Scope parent,
@@ -56,6 +61,7 @@ namespace Umbraco.Core.Scoping
             _scopeProvider = scopeProvider;
             _coreDebugSettings = coreDebugSettings;
             _mediaFileSystem = mediaFileSystem;
+            _eventAggregator = eventAggregator;
             _logger = logger;
 
             Context = scopeContext;
@@ -69,23 +75,37 @@ namespace Umbraco.Core.Scoping
 
             Detachable = detachable;
 
+
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
-            Console.WriteLine("create " + InstanceId.ToString("N").Substring(0, 8));
 #endif
+            logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N").Substring(0, 8), Thread.CurrentThread.ManagedThreadId);
 
             if (detachable)
             {
-                if (parent != null) throw new ArgumentException("Cannot set parent on detachable scope.", nameof(parent));
-                if (scopeContext != null) throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
-                if (autoComplete) throw new ArgumentException("Cannot auto-complete a detachable scope.", nameof(autoComplete));
+                if (parent != null)
+                {
+                    throw new ArgumentException("Cannot set parent on detachable scope.", nameof(parent));
+                }
+
+                if (scopeContext != null)
+                {
+                    throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
+                }
+
+                if (autoComplete)
+                {
+                    throw new ArgumentException("Cannot auto-complete a detachable scope.", nameof(autoComplete));
+                }
 
                 // detachable creates its own scope context
                 Context = new ScopeContext();
 
                 // see note below
                 if (scopeFileSystems == true)
+                {
                     _fscope = fileSystems.Shadow();
+                }
 
                 return;
             }
@@ -98,16 +118,22 @@ namespace Umbraco.Core.Scoping
                 // TODO: means that it's OK to go from L2 to None for reading purposes, but writing would be BAD!
                 // this is for XmlStore that wants to bypass caches when rebuilding XML (same for NuCache)
                 if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode > repositoryCacheMode)
+                {
                     throw new ArgumentException($"Value '{repositoryCacheMode}' cannot be lower than parent value '{parent.RepositoryCacheMode}'.", nameof(repositoryCacheMode));
+                }
 
                 // cannot specify a dispatcher!
                 if (_eventDispatcher != null)
+                {
                     throw new ArgumentException("Value cannot be specified on nested scope.", nameof(eventDispatcher));
+                }
 
                 // cannot specify a different fs scope!
                 // can be 'true' only on outer scope (and false does not make much sense)
                 if (scopeFileSystems != null && parent._scopeFileSystem != scopeFileSystems)
+                {
                     throw new ArgumentException($"Value '{scopeFileSystems.Value}' be different from parent value '{parent._scopeFileSystem}'.", nameof(scopeFileSystems));
+                }
             }
             else
             {
@@ -115,7 +141,9 @@ namespace Umbraco.Core.Scoping
                 // every scoped FS to trigger the creation of shadow FS "on demand", and that would be
                 // pretty pointless since if scopeFileSystems is true, we *know* we want to shadow
                 if (scopeFileSystems == true)
+                {
                     _fscope = fileSystems.Shadow();
+                }
             }
         }
 
@@ -124,6 +152,7 @@ namespace Umbraco.Core.Scoping
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
+            IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             bool detachable,
@@ -134,7 +163,7 @@ namespace Umbraco.Core.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileSystem, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, coreDebugSettings, mediaFileSystem, eventAggregator, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         // initializes a new scope in a nested scopes chain, with its parent
@@ -142,6 +171,7 @@ namespace Umbraco.Core.Scoping
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
             IMediaFileSystem mediaFileSystem,
+            IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             Scope parent,
@@ -151,10 +181,12 @@ namespace Umbraco.Core.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileSystem, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, coreDebugSettings, mediaFileSystem, eventAggregator, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
+
+        public int CreatedThreadId { get; } = Thread.CurrentThread.ManagedThreadId;
 
         public ISqlContext SqlContext => _scopeProvider.SqlContext;
 
@@ -163,8 +195,16 @@ namespace Umbraco.Core.Scoping
         {
             get
             {
-                if (_callContext) return true;
-                if (ParentScope != null) return ParentScope.CallContext;
+                if (_callContext)
+                {
+                    return true;
+                }
+
+                if (ParentScope != null)
+                {
+                    return ParentScope.CallContext;
+                }
+
                 return false;
             }
             set => _callContext = value;
@@ -174,7 +214,11 @@ namespace Umbraco.Core.Scoping
         {
             get
             {
-                if (ParentScope != null) return ParentScope.ScopedFileSystems;
+                if (ParentScope != null)
+                {
+                    return ParentScope.ScopedFileSystems;
+                }
+
                 return _fscope != null;
             }
         }
@@ -184,8 +228,16 @@ namespace Umbraco.Core.Scoping
         {
             get
             {
-                if (_repositoryCacheMode != RepositoryCacheMode.Unspecified) return _repositoryCacheMode;
-                if (ParentScope != null) return ParentScope.RepositoryCacheMode;
+                if (_repositoryCacheMode != RepositoryCacheMode.Unspecified)
+                {
+                    return _repositoryCacheMode;
+                }
+
+                if (ParentScope != null)
+                {
+                    return ParentScope.RepositoryCacheMode;
+                }
+
                 return RepositoryCacheMode.Default;
             }
         }
@@ -195,10 +247,12 @@ namespace Umbraco.Core.Scoping
         {
             get
             {
-                if (ParentScope != null) return ParentScope.IsolatedCaches;
+                if (ParentScope != null)
+                {
+                    return ParentScope.IsolatedCaches;
+                }
 
-                return _isolatedCaches ?? (_isolatedCaches
-                           = new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+                return _isolatedCaches ??= new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache()));
             }
         }
 
@@ -224,8 +278,16 @@ namespace Umbraco.Core.Scoping
         {
             get
             {
-                if (_isolationLevel != IsolationLevel.Unspecified) return _isolationLevel;
-                if (ParentScope != null) return ParentScope.IsolationLevel;
+                if (_isolationLevel != IsolationLevel.Unspecified)
+                {
+                    return _isolationLevel;
+                }
+
+                if (ParentScope != null)
+                {
+                    return ParentScope.IsolationLevel;
+                }
+
                 return Database.SqlContext.SqlSyntax.DefaultIsolationLevel;
             }
         }
@@ -238,14 +300,19 @@ namespace Umbraco.Core.Scoping
                 EnsureNotDisposed();
 
                 if (_database != null)
+                {
                     return _database;
+                }
 
                 if (ParentScope != null)
                 {
-                    var database = ParentScope.Database;
-                    var currentLevel = database.GetCurrentTransactionIsolationLevel();
+                    IUmbracoDatabase database = ParentScope.Database;
+                    IsolationLevel currentLevel = database.GetCurrentTransactionIsolationLevel();
                     if (_isolationLevel > IsolationLevel.Unspecified && currentLevel < _isolationLevel)
+                    {
                         throw new Exception("Scope requires isolation level " + _isolationLevel + ", but got " + currentLevel + " from parent.");
+                    }
+
                     return _database = database;
                 }
 
@@ -282,8 +349,12 @@ namespace Umbraco.Core.Scoping
             get
             {
                 EnsureNotDisposed();
-                if (ParentScope != null) return ParentScope.Messages;
-                return _messages ?? (_messages = new EventMessages());
+                if (ParentScope != null)
+                {
+                    return ParentScope.Messages;
+                }
+
+                return _messages ??= new EventMessages();
 
                 // TODO: event messages?
                 // this may be a problem: the messages collection will be cleared at the end of the scope
@@ -309,8 +380,22 @@ namespace Umbraco.Core.Scoping
             get
             {
                 EnsureNotDisposed();
-                if (ParentScope != null) return ParentScope.Events;
-                return _eventDispatcher ?? (_eventDispatcher = new QueuingEventDispatcher(_mediaFileSystem));
+                if (ParentScope != null)
+                {
+                    return ParentScope.Events;
+                }
+
+                return _eventDispatcher ??= new QueuingEventDispatcher(_mediaFileSystem);
+            }
+        }
+
+        public IScopedNotificationPublisher Notifications
+        {
+            get
+            {
+                EnsureNotDisposed();
+                if (ParentScope != null) return ParentScope.Notifications;
+                return _notificationPublisher ?? (_notificationPublisher = new ScopedNotificationPublisher(_eventAggregator));
             }
         }
 
@@ -318,14 +403,14 @@ namespace Umbraco.Core.Scoping
         public bool Complete()
         {
             if (_completed.HasValue == false)
+            {
                 _completed = true;
+            }
+
             return _completed.Value;
         }
 
-        public void Reset()
-        {
-            _completed = null;
-        }
+        public void Reset() => _completed = null;
 
         public void ChildCompleted(bool? completed)
         {
@@ -333,7 +418,9 @@ namespace Umbraco.Core.Scoping
             if (completed.HasValue == false || completed.Value == false)
             {
                 if (LogUncompletedScopes)
-                    _logger.LogDebug("Uncompleted Child Scope at\r\n {StackTrace}", Environment.StackTrace);
+                {
+                    _logger.LogWarning("Uncompleted Child Scope at\r\n {StackTrace}", Environment.StackTrace);
+                }
 
                 _completed = false;
             }
@@ -341,8 +428,17 @@ namespace Umbraco.Core.Scoping
 
         private void EnsureNotDisposed()
         {
+            // We can't be disposed
             if (_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            {
+                throw new ObjectDisposedException($"The {nameof(Scope)} ({this.GetDebugInfo()}) is already disposed");
+            }
+
+            // And neither can our ancestors if we're trying to be disposed since
+            // a child must always be disposed before it's parent.
+            // This is a safety check, it's actually not entirely possible that a parent can be
+            // disposed before the child since that will end up with a "not the Ambient" exception.
+            ParentScope?.EnsureNotDisposed();
 
             // TODO: safer?
             //if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
@@ -355,38 +451,49 @@ namespace Umbraco.Core.Scoping
 
             if (this != _scopeProvider.AmbientScope)
             {
+                var failedMessage = $"The {nameof(Scope)} {this.GetDebugInfo()} being disposed is not the Ambient {nameof(Scope)} {_scopeProvider.AmbientScope.GetDebugInfo()}. This typically indicates that a child {nameof(Scope)} was not disposed, or flowed to a child thread that was not awaited, or concurrent threads are accessing the same {nameof(Scope)} (Ambient context) which is not supported. If using Task.Run (or similar) as a fire and forget tasks or to run threads in parallel you must suppress execution context flow with ExecutionContext.SuppressFlow() and ExecutionContext.RestoreFlow().";
+
 #if DEBUG_SCOPES
-                var ambient = _scopeProvider.AmbientScope;
-                _logger.Debug<Scope>("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
+                Scope ambient = _scopeProvider.AmbientScope;
+                _logger.LogWarning("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
                 if (ambient == null)
+                {
                     throw new InvalidOperationException("Not the ambient scope (no ambient scope).");
-                var ambientInfos = _scopeProvider.GetScopeInfo(ambient);
-                var disposeInfos = _scopeProvider.GetScopeInfo(this);
-                throw new InvalidOperationException("Not the ambient scope (see ctor stack traces).\r\n"
-                    + "- ambient ctor ->\r\n" + ambientInfos.CtorStack + "\r\n"
-                    + "- dispose ctor ->\r\n" + disposeInfos.CtorStack + "\r\n");
+                }
+
+                ScopeInfo ambientInfos = _scopeProvider.GetScopeInfo(ambient);
+                ScopeInfo disposeInfos = _scopeProvider.GetScopeInfo(this);
+                throw new InvalidOperationException($"{failedMessage} (see ctor stack traces).\r\n"
+                    + "- ambient ->\r\n" + ambientInfos.ToString() + "\r\n"
+                    + "- dispose ->\r\n" + disposeInfos.ToString() + "\r\n");
 #else
-                throw new InvalidOperationException("Not the ambient scope.");
+                throw new InvalidOperationException(failedMessage);
 #endif
             }
 
-            var parent = ParentScope;
-            _scopeProvider.AmbientScope = parent; // might be null = this is how scopes are removed from context objects
+            // Replace the Ambient scope with the parent
+            Scope parent = ParentScope;
+            _scopeProvider.PopAmbientScope(this); // pop, the parent is on the stack so is now current
 
 #if DEBUG_SCOPES
             _scopeProvider.Disposed(this);
 #endif
 
             if (_autoComplete && _completed == null)
+            {
                 _completed = true;
+            }
 
             if (parent != null)
+            {
                 parent.ChildCompleted(_completed);
+            }
             else
+            {
                 DisposeLastScope();
+            }
 
             _disposed = true;
-            GC.SuppressFinalize(this);
         }
 
         private void DisposeLastScope()
@@ -401,9 +508,13 @@ namespace Umbraco.Core.Scoping
                 try
                 {
                     if (completed)
+                    {
                         _database.CompleteTransaction();
+                    }
                     else
+                    {
                         _database.AbortTransaction();
+                    }
                 }
                 catch
                 {
@@ -416,7 +527,9 @@ namespace Umbraco.Core.Scoping
                     _database = null;
 
                     if (databaseException)
+                    {
                         RobustExit(false, true);
+                    }
                 }
             }
 
@@ -438,14 +551,20 @@ namespace Umbraco.Core.Scoping
         //    to ensure we don't leave a scope around, etc
         private void RobustExit(bool completed, bool onException)
         {
-             if (onException) completed = false;
+             if (onException)
+            {
+                completed = false;
+            }
 
             TryFinally(() =>
             {
                 if (_scopeFileSystem == true)
                 {
                     if (completed)
+                    {
                         _fscope.Complete();
+                    }
+
                     _fscope.Dispose();
                     _fscope = null;
                 }
@@ -453,7 +572,10 @@ namespace Umbraco.Core.Scoping
             {
                 // deal with events
                 if (onException == false)
+                {
                     _eventDispatcher?.ScopeExit(completed);
+                    _notificationPublisher?.ScopeExit(completed);
+                }
             }, () =>
             {
                 // if *we* created it, then get rid of it
@@ -466,7 +588,7 @@ namespace Umbraco.Core.Scoping
                     finally
                     {
                         // removes the ambient context (ambient scope already gone)
-                        _scopeProvider.SetAmbient(null);
+                        _scopeProvider.PopAmbientScopeContext();
                     }
                 }
             }, () =>
@@ -474,7 +596,18 @@ namespace Umbraco.Core.Scoping
                 if (Detachable)
                 {
                     // get out of the way, restore original
-                    _scopeProvider.SetAmbient(OrigScope, OrigContext);
+
+                    // TODO: Difficult to know if this is correct since this is all required
+                    // by Deploy which I don't fully understand since there is limited tests on this in the CMS
+                    if (OrigScope != _scopeProvider.AmbientScope)
+                    {
+                        _scopeProvider.PopAmbientScope(_scopeProvider.AmbientScope);
+                    }
+                    if (OrigContext != _scopeProvider.AmbientContext)
+                    {
+                        _scopeProvider.PopAmbientScopeContext();
+                    }
+
                     Attached = false;
                     OrigScope = null;
                     OrigContext = null;
@@ -482,14 +615,15 @@ namespace Umbraco.Core.Scoping
             });
         }
 
-        private static void TryFinally(params Action[] actions)
-        {
-            TryFinally(0, actions);
-        }
+        private static void TryFinally(params Action[] actions) => TryFinally(0, actions);
 
         private static void TryFinally(int index, Action[] actions)
         {
-            if (index == actions.Length) return;
+            if (index == actions.Length)
+            {
+                return;
+            }
+
             try
             {
                 actions[index]();
@@ -500,18 +634,19 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        // backing field for LogUncompletedScopes
-        private static bool? _logUncompletedScopes;
-
-        // caching config
         // true if Umbraco.CoreDebugSettings.LogUncompletedScope appSetting is set to "true"
-        private bool LogUncompletedScopes => (_logUncompletedScopes
-            ?? (_logUncompletedScopes = _coreDebugSettings.LogIncompletedScopes)).Value;
+        private bool LogUncompletedScopes => _coreDebugSettings.LogIncompletedScopes;
 
         /// <inheritdoc />
         public void ReadLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.ReadLock(Database, lockIds);
 
         /// <inheritdoc />
+        public void ReadLock(TimeSpan timeout, int lockId) => Database.SqlContext.SqlSyntax.ReadLock(Database, timeout, lockId);
+
+        /// <inheritdoc />
         public void WriteLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.WriteLock(Database, lockIds);
+
+        /// <inheritdoc />
+        public void WriteLock(TimeSpan timeout, int lockId) => Database.SqlContext.SqlSyntax.WriteLock(Database, timeout, lockId);
     }
 }

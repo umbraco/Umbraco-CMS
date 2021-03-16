@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Localization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
@@ -9,16 +8,16 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using Smidge;
 using Smidge.Nuglify;
 using StackExchange.Profiling;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
-using Umbraco.Web.Common.Middleware;
-using Umbraco.Web.Common.Plugins;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Middleware;
+using Umbraco.Cms.Web.Common.Plugins;
 
 namespace Umbraco.Extensions
 {
-
     /// <summary>
     /// <see cref="IApplicationBuilder"/> extensions for Umbraco
     /// </summary>
@@ -122,10 +121,12 @@ namespace Umbraco.Extensions
 
             if (!app.UmbracoCanBoot())
             {
+                app.UseStaticFiles(); // We need static files to show the nice error page.
                 app.UseMiddleware<BootFailedMiddleware>();
             }
             else
             {
+                app.UseMiddleware<PreviewAuthenticationMiddleware>();
                 app.UseMiddleware<UmbracoRequestMiddleware>();
                 app.UseMiddleware<MiniProfilerMiddleware>();
             }

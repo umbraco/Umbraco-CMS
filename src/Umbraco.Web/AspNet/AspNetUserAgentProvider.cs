@@ -1,4 +1,4 @@
-using Umbraco.Net;
+using Umbraco.Cms.Core.Net;
 
 namespace Umbraco.Web.AspNet
 {

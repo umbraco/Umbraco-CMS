@@ -1,21 +1,20 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Umbraco.Core;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Entities;
-using Umbraco.Core.Trees;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.Common.Filters;
-using Umbraco.Web.Common.ModelBinders;
-using Umbraco.Web.Models.Trees;
-using Umbraco.Web.Trees;
-using Umbraco.Web.WebApi;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.BackOffice.Trees
+namespace Umbraco.Cms.Web.BackOffice.Trees
 {
     /// <summary>
     /// A base controller reference for non-attributed trees (un-registered).
@@ -29,10 +28,12 @@ namespace Umbraco.Web.BackOffice.Trees
         // TODO: Need to set this, but from where?
         //       Presumably not injecting as this will be a base controller for package/solution developers.
         private readonly UmbracoApiControllerTypeCollection _apiControllers;
+        private readonly IEventAggregator _eventAggregator;
 
-        protected TreeControllerBase(UmbracoApiControllerTypeCollection apiControllers)
+        protected TreeControllerBase(UmbracoApiControllerTypeCollection apiControllers, IEventAggregator eventAggregator)
         {
             _apiControllers = apiControllers;
+            _eventAggregator = eventAggregator;
         }
 
         /// <summary>
@@ -87,7 +88,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// </summary>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public ActionResult<TreeNode> GetRootNode([ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public async Task<ActionResult<TreeNode>> GetRootNode([ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
             var nodeResult = CreateRootNode(queryStrings);
@@ -111,7 +112,7 @@ namespace Umbraco.Web.BackOffice.Trees
             if (IsDialog(queryStrings))
                 node.RoutePath = "#";
 
-            OnRootNodeRendering(this, new TreeNodeRenderingEventArgs(node, queryStrings));
+            await _eventAggregator.PublishAsync(new RootNodeRenderingNotification(node, queryStrings));
 
             return node;
         }
@@ -128,7 +129,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// We are allowing an arbitrary number of query strings to be passed in so that developers are able to persist custom data from the front-end
         /// to the back end to be used in the query for model data.
         /// </remarks>
-        public ActionResult<TreeNodeCollection> GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public async Task<ActionResult<TreeNodeCollection>> GetNodes(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
             var nodesResult = GetTreeNodes(id, queryStrings);
@@ -149,7 +150,7 @@ namespace Umbraco.Web.BackOffice.Trees
                     node.RoutePath = "#";
 
             //raise the event
-            OnTreeNodesRendering(this, new TreeNodesRenderingEventArgs(nodes, queryStrings));
+            await _eventAggregator.PublishAsync(new TreeNodesRenderingNotification(nodes, queryStrings));
 
             return nodes;
         }
@@ -160,7 +161,7 @@ namespace Umbraco.Web.BackOffice.Trees
         /// <param name="id"></param>
         /// <param name="queryStrings"></param>
         /// <returns></returns>
-        public ActionResult<MenuItemCollection> GetMenu(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
+        public async Task<ActionResult<MenuItemCollection>> GetMenu(string id, [ModelBinder(typeof(HttpQueryStringModelBinder))]FormCollection queryStrings)
         {
             if (queryStrings == null) queryStrings = FormCollection.Empty;
             var menuResult = GetMenuForNode(id, queryStrings);
@@ -171,7 +172,7 @@ namespace Umbraco.Web.BackOffice.Trees
 
             var menu = menuResult.Value;
             //raise the event
-            OnMenuRendering(this, new MenuRenderingEventArgs(id, menu, queryStrings));
+            await _eventAggregator.PublishAsync(new MenuRenderingNotification(id, menu, queryStrings));
             return menu;
         }
 
@@ -375,46 +376,6 @@ namespace Umbraco.Web.BackOffice.Trees
         {
             queryStrings.TryGetValue(TreeQueryStringParameters.Use, out var use);
             return use == "dialog";
-        }
-
-        /// <summary>
-        /// An event that allows developers to modify the tree node collection that is being rendered
-        /// </summary>
-        /// <remarks>
-        /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
-        /// </remarks>
-        public static event TypedEventHandler<TreeControllerBase, TreeNodesRenderingEventArgs> TreeNodesRendering;
-
-        private static void OnTreeNodesRendering(TreeControllerBase instance, TreeNodesRenderingEventArgs e)
-        {
-            var handler = TreeNodesRendering;
-            handler?.Invoke(instance, e);
-        }
-
-        /// <summary>
-        /// An event that allows developer to modify the root tree node that is being rendered
-        /// </summary>
-        public static event TypedEventHandler<TreeControllerBase, TreeNodeRenderingEventArgs> RootNodeRendering;
-
-        // internal for temp class below - kill eventually!
-        internal static void OnRootNodeRendering(TreeControllerBase instance, TreeNodeRenderingEventArgs e)
-        {
-            var handler = RootNodeRendering;
-            handler?.Invoke(instance, e);
-        }
-
-        /// <summary>
-        /// An event that allows developers to modify the menu that is being rendered
-        /// </summary>
-        /// <remarks>
-        /// Developers can add/remove/replace/insert/update/etc... any of the tree items in the collection.
-        /// </remarks>
-        public static event TypedEventHandler<TreeControllerBase, MenuRenderingEventArgs> MenuRendering;
-
-        private static void OnMenuRendering(TreeControllerBase instance, MenuRenderingEventArgs e)
-        {
-            var handler = MenuRendering;
-            handler?.Invoke(instance, e);
         }
     }
 }

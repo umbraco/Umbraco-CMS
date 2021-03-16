@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.Events;
-using Umbraco.Core.Exceptions;
-using Umbraco.Core.IO;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     /// <summary>
     /// Represents the DataType Service, which is an easy access to operations involving <see cref="IDataType"/>
@@ -53,14 +54,14 @@ namespace Umbraco.Core.Services.Implement
 
         #region Containers
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
             {
                 try
                 {
-                    var container = new EntityContainer(Constants.ObjectTypes.DataType)
+                    var container = new EntityContainer(Cms.Core.Constants.ObjectTypes.DataType)
                     {
                         Name = name,
                         ParentId = parentId,
@@ -114,7 +115,7 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<EntityContainer> GetContainers(IDataType dataType)
         {
-            var ancestorIds = dataType.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = dataType.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();
@@ -134,13 +135,13 @@ namespace Umbraco.Core.Services.Implement
             }
         }
 
-        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Constants.Security.SuperUserId)
+        public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            if (container.ContainedObjectType != Constants.ObjectTypes.DataType)
+            if (container.ContainedObjectType != Cms.Core.Constants.ObjectTypes.DataType)
             {
-                var ex = new InvalidOperationException("Not a " + Constants.ObjectTypes.DataType + " container.");
+                var ex = new InvalidOperationException("Not a " + Cms.Core.Constants.ObjectTypes.DataType + " container.");
                 return OperationResult.Attempt.Fail(evtMsgs, ex);
             }
 
@@ -168,7 +169,7 @@ namespace Umbraco.Core.Services.Implement
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = Constants.Security.SuperUserId)
+        public Attempt<OperationResult> DeleteContainer(int containerId, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -201,7 +202,7 @@ namespace Umbraco.Core.Services.Implement
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
 
-        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Constants.Security.SuperUserId)
+        public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
@@ -378,7 +379,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="dataType"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
-        public void Save(IDataType dataType, int userId = Constants.Security.SuperUserId)
+        public void Save(IDataType dataType, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             dataType.CreatorId = userId;
 
@@ -415,7 +416,7 @@ namespace Umbraco.Core.Services.Implement
         /// </summary>
         /// <param name="dataTypeDefinitions"><see cref="IDataType"/> to save</param>
         /// <param name="userId">Id of the user issuing the save</param>
-        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = Constants.Security.SuperUserId)
+        public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             Save(dataTypeDefinitions, userId, true);
         }
@@ -465,7 +466,7 @@ namespace Umbraco.Core.Services.Implement
         /// </remarks>
         /// <param name="dataType"><see cref="IDataType"/> to delete</param>
         /// <param name="userId">Optional Id of the user issuing the deletion</param>
-        public void Delete(IDataType dataType, int userId = Constants.Security.SuperUserId)
+        public void Delete(IDataType dataType, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             using (var scope = ScopeProvider.CreateScope())
             {

@@ -1,7 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-namespace Umbraco.Core.Configuration.Models
+using System;
+
+namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
     /// Typed configuration options for global settings.
@@ -25,18 +27,9 @@ namespace Umbraco.Core.Configuration.Models
         public string ReservedPaths { get; set; } = StaticReservedPaths;
 
         /// <summary>
-        /// Gets or sets a value for the configuration status.
+        /// Gets or sets a value for the timeout
         /// </summary>
-        /// <remarks>
-        /// TODO: https://github.com/umbraco/Umbraco-CMS/issues/4238 - stop having version in web.config appSettings
-        /// TODO: previously this would throw on set, but presumably we can't do that if we do still want this in config.
-        /// </remarks>
-        public string ConfigurationStatus { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value for the timeout in minutes.
-        /// </summary>
-        public int TimeOutInMinutes { get; set; } = 20;
+        public TimeSpan TimeOut{ get; set; } = TimeSpan.FromMinutes(20);
 
         /// <summary>
         /// Gets or sets a value for the default UI language.
@@ -94,16 +87,6 @@ namespace Umbraco.Core.Configuration.Models
         public bool InstallMissingDatabase { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets a value indicating whether unattended installs are enabled.
-        /// </summary>
-        /// <remarks>
-        /// <para>By default, when a database connection string is configured and it is possible to connect to
-        /// the database, but the database is empty, the runtime enters the <c>Install</c> level.
-        /// If this option is set to <c>true</c> an unattended install will be performed and the runtime enters
-        /// the <c>Run</c> level.</para>
-        /// </remarks>
-        public bool InstallUnattended { get; set; } = false;
-        /// <summary>
         /// Gets or sets a value indicating whether to disable the election for a single server.
         /// </summary>
         public bool DisableElectionForSingleServer { get; set; } = false;
@@ -143,5 +126,14 @@ namespace Umbraco.Core.Configuration.Models
         /// Gets a value indicating whether SMTP is configured.
         /// </summary>
         public bool IsSmtpServerConfigured => !string.IsNullOrWhiteSpace(Smtp?.Host);
+
+        /// <summary>
+        /// An int value representing the time in milliseconds to lock the database for a write operation
+        /// </summary>
+        /// <remarks>
+        /// The default value is 5000 milliseconds
+        /// </remarks>
+        /// <value>The timeout in milliseconds.</value>
+        public TimeSpan SqlWriteLockTimeOut { get; } = TimeSpan.FromMilliseconds(5000);
     }
 }

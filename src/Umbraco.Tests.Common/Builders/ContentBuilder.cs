@@ -4,13 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Tests.Common.Builders.Extensions;
-using Umbraco.Tests.Common.Builders.Interfaces;
-using Umbraco.Tests.Testing;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
+using Umbraco.Cms.Tests.Common.Builders.Interfaces;
+using Umbraco.Cms.Tests.Common.Extensions;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.Common.Builders
+namespace Umbraco.Cms.Tests.Common.Builders
 {
     public class ContentBuilder
         : BuilderBase<Content>,

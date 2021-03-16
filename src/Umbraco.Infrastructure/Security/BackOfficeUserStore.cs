@@ -8,15 +8,18 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Mapping;
-using Umbraco.Core.Models;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Mapping;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     // TODO: Make this into a base class that can be re-used
 
@@ -31,6 +34,7 @@ namespace Umbraco.Core.Security
         private readonly IExternalLoginService _externalLoginService;
         private readonly GlobalSettings _globalSettings;
         private readonly UmbracoMapper _mapper;
+        private readonly AppCaches _appCaches;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeUserStore"/> class.
@@ -42,7 +46,8 @@ namespace Umbraco.Core.Security
             IExternalLoginService externalLoginService,
             IOptions<GlobalSettings> globalSettings,
             UmbracoMapper mapper,
-            IdentityErrorDescriber describer)
+            IdentityErrorDescriber describer,
+            AppCaches appCaches)
             : base(describer)
         {
             _scopeProvider = scopeProvider;
@@ -51,6 +56,7 @@ namespace Umbraco.Core.Security
             _externalLoginService = externalLoginService ?? throw new ArgumentNullException(nameof(externalLoginService));
             _globalSettings = globalSettings.Value;
             _mapper = mapper;
+            _appCaches = appCaches;
             _userService = userService;
             _externalLoginService = externalLoginService;
         }
@@ -83,7 +89,7 @@ namespace Umbraco.Core.Security
             // prefix will help us determine if the password hasn't actually been specified yet.
             // this will hash the guid with a salt so should be nicely random
             var aspHasher = new PasswordHasher<BackOfficeIdentityUser>();
-            var emptyPasswordValue = Constants.Security.EmptyPasswordPrefix +
+            var emptyPasswordValue = Cms.Core.Constants.Security.EmptyPasswordPrefix +
                                       aspHasher.HashPassword(user, Guid.NewGuid().ToString("N"));
 
             var userEntity = new User(_globalSettings, user.Name, user.Email, user.UserName, emptyPasswordValue)
@@ -437,7 +443,7 @@ namespace Umbraco.Core.Security
         }
 
         /// <summary>
-        /// Returns the roles (user groups) for this user
+        /// Gets a list of role names the specified user belongs to.
         /// </summary>
         public override Task<IList<string>> GetRolesAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default)
         {
@@ -683,8 +689,8 @@ namespace Umbraco.Core.Security
             }
 
             // we should re-set the calculated start nodes
-            identityUser.CalculatedMediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService);
-            identityUser.CalculatedContentStartNodeIds = user.CalculateContentStartNodeIds(_entityService);
+            identityUser.CalculatedMediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+            identityUser.CalculatedContentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
 
             // reset all changes
             identityUser.ResetDirtyProperties(false);

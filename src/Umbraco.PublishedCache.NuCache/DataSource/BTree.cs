@@ -1,10 +1,9 @@
 ﻿using System.Configuration;
 using CSharpTest.Net.Collections;
 using CSharpTest.Net.Serialization;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
+using Umbraco.Cms.Core.Configuration.Models;
 
-namespace Umbraco.Web.PublishedCache.NuCache.DataSource
+namespace Umbraco.Cms.Infrastructure.PublishedCache.DataSource
 {
     internal class BTree
     {

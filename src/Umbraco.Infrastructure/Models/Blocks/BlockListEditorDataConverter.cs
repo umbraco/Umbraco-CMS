@@ -1,15 +1,15 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Collections.Generic;
+using Newtonsoft.Json.Linq;
 
-namespace Umbraco.Core.Models.Blocks
+namespace Umbraco.Cms.Core.Models.Blocks
 {
     /// <summary>
     /// Data converter for the block list property editor
     /// </summary>
     public class BlockListEditorDataConverter : BlockEditorDataConverter
     {
-        public BlockListEditorDataConverter() : base(Constants.PropertyEditors.Aliases.BlockList)
+        public BlockListEditorDataConverter() : base(Cms.Core.Constants.PropertyEditors.Aliases.BlockList)
         {
         }
 

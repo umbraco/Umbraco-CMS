@@ -1,27 +1,31 @@
 using System;
 using System.Linq;
+using Ganss.XSS;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Services;
-using Umbraco.Extensions;
-using Umbraco.Infrastructure.DependencyInjection;
-using Umbraco.Web.BackOffice.Authorization;
-using Umbraco.Web.BackOffice.Controllers;
-using Umbraco.Web.BackOffice.Filters;
-using Umbraco.Web.BackOffice.Middleware;
-using Umbraco.Web.BackOffice.Routing;
-using Umbraco.Web.BackOffice.Security;
-using Umbraco.Web.BackOffice.Services;
-using Umbraco.Web.BackOffice.Trees;
-using Umbraco.Web.Common.Authorization;
-using Umbraco.Web.Common.DependencyInjection;
-using Umbraco.Web.WebAssets;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Infrastructure.WebAssets;
+using Umbraco.Cms.Web.BackOffice.Controllers;
+using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.Middleware;
+using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
+using Umbraco.Cms.Web.BackOffice.Routing;
+using Umbraco.Cms.Web.BackOffice.Security;
+using Umbraco.Cms.Web.BackOffice.Services;
+using Umbraco.Cms.Web.BackOffice.SignalR;
+using Umbraco.Cms.Web.BackOffice.Trees;
+using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Security;
+using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
 
-namespace Umbraco.Web.BackOffice.DependencyInjection
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the Umbraco back office
@@ -31,21 +35,25 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
         /// <summary>
         /// Adds all required components to run the Umbraco back office
         /// </summary>
-        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder) => builder
+        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, IWebHostEnvironment webHostEnvironment) => builder
                 .AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
-                .AddRuntimeMinifier()
+                .AddRuntimeMinifier(webHostEnvironment)
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
+                .AddMembersIdentity()
                 .AddBackOfficeAuthorizationPolicies()
                 .AddUmbracoProfiler()
                 .AddMvcAndRazor()
                 .AddWebServer()
                 .AddPreviewSupport()
                 .AddHostedServices()
-                .AddDistributedCache();
+                .AddDistributedCache()
+                .AddModelsBuilderDashboard()
+                .AddUnattedInstallCreateUser()
+                .AddExamine();
 
         /// <summary>
         /// Adds Umbraco back office authentication requirements
@@ -60,26 +68,33 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
                 .AddAuthentication()
 
                 // Add our custom schemes which are cookie handlers
-                .AddCookie(Core.Constants.Security.BackOfficeAuthenticationType)
-                .AddCookie(Core.Constants.Security.BackOfficeExternalAuthenticationType, o =>
+                .AddCookie(Constants.Security.BackOfficeAuthenticationType)
+                .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
                 {
-                    o.Cookie.Name = Core.Constants.Security.BackOfficeExternalAuthenticationType;
+                    o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
                     o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                 })
 
                 // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
                 // they don't have to worry about manually adding this scheme or modifying the sign in manager
-                .AddCookie(Core.Constants.Security.BackOfficeTwoFactorAuthenticationType, o =>
+                .AddCookie(Constants.Security.BackOfficeTwoFactorAuthenticationType, o =>
                 {
-                    o.Cookie.Name = Core.Constants.Security.BackOfficeTwoFactorAuthenticationType;
+                    o.Cookie.Name = Constants.Security.BackOfficeTwoFactorAuthenticationType;
                     o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
                 });
 
             builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
 
-            builder.Services.AddUnique<PreviewAuthenticationMiddleware>();
             builder.Services.AddUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
             builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
+
+            builder.AddNotificationHandler<UserLoginSuccessNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserLogoutSuccessNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserLoginFailedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserForgotPasswordRequestedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserForgotPasswordChangedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserPasswordChangedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserPasswordResetNotification, BackOfficeUserManagerAuditer>();
 
             return builder;
         }
@@ -95,9 +110,19 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
         }
 
         /// <summary>
+        /// Adds Identity support for Umbraco members
+        /// </summary>
+        public static IUmbracoBuilder AddMembersIdentity(this IUmbracoBuilder builder)
+        {
+            builder.Services.AddMembersIdentity();
+
+            return builder;
+        }
+
+        /// <summary>
         /// Adds Umbraco back office authorization policies
         /// </summary>
-        public static IUmbracoBuilder AddBackOfficeAuthorizationPolicies(this IUmbracoBuilder builder, string backOfficeAuthenticationScheme = Core.Constants.Security.BackOfficeAuthenticationType)
+        public static IUmbracoBuilder AddBackOfficeAuthorizationPolicies(this IUmbracoBuilder builder, string backOfficeAuthenticationScheme = Constants.Security.BackOfficeAuthenticationType)
         {
             builder.Services.AddBackOfficeAuthorizationPolicies(backOfficeAuthenticationScheme);
 
@@ -140,6 +165,7 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
             builder.Services.AddUnique<ServerVariablesParser>();
             builder.Services.AddUnique<BackOfficeAreaRoutes>();
             builder.Services.AddUnique<PreviewRoutes>();
+            builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();
             builder.Services.AddUnique<BackOfficeServerVariables>();
             builder.Services.AddScoped<BackOfficeSessionIdValidator>();
             builder.Services.AddScoped<BackOfficeSecurityStampValidator>();
@@ -167,6 +193,14 @@ namespace Umbraco.Web.BackOffice.DependencyInjection
             });
 
             builder.Services.AddUnique<IIconService, IconService>();
+            builder.Services.AddUnique<IHtmlSanitizer>(_ =>
+            {
+                var sanitizer = new HtmlSanitizer();
+                sanitizer.AllowedAttributes.UnionWith(Constants.SvgSanitizer.Attributes);
+                sanitizer.AllowedCssProperties.UnionWith(Constants.SvgSanitizer.Attributes);
+                sanitizer.AllowedTags.UnionWith(Constants.SvgSanitizer.Tags);
+                return sanitizer;
+            });
             builder.Services.AddUnique<UnhandledExceptionLoggerMiddleware>();
 
             return builder;

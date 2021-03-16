@@ -1,5 +1,5 @@
 ﻿
-namespace Umbraco.Web.Media.Exif
+namespace Umbraco.Cms.Core.Media.Exif
 {
     /// <summary>
     /// Represents the tags associated with exif fields.

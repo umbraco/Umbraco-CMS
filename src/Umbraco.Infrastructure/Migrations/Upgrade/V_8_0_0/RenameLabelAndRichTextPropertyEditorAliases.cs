@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0
 {
     public class RenameLabelAndRichTextPropertyEditorAliases : MigrationBase
     {
@@ -13,8 +13,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            MigratePropertyEditorAlias("Umbraco.TinyMCEv3", Constants.PropertyEditors.Aliases.TinyMce);
-            MigratePropertyEditorAlias("Umbraco.NoEdit", Constants.PropertyEditors.Aliases.Label);
+            MigratePropertyEditorAlias("Umbraco.TinyMCEv3", Cms.Core.Constants.PropertyEditors.Aliases.TinyMce);
+            MigratePropertyEditorAlias("Umbraco.NoEdit", Cms.Core.Constants.PropertyEditors.Aliases.Label);
         }
 
         private void MigratePropertyEditorAlias(string oldAlias, string newAlias)

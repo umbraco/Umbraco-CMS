@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 using BenchmarkDotNet.Attributes;
-using Umbraco.Core;
+using Umbraco.Cms.Core;
 using Umbraco.Tests.Benchmarks.Config;
 
 namespace Umbraco.Tests.Benchmarks

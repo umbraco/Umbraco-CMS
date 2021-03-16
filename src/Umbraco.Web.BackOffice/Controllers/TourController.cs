@@ -2,19 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Umbraco.Core;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Web.Common.Attributes;
-using Umbraco.Web.Models;
-using Umbraco.Web.Security;
-using Umbraco.Web.Tour;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Tour;
+using Umbraco.Cms.Web.Common.Attributes;
 
-namespace Umbraco.Web.BackOffice.Controllers
+namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class TourController : UmbracoAuthorizedJsonController
@@ -40,7 +41,7 @@ namespace Umbraco.Web.BackOffice.Controllers
             _contentTypeService = contentTypeService;
         }
 
-        public IEnumerable<BackOfficeTourFile> GetTours()
+        public async Task<IEnumerable<BackOfficeTourFile>> GetTours()
         {
             var result = new List<BackOfficeTourFile>();
 
@@ -58,22 +59,24 @@ namespace Umbraco.Web.BackOffice.Controllers
             var nonPluginFilters = _filters.Where(x => x.PluginName == null).ToList();
 
             //add core tour files
-            var coreToursPath = Path.Combine(_hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.Config), "BackOfficeTours");
-            if (Directory.Exists(coreToursPath))
+            var embeddedTourNames = GetType()
+                .Assembly
+                .GetManifestResourceNames()
+                .Where(x => x.StartsWith("Umbraco.Cms.Web.BackOffice.EmbeddedResources.Tours."));
+
+            foreach (var embeddedTourName in embeddedTourNames)
             {
-                foreach (var tourFile in Directory.EnumerateFiles(coreToursPath, "*.json"))
-                {
-                    TryParseTourFile(tourFile, result, nonPluginFilters, aliasOnlyFilters);
-                }
+                await TryParseTourFile(embeddedTourName, result, nonPluginFilters, aliasOnlyFilters, async x=> await GetContentFromEmbeddedResource(x));
             }
 
+
             //collect all tour files in packages
-            var appPlugins = _hostingEnvironment.MapPathContentRoot(Core.Constants.SystemDirectories.AppPlugins);
+            var appPlugins = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins);
             if (Directory.Exists(appPlugins))
             {
                 foreach (var plugin in Directory.EnumerateDirectories(appPlugins))
                 {
-                    var pluginName = Path.GetFileName(plugin.TrimEnd('\\'));
+                    var pluginName = Path.GetFileName(plugin.TrimEnd(Constants.CharArrays.Backslash));
                     var pluginFilters = _filters.Where(x => x.PluginName != null && x.PluginName.IsMatch(pluginName))
                         .ToList();
 
@@ -90,7 +93,7 @@ namespace Umbraco.Web.BackOffice.Controllers
                         {
                             foreach (var tourFile in Directory.EnumerateFiles(tourDir, "*.json"))
                             {
-                                TryParseTourFile(tourFile, result, combinedFilters, aliasOnlyFilters, pluginName);
+                                await TryParseTourFile(tourFile, result, combinedFilters, aliasOnlyFilters, async x => await System.IO.File.ReadAllTextAsync(x), pluginName);
                             }
                         }
                     }
@@ -127,14 +130,22 @@ namespace Umbraco.Web.BackOffice.Controllers
             return result.Except(toursToBeRemoved).OrderBy(x => x.FileName, StringComparer.InvariantCultureIgnoreCase);
         }
 
+        private async Task<string> GetContentFromEmbeddedResource(string fileName)
+        {
+            var resourceStream = GetType().Assembly.GetManifestResourceStream(fileName);
+
+            using var reader = new StreamReader(resourceStream, Encoding.UTF8);
+            return await reader.ReadToEndAsync();
+        }
+
         /// <summary>
         /// Gets a tours for a specific doctype
         /// </summary>
         /// <param name="doctypeAlias">The documenttype alias</param>
         /// <returns>A <see cref="BackOfficeTour"/></returns>
-        public IEnumerable<BackOfficeTour> GetToursForDoctype(string doctypeAlias)
+        public async Task<IEnumerable<BackOfficeTour>> GetToursForDoctype(string doctypeAlias)
         {
-            var tourFiles = this.GetTours();
+            var tourFiles = await this.GetTours();
 
             var doctypeAliasWithCompositions = new List<string>
                                                    {
@@ -155,15 +166,16 @@ namespace Umbraco.Web.BackOffice.Controllers
                         {
                             return false;
                         }
-                        var contentTypes = x.ContentType.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
+                        var contentTypes = x.ContentType.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
                         return contentTypes.Intersect(doctypeAliasWithCompositions).Any();
                     });
         }
 
-        private void TryParseTourFile(string tourFile,
+        private async Task TryParseTourFile(string tourFile,
             ICollection<BackOfficeTourFile> result,
             List<BackOfficeTourFilter> filters,
             List<BackOfficeTourFilter> aliasOnlyFilters,
+            Func<string, Task<string>> fileNameToFileContent,
             string pluginName = null)
         {
             var fileName = Path.GetFileNameWithoutExtension(tourFile);
@@ -183,7 +195,7 @@ namespace Umbraco.Web.BackOffice.Controllers
 
             try
             {
-                var contents = System.IO.File.ReadAllText(tourFile);
+                var contents = await fileNameToFileContent(tourFile);
                 var tours = JsonConvert.DeserializeObject<BackOfficeTour[]>(contents);
 
                 var backOfficeTours = tours.Where(x =>

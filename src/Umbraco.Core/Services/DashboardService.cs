@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Core;
-using Umbraco.Core.Dashboards;
-using Umbraco.Core.Models.Membership;
-using Umbraco.Core.Services;
-using Umbraco.Web.Dashboards;
-using Umbraco.Web.Models.ContentEditing;
+using Umbraco.Cms.Core.Dashboards;
+using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Extensions;
 
-namespace Umbraco.Web.Services
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// A utility class for determine dashboard security
@@ -84,7 +82,7 @@ namespace Umbraco.Web.Services
                 if (grantBySectionRules.Length > 0)
                 {
                     var allowedSections = sectionService.GetAllowedSections(user.Id).Select(x => x.Alias).ToArray();
-                    var wantedSections = grantBySectionRules.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
+                    var wantedSections = grantBySectionRules.SelectMany(g => g.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)).ToArray();
 
                     if (wantedSections.Intersect(allowedSections).Any())
                         hasAccess = true;
@@ -95,7 +93,7 @@ namespace Umbraco.Web.Services
                 if (hasAccess == false && grantRules.Any())
                 {
                     assignedUserGroups = user.Groups.Select(x => x.Alias).ToArray();
-                    var wantedUserGroups = grantRules.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
+                    var wantedUserGroups = grantRules.SelectMany(g => g.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)).ToArray();
 
                     if (wantedUserGroups.Intersect(assignedUserGroups).Any())
                         hasAccess = true;
@@ -109,7 +107,7 @@ namespace Umbraco.Web.Services
             // check if this item has any deny arguments, if so check if the user is in one of the denied user groups, if so they will
             // be denied to see it no matter what
             assignedUserGroups = assignedUserGroups ?? user.Groups.Select(x => x.Alias).ToArray();
-            var deniedUserGroups = denyRules.SelectMany(g => g.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)).ToArray();
+            var deniedUserGroups = denyRules.SelectMany(g => g.Value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)).ToArray();
 
             if (deniedUserGroups.Intersect(assignedUserGroups).Any())
                 hasAccess = false;

@@ -1,15 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.InteropServices;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.IO
+namespace Umbraco.Cms.Core.IO
 {
     public abstract class IOHelper : IIOHelper
     {
@@ -32,34 +31,17 @@ namespace Umbraco.Core.IO
                 retval = virtualPath.Replace("~", _hostingEnvironment.ApplicationVirtualPath);
 
             if (virtualPath.StartsWith("/") && !PathStartsWith(virtualPath, _hostingEnvironment.ApplicationVirtualPath))
-                retval = _hostingEnvironment.ApplicationVirtualPath + "/" + virtualPath.TrimStart('/');
+                retval = _hostingEnvironment.ApplicationVirtualPath + "/" + virtualPath.TrimStart(Constants.CharArrays.ForwardSlash);
 
             return retval;
         }
 
-        // TODO: This is the same as IHostingEnvironment.ToAbsolute
+        // TODO: This is the same as IHostingEnvironment.ToAbsolute - marked as obsolete in IIOHelper for now
         public string ResolveUrl(string virtualPath)
         {
             if (string.IsNullOrWhiteSpace(virtualPath)) return virtualPath;
             return _hostingEnvironment.ToAbsolute(virtualPath);
 
-        }
-
-        public Attempt<string> TryResolveUrl(string virtualPath)
-        {
-            try
-            {
-                if (virtualPath.StartsWith("~"))
-                    return Attempt.Succeed(virtualPath.Replace("~", _hostingEnvironment.ApplicationVirtualPath).Replace("//", "/"));
-                if (Uri.IsWellFormedUriString(virtualPath, UriKind.Absolute))
-                    return Attempt.Succeed(virtualPath);
-
-                return Attempt.Succeed(_hostingEnvironment.ToAbsolute(virtualPath));
-            }
-            catch (Exception ex)
-            {
-                return Attempt.Fail(virtualPath, ex);
-            }
         }
 
         public string MapPath(string path)
@@ -76,14 +58,14 @@ namespace Umbraco.Core.IO
             {
                 var result = (!string.IsNullOrEmpty(path) && (path.StartsWith("~") || PathStartsWith(path, _hostingEnvironment.ApplicationVirtualPath)))
                     ? _hostingEnvironment.MapPathWebRoot(path)
-                    : _hostingEnvironment.MapPathWebRoot("~/" + path.TrimStart('/'));
+                    : _hostingEnvironment.MapPathWebRoot("~/" + path.TrimStart(Constants.CharArrays.ForwardSlash));
 
                 if (result != null) return result;
             }
 
             var dirSepChar = Path.DirectorySeparatorChar;
             var root = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
-            var newPath = path.TrimStart('~', '/').Replace('/', dirSepChar);
+            var newPath = path.TrimStart(Constants.CharArrays.TildeForwardSlash).Replace('/', dirSepChar);
             var retval = root + dirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
 
             return retval;
@@ -159,7 +141,7 @@ namespace Umbraco.Core.IO
         public bool VerifyFileExtension(string filePath, IEnumerable<string> validFileExtensions)
         {
             var ext = Path.GetExtension(filePath);
-            return ext != null && validFileExtensions.Contains(ext.TrimStart('.'));
+            return ext != null && validFileExtensions.Contains(ext.TrimStart(Constants.CharArrays.Period));
         }
 
         public abstract bool PathStartsWith(string path, string root, params char[] separators);

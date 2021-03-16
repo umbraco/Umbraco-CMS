@@ -1,7 +1,7 @@
 ﻿using System;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Core.Strings;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Strings;
+using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.TestHelpers.Entities
 {

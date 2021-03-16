@@ -12,22 +12,23 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.Models;
-using Umbraco.Core.DependencyInjection;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Scoping;
-using Umbraco.Tests.TestHelpers;
+using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Tests.UnitTests.TestHelpers;
+using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
+namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
 {
     [TestFixture]
     public class ComponentTests
@@ -50,7 +51,8 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             var fs = new FileSystems(mock.Object, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, IOHelper, Options.Create(globalSettings), Mock.Of<IHostingEnvironment>());
             var coreDebug = new CoreDebugSettings();
             IMediaFileSystem mediaFileSystem = Mock.Of<IMediaFileSystem>();
-            var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance);
+            IEventAggregator eventAggregator = Mock.Of<IEventAggregator>();
+            var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance, eventAggregator);
 
             mock.Setup(x => x.GetService(typeof(ILogger))).Returns(logger);
             mock.Setup(x => x.GetService(typeof(ILogger<ComponentCollection>))).Returns(loggerFactory.CreateLogger<ComponentCollection>);
@@ -198,7 +200,7 @@ namespace Umbraco.Tests.UnitTests.Umbraco.Core.Components
             }
             catch (Exception e)
             {
-                Assert.AreEqual("Broken composer dependency: Umbraco.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer2 -> Umbraco.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer4.", e.Message);
+                Assert.AreEqual("Broken composer dependency: Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer2 -> Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components.ComponentTests+Composer4.", e.Message);
             }
         }
 

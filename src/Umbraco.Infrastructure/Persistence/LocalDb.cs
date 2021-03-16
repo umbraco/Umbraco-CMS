@@ -6,7 +6,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.Data.SqlClient;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     /// <summary>
     /// Manages LocalDB databases.

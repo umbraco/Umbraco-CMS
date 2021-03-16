@@ -1,21 +1,25 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
+using Examine;
+using Examine.LuceneEngine;
 using Examine.LuceneEngine.Providers;
 using Lucene.Net.Analysis;
 using Lucene.Net.Documents;
 using Lucene.Net.Index;
-using Umbraco.Core;
-using Examine;
-using Examine.LuceneEngine;
 using Lucene.Net.Store;
-using Umbraco.Core.Hosting;
-using Umbraco.Core.IO;
-using Umbraco.Core.Logging;
-using Directory = Lucene.Net.Store.Directory;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Services;
+using Directory = Lucene.Net.Store.Directory;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
 
     /// <summary>
@@ -27,12 +31,12 @@ namespace Umbraco.Examine
         private readonly ILoggerFactory _loggerFactory;
 
         private readonly IRuntimeState _runtimeState;
+
         // note
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
         // context because they will fork a thread/task/whatever which should *not* capture our
-        // call context (and the database it can contain)! ideally we should be able to override
-        // SafelyProcessQueueItems but that's not possible in the current version of Examine.
-
+        // call context (and the database it can contain)!
+        // TODO: FIX Examine to not flow the ExecutionContext so callers don't need to worry about this!
 
         /// <summary>
         /// Create a new <see cref="UmbracoExamineIndex"/>
@@ -89,7 +93,7 @@ namespace Umbraco.Examine
         public IEnumerable<string> GetFields()
         {
             //we know this is a LuceneSearcher
-            var searcher = (LuceneSearcher) GetSearcher();
+            var searcher = (LuceneSearcher)GetSearcher();
             return searcher.GetAllIndexedFields();
         }
 
@@ -103,10 +107,27 @@ namespace Umbraco.Examine
         {
             if (CanInitialize())
             {
-                using (new SafeCallContext())
+                // Use ExecutionContext.SuppressFlow to prevent the current Execution Context (AsyncLocal) flow to child
+                // tasks executed in the base class so we don't leak Scopes.
+                // TODO: See notes at the top of this class
+                using (ExecutionContext.SuppressFlow())
                 {
                     base.PerformDeleteFromIndex(itemIds, onComplete);
                 }
+            }
+        }
+
+        protected override void PerformIndexItems(IEnumerable<ValueSet> values, Action<IndexOperationEventArgs> onComplete)
+        {
+            if (CanInitialize())
+            {
+                // Use ExecutionContext.SuppressFlow to prevent the current Execution Context (AsyncLocal) flow to child
+                // tasks executed in the base class so we don't leak Scopes.
+                // TODO: See notes at the top of this class
+                using (ExecutionContext.SuppressFlow())
+                {
+                    base.PerformIndexItems(values, onComplete);
+                }                
             }
         }
 
@@ -164,9 +185,9 @@ namespace Umbraco.Examine
         protected override void AddDocument(Document doc, ValueSet valueSet, IndexWriter writer)
         {
             _logger.LogDebug("Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
-                valueSet.Id,
-                valueSet.Category,
-                valueSet.ItemType);
+            valueSet.Id,
+            valueSet.Category,
+            valueSet.ItemType);
 
             base.AddDocument(doc, valueSet, writer);
         }
