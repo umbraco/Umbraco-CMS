@@ -7,7 +7,7 @@ using Examine;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Runtime;
@@ -20,7 +20,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Search
 {
-    public sealed class ExamineComponent : IComponent
+    public sealed class ExamineNotificationHandler :
+        INotificationHandler<UmbracoApplicationStarting>,
+        INotificationHandler<ContentCacheRefresherNotification>,
+        INotificationHandler<ContentTypeCacheRefresherNotification>,
+        INotificationHandler<MediaCacheRefresherNotification>,
+        INotificationHandler<MemberCacheRefresherNotification>,
+        INotificationHandler<LanguageCacheRefresherNotification>
     {
         private readonly IExamineManager _examineManager;
         private readonly IContentValueSetBuilder _contentValueSetBuilder;
@@ -33,18 +39,19 @@ namespace Umbraco.Cms.Infrastructure.Search
         private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _profilingLogger;
-        private readonly ILogger<ExamineComponent> _logger;
+        private readonly ILogger<ExamineNotificationHandler> _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
+        private static bool s_deactivate_handlers;
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
 
-        public ExamineComponent(IMainDom mainDom,
+        public ExamineNotificationHandler(IMainDom mainDom,
             IExamineManager examineManager,
             IProfilingLogger profilingLogger,
-            ILoggerFactory loggerFactory,
+            ILogger<ExamineNotificationHandler> logger,
             IScopeProvider scopeProvider,
             IUmbracoIndexesCreator indexCreator,
             ServiceContext services,
@@ -66,16 +73,15 @@ namespace Umbraco.Cms.Infrastructure.Search
             _taskHelper = taskHelper;
             _mainDom = mainDom;
             _profilingLogger = profilingLogger;
-            _logger = loggerFactory.CreateLogger<ExamineComponent>();
+            _logger = logger;
             _indexCreator = indexCreator;
         }
-
-        public void Initialize()
+        public void Handle(UmbracoApplicationStarting notification)
         {
             //let's deal with shutting down Examine with MainDom
             var examineShutdownRegistered = _mainDom.Register(release: () =>
             {
-                using (_profilingLogger.TraceDuration<ExamineComponent>("Examine shutting down"))
+                using (_profilingLogger.TraceDuration<ExamineNotificationHandler>("Examine shutting down"))
                 {
                     _examineManager.Dispose();
                 }
@@ -105,26 +111,12 @@ namespace Umbraco.Cms.Infrastructure.Search
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)
             {
-                return;
+                s_deactivate_handlers = true;
             }
 
-            // bind to distributed cache events - this ensures that this logic occurs on ALL servers
-            // that are taking part in a load balanced environment.
-            ContentCacheRefresher.CacheUpdated += ContentCacheRefresherUpdated;
-            ContentTypeCacheRefresher.CacheUpdated += ContentTypeCacheRefresherUpdated;
-            MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
-            MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
-            LanguageCacheRefresher.CacheUpdated += LanguageCacheRefresherUpdated;
+
         }
 
-        public void Terminate()
-        {
-            ContentCacheRefresher.CacheUpdated -= ContentCacheRefresherUpdated;
-            ContentTypeCacheRefresher.CacheUpdated -= ContentTypeCacheRefresherUpdated;
-            MediaCacheRefresher.CacheUpdated -= MediaCacheRefresherUpdated;
-            MemberCacheRefresher.CacheUpdated -= MemberCacheRefresherUpdated;
-            LanguageCacheRefresher.CacheUpdated -= LanguageCacheRefresherUpdated;
-        }
 
         #region Cache refresher updated event handlers
 
@@ -133,8 +125,12 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void ContentCacheRefresherUpdated(ContentCacheRefresher sender, CacheRefresherEventArgs args)
+        public void Handle(ContentCacheRefresherNotification args)
         {
+            if (s_deactivate_handlers)
+            {
+                return;
+            }
             if (Suspendable.ExamineEvents.CanIndex == false)
             {
                 return;
@@ -237,8 +233,13 @@ namespace Umbraco.Cms.Infrastructure.Search
             }
         }
 
-        private void MemberCacheRefresherUpdated(MemberCacheRefresher sender, CacheRefresherEventArgs args)
+        public void Handle(MemberCacheRefresherNotification args)
         {
+            if (s_deactivate_handlers)
+            {
+                return;
+            }
+
             if (Suspendable.ExamineEvents.CanIndex == false)
             {
                 return;
@@ -300,8 +301,13 @@ namespace Umbraco.Cms.Infrastructure.Search
             }
         }
 
-        private void MediaCacheRefresherUpdated(MediaCacheRefresher sender, CacheRefresherEventArgs args)
+        public void Handle(MediaCacheRefresherNotification args)
         {
+            if (s_deactivate_handlers)
+            {
+                return;
+            }
+
             if (Suspendable.ExamineEvents.CanIndex == false)
             {
                 return;
@@ -364,9 +370,14 @@ namespace Umbraco.Cms.Infrastructure.Search
             }
         }
 
-        private void LanguageCacheRefresherUpdated(LanguageCacheRefresher sender, CacheRefresherEventArgs e)
+        public void Handle(LanguageCacheRefresherNotification args)
         {
-            if (!(e.MessageObject is LanguageCacheRefresher.JsonPayload[] payloads))
+            if (s_deactivate_handlers)
+            {
+                return;
+            }
+
+            if (!(args.MessageObject is LanguageCacheRefresher.JsonPayload[] payloads))
             {
                 return;
             }
@@ -393,8 +404,13 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="args"></param>
-        private void ContentTypeCacheRefresherUpdated(ContentTypeCacheRefresher sender, CacheRefresherEventArgs args)
+        public void Handle(ContentTypeCacheRefresherNotification args)
         {
+            if (s_deactivate_handlers)
+            {
+                return;
+            }
+
             if (Suspendable.ExamineEvents.CanIndex == false)
             {
                 return;
@@ -668,34 +684,34 @@ namespace Umbraco.Cms.Infrastructure.Search
         private class DeferedReIndexForContent : DeferedAction
         {
             private readonly TaskHelper _taskHelper;
-            private readonly ExamineComponent _examineComponent;
+            private readonly ExamineNotificationHandler _ExamineNotificationHandler;
             private readonly IContent _content;
             private readonly bool _isPublished;
 
-            public DeferedReIndexForContent(TaskHelper taskHelper, ExamineComponent examineComponent, IContent content, bool isPublished)
+            public DeferedReIndexForContent(TaskHelper taskHelper, ExamineNotificationHandler ExamineNotificationHandler, IContent content, bool isPublished)
             {
                 _taskHelper = taskHelper;
-                _examineComponent = examineComponent;
+                _ExamineNotificationHandler = ExamineNotificationHandler;
                 _content = content;
                 _isPublished = isPublished;
             }
 
-            public override void Execute() => Execute(_taskHelper, _examineComponent, _content, _isPublished);
+            public override void Execute() => Execute(_taskHelper, _ExamineNotificationHandler, _content, _isPublished);
 
-            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IContent content, bool isPublished)
+            public static void Execute(TaskHelper taskHelper, ExamineNotificationHandler ExamineNotificationHandler, IContent content, bool isPublished)
                 => taskHelper.RunBackgroundTask(() =>
                 {
-                    using IScope scope = examineComponent._scopeProvider.CreateScope(autoComplete: true);
+                    using IScope scope = ExamineNotificationHandler._scopeProvider.CreateScope(autoComplete: true);
 
                     // for content we have a different builder for published vs unpublished
                     // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
                     var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
                     {
-                        [true] = new Lazy<List<ValueSet>>(() => examineComponent._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
-                        [false] = new Lazy<List<ValueSet>>(() => examineComponent._contentValueSetBuilder.GetValueSets(content).ToList())
+                        [true] = new Lazy<List<ValueSet>>(() => ExamineNotificationHandler._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
+                        [false] = new Lazy<List<ValueSet>>(() => ExamineNotificationHandler._contentValueSetBuilder.GetValueSets(content).ToList())
                     };
 
-                    foreach (IUmbracoIndex index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                    foreach (IUmbracoIndex index in ExamineNotificationHandler._examineManager.Indexes.OfType<IUmbracoIndex>()
                         //filter the indexers
                         .Where(x => isPublished || !x.PublishedValuesOnly)
                         .Where(x => x.EnableDefaultEventHandler))
@@ -714,29 +730,29 @@ namespace Umbraco.Cms.Infrastructure.Search
         private class DeferedReIndexForMedia : DeferedAction
         {
             private readonly TaskHelper _taskHelper;
-            private readonly ExamineComponent _examineComponent;
+            private readonly ExamineNotificationHandler _ExamineNotificationHandler;
             private readonly IMedia _media;
             private readonly bool _isPublished;
 
-            public DeferedReIndexForMedia(TaskHelper taskHelper, ExamineComponent examineComponent, IMedia media, bool isPublished)
+            public DeferedReIndexForMedia(TaskHelper taskHelper, ExamineNotificationHandler ExamineNotificationHandler, IMedia media, bool isPublished)
             {
                 _taskHelper = taskHelper;
-                _examineComponent = examineComponent;
+                _ExamineNotificationHandler = ExamineNotificationHandler;
                 _media = media;
                 _isPublished = isPublished;
             }
 
-            public override void Execute() => Execute(_taskHelper, _examineComponent, _media, _isPublished);
+            public override void Execute() => Execute(_taskHelper, _ExamineNotificationHandler, _media, _isPublished);
 
-            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IMedia media, bool isPublished) =>
+            public static void Execute(TaskHelper taskHelper, ExamineNotificationHandler ExamineNotificationHandler, IMedia media, bool isPublished) =>
                 // perform the ValueSet lookup on a background thread
                 taskHelper.RunBackgroundTask(() =>
                 {
-                    using IScope scope = examineComponent._scopeProvider.CreateScope(autoComplete: true);
+                    using IScope scope = ExamineNotificationHandler._scopeProvider.CreateScope(autoComplete: true);
 
-                    var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
+                    var valueSet = ExamineNotificationHandler._mediaValueSetBuilder.GetValueSets(media).ToList();
 
-                    foreach (IUmbracoIndex index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                    foreach (IUmbracoIndex index in ExamineNotificationHandler._examineManager.Indexes.OfType<IUmbracoIndex>()
                         //filter the indexers
                         .Where(x => isPublished || !x.PublishedValuesOnly)
                         .Where(x => x.EnableDefaultEventHandler))
@@ -753,27 +769,27 @@ namespace Umbraco.Cms.Infrastructure.Search
         /// </summary>
         private class DeferedReIndexForMember : DeferedAction
         {
-            private readonly ExamineComponent _examineComponent;
+            private readonly ExamineNotificationHandler _ExamineNotificationHandler;
             private readonly IMember _member;
             private readonly TaskHelper _taskHelper;
 
-            public DeferedReIndexForMember(TaskHelper taskHelper, ExamineComponent examineComponent, IMember member)
+            public DeferedReIndexForMember(TaskHelper taskHelper, ExamineNotificationHandler ExamineNotificationHandler, IMember member)
             {
-                _examineComponent = examineComponent;
+                _ExamineNotificationHandler = ExamineNotificationHandler;
                 _member = member;
                 _taskHelper = taskHelper;
             }
 
-            public override void Execute() => Execute(_taskHelper, _examineComponent, _member);
+            public override void Execute() => Execute(_taskHelper, _ExamineNotificationHandler, _member);
 
-            public static void Execute(TaskHelper taskHelper, ExamineComponent examineComponent, IMember member) =>
+            public static void Execute(TaskHelper taskHelper, ExamineNotificationHandler ExamineNotificationHandler, IMember member) =>
                 // perform the ValueSet lookup on a background thread
                 taskHelper.RunBackgroundTask(() =>
                 {
-                    using IScope scope = examineComponent._scopeProvider.CreateScope(autoComplete: true);
+                    using IScope scope = ExamineNotificationHandler._scopeProvider.CreateScope(autoComplete: true);
 
-                    var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
-                    foreach (IUmbracoIndex index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                    var valueSet = ExamineNotificationHandler._memberValueSetBuilder.GetValueSets(member).ToList();
+                    foreach (IUmbracoIndex index in ExamineNotificationHandler._examineManager.Indexes.OfType<IUmbracoIndex>()
                         //filter the indexers
                         .Where(x => x.EnableDefaultEventHandler))
                     {
@@ -786,23 +802,23 @@ namespace Umbraco.Cms.Infrastructure.Search
 
         private class DeferedDeleteIndex : DeferedAction
         {
-            private readonly ExamineComponent _examineComponent;
+            private readonly ExamineNotificationHandler _ExamineNotificationHandler;
             private readonly int _id;
             private readonly bool _keepIfUnpublished;
 
-            public DeferedDeleteIndex(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
+            public DeferedDeleteIndex(ExamineNotificationHandler ExamineNotificationHandler, int id, bool keepIfUnpublished)
             {
-                _examineComponent = examineComponent;
+                _ExamineNotificationHandler = ExamineNotificationHandler;
                 _id = id;
                 _keepIfUnpublished = keepIfUnpublished;
             }
 
-            public override void Execute() => Execute(_examineComponent, _id, _keepIfUnpublished);
+            public override void Execute() => Execute(_ExamineNotificationHandler, _id, _keepIfUnpublished);
 
-            public static void Execute(ExamineComponent examineComponent, int id, bool keepIfUnpublished)
+            public static void Execute(ExamineNotificationHandler ExamineNotificationHandler, int id, bool keepIfUnpublished)
             {
                 var strId = id.ToString(CultureInfo.InvariantCulture);
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                foreach (var index in ExamineNotificationHandler._examineManager.Indexes.OfType<IUmbracoIndex>()
                     .Where(x => x.PublishedValuesOnly || !keepIfUnpublished)
                     .Where(x => x.EnableDefaultEventHandler))
                 {
@@ -811,7 +827,5 @@ namespace Umbraco.Cms.Infrastructure.Search
             }
         }
         #endregion
-
-
     }
 }
