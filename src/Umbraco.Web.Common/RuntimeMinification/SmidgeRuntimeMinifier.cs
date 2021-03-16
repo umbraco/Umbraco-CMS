@@ -1,8 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Smidge;
+using Smidge.Cache;
 using Smidge.CompositeFiles;
 using Smidge.FileProcessors;
 using Smidge.Models;
@@ -15,6 +17,19 @@ using JavaScriptFile = Smidge.Models.JavaScriptFile;
 
 namespace Umbraco.Cms.Web.Common.RuntimeMinification
 {
+//    public class UmbracoCacheBuster : ICacheBuster
+//    {
+//        /// <summary>
+//        /// Gets the cache buster value
+//        /// </summary>
+//        /// <returns></returns>
+//        public string GetValue() => throw new NotImplementedException();
+
+//        // This doesn't do anything in Smidge (is removed in v4 unreleased version)
+//        [EditorBrowsable(EditorBrowsableState.Never)]
+//        public bool PersistProcessedFiles => throw new NotImplementedException();
+//    }
+
     public class SmidgeRuntimeMinifier : IRuntimeMinifier
     {
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -24,12 +39,12 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
         private readonly SmidgeHelperAccessor _smidge;
 
         // used only for minifying in MinifyAsync not for an actual pipeline
-        private Lazy<PreProcessPipeline> _jsMinPipeline;
-        private Lazy<PreProcessPipeline> _cssMinPipeline;
+        private readonly Lazy<PreProcessPipeline> _jsMinPipeline;
+        private readonly Lazy<PreProcessPipeline> _cssMinPipeline;
 
         // default pipelines for processing js/css files for the back office
-        private Lazy<PreProcessPipeline> _jsPipeline;
-        private Lazy<PreProcessPipeline> _cssPipeline;
+        private readonly Lazy<PreProcessPipeline> _jsPipeline;
+        private readonly Lazy<PreProcessPipeline> _cssPipeline;
 
         public SmidgeRuntimeMinifier(
             IBundleManager bundles,
@@ -65,7 +80,7 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
             if (_bundles.Exists(bundleName))
                 throw new InvalidOperationException($"The bundle name {bundleName} already exists");
 
-            // Here we could configure bundle options instead of using smidge's global defaults.
+            // TODO: Here we could configure bundle options instead of using smidge's global defaults.
             // For example we can use our own custom cache buster for this bundle without having the global one
             // affect this or vice versa.
             var bundle = _bundles.Create(bundleName, _cssPipeline.Value, WebFileType.Css, filePaths);
@@ -81,7 +96,7 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
             if (_bundles.Exists(bundleName))
                 throw new InvalidOperationException($"The bundle name {bundleName} already exists");
 
-            // Here we could configure bundle options instead of using smidge's global defaults.
+            // TODO: Here we could configure bundle options instead of using smidge's global defaults.
             // For example we can use our own custom cache buster for this bundle without having the global one
             // affect this or vice versa.
             var pipeline = optimizeOutput ? _jsPipeline.Value : _bundles.PipelineFactory.Create();

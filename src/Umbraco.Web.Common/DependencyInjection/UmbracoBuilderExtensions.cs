@@ -219,7 +219,7 @@ namespace Umbraco.Extensions
         /// </summary>
         public static IUmbracoBuilder AddRuntimeMinifier(this IUmbracoBuilder builder)
         {
-            builder.Services.AddSmidge(builder.Config.GetSection(Cms.Core.Constants.Configuration.ConfigRuntimeMinification));
+            builder.Services.AddSmidge(builder.Config.GetSection(Constants.Configuration.ConfigRuntimeMinification));
             builder.Services.AddSmidgeNuglify();
 
             return builder;
