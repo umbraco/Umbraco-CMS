@@ -14,7 +14,8 @@
             "**/Umbraco.Web.csproj",
             "**/Umbraco.Infrastructure.csproj",
             "**/Umbraco.Web.UI.csproj",
-            "**/Umbraco.Web.UI.Netcore.csproj"
+            "**/Umbraco.Web.UI.Netcore.csproj",
+            "**/**.Test**/*.csproj"
           ]
         }
       ],
