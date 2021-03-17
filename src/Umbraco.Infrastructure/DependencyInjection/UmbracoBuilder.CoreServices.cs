@@ -66,7 +66,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddRepositories()
                 .AddServices()
                 .AddCoreMappingProfiles()
-                .AddFileSystems();
+                .AddFileSystems()
+                .AddWebAssets();
 
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it

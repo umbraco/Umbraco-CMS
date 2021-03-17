@@ -48,17 +48,18 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         {
             // Create bundles
 
-            _runtimeMinifier.CreateCssBundle(UmbracoInitCssBundleName,
+            // TODO: I think we don't want to optimize these css if/when we get gulp to do that all for us
+            _runtimeMinifier.CreateCssBundle(UmbracoInitCssBundleName, true,
                 FormatPaths("lib/bootstrap-social/bootstrap-social.css",
                 "assets/css/umbraco.css",
                 "lib/font-awesome/css/font-awesome.min.css"));
 
-            _runtimeMinifier.CreateCssBundle(UmbracoUpgradeCssBundleName,
+            _runtimeMinifier.CreateCssBundle(UmbracoUpgradeCssBundleName, true,
                 FormatPaths("assets/css/umbraco.css",
                 "lib/bootstrap-social/bootstrap-social.css",
                 "lib/font-awesome/css/font-awesome.min.css"));
 
-            _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName,
+            _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName, true,
                 FormatPaths("assets/css/canvasdesigner.css"));
 
             _runtimeMinifier.CreateJsBundle(UmbracoPreviewJsBundleName, false,
@@ -81,7 +82,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
                         propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>())));
 
             _runtimeMinifier.CreateCssBundle(
-                UmbracoCssBundleName,
+                UmbracoCssBundleName, true,
                 FormatPaths(
                     GetStylesheetsForBackOffice(
                         propertyEditorAssets.TryGetValue(AssetType.Css, out var styles) ? styles : Enumerable.Empty<string>())));

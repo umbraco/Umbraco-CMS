@@ -13,11 +13,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
         private static OptionsBuilder<TOptions> AddOptions<TOptions>(IUmbracoBuilder builder, string key)
             where TOptions : class
-        {
-            return builder.Services.AddOptions<TOptions>()
+            => builder.Services.AddOptions<TOptions>()
                 .Bind(builder.Config.GetSection(key))
                 .ValidateDataAnnotations();
-        }
+
         /// <summary>
         /// Add Umbraco configuration services and options
         /// </summary>
@@ -57,6 +56,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             AddOptions<UmbracoPluginSettings>(builder, Constants.Configuration.ConfigPlugins);
             AddOptions<UnattendedSettings>(builder, Constants.Configuration.ConfigUnattended);
             AddOptions<RichTextEditorSettings>(builder, Constants.Configuration.ConfigRichTextEditor);
+            AddOptions<RuntimeMinificationSettings>(builder, Constants.Configuration.ConfigRuntimeMinification);
 
             return builder;
         }
