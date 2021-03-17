@@ -120,7 +120,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             var compiledPackage = GetCompiledPackageInfo(packageFile);
             if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFile);
 
-            if (ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFile.Name, compiledPackage), this))
+            // Trigger the Importing Package Notification
+            var notification = new ImportingPackageNotification(packageFile.Name, compiledPackage);
+            _eventAggregator.Publish(notification);
+
+            // Stop execution if event/user is cancelling it
+            if (notification.Cancel)
                 return new InstallationSummary { MetaData = compiledPackage };
 
             var summary = _packageInstallation.InstallPackageData(packageDefinition, compiledPackage, userId);
@@ -129,8 +134,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
 
-            // trigger the ImportPackage event
-            _eventAggregator.Publish(new ImportPackageNotification(summary, compiledPackage));
+            // trigger the ImportedPackage event
+            _eventAggregator.Publish(new ImportedPackageNotification(summary, compiledPackage));
 
             return summary;
         }
@@ -240,22 +245,5 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         #endregion
-
-        #region Event Handlers
-
-        /// <summary>
-        /// Occurs before Importing umbraco package
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<string>> ImportingPackage;
-
-        /// <summary>
-        /// Occurs after a package is imported
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
-
-       
-        #endregion
-
-
     }
 }
