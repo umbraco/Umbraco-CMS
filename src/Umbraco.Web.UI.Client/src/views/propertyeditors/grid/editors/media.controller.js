@@ -1,9 +1,9 @@
 angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MediaController",
-    function ($scope, userService, editorService, localizationService) {        
-        
-        $scope.thumbnailUrl = getThumbnailUrl();        
-        
+    function ($scope, userService, editorService, localizationService) {
+
+        $scope.thumbnailUrl = getThumbnailUrl();
+
         if (!$scope.model.config.startNodeId) {
             if ($scope.model.config.ignoreUserStartNodes === true) {
                 $scope.model.config.startNodeId = -1;
@@ -29,16 +29,16 @@ angular.module("umbraco")
                 onlyImages: true,
                 dataTypeKey: $scope.model.dataTypeKey,
                 submit: model => {
-                    updateControlValue(model.selection[0]);                    
+                    updateControlValue(model.selection[0]);
                     editorService.close();
                 },
-                close: () => editorService.close()                
+                close: () => editorService.close()
             };
 
             editorService.mediaPicker(mediaPicker);
         };
 
-        $scope.editImage = function() {               
+        $scope.editImage = function() {
 
             const mediaCropDetailsConfig = {
                 size: 'small',
@@ -47,17 +47,17 @@ angular.module("umbraco")
                     updateControlValue(model.target);
                     editorService.close();
                 },
-                close: () => editorService.close()                
+                close: () => editorService.close()
             };
 
             localizationService.localize('defaultdialogs_editSelectedMedia').then(value => {
                 mediaCropDetailsConfig.title = value;
                 editorService.mediaCropDetails(mediaCropDetailsConfig);
-            });        
+            });
         }
-        
+
         /**
-         * 
+         *
          */
         function getThumbnailUrl() {
 
@@ -94,16 +94,15 @@ angular.module("umbraco")
 
                 return url;
             }
-            
+
             return null;
         }
 
         /**
-         * 
-         * @param {object} selectedImage 
+         *
+         * @param {object} selectedImage
          */
         function updateControlValue(selectedImage) {
-
             // we could apply selectedImage directly to $scope.control.value,
             // but this allows excluding fields in future if needed
             $scope.control.value = {
@@ -115,10 +114,6 @@ angular.module("umbraco")
                 caption: selectedImage.caption,
                 altText: selectedImage.altText
             };
-
-            // only update the thumbnail if the image or focal point have changed
-            if ($scope.control.value.focalPoint !== selectedImage.focalPoint || $scope.control.value.image !== selectedImage.image) {
-                $scope.thumbnailUrl = getThumbnailUrl();
-            }
-        }       
+            $scope.thumbnailUrl = getThumbnailUrl();
+        }
     });
