@@ -6,13 +6,14 @@
           "src": "../",
           "files": [
             "**/*.csproj",
+            "**/Umbraco.Infrastructure/**/**/*",
             "**/Umbraco.Infrastructure/**/*"
           ],
           "exclude": [
             "**/obj/**",
             "**/bin/**",
             "**/Umbraco.Web.csproj",
-            "**/Umbraco.Infrastructure/*",
+            "**/Umbraco.Infrastructure.csproj",
             "**/Umbraco.Web.UI.csproj",
             "**/Umbraco.Web.UI.Netcore.csproj"
           ]
