@@ -17,11 +17,21 @@
           "exclude": [
             "**/obj/**",
             "**/bin/**",
+
+            "**/Umbraco.Infrastructure/Cache/**",
+            "**/Umbraco.Infrastructure/Compose/**",
+            "**/Umbraco.Infrastructure/Configuration/**",
+            "**/Umbraco.Infrastructure/DependencyInjection/**",
+            "**/Umbraco.Infrastructure/Deploy/**",
+            "**/Umbraco.Infrastructure/Events/**",
+            "**/Umbraco.Infrastructure/Examine/**",
+
             "**/Umbraco.Infrastructure/Persistence/**",
             "**/Umbraco.Infrastructure/Services/**",
             "**/Umbraco.Infrastructure/Migrations/**",
-            "**/Umbraco.Infrastructure/Examine/**",
+
             "**/Umbraco.Infrastructure/PropertyEditors/**"
+
           ]
         }
       ],
