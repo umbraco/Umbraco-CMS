@@ -17,7 +17,11 @@
           "exclude": [
             "**/obj/**",
             "**/bin/**",
-            "**/Umbraco.Infrastructure/**",
+            "**/Umbraco.Infrastructure/Persistence/**",
+            "**/Umbraco.Infrastructure/Services/**",
+            "**/Umbraco.Infrastructure/Migrations/**",
+            "**/Umbraco.Infrastructure/Examine/**",
+            "**/Umbraco.Infrastructure/PropertyEditors/**"
           ]
         }
       ],
