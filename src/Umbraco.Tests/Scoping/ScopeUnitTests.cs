@@ -342,14 +342,14 @@ namespace Umbraco.Tests.Scoping
                     Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTree], $"innerScope1, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTree)}");
                     Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.ContentTypes], $"innerScope1, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.ContentTypes)}");
                     Assert.AreEqual(1, realParentScope.WriteLocks[innerScope1.InstanceId][Constants.Locks.Languages], $"innerScope1, innerScope1 instance, after innserScope2 disposed: {nameof(Constants.Locks.Languages)}");
-                    Assert.IsFalse(realParentScope.ReadLocks.ContainsKey(innerScope2Id));
+                    Assert.IsFalse(realParentScope.WriteLocks.ContainsKey(innerScope2Id));
 
                     innerScope1.Complete();
                 }
                 Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTree], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTree)}");
                 Assert.AreEqual(1, realParentScope.WriteLocks[realParentScope.InstanceId][Constants.Locks.ContentTypes], $"parentScope after inner scopes disposed: {nameof(Constants.Locks.ContentTypes)}");
-                Assert.IsFalse(realParentScope.ReadLocks.ContainsKey(innerScope2Id));
-                Assert.IsFalse(realParentScope.ReadLocks.ContainsKey(innerScope1Id));
+                Assert.IsFalse(realParentScope.WriteLocks.ContainsKey(innerScope2Id));
+                Assert.IsFalse(realParentScope.WriteLocks.ContainsKey(innerScope1Id));
 
                 parentScope.Complete();
             }
@@ -454,15 +454,23 @@ namespace Umbraco.Tests.Scoping
             var scopeprovider = GetScopeProvider(out var syntaxProviderMock);
             var scope = (Scope) scopeprovider.CreateScope();
 
-            var readDict = new Dictionary<int, int>();
-            readDict[Constants.Locks.Languages] = 1;
-            scope.ReadLocks[Guid.NewGuid()] = readDict;
+            try
+            {
+                // Request a lock to create the ReadLocks dict.
+                scope.ReadLock(Constants.Locks.Domains);
 
-            Assert.Throws<InvalidOperationException>(() => scope.Dispose());
+                var readDict = new Dictionary<int, int>();
+                readDict[Constants.Locks.Languages] = 1;
+                scope.ReadLocks[Guid.NewGuid()] = readDict;
 
-            // We have to clear so we can properly dispose the scope, otherwise it'll mess with other tests.
-            scope.ReadLocks.Clear();
-            scope.Dispose();
+                Assert.Throws<InvalidOperationException>(() => scope.Dispose());
+            }
+            finally
+            {
+                // We have to clear so we can properly dispose the scope, otherwise it'll mess with other tests.
+                scope.ReadLocks?.Clear();
+                scope.Dispose();
+            }
         }
 
         [Test]
@@ -471,15 +479,47 @@ namespace Umbraco.Tests.Scoping
             var scopeprovider = GetScopeProvider(out var syntaxProviderMock);
             var scope = (Scope) scopeprovider.CreateScope();
 
-            var writeDict = new Dictionary<int, int>();
-            writeDict[Constants.Locks.Languages] = 1;
-            scope.WriteLocks[Guid.NewGuid()] = writeDict;
+            try
+            {
+                // Request a lock to create the ReadLocks dict.
+                scope.WriteLock(Constants.Locks.Domains);
 
-            Assert.Throws<InvalidOperationException>(() => scope.Dispose());
+                var writeDict = new Dictionary<int, int>();
+                writeDict[Constants.Locks.Languages] = 1;
+                scope.WriteLocks[Guid.NewGuid()] = writeDict;
 
-            // We have to clear so we can properly dispose the scope, otherwise it'll mess with other tests.
-            scope.WriteLocks.Clear();
-            scope.Dispose();
+                Assert.Throws<InvalidOperationException>(() => scope.Dispose());
+            }
+            finally
+            {
+                // We have to clear so we can properly dispose the scope, otherwise it'll mess with other tests.
+                scope.WriteLocks?.Clear();
+                scope.Dispose();
+            }
+        }
+
+        [Test]
+        public void WriteLocks_Not_Created_Until_First_Lock()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                var realScope = (Scope) scope;
+                Assert.IsNull(realScope.WriteLocks);
+            }
+        }
+
+        [Test]
+        public void ReadLocks_Not_Created_Until_First_Lock()
+        {
+            var scopeProvider = GetScopeProvider(out var syntaxProviderMock);
+
+            using (var scope = scopeProvider.CreateScope())
+            {
+                var realScope = (Scope) scope;
+                Assert.IsNull(realScope.ReadLocks);
+            }
         }
     }
 }

@@ -37,13 +37,13 @@ namespace Umbraco.Core.Scoping
         private IEventDispatcher _eventDispatcher;
 
         private object _dictionaryLocker;
-        private readonly HashSet<int> _readLocks;
-        private readonly HashSet<int> _writeLocks;
+        private HashSet<int> _readLocks;
+        private HashSet<int> _writeLocks;
 
         // ReadLocks and WriteLocks if we're the outer most scope it's those owned by the entire chain
         // If we're a child scope it's those that we have requested.
-        internal readonly Dictionary<Guid, Dictionary<int, int>> ReadLocks;
-        internal readonly Dictionary<Guid, Dictionary<int, int>> WriteLocks;
+        internal Dictionary<Guid, Dictionary<int, int>> ReadLocks { get; private set; }
+        internal Dictionary<Guid, Dictionary<int, int>> WriteLocks { get; private set; }
 
         // initializes a new scope
         private Scope(ScopeProvider scopeProvider,
@@ -70,10 +70,6 @@ namespace Umbraco.Core.Scoping
             Detachable = detachable;
 
             _dictionaryLocker = new object();
-            WriteLocks = new Dictionary<Guid, Dictionary<int, int>>();
-            ReadLocks = new Dictionary<Guid, Dictionary<int, int>>();
-            _writeLocks = new HashSet<int>();
-            _readLocks = new HashSet<int>();
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
@@ -374,7 +370,7 @@ namespace Umbraco.Core.Scoping
             {
                 // We're the parent scope, make sure that locks of all scopes has been cleared
                 // Since we're only reading we don't have to be in a lock
-                if (ReadLocks.Any() || WriteLocks.Any())
+                if (ReadLocks is not null && ReadLocks.Any() || WriteLocks is not null && WriteLocks.Any())
                 {
                     throw new InvalidOperationException($"All scopes has not been disposed from parent scope: {InstanceId}");
                 }
@@ -529,6 +525,9 @@ namespace Umbraco.Core.Scoping
         private void IncrementWriteLock(int lockId, Guid instanceId)
         {
             // Since we've already checked that we're the parent in the WriteLockInner method, we don't need to check again.
+            // If it's the very first time a lock has been requested the WriteLocks dict hasn't been instantiated yet.
+            WriteLocks ??= new Dictionary<Guid, Dictionary<int, int>>();
+
             // Try and get the dict associated with the scope id.
             var locksDictFound = WriteLocks.TryGetValue(instanceId, out var locksDict);
             if (locksDictFound)
@@ -555,6 +554,9 @@ namespace Umbraco.Core.Scoping
         private void IncrementReadLock(int lockId, Guid instanceId)
         {
             // Since we've already checked that we're the parent in the WriteLockInner method, we don't need to check again.
+            // If it's the very first time a lock has been requested the ReadLocks dict hasn't been instantiated yet.
+            ReadLocks ??= new Dictionary<Guid, Dictionary<int, int>>();
+
             var locksDictFound = ReadLocks.TryGetValue(instanceId, out var locksDict);
             if (locksDictFound)
             {
@@ -581,6 +583,12 @@ namespace Umbraco.Core.Scoping
             }
             else
             {
+                if (ReadLocks is null)
+                {
+                    // If ReadLocks is null, no locks has been requested and we don't have to do anything.
+                    return;
+                }
+
                 lock (_dictionaryLocker)
                 {
                     // Remove the scope from the dictionary because it's getting disposed.
@@ -604,6 +612,11 @@ namespace Umbraco.Core.Scoping
             }
             else
             {
+                if (WriteLocks is null)
+                {
+                    return;
+                }
+
                 lock (_dictionaryLocker)
                 {
                     // Remove the scope from the dictionary because it's getting disposed.
@@ -656,6 +669,7 @@ namespace Umbraco.Core.Scoping
 
             lock (_dictionaryLocker)
             {
+                _readLocks ??= new HashSet<int>();
                 // If we are the parent, then handle the lock request.
                 foreach (var lockId in lockIds)
                 {
@@ -712,6 +726,7 @@ namespace Umbraco.Core.Scoping
 
             lock (_dictionaryLocker)
             {
+                _writeLocks ??= new HashSet<int>();
                 foreach (var lockId in lockIds)
                 {
                     // Only acquire lock if we haven't yet (WriteLocks not containing the key)
