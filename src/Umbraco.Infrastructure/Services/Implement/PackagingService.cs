@@ -129,7 +129,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
 
-            ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(summary, compiledPackage, false), this);
+            // trigger the ImportPackage event
+            _eventAggregator.Publish(new ImportPackageNotification(summary, compiledPackage));
 
             return summary;
         }
