@@ -17,45 +17,7 @@
           "exclude": [
             "**/obj/**",
             "**/bin/**",
-
-            "**/Umbraco.Infrastructure/Cache/**",
-            "**/Umbraco.Infrastructure/Compose/**",
-            "**/Umbraco.Infrastructure/Configuration/**",
-            "**/Umbraco.Infrastructure/DependencyInjection/**",
-            "**/Umbraco.Infrastructure/Deploy/**",
-            "**/Umbraco.Infrastructure/Events/**",
-            "**/Umbraco.Infrastructure/Examine/**",
-
-            "**/Umbraco.Infrastructure/Extensions/**",
-            "**/Umbraco.Infrastructure/HealthChecks/**",
-            "**/Umbraco.Infrastructure/HostedServices/**",
-            "**/Umbraco.Infrastructure/Install/**",
-            "**/Umbraco.Infrastructure/Logging/**",
-            "**/Umbraco.Infrastructure/Macros/**",
-            "**/Umbraco.Infrastructure/Manifest/**",
-            "**/Umbraco.Infrastructure/Media/**",
-            "**/Umbraco.Infrastructure/Migrations/**",
-
-            "**/Umbraco.Infrastructure/Models/**",
-            "**/Umbraco.Infrastructure/ModelsBuilder/**",
-            "**/Umbraco.Infrastructure/Packaging/**",
-            "**/Umbraco.Infrastructure/Persistence/**",
-            "**/Umbraco.Infrastructure/PropertyEditors/**",
-            "**/Umbraco.Infrastructure/PublishedCache/**",
-            "**/Umbraco.Infrastructure/Routing/**",
-            "**/Umbraco.Infrastructure/Runtime/**",
-            "**/Umbraco.Infrastructure/Scoping/**",
-
-            "**/Umbraco.Infrastructure/Search/**",
-            "**/Umbraco.Infrastructure/Security/**",
-            "**/Umbraco.Infrastructure/Serialization/**",
-            "**/Umbraco.Infrastructure/Services/**",
-            "**/Umbraco.Infrastructure/Sync/**",
-            "**/Umbraco.Infrastructure/Trees/**",
-            "**/Umbraco.Infrastructure/WebAssets/**",
             "**/Umbraco.Infrastructure/*"
-
-
           ]
         }
       ],
