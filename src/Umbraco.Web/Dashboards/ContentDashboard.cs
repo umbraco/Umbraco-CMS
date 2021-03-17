@@ -1,6 +1,9 @@
-﻿using Umbraco.Core;
+﻿using System.IO;
+using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Web.Dashboards
 {
@@ -9,7 +12,7 @@ namespace Umbraco.Web.Dashboards
     {
         public string Alias => "contentIntro";
 
-        public string[] Sections => new [] { "content" };
+        public string[] Sections => new[] { "content" };
 
         public string View => "views/dashboard/default/startupdashboardintro.html";
 
@@ -17,11 +20,22 @@ namespace Umbraco.Web.Dashboards
         {
             get
             {
-                var rules = new IAccessRule[]
+                IAccessRule[] rules;
+                var dashboardConfig = Path.Combine(IOHelper.MapPath(SystemDirectories.Config), "content.dashboard.access.config.js");
+
+                if (File.Exists(dashboardConfig))
                 {
-                    new AccessRule {Type = AccessRuleType.Deny, Value = Constants.Security.TranslatorGroupAlias},
-                    new AccessRule {Type = AccessRuleType.Grant, Value = Constants.Security.AdminGroupAlias}
-                };
+                    var rawJson = File.ReadAllText(dashboardConfig);
+                    rules = JsonConvert.DeserializeObject<AccessRule[]>(rawJson);
+                }
+                else
+                {
+                    rules = new IAccessRule[]
+                    {
+                        new AccessRule {Type = AccessRuleType.Deny, Value = Constants.Security.TranslatorGroupAlias},
+                        new AccessRule {Type = AccessRuleType.Grant, Value = Constants.Security.AdminGroupAlias}
+                    };
+                }
                 return rules;
             }
         }
