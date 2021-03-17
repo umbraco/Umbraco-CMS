@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Web.Common.Security
         private readonly IIpResolver _ipResolver;
 
         public MemberSignInManager(
-            MemberManager memberManager,
+            UserManager<MemberIdentityUser> memberManager,
             IIpResolver ipResolver,
             IHttpContextAccessor contextAccessor,
             IUserClaimsPrincipalFactory<MemberIdentityUser> claimsFactory,
