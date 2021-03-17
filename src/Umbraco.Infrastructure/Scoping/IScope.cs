@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -29,6 +29,11 @@ namespace Umbraco.Cms.Core.Scoping
         /// Gets the scope event dispatcher.
         /// </summary>
         IEventDispatcher Events { get; }
+
+        /// <summary>
+        /// Gets the scope notification publisher
+        /// </summary>
+        IScopedNotificationPublisher Notifications { get; }
 
         /// <summary>
         /// Gets the repositories cache mode.
