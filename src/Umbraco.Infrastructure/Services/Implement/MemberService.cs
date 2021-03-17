@@ -796,6 +796,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 if (raiseEvents)
                 {
                     scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
+                    scope.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(member, false));
                 }
 
                 Audit(AuditType.Save, 0, member.Id);
@@ -834,6 +835,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 if (raiseEvents)
                 {
                     scope.Notifications.Publish(new MemberSavedNotification(membersA, evtMsgs).WithStateFrom(savingNotification));
+                    scope.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(membersA, false));
                 }
                 Audit(AuditType.Save, 0, -1, "Save multiple Members");
 
@@ -875,6 +877,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             // a member has no descendants
             _memberRepository.Delete(member);
             scope.Notifications.Publish(new MemberDeletedNotification(member, evtMsgs).WithState(notificationState));
+            scope.Events.Dispatch(Deleted, this, new DeleteEventArgs<IMember>(member, false));
 
             // media files deleted by QueuingEventDispatcher
         }
@@ -1018,6 +1021,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 int[] ids = _memberGroupRepository.GetMemberIds(usernames);
                 _memberGroupRepository.AssignRoles(ids, roleNames);
                 scope.Notifications.Publish(new AssignedMemberRolesNotification(ids, roleNames));
+                scope.Complete();
             }
         }
 
@@ -1031,6 +1035,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 int[] ids = _memberGroupRepository.GetMemberIds(usernames);
                 _memberGroupRepository.DissociateRoles(ids, roleNames);
                 scope.Notifications.Publish(new RemovedMemberRolesNotification(ids, roleNames));
+                scope.Complete();
             }
         }
 
@@ -1043,6 +1048,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.AssignRoles(memberIds, roleNames);
                 scope.Notifications.Publish(new AssignedMemberRolesNotification(memberIds, roleNames));
+                scope.Complete();
             }
         }
 
@@ -1055,6 +1061,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.DissociateRoles(memberIds, roleNames);
                 scope.Notifications.Publish(new RemovedMemberRolesNotification(memberIds, roleNames));
+                scope.Complete();
             }
         }
 
@@ -1068,10 +1075,11 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         #region Event Handlers
 
-        /// <summary>
-        /// Occurs after members have been exported.
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, ExportedMemberEventArgs> Exported;
+        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for MemberDeletedNotification instead.")]
+        public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleted;
+
+        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for MemberSavedNotification instead.")]
+        public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
 
         #endregion
 

@@ -76,17 +76,6 @@ namespace Umbraco.Cms.Core.Compose
                 .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
                 .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
                 .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
-
-            // add notifications handlers for distributed cache
-            builder
-                .AddNotificationHandler<MemberSavedNotification, DistributedCacheHandler>()
-                .AddNotificationHandler<MemberDeletedNotification, DistributedCacheHandler>()
-                .AddNotificationHandler<UserSavedNotification, DistributedCacheHandler>()
-                .AddNotificationHandler<UserDeletedNotification, DistributedCacheHandler>()
-                .AddNotificationHandler<UserGroupSavedNotification, DistributedCacheHandler>()
-                .AddNotificationHandler<UserGroupDeletedNotification, DistributedCacheHandler>()
-                .AddNotificationHandler<PublicAccessEntrySavedNotification, DistributedCacheHandler>()
-                .AddNotificationHandler<PublicAccessEntryDeletedNotification, DistributedCacheHandler>();
         }
     }
 }

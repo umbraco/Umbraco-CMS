@@ -142,6 +142,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 _userRepository.Save(user);
 
                 scope.Notifications.Publish(new UserSavedNotification(user, evtMsgs).WithStateFrom(savingNotification));
+                scope.Events.Dispatch(SavedUser, this, new SaveEventArgs<IUser>(user, false));
                 scope.Complete();
             }
 
@@ -255,6 +256,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _userRepository.Delete(user);
 
                     scope.Notifications.Publish(new UserDeletedNotification(user, evtMsgs).WithStateFrom(deletingNotification));
+                    scope.Events.Dispatch(DeletedUser, this, new DeleteEventArgs<IUser>(user, false));
                     scope.Complete();
                 }
             }
@@ -298,6 +300,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     if (raiseEvents)
                     {
                         scope.Notifications.Publish(new UserSavedNotification(entity, evtMsgs).WithStateFrom(savingNotification));
+                        scope.Events.Dispatch(SavedUser, this, new SaveEventArgs<IUser>(entity, false));
                     }
 
                     scope.Complete();
@@ -351,6 +354,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 if (raiseEvents)
                 {
                     scope.Notifications.Publish(new UserSavedNotification(entitiesA, evtMsgs).WithStateFrom(savingNotification));
+                    scope.Events.Dispatch(SavedUser, this, new SaveEventArgs<IUser>(entitiesA, false));
                 }
 
                 //commit the whole lot in one go
@@ -861,6 +865,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 {
                     scope.Notifications.Publish(new UserGroupSavedNotification(userGroup, evtMsgs).WithStateFrom(savingNotification));
                     scope.Notifications.Publish(new UserGroupWithUsersSavedNotification(userGroupWithUsers, evtMsgs).WithStateFrom(savingUserGroupWithUsersNotification));
+                    scope.Events.Dispatch(SavedUserGroup, this, new SaveEventArgs<UserGroupWithUsers>(new UserGroupWithUsers(userGroup, addedUsers, removedUsers), false));
                 }
 
                 scope.Complete();
@@ -887,6 +892,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 _userGroupRepository.Delete(userGroup);
 
                 scope.Notifications.Publish(new UserGroupDeletedNotification(userGroup, evtMsgs).WithStateFrom(deletingNotification));
+                scope.Events.Dispatch(DeletedUserGroup, this, new DeleteEventArgs<IUserGroup>(userGroup, false));
 
                 scope.Complete();
             }
@@ -1166,5 +1172,17 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         #endregion
+
+        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for UserSavedNotification instead.")]
+        public static event TypedEventHandler<IUserService, SaveEventArgs<IUser>> SavedUser;
+
+        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for UserDeletedNotification instead.")]
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUser>> DeletedUser;
+
+        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for UserGroupSavedNotification instead.")]
+        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup;
+
+        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for UserGroupDeletedNotification instead.")]
+        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserGroup>> DeletedUserGroup;
     }
 }

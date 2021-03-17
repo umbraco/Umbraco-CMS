@@ -140,6 +140,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.Complete();
 
                 scope.Notifications.Publish(new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
+                scope.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs, entry);
@@ -176,6 +177,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.Complete();
 
                 scope.Notifications.Publish(new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
+                scope.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);
@@ -202,6 +204,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.Complete();
 
                 scope.Notifications.Publish(new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
+                scope.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);
@@ -228,9 +231,16 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.Complete();
 
                 scope.Notifications.Publish(new PublicAccessEntryDeletedNotification(entry, evtMsgs).WithStateFrom(deletingNotification));
+                scope.Events.Dispatch(Deleted, this, new DeleteEventArgs<PublicAccessEntry>(entry, false));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
+
+        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for PublicAccessEntrySavedNotification instead.")]
+        public static event TypedEventHandler<IPublicAccessService, SaveEventArgs<PublicAccessEntry>> Saved;
+
+        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for PublicAccessEntryDeletedNotification instead.")]
+        public static event TypedEventHandler<IPublicAccessService, DeleteEventArgs<PublicAccessEntry>> Deleted;
     }
 }
