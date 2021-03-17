@@ -25,27 +25,27 @@ namespace Umbraco.Cms.Core.Models
         /// <summary>
         /// Cache instruction Id.
         /// </summary>
-        public int Id { get; private set; }
+        public int Id { get; }
 
         /// <summary>
         /// Cache instruction created date.
         /// </summary>
-        public DateTime UtcStamp { get; private set; }
+        public DateTime UtcStamp { get; }
 
         /// <summary>
         /// Serialized instructions.
         /// </summary>
-        public string Instructions { get; private set; }
+        public string Instructions { get; }
 
         /// <summary>
         /// Identity of server originating the instruction.
         /// </summary>
-        public string OriginIdentity { get; private set; }
+        public string OriginIdentity { get; }
 
         /// <summary>
         /// Count of instructions.
         /// </summary>
-        public int InstructionCount { get; private set; }
+        public int InstructionCount { get; }
 
     }
 }
