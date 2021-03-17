@@ -79,7 +79,7 @@
                 on-change-sort-order-value="onChangeGroupSortOrderValue(group)">
                 
                 <ul class="umb-group-builder__properties" ui-sortable="sortableOptionsProperty" ng-model="group.properties">
-                    <li ng-repeat="(propertyIndex, property) in group.properties track by property.alias" data-element="property-{{property.alias}}" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
+                    <li ng-repeat="(propertyIndex, property) in group.properties track by property.alias" ng-class="{'umb-group-builder__property-sortable': sortingMode && !property.inherited}">
                         <umb-content-type-property
                             ng-if="property.propertyState !== 'init'"
                             property="property"

@@ -1,4 +1,4 @@
-<div class="umb-group-builder__property" ng-class="{'-active': vm.dialogIsOpen, '-active': vm.property.propertyState=='active', '-inherited': vm.property.inherited, '-locked': vm.property.locked, 'umb-group-builder__property-handle -sortable': vm.sortable && !vm.property.inherited, '-sortable-locked': vm.sortable && vm.property.inherited}">
+<div data-element="property-{{vm.property.alias}}" class="umb-group-builder__property" ng-class="{'-active': vm.dialogIsOpen, '-active': vm.property.propertyState=='active', '-inherited': vm.property.inherited, '-locked': vm.property.locked, 'umb-group-builder__property-handle -sortable': vm.sortable && !vm.property.inherited, '-sortable-locked': vm.sortable && vm.property.inherited}">
 
   <!-- property meta text -->
   <div class="umb-group-builder__property-meta" ng-class="{'-full-width': vm.sortable}">
