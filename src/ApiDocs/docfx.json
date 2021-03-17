@@ -16,7 +16,8 @@
           ],
           "exclude": [
             "**/obj/**",
-            "**/bin/**"
+            "**/bin/**",
+            "**/Umbraco.Infrastructure/**",
           ]
         }
       ],
