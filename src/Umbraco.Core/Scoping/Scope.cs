@@ -37,6 +37,8 @@ namespace Umbraco.Core.Scoping
         private IEventDispatcher _eventDispatcher;
 
         private object _dictionaryLocker;
+        private readonly HashSet<int> _readLocks;
+        private readonly HashSet<int> _writeLocks;
 
         // ReadLocks and WriteLocks if we're the outer most scope it's those owned by the entire chain
         // If we're a child scope it's those that we have requested.
@@ -68,8 +70,10 @@ namespace Umbraco.Core.Scoping
             Detachable = detachable;
 
             _dictionaryLocker = new object();
-            ReadLocks = new Dictionary<Guid, Dictionary<int, int>>();
             WriteLocks = new Dictionary<Guid, Dictionary<int, int>>();
+            ReadLocks = new Dictionary<Guid, Dictionary<int, int>>();
+            _writeLocks = new HashSet<int>();
+            _readLocks = new HashSet<int>();
 
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
@@ -370,8 +374,7 @@ namespace Umbraco.Core.Scoping
             {
                 // We're the parent scope, make sure that locks of all scopes has been cleared
                 // Since we're only reading we don't have to be in a lock
-                if (ReadLocks.Values.Any(x => x.Values.Any(value => value != 0))
-                    || WriteLocks.Values.Any(x => x.Values.Any(value => value != 0)))
+                if (ReadLocks.Any() || WriteLocks.Any())
                 {
                     throw new InvalidOperationException($"All scopes has not been disposed from parent scope: {InstanceId}");
                 }
@@ -580,13 +583,10 @@ namespace Umbraco.Core.Scoping
             {
                 lock (_dictionaryLocker)
                 {
-                    // Reset all values to 0 since the scope is being disposed
+                    // Remove the scope from the dictionary because it's getting disposed.
                     if (ReadLocks.ContainsKey(instanceId))
                     {
-                        foreach (var key in ReadLocks[instanceId].Keys.ToList())
-                        {
-                            ReadLocks[instanceId][key] = 0;
-                        }
+                        ReadLocks.Remove(instanceId);
                     }
                 }
             }
@@ -606,13 +606,10 @@ namespace Umbraco.Core.Scoping
             {
                 lock (_dictionaryLocker)
                 {
-                    // Reset all values to 0 since the scope is being disposed
+                    // Remove the scope from the dictionary because it's getting disposed.
                     if (WriteLocks.ContainsKey(instanceID))
                     {
-                        foreach (var key in WriteLocks[instanceID].Keys.ToList())
-                        {
-                            WriteLocks[instanceID][key] = 0;
-                        }
+                        WriteLocks.Remove(instanceID);
                     }
                 }
 
@@ -644,28 +641,6 @@ namespace Umbraco.Core.Scoping
         }
 
         /// <summary>
-        /// Determine if a read lock with the specified ID has already been obtained.
-        /// </summary>
-        /// <param name="lockId">Id to test.</param>
-        /// <returns>True if no scopes has obtained a read lock with the specific ID yet.</returns>
-        private bool HasReadLock(int lockId)
-        {
-            // Check if there is any dictionary<int,int> with a key equal to lockId
-            // And check that the value associated with that key is greater than 0, if not it could be because a lock was requested but it failed.
-            return ReadLocks.Values.Any(x => x.ContainsKey(lockId));
-        }
-
-        /// <summary>
-        /// Determine if a write lock with the specified ID has already been obtained.
-        /// </summary>
-        /// <param name="lockId">Id to test</param>
-        /// <returns>>True if no scopes has obtained a write lock with the specific ID yet.</returns>
-        private bool HasWriteLock(int lockId)
-        {
-            return WriteLocks.Values.Any(x => x.ContainsKey(lockId));
-        }
-
-        /// <summary>
         /// Handles acquiring a read lock, will delegate it to the parent if there are any.
         /// </summary>
         /// <param name="timeout">Optional database timeout in milliseconds.</param>
@@ -685,9 +660,10 @@ namespace Umbraco.Core.Scoping
                 foreach (var lockId in lockIds)
                 {
                     // Only acquire the lock if we haven't done so yet.
-                    if (!HasReadLock(lockId))
+                    if (!_readLocks.Contains(lockId))
                     {
                         IncrementReadLock(lockId, instanceId);
+                        _readLocks.Add(lockId);
                         try
                         {
                             if (timeout is null)
@@ -707,6 +683,7 @@ namespace Umbraco.Core.Scoping
                             // Since we at this point have determined that we haven't got any key of LockID, it's safe to completely remove it instead of decrementing.
                             // It needs to be completely removed, because that's how we determine to acquire a lock.
                             ReadLocks[instanceId].Remove(lockId);
+                            _readLocks.Remove(lockId);
                             throw;
                         }
                     }
@@ -738,9 +715,10 @@ namespace Umbraco.Core.Scoping
                 foreach (var lockId in lockIds)
                 {
                     // Only acquire lock if we haven't yet (WriteLocks not containing the key)
-                    if (!HasWriteLock(lockId))
+                    if (!_writeLocks.Contains(lockId))
                     {
                         IncrementWriteLock(lockId, instanceId);
+                        _writeLocks.Add(lockId);
                         try
                         {
                             if (timeout is null)
@@ -758,6 +736,7 @@ namespace Umbraco.Core.Scoping
                             // Since we at this point have determined that we haven't got any key of LockID, it's safe to completely remove it instead of decrementing.
                             // It needs to be completely removed, because that's how we determine to acquire a lock.
                             WriteLocks[instanceId].Remove(lockId);
+                            _writeLocks.Remove(lockId);
                             throw;
                         }
                     }
