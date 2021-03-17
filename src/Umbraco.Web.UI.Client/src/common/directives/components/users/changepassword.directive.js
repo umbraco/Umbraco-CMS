@@ -11,6 +11,7 @@
         vm.cancelChange = cancelChange;
         vm.showOldPass = showOldPass;
         vm.showCancelBtn = showCancelBtn;
+        vm.newPasswordKeyUp = newPasswordKeyUp;
 
         var unsubscribe = [];
 
@@ -156,6 +157,10 @@
         function showCancelBtn() {
             return vm.config.disableToggle !== true && vm.config.hasPassword;
         };
+
+        function newPasswordKeyUp(event) {
+            vm.passwordVal = event.target.value;
+        }
     }
 
     var component = {

@@ -2,24 +2,27 @@
     'use strict';
 
     angular
-        .module('umbraco.directives')        
+        .module('umbraco.directives')
         .component('umbPasswordTip', {
             controller: UmbPasswordTipController,
             controllerAs: 'vm',
-            template: '<span class="help-inline" style="display: block;" ng-if="vm.passwordTip" ng-bind-html="vm.passwordTip">{{vm.passwordTip}}</span>',
+            template:
+                '<span class="help-inline" style="display: block;" ng-if="vm.passwordTip" ng-bind-html="vm.passwordTip">{{vm.passwordTip}}</span>',
             bindings: {
+                passwordVal: "<",
                 minPwdLength: "<",
                 minPwdNonAlphaNum: "<"
             }
         });
 
-    function UmbPasswordTipController($scope, $attrs, localizationService) {
+    function UmbPasswordTipController(localizationService) {
 
         let defaultMinPwdLength = Umbraco.Sys.ServerVariables.umbracoSettings.minimumPasswordLength;
         let defaultMinPwdNonAlphaNum = Umbraco.Sys.ServerVariables.umbracoSettings.minimumPasswordNonAlphaNum;
 
         var vm = this;
         vm.$onInit = onInit;
+        vm.$onChanges = onChanges;
 
         function onInit() {
             if (vm.minPwdLength === undefined) {
@@ -30,16 +33,6 @@
                 vm.minPwdNonAlphaNum = defaultMinPwdNonAlphaNum;
             }
 
-            // because the password field can have min-length, we can't watch the raw value, since it
-            // won't exist until it meets the minimum length, which means the password tip won't be 
-            // visible until the password meets the min length, at which point the tip is redundant
-            const element = document.querySelector($attrs.bindTo);
-            if (element) {
-                vm.passwordWatcher = $scope.$watch(
-                    () => element.value,
-                    newVal => updatePasswordTip(newVal.length));
-            }
-
             if (vm.minPwdNonAlphaNum > 0) {
                 localizationService.localize('user_newPasswordFormatNonAlphaTip', [vm.minPwdNonAlphaNum]).then(data => {
                     vm.passwordNonAlphaTip = data;
@@ -48,6 +41,16 @@
             } else {
                 vm.passwordNonAlphaTip = '';
                 updatePasswordTip(0);
+            }
+        }
+
+        function onChanges(simpleChanges) {
+            if (simpleChanges.passwordVal) {
+                if (simpleChanges.passwordVal.currentValue) {
+                    updatePasswordTip(simpleChanges.passwordVal.currentValue.length);
+                } else {
+                    updatePasswordTip(0);
+                }
             }
         }
 
@@ -64,8 +67,5 @@
                 vm.passwordTip = vm.passwordNonAlphaTip;
             }
         }
-
-        $scope.$on('$destroy', () => vm.passwordWatcher());
     }
-
 })();
