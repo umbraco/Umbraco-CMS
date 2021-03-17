@@ -39,9 +39,6 @@ namespace Umbraco.Core.Scoping
         private object _dictionaryLocker;
         private HashSet<int> _readLocks;
         private HashSet<int> _writeLocks;
-
-        // ReadLocks and WriteLocks if we're the outer most scope it's those owned by the entire chain
-        // If we're a child scope it's those that we have requested.
         internal Dictionary<Guid, Dictionary<int, int>> ReadLocks { get; private set; }
         internal Dictionary<Guid, Dictionary<int, int>> WriteLocks { get; private set; }
 
@@ -577,25 +574,16 @@ namespace Umbraco.Core.Scoping
         /// <param name="instanceId">Instance ID of the scope to clear of lock counters.</param>
         private void ClearReadLocks(Guid instanceId)
         {
-            if (ParentScope != null)
+            if (ParentScope is not null)
             {
                 ParentScope.ClearReadLocks(instanceId);
             }
             else
             {
-                if (ReadLocks is null)
-                {
-                    // If ReadLocks is null, no locks has been requested and we don't have to do anything.
-                    return;
-                }
-
                 lock (_dictionaryLocker)
                 {
                     // Remove the scope from the dictionary because it's getting disposed.
-                    if (ReadLocks.ContainsKey(instanceId))
-                    {
-                        ReadLocks.Remove(instanceId);
-                    }
+                    ReadLocks?.Remove(instanceId);
                 }
             }
         }
@@ -606,26 +594,17 @@ namespace Umbraco.Core.Scoping
         /// <param name="instanceID">Instance ID of the scope to clear of lock counters.</param>
         private void ClearWriteLocks(Guid instanceID)
         {
-            if (ParentScope != null)
+            if (ParentScope is not null)
             {
                 ParentScope.ClearWriteLocks(instanceID);
             }
             else
             {
-                if (WriteLocks is null)
-                {
-                    return;
-                }
-
                 lock (_dictionaryLocker)
                 {
                     // Remove the scope from the dictionary because it's getting disposed.
-                    if (WriteLocks.ContainsKey(instanceID))
-                    {
-                        WriteLocks.Remove(instanceID);
-                    }
+                    WriteLocks?.Remove(instanceID);
                 }
-
             }
         }
 
@@ -656,11 +635,12 @@ namespace Umbraco.Core.Scoping
         /// <summary>
         /// Handles acquiring a read lock, will delegate it to the parent if there are any.
         /// </summary>
+        /// <param name="instanceId">Instance ID of the requesting scope.</param>
         /// <param name="timeout">Optional database timeout in milliseconds.</param>
         /// <param name="lockIds">Array of lock object identifiers.</param>
         private void ReadLockInner(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
         {
-            if (ParentScope != null)
+            if (ParentScope is not null)
             {
                 // Delegate acquiring the lock to the parent if any.
                 ParentScope.ReadLockInner(instanceId, timeout, lockIds);
@@ -670,7 +650,7 @@ namespace Umbraco.Core.Scoping
             lock (_dictionaryLocker)
             {
                 _readLocks ??= new HashSet<int>();
-                // If we are the parent, then handle the lock request.
+                // We are the parent handle the lock request.
                 foreach (var lockId in lockIds)
                 {
                     // Only acquire the lock if we haven't done so yet.
@@ -694,16 +674,16 @@ namespace Umbraco.Core.Scoping
                         catch
                         {
                             // Something went wrong and we didn't get the lock
-                            // Since we at this point have determined that we haven't got any key of LockID, it's safe to completely remove it instead of decrementing.
-                            // It needs to be completely removed, because that's how we determine to acquire a lock.
+                            // Since we at this point have determined that we haven't got any lock with an ID of LockID, it's safe to completely remove it instead of decrementing.
                             ReadLocks[instanceId].Remove(lockId);
+                            // It needs to be removed from the HashSet as well, because that's how we determine to acquire a lock.
                             _readLocks.Remove(lockId);
                             throw;
                         }
                     }
                     else
                     {
-                        // We already have a lock, but need to update the readlock dictionary for debugging purposes.
+                        // We already have a lock, but need to update the ReadLock dictionary for debugging purposes.
                         IncrementReadLock(lockId, instanceId);
                     }
                 }
@@ -713,11 +693,12 @@ namespace Umbraco.Core.Scoping
         /// <summary>
         /// Handles acquiring a write lock with a specified timeout, will delegate it to the parent if there are any.
         /// </summary>
+        /// <param name="instanceId">Instance ID of the requesting scope.</param>
         /// <param name="timeout">Optional database timeout in milliseconds.</param>
         /// <param name="lockIds">Array of lock object identifiers.</param>
-        internal void WriteLockInner(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
+        private void WriteLockInner(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
         {
-            if (ParentScope != null)
+            if (ParentScope is not null)
             {
                 // If we have a parent we delegate lock creation to parent.
                 ParentScope.WriteLockInner(instanceId, timeout, lockIds);
@@ -729,7 +710,7 @@ namespace Umbraco.Core.Scoping
                 _writeLocks ??= new HashSet<int>();
                 foreach (var lockId in lockIds)
                 {
-                    // Only acquire lock if we haven't yet (WriteLocks not containing the key)
+                    // Only acquire lock if we haven't yet
                     if (!_writeLocks.Contains(lockId))
                     {
                         IncrementWriteLock(lockId, instanceId);
@@ -748,9 +729,9 @@ namespace Umbraco.Core.Scoping
                         catch
                         {
                             // Something went wrong and we didn't get the lock
-                            // Since we at this point have determined that we haven't got any key of LockID, it's safe to completely remove it instead of decrementing.
-                            // It needs to be completely removed, because that's how we determine to acquire a lock.
+                            // Since we at this point have determined that we haven't got any lock with an ID of LockID, it's safe to completely remove it instead of decrementing.
                             WriteLocks[instanceId].Remove(lockId);
+                            // It needs to be removed from the HashSet as well, because that's how we determine to acquire a lock.
                             _writeLocks.Remove(lockId);
                             throw;
                         }
@@ -781,7 +762,7 @@ namespace Umbraco.Core.Scoping
         private void ObtainTimoutReadLock(int lockId, TimeSpan timeout)
         {
             var syntax2 = Database.SqlContext.SqlSyntax as ISqlSyntaxProvider2;
-            if (syntax2 == null)
+            if (syntax2 is null)
             {
                 throw new InvalidOperationException($"{Database.SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
             }
@@ -806,7 +787,7 @@ namespace Umbraco.Core.Scoping
         private void ObtainTimeoutWriteLock(int lockId, TimeSpan timeout)
         {
             var syntax2 = Database.SqlContext.SqlSyntax as ISqlSyntaxProvider2;
-            if (syntax2 == null)
+            if (syntax2 is null)
             {
                 throw new InvalidOperationException($"{Database.SqlContext.SqlSyntax.GetType()} is not of type {typeof(ISqlSyntaxProvider2)}");
             }
