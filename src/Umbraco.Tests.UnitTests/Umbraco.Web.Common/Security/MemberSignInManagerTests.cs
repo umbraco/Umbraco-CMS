@@ -54,6 +54,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
             var lockoutOnFailure = false;
             var isPersistent = true;
             _memberManager.Setup(x => x.FindByNameAsync(It.IsAny<string>())).ReturnsAsync(fakeUser);
+            _memberManager.Setup(x => x.CheckPasswordAsync(fakeUser, password)).ReturnsAsync(true);
+            _memberManager.Setup(x => x.IsEmailConfirmedAsync(fakeUser)).ReturnsAsync(true);
+            _memberManager.Setup(x => x.IsLockedOutAsync(fakeUser)).ReturnsAsync(false);
 
             //act
             SignInResult actual = await sut.PasswordSignInAsync(fakeUser, password, isPersistent, lockoutOnFailure);
