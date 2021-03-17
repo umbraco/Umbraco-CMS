@@ -3,6 +3,9 @@
 
 ## Quick Links:
 
-### [Umbraco.Cms.Core](api/Umbraco.Cms.Core.html) docs
-### [Umbraco.Extensions](api/Umbraco.Extensions.html) docs
+### [Core](api/Umbraco.Cms.Core.html) docs
+### [Infrastructure](api/Umbraco.Cms.Infrastructure.html) docs
+### [Web](api/Umbraco.Cms.Web.Common.html) docs
+### [Extensions](api/Umbraco.Extensions.html) docs
+
 
