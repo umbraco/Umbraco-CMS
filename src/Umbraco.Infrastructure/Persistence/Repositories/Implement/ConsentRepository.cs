@@ -27,9 +27,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         { }
 
         /// <inheritdoc />
-        protected override Guid NodeObjectTypeId => throw new NotSupportedException();
-
-        /// <inheritdoc />
         protected override IConsent PerformGet(int id)
         {
             throw new NotSupportedException();

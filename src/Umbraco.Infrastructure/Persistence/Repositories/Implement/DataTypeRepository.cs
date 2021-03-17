@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return Array.Empty<string>();
         }
 
-        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.DataType;
+        protected Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.DataType;
 
         #endregion
 

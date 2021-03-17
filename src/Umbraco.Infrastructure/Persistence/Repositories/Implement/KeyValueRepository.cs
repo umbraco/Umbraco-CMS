@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -32,8 +32,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         #endregion
 
         #region Overrides of EntityRepositoryBase<string, IKeyValue>
-
-        protected override Guid NodeObjectTypeId => throw new NotSupportedException();
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {

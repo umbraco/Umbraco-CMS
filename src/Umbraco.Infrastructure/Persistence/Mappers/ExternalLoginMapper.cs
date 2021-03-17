@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 

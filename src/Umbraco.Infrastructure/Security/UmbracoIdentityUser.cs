@@ -37,7 +37,9 @@ namespace Umbraco.Cms.Core.Models.Identity
         private string _passwordHash;
         private DateTime? _lastPasswordChangeDateUtc;
         private ObservableCollection<IIdentityUserLogin> _logins;
+        private ObservableCollection<IIdentityUserToken> _tokens;
         private Lazy<IEnumerable<IIdentityUserLogin>> _getLogins;
+        private Lazy<IEnumerable<IIdentityUserToken>> _getTokens;
         private ObservableCollection<IdentityUserRole<string>> _roles;
 
         /// <summary>
@@ -181,6 +183,38 @@ namespace Umbraco.Cms.Core.Models.Identity
         }
 
         /// <summary>
+        /// Gets the external login tokens collection
+        /// </summary>
+        public ICollection<IIdentityUserToken> LoginTokens
+        {
+            get
+            {
+                // return if it exists
+                if (_tokens is not null)
+                {
+                    return _tokens;
+                }
+
+                _tokens = new ObservableCollection<IIdentityUserToken>();
+
+                // if the callback is there and hasn't been created yet then execute it and populate the logins
+               // if (_getTokens != null && !_getTokens.IsValueCreated)
+                    if (_getTokens?.IsValueCreated != true)
+                {
+                    foreach (IIdentityUserToken l in _getTokens.Value)
+                    {
+                        _tokens.Add(l);
+                    }
+                }
+
+                // now assign events
+                _tokens.CollectionChanged += LoginTokens_CollectionChanged;
+
+                return _tokens;
+            }
+        }
+
+        /// <summary>
         /// Gets or sets user ID (Primary Key)
         /// </summary>
         public override string Id
@@ -266,9 +300,17 @@ namespace Umbraco.Cms.Core.Models.Identity
         /// Used to set a lazy call back to populate the user's Login list
         /// </summary>
         /// <param name="callback">The lazy value</param>
-        public void SetLoginsCallback(Lazy<IEnumerable<IIdentityUserLogin>> callback) => _getLogins = callback ?? throw new ArgumentNullException(nameof(callback));
+        internal void SetLoginsCallback(Lazy<IEnumerable<IIdentityUserLogin>> callback) => _getLogins = callback ?? throw new ArgumentNullException(nameof(callback));
+
+        /// <summary>
+        /// Used to set a lazy call back to populate the user's token list
+        /// </summary>
+        /// <param name="callback">The lazy value</param>
+        internal void SetTokensCallback(Lazy<IEnumerable<IIdentityUserToken>> callback) => _getTokens = callback ?? throw new ArgumentNullException(nameof(callback));
 
         private void Logins_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => BeingDirty.OnPropertyChanged(nameof(Logins));
+
+        private void LoginTokens_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => BeingDirty.OnPropertyChanged(nameof(LoginTokens));
 
         private void Roles_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e) => BeingDirty.OnPropertyChanged(nameof(Roles));
     }

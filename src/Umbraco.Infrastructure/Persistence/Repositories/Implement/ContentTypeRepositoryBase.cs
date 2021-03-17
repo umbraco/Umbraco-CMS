@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -43,6 +43,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         protected IContentTypeCommonRepository CommonRepository { get; }
         protected ILanguageRepository LanguageRepository { get; }
         protected abstract bool SupportsPublishing { get; }
+
+        /// <summary>
+        /// Gets the node object type for the repository's entity
+        /// </summary>
+        protected abstract Guid NodeObjectTypeId { get; }
 
         public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer container)
         {
