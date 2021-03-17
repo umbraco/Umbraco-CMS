@@ -304,9 +304,8 @@ namespace Umbraco.Core.Mapping
         public TTarget Map<TSource, TTarget>(TSource source, TTarget target, Action<MapperContext> f)
         {
             var context = new MapperContext(this);
-
             f(context);
-            return Map(source, target, context);;
+            return Map(source, target, context);
         }
 
         /// <summary>
