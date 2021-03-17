@@ -44,7 +44,6 @@
         };
 
         vm.allowPasswordReset = Umbraco.Sys.ServerVariables.umbracoSettings.canSendRequiredEmail && Umbraco.Sys.ServerVariables.umbracoSettings.allowPasswordReset;
-
         vm.errorMsg = "";
         vm.externalLoginFormAction = Umbraco.Sys.ServerVariables.umbracoUrls.externalLoginsUrl;
         vm.externalLoginProviders = externalLoginInfoService.getLoginProviders();
@@ -73,7 +72,6 @@
         vm.loginSubmit = loginSubmit;
         vm.requestPasswordResetSubmit = requestPasswordResetSubmit;
         vm.setPasswordSubmit = setPasswordSubmit;
-
         vm.labels = {};
         localizationService.localizeMany([
             vm.usernameIsEmail ? "general_email" : "general_username",
@@ -95,6 +93,7 @@
 
             // Check if it is a new user
             const inviteVal = $location.search().invite;
+
             //1 = enter password, 2 = password set, 3 = invalid token
             if (inviteVal && (inviteVal === "1" || inviteVal === "2")) {
 
@@ -362,7 +361,6 @@
                 }
             });
         }
-
         ////
 
         function setGreeting() {

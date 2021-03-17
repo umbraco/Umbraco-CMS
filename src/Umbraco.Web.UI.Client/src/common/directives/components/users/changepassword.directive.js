@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function ChangePasswordController($scope, localizationService) {
+    function ChangePasswordController($scope) {
 
         var vm = this;
 
@@ -174,4 +174,3 @@
 
 
 })();
-
