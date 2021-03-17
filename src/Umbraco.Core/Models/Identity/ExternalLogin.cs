@@ -2,6 +2,7 @@ using System;
 
 namespace Umbraco.Cms.Core.Models.Identity
 {
+
     /// <inheritdoc />
     public class ExternalLogin : IExternalLogin
     {

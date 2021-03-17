@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -80,8 +80,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             throw new InvalidOperationException("This method won't be implemented.");
         }
-
-        protected sealed override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
         protected sealed override void PersistNewItem(TEntity entity)
         {

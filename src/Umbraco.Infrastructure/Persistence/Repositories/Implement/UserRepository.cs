@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -430,8 +430,6 @@ ORDER BY colName";
             };
             return list;
         }
-
-        protected override Guid NodeObjectTypeId => throw new NotImplementedException();
 
         protected override void PersistNewItem(IUser entity)
         {
