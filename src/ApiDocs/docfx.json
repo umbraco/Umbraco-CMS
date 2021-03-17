@@ -36,12 +36,22 @@
             "**/Umbraco.Infrastructure/Media/**",
             "**/Umbraco.Infrastructure/Migrations/**",
 
-
+            "**/Umbraco.Infrastructure/Models/**",
+            "**/Umbraco.Infrastructure/ModelsBuilder/**",
+            "**/Umbraco.Infrastructure/Packaging/**",
             "**/Umbraco.Infrastructure/Persistence/**",
-            "**/Umbraco.Infrastructure/Services/**",
+            "**/Umbraco.Infrastructure/PropertyEditors/**",
+            "**/Umbraco.Infrastructure/PublishedCache/**",
+            "**/Umbraco.Infrastructure/Routing/**",
+            "**/Umbraco.Infrastructure/Runtime/**",
+            "**/Umbraco.Infrastructure/Scoping/**",
 
 
-            "**/Umbraco.Infrastructure/PropertyEditors/**"
+
+            "**/Umbraco.Infrastructure/Services/**"
+
+
+
 
           ]
         }
