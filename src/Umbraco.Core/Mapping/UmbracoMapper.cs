@@ -305,14 +305,8 @@ namespace Umbraco.Core.Mapping
         {
             var context = new MapperContext(this);
 
-            TTarget targetInstance;
-            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
-            {
-                f(context);
-                targetInstance = Map(source, target, context);
-            }
-
-            return targetInstance;
+            f(context);
+            return Map(source, target, context);;
         }
 
         /// <summary>
