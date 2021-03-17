@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = _uowProvider.CreateScope(autoComplete: true))
             {
-                return _notificationsRepository.GetUsersNotifications(scope, userIds, action, nodeIds, objectType);
+                return _notificationsRepository.GetUsersNotifications(userIds, action, nodeIds, objectType);
             }
         }
         /// <summary>
@@ -153,7 +153,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = _uowProvider.CreateScope(autoComplete: true))
             {
-                return _notificationsRepository.GetUserNotifications(scope, user);
+                return _notificationsRepository.GetUserNotifications(user);
             }
         }
 
@@ -192,7 +192,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = _uowProvider.CreateScope(autoComplete: true))
             {
-                return _notificationsRepository.GetEntityNotifications(scope, entity);
+                return _notificationsRepository.GetEntityNotifications(entity);
             }
         }
 
@@ -204,7 +204,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = _uowProvider.CreateScope())
             {
-                _notificationsRepository.DeleteNotifications(scope, entity);
+                _notificationsRepository.DeleteNotifications(entity);
                 scope.Complete();
             }
         }
@@ -217,7 +217,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = _uowProvider.CreateScope())
             {
-                _notificationsRepository.DeleteNotifications(scope, user);
+                _notificationsRepository.DeleteNotifications(user);
                 scope.Complete();
             }
         }
@@ -231,7 +231,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = _uowProvider.CreateScope())
             {
-                _notificationsRepository.DeleteNotifications(scope, user, entity);
+                _notificationsRepository.DeleteNotifications(user, entity);
                 scope.Complete();
             }
         }
@@ -249,7 +249,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = _uowProvider.CreateScope())
             {
-                var notifications = _notificationsRepository.SetNotifications(scope, user, entity, actions);
+                var notifications = _notificationsRepository.SetNotifications(user, entity, actions);
                 scope.Complete();
                 return notifications;
             }
@@ -266,7 +266,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = _uowProvider.CreateScope())
             {
-                var notification = _notificationsRepository.CreateNotification(scope, user, entity, action);
+                var notification = _notificationsRepository.CreateNotification(user, entity, action);
                 scope.Complete();
                 return notification;
             }

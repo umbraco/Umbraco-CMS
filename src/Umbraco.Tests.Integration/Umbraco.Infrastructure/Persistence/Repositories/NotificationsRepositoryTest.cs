@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                var repo = new NotificationsRepository();
+                var repo = new NotificationsRepository((IScopeAccessor)provider);
 
                 var node = new NodeDto // create bogus item so we can add a notification
                 {
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 IEntity entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
                 IUser user = Mock.Of<IUser>(e => e.Id == node.UserId);
 
-                Notification notification = repo.CreateNotification(scope, user, entity, "A");
+                Notification notification = repo.CreateNotification(user, entity, "A");
 
                 Assert.AreEqual("A", notification.Action);
                 Assert.AreEqual(node.NodeId, notification.EntityId);
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                var repo = new NotificationsRepository();
+                var repo = new NotificationsRepository((IScopeAccessor)provider);
 
                 var userDto = new UserDto { Email = "test", Login = "test", Password = "test", UserName = "test", UserLanguage = "en", CreateDate = DateTime.Now, UpdateDate = DateTime.Now };
                 scope.Database.Insert(userDto);
@@ -76,10 +76,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                     var node = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1," + i, SortOrder = 1, Text = "hello" + i, Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
                     object result = scope.Database.Insert(node);
                     IEntity entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
-                    Notification notification = repo.CreateNotification(scope, (i % 2 == 0) ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture));
+                    Notification notification = repo.CreateNotification((i % 2 == 0) ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture));
                 }
 
-                IEnumerable<Notification> notifications = repo.GetUserNotifications(scope, userAdmin);
+                IEnumerable<Notification> notifications = repo.GetUserNotifications(userAdmin);
 
                 Assert.AreEqual(5, notifications.Count());
             }
@@ -91,7 +91,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                var repo = new NotificationsRepository();
+                var repo = new NotificationsRepository((IScopeAccessor)provider);
 
                 var node1 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,1", SortOrder = 1, Text = "hello1", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
                 scope.Database.Insert(node1);
@@ -105,10 +105,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                     var userDto = new UserDto { Email = "test" + i, Login = "test" + i, Password = "test", UserName = "test" + i, UserLanguage = "en", CreateDate = DateTime.Now, UpdateDate = DateTime.Now };
                     scope.Database.Insert(userDto);
                     IUser userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                    Notification notification = repo.CreateNotification(scope, userNew, (i % 2 == 0) ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture));
+                    Notification notification = repo.CreateNotification(userNew, (i % 2 == 0) ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture));
                 }
 
-                IEnumerable<Notification> notifications = repo.GetEntityNotifications(scope, entity1);
+                IEnumerable<Notification> notifications = repo.GetEntityNotifications(entity1);
 
                 Assert.AreEqual(5, notifications.Count());
             }
@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                var repo = new NotificationsRepository();
+                var repo = new NotificationsRepository((IScopeAccessor)provider);
 
                 var node1 = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1,1", SortOrder = 1, Text = "hello1", Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
                 scope.Database.Insert(node1);
@@ -134,10 +134,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                     var userDto = new UserDto { Email = "test" + i, Login = "test" + i, Password = "test", UserName = "test" + i, UserLanguage = "en", CreateDate = DateTime.Now, UpdateDate = DateTime.Now };
                     scope.Database.Insert(userDto);
                     IUser userNew = Mock.Of<IUser>(e => e.Id == userDto.Id);
-                    Notification notification = repo.CreateNotification(scope, userNew, (i % 2 == 0) ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture));
+                    Notification notification = repo.CreateNotification(userNew, (i % 2 == 0) ? entity1 : entity2, i.ToString(CultureInfo.InvariantCulture));
                 }
 
-                int delCount = repo.DeleteNotifications(scope, entity1);
+                int delCount = repo.DeleteNotifications(entity1);
 
                 Assert.AreEqual(5, delCount);
             }
@@ -149,7 +149,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                var repo = new NotificationsRepository();
+                var repo = new NotificationsRepository((IScopeAccessor)provider);
 
                 var userDto = new UserDto { Email = "test", Login = "test", Password = "test", UserName = "test", UserLanguage = "en", CreateDate = DateTime.Now, UpdateDate = DateTime.Now };
                 scope.Database.Insert(userDto);
@@ -162,10 +162,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                     var node = new NodeDto { CreateDate = DateTime.Now, Level = 1, NodeObjectType = Constants.ObjectTypes.ContentItem, ParentId = -1, Path = "-1," + i, SortOrder = 1, Text = "hello" + i, Trashed = false, UniqueId = Guid.NewGuid(), UserId = -1 };
                     object result = scope.Database.Insert(node);
                     IEntity entity = Mock.Of<IEntity>(e => e.Id == node.NodeId);
-                    Notification notification = repo.CreateNotification(scope, (i % 2 == 0) ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture));
+                    Notification notification = repo.CreateNotification((i % 2 == 0) ? userAdmin : userNew, entity, i.ToString(CultureInfo.InvariantCulture));
                 }
 
-                int delCount = repo.DeleteNotifications(scope, userAdmin);
+                int delCount = repo.DeleteNotifications(userAdmin);
 
                 Assert.AreEqual(5, delCount);
             }
