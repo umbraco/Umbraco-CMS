@@ -5,19 +5,15 @@
         {
           "src": "../",
           "files": [
-            "Umbraco.Core/Umbraco.Core.csproj",
-            "Umbraco.Examine.Lucene/Umbraco.Examine.Lucene.csproj",
-            "Umbraco.Persistence.SqlCe/Umbraco.Persistence.SqlCe.csproj",
-            "Umbraco.PublishedCache.NuCache/Umbraco.PublishedCache.NuCache.csproj",
-            "Umbraco.Web.BackOffice/Umbraco.Web.BackOffice.csproj",
-            "Umbraco.Web.Common/Umbraco.Web.Common.csproj",
-            "Umbraco.Web.Website/Umbraco.Web.Website.csproj",
-            "Umbraco.Infrastructure/Umbraco.Infrastructure.csproj"
+            "**/*.csproj"
           ],
           "exclude": [
             "**/obj/**",
             "**/bin/**",
-            "**/Umbraco.Infrastructure/*"
+            "**/Umbraco.Web.csproj",
+            "**/Umbraco.Infrastructure/*",
+            "**/Umbraco.Web.UI.csproj",
+            "**/Umbraco.Web.UI.Netcore.csproj"
           ]
         }
       ],
