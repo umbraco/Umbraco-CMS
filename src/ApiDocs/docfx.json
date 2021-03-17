@@ -26,9 +26,20 @@
             "**/Umbraco.Infrastructure/Events/**",
             "**/Umbraco.Infrastructure/Examine/**",
 
+            "**/Umbraco.Infrastructure/Extensions/**",
+            "**/Umbraco.Infrastructure/HealthChecks/**",
+            "**/Umbraco.Infrastructure/HostedServices/**",
+            "**/Umbraco.Infrastructure/Install/**",
+            "**/Umbraco.Infrastructure/Logging/**",
+            "**/Umbraco.Infrastructure/Macros/**",
+            "**/Umbraco.Infrastructure/Manifest/**",
+            "**/Umbraco.Infrastructure/Media/**",
+            "**/Umbraco.Infrastructure/Migrations/**",
+
+
             "**/Umbraco.Infrastructure/Persistence/**",
             "**/Umbraco.Infrastructure/Services/**",
-            "**/Umbraco.Infrastructure/Migrations/**",
+
 
             "**/Umbraco.Infrastructure/PropertyEditors/**"
 
