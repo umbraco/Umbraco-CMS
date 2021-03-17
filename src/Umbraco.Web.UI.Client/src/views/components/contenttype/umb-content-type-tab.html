@@ -9,7 +9,7 @@
       </div>
       <div class="umb-group-builder__tab-title-wrapper">
           <i class="umb-group-builder__tab-title-icon icon-navigation" ng-if="vm.sorting && !vm.tab.inherited"></i>
-          <ng-form name="tabNameForm" data-element="group-name">
+          <ng-form name="tabNameForm" data-element="tab-name">
               <div class="umb-group-builder__tab-name" ng-if="vm.tab.inherited || vm.sorting">{{ vm.tab.name }}</div>
               <input
                   ng-if="!vm.tab.inherited && !vm.sorting"
