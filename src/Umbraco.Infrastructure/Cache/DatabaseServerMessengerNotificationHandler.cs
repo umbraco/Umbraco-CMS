@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 
@@ -14,7 +15,7 @@ namespace Umbraco.Cms.Core.Cache
     public sealed class DatabaseServerMessengerNotificationHandler : INotificationHandler<UmbracoApplicationStarting>, INotificationHandler<UmbracoRequestEnd>
     {
         private readonly IServerMessenger _messenger;
-        private readonly IUmbracoDatabaseFactory _databaseFactory;
+        private readonly IRuntimeState _runtimeState;
         private readonly IDistributedCacheBinder _distributedCacheBinder;
         private readonly ILogger<DatabaseServerMessengerNotificationHandler> _logger;
 
@@ -23,22 +24,22 @@ namespace Umbraco.Cms.Core.Cache
         /// </summary>
         public DatabaseServerMessengerNotificationHandler(
             IServerMessenger serverMessenger,
-            IUmbracoDatabaseFactory databaseFactory,
+            IRuntimeState runtimeState,
             IDistributedCacheBinder distributedCacheBinder,
             ILogger<DatabaseServerMessengerNotificationHandler> logger)
         {
-            _databaseFactory = databaseFactory;
             _distributedCacheBinder = distributedCacheBinder;
             _logger = logger;
             _messenger = serverMessenger;
+            _runtimeState = runtimeState;
         }
 
         /// <inheritdoc/>
         public void Handle(UmbracoApplicationStarting notification)
         {
-            if (_databaseFactory.CanConnect == false)
+            if (_runtimeState.Level == RuntimeLevel.Install)
             {
-                _logger.LogWarning("Cannot connect to the database, distributed calls will not be enabled for this server.");
+                _logger.LogWarning("Disabling distributed calls during install");
             }
             else
             {
