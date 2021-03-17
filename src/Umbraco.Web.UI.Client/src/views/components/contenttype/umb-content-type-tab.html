@@ -37,7 +37,7 @@
 
           <ng-form name="tabSortOrderForm" class="umb-group-builder__tab-sort-order">
               <div ng-if="vm.sorting">
-                  <input name="tabSortOrder" type="number" class="umb-property-editor-tiny" style="margin-bottom: 0;" ng-model="vm.tab.sortOrder" ng-disabled="vm.tab.inherited" ng-blur="changeSortOrderValue(tab)" required />
+                  <input name="tabSortOrder" type="number" class="umb-property-editor-tiny" style="margin-bottom: 0;" ng-model="vm.tab.sortOrder" ng-disabled="vm.tab.inherited" ng-blur="vm.changeSortOrderValue()" required />
 
                   <!-- This is a manual validation message not bound to a validator -->
                   <div class="umb-validation-label -arrow-left" ng-if="tabSortOrderForm.tabSortOrder.$error.required && vm.tab.showSortOrderMissing"><localize key="required"></localize></div>

@@ -15,6 +15,7 @@
     vm.togglePrompt = togglePrompt;
     vm.hidePrompt = hidePrompt;
     vm.remove = remove;
+    vm.changeSortOrderValue = changeSortOrderValue;
 
     function edit () {
       if (vm.onEdit) {
@@ -37,6 +38,12 @@
       }
     }
 
+    function changeSortOrderValue () {
+      if (vm.onChangeSortOrderValue) {
+        vm.onChangeSortOrderValue( {property: vm.property});
+      }
+    }
+
   }
 
   const umbContentTypePropertyComponent = {
@@ -47,7 +54,8 @@
       onEdit: '&',
       onRemove: '&',
       valServerFieldAlias: '@',
-      valServerFieldLabel: '@'
+      valServerFieldLabel: '@',
+      onChangeSortOrderValue: '&'
     },
     controllerAs: 'vm',
     controller: umbContentTypePropertyController

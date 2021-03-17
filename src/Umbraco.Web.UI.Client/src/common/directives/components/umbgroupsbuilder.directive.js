@@ -53,7 +53,6 @@
                     items: ".umb-group-builder__tab-sortable",
                     stop: function (event, ui) {
                         updateSortOrder(scope.model.tabs);
-                        updateGroupSortOrder();
                     }
                 };
 
@@ -67,7 +66,8 @@
                         const groupId = ui.item[0].dataset.groupId ? parseInt(ui.item[0].dataset.groupId) : null;
                         const group = groupId ? scope.model.groups.find(group => group.id === parseInt(groupId)) : null;
                         group.tabId = scope.openTabId;
-                        updateGroupSortOrder();
+                        const groupsInTab = scope.model.groups.filter(group => group.tabId === scope.openTabId);
+                        updateSortOrder(groupsInTab);
                     }
                 };
 
@@ -92,25 +92,42 @@
                 };
             }
 
-            function updateGroupSortOrder () {
-                const order = scope.model.tabs && scope.model.tabs.length > 0 ? scope.model.tabs.map(tab => tab.id) : [];
-                scope.model.groups = scope.model.groups.concat().sort((a, b) => order.indexOf(a.tabId) - order.indexOf(b.tabId));
-                updateSortOrder(scope.model.groups);
-            }
-
             function updateSortOrder(items) {
+                let first = true;
+                let prevSortOrder = 0;
+
                 items.forEach((item, index) => {
-                    if (item.inherited) {
-                        return;
-                    }
+                    if (item.tabState !== "init" && item.propertyState !== "init") {
 
-                    if (index === 0) {
-                        item.sortOrder = 0;
-                        return;
-                    }
+                        // set the first not inherited tab to sort order 0
+                        if (!item.inherited && first) {
 
-                    const prevSortOrder = items[index - 1].sortOrder;
-                    item.sortOrder = prevSortOrder + 1;
+                            // set the first tab sort order to 0 if prev is 0
+                            if (prevSortOrder === 0) {
+                                item.sortOrder = 0;
+                                // when the first tab is inherited and sort order is not 0
+                            } else {
+                                item.sortOrder = prevSortOrder + 1;
+                            }
+
+                            first = false;
+
+                        } else if (!item.inherited && !first) {
+                            // find next item
+                            const nextItem = items[index + 1];
+
+                            // if an item is dropped in the middle of the collection with
+                            // same sort order. Give it the dropped item same sort order
+                            if (nextItem && nextItem.sortOrder === prevSortOrder) {
+                                item.sortOrder = prevSortOrder;
+                            } else {
+                                item.sortOrder = prevSortOrder + 1;
+                            }
+                        }
+
+                        // store this tabs sort order as reference for the next
+                        prevSortOrder = item.sortOrder;
+                    }
                 });
             }
 
@@ -157,10 +174,6 @@
 
             function updatePropertiesSortOrder() {
                 scope.model.groups.forEach(group => group.properties = contentTypeHelper.updatePropertiesSortOrder(group.properties));
-            }
-
-            function updateFieldsetsSortOrder () {
-                scope.model.groups = contentTypeHelper.updateFieldsetsSortOrder(scope.model.groups);
             }
 
             function setupAvailableContentTypesModel(result) {
@@ -396,6 +409,10 @@
                 return tab.inherited !== true;
             };
 
+            scope.onChangeTabSortOrderValue = function (tab) {
+                scope.model.tabs = $filter('orderBy')(scope.model.tabs, 'sortOrder');
+            };
+
             scope.addNewProperty = function (group) {
                 let newProperty = {
                     label: null,
@@ -440,14 +457,17 @@
             scope.addGroup = function (tabId) {
                 scope.model.groups = scope.model.groups || [];
 
-                // TODO: handle groups added on tabs in between other groups
+                const groupsInTab = scope.model.groups.filter(group => group.tabId === tabId);
+                const lastGroupSortOrder = groupsInTab.length > 0 ? groupsInTab[groupsInTab.length - 1].sortOrder + 1 : 0;
+
                 const group = {
                     id: scope.model.groups.length + 1, // temp id
                     properties: [],
                     parentTabContentTypes: [],
                     parentTabContentTypeNames: [],
                     name: "",
-                    tabId: tabId || undefined
+                    tabId: tabId || undefined,
+                    sortOrder: lastGroupSortOrder
                 };
 
                 scope.model.groups = [...scope.model.groups, group];
@@ -490,6 +510,13 @@
                 }
 
                 scope.model.groups = $filter('orderBy')(scope.model.groups, 'sortOrder');
+            };
+
+            scope.onChangeGroupSortOrderValue = function (sortedGroup) {
+                const groupsInTab = scope.model.groups.filter(group => group.tabId === sortedGroup.tabId);
+                const otherGroups = scope.model.groups.filter(group => group.tabId !== sortedGroup.tabId);
+                const sortedGroups = $filter('orderBy')(groupsInTab, 'sortOrder');
+                scope.model.groups = [...otherGroups, ...sortedGroups];
             };
 
             /* ---------- PROPERTIES ---------- */
@@ -634,6 +661,10 @@
                 const index = properties.map(property => property.id).findIndex(propertyId => propertyId === id);
                 properties.splice(index, 1);
                 notifyChanged();
+            };
+
+            scope.onChangePropertySortOrderValue = function (group) {
+                group.properties = $filter('orderBy')(group.properties, 'sortOrder');
             };
 
             function notifyChanged() {

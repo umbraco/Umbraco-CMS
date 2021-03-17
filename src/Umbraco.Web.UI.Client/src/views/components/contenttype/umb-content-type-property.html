@@ -49,7 +49,7 @@
           <i class="icon icon-navigation" ng-if="!vm.property.inherited" style="margin-right: 10px;"></i>
           <span class="umb-group-builder__property-meta-label">{{ vm.property.label }}</span>
           <span class="umb-group-builder__property-meta-alias" style="margin-bottom: 0; margin-left: 5px; margin-top: 1px;">({{ vm.property.alias }})</span>
-          <input name="propertySortOrder" type="number" class="umb-group-builder__group-sort-value umb-property-editor-tiny" ng-model="vm.property.sortOrder" ng-disabled="vm.property.inherited" />
+          <input name="propertySortOrder" type="number" class="umb-group-builder__group-sort-value umb-property-editor-tiny" ng-model="vm.property.sortOrder" ng-disabled="vm.property.inherited" ng-blur="vm.changeSortOrderValue()" />
       </div>
 
   </div>

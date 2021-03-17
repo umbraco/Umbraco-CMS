@@ -17,6 +17,7 @@
     vm.hidePrompt = hidePrompt;
     vm.whenNameFocus = whenNameFocus;
     vm.whenFocus = whenFocus;
+    vm.changeSortOrderValue = changeSortOrderValue;
 
     function togglePrompt () {
       vm.removePromptIsVisible = !vm.removePromptIsVisible;
@@ -50,6 +51,12 @@
         vm.onFocus();
       }
     }
+
+    function changeSortOrderValue () {
+      if (vm.onChangeSortOrderValue) {
+        vm.onChangeSortOrderValue( {group: vm.group});
+      }
+    }
   }
 
   const umbContentTypeGroupComponent = {
@@ -65,7 +72,8 @@
       sorting: '<',
       valServerFieldName: '@',
       onNameFocus: '&',
-      onFocus: '&'
+      onFocus: '&',
+      onChangeSortOrderValue: '&'
     },
     controller: umbContentTypeGroupController
   };
