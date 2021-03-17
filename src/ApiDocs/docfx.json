@@ -6,8 +6,7 @@
           "src": "../",
           "files": [
             "**/*.csproj",
-            "**/Umbraco.Infrastructure/**/**/*",
-            "**/Umbraco.Infrastructure/**/*"
+            "**/Umbraco.Infrastructure/**/*.cs"
           ],
           "exclude": [
             "**/obj/**",
