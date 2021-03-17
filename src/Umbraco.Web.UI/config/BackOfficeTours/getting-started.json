@@ -153,9 +153,15 @@
                 "content": "<p>A description helps to pick the right document type when creating content.</p><p>Write a description for our Home page. It could be: <br/><pre>The home page of the website</pre></p>"
             },
             {
+                "element": "[data-element='groups-builder']",
+                "elementPreventClick": true,
+                "title": "Properties, groups, and tabs",
+                "content": "A Document Type consist of Properties (data fields/attributes) where an editor can input data. For complex Document Types you can organize Properties in groups and tabs."
+            },
+            {
                 "element": "[data-element='group-add']",
                 "title": "Add group",
-                "content": "Group are used to organize properties on content in the Content section. Click <b>Add Group</b> to add a group.",
+                "content": "In this tour we only need a group. Click <b>Add Group</b> to add a group.",
                 "event": "click"
             },
             {
