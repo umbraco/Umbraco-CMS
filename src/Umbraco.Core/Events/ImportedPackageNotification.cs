@@ -3,10 +3,10 @@ using Umbraco.Cms.Core.Packaging;
 
 namespace Umbraco.Cms.Core.Events
 {
-    public class ImportPackageNotification : ICancelableNotification
+    public class ImportedPackageNotification : INotification
     {
 
-        public ImportPackageNotification(InstallationSummary installationSummary, IPackageInfo packageMetaData)
+        public ImportedPackageNotification(InstallationSummary installationSummary, IPackageInfo packageMetaData)
         {
             InstallationSummary = installationSummary;
             PackageMetaData = packageMetaData;
@@ -15,7 +15,5 @@ namespace Umbraco.Cms.Core.Events
         public IPackageInfo PackageMetaData { get; }
 
         public InstallationSummary InstallationSummary { get; }
-
-        public bool Cancel { get; set; }
     }
 }
