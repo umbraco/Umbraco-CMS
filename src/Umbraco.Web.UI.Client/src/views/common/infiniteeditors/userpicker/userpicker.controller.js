@@ -1,8 +1,8 @@
 (function () {
     "use strict";
 
-    function UserPickerController($scope, usersResource, localizationService, eventsService) {
-        
+    function UserPickerController($scope, usersResource, entityResource, localizationService, eventsService) {
+
         var vm = this;
 
         vm.users = [];
@@ -102,17 +102,9 @@
             vm.loading = true;
 
             // Get users
-            usersResource.getPagedResults(vm.usersOptions).then(function (users) {
-
-                vm.users = users.items;
-
-                vm.usersOptions.pageNumber = users.pageNumber;
-                vm.usersOptions.pageSize = users.pageSize;
-                vm.usersOptions.totalItems = users.totalItems;
-                vm.usersOptions.totalPages = users.totalPages;
-
+            entityResource.getAll("User").then(function (data) {
+                vm.users = data;
                 preSelect($scope.model.selection, vm.users);
-
                 vm.loading = false;
             });
         }
