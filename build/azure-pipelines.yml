@@ -60,10 +60,10 @@ stages:
                       command: test
                       projects: '**/*.Tests.UnitTests.csproj'
     - stage: Integration_Tests
+      displayName: Unit Tests
       dependsOn: []
       jobs:
           - job: Linux_Integration_Tests
-            displayName: Integration Tests
             services:
                 mssql: mssql
             timeoutInMinutes: 120
