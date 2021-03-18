@@ -1,4 +1,4 @@
-function userPickerController($scope, usersResource , iconHelper, editorService, overlayService){
+function userPickerController($scope, usersResource , iconHelper, editorService, overlayService, entityResource) {
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -92,17 +92,22 @@ function userPickerController($scope, usersResource , iconHelper, editorService,
         unsubscribe();
     });
 
-    //load user data
-    var modelIds = $scope.model.value ? $scope.model.value.split(',') : [];
-
-    // entityResource.getByIds doesn't support "User" and we would like to show avatars in umb-user-preview as well.
-    usersResource.getUsers(modelIds).then(function (data) {
-        _.each(data, function (item, i) {
-            // set default icon if it's missing
-            item.icon = item.icon ? iconHelper.convertFromLegacyIcon(item.icon) : "icon-user";
-            $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon, avatars: item.avatars });
-        });
-    });
+    //load user data - split to an array of ints (map)
+    const modelIds = $scope.model.value ? $scope.model.value.split(',').map(x => +x) : [];
+    if(modelIds.length !== 0) {
+        entityResource.getAll("User").then(function (users) {
+            const filteredUsers = users.filter(user => modelIds.indexOf(user.id) !== -1);
+            filteredUsers.forEach(item => {
+                    $scope.renderModel.push({
+                        name: item.name,
+                        id: item.id,
+                        udi: item.udi,
+                        icon: item.icon = item.icon ? iconHelper.convertFromLegacyIcon(item.icon) : "icon-user",
+                        avatars: item.avatars
+                    });
+                });
+            });
+    }
 }
 
 
