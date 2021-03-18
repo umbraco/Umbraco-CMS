@@ -2,7 +2,7 @@ using Umbraco.Cms.Core.Models.Packaging;
 
 namespace Umbraco.Cms.Core.Events
 {
-    public class ImportingPackageNotification : ICancelableNotification
+    public class ImportingPackageNotification : StatefulNotification, ICancelableNotification
     {
         public ImportingPackageNotification(string packageName, IPackageInfo packageMetaData)
         {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -120,13 +120,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             var compiledPackage = GetCompiledPackageInfo(packageFile);
             if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFile);
 
-            // Trigger the Importing Package Notification
-            var notification = new ImportingPackageNotification(packageFile.Name, compiledPackage);
-            _eventAggregator.Publish(notification);
-
-            // Stop execution if event/user is cancelling it
-            if (notification.Cancel)
+            // Trigger the Importing Package Notification and stop execution if event/user is cancelling it
+            var importingPackageNotification = new ImportingPackageNotification(packageFile.Name, compiledPackage);
+            if (_eventAggregator.PublishCancelable(importingPackageNotification))
+            {
                 return new InstallationSummary { MetaData = compiledPackage };
+            }
 
             var summary = _packageInstallation.InstallPackageData(packageDefinition, compiledPackage, userId);
 
@@ -135,7 +134,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
 
             // trigger the ImportedPackage event
-            _eventAggregator.Publish(new ImportedPackageNotification(summary, compiledPackage));
+            _eventAggregator.Publish(new ImportedPackageNotification(summary, compiledPackage).WithStateFrom(importingPackageNotification));
 
             return summary;
         }

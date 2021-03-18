@@ -2,9 +2,8 @@
 // See LICENSE for more details.
 
 using System.Collections.Generic;
-using Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Cms.Infrastructure.Services.Notifications
+namespace Umbraco.Cms.Core.Events
 {
     public abstract class MovedNotification<T> : ObjectNotification<IEnumerable<MoveEventInfo<T>>>
     {

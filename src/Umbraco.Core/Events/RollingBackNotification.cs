@@ -1,9 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using Umbraco.Cms.Core.Events;
-
-namespace Umbraco.Cms.Infrastructure.Services.Notifications
+namespace Umbraco.Cms.Core.Events
 {
     public abstract class RollingBackNotification<T> : CancelableObjectNotification<T> where T : class
     {

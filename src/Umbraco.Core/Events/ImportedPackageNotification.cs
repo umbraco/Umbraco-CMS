@@ -3,7 +3,7 @@ using Umbraco.Cms.Core.Packaging;
 
 namespace Umbraco.Cms.Core.Events
 {
-    public class ImportedPackageNotification : INotification
+    public class ImportedPackageNotification : StatefulNotification
     {
 
         public ImportedPackageNotification(InstallationSummary installationSummary, IPackageInfo packageMetaData)
