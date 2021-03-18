@@ -10,6 +10,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Scoping;
+using Umbraco.Tests.TestHelpers;
 
 namespace Umbraco.Tests.Scoping
 {
@@ -481,7 +482,7 @@ namespace Umbraco.Tests.Scoping
 
             try
             {
-                // Request a lock to create the ReadLocks dict.
+                // Request a lock to create the WriteLocks dict.
                 scope.WriteLock(Constants.Locks.Domains);
 
                 var writeDict = new Dictionary<int, int>();
