@@ -14,20 +14,23 @@ namespace Umbraco.Cms.Core.Cache
     /// </summary>
     public sealed class DatabaseServerMessengerNotificationHandler : INotificationHandler<UmbracoApplicationStarting>, INotificationHandler<UmbracoRequestEnd>
     {
-        private readonly IServerMessenger _messenger;
-        private readonly IRuntimeState _runtimeState;
+        private readonly IServerMessenger _messenger; 
+        private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IDistributedCacheBinder _distributedCacheBinder;
         private readonly ILogger<DatabaseServerMessengerNotificationHandler> _logger;
+        private readonly IRuntimeState _runtimeState;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseServerMessengerNotificationHandler"/> class.
         /// </summary>
         public DatabaseServerMessengerNotificationHandler(
-            IServerMessenger serverMessenger,
-            IRuntimeState runtimeState,
+            IServerMessenger serverMessenger, 
+            IUmbracoDatabaseFactory databaseFactory,
             IDistributedCacheBinder distributedCacheBinder,
-            ILogger<DatabaseServerMessengerNotificationHandler> logger)
-        {
+            ILogger<DatabaseServerMessengerNotificationHandler> logger,
+            IRuntimeState runtimeState)
+        { 
+            _databaseFactory = databaseFactory;
             _distributedCacheBinder = distributedCacheBinder;
             _logger = logger;
             _messenger = serverMessenger;
@@ -37,11 +40,15 @@ namespace Umbraco.Cms.Core.Cache
         /// <inheritdoc/>
         public void Handle(UmbracoApplicationStarting notification)
         {
-            if (_runtimeState.Level == RuntimeLevel.Install)
+            if (_databaseFactory.CanConnect == false)
+			{
+				_logger.LogWarning("Cannot connect to the database, distributed calls will not be enabled for this server.");
+			}
+            else if (_runtimeState.Level != RuntimeLevel.Run)
             {
-                _logger.LogWarning("Disabling distributed calls during install");
+                _logger.LogWarning("Distributed calls are not available outside the Run runtime level");
             }
-            else
+			else
             {
                 _distributedCacheBinder.BindEvents();
 
