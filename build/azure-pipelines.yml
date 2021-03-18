@@ -60,7 +60,7 @@ stages:
                       command: test
                       projects: '**/*.Tests.UnitTests.csproj'
     - stage: Integration_Tests
-      displayName: Unit Tests
+      displayName: Integration Tests
       dependsOn: []
       jobs:
           - job: Linux_Integration_Tests
