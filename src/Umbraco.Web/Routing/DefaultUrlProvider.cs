@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Routing
 {
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Routing
         {
             if (string.IsNullOrWhiteSpace(route))
             {
-                _logger.Debug<DefaultUrlProvider>("Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.", id);
+                _logger.Debug<DefaultUrlProvider,int>("Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.", id);
                 return null;
             }
 
@@ -172,8 +173,8 @@ namespace Umbraco.Web.Routing
 
         string CombinePaths(string path1, string path2)
         {
-            string path = path1.TrimEnd('/') + path2;
-            return path == "/" ? path : path.TrimEnd('/');
+            string path = path1.TrimEnd(Constants.CharArrays.ForwardSlash) + path2;
+            return path == "/" ? path : path.TrimEnd(Constants.CharArrays.ForwardSlash);
         }
 
         #endregion

@@ -57,7 +57,7 @@ namespace Umbraco.Web.WebApi.Filters
                             }
                             catch (System.Exception ex)
                             {
-                                Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not delete temp file {FileName}", f.TempFilePath);
+                                Current.Logger.Error<FileUploadCleanupFilterAttribute, string>(ex, "Could not delete temp file {FileName}", f.TempFilePath);
                             }
                         }
                     }
@@ -111,7 +111,7 @@ namespace Umbraco.Web.WebApi.Filters
                                         tempFolders.Add(dir);
                                     }
 
-                                    Current.Logger.Debug<FileUploadCleanupFilterAttribute>("Removing temp file {FileName}", f.TempFilePath);
+                                    Current.Logger.Debug<FileUploadCleanupFilterAttribute, string>("Removing temp file {FileName}", f.TempFilePath);
 
                                     try
                                     {
@@ -119,7 +119,7 @@ namespace Umbraco.Web.WebApi.Filters
                                     }
                                     catch (System.Exception ex)
                                     {
-                                        Current.Logger.Error<FileUploadCleanupFilterAttribute>(ex, "Could not delete temp file {FileName}", f.TempFilePath);
+                                        Current.Logger.Error<FileUploadCleanupFilterAttribute, string>(ex, "Could not delete temp file {FileName}", f.TempFilePath);
                                     }
 
                                     //clear out the temp path so it's not returned in the response
@@ -138,12 +138,12 @@ namespace Umbraco.Web.WebApi.Filters
                     }
                     else
                     {
-                        Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content.Value is not IHaveUploadedFiles, it is {ObjectType}", objectContent.Value.GetType());
+                        Current.Logger.Warn<FileUploadCleanupFilterAttribute,Type>("The actionExecutedContext.Request.Content.Value is not IHaveUploadedFiles, it is {ObjectType}", objectContent.Value.GetType());
                     }
                 }
                 else
                 {
-                    Current.Logger.Warn<FileUploadCleanupFilterAttribute>("The actionExecutedContext.Request.Content is not ObjectContent, it is {RequestObjectType}", actionExecutedContext.Request.Content.GetType());
+                    Current.Logger.Warn<FileUploadCleanupFilterAttribute,Type>("The actionExecutedContext.Request.Content is not ObjectContent, it is {RequestObjectType}", actionExecutedContext.Request.Content.GetType());
                 }
             }
         }

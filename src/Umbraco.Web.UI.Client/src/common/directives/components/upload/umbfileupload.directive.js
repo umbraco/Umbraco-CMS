@@ -20,11 +20,7 @@ function umbFileUpload() {
                 el.val('');
             });
 
-            el.on('drag dragstart dragend dragover dragenter dragleave drop', function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            })
-            .on('dragover dragenter', function () {
+            el.on('dragover dragenter', function () {
                 scope.$emit("isDragover", { value: true });
             })
             .on('dragleave dragend drop', function () {

@@ -23,11 +23,11 @@ namespace Umbraco.Web
             if (items.Any() == false) return "";
 
             var builder = new StringBuilder();
-            foreach (var i in items.Where(i => keysToIgnore.InvariantContains(i.Key) == false))
+            foreach (var (key, value) in items.Where(i => keysToIgnore.InvariantContains(i.Key) == false))
             {
-                builder.Append(string.Format("{0}={1}&", i.Key, i.Value));
+                builder.Append($"{key}={value}&");
             }
-            return builder.ToString().TrimEnd('&');
+            return builder.ToString().TrimEnd(Constants.CharArrays.Ampersand);
         }
 
         /// <summary>

@@ -35,7 +35,8 @@ namespace Umbraco.Web.Editors.Binders
             {
                 //The name that has been assigned in JS has 2 or more parts. The second part indicates the property id
                 // for which the file belongs, the remaining parts are just metadata that can be used by the property editor.
-                var parts = file.Headers.ContentDisposition.Name.Trim('\"').EscapedSplit('_').ToArray();
+                var parts = file.Headers.ContentDisposition.Name.Trim(Constants.CharArrays.DoubleQuote).Split(Constants.CharArrays.Underscore);
+
                 if (parts.Length < 2)
                 {
                     var response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest);
@@ -70,7 +71,7 @@ namespace Umbraco.Web.Editors.Binders
 
                 // TODO: anything after 4 parts we can put in metadata
 
-                var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
+                var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote);
 
                 model.UploadedFiles.Add(new ContentPropertyFile
                 {
