@@ -1,4 +1,4 @@
-function userPickerController($scope, usersResource , iconHelper, editorService, overlayService, entityResource) {
+function userPickerController($scope, iconHelper, editorService, overlayService, entityResource) {
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');

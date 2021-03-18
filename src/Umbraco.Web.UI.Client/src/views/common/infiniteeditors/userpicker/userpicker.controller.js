@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UserPickerController($scope, usersResource, entityResource, localizationService, eventsService) {
+    function UserPickerController($scope, entityResource, localizationService, eventsService) {
 
         var vm = this;
 
