@@ -595,6 +595,12 @@ namespace Umbraco.Cms.Core.Security
                 }
             }
 
+            if (member.IsApproved != identityUserMember.IsApproved)
+            {
+                anythingChanged = true;
+                member.IsApproved = identityUserMember.IsApproved;
+            }
+
             if (identityUserMember.IsPropertyDirty(nameof(MembersIdentityUser.UserName))
                 && member.Username != identityUserMember.UserName && identityUserMember.UserName.IsNullOrWhiteSpace() == false)
             {

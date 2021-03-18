@@ -789,7 +789,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     continue;
                 }
 
-                var unlockResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
+                var unlockResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now.AddMinutes(-1));
                 if (unlockResult.Succeeded == false)
                 {
                     return new ValidationErrorResult(
