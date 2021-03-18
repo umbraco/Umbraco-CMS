@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -140,7 +140,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.Template;
+        protected Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.Template;
 
         protected override void PersistNewItem(ITemplate entity)
         {

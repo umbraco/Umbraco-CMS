@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -956,6 +956,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         // reading repository purely for looking up by GUID
         // TODO: ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
+        // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
         private class ContentByGuidReadRepository : EntityRepositoryBase<Guid, IContent>
         {
             private readonly DocumentRepository _outerRepo;
@@ -965,8 +966,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 _outerRepo = outerRepo;
             }
-
-            protected override Guid NodeObjectTypeId => _outerRepo.NodeObjectTypeId;
 
             protected override IContent PerformGet(Guid id)
             {

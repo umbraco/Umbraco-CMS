@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -113,20 +113,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return sql;
         }
 
-        protected override string GetBaseWhereClause()
-        {
-            return "umbracoNode.id = @id and nodeObjectType = @NodeObjectType";
-        }
+        protected override string GetBaseWhereClause() => "umbracoNode.id = @id and nodeObjectType = @NodeObjectType";
 
-        protected override IEnumerable<string> GetDeleteClauses()
-        {
-            throw new NotImplementedException();
-        }
+        protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { return _containerObjectType; }
-        }
+        protected Guid NodeObjectTypeId => _containerObjectType;
 
         protected override void PersistDeletedItem(EntityContainer entity)
         {

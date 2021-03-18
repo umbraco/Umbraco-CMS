@@ -1,22 +1,20 @@
-﻿using System;
+using System;
 using System.IO;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Configuration.Json;
 using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Cms.Core.Configuration
 {
     public class JsonConfigManipulator : IConfigManipulator
     {
-        private static readonly object s_locker = new object();
         private readonly IConfiguration _configuration;
+        private readonly object _locker = new object();
 
-        public JsonConfigManipulator(IConfiguration configuration)
-        {
-            _configuration = configuration;
-        }
+        public JsonConfigManipulator(IConfiguration configuration) => _configuration = configuration;
 
         public string UmbracoConnectionPath { get; } = $"ConnectionStrings:{ Cms.Core.Constants.System.UmbracoConnectionName}";
         public void RemoveConnectionString()
@@ -53,11 +51,13 @@ namespace Umbraco.Cms.Core.Configuration
             JToken token = json;
             foreach (var propertyName in key.Split(new[] { ':' }))
             {
-                if (token is null) break;
+                if (token is null)
+                    break;
                 token = CaseSelectPropertyValues(token, propertyName);
             }
 
-            if (token is null) return;
+            if (token is null)
+                return;
 
             var writer = new JTokenWriter();
             writer.WriteValue(value);
@@ -162,11 +162,9 @@ namespace Umbraco.Cms.Core.Configuration
             token?.Parent?.Remove();
         }
 
-
-
-        private static void SaveJson(JsonConfigurationProvider provider, JObject json)
+        private void SaveJson(JsonConfigurationProvider provider, JObject json)
         {
-            lock (s_locker)
+            lock (_locker)
             {
                 if (provider.Source.FileProvider is PhysicalFileProvider physicalFileProvider)
                 {
@@ -184,25 +182,25 @@ namespace Umbraco.Cms.Core.Configuration
             }
         }
 
-        private static JObject GetJson(JsonConfigurationProvider provider)
+        private JObject GetJson(JsonConfigurationProvider provider)
         {
-            if (provider.Source.FileProvider is PhysicalFileProvider physicalFileProvider)
+            lock (_locker)
             {
-                var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
-
-                var serializer = new JsonSerializer();
-                using (var sr = new StreamReader(jsonFilePath))
-                using (var jsonTextReader = new JsonTextReader(sr))
+                if (provider.Source.FileProvider is PhysicalFileProvider physicalFileProvider)
                 {
-                    return serializer.Deserialize<JObject>(jsonTextReader);
+                    var jsonFilePath = Path.Combine(physicalFileProvider.Root, provider.Source.Path);
+
+                    var serializer = new JsonSerializer();
+                    using (var sr = new StreamReader(jsonFilePath))
+                    using (var jsonTextReader = new JsonTextReader(sr))
+                    {
+                        return serializer.Deserialize<JObject>(jsonTextReader);
+                    }
                 }
+
+                return null; 
             }
-
-            return null;
         }
-
-
-
 
         private JsonConfigurationProvider GetJsonConfigurationProvider(string requiredKey = null)
         {
