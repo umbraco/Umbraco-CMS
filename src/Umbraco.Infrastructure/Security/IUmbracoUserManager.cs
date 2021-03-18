@@ -259,14 +259,7 @@ namespace Umbraco.Cms.Core.Security
         /// </summary>
         /// <returns>A generated password</returns>
         string GeneratePassword();
-
-        /// <summary>
-        /// Hashes a password for a null user based on the default password hasher
-        /// </summary>
-        /// <param name="password">The password to hash</param>
-        /// <returns>The hashed password</returns>
-        string HashPassword(string password);
-
+        
         /// <summary>
         /// Used to validate the password without an identity user
         /// Validation code is based on the default ValidatePasswordAsync code

@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
@@ -17,15 +18,16 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
-using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -49,6 +51,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _localizedTextService;
         private readonly AppCaches _appCaches;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IPasswordChanger<BackOfficeIdentityUser> _passwordChanger;
 
         public CurrentUserController(
             IMediaFileSystem mediaFileSystem,
@@ -62,7 +65,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILoggerFactory loggerFactory,
             ILocalizedTextService localizedTextService,
             AppCaches appCaches,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IPasswordChanger<BackOfficeIdentityUser> passwordChanger)
         {
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings.Value;
@@ -76,6 +80,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService;
             _appCaches = appCaches;
             _shortStringHelper = shortStringHelper;
+            _passwordChanger = passwordChanger;
         }
 
 
@@ -211,25 +216,28 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <summary>
         /// Changes the users password
         /// </summary>
-        /// <param name="data"></param>
+        /// <param name="changingPasswordModel">The changing password model</param>
         /// <returns>
         /// If the password is being reset it will return the newly reset password, otherwise will return an empty value
         /// </returns>
-        public async Task<ActionResult<ModelWithNotifications<string>>> PostChangePassword(ChangingPasswordModel data)
+        public async Task<ActionResult<ModelWithNotifications<string>>> PostChangePassword(ChangingPasswordModel changingPasswordModel)
         {
-            // TODO: Why don't we inject this? Then we can just inject a logger
-            var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
-            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, data, _backOfficeUserManager);
+            IUser currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+            changingPasswordModel.Id = currentUser.Id;
+
+            // all current users have access to reset/manually change their password
+
+            Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _backOfficeUserManager);
 
             if (passwordChangeResult.Success)
             {
-                //even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
+                // even if we weren't resetting this, it is the correct value (null), otherwise if we were resetting then it will contain the new pword
                 var result = new ModelWithNotifications<string>(passwordChangeResult.Result.ResetPassword);
                 result.AddSuccessNotification(_localizedTextService.Localize("user/password"), _localizedTextService.Localize("user/passwordChanged"));
                 return result;
             }
 
-            foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+            foreach (string memberName in passwordChangeResult.Result.ChangeError.MemberNames)
             {
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
