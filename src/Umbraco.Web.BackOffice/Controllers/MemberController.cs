@@ -511,7 +511,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 if (!passwordChangeResult.Success)
                 {
-                    foreach (string memberName in passwordChangeResult.Result.ChangeError?.MemberNames)
+                    foreach (string memberName in passwordChangeResult.Result?.ChangeError?.MemberNames ?? Enumerable.Empty<string>())
                     {
                         ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError?.ErrorMessage ?? string.Empty);
                     }
