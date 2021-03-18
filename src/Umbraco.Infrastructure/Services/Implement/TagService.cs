@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// <remarks>
     /// If there is unpublished content with tags, those tags will not be contained
     /// </remarks>
-    public class TagService : ScopeRepositoryService, ITagService
+    public class TagService : RepositoryService, ITagService
     {
         private readonly ITagRepository _tagRepository;
 
