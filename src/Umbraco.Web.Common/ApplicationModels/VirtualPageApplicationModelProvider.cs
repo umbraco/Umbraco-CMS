@@ -2,8 +2,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Extensions;
-using Umbraco.Web.Common.Controllers;
 
 namespace Umbraco.Cms.Web.Common.ApplicationModels
 {
