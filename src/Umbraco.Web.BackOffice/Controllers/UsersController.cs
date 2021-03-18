@@ -686,12 +686,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return new ValidationErrorResult("Password reset is not allowed");
             }
 
-            // if the current user has access to reset/manually change the password
-            if (currentUser.HasSectionAccess(Constants.Applications.Users) == false)
-            {
-                return new ValidationErrorResult("The current user is not authorized");
-            }
-
             if (!currentUser.IsAdmin() && found.IsAdmin())
             {
                 return new ValidationErrorResult("The current user cannot change the password for the specified user");
