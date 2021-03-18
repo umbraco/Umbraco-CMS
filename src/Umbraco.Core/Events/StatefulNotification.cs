@@ -1,9 +1,8 @@
 // Copyright (c) Umbraco.
 
 using System.Collections.Generic;
-using Umbraco.Cms.Core.Events;
 
-namespace Umbraco.Cms.Infrastructure.Services.Notifications
+namespace Umbraco.Cms.Core.Events
 {
     public abstract class StatefulNotification : IStatefulNotification
     {

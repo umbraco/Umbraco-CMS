@@ -1,7 +1,4 @@
-using System;
-using Umbraco.Cms.Core.Events;
-
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     /// <summary>
     /// Used to notify that an Unattended install has completed
