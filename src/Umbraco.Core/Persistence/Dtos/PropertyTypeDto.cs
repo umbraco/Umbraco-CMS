@@ -27,6 +27,11 @@ namespace Umbraco.Core.Persistence.Dtos
         [ForeignKey(typeof(PropertyTypeGroupDto))]
         public int? PropertyTypeGroupId { get; set; }
 
+        [Column("propertyTypeTabId")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [ForeignKey(typeof(PropertyTypeGroupDto))]
+        public int? PropertyTypeTabId { get; set; }
+
         [Index(IndexTypes.NonClustered, Name = "IX_cmsPropertyTypeAlias")]
         [Column("Alias")]
         public string Alias { get; set; }

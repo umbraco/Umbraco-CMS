@@ -9,6 +9,7 @@ using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_9_0;
 using Umbraco.Core.Migrations.Upgrade.V_8_10_0;
+using Umbraco.Core.Migrations.Upgrade.V_8_13_0;
 
 namespace Umbraco.Core.Migrations.Upgrade
 {
@@ -201,6 +202,9 @@ namespace Umbraco.Core.Migrations.Upgrade
 			
             // to 8.10.0
             To<AddPropertyTypeLabelOnTopColumn>("{D6A8D863-38EC-44FB-91EC-ACD6A668BD18}");
+
+            // t0 8.13.0 - Guess whos back, back again... TABS is back... tell a friend
+            To<AddPropertyTypeTabsTable>("{153865E9-7332-4C2A-9F9D-F20AEE078EC7}");
 
             //FINAL
         }
