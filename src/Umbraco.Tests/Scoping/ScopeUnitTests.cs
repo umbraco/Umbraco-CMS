@@ -94,7 +94,6 @@ namespace Umbraco.Tests.Scoping
                 outerScope.Complete();
             }
 
-            // Since we request the ReadLock after the innerScope has been dispose, the key has been removed from the dictionary, and we fetch it again.
             syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
             syntaxProviderMock.Verify(x => x.WriteLock(It.IsAny<IDatabase>(), Constants.Locks.ContentTree), Times.Once);
         }
@@ -223,7 +222,6 @@ namespace Umbraco.Tests.Scoping
                 outerScope.Complete();
             }
 
-            // Since we request the ReadLock after the innerScope has been dispose, the key has been removed from the dictionary, and we fetch it again.
             syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), Constants.Locks.Languages), Times.Once);
             syntaxProviderMock.Verify(x => x.ReadLock(It.IsAny<IDatabase>(), Constants.Locks.ContentTree), Times.Once);
         }

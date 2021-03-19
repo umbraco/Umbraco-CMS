@@ -368,14 +368,8 @@ namespace Umbraco.Core.Scoping
                 // Since we're only reading we don't have to be in a lock
                 if (ReadLocks?.Count > 0 || WriteLocks?.Count > 0)
                 {
-                    // Dump the dicts into a message for the locks.
-                    StringBuilder builder = new StringBuilder();
-                    builder.AppendLine($"Lock counters aren't empty, suggesting a scope hasn't been properly disposed, parent id: {InstanceId}");
-                    WriteLockDictionaryToString(ReadLocks, builder, "read locks");
-                    WriteLockDictionaryToString(WriteLocks, builder, "write locks");
-
                     var exception = new InvalidOperationException($"All scopes has not been disposed from parent scope: {InstanceId}, see log for more details.");
-                    _logger.Error<Scope>(exception, builder.ToString());
+                    _logger.Error<Scope>(exception, GenerateUnclearedScopesLogMessage());
                     throw exception;
                 }
             }
@@ -397,6 +391,20 @@ namespace Umbraco.Core.Scoping
 
             _disposed = true;
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Generates a log message with all scopes that hasn't cleared their locks, including how many, and what locks they have requested.
+        /// </summary>
+        /// <returns>Log message.</returns>
+        private string GenerateUnclearedScopesLogMessage()
+        {
+            // Dump the dicts into a message for the locks.
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine($"Lock counters aren't empty, suggesting a scope hasn't been properly disposed, parent id: {InstanceId}");
+            WriteLockDictionaryToString(ReadLocks, builder, "read locks");
+            WriteLockDictionaryToString(WriteLocks, builder, "write locks");
+            return builder.ToString();
         }
 
         /// <summary>
