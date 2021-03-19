@@ -117,7 +117,7 @@ namespace Umbraco.Core.Persistence.Factories
             return dto;
         }
 
-        internal static PropertyTypeDto BuildPropertyTypeDto(int tabId, PropertyType propertyType, int contentTypeId)
+        internal static PropertyTypeDto BuildPropertyTypeDto(int groupId, PropertyType propertyType, int contentTypeId)
         {
             var propertyTypeDto = new PropertyTypeDto
             {
@@ -136,9 +136,9 @@ namespace Umbraco.Core.Persistence.Factories
                 LabelOnTop = propertyType.LabelOnTop
             };
 
-            if (tabId != default)
+            if (groupId != default)
             {
-                propertyTypeDto.PropertyTypeGroupId = tabId;
+                propertyTypeDto.PropertyTypeGroupId = groupId;
             }
             else
             {
