@@ -136,7 +136,7 @@
     <key alias="select">Välj</key>
     <key alias="saveAndPreview">Förhandsgranska</key>
     <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
-    <key alias="somethingElse">Ångra</key>
+    <key alias="somethingElse">Gör något annat</key>
     <key alias="styleChoose">Välj stil</key>
     <key alias="styleShow">Visa stil</key>
     <key alias="tableInsert">Infoga tabell</key>
