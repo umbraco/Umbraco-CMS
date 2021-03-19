@@ -9,7 +9,7 @@
 
             <ContentFiles Include="$(ContentFilesPath)" />
         </ItemGroup>
-        <Message Text="Copying content files: $(ContentFilesPath) - #@(ContentFiles->Count()) files"  Importance="high" />
+        <Message Text="Copying Umbraco content files: $(ContentFilesPath) - #@(ContentFiles->Count()) files"  Importance="high" />
         <Copy
             SourceFiles="@(ContentFiles)"
             DestinationFiles="@(ContentFiles->'$(MSBuildProjectDirectory)\%(RecursiveDir)%(Filename)%(Extension)')"
