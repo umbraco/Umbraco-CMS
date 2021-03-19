@@ -64,7 +64,7 @@
                 var saveModel = _.pick(displayModel,
                     'compositeContentTypes', 'isContainer', 'allowAsRoot', 'allowedTemplates', 'allowedContentTypes',
                     'alias', 'description', 'thumbnail', 'name', 'id', 'icon', 'trashed',
-                    'key', 'parentId', 'alias', 'path', 'allowCultureVariant', 'allowSegmentVariant', 'isElement');
+                    'key', 'parentId', 'alias', 'path', 'allowCultureVariant', 'allowSegmentVariant', 'isElement', 'tabs');
 
                 // TODO: Map these
                 saveModel.allowedTemplates = _.map(displayModel.allowedTemplates, function (t) { return t.alias; });
@@ -75,7 +75,7 @@
                 });
                 saveModel.groups = _.map(realGroups, function (g) {
 
-                    var saveGroup = _.pick(g, 'inherited', 'id', 'sortOrder', 'name');
+                    var saveGroup = _.pick(g, 'inherited', 'id', 'sortOrder', 'name', 'tabId');
 
                     var realProperties = _.reject(g.properties, function (p) {
                         //do not include these properties
