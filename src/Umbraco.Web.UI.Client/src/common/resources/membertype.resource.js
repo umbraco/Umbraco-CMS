@@ -115,7 +115,7 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, local
                 throw "args.id cannot be null";
             }
 
-            var promise = localizationService.localize("member_copyFailed");
+            var promise = localizationService.localize("memberType_copyFailed");
 
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("memberTypeApiBaseUrl", "PostCopy"),

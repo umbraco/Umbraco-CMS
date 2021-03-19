@@ -336,6 +336,17 @@
     <key alias="allMembers">Alle medlemmer</key>
     <key alias="memberGroupNoProperties">Medlemgrupper har ingen yderligere egenskaber til redigering.</key>
   </area>
+  <area alias="contentType">
+     <key alias="copyFailed">Kopiering af indholdstypen fejlede</key>
+     <key alias="moveFailed">Flytning af indholdstypen fejlede</key>
+  </area>
+  <area alias="mediaType">
+     <key alias="copyFailed">Kopiering af medietypen fejlede</key>
+     <key alias="moveFailed">Flytning af medietypen fejlede</key>
+  </area>
+  <area alias="memberType">
+     <key alias="copyFailed">Kopiering af medlemstypen fejlede</key>
+  </area>
   <area alias="create">
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
     <key alias="createUnder">Opret under</key>
