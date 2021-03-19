@@ -30,7 +30,13 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                //delete member type/group
+                var memberType = Services.MemberTypeService.Get(int.Parse(id));
+                if (memberType != null)
+                {
+                    menu.Items.Add<ActionCopy>(Services.TextService, opensDialog: true);
+                }
+
+                // delete member type/group
                 menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
             }
 
