@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Linq;
 using System.Text;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
@@ -367,38 +366,15 @@ namespace Umbraco.Core.Scoping
             {
                 // We're the parent scope, make sure that locks of all scopes has been cleared
                 // Since we're only reading we don't have to be in a lock
-                if (ReadLocks is not null && ReadLocks.Any() || WriteLocks is not null && WriteLocks.Any())
+                if (ReadLocks?.Count > 0 || WriteLocks?.Count > 0)
                 {
                     // Dump the dicts into a message for the locks.
                     StringBuilder builder = new StringBuilder();
                     builder.AppendLine($"Lock counters aren't empty, suggesting a scope hasn't been properly disposed, parent id: {InstanceId}");
-                    if (ReadLocks is not null && ReadLocks.Any())
-                    {
-                        builder.AppendLine("Remaining ReadLocks:");
-                        foreach (var locksValues in ReadLocks)
-                        {
-                            builder.AppendLine($"Scope {locksValues.Key}:");
-                            foreach (var lockCounter in locksValues.Value)
-                            {
-                                builder.AppendLine($"\tLock ID: {lockCounter.Key} - times requested: {lockCounter.Value}");
-                            }
-                        }
-                    }
+                    WriteLockDictionaryToString(ReadLocks, builder, "read locks");
+                    WriteLockDictionaryToString(WriteLocks, builder, "write locks");
 
-                    if (WriteLocks is not null && WriteLocks.Any())
-                    {
-                        builder.AppendLine("Remaining WriteLocks:");
-                        foreach (var locksValues in WriteLocks)
-                        {
-                            builder.AppendLine($"Scope {locksValues.Key}:");
-                            foreach (var lockCounter in locksValues.Value)
-                            {
-                                builder.AppendLine($"\tLock ID: {lockCounter.Key}, amount requested: {lockCounter.Value}");
-                            }
-                        }
-                    }
-
-                    var exception = new InvalidOperationException($"All scopes has not been disposed from parent scope: {InstanceId}");
+                    var exception = new InvalidOperationException($"All scopes has not been disposed from parent scope: {InstanceId}, see log for more details.");
                     _logger.Error<Scope>(exception, builder.ToString());
                     throw exception;
                 }
@@ -421,6 +397,28 @@ namespace Umbraco.Core.Scoping
 
             _disposed = true;
             GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Writes a locks dictionary to a <see cref="StringBuilder"/> for logging purposes.
+        /// </summary>
+        /// <param name="dict">Lock dictionary to report on.</param>
+        /// <param name="builder">String builder to write to.</param>
+        /// <param name="dictName">The name to report the dictionary as.</param>
+        private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>> dict, StringBuilder builder, string dictName)
+        {
+            if (dict?.Count > 0)
+            {
+                builder.AppendLine($"Remaining {dictName}:");
+                foreach (var instance in dict)
+                {
+                    builder.AppendLine($"Scope {instance.Key}");
+                    foreach (var lockCounter in instance.Value)
+                    {
+                        builder.AppendLine($"\tLock ID: {lockCounter.Key} - times requested: {lockCounter.Value}");
+                    }
+                }
+            }
         }
 
         private void DisposeLastScope()
