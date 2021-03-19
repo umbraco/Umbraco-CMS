@@ -1,0 +1,27 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+    <PropertyGroup>
+        <UmbracoPackageContentFilesPath>$(MSBuildThisFileDirectory)..\App_Plugins\UmbracoPackage\**\*.*</UmbracoPackageContentFilesPath>
+    </PropertyGroup>
+
+    <Target Name="CopyAssets" BeforeTargets="Build">
+        <ItemGroup>
+            <UmbracoPackageContentFiles Include="$(UmbracoPackageContentFilesPath)" />
+        </ItemGroup>
+        <Message Text="Copying package files: $(UmbracoPackageContentFilesPath) - #@(UmbracoPackageContentFiles->Count()) files"  Importance="high" />
+        <Copy
+            SourceFiles="@(UmbracoPackageContentFiles)"
+            DestinationFiles="@(UmbracoPackageContentFiles->'$(MSBuildProjectDirectory)\App_Plugins\UmbracoPackage\%(RecursiveDir)%(Filename)%(Extension)')"
+            SkipUnchangedFiles="true" />
+
+    </Target>
+
+    <Target Name="ClearAssets" BeforeTargets="Clean">
+        <ItemGroup>
+            <UmbracoPackageDir Include="$(MSBuildProjectDirectory)\App_Plugins\UmbracoPackage\" />
+        </ItemGroup>
+        <Message Text="Clear old package data"  Importance="high" />
+        <RemoveDir Directories="@(UmbracoPackageDir)"  />
+    </Target>
+
+</Project>

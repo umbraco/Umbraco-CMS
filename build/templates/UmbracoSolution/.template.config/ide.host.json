@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json.schemastore.org/vs-2017.3.host",
+    "order" : 0,
+    "icon": "icon.png",
+    "description": {
+        "id": "UmbracoSolution",
+        "text": "Umbraco"
+    },
+    "symbolInfo": [
+        {
+            "id": "PackageTestSiteName",
+            "name": {
+                "text": "Package TestSite Name"
+            },
+            "isVisible": "true"
+        },
+        {
+            "id": "UseSqlCe",
+            "name": {
+                "text": "Use Sql Compact Edition (SqlCE)"
+            },
+            "isVisible": "true"
+        }
+    ]
+
+}
