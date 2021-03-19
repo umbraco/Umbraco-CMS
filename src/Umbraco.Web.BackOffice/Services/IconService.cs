@@ -1,8 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using Ganss.XSS;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
@@ -16,35 +19,41 @@ namespace Umbraco.Cms.Web.BackOffice.Services
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IHtmlSanitizer _htmlSanitizer;
+        private readonly IAppPolicyCache _cache;
 
         public IconService(
             IOptions<GlobalSettings> globalSettings,
             IHostingEnvironment hostingEnvironment,
-            IHtmlSanitizer htmlSanitizer)
+            IHtmlSanitizer htmlSanitizer, AppCaches appCaches)
         {
             _globalSettings = globalSettings;
             _hostingEnvironment = hostingEnvironment;
             _htmlSanitizer = htmlSanitizer;
+            _cache = appCaches.RuntimeCache;
         }
-
 
         /// <inheritdoc />
-        public IList<IconModel> GetAllIcons()
-        {
-            var directory = new DirectoryInfo(_hostingEnvironment.MapPathWebRoot($"{_globalSettings.Value.IconsPath}/"));
-            var iconNames = directory.GetFiles("*.svg");
-
-            return iconNames.OrderBy(f => f.Name)
-                .Select(iconInfo => GetIcon(iconInfo)).WhereNotNull().ToList();
-
-        }
+        public IReadOnlyDictionary<string, string> GetIcons() => GetIconDictionary();
 
         /// <inheritdoc />
         public IconModel GetIcon(string iconName)
         {
-            return string.IsNullOrWhiteSpace(iconName)
-                ? null
-                : CreateIconModel(iconName.StripFileExtension(), _hostingEnvironment.MapPathWebRoot($"{_globalSettings.Value.IconsPath}/{iconName}.svg"));
+            if (iconName.IsNullOrWhiteSpace())
+            {
+                return null;
+            }
+
+            var allIconModels = GetIconDictionary();
+            if (allIconModels.ContainsKey(iconName))
+            {
+                return new IconModel
+                {
+                    Name = iconName,
+                    SvgString = allIconModels[iconName]
+                };
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -85,5 +94,52 @@ namespace Umbraco.Cms.Web.BackOffice.Services
                 return null;
             }
         }
+
+        private IEnumerable<FileInfo> GetAllIconsFiles()
+        {
+            var icons = new HashSet<FileInfo>(new CaseInsensitiveFileInfoComparer());
+
+            // add icons from plugins
+            var appPluginsDirectoryPath = _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.AppPlugins);
+            if (Directory.Exists(appPluginsDirectoryPath))
+            {
+                var appPlugins = new DirectoryInfo(appPluginsDirectoryPath);
+
+                // iterate sub directories of app plugins
+                foreach (var dir in appPlugins.EnumerateDirectories())
+                {
+                    var iconPath = _hostingEnvironment.MapPathContentRoot($"{Constants.SystemDirectories.AppPlugins}/{dir.Name}{Constants.SystemDirectories.AppPluginIcons}");
+                    if (Directory.Exists(iconPath))
+                    {
+                        var dirIcons = new DirectoryInfo(iconPath).EnumerateFiles("*.svg", SearchOption.TopDirectoryOnly);
+                        icons.UnionWith(dirIcons);
+                    }
+                }
+            }
+
+            // add icons from IconsPath if not already added from plugins
+            var coreIconsDirectory = new DirectoryInfo(_hostingEnvironment.MapPathWebRoot($"{_globalSettings.Value.IconsPath}/"));
+            var coreIcons = coreIconsDirectory.GetFiles("*.svg");
+
+            icons.UnionWith(coreIcons);
+
+            return icons;
+        }
+
+        private class CaseInsensitiveFileInfoComparer : IEqualityComparer<FileInfo>
+        {
+            public bool Equals(FileInfo one, FileInfo two) => StringComparer.InvariantCultureIgnoreCase.Equals(one.Name, two.Name);
+
+            public int GetHashCode(FileInfo item) => StringComparer.InvariantCultureIgnoreCase.GetHashCode(item.Name);
+        }
+
+        private IReadOnlyDictionary<string, string> GetIconDictionary() => _cache.GetCacheItem(
+            $"{typeof(IconService).FullName}.{nameof(GetIconDictionary)}",
+            () => GetAllIconsFiles()
+                .Select(GetIcon)
+                .Where(i => i != null)
+                .GroupBy(i => i.Name, StringComparer.OrdinalIgnoreCase)
+                .ToDictionary(g => g.Key, g => g.First().SvgString, StringComparer.OrdinalIgnoreCase)
+        );
     }
 }

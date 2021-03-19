@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Core.Scoping
             ConcurrentStack<IScope> stack = s_scopeStack.Value;
 
 #if DEBUG_SCOPES
-            // first, null-register the existing value            
+            // first, null-register the existing value
             if (stack != null && stack.TryPeek(out IScope ambientScope))
             {
                 RegisterContext(ambientScope, null);
@@ -276,7 +276,7 @@ namespace Umbraco.Cms.Core.Scoping
         #endregion
 
         #region Ambient Scope
-        
+
         IScope IScopeAccessor.AmbientScope => AmbientScope;
 
         /// <summary>
@@ -327,7 +327,7 @@ namespace Umbraco.Cms.Core.Scoping
             {
                 MoveHttpContextScopeToCallContext();
                 MoveHttpContextScopeContextToCallContext();
-            } 
+            }
         }
 
         #endregion
@@ -439,7 +439,7 @@ namespace Umbraco.Cms.Core.Scoping
             {
                 throw new InvalidOperationException($"The detatched scope context does not match the original");
             }
-            
+
             ambientScope.OrigScope = null;
             ambientScope.OrigContext = null;
             ambientScope.Attached = false;
@@ -466,7 +466,7 @@ namespace Umbraco.Cms.Core.Scoping
                 if (newContext != null)
                 {
                     PushAmbientScopeContext(newContext);
-                }                 
+                }
                 return scope;
             }
 

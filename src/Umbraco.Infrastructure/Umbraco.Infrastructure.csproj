@@ -12,6 +12,10 @@
         <DocumentationFile>bin\Release\Umbraco.Infrastructure.xml</DocumentationFile>
     </PropertyGroup>
 
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <DefineConstants>TRACE_SCOPES;</DefineConstants>
+    </PropertyGroup>
+
 
     <ItemGroup>
       <PackageReference Include="HtmlAgilityPack" Version="1.11.31" />
