@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             // Hat-tip: https://stackoverflow.com/a/14207615/489433
             await PerformExecuteAsync(state);
 
-        internal abstract Task PerformExecuteAsync(object state);
+        public abstract Task PerformExecuteAsync(object state);
 
         /// <inheritdoc/>
         public Task StopAsync(CancellationToken cancellationToken)

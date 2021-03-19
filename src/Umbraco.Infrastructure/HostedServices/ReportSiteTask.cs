@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Text;
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         /// Runs the background task to send the anonymous ID
         /// to telemetry service
         /// </summary>
-        internal override async Task PerformExecuteAsync(object state)
+        public override async Task PerformExecuteAsync(object state)
         {
             // Try & get a value stored in umbracoSettings.config on the backoffice XML element ID attribute
             var backofficeIdentifierRaw = _globalSettings.Value.Id;
