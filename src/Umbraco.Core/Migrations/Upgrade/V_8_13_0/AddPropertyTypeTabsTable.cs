@@ -1,4 +1,5 @@
-﻿using Umbraco.Core.Persistence.Dtos;
+﻿using System.Linq;
+using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_13_0
 {
@@ -16,6 +17,10 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_13_0
             // A brand new table/DTO for storing Tabs
             // and references to Proprty Types/DocTypes/Content Types
             Create.Table<PropertyTypeTabDto>(true).Do();
+
+            // Add key reference into the PropertyType Table to our new table
+            var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
+            AddColumnIfNotExists<PropertyTypeDto>(columns, "propertyTypeTabId");
         }
     }
 }

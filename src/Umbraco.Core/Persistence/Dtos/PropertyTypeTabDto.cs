@@ -26,7 +26,7 @@ namespace Umbraco.Core.Persistence.Dtos
         public int SortOrder { get; set; }
 
         [ResultColumn]
-        [Reference(ReferenceType.Many, ReferenceMemberName = "PropertyTypeTabId")]
+        [Reference(ReferenceType.Many, ReferenceMemberName = "propertyTypeTabId")]
         public List<PropertyTypeDto> PropertyTypeDtos { get; set; }
 
         [Column("uniqueID")]
