@@ -12,6 +12,7 @@ using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Infrastructure.Security;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Extensions
@@ -74,7 +75,8 @@ namespace Umbraco.Extensions
             // Services used by Umbraco members identity
             services.TryAddScoped<IUserValidator<MembersIdentityUser>, UserValidator<MembersIdentityUser>>();
             services.TryAddScoped<IPasswordValidator<MembersIdentityUser>, PasswordValidator<MembersIdentityUser>>();
-            services.TryAddScoped<IPasswordHasher<MembersIdentityUser>, PasswordHasher<MembersIdentityUser>>();
+            services.TryAddScoped<IPasswordHasher<MembersIdentityUser>>(_ => new MemberPasswordHasher(new LegacyPasswordSecurity()));
+
             return new MembersIdentityBuilder(services);
         }
 
