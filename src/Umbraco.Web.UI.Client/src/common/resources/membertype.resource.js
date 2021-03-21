@@ -124,8 +124,7 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, local
                         id: args.id
                     }, { responseType: 'text' }),
                 promise);
-        },
-
+        }
     };
 }
 angular.module('umbraco.resources').factory('memberTypeResource', memberTypeResource);
