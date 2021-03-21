@@ -43,6 +43,7 @@ namespace Umbraco.Core.Models
             Icon = contentType.Icon;
             IsContainer = contentType.IsContainer;
             Name = contentType.Name;
+            Description = contentType.Description;
             AllowedAsRoot = contentType.AllowedAsRoot;
             IsElement = contentType.IsElement;
         }
@@ -67,6 +68,8 @@ namespace Umbraco.Core.Models
         public bool IsContainer { get; }
         
         public string Name { get; }
+
+        public string Description { get; set; }
 
         /// <inheritdoc />
         public bool AllowedAsRoot { get; }
