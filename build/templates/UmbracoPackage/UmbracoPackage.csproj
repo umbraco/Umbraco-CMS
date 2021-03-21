@@ -2,6 +2,12 @@
     <PropertyGroup>
         <TargetFramework>net5.0</TargetFramework>
         <ContentTargetFolders>.</ContentTargetFolders>
+        <Product>UmbracoPackage</Product>
+        <PackageId>UmbracoPackage</PackageId>
+        <Title>UmbracoPackage</Title>
+        <Description>...</Description>
+        <Product>...</Product>
+        <PackageTags>umbraco plugin package</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
