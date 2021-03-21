@@ -189,7 +189,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options
-    angular.extend(dialogOptions, $scope.model.config);
+    Utilities.extend(dialogOptions, $scope.model.config);
 
     dialogOptions.dataTypeKey = $scope.model.dataTypeKey;
 

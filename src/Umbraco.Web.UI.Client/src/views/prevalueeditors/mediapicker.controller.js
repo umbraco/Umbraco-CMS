@@ -23,7 +23,7 @@ function mediaPickerController($scope, entityResource, iconHelper, editorService
 
     //combine the dialogOptions with any values returned from the server
     if ($scope.model.config) {
-        angular.extend(dialogOptions, $scope.model.config);
+        Utilities.extend(dialogOptions, $scope.model.config);
     }
 
     $scope.openTreePicker = function () {

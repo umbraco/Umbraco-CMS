@@ -463,8 +463,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 };
 
-                angular.extend(config, pasteConfig);
-
+                Utilities.extend(config, pasteConfig);
 
                 if (tinyMceConfig.customConfig) {
 
@@ -481,7 +480,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                                     //overwrite the baseline config item if it is an array, we want to concat the items in the array, otherwise
                                     //if it's an object it will overwrite the baseline
                                     if (Utilities.isArray(config[i]) && Utilities.isArray(tinyMceConfig.customConfig[i])) {
-                                        //concat it and below this concat'd array will overwrite the baseline in angular.extend
+                                        //concat it and below this concat'd array will overwrite the baseline in Utilities.extend
                                         tinyMceConfig.customConfig[i] = config[i].concat(tinyMceConfig.customConfig[i]);
                                     }
                                 }
@@ -498,7 +497,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         }
                     }
 
-                    angular.extend(config, tinyMceConfig.customConfig);
+                    Utilities.extend(config, tinyMceConfig.customConfig);
                 }
 
                 return config;
