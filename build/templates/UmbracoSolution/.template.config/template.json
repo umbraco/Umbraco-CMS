@@ -45,11 +45,6 @@
             "replaces":"PackageTestSiteName",
             "description": "The name of the package this should be a test site for (Default: '')"
         },
-        "PackageTestSite": {
-            "type": "computed",
-            "datatype":"bool",
-            "value": "(PackageTestSiteName != \"\" && PackageTestSiteName != null)"
-        },
         "UseSqlCe":{
             "type": "parameter",
             "datatype":"bool",

@@ -4,13 +4,13 @@
     "icon": "icon.png",
     "description": {
         "id": "UmbracoSolution",
-        "text": "Umbraco"
+        "text": "An empty Umbraco Solution ready to get started"
     },
     "symbolInfo": [
         {
             "id": "PackageTestSiteName",
             "name": {
-                "text": "Package TestSite Name"
+                "text": "Optional: Specific the name of a package that this should be a test site for.",
             },
             "isVisible": "true"
         },

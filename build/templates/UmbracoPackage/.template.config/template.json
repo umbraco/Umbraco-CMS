@@ -3,7 +3,7 @@
     "author": "Umbraco HQ",
     "description": "An empty Umbraco Package/Plugin ready to get started",
     "classifications": [ "Web", "CMS", "Umbraco", "Package", "Plugin"],
-    "groupIdentity": "Umbraco.TemplatesUmbracoPackage",
+    "groupIdentity": "Umbraco.Templates.UmbracoPackage",
     "identity": "Umbraco.Templates.UmbracoPackage.CSharp",
     "name": "Umbraco Package",
     "shortName": "umbracopackage",
