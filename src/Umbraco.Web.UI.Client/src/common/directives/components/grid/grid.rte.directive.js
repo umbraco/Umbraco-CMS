@@ -75,7 +75,7 @@ angular.module("umbraco.directives")
                         maxImageSize: editorConfig.maxImageSize
                     };
 
-                    angular.extend(baseLineConfigObj, standardConfig);
+                    Utilities.extend(baseLineConfigObj, standardConfig);
 
                     baseLineConfigObj.setup = function (editor) {
 

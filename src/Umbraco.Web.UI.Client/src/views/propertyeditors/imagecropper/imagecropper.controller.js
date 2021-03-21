@@ -41,7 +41,7 @@ angular.module('umbraco')
             function setModelValueWithSrc(src) {
                 if (!$scope.model.value || !$scope.model.value.src) {
                     //we are copying to not overwrite the original config
-                    $scope.model.value = angular.extend(Utilities.copy($scope.model.config), { src: src });
+                    $scope.model.value = Utilities.extend(Utilities.copy($scope.model.config), { src: src });
                 }
             }
 

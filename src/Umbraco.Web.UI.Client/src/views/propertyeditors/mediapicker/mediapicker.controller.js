@@ -112,7 +112,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     media.loading = true;
                     entityResource.getById(media.udi, "Media")
                         .then(function (mediaEntity) {
-                            angular.extend(media, mediaEntity);
+                            Utilities.extend(media, mediaEntity);
                             media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                             media.loading = false;
                         });
@@ -195,7 +195,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                                 // we need to update all the media items
                                 $scope.mediaItems.forEach(media => {
                                     if (media.id === model.mediaNode.id) {
-                                        angular.extend(media, mediaEntity);
+                                        Utilities.extend(media, mediaEntity);
                                         media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                                     }
                                 });

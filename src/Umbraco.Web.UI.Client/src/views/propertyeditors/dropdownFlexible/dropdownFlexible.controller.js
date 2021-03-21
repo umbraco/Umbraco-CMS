@@ -8,7 +8,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.DropdownFlexibleCo
         };
 
         //map the user config
-        angular.extend(config, $scope.model.config);
+        Utilities.extend(config, $scope.model.config);
 
         //map back to the model
         $scope.model.config = config;

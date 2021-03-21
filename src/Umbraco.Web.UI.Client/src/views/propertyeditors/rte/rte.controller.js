@@ -87,7 +87,7 @@ angular.module("umbraco")
                     
                 };
                 
-                angular.extend(baseLineConfigObj, standardConfig);
+                Utilities.extend(baseLineConfigObj, standardConfig);
                 
                 // We need to wait for DOM to have rendered before we can find the element by ID.
                 $timeout(function () {

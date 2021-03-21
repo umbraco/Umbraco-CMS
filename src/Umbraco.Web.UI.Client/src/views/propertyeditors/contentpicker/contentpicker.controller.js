@@ -130,7 +130,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             delete $scope.model.config.startNode;
         }
         //merge the server config on top of the default config, then set the server config to use the result
-        $scope.model.config = angular.extend(defaultConfig, $scope.model.config);
+        $scope.model.config = Utilities.extend(defaultConfig, $scope.model.config);
 
         // if the property is mandatory, set the minCount config to 1 (unless of course it is set to something already),
         // that way the minCount/maxCount validation handles the mandatory as well

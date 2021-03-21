@@ -148,6 +148,11 @@
                  */
                 var opts = angular.extend({}, options, scope.umbAceEditor);
 
+                console.log("opts1", opts);
+
+                var opts2 = Utilities.extend({}, options, scope.umbAceEditor);
+                console.log("opts2", opts2);
+
 
                 //load ace libraries here... 
 
