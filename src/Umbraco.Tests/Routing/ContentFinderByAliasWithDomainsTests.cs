@@ -63,6 +63,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain1.com/page2/alias", "de-DE", 10011)] // alias to sub-page works
         [TestCase("http://domain1.com/endanger", "de-DE", 10011)] // alias to sub-page works, even with "en..."
         [TestCase("http://domain1.com/en/flux", "en-US", -10011)] // alias to domain's page fails - no /en alias on domain's home
+        [TestCase("http://domain1.com/prefix", "de-DE", 1001)] // Alias starts with a '/'
 
         [TestCase("http://domain2.com/test212", "de-DE", -1002)] // Alias does not exist
         [TestCase("http://domain2.com/de/test1", "de-DE", 1002)] // Alias exists
@@ -70,6 +71,7 @@ namespace Umbraco.Tests.Routing
         [TestCase("http://domain2.com/de/page2/alias", "de-DE", 10021)] // alias to sub-page works
         [TestCase("http://domain2.com/en/test1", "en-US", 1002)] // Alias exists
         [TestCase("http://domain2.com/en/foo/bar", "en-US", 1002)] // Alias exists
+        [TestCase("http://domain2.com/en/prefix", "en-US", 1002)] // Alias starts with a '/'
 
         [TestCase("http://de.domain3.com/test1", "de-DE", 1003)] // Alias exists
         [TestCase("http://de.domain3.com/page2/alias", "de-DE", 10031)] // alias to sub-page works

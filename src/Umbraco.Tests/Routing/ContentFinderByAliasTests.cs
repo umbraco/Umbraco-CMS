@@ -68,7 +68,7 @@ namespace Umbraco.Tests.Routing
 
     <Doc id=""1001"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""0"" createDate=""2012-06-12T14:13:17"" updateDate=""2012-07-20T18:50:43"" nodeName=""Home"" urlName=""1001"" writerName=""admin"" creatorName=""admin"" path=""-1,1001"" isDoc="""">
         <content><![CDATA[]]></content>
-        <umbracoUrlAlias><![CDATA[this/is/my/alias, anotheralias, myotheralias]]></umbracoUrlAlias>
+        <umbracoUrlAlias><![CDATA[this/is/my/alias, anotheralias, myotheralias, /prefix]]></umbracoUrlAlias>
 
         <Doc id=""10011"" parentID=""1001"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""0"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""1001-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1001,10011"" isDoc="""">
             <content><![CDATA[<div>This is some content</div>]]></content>
@@ -120,7 +120,7 @@ namespace Umbraco.Tests.Routing
 
     <Doc id=""1002"" parentID=""-1"" level=""1"" writerID=""0"" creatorID=""0"" nodeType=""1234"" template=""" + templateId + @""" sortOrder=""2"" createDate=""2012-07-16T15:26:59"" updateDate=""2012-07-18T14:23:35"" nodeName=""Test"" urlName=""1002"" writerName=""admin"" creatorName=""admin"" path=""-1,1002"" isDoc="""">
         <content><![CDATA[]]></content>
-        <umbracoUrlAlias><![CDATA[test1, foo/bar]]></umbracoUrlAlias>
+        <umbracoUrlAlias><![CDATA[test1, foo/bar, /prefix]]></umbracoUrlAlias>
 
         <Doc id=""10021"" parentID=""1002"" level=""2"" writerID=""0"" creatorID=""0"" nodeType=""1044"" template=""" + templateId + @""" sortOrder=""0"" createDate=""2012-07-20T18:06:45"" updateDate=""2012-07-20T19:07:31"" nodeName=""Sub1"" urlName=""1002-1"" writerName=""admin"" creatorName=""admin"" path=""-1,1002,10021"" isDoc="""">
             <content><![CDATA[<div>This is some content</div>]]></content>

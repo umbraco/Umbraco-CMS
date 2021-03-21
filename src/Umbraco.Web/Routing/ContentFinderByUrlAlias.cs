@@ -98,12 +98,12 @@ namespace Umbraco.Web.Routing
 
                 // Build up a comparison list of the current node's urlAlias to compare with the current request
                 var sb = new StringBuilder(",");
-                foreach (var urlAlias in v.Split(','))
+                foreach (var urlAlias in v.Replace(" ", "").Split(','))
                 {
                     // Add the node's urlAlias to the list
-                    sb.Append(urlAlias.Replace(" ", "") + ",");
+                    sb.Append(urlAlias + ",");
                     // Add the root node's absolute url joined to the node's urlAlias to the list
-                    sb.Append(rootAbsoluteUrl + (urlAlias.StartsWith("/") || rootAbsoluteUrl.EndsWith("/") ? "" : "/") + urlAlias.Replace(" ", "") + ",");
+                    sb.Append(rootAbsoluteUrl + urlAlias.TrimStart('/') + ",");
                 }
                 var urlAliases = sb.ToString();
                 return urlAliases.InvariantContains(requestAlias1) || urlAliases.InvariantContains(requestAlias2) || urlAliases.InvariantContains(requestAbsoluteUrl);
@@ -115,13 +115,13 @@ namespace Umbraco.Web.Routing
             if (rootNodeId > 0)
             {
                 var rootNode = cache.GetById(rootNodeId);
-                var rootNodeAbsoluteUrl = umbracoContext?.Url(rootNodeId, UrlMode.Absolute, culture);
+                var rootNodeAbsoluteUrl = umbracoContext?.Url(rootNodeId, UrlMode.Absolute, culture)?.EnsureEndsWith('/');
                 return rootNode?.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2, absoluteUri, rootNodeAbsoluteUrl));
             }
 
             foreach (var rootContent in cache.GetAtRoot())
             {
-                var rootNodeAbsoluteUrl = umbracoContext?.Url(rootNodeId, UrlMode.Absolute, culture);
+                var rootNodeAbsoluteUrl = umbracoContext?.Url(rootNodeId, UrlMode.Absolute, culture)?.EnsureEndsWith('/');
                 var c = rootContent.DescendantsOrSelf().FirstOrDefault(x => IsMatch(x, test1, test2, absoluteUri, rootNodeAbsoluteUrl));
                 if (c != null) return c;
             }
