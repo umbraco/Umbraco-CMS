@@ -336,6 +336,17 @@
     <key alias="allMembers">Tous les membres</key>
     <key alias="memberGroupNoProperties">Les groupes de membres n'ont pas de propriétés supplémentaires modifiables.</key>
   </area>
+  <area alias="contentType">
+    <key alias="copyFailed">Echec de la copie du type de contenu</key>
+    <key alias="moveFailed">Echec du déplacement du type de contenu</key>
+  </area>
+  <area alias="mediaType">
+    <key alias="copyFailed">Echec de la copie du type de media</key>
+    <key alias="moveFailed">Echec du déplacement du type de media</key>
+  </area>
+  <area alias="memberType">
+    <key alias="copyFailed">Echec de la copie du type de membre</key>
+  </area>
   <area alias="create">
     <key alias="chooseNode">Où voulez-vous créer le nouveau %0%</key>
     <key alias="createUnder">Créer un élément sous</key>

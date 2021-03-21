@@ -355,6 +355,17 @@
     <key alias="allMembers">All Members</key>
     <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
   </area>
+  <area alias="contentType">
+     <key alias="copyFailed">Failed to copy content type</key>
+     <key alias="moveFailed">Failed to move content type</key>
+  </area>
+  <area alias="mediaType">
+     <key alias="copyFailed">Failed to copy media type</key>
+     <key alias="moveFailed">Failed to move media type</key>
+  </area>
+  <area alias="memberType">
+     <key alias="copyFailed">Failed to copy member type</key>
+  </area>
   <area alias="create">
     <key alias="chooseNode">Where do you want to create the new %0%</key>
     <key alias="createUnder">Create an item under</key>
