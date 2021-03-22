@@ -128,6 +128,10 @@ stages:
                   inputs:
                       command: build
                       projects: '**/Umbraco.Web.UI.Netcore.csproj'
+          - job: Install_client
+            displayName: Install Client
+            dependsOn: Windows
+            steps:
                 - task: NodeTool@0
                   displayName: Use Node 11.x
                   inputs:
@@ -149,8 +153,12 @@ stages:
                       scriptType: inlineScript
                       inlineScript: >
                           Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
+          - job: Install_Cypress
+            displayName: Install Cypress
+            dependsOn: Windows
+            steps:
                 - task: PowerShell@1
-                  displayName: whatever
+                  displayName: Update cypress.env
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
@@ -160,6 +168,12 @@ stages:
                   inputs:
                       workingDir: src\Umbraco.Tests.AcceptanceTest
                       verbose: false
+          - job: Run_Tests
+            displayName: Run acceptance tests
+            dependsOn:
+                - Install_client
+                - Install_Cypress
+            steps:
                 - task: Npm@1
                   inputs:
                       command: 'custom'
