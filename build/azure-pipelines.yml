@@ -130,7 +130,7 @@ stages:
                   inputs:
                       command: build
                       projects: '**/Umbraco.Web.UI.Netcore.csproj'
-          - job: Windows_Install_client
+          - job: Windows_Install_Client
             displayName: Windows Install Client
             dependsOn: Windows_Dotnet_build
             pool:
@@ -177,8 +177,8 @@ stages:
           - job: Windows_Run_Tests
             displayName: Windows Run Acceptance Tests
             dependsOn:
-                - Install_client
-                - Install_Cypress
+                - Windows_Install_Client
+                - Windows_Install_Cypress
             pool:
                 vmImage: windows-latest
             steps:
