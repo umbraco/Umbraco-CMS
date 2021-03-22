@@ -124,7 +124,7 @@ stages:
                   inputs:
                       version: 5.x
                 - powershell: sqllocaldb start mssqllocaldb
-                        displayName: Start MSSQL LocalDb
+                  displayName: Start MSSQL LocalDb
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build (Netcore)
                   inputs:
