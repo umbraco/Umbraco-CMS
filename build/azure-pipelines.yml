@@ -132,6 +132,19 @@ stages:
                     gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
                     targets: build
                     workingDirectory: src\Umbraco.Web.UI.Client
+                - task: PowerShell@1
+                  displayName: dotnet run
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: >
+                          cd src\Umbraco.Web.UI.Netcore
+                          Start-Process -FilePath "dotnet" -ArgumentList "run"
+                - task: PowerShell@1
+                  displayName: whatever
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: >
+                          Write-Host "Hello World"
     - stage: Artifacts
       dependsOn: []
       jobs:
