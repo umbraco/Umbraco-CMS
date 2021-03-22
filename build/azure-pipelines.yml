@@ -131,6 +131,8 @@ stages:
           - job: Install_client
             displayName: Install Client
             dependsOn: Windows
+            pool:
+                vmImage: windows-latest
             steps:
                 - task: NodeTool@0
                   displayName: Use Node 11.x
@@ -156,6 +158,8 @@ stages:
           - job: Install_Cypress
             displayName: Install Cypress
             dependsOn: Windows
+            pool:
+                vmImage: windows-latest
             steps:
                 - task: PowerShell@1
                   displayName: Generate Cypress.env.json
@@ -173,6 +177,8 @@ stages:
             dependsOn:
                 - Install_client
                 - Install_Cypress
+            pool:
+                vmImage: windows-latest
             steps:
                 - task: Npm@1
                   displayName: npm run test (AcceptanceTest)
