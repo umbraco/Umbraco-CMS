@@ -177,6 +177,7 @@ stages:
                 - task: Npm@1
                   displayName: npm run test (AcceptanceTest)
                   inputs:
+                      workingDir: src\Umbraco.Tests.AcceptanceTest
                       command: 'custom'
                       customCommand: 'run test'
     - stage: Artifacts
