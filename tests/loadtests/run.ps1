@@ -1,12 +1,13 @@
 ﻿# Set environment variables for artillery to use:
 # TODO: Cypress generates this information so either use what cypress generates or use the code that it uses
 
-$Env:U_BASE_URL = "http://localhost:8111/"
+$Env:U_BASE_URL = "http://localhost:8121/"
 $Env:U_USERNAME = "sdeminick2@gmail.com"
 $Env:U_PASS = "testtesttest"
 $Env:U_SERVERNAME = "TEAMCANADA3"
 $Env:U_PROCESSNAME = "iisexpress"
 $Env:U_SCRIPTROOT = $PSScriptRoot
+$Env:U_DEBUG = 'true'
 
 $RunCount = 1;
 $Rate = 1;
@@ -51,6 +52,11 @@ $Artillery = @(
     # Set a GUID for a new content type that we'll create which can be used for it's aliases, etc...
     "create-doctype.yml"
 )
+
+# set special artillery debug switches
+if ($Env:U_DEBUG -eq 'true') {
+    $Env:DEBUG = "http,http:capture,http:response"
+}
 
 foreach ( $a in $Artillery )
 {

@@ -3,7 +3,8 @@ module.exports = {
     beforeRequest: beforeRequest,
     afterResponse: afterResponse,
     beforeScenario: beforeScenario,
-    afterScenario: afterScenario
+    afterScenario: afterScenario,
+    configureDocType: configureDocType
 }
 
 const fs = require('fs');
@@ -19,7 +20,7 @@ const loadTempData = new Promise((resolve, reject) => {
         // we use a persisted file to store/share information between
         // this artillery process (node) and the parent powershell process.
         fs.readFile(tempDataPath, function (err, data) {
-            if (err) return console.log(err);
+            if (err) return console.error(err);
 
             if (data) {
                 tempData = JSON.parse(data);
@@ -35,7 +36,7 @@ const loadTempData = new Promise((resolve, reject) => {
 function updateTempStorage(t) {
     tempData = Object.assign(tempData, t);
     fs.writeFile(tempDataPath, JSON.stringify(tempData, null, 2), function (err) {
-        if (err) return console.log(err);
+        if (err) return console.error(err);
     });
 }
 
@@ -100,6 +101,52 @@ function replaceAndStoreGuid(requestParams) {
     }
 }
 
+function writeDebug(context, msg) {
+    if (context.vars.$processEnvironment.U_DEBUG === 'true') {
+        console.log("DEBUG: " + msg);
+    }
+}
+
+function configureDocType(requestParams, context, ee, next) {
+    if (!context.vars.jsonResponse) {
+        throw "jsonResponse was not found in the context";
+    }
+    if ((typeof context.vars.jsonResponse) !== 'object') {
+        throw "jsonResponse is not of type 'object'";
+    }
+
+    const keyCollapsed = context.vars.jsonResponse.key.replace(/\-/g, "");
+    const docTypeProps = ["id", "key", "isContainer", "allowAsRoot", "alias", "description", "thumbnail", "name", "icon", "trashed", "parentId", "path", "allowCultureVariant", "allowSegmentVariant", "isElement"];
+
+    let destDocType = _.pick(context.vars.jsonResponse, docTypeProps);
+    destDocType.allowedTemplates = [context.vars.jsonResponse.allowedTemplates[0].alias];
+    destDocType.allowedContentTypes = [destDocType.id];
+    destDocType.groups = [];
+    // need to re-map the properties/groups
+    const groupProps = ["inherited", "id", "sortOrder", "name"];
+    const propertiesProps = ["id", "alias", "email", "description", "validation", "label", "sortOrder", "dataTypeId", "groupId", "allowCultureVariant", "allowSegmentVariant", "labelOnTop"];
+    for (let g = 0; g < context.vars.jsonResponse.groups.length; g++) {
+        const sourceGroup = context.vars.jsonResponse.groups[g];
+        const destGroup = _.pick(sourceGroup, groupProps);
+        destGroup.properties = [];
+        for (let p = 0; p < sourceGroup.properties.length; p++) {
+            const sourceProp = sourceGroup.properties[p];
+            const destProp = _.pick(sourceProp, propertiesProps);
+            destGroup.properties.push(destProp);
+        }
+        destDocType.groups.push(destGroup);
+    }
+
+    writeDebug(context, requestParams.body);
+
+    // set the request body
+    requestParams.body = JSON.stringify(destDocType);
+
+    writeDebug(context, requestParams.body);
+
+    next();
+}
+
 /** Called when artillery sends a request to set xsrf/cookies */
 function beforeRequest(requestParams, context, ee, next) {
     return loadTempData.then(function () {
@@ -139,18 +186,18 @@ function afterResponse(requestParams, response, context, ee, next) {
 
     if (response.statusCode != 200) {
         //console.error(response.body);
-        console.log(response);
+        console.error(response);
     }
 
-    // TODO: Check if we get jsonResponse here and then can parse?... nope, need to adjust regex
-    // Or we always just parse the angular response and always set Id/Key of the object? I dunno it sucks
-    // with this angular prefix! There's prob still a way to do it with regex + transform
-    console.log(context);
-    // const angularPrefix = ")]}',\n";
-    // if (response.body.startsWith(angularPrefix)) {
-    //     console.log("ANGULAR!");
-    //     response.body = response.body.substring(angularPrefix.length);
-    // }
+    writeDebug(context, `${response.request.uri.path}: ${response.statusCode}`);
+
+    // If we have a jsonResponse var in the response it means we've flagged
+    // the response to be captured
+    if ((typeof context.vars.jsonResponse) === 'string') {
+        let json = JSON.parse(context.vars.jsonResponse.trim());
+        // now set the json object on the context properties to be used in beforeResponse
+        context.vars.jsonResponse = json;
+    }
 
     return loadTempData.then(function () {
 
