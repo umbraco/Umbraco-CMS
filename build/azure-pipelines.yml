@@ -148,7 +148,7 @@ stages:
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
-                          Start-Process -FilePath "dotnet" -ArgumentList "run", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
+                          Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
                 - task: PowerShell@1
                   displayName: whatever
                   inputs:
