@@ -150,12 +150,6 @@ stages:
                     gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
                     targets: build
                     workingDirectory: src\Umbraco.Web.UI.Client
-                - task: PowerShell@1
-                  displayName: dotnet run (Netcore)
-                  inputs:
-                      scriptType: inlineScript
-                      inlineScript: >
-                          Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
           - job: Windows_Install_Cypress
             displayName: Windows Install Cypress
             pool:
@@ -181,6 +175,12 @@ stages:
             pool:
                 vmImage: windows-latest
             steps:
+                - task: PowerShell@1
+                  displayName: dotnet run (Netcore)
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: >
+                          Start-Process -FilePath "dotnet" -ArgumentList "run", "--no-build", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
                 - task: Npm@1
                   displayName: npm run test (AcceptanceTest)
                   inputs:
