@@ -130,7 +130,7 @@ stages:
 
                 - powershell: sqllocaldb start mssqllocaldb
                   displayName: Start MSSQL LocalDb
-                - powershell:  Invoke-Sqlcmd -Query "CREATE DATABASE Cypress" -ServerInstance "(LocalDB)\\MSSQLLocalDB"
+                - powershell:  Invoke-Sqlcmd -Query "CREATE DATABASE Cypress" -ServerInstance "(LocalDB)\MSSQLLocalDB"
                   displayName: Create database
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build (Netcore)
