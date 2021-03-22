@@ -158,7 +158,7 @@ stages:
             dependsOn: Windows
             steps:
                 - task: PowerShell@1
-                  displayName: Update cypress.env
+                  displayName: Generate Cypress.env.json
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
@@ -175,6 +175,7 @@ stages:
                 - Install_Cypress
             steps:
                 - task: Npm@1
+                  displayName: npm run test (AcceptanceTest)
                   inputs:
                       command: 'custom'
                       customCommand: 'run test'
