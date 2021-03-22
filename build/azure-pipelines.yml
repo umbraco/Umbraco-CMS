@@ -111,8 +111,12 @@ stages:
             value: cypress@umbraco.com
           - name: Umbraco__CMS__Unattended__UnattendedUserPassword
             value: UmbracoAcceptance123!
+          - name: UmbracoDatabaseServer
+            value: (LocalDB)\\MSSQLLocalDB
+          - name: UmbracoDatabaseName
+            value: Cypress
           - name: ConnectionStrings__umbracoDbDSN
-            value: Server=(LocalDB)\\MSSQLLocalDB;Initial Catalog=Cypress;Integrated Security=true
+            value: Server=$(UmbracoDatabaseServer);Database=$(UmbracoDatabaseName);Integrated Security=true;
       jobs:
           - job: Windows_Acceptance_tests
             displayName: Windows
@@ -125,6 +129,8 @@ stages:
                       version: 5.x
                 - powershell: sqllocaldb start mssqllocaldb
                   displayName: Start MSSQL LocalDb
+                - powershell:  Invoke-Sqlcmd -Query "CREATE DATABASE $env:UmbracoDatabaseName" -ServerInstance $env:UmbracoDatabaseServer
+                  displayName: Create database
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build (Netcore)
                   inputs:
