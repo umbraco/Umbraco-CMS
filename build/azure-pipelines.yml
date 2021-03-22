@@ -112,7 +112,7 @@ stages:
           - name: Umbraco__CMS__Unattended__UnattendedUserPassword
             value: UmbracoAcceptance123!
           - name: ConnectionStrings__umbracoDbDSN
-            value: Server=(LocalDB)\\mssqllocaldb;Database=Cypress;Integrated Security=true
+            value: Server=(LocalDB)\\MSSQLLocalDB;Initial Catalog=Cypress;Integrated Security=true
       jobs:
           - job: Windows_Acceptance_tests
             displayName: Windows
