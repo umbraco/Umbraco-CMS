@@ -555,7 +555,7 @@ namespace Umbraco.Web.Routing
             }
 
             request.SetInternalRedirectPublishedContent(internalRedirectNode); // don't use .PublishedContent here
-            _logger.Debug<PublishedRouter,int>("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectId);
+            _logger.Debug<PublishedRouter,int>("FollowInternalRedirects: Redirecting to id={InternalRedirectId}", internalRedirectIdAsInt);
             return true;
         }
 
