@@ -150,7 +150,7 @@ stages:
                       inlineScript: >
                           Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
                 - task: PowerShell@1
-                  displayName: whatever
+                  displayName: Generate Cypress.env.json
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
@@ -161,6 +161,7 @@ stages:
                       workingDir: src\Umbraco.Tests.AcceptanceTest
                       verbose: false
                 - task: Npm@1
+                  displayName: npm run test (AcceptanceTest)
                   inputs:
                       command: 'custom'
                       customCommand: 'run test'
