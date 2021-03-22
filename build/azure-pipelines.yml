@@ -167,8 +167,8 @@ stages:
                   inputs:
                       workingDir: src\Umbraco.Tests.AcceptanceTest
                       verbose: false
-                - powershell: Invoke-WebRequest https://localhost:44331 -SkipCertificateCheck -TimeoutSec 120
-                  displayName: Call website
+#                - powershell: Invoke-WebRequest https://localhost:44331 -SkipCertificateCheck -TimeoutSec 120
+#                  displayName: Call website
                 - task: Npm@1
                   displayName: npm run test (AcceptanceTest)
                   inputs:
