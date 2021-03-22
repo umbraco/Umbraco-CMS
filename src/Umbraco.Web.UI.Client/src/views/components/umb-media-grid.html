@@ -78,7 +78,7 @@
                     <div class="umb-table-row umb-media-grid__list-item -selectable" ng-click="clickItem(item, $event, $index)" ng-repeat="item in items | filter:filterBy | orderBy:sortBy:sortReverse" ng-class="{'-selected': item.selected}">
 
                         <div class="umb-table-cell">
-                            <i ng-show="item.selected" class="umb-table-body__icon umb-table-body__checkicon icon-check" aria-hidden="true"></i>
+                            <i ng-show="item.selected" class="umb-table-body__icon umb-table-body__checkicon icon-check color-green" aria-hidden="true"></i>
                             <i class="{{item.icon}}" class="umb-table-body__icon" aria-hidden="true" ng-if="!item.thumbnail && item.extension != 'svg' && !item.selected"></i><i class="icon-picture"  aria-hidden="true" ng-if="item.thumbnail && !item.selected"></i>
                         </div>
                         <div class="umb-table-cell  umb-table__name">
