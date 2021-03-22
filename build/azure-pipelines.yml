@@ -152,10 +152,10 @@ stages:
                     gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
                     targets: build
                     workingDirectory: src\Umbraco.Web.UI.Client
-                #- powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "--no-build", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
-                #  displayName: dotnet run (Netcore)
-                - powershell: dotnet run --no-build -p .\src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj
+                - powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "--no-build", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
                   displayName: dotnet run (Netcore)
+#                - powershell: dotnet run --no-build -p .\src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj
+#                  displayName: dotnet run (Netcore)
                 - task: PowerShell@1
                   displayName: Generate Cypress.env.json
                   inputs:
