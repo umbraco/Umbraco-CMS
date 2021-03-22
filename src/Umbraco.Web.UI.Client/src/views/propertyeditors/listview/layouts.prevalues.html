@@ -6,18 +6,20 @@
 
            <div class="list-view-layout" ng-repeat="layout in model.value">
 
-               <i class="icon-navigation list-view-layout__sort-handle" aria-hidden="true" aria-label="Sort"></i>
+               <umb-icon icon="icon-navigation" class="icon-navigation list-view-layout__sort-handle" aria-label="Sort"></umb-icon>
 
                <div class="list-view-layout__icon-wrapper">
 
                    <button ng-if="layout.isSystem !== 1" type="button" class="btn-reset" ng-click="vm.openIconPicker(layout)" umb-auto-focus>
                        <span class="list-view-layout__icon">
-                           <i class="{{layout.icon}}" aria-hidden="true"></i>
+                           <umb-icon icon="{{layout.icon}}" class="{{layout.icon}}"></umb-icon>
                        </span>
                    </button>
 
-                   <div ng-if="layout.isSystem === 1" class="list-view-layout__icon">
-                       <i class="{{layout.icon}}" aria-hidden="true"></i>
+                   <div ng-if="layout.isSystem === 1">
+                       <span class="list-view-layout__icon">
+                            <umb-icon icon="{{layout.icon}}" class="{{layout.icon}}"></umb-icon>
+                       </span>
                    </div>
 
                </div>
@@ -37,7 +39,7 @@
 
                    <div class="list-view-layout__remove" ng-if="layout.isSystem !== 1">
                        <button type="button" class="btn-icon" ng-click="vm.showPrompt(layout)" aria-label="Remove">
-                           <i class="icon-trash" aria-hidden="true"></i>
+                           <umb-icon icon="icon-trash" class="icon-trash"></umb-icon>
                        </button>
                        <umb-confirm-action ng-if="layout.deletePrompt"
                                            direction="left"
