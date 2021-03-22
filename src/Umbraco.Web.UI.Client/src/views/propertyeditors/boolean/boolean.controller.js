@@ -11,8 +11,8 @@ function booleanEditorController($scope, angularHelper) {
         showLabels: false
     };
 
-    if ($scope.model.config && $scope.model.config.showLabels && Object.toBoolean($scope.model.config.showLabels)) {
-        config.showLabels = true;
+    if ($scope.model.config) {
+        $scope.model.config.showLabels = $scope.model.config.showLabels ? Object.toBoolean($scope.model.config.showLabels) : config.showLabels;
     }
 
     // Map the user config
