@@ -123,8 +123,6 @@ stages:
                   displayName: Use .Net Core sdk 5.x
                   inputs:
                       version: 5.x
-                - powershell: sqllocaldb start mssqllocaldb
-                  displayName: Start MSSQL LocalDb
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build (Netcore)
                   inputs:
@@ -175,6 +173,8 @@ stages:
             pool:
                 vmImage: windows-latest
             steps:
+                - powershell: sqllocaldb start mssqllocaldb
+                  displayName: Start MSSQL LocalDb
                 - task: PowerShell@1
                   displayName: dotnet run (Netcore)
                   inputs:
