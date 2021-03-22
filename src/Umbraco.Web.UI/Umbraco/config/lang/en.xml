@@ -1876,6 +1876,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="changePassword">Change your password</key>
     <key alias="changePhoto">Change photo</key>
     <key alias="newPassword">New password</key>
+    <key alias="newPasswordFormatLengthTip">Minimum %0% character(s) to go!</key>
+    <key alias="newPasswordFormatNonAlphaTip">There should be at least %0% special character(s) in there.</key>
     <key alias="noLockouts">hasn't been locked out</key>
     <key alias="noPasswordChange">The password hasn't been changed</key>
     <key alias="confirmNewPassword">Confirm new password</key>

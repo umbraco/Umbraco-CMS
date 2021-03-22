@@ -1813,6 +1813,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="changePassword">Changer le mot de passe</key>
     <key alias="changePhoto">Changer la photo</key>
     <key alias="newPassword">Nouveau mot de passe</key>
+    <key alias="newPasswordFormatLengthTip">Plus que %0% caractère(s) minimum!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Il devrait y avoir au moins %0% caractère(s) spéciaux.</key>
     <key alias="noLockouts">n'a pas été bloqué</key>
     <key alias="noPasswordChange">Le mot de passe n'a pas été modifié</key>
     <key alias="confirmNewPassword">Confirmez votre nouveau mot de passe</key>
