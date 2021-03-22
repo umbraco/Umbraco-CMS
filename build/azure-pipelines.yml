@@ -114,8 +114,8 @@ stages:
           - name: ConnectionStrings__umbracoDbDSN
             value: Server=(LocalDB)\\MSSQLLocalDB;Database=Cypress;Integrated Security=true
       jobs:
-          - job: Windows
-            displayName: Windows
+          - job: dotnet_build
+            displayName: Build C#
             pool:
                 vmImage: windows-latest
             steps:
@@ -128,6 +128,8 @@ stages:
                   inputs:
                       command: build
                       projects: '**/Umbraco.Web.UI.Netcore.csproj'
+                - powershell: sqllocaldb start mssqllocaldb
+                  displayName: Start MSSQL LocalDb
           - job: Install_client
             displayName: Install Client
             dependsOn: Windows
