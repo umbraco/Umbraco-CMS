@@ -15,7 +15,6 @@ resources:
 stages:
     - stage: Unit_Tests
       displayName: Unit Tests
-
       dependsOn: []
       jobs:
           - job: Linux_Unit_Tests
@@ -125,7 +124,7 @@ stages:
                   inputs:
                       version: 5.x
                 - task: DotNetCoreCLI@2
-                  displayName: dotnet build
+                  displayName: dotnet build (Netcore)
                   inputs:
                       command: build
                       projects: '**/Umbraco.Web.UI.Netcore.csproj'
@@ -134,7 +133,7 @@ stages:
                   inputs:
                        versionSpec: 11.x
                 - task: Npm@1
-                  displayName: npm install
+                  displayName: npm install (Client)
                   inputs:
                     workingDir: src\Umbraco.Web.UI.Client
                     verbose: false
@@ -145,7 +144,7 @@ stages:
                     targets: build
                     workingDirectory: src\Umbraco.Web.UI.Client
                 - task: PowerShell@1
-                  displayName: dotnet run
+                  displayName: dotnet run (Netcore)
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
@@ -155,12 +154,16 @@ stages:
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
-                          Write-Host "Hello World"
+                          @{ username = $env:Umbraco__CMS__Unattended__UnattendedUserEmail; password = $env:Umbraco__CMS__Unattended__UnattendedUserPassword } | ConvertTo-Json | Set-Content -Path "src\Umbraco.Tests.AcceptanceTest\cypress.env.json"
                 - task: Npm@1
-                  displayName: npm install
+                  displayName: npm install (AcceptanceTest)
                   inputs:
-                    workingDir: src\Umbraco.Tests.AcceptanceTest
-                    verbose: false
+                      workingDir: src\Umbraco.Tests.AcceptanceTest
+                      verbose: false
+                - task: Npm@1
+                  inputs:
+                      command: 'custom'
+                      customCommand: 'run test'
     - stage: Artifacts
       dependsOn: []
       jobs:
