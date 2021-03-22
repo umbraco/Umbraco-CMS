@@ -114,8 +114,8 @@ stages:
           - name: ConnectionStrings__umbracoDbDSN
             value: Server=(LocalDB)\\MSSQLLocalDB;Database=Cypress;Integrated Security=true
       jobs:
-          - job: dotnet_build
-            displayName: Build C#
+          - job: Windows_Dotnet_build
+            displayName: Windows Dotnet build
             pool:
                 vmImage: windows-latest
             steps:
@@ -123,16 +123,16 @@ stages:
                   displayName: Use .Net Core sdk 5.x
                   inputs:
                       version: 5.x
+                - powershell: sqllocaldb start mssqllocaldb
+                  displayName: Start MSSQL LocalDb
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build (Netcore)
                   inputs:
                       command: build
                       projects: '**/Umbraco.Web.UI.Netcore.csproj'
-                - powershell: sqllocaldb start mssqllocaldb
-                  displayName: Start MSSQL LocalDb
-          - job: Install_client
-            displayName: Install Client
-            dependsOn: Windows
+          - job: Windows_Install_Client
+            displayName: Windows Install Client
+            dependsOn: Windows_Dotnet_build
             pool:
                 vmImage: windows-latest
             steps:
@@ -157,9 +157,9 @@ stages:
                       scriptType: inlineScript
                       inlineScript: >
                           Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
-          - job: Install_Cypress
-            displayName: Install Cypress
-            dependsOn: Windows
+          - job: Windows_Install_Cypress
+            displayName: Windows Install Cypress
+            dependsOn: Windows_Dotnet_build
             pool:
                 vmImage: windows-latest
             steps:
@@ -174,11 +174,11 @@ stages:
                   inputs:
                       workingDir: src\Umbraco.Tests.AcceptanceTest
                       verbose: false
-          - job: Run_Tests
-            displayName: Run acceptance tests
+          - job: Windows_Run_Tests
+            displayName: Windows Run Acceptance Tests
             dependsOn:
-                - Install_client
-                - Install_Cypress
+                - Windows_Install_Client
+                - Windows_Install_Cypress
             pool:
                 vmImage: windows-latest
             steps:
