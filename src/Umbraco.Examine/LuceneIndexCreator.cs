@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Configuration;
 using System.IO;
+using System.Linq;
 using Examine;
 using Examine.LuceneEngine.Directories;
 using Lucene.Net.Store;
@@ -17,6 +18,16 @@ namespace Umbraco.Examine
     /// </summary>
     public abstract class LuceneIndexCreator : IIndexCreator
     {
+        private readonly IDirectoryFactory _directoryFactory;
+
+        [Obsolete("Use  LuceneIndexCreator(IDirectoryFactory factory) instead")]
+        public LuceneIndexCreator() : this((IDirectoryFactory)Current.Factory.GetInstance(TypeFinder.GetTypeByName(ConfigurationManager.AppSettings["Umbraco.Examine.LuceneDirectoryFactory"].ToString())))
+        {
+        }
+        public LuceneIndexCreator(IDirectoryFactory directoryFactory)
+        {
+            _directoryFactory = directoryFactory;
+        }
         public abstract IEnumerable<IIndex> Create();
 
         /// <summary>
@@ -28,20 +39,14 @@ namespace Umbraco.Examine
         /// <returns></returns>
         public virtual Lucene.Net.Store.Directory CreateFileSystemLuceneDirectory(string folderName)
         {
-            
             var dirInfo = new DirectoryInfo(Path.Combine(IOHelper.MapPath(SystemDirectories.TempData), "ExamineIndexes", folderName));
             if (!dirInfo.Exists)
                 System.IO.Directory.CreateDirectory(dirInfo.FullName);
 
             //check if there's a configured directory factory, if so create it and use that to create the lucene dir
-            var configuredDirectoryFactory = ConfigurationManager.AppSettings["Umbraco.Examine.LuceneDirectoryFactory"];
-            if (!configuredDirectoryFactory.IsNullOrWhiteSpace())
+            if (_directoryFactory != null)
             {
-                //this should be a fully qualified type
-                var factoryType = TypeFinder.GetTypeByName(configuredDirectoryFactory);
-                if (factoryType == null) throw new NullReferenceException("No directory type found for value: " + configuredDirectoryFactory);
-                var directoryFactory = (IDirectoryFactory)Activator.CreateInstance(factoryType);
-                return directoryFactory.CreateDirectory(dirInfo);
+                return _directoryFactory.CreateDirectory(dirInfo);
             }
 
             //no dir factory, just create a normal fs directory
@@ -55,8 +60,6 @@ namespace Umbraco.Examine
             // however, we are setting the DefaultLockFactory in startup so we'll use that instead since it can be managed globally.
             luceneDir.SetLockFactory(DirectoryFactory.DefaultLockFactory(dirInfo));
             return luceneDir;
-
-
         }
     }
 }
