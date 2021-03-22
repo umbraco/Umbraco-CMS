@@ -120,7 +120,7 @@ stages:
                 - task: NodeTool@0
                   displayName: Use Node 11.x
                   inputs:
-                  versionSpec: 11.x
+                       versionSpec: 11.x
                 - task: Npm@1
                   displayName: npm install
                   inputs:
