@@ -181,6 +181,8 @@ stages:
                       scriptType: inlineScript
                       inlineScript: >
                           Start-Process -FilePath "dotnet" -ArgumentList "run", "--no-build", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
+                          Start-Sleep -s 15
+                          Invoke-WebRequest https://localhost:44331 -TimeoutSec 120
                 - task: Npm@1
                   displayName: npm run test (AcceptanceTest)
                   inputs:
