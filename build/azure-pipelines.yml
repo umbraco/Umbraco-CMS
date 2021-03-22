@@ -114,8 +114,8 @@ stages:
           - name: ConnectionStrings__umbracoDbDSN
             value: Server=(LocalDB)\\MSSQLLocalDB;Database=Cypress;Integrated Security=true
       jobs:
-          - job: Windows_Dotnet_build
-            displayName: Windows Dotnet build
+          - job: Windows_Dotnet_Build
+            displayName: Windows Dotnet Build
             pool:
                 vmImage: windows-latest
             steps:
@@ -132,7 +132,6 @@ stages:
                       projects: '**/Umbraco.Web.UI.Netcore.csproj'
           - job: Windows_Install_Client
             displayName: Windows Install Client
-            dependsOn: Windows_Dotnet_build
             pool:
                 vmImage: windows-latest
             steps:
@@ -159,7 +158,6 @@ stages:
                           Start-Process -FilePath "dotnet" -ArgumentList "run", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
           - job: Windows_Install_Cypress
             displayName: Windows Install Cypress
-            dependsOn: Windows_Dotnet_build
             pool:
                 vmImage: windows-latest
             steps:
@@ -177,6 +175,7 @@ stages:
           - job: Windows_Run_Tests
             displayName: Windows Run Acceptance Tests
             dependsOn:
+                - Windows_Dotnet_Build
                 - Windows_Install_Client
                 - Windows_Install_Cypress
             pool:
