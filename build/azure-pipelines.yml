@@ -15,6 +15,7 @@ resources:
 stages:
     - stage: Unit_Tests
       displayName: Unit Tests
+
       dependsOn: []
       jobs:
           - job: Linux_Unit_Tests
@@ -102,6 +103,17 @@ stages:
     - stage: Acceptance_Tests
       displayName: Acceptance Tests
       dependsOn: []
+      variables:
+          - name: Umbraco__CMS__Unattended__InstallUnattended
+            value: true
+          - name: Umbraco__CMS__Unattended__UnattendedUserName
+            value: Cypress Test
+          - name: Umbraco__CMS__Unattended__UnattendedUserEmail
+            value: cypress@umbraco.com
+          - name: Umbraco__CMS__Unattended__UnattendedUserPassword
+            value: abc123ABC!!!
+          - name: ConnectionStrings__umbracoDbDSN
+            value: Server=(LocalDB)\\MSSQLLocalDB;Database=Cypress;Integrated Security=true
       jobs:
           - job: Windows
             displayName: Windows
@@ -137,14 +149,18 @@ stages:
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
-                          cd src\Umbraco.Web.UI.Netcore
-                          Start-Process -FilePath "dotnet" -ArgumentList "run"
+                          Start-Process -FilePath "dotnet" -ArgumentList "run", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
                 - task: PowerShell@1
                   displayName: whatever
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
                           Write-Host "Hello World"
+                - task: Npm@1
+                  displayName: npm install
+                  inputs:
+                    workingDir: src\Umbraco.Tests.AcceptanceTest
+                    verbose: false
     - stage: Artifacts
       dependsOn: []
       jobs:
