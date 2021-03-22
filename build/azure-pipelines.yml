@@ -175,7 +175,9 @@ stages:
             steps:
                 - powershell: sqllocaldb start mssqllocaldb
                   displayName: Start MSSQL LocalDb
-                - powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "--no-build", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
+                #- powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "--no-build", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
+                #  displayName: dotnet run (Netcore)
+                - powershell: dotnet run --no-build -p src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj
                   displayName: dotnet run (Netcore)
                 - powershell: Start-Sleep -s 15
                   displayName: Sleep 15 sec
