@@ -37,6 +37,9 @@
                 </umb-file-icon>
 
                 <div class="umb-sortable-thumbnails__actions" data-element="sortable-thumbnail-actions">
+                    <button type="button" aria-label="Copy media" ng-if="!media.trashed" class="umb-sortable-thumbnails__action btn-reset" data-element="action-copy" ng-click="vm.copyItem(media)">
+                        <i class="icon icon-documents" aria-hidden="true"></i>
+                    </button>
                     <button type="button" aria-label="Edit media" ng-if="allowEditMedia && !media.trashed" class="umb-sortable-thumbnails__action btn-reset" data-element="action-edit" ng-click="vm.editItem(media)">
                         <i class="icon icon-edit" aria-hidden="true"></i>
                     </button>

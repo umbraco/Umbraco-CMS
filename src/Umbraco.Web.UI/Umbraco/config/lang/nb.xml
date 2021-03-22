@@ -689,7 +689,6 @@ Vennlig hilsen Umbraco roboten
     <key alias="tabs">Arkfaner</key>
     <key alias="contentTypeEnabled">Hovedinnholdstype aktivert</key>
     <key alias="contentTypeUses">Denne dokumenttypen bruker</key>
-    <key alias="asAContentMasterType">som hoveddokumenttype. Arkfaner fra hoveddokumenttyper vises ikke og kan kun endres på hoveddokumenttypen selv.</key>
     <key alias="noPropertiesDefinedOnTab">Ingen egenskaper definert i denne arkfanen. Klikk på "legg til ny egenskap" lenken i toppen for å opprette en ny egenskap.</key>
   </area>
   <area alias="sort">
