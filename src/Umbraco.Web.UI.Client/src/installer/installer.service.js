@@ -85,12 +85,12 @@ angular.module("umbraco.install").factory('installerService', function ($rootSco
     /** Have put this here because we are not referencing our other modules */
 	function safeApply (scope, fn) {
 	    if (scope.$$phase || scope.$root.$$phase) {
-	        if (angular.isFunction(fn)) {
+	        if (Utilities.isFunction(fn)) {
 	            fn();
 	        }
 	    }
 	    else {
-	        if (angular.isFunction(fn)) {
+	        if (Utilities.isFunction(fn)) {
 	            scope.$apply(fn);
 	        }
 	        else {

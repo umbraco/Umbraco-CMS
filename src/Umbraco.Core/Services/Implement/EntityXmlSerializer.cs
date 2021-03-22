@@ -77,7 +77,7 @@ namespace Umbraco.Core.Services.Implement
                     var children = _contentService.GetPagedChildren(content.Id, page++, pageSize, out total);
                     SerializeChildren(children, xml, published);
                 }
-                
+
             }
 
             return xml;
@@ -488,7 +488,7 @@ namespace Umbraco.Core.Services.Implement
                                                    new XElement("Alias", propertyType.Alias),
                                                    new XElement("Key", propertyType.Key),
                                                    new XElement("Type", propertyType.PropertyEditorAlias),
-                                                   new XElement("Definition", definition.Key),                                                   
+                                                   new XElement("Definition", definition.Key),
                                                    new XElement("Tab", propertyGroup == null ? "" : propertyGroup.Name),
                                                    new XElement("SortOrder", propertyType.SortOrder),
                                                    new XElement("Mandatory", propertyType.Mandatory.ToString()),
@@ -552,6 +552,13 @@ namespace Umbraco.Core.Services.Implement
                 new XAttribute("urlName", urlValue),
                 new XAttribute("path", contentBase.Path),
                 new XAttribute("isDoc", ""));
+
+
+            // Add culture specific node names
+            foreach (var culture in contentBase.AvailableCultures)
+            {
+                xml.Add(new XAttribute("nodeName-" + culture, contentBase.GetCultureName(culture)));
+            }
 
             foreach (var property in contentBase.Properties)
                 xml.Add(SerializeProperty(property, published));

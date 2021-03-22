@@ -477,7 +477,7 @@ namespace Umbraco.Core.Services.Implement
             if (media.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IMedia>();
 
             var rootId = Constants.System.RootString;
-            var ids = media.Path.Split(',')
+            var ids = media.Path.Split(Constants.CharArrays.Comma)
                 .Where(x => x != rootId && x != media.Id.ToString(CultureInfo.InvariantCulture))
                 .Select(int.Parse)
                 .ToArray();
