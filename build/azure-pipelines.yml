@@ -167,8 +167,24 @@ stages:
                   inputs:
                       workingDir: src\Umbraco.Tests.AcceptanceTest
                       verbose: false
-                - powershell: Invoke-WebRequest https://localhost:44331 -TimeoutSec 120
+                - task: PowerShell@1
                   displayName: Call website
+                  inputs:
+                      scriptType: inlineScript
+                      inlineScript: >
+                          add-type @"
+                              using System.Net;
+                              using System.Security.Cryptography.X509Certificates;
+                              public class TrustAllCertsPolicy : ICertificatePolicy {
+                                  public bool CheckValidationResult(
+                                      ServicePoint srvPoint, X509Certificate certificate,
+                                      WebRequest request, int certificateProblem) {
+                                      return true;
+                                  }
+                              }
+                          "@
+                          [System.Net.ServicePointManager]::CertificatePolicy = New-Object TrustAllCertsPolicy
+                          Invoke-WebRequest https://localhost:44331 -TimeoutSec 120
                 - task: Npm@1
                   displayName: npm run test (AcceptanceTest)
                   inputs:
