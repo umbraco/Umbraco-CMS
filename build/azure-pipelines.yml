@@ -114,8 +114,8 @@ stages:
           - name: ConnectionStrings__umbracoDbDSN
             value: Server=(LocalDB)\\MSSQLLocalDB;Database=Cypress;Integrated Security=true
       jobs:
-          - job: Windows_Dotnet_Build
-            displayName: Windows Dotnet Build
+          - job: Windows_Acceptance_tests
+            displayName: Windows
             pool:
                 vmImage: windows-latest
             steps:
@@ -123,16 +123,13 @@ stages:
                   displayName: Use .Net Core sdk 5.x
                   inputs:
                       version: 5.x
+                - powershell: sqllocaldb start mssqllocaldb
+                  displayName: Start MSSQL LocalDb
                 - task: DotNetCoreCLI@2
                   displayName: dotnet build (Netcore)
                   inputs:
                       command: build
                       projects: '**/Umbraco.Web.UI.Netcore.csproj'
-          - job: Windows_Install_Client
-            displayName: Windows Install Client
-            pool:
-                vmImage: windows-latest
-            steps:
                 - task: NodeTool@0
                   displayName: Use Node 11.x
                   inputs:
@@ -148,11 +145,10 @@ stages:
                     gulpFile: src\Umbraco.Web.UI.Client\gulpfile.js
                     targets: build
                     workingDirectory: src\Umbraco.Web.UI.Client
-          - job: Windows_Install_Cypress
-            displayName: Windows Install Cypress
-            pool:
-                vmImage: windows-latest
-            steps:
+                #- powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "--no-build", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
+                #  displayName: dotnet run (Netcore)
+                - powershell: dotnet run --no-build -p .\src\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj
+                  displayName: dotnet run (Netcore)
                 - task: PowerShell@1
                   displayName: Generate Cypress.env.json
                   inputs:
@@ -164,23 +160,6 @@ stages:
                   inputs:
                       workingDir: src\Umbraco.Tests.AcceptanceTest
                       verbose: false
-          - job: Windows_Run_Tests
-            displayName: Windows Run Acceptance Tests
-            dependsOn:
-                - Windows_Dotnet_Build
-                - Windows_Install_Client
-                - Windows_Install_Cypress
-            pool:
-                vmImage: windows-latest
-            steps:
-                - powershell: sqllocaldb start mssqllocaldb
-                  displayName: Start MSSQL LocalDb
-                #- powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "--no-build", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
-                #  displayName: dotnet run (Netcore)
-                - powershell: dotnet run --no-build -p src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj
-                  displayName: dotnet run (Netcore)
-                - powershell: Start-Sleep -s 15
-                  displayName: Sleep 15 sec
                 - powershell: Invoke-WebRequest https://localhost:44331 -TimeoutSec 120
                   displayName: Call website
                 - task: Npm@1
