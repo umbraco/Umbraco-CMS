@@ -168,44 +168,32 @@ stages:
                       workingDir: 'src\Umbraco.Tests.AcceptanceTest'
                 - task: Npm@1
                   displayName: Run Cypress (Desktop)
+                  continueOnError: true
                   inputs:
                       workingDir: src\Umbraco.Tests.AcceptanceTest
                       command: 'custom'
-                      customCommand: 'run test -- --reporter=junit --reporter-options="mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="videoUploadOnPasses=false,viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos"'
-                - task: PublishTestResults@2
-                  displayName: Publish Test results (Desktop)
-                  inputs:
-                      testResultsFormat: 'JUnit'
-                      testResultsFiles: 'results/test-output-D-*.xml'
-                      mergeTestResults: true
-                      testRunTitle: "Test results Desktop"
+                      customCommand: 'run test -- --config="videoUploadOnPasses=false,viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos"'
+                  
                 - task: Npm@1
                   displayName: Run Cypress (Tablet portrait)
+                  continueOnError: true
                   inputs:
                       workingDir: src\Umbraco.Tests.AcceptanceTest
                       command: 'custom'
-                      customCommand: 'run test -- --reporter=junit --reporter-options="mochaFile=results/test-output-T-[hash].xml,toConsole=true" --config="videoUploadOnPasses=false,viewportHeight=1366,viewportWidth=1024,screenshotsFolder=cypress/artifacts/tablet/screenshots,videosFolder=cypress/artifacts/tablet/videos"'
-                - task: PublishTestResults@2
-                  displayName: Publish Test results (Tablet portrait)
-                  inputs:
-                      testResultsFormat: 'JUnit'
-                      testResultsFiles: 'results/test-output-T-*.xml'
-                      mergeTestResults: true
-                      testRunTitle: "Test results Tablet portrait"
+                      customCommand: 'run test -- --config="videoUploadOnPasses=false,viewportHeight=1366,viewportWidth=1024,screenshotsFolder=cypress/artifacts/tablet/screenshots,videosFolder=cypress/artifacts/tablet/videos"'
+                  
                 - task: Npm@1
                   displayName: Run Cypress (Mobile protrait)
+                  continueOnError: true
                   inputs:
                       workingDir: src\Umbraco.Tests.AcceptanceTest
                       command: 'custom'
-                      customCommand: 'run test -- --reporter-options="mochaFile=results/test-output-M-[hash].xml,toConsole=true" --config="videoUploadOnPasses=false,viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos"'
-                
-                - task: PublishTestResults@2
-                  displayName: Publish Test results (Mobile portrait)
+                      customCommand: 'run test -- --config="videoUploadOnPasses=false,viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos"'
+                - task: PublishPipelineArtifact@1
+                  displayName: "Publish test artifacts"
                   inputs:
-                      testResultsFormat: 'JUnit'
-                      testResultsFiles: 'results/test-output-M-*.xml'
-                      mergeTestResults: true
-                      testRunTitle: "Test results Mobile"
+                    targetPath: '$(Build.SourcesDirectory)/cypress/artifacts'
+                    artifact: 'Test artifacts'
                       
     - stage: Artifacts
       dependsOn: []
