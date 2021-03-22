@@ -192,7 +192,7 @@ stages:
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish test artifacts"
                   inputs:
-                    targetPath: '$(Build.SourcesDirectory)/cypress/artifacts'
+                    targetPath: '$(Build.SourcesDirectory)/src/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
                     artifact: 'Test artifacts'
                       
     - stage: Artifacts
