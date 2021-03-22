@@ -110,7 +110,7 @@ stages:
           - name: Umbraco__CMS__Unattended__UnattendedUserEmail
             value: cypress@umbraco.com
           - name: Umbraco__CMS__Unattended__UnattendedUserPassword
-            value: abc123ABC!!!
+            value: UmbracoAcceptance123!
           - name: ConnectionStrings__umbracoDbDSN
             value: Server=(LocalDB)\\MSSQLLocalDB;Database=Cypress;Integrated Security=true
       jobs:
@@ -175,14 +175,12 @@ stages:
             steps:
                 - powershell: sqllocaldb start mssqllocaldb
                   displayName: Start MSSQL LocalDb
-                - task: PowerShell@1
+                - powershell: Start-Process -FilePath "dotnet" -ArgumentList "run", "--no-build", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
                   displayName: dotnet run (Netcore)
-                  inputs:
-                      scriptType: inlineScript
-                      inlineScript: >
-                          Start-Process -FilePath "dotnet" -ArgumentList "run", "--no-build", "-p", "src\Umbraco.Web.UI.Netcore\Umbraco.Web.UI.Netcore.csproj"
-                          Start-Sleep -s 15
-                          Invoke-WebRequest https://localhost:44331 -TimeoutSec 120
+                - powershell: Start-Sleep -s 15
+                  displayName: Sleep 15 sec
+                - powershell: Invoke-WebRequest https://localhost:44331 -TimeoutSec 120
+                  displayName: Call website
                 - task: Npm@1
                   displayName: npm run test (AcceptanceTest)
                   inputs:
