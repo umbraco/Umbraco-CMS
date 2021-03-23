@@ -7,5 +7,9 @@
         "password": "<insert password in cypress.env.json>"
     },
     "supportFile": "cypress/support/index.ts",
-    "videoUploadOnPasses" : false
+    "videoUploadOnPasses" : false,
+    "retries": {
+      "runMode": 2,
+      "openMode": 1
+    }
 }
