@@ -192,7 +192,7 @@ stages:
 #                      customCommand: 'run test -- --config="viewportHeight=812,viewportWidth=375,screenshotsFolder=cypress/artifacts/mobile/screenshots,videosFolder=cypress/artifacts/mobile/videos,videoUploadOnPasses=false"'
                 - task: PublishPipelineArtifact@1
                   displayName: "Publish test artifacts"
-                  condition: always()
+                  condition: failed()
                   inputs:
                     targetPath: '$(Build.SourcesDirectory)/src/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
                     artifact: 'Test artifacts'
