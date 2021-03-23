@@ -17,4 +17,14 @@
 
     </Target>
 
+    <Target Name="ClearUmbracoAssets" BeforeTargets="Clean">
+        <ItemGroup>
+            <UmbracoPackageDir Include="$(MSBuildProjectDirectory)\umbraco\" />
+            <WwwrootUmbracoPackageDir Include="$(MSBuildProjectDirectory)\wwwroot\umbraco\" />
+        </ItemGroup>
+        <Message Text="Clear old umbraco data"  Importance="high" />
+        <RemoveDir Directories="@(UmbracoPackageDir)"  />
+        <RemoveDir Directories="@(WwwrootUmbracoPackageDir)"  />
+    </Target>
+
 </Project>
