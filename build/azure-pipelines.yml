@@ -178,7 +178,7 @@ stages:
                 - task: PublishTestResults@2
                   inputs:
                       testResultsFormat: 'JUnit'
-                      testResultsFiles: 'src/Umbraco.Tests.AcceptanceTest/results/test-output-M-*.xml'
+                      testResultsFiles: 'src/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
                       mergeTestResults: true
                       testRunTitle: "Test results Desktop"
 #                - task: Npm@1
