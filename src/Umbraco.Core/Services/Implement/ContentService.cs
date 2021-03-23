@@ -594,8 +594,15 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.ContentTree);
-                var parentId = GetById(id)?.Id ?? 0;
-                var query = Query<IContent>().Where(x => x.ParentId == parentId);
+
+                var parent = GetById(id);
+                if (parent == null)
+                {
+                    totalChildren = 0;
+                    return Enumerable.Empty<IContent>();
+                }
+
+                var query = Query<IContent>().Where(x => x.ParentId == parent.Id);
                 return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
             }
         }
