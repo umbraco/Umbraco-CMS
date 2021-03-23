@@ -7,9 +7,9 @@ $Env:U_PASS = "testtesttest"
 $Env:U_SERVERNAME = "TEAMCANADA3"
 $Env:U_PROCESSNAME = "iisexpress"
 $Env:U_SCRIPTROOT = $PSScriptRoot
-$Env:U_DEBUG = 'true'
+$Env:U_DEBUG = 'false' # TODO: Change to 'true' for verbose logging
 
-$RunCount = 1;
+$RunCount = 2;
 $Rate = 1;
 $ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $RunCount + ', ""arrivalRate"": ' + $Rate + '}]}}'
 
@@ -40,10 +40,11 @@ $GetCountersScript = {
     Get-Counter -Counter $args[0] -ComputerName $args[1] -Continuous | Export-Counter -path "$($args[2])" -FileFormat csv -Force
 }
 
-## Clear our temp storage first
-if (Test-Path "$PSScriptRoot\output\run.tmp"){
-    Remove-Item "$PSScriptRoot\output\run.tmp"
+## Clear our output first
+if (Test-Path "$PSScriptRoot\output"){
+    Remove-Item "$PSScriptRoot\output\" -Force -Recurse
 }
+New-Item -Path "$PSScriptRoot\" -Name "output" -ItemType "directory"
 
 $Artillery = @(
     "login-and-load.yml",
@@ -57,9 +58,18 @@ $Artillery = @(
 if ($Env:U_DEBUG -eq 'true') {
     $Env:DEBUG = "http,http:capture,http:response"
 }
+else {
+    $Env:DEBUG = ""
+}
 
+# Run the artillery load testing
 foreach ( $a in $Artillery )
 {
+    # TODO: Ideally we would force a GC Collect here. BUT that's not really possible when running from a remote machine.
+    # It is possible on the same machine by using something like this https://github.com/cklutz/EtwForceGC, https://stackoverflow.com/a/26033289
+    # So potentially, we may want to host a custom endpoint when we automate the installation of Umbraco to be able to be called
+    # to just call GC.Collect on that machine.
+
     # start the counter collection on a background task, since we specified continuous this will keep going till we stop the task
     $Job = Start-Job $GetCountersScript -Name "MyCounters" -ArgumentList $Counters,$Env:U_SERVERNAME,"$PSScriptRoot\output\$a.csv"
     $Job | Receive-Job -Keep
@@ -70,7 +80,16 @@ foreach ( $a in $Artillery )
         # like: artillery run –overrides ‘{“config”: {“phases”: [{“duration”: 10, “arrivalRate”: 1}]}}’ test. yaml
 
         $Artillery | & artillery run "$PSScriptRoot\artillery\$a" --output "$PSScriptRoot\output\$a.json" --target $Env:U_BASE_URL --overrides $ArtilleryOverrides
-        & artillery report --output "$PSScriptRoot\output\$a.html" "$PSScriptRoot\output\$a.json"
+
+        if($?)
+        {
+            & artillery report --output "$PSScriptRoot\output\$a.html" "$PSScriptRoot\output\$a.json"
+        }
+        else
+        {
+            Write-Error "Artillery request failed. Exiting process."
+            exit 1
+        }
     }
     finally {
         Write-Verbose "Stopping counters"
@@ -80,3 +99,9 @@ foreach ( $a in $Artillery )
         $Batch | Remove-Job
     }
 }
+
+# Run the node app to push our reports
+
+# TODO: We'll need to change this to be something unique for the specific
+# testing hardware/specs we will be using, for now it's just my computer "8.12.1"
+& node .\app.js 8.12.1 TEAMCANADA3

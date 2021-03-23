@@ -107,6 +107,10 @@ function writeDebug(context, msg) {
     }
 }
 
+function writeError(msg) {
+    console.error("ERROR: " + msg);
+}
+
 function configureDocType(requestParams, context, ee, next) {
     if (!context.vars.jsonResponse) {
         throw "jsonResponse was not found in the context";
@@ -157,12 +161,12 @@ function beforeRequest(requestParams, context, ee, next) {
 
         // set the xsrf header if we've captured it
         if (context.vars.umbXsrf) {
-            console.log("SETTING XSRF HEADER FROM CTX: " + context.vars.umbXsrf.value);
+            writeDebug(context, "SETTING XSRF HEADER FROM CTX: " + context.vars.umbXsrf.value);
             requestParams.headers["X-UMB-XSRF-TOKEN"] = context.vars.umbXsrf.value;
         }
         else if (!isLogin && tempData.umbXsrf) {
             let val = tough.Cookie.parse(tempData.umbXsrf).value;
-            console.log("SETTING XSRF HEADER FROM STORAGE: " + val);
+            writeDebug(context, "SETTING XSRF HEADER FROM STORAGE: " + val);
 
             // set from storage
             requestParams.headers["X-UMB-XSRF-TOKEN"] = val;
@@ -185,8 +189,11 @@ function beforeRequest(requestParams, context, ee, next) {
 function afterResponse(requestParams, response, context, ee, next) {
 
     if (response.statusCode != 200) {
-        //console.error(response.body);
-        console.error(response);
+        // Kill the process if we don't have a 200 code
+        const msg = "Non 200 status code returned: " + response.request.uri.path;
+        writeError(msg);
+        writeError(response);
+        throw msg;
     }
 
     writeDebug(context, `${response.request.uri.path}: ${response.statusCode}`);

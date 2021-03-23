@@ -5,7 +5,9 @@
   "main": "umbraco-flow.js",
   "dependencies": {},
   "devDependencies": {
+    "@azure/cosmos": "^3.10.3",
     "artillery": "^1.6.1",
+    "csv-parser": "^3.0.0",
     "lodash": "^4.17.20",
     "node-powershell": "^4.0.0",
     "perfmon": "^0.2.0",
