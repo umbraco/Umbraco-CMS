@@ -176,6 +176,7 @@ stages:
                       customCommand: 'run test -- --reporter junit --reporter-options "mochaFile=results/test-output-D-[hash].xml,toConsole=true" --config="viewportHeight=1600,viewportWidth=2560,screenshotsFolder=cypress/artifacts/desktop/screenshots,videosFolder=cypress/artifacts/desktop/videos,videoUploadOnPasses=false"'
 
                 - task: PublishTestResults@2
+                  condition: always()
                   inputs:
                       testResultsFormat: 'JUnit'
                       testResultsFiles: 'src/Umbraco.Tests.AcceptanceTest/results/test-output-D-*.xml'
