@@ -1,4 +1,3 @@
-﻿using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
@@ -37,9 +36,16 @@ namespace Umbraco.Web
                 // we have a value
                 // try to cast or convert it
                 var value =  property.GetValue(culture, segment);
-                if (value is T valueAsT) return valueAsT;
+                if (value is T valueAsT)
+                {
+                    return valueAsT;
+                }
+
                 var valueConverted = value.TryConvertTo<T>();
-                if (valueConverted) return valueConverted.Result;
+                if (valueConverted)
+                {
+                    return valueConverted.Result;
+                }
 
                 // cannot cast nor convert the value, nothing we can return but 'default'
                 // note: we don't want to fallback in that case - would make little sense
@@ -48,14 +54,28 @@ namespace Umbraco.Web
 
             // we don't have a value, try fallback
             if (PublishedValueFallback.TryGetValue(property, culture, segment, fallback, defaultValue, out var fallbackValue))
+            {
                 return fallbackValue;
+            }
 
             // we don't have a value - neither direct nor fallback
             // give a chance to the converter to return something (eg empty enumerable)
             var noValue = property.GetValue(culture, segment);
-            if (noValue is T noValueAsT) return noValueAsT;
+            if (noValue == null)
+            {
+                return default;
+            }
+
+            if (noValue is T noValueAsT)
+            {
+                return noValueAsT;
+            }
+
             var noValueConverted = noValue.TryConvertTo<T>();
-            if (noValueConverted) return noValueConverted.Result;
+            if (noValueConverted)
+            {
+                return noValueConverted.Result;
+            }
 
             // cannot cast noValue nor convert it, nothing we can return but 'default'
             return default;

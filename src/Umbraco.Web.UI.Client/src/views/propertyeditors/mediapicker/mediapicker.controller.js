@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, angularHelper, overlayService) {
+    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, angularHelper, overlayService, clipboardService) {
 
         var vm = this;
 
@@ -10,6 +10,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         vm.add = add;
         vm.remove = remove;
+        vm.copyItem = copyItem;
         vm.editItem = editItem;
         vm.showAdd = showAdd;
 
@@ -53,7 +54,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         // it's prone to someone "fixing" it at some point without knowing the effects. Rather use toString()
                         // compares and be completely sure it works.
                         var found = medias.find(m => m.udi.toString() === id.toString() || m.id.toString() === id.toString());
-                        
+
                         var mediaItem = found ||
                         {
                             name: vm.labels.deletedItem,
@@ -94,6 +95,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         function sync() {
             $scope.model.value = $scope.ids.join();
             removeAllEntriesAction.isDisabled = $scope.ids.length === 0;
+            copyAllEntriesAction.isDisabled = removeAllEntriesAction.isDisabled;
         }
 
         function setDirty() {
@@ -127,7 +129,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             ];
 
             localizationService.localizeMany(labelKeys)
-                .then(function(data) {
+                .then(function (data) {
                     vm.labels.deletedItem = data[0];
                     vm.labels.trashed = data[1];
 
@@ -141,7 +143,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                             else {
                                 $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
                                 $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-                            }  
+                            }
                         }
 
                         // only allow users to add and edit media if they have access to the media section
@@ -159,6 +161,23 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             $scope.ids.splice(index, 1);
             sync();
             setDirty();
+        }
+
+        function copyAllEntries() {
+            clipboardService.copyMultiple(clipboardService.TYPES.IMAGE,
+                "Media",
+                $scope.mediaItems.map(item => {
+                    return { "media": item, "key": item.udi }
+                }), clearNodeForCopy);
+        }
+
+        function copyItem(item) {
+            clipboardService.copy(clipboardService.TYPES.IMAGE, "Media", { "media": item }, null, null, item.udi, clearNodeForCopy);
+        }
+
+        function clearNodeForCopy(item) {
+            delete item.media.selected;
+            delete item.media.selectable;
         }
 
         function editItem(item) {
@@ -260,6 +279,14 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             });
         }
 
+        var copyAllEntriesAction = {
+            labelKey: 'clipboard_labelForCopyAllEntries',
+            labelTokens: ['Media'],
+            icon: "documents",
+            method: copyAllEntries,
+            isDisabled: true
+        }
+
         var removeAllEntriesAction = {
             labelKey: 'clipboard_labelForRemoveAllEntries',
             labelTokens: [],
@@ -267,9 +294,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             method: removeAllEntries,
             isDisabled: true
         };
-        
+
         if (multiPicker === true) {
             var propertyActions = [
+                copyAllEntriesAction,
                 removeAllEntriesAction
             ];
 
@@ -287,12 +315,12 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             cancel: ".unsortable",
             update: function () {
                 setDirty();
-                $timeout(function() {
+                $timeout(function () {
                     // TODO: Instead of doing this with a timeout would be better to use a watch like we do in the
                     // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the
                     // watch do all the rest.
                     $scope.ids = $scope.mediaItems.map(media => $scope.model.config.idType === "udi" ? media.udi : media.id);
-                    
+
                     sync();
                 });
             }
