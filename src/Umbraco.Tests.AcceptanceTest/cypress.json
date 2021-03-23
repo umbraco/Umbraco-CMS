@@ -9,7 +9,7 @@
     "supportFile": "cypress/support/index.ts",
     "videoUploadOnPasses" : false,
     "retries": {
-      "runMode": 2,
+      "runMode": 5,
       "openMode": 1
     }
 }
