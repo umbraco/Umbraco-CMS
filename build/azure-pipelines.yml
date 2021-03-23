@@ -222,7 +222,7 @@ stages:
                   displayName: Use .Net Core sdk 5.x
                   inputs:
                       version: 5.x
-                - powershell:  sqlcmd -S="localhost,1433" -U="sa" -P="UmbracoIntegration123!" -Q="CREATE DATABASE $env:UmbracoDatabaseName"
+                - powershell:  sqlcmd -S="127.0.0.1,1433" -U="sa" -P="UmbracoIntegration123!" -Q="CREATE DATABASE $env:UmbracoDatabaseName"
                   displayName: Create database
                 #                - task: DotNetCoreCLI@2
                 #                  displayName: dotnet build (Netcore)
