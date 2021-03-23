@@ -146,7 +146,7 @@
                  * umbAceEditorConfig merged with user options via json in attribute or data binding
                  * @type object
                  */
-                var opts = Utilities.extend(options, scope.umbAceEditor);
+                var opts = Utilities.extend({}, options, scope.umbAceEditor);
 
                 //load ace libraries here... 
 
@@ -272,7 +272,7 @@
                         return;
                     }
 
-                    opts = Utilities.extend(options, scope.umbAceEditor);
+                    opts = Utilities.extend({}, options, scope.umbAceEditor);
 
                     opts.callbacks = [opts.onLoad];
                     if (opts.onLoad !== options.onLoad) {
