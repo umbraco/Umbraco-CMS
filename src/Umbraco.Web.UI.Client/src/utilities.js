@@ -34,7 +34,7 @@
      * Facade to angular.extend
      * Use this with Angular objects, for vanilla JS objects, use Object.assign()
      */
-    const extend = (dst, src) => angular.extend(dst, src);
+    const extend = (dst, src) => angular.extend(dst, ...src);
 
     /**
      * Equivalent to angular.isFunction
