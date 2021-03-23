@@ -253,9 +253,9 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             // find content root nodes
             entityResource.getChildren(-1, "Document").then(function (data) {
 
-                var children = data;
-                if (children.length === 1) {
-                    var nodeId = children[0].id;
+                // if only a single content node at root we can use that in XPath query
+                if (data && data.length === 1) {
+                    var nodeId = data[0].id;
                     entityResource.getByQuery($scope.model.config.startNode.query, nodeId, "Document").then(function (ent) {
                         // ensure an entity is returned
                         if (ent) {
