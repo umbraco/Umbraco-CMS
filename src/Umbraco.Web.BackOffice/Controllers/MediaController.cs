@@ -24,7 +24,6 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -42,7 +41,6 @@ using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -647,7 +645,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // Authorize...
             var requirement = new MediaPermissionsResourceRequirement();
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, _mediaService.GetById(sorted.ParentId), requirement);
+            var resource = new MediaPermissionsResource(sorted.ParentId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, resource, requirement);
             if (!authorizationResult.Succeeded)
             {
                 return Forbid();
