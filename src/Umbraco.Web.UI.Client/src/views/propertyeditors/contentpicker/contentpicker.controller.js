@@ -238,11 +238,34 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         dialogOptions.startNodeId = -1;
     }
     else if ($scope.model.config.startNode.query) {
-        //if we have a query for the startnode, we will use that.
-        var rootId = $routeParams.id;
-        entityResource.getByQuery($scope.model.config.startNode.query, rootId, "Document").then(function (ent) {
-            dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
-        });
+
+        if ($routeParams.section === "content") {
+            var nodeId = $routeParams.id;
+            //if we have a query for the startnode, we will use that.
+            entityResource.getByQuery($scope.model.config.startNode.query, nodeId, "Document").then(function (ent) {
+                // ensure an entity is returned
+                if (ent) {
+                    dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
+                }
+            });
+        }
+        else {
+            // find content root nodes
+            entityResource.getChildren(-1, "Document").then(function (data) {
+
+                var children = data;
+                if (children.length === 1) {
+                    var nodeId = children[0].id;
+                    entityResource.getByQuery($scope.model.config.startNode.query, nodeId, "Document").then(function (ent) {
+                        // ensure an entity is returned
+                        if (ent) {
+                            dialogOptions.startNodeId = ($scope.model.config.idType === "udi" ? ent.udi : ent.id).toString();
+                        }
+                    });
+                }
+
+            });
+        }
     }
     else {
         dialogOptions.startNodeId = $scope.model.config.startNode.id;
