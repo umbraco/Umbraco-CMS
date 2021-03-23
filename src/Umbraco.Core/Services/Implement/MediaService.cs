@@ -327,6 +327,20 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <summary>
+        /// Gets an <see cref="IMedia"/> object by its 'UniqueId'
+        /// </summary>
+        /// <param name="key">Guid key of the Media to retrieve</param>
+        /// <returns><see cref="IMedia"/></returns>
+        public IMedia GetById(Guid key)
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+                return _mediaRepository.Get(key);
+            }
+        }
+
+        /// <summary>
         /// Gets an <see cref="IMedia"/> object by Id
         /// </summary>
         /// <param name="ids">Ids of the Media to retrieve</param>
@@ -340,20 +354,6 @@ namespace Umbraco.Core.Services.Implement
             {
                 scope.ReadLock(Constants.Locks.MediaTree);
                 return _mediaRepository.GetMany(idsA);
-            }
-        }
-
-        /// <summary>
-        /// Gets an <see cref="IMedia"/> object by its 'UniqueId'
-        /// </summary>
-        /// <param name="key">Guid key of the Media to retrieve</param>
-        /// <returns><see cref="IMedia"/></returns>
-        public IMedia GetById(Guid key)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                scope.ReadLock(Constants.Locks.MediaTree);
-                return _mediaRepository.Get(key);
             }
         }
 
@@ -511,6 +511,32 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
+        public IEnumerable<IMedia> GetPagedChildren(Guid id, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IMedia> filter = null, Ordering ordering = null)
+        {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            if (ordering == null)
+                ordering = Ordering.By("sortOrder");
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+
+                var parent = GetById(id);
+                if (parent == null)
+                {
+                    totalChildren = 0;
+                    return Enumerable.Empty<IMedia>();
+                }
+
+                var query = Query<IMedia>().Where(x => x.ParentId == parent.Id);
+                return _mediaRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            }
+        }
+
+        /// <inheritdoc />
         public IEnumerable<IMedia> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
             IQuery<IMedia> filter = null, Ordering ordering = null)
         {
@@ -563,6 +589,18 @@ namespace Umbraco.Core.Services.Implement
         {
             // intentionally not locking
             var media = GetById(id);
+            return GetParent(media);
+        }
+
+        /// <summary>
+        /// Gets the parent of the current media as an <see cref="IMedia"/> item.
+        /// </summary>
+        /// <param name="key">Key of the <see cref="IMedia"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IMedia"/> object</returns>
+        public IMedia GetParent(Guid key)
+        {
+            // intentionally not locking
+            var media = GetById(key);
             return GetParent(media);
         }
 

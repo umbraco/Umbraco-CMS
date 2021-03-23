@@ -666,12 +666,12 @@ namespace Umbraco.Core.Services.Implement
         /// <summary>
         /// Gets the parent of the current content as an <see cref="IContent"/> item.
         /// </summary>
-        /// <param name="id">Id of the <see cref="IContent"/> to retrieve the parent from</param>
+        /// <param name="key">Guid key of the <see cref="IContent"/> to retrieve the parent from</param>
         /// <returns>Parent <see cref="IContent"/> object</returns>
-        public IContent GetParent(Guid id)
+        public IContent GetParent(Guid key)
         {
             // intentionally not locking
-            var content = GetById(id);
+            var content = GetById(key);
             return GetParent(content);
         }
 

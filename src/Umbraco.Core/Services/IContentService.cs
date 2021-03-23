@@ -92,7 +92,7 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the parent of a document.
         /// </summary>
-        IContent GetParent(Guid key);
+        IContent GetParent(Guid id);
 
         /// <summary>
         /// Gets the parent of a document.

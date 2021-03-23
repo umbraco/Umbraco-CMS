@@ -74,9 +74,16 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets an <see cref="IMedia"/> object by Id
         /// </summary>
-        /// <param name="id">Id of the Content to retrieve</param>
+        /// <param name="id">Id of the Media to retrieve</param>
         /// <returns><see cref="IMedia"/></returns>
         IMedia GetById(int id);
+
+        /// <summary>
+        /// Gets an <see cref="IMedia"/> object by its 'UniqueId'
+        /// </summary>
+        /// <param name="key">Guid key of the Media to retrieve</param>
+        /// <returns><see cref="IMedia"/></returns>
+        IMedia GetById(Guid key);
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
@@ -91,6 +98,21 @@ namespace Umbraco.Core.Services
         /// <param name="filter"></param>
         /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
         IEnumerable<IMedia> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IMedia> filter = null, Ordering ordering = null);
+
+        /// <summary>
+        /// Gets a collection of <see cref="IMedia"/> objects by Parent Id
+        /// </summary>
+        /// <param name="id">Id of the Parent to retrieve Children from</param>
+        /// <param name="pageIndex">Page number</param>
+        /// <param name="pageSize">Page size</param>
+        /// <param name="totalRecords">Total records query would return without paging</param>
+        /// <param name="orderBy">Field to order by</param>
+        /// <param name="orderDirection">Direction to order by</param>
+        /// <param name="orderBySystemField">Flag to indicate when ordering by system field</param>
+        /// <param name="filter"></param>
+        /// <returns>An Enumerable list of <see cref="IContent"/> objects</returns>
+        IEnumerable<IMedia> GetPagedChildren(Guid id, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IMedia> filter = null, Ordering ordering = null);
 
         /// <summary>
@@ -214,13 +236,6 @@ namespace Umbraco.Core.Services
         /// <param name="userId">Id of the User saving the Media</param>
         /// <param name="raiseEvents">Optional boolean indicating whether or not to raise events.</param>
         Attempt<OperationResult> Save(IEnumerable<IMedia> medias, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
-
-        /// <summary>
-        /// Gets an <see cref="IMedia"/> object by its 'UniqueId'
-        /// </summary>
-        /// <param name="key">Guid key of the Media to retrieve</param>
-        /// <returns><see cref="IMedia"/></returns>
-        IMedia GetById(Guid key);
 
         /// <summary>
         /// Gets a collection of <see cref="IMedia"/> objects by Level
