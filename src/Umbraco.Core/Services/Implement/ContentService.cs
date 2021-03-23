@@ -582,6 +582,25 @@ namespace Umbraco.Core.Services.Implement
         }
 
         /// <inheritdoc />
+        public IEnumerable<IContent> GetPagedChildren(Guid id, long pageIndex, int pageSize, out long totalChildren,
+            IQuery<IContent> filter = null, Ordering ordering = null)
+        {
+            if (pageIndex < 0) throw new ArgumentOutOfRangeException(nameof(pageIndex));
+            if (pageSize <= 0) throw new ArgumentOutOfRangeException(nameof(pageSize));
+
+            if (ordering == null)
+                ordering = Ordering.By("sortOrder");
+
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                var parentId = GetById(id)?.Id ?? 0;
+                var query = Query<IContent>().Where(x => x.ParentId == parentId);
+                return _documentRepository.GetPage(query, pageIndex, pageSize, out totalChildren, filter, ordering);
+            }
+        }
+
+        /// <inheritdoc />
         public IEnumerable<IContent> GetPagedDescendants(int id, long pageIndex, int pageSize, out long totalChildren,
             IQuery<IContent> filter = null, Ordering ordering = null)
         {
@@ -631,6 +650,18 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="id">Id of the <see cref="IContent"/> to retrieve the parent from</param>
         /// <returns>Parent <see cref="IContent"/> object</returns>
         public IContent GetParent(int id)
+        {
+            // intentionally not locking
+            var content = GetById(id);
+            return GetParent(content);
+        }
+
+        /// <summary>
+        /// Gets the parent of the current content as an <see cref="IContent"/> item.
+        /// </summary>
+        /// <param name="id">Id of the <see cref="IContent"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IContent"/> object</returns>
+        public IContent GetParent(Guid id)
         {
             // intentionally not locking
             var content = GetById(id);

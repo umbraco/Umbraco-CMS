@@ -92,6 +92,11 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the parent of a document.
         /// </summary>
+        IContent GetParent(Guid key);
+
+        /// <summary>
+        /// Gets the parent of a document.
+        /// </summary>
         IContent GetParent(IContent content);
 
         /// <summary>
@@ -168,6 +173,18 @@ namespace Umbraco.Core.Services
         /// <param name="filter">Query filter.</param>
         /// <param name="ordering">Ordering infos.</param>
         IEnumerable<IContent> GetPagedChildren(int id, long pageIndex, int pageSize, out long totalRecords,
+            IQuery<IContent> filter = null, Ordering ordering = null);
+
+        /// <summary>
+        /// Gets child documents of a parent.
+        /// </summary>
+        /// <param name="id">The parent identifier.</param>
+        /// <param name="pageIndex">The page number.</param>
+        /// <param name="pageSize">The page size.</param>
+        /// <param name="totalRecords">Total number of documents.</param>
+        /// <param name="filter">Query filter.</param>
+        /// <param name="ordering">Ordering infos.</param>
+        IEnumerable<IContent> GetPagedChildren(Guid id, long pageIndex, int pageSize, out long totalRecords,
             IQuery<IContent> filter = null, Ordering ordering = null);
 
         /// <summary>
