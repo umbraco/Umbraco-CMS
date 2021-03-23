@@ -313,6 +313,13 @@ namespace Umbraco.Core.Services
         /// <summary>
         /// Gets the parent of the current media as an <see cref="IMedia"/> item.
         /// </summary>
+        /// <param name="key">Key of the <see cref="IMedia"/> to retrieve the parent from</param>
+        /// <returns>Parent <see cref="IMedia"/> object</returns>
+        IMedia GetParent(Guid key);
+
+        /// <summary>
+        /// Gets the parent of the current media as an <see cref="IMedia"/> item.
+        /// </summary>
         /// <param name="media"><see cref="IMedia"/> to retrieve the parent from</param>
         /// <returns>Parent <see cref="IMedia"/> object</returns>
         IMedia GetParent(IMedia media);
