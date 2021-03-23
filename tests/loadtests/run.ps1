@@ -9,6 +9,11 @@ $Env:U_PROCESSNAME = "iisexpress"
 $Env:U_SCRIPTROOT = $PSScriptRoot
 $Env:U_DEBUG = 'false' # TODO: Change to 'true' for verbose logging
 
+$CosmosDbEndpoint = "https://xyz.documents.azure.com:443/"
+$CosmosDbKey = "abc"
+$CosmosDbDatabaseId = "UmbracoLoadTesting"
+$CosmosDbContainerId = "LoadTestResults"
+
 $RunCount = 2;
 $Rate = 1;
 $ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $RunCount + ', ""arrivalRate"": ' + $Rate + '}]}}'
@@ -104,4 +109,4 @@ foreach ( $a in $Artillery )
 
 # TODO: We'll need to change this to be something unique for the specific
 # testing hardware/specs we will be using, for now it's just my computer "8.12.1"
-& node .\app.js 8.12.1 TEAMCANADA3
+& node .\app.js 8.12.1 TEAMCANADA3 $CosmosDbEndpoint $CosmosDbKey $CosmosDbDatabaseId $CosmosDbContainerId

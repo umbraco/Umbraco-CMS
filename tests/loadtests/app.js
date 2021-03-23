@@ -1,5 +1,4 @@
 const CosmosClient = require("@azure/cosmos").CosmosClient;
-const config = require("./config");
 const dbContext = require("./databaseContext");
 const csvReports = require("./csvReports");
 const throughputReports = require("./throughputReports");
@@ -108,11 +107,25 @@ async function main() {
     if (myArgs.length < 2) {
         throw "Missing argument for the test runner machine spec";
     }
+    if (myArgs.length < 3) {
+        throw "Missing argument for cosmosdb endpoint";
+    }
+    if (myArgs.length < 4) {
+        throw "Missing argument for cosmosdb key";
+    }
+    if (myArgs.length < 5) {
+        throw "Missing argument for cosmosdb databaseId";
+    }
+    if (myArgs.length < 6) {
+        throw "Missing argument for cosmosdb containerId";
+    }
 
     const umbVersion = myArgs[0];
     const machineSpec = myArgs[1];
-
-    const { endpoint, key, databaseId, containerId } = config;
+    const endpoint = myArgs[2];
+    const key = myArgs[3];
+    const databaseId = myArgs[4];
+    const containerId = myArgs[5];
 
     const client = new CosmosClient({ endpoint, key });
 
@@ -120,7 +133,8 @@ async function main() {
     const container = database.container(containerId);
 
     // Make sure Tasks database is already setup. If not, create it.
-    await dbContext.create(client, databaseId, containerId);
+    const partitionKey = { kind: "Hash", paths: ["/testingSource"] };
+    await dbContext.create(client, databaseId, containerId, partitionKey);
 
     await pushReports(container, umbVersion, machineSpec);
     await showReport(container, machineSpec);
