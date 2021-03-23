@@ -3,7 +3,7 @@
 config:
   variables:
     backOfficeApiPath: "/umbraco/backoffice/UmbracoApi"
-  processor: "./umbraco-flow.js"
+  processor: "./umbracoDataFlow.js"
   phases:
     - duration: 1
       arrivalRate: 1

@@ -14,7 +14,12 @@ $CosmosDbKey = "abc"
 $CosmosDbDatabaseId = "UmbracoLoadTesting"
 $CosmosDbContainerId = "LoadTestResults"
 
-$RunCount = 2;
+# TODO: We'll need to change this to be something unique for the specific
+# testing hardware/specs we will be using, for now it's just my computer "8.12.1"
+$UmbracoVersion = "8.12.1"
+$MachineSpec = "TEAMCANADA3"
+
+$RunCount = 1;
 $Rate = 1;
 $ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $RunCount + ', ""arrivalRate"": ' + $Rate + '}]}}'
 
@@ -53,10 +58,8 @@ New-Item -Path "$PSScriptRoot\" -Name "output" -ItemType "directory"
 
 $Artillery = @(
     "login-and-load.yml",
-
-    # TODO: Ok, so now we need to be able to set a few GUIDs as env variables I think:
-    # Set a GUID for a new content type that we'll create which can be used for it's aliases, etc...
-    "create-doctype.yml"
+    "create-doctype.yml",
+    "create-content.yml"
 )
 
 # set special artillery debug switches
@@ -106,7 +109,4 @@ foreach ( $a in $Artillery )
 }
 
 # Run the node app to push our reports
-
-# TODO: We'll need to change this to be something unique for the specific
-# testing hardware/specs we will be using, for now it's just my computer "8.12.1"
-& node .\app.js 8.12.1 TEAMCANADA3 $CosmosDbEndpoint $CosmosDbKey $CosmosDbDatabaseId $CosmosDbContainerId
+& node .\app.js $UmbracoVersion $MachineSpec $CosmosDbEndpoint $CosmosDbKey $CosmosDbDatabaseId $CosmosDbContainerId
