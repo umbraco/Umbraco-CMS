@@ -152,9 +152,9 @@ stages:
                           $a | ConvertTo-Json -depth 32| set-content $templatePath
 
                           $template2Path = 'build/templates/UmbracoPackage/.template.config/template.json'
-                          $a2 = Get-Content $template2Path -raw | ConvertFrom-Json
-                          $a2.symbols.version.defaultValue = $continuous
-                          $a2 | ConvertTo-Json -depth 32| set-content $template2Path
+                          $b = Get-Content $template2Path -raw | ConvertFrom-Json
+                          $b.symbols.version.defaultValue = $continuous
+                          $b | ConvertTo-Json -depth 32| set-content $template2Path
 
                           Write-Host "Building: $continuous"
                 - task: PowerShell@1
