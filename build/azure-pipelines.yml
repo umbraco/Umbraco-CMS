@@ -124,39 +124,49 @@ stages:
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
-                          Write-Host "Working folder: $pwd"
+                        Write-Host "Working folder: $pwd"
 
-                          $ubuild = build/build.ps1 -get -continue
-
-
-                          $version = $ubuild.GetUmbracoVersion()
-
-                          if ($version.Comment -ne "")
-                            {
-                              # 8.0.0-beta.33.1234
-                              $continuous = "$($version.Semver).$(Build.BuildNumber)"
-                            }
-                          else
-                            {
-                              # 8.0.0-alpha.1234
-                              $continuous = "$($version.Release)-alpha.$(Build.BuildNumber)"
-                            }
-                          $ubuild.SetUmbracoVersion($continuous)
+                        $ubuild = build/build.ps1 -get -continue
 
 
-                          #Update the version in templates also
+                        $version = $ubuild.GetUmbracoVersion()
 
-                          $templatePath ='build/templates/UmbracoSolution/.template.config/template.json'
-                          $a = Get-Content $templatePath -raw | ConvertFrom-Json
-                          $a.symbols.version.defaultValue = $continuous
-                          $a | ConvertTo-Json -depth 32| set-content $templatePath
+                        if ($version.Comment -ne "")
+                        {
+                          # 8.0.0-beta.33.1234
+                          $continuous = "$($version.Semver).$(Build.BuildNumber)"
+                        }
+                        else
+                        {
+                          # 8.0.0-alpha.1234
+                          $continuous = "$($version.Release)-alpha.$(Build.BuildNumber)"
+                        }
+                        $ubuild.SetUmbracoVersion($continuous)
 
-                          $template2Path = 'build/templates/UmbracoPackage/.template.config/template.json'
-                          $b = Get-Content $template2Path -raw | ConvertFrom-Json
-                          $b.symbols.version.defaultValue = $continuous
-                          $b | ConvertTo-Json -depth 32| set-content $template2Path
 
-                          Write-Host "Building: $continuous"
+                        #Update the version in templates also
+
+                        $templatePath =
+                        'build/templates/UmbracoSolution/.template.config/template.json'
+
+                        $a = Get-Content $templatePath -raw | ConvertFrom-Json
+
+                        $a.symbols.version.defaultValue = $continuous
+
+                        $a | ConvertTo-Json -depth 32| set-content $templatePath
+
+
+                        $templatePath =
+                        'build/templates/UmbracoPackage/.template.config/template.json'
+
+                        $a = Get-Content $templatePath -raw | ConvertFrom-Json
+
+                        $a.symbols.version.defaultValue = $continuous
+
+                        $a | ConvertTo-Json -depth 32| set-content $templatePath
+
+
+                        Write-Host "Building: $continuous"
                 - task: PowerShell@1
                   displayName: Prepare Build
                   inputs:
