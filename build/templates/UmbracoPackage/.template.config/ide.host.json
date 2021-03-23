@@ -4,7 +4,7 @@
     "icon": "icon.png",
     "description": {
         "id": "UmbracoPackage",
-        "text": "An empty Umbraco Package/Plugin ready to get started."
+        "text": "Umbraco Package - An empty Umbraco CMS package (Plugin)"
     },
     "symbolInfo": [
 
