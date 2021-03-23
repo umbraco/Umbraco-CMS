@@ -222,10 +222,7 @@ stages:
                   displayName: Use .Net Core sdk 5.x
                   inputs:
                       version: 5.x
-
-                - powershell:  Install-Module -Name SqlServer
-                  displayName: Install PS Module for MSSql
-                - powershell:  Invoke-Sqlcmd -Query "CREATE DATABASE $env:UmbracoDatabaseName" -ServerInstance $env:UmbracoDatabaseServer
+                - powershell:  sqlcmd -S $env:UmbracoDatabaseServer -Q "CREATE DATABASE $env:UmbracoDatabaseName"
                   displayName: Create database
                 #                - task: DotNetCoreCLI@2
                 #                  displayName: dotnet build (Netcore)
