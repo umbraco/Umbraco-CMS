@@ -10,7 +10,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
     /// </summary>
     public class ModelsBuilderSettings
     {
-        private bool _flagOutOfDateModels;
+        private bool _flagOutOfDateModels = true;
 
         private static string DefaultModelsDirectory => "~/umbraco/models";
 
