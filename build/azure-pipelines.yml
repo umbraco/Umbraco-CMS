@@ -144,17 +144,17 @@ stages:
                           $ubuild.SetUmbracoVersion($continuous)
 
 
-                          #Update the version in template also
+                          #Update the version in templates also
 
-                          $templatePath =
-                          'build/templates/UmbracoSolution/.template.config/template.json'
-
+                          $templatePath ='build/templates/UmbracoSolution/.template.config/template.json'
                           $a = Get-Content $templatePath -raw | ConvertFrom-Json
-
                           $a.symbols.version.defaultValue = $continuous
-
                           $a | ConvertTo-Json -depth 32| set-content $templatePath
 
+                          $templatePath = 'build/templates/UmbracoPackage/.template.config/template.json'
+                          $a = Get-Content $templatePath -raw | ConvertFrom-Json
+                          $a.symbols.version.defaultValue = $continuous
+                          $a | ConvertTo-Json -depth 32| set-content $templatePath
 
                           Write-Host "Building: $continuous"
                 - task: PowerShell@1
