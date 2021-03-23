@@ -100,7 +100,7 @@ Use this directive to render a date time picker
         ctrl.$onInit = function () {
 
             // load css file for the date picker
-            assetsService.loadCss('lib/flatpickr/flatpickr.css', $scope).then(function () {
+            assetsService.loadCss('lib/flatpickr/flatpickr.min.css', $scope).then(function () {
                 userService.getCurrentUser().then(function (user) {
 
                     // init date picker

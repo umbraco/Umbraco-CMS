@@ -178,7 +178,7 @@ function dependencies() {
             "name": "flatpickr",
             "src":  [
                 "./node_modules/flatpickr/dist/flatpickr.min.js",
-                "./node_modules/flatpickr/dist/flatpickr.css",
+                "./node_modules/flatpickr/dist/flatpickr.min.css",
                 "./node_modules/flatpickr/dist/l10n/*.js"
             ],
             "base": "./node_modules/flatpickr/dist"
@@ -248,7 +248,7 @@ function dependencies() {
             "name": "spectrum",
             "src":  [
                 "./node_modules/spectrum-colorpicker2/dist/spectrum.js",
-                "./node_modules/spectrum-colorpicker2/dist/spectrum.css"
+                "./node_modules/spectrum-colorpicker2/dist/spectrum.min.css"
             ],
             "base": "./node_modules/spectrum-colorpicker2/dist"
         },
