@@ -248,7 +248,7 @@ stages:
                   displayName: dotnet run (Netcore)
                   inputs:
                     targetType: 'inline'
-                    script: 'nohup dotnet run  -p ./src/Umbraco.Web.UI.NetCore/Umbraco.Web.UI.NetCore.csproj &'
+                    script: 'dotnet run  -p ./src/Umbraco.Web.UI.NetCore/Umbraco.Web.UI.NetCore.csproj'
                 - task: Bash@3
                   displayName: Generate Cypress.env.json
                   inputs:
