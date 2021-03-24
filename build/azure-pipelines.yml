@@ -245,10 +245,12 @@ stages:
                       targets: build
                       workingDirectory: src/Umbraco.Web.UI.Client
                 - task: Bash@3
+                  displayName: dotnet run (Netcore)
                   inputs:
                     targetType: 'inline'
-                    script: 'dotnet run  -p ./src/Umbraco.Web.UI.NetCore/Umbraco.Web.UI.NetCore.csproj &'
+                    script: 'nohup dotnet run  -p ./src/Umbraco.Web.UI.NetCore/Umbraco.Web.UI.NetCore.csproj &'
                 - task: Bash@3
+                  displayName: Generate Cypress.env.json
                   inputs:
                     targetType: 'inline'
                     script: 'echo ''{ "username": "$Umbraco__CMS__Unattended__UnattendedUserEmail", "password": "$Umbraco__CMS__Unattended__UnattendedUserPassword" }'' > ''src/Umbraco.Tests.AcceptanceTest/cypress.env.json'''
