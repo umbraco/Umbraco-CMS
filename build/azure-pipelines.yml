@@ -227,9 +227,9 @@ stages:
                   inputs:
                       targetType: 'inline'
                       script: 'sqlcmd -S . -U sa -P $SA_PASSWORD -Q "CREATE DATABASE $DBNAME"'
-                      env:
-                          DBNAME: $(UmbracoDatabaseName)
-                          SA_PASSWORD: $(SA_PASSWORD)
+                  env:
+                      DBNAME: $(UmbracoDatabaseName)
+                      SA_PASSWORD: $(SA_PASSWORD)
                 - task: NodeTool@0
                   displayName: Use Node 11.x
                   inputs:
@@ -255,9 +255,9 @@ stages:
                   inputs:
                     targetType: 'inline'
                     script: 'echo "{ \"username\": \"$USERNAME\", \"password\": \"$PASSWORD\" }" > "src/Umbraco.Tests.AcceptanceTest/cypress.env.json"'
-                    env:
-                        USERNAME: $(Umbraco__CMS__Unattended__UnattendedUserEmail)
-                        PASSWORD: $(Umbraco__CMS__Unattended__UnattendedUserPassword)
+                  env:
+                    USERNAME: $(Umbraco__CMS__Unattended__UnattendedUserEmail)
+                    PASSWORD: $(Umbraco__CMS__Unattended__UnattendedUserPassword)
                 - task: Npm@1
                   name: PrepareTask
                   displayName: npm install (AcceptanceTest)
