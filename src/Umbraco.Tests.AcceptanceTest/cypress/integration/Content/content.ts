@@ -644,9 +644,9 @@ context('Content', () => {
             .withAllowAsRoot(true)
             .withDefaultTemplate(alias)
             .addGroup()
-            .addRichTextProperty()
-            .withAlias('text')
-            .done()
+                .addRichTextProperty()
+                    .withAlias('text')
+                .done()
             .done()
             .build();
 
@@ -656,8 +656,8 @@ context('Content', () => {
                 .withContentTypeAlias(generatedDocType["alias"])
                 .withAction('saveNew')
                 .addVariant()
-                .withName(viewMacroName)
-                .withSave(true)
+                    .withName(viewMacroName)
+                    .withSave(true)
                 .done()
                 .build();
 
@@ -728,9 +728,9 @@ context('Content', () => {
                 .withAllowAsRoot(true)
                 .withDefaultTemplate(alias)
                 .addGroup()
-                .addCustomProperty(dataType['id'])
-                .withAlias('grid')
-                .done()
+                    .addCustomProperty(dataType['id'])
+                        .withAlias('grid')
+                    .done()
                 .done()
                 .build();
 
@@ -738,8 +738,8 @@ context('Content', () => {
                 const contentNode = new ContentBuilder()
                     .withContentTypeAlias(generatedDocType["alias"])
                     .addVariant()
-                    .withName(name)
-                    .withSave(true)
+                        .withName(name)
+                        .withSave(true)
                     .done()
                     .build();
 
