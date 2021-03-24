@@ -10,6 +10,7 @@ namespace Umbraco.Web.Dashboards
     [Weight(10)]
     public class ContentDashboard : IDashboard
     {
+        private readonly IContentDashboardSettings _dashboardSettings;
         public string Alias => "contentIntro";
 
         public string[] Sections => new[] { "content" };
@@ -20,15 +21,9 @@ namespace Umbraco.Web.Dashboards
         {
             get
             {
-                IAccessRule[] rules;
-                var dashboardConfig = Path.Combine(IOHelper.MapPath(SystemDirectories.Config), "content.dashboard.access.config.js");
+                var rules = _dashboardSettings.GetAccessRulesFromConfig();
 
-                if (File.Exists(dashboardConfig))
-                {
-                    var rawJson = File.ReadAllText(dashboardConfig);
-                    rules = JsonConvert.DeserializeObject<AccessRule[]>(rawJson);
-                }
-                else
+                if (rules.Length == 0)
                 {
                     rules = new IAccessRule[]
                     {
@@ -36,8 +31,14 @@ namespace Umbraco.Web.Dashboards
                         new AccessRule {Type = AccessRuleType.Grant, Value = Constants.Security.AdminGroupAlias}
                     };
                 }
+
                 return rules;
             }
+        }
+
+        public ContentDashboard(IContentDashboardSettings dashboardSettings)
+        {
+            _dashboardSettings = dashboardSettings;
         }
     }
 }
