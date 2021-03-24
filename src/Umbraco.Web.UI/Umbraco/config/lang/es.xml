@@ -208,7 +208,7 @@
     <key alias="childItems" version="7.0">Nodos hijo</key>
         <key alias="target" version="7.0">Destino</key>
     <key alias="scheduledPublishServerTime">Esto se traduce en la siguiente hora en el servidor:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">¿Esto qué significa?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">¿Esto qué significa?</a>]]></key>
     <key alias="nestedContentDeleteItem">¿Estás seguro que quieres eliminar este elemento?</key>
     <key alias="nestedContentEditorNotSupported">Propiedad %0% utiliza editor %1% que no está soportado por Nested Content.</key>
     <key alias="addTextBox">Añadir otra caja de texto</key>
@@ -320,7 +320,7 @@
         <key alias="recycleBinDeleting">Se está vaciando la papelera. No cierres esta ventana mientras se ejecuta este proceso</key>
     <key alias="recycleBinIsEmpty">La papelera está vacía</key>
         <key alias="recycleBinWarning">No podrás recuperar los elementos una vez sean borrados de la papelera</key>
-    <key alias="regexSearchError"><![CDATA[El servicio web <a target='_blank' href='http://regexlib.com'>regexlib.com</a> está experimentando algunos problemas en estos momentos, de los cuales no somos responsables. Pedimos disculpas por las molestias.]]></key>
+    <key alias="regexSearchError"><![CDATA[El servicio web <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> está experimentando algunos problemas en estos momentos, de los cuales no somos responsables. Pedimos disculpas por las molestias.]]></key>
     <key alias="regexSearchHelp">Buscar una expresión regular para agregar validación a un campo de formulario. Ejemplo: 'correo electrónico', 'código postal', 'URL'.</key>
     <key alias="removeMacro">Eliminar macro</key>
     <key alias="requiredField">Campo obligatorio</key>
@@ -696,7 +696,7 @@
     <key alias="greeting6">Resplandeciente sábado</key>
     <key alias="instruction">Iniciar sesión</key>
     <key alias="timeout">La sesión ha caducado</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">¿Olvidaste tu contraseña?</key>
     <key alias="forgottenPasswordInstruction">Enviaremos un email a la dirección especificada con un enlace para restaurar tu contraseña</key>
         <key alias="requestPasswordResetConfirmation">Un email con instrucciones para restaurar tu contraseña será enviado a la dirección especificada si ésta está registrada.</key>
@@ -752,7 +752,7 @@
 																<tbody>
 																	<tr>
 																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																				Pulsa este enlace para restaurar tu contraseña
 																			</a>
 																		</td>
@@ -1484,7 +1484,7 @@
 																			<tbody>
 																				<tr>
 																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																						<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																							Pulsa este enlace para aceptar la invitación
 																						</a>
 																					</td>
