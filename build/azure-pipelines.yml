@@ -222,8 +222,11 @@ stages:
                   displayName: Use .Net Core sdk 5.x
                   inputs:
                       version: 5.x
-                - powershell:  sqlcmd -S . -U sa -P $env:SA_PASSWORD -Q "CREATE DATABASE $env:UmbracoDatabaseName"
+                - task: Bash@3
                   displayName: Create database
+                  inputs:
+                      targetType: 'inline'
+                      script: 'sqlcmd -S . -U sa -P $SA_PASSWORD -Q "CREATE DATABASE $UmbracoDatabaseName"'
                 #                - task: DotNetCoreCLI@2
                 #                  displayName: dotnet build (Netcore)
                 #                  inputs:
