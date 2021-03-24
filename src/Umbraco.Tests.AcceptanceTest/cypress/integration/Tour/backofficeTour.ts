@@ -49,7 +49,7 @@ function resetTourData() {
     {
         "alias": "umbIntroIntroduction",
         "completed": false,
-        "disabled": false
+        "disabled": true
     };
 
     cy.getCookie('UMB-XSRF-TOKEN', { log: false }).then((token) => {
