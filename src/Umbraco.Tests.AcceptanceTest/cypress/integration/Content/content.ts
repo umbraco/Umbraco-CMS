@@ -1,11 +1,11 @@
 /// <reference types="Cypress" />
 import {
-    DocumentTypeBuilder,
-    ContentBuilder,
-    AliasHelper,
-    GridDataTypeBuilder,
-    PartialViewMacroBuilder,
-    MacroBuilder
+  AliasHelper,
+  ContentBuilder,
+  DocumentTypeBuilder,
+  GridDataTypeBuilder,
+  MacroBuilder,
+  PartialViewMacroBuilder
 } from 'umbraco-cypress-testhelpers';
 
 context('Content', () => {
@@ -25,7 +25,7 @@ context('Content', () => {
     function createSimpleMacro(name){
         const insertMacro = new PartialViewMacroBuilder()
             .withName(name)
-            .withContent(`@inherits Umbraco.Web.Macros.PartialViewMacroPage
+            .withContent(`@inherits Umbraco.Cms.Web.Common.Macros.PartialViewMacroPage
 <h1>Acceptance test</h1>`)
             .build();
 
@@ -660,10 +660,9 @@ context('Content', () => {
         });
 
         // Edit the macro template in order to have something to verify on when rendered.
-        cy.editTemplate(viewMacroName, `@inherits Umbraco.Web.Mvc.UmbracoViewPage
-@using ContentModels = Umbraco.Web.PublishedModels;
+        cy.editTemplate(viewMacroName, `@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
 @{
-  Layout = null;
+    Layout = null;
 }
 @{
     if (Model.HasValue("text")){
@@ -743,11 +742,10 @@ context('Content', () => {
         });
 
         // Edit the template to allow us to verify the rendered view
-        cy.editTemplate(name, `@inherits Umbraco.Web.Mvc.UmbracoViewPage
-@using ContentModels = Umbraco.Web.PublishedModels;
-@{
-  Layout = null;
-}
+        cy.editTemplate(name, `@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage
+        @{
+            Layout = null;
+        }
 @Html.GetGridHtml(Model, "grid")`);
 
         // Act
