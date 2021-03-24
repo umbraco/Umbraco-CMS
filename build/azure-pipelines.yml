@@ -253,7 +253,8 @@ stages:
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
-                          @{ username = $env:Umbraco__CMS__Unattended__UnattendedUserEmail; password = $env:Umbraco__CMS__Unattended__UnattendedUserPassword } | ConvertTo-Json | Set-Content -Path "src/Umbraco.Tests.AcceptanceTest/cypress.env.json"
+                          $jsonObject = "{ ""username"": ""$env:Umbraco__CMS__Unattended__UnattendedUserEmail"", ""password"" : ""$env:Umbraco__CMS__Unattended__UnattendedUserPassword"" }"
+                          $jsonObject | ConvertTo-Json | Set-Content -Path "src/Umbraco.Tests.AcceptanceTest/cypress.env.json"
                 - task: Npm@1
                   name: PrepareTask
                   displayName: npm install (AcceptanceTest)
