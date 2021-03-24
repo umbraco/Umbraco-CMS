@@ -74,7 +74,7 @@ namespace Umbraco.Web.Editors
 
             // Really we should only have one file per request to this endpoint
             var file = result.FileData[0];
-            var fileName = file.Headers.ContentDisposition.FileName.Trim(new[] { '\"' }).TrimEnd();
+            var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
             var safeFileName = fileName.ToSafeFileName();
             var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 

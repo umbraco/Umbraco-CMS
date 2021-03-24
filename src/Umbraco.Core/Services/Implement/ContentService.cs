@@ -535,7 +535,7 @@ namespace Umbraco.Core.Services.Implement
             if (content.Path.IsNullOrWhiteSpace()) return Enumerable.Empty<IContent>();
 
             var rootId = Constants.System.RootString;
-            var ids = content.Path.Split(',')
+            var ids = content.Path.Split(Constants.CharArrays.Comma)
                 .Where(x => x != rootId && x != content.Id.ToString(CultureInfo.InvariantCulture)).Select(int.Parse).ToArray();
             if (ids.Any() == false)
                 return new List<IContent>();

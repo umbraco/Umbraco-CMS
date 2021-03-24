@@ -25,7 +25,7 @@ namespace Umbraco.Core.Models
             if (entity.Path.IsNullOrWhiteSpace())
                 throw new InvalidDataException($"The content item {entity.NodeId} has an empty path: {entity.Path} with parentID: {entity.ParentId}");
 
-            var pathParts = entity.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var pathParts = entity.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
             if (pathParts.Length < 2)
             {
                 //a path cannot be less than 2 parts, at a minimum it must be root (-1) and it's own id
@@ -53,7 +53,7 @@ namespace Umbraco.Core.Models
             if (entity.Path.IsNullOrWhiteSpace())
                 return false;
 
-            var pathParts = entity.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var pathParts = entity.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
             if (pathParts.Length < 2)
             {
                 //a path cannot be less than 2 parts, at a minimum it must be root (-1) and it's own id
