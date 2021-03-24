@@ -23,6 +23,9 @@ context('Templates', () => {
         cy.umbracoEnsureTemplateNameNotExists(name);
 
         createTemplate();
+        // We have to wait for the ace editor to load, because when the editor is loading it will "steal" the focus briefly,
+        // which causes the save event to fire if we've added something to the header field, causing errors.
+        cy.wait(500);
         //Type name
         cy.umbracoEditorHeaderName(name);
         // Save
