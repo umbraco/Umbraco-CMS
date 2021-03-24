@@ -406,14 +406,8 @@ namespace Umbraco.Core.Configuration
         {
             get
             {
-                try
-                {
-                    return bool.Parse(ConfigurationManager.AppSettings[Constants.AppSettings.AllowContentDashboardAccessToAllUsers]);
-                }
-                catch
-                {
-                    return false;
-                }
+                bool.TryParse(ConfigurationManager.AppSettings[Constants.AppSettings.AllowContentDashboardAccessToAllUsers], out var value);
+                return value;
             }
         }
 
