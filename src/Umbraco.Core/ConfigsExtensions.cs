@@ -1,6 +1,5 @@
 ﻿using System.IO;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.Grid;
 using Umbraco.Core.Configuration.HealthChecks;
