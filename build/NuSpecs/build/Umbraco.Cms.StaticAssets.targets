@@ -17,4 +17,22 @@
 
     </Target>
 
+    <Target Name="ClearUmbracoAssets" BeforeTargets="Clean">
+        <ItemGroup>
+            <UmbracoConfigPackageDir Include="$(MSBuildProjectDirectory)\umbraco\config\" />
+            <UmbracoPartialViewMacrosPackageDir Include="$(MSBuildProjectDirectory)\umbraco\PartialViewMacros\" />
+            <UmbracoUmbracoBackOfficeMacrosDir Include="$(MSBuildProjectDirectory)\umbraco\UmbracoBackOffice\" />
+            <UmbracoUmbracoInstallDir Include="$(MSBuildProjectDirectory)\umbraco\UmbracoInstall\" />
+            <UmbracoUmbracoWebsiteMacrosDir Include="$(MSBuildProjectDirectory)\umbraco\UmbracoWebsite\" />
+            <WwwrootUmbracoPackageDir Include="$(MSBuildProjectDirectory)\wwwroot\umbraco\" />
+        </ItemGroup>
+        <Message Text="Clear old umbraco data"  Importance="high" />
+        <RemoveDir Directories="@(UmbracoConfigPackageDir)"  />
+        <RemoveDir Directories="@(UmbracoPartialViewMacrosPackageDir)"  />
+        <RemoveDir Directories="@(UmbracoUmbracoBackOfficeMacrosDir)"  />
+        <RemoveDir Directories="@(UmbracoUmbracoInstallDir)"  />
+        <RemoveDir Directories="@(UmbracoUmbracoWebsiteMacrosDir)"  />
+        <RemoveDir Directories="@(WwwrootUmbracoPackageDir)"  />
+    </Target>
+
 </Project>

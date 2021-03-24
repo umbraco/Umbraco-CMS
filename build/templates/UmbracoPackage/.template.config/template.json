@@ -1,13 +1,13 @@
 {
     "$schema": "http://json.schemastore.org/template",
     "author": "Umbraco HQ",
-    "description": "An empty Umbraco Solution ready to get started",
-    "classifications": [ "Web", "CMS", "Umbraco"],
-    "groupIdentity": "Umbraco.Templates.UmbracoSolution",
-    "identity": "Umbraco.Templates.UmbracoSolution.CSharp",
-    "name": "Umbraco Solution",
-    "shortName": "umbraco",
-    "defaultName": "UmbracoSolution1",
+    "description": "An empty Umbraco Package/Plugin ready to get started",
+    "classifications": [ "Web", "CMS", "Umbraco", "Package", "Plugin"],
+    "groupIdentity": "Umbraco.Templates.UmbracoPackage",
+    "identity": "Umbraco.Templates.UmbracoPackage.CSharp",
+    "name": "Umbraco Package",
+    "shortName": "umbracopackage",
+    "defaultName": "UmbracoPackage1",
     "preferNameDirectory": true,
     "tags": {
         "language": "C#",
@@ -15,10 +15,10 @@
     },
     "primaryOutputs": [
         {
-        "path": "UmbracoSolution.csproj"
+            "path": "UmbracoPackage.csproj"
         }
     ],
-    "sourceName": "UmbracoSolution",
+    "sourceName": "UmbracoPackage",
     "preferNameDirectory": true,
     "symbols": {
         "version": {
@@ -33,23 +33,10 @@
             "generator": "coalesce",
             "parameters": {
                 "sourceVariableName": "name",
-                "defaultValue": "UmbracoSolution",
+                "defaultValue": "UmbracoPackage",
                 "fallbackVariableName": "name"
             },
-            "replaces":"Umbraco.Web.UI.NetCore"
-        },
-        "PackageTestSiteName": {
-            "type": "parameter",
-            "datatype":"text",
-            "defaultValue": "",
-            "replaces":"PackageTestSiteName",
-            "description": "The name of the package this should be a test site for (Default: '')"
-        },
-        "UseSqlCe":{
-            "type": "parameter",
-            "datatype":"bool",
-            "defaultValue": "false",
-            "description": "Adds the required dependencies to use SqlCE (Windows only) (Default: false)"
+            "replaces":"UmbracoPackage"
         },
         "Framework": {
             "type": "parameter",
