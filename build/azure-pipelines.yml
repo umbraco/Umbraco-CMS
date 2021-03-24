@@ -203,7 +203,7 @@ stages:
                   condition: failed()
                   inputs:
                     targetPath: '$(Build.SourcesDirectory)/src/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
-                    artifact: 'Test artifacts'
+                    artifact: 'Test artifacts - Windows'
           - job: Linux_Acceptance_tests
             displayName: Linux
             variables:
@@ -251,7 +251,7 @@ stages:
                   displayName: Generate Cypress.env.json
                   inputs:
                     targetType: 'inline'
-                    script: 'echo ''{ "username": "$Umbraco__CMS__Unattended__UnattendedUserEmail", "password": "$Umbraco__CMS__Unattended__UnattendedUserPassword" }'' > ''src/Umbraco.Tests.AcceptanceTest/cypress.env.json'''
+                    script: 'echo "{ \"username\": \"$Umbraco__CMS__Unattended__UnattendedUserEmail\", \"password\": \"$Umbraco__CMS__Unattended__UnattendedUserPassword\" }" > "src/Umbraco.Tests.AcceptanceTest/cypress.env.json"'
                 - task: Npm@1
                   name: PrepareTask
                   displayName: npm install (AcceptanceTest)
@@ -292,7 +292,7 @@ stages:
                   condition: failed()
                   inputs:
                       targetPath: '$(Build.SourcesDirectory)/src/Umbraco.Tests.AcceptanceTest/cypress/artifacts'
-                      artifact: 'Test artifacts'
+                      artifact: 'Test artifacts - Linux'
     - stage: Artifacts
       dependsOn: []
       jobs:
