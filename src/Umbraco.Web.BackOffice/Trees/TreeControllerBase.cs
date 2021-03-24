@@ -171,7 +171,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             var menu = menuResult.Value;
             //raise the event
-            await _eventAggregator.PublishAsync(new MenuRenderingNotification(id, menu, queryStrings));
+            await _eventAggregator.PublishAsync(new MenuRenderingNotification(id, menu, queryStrings, TreeAlias));
             return menu;
         }
 

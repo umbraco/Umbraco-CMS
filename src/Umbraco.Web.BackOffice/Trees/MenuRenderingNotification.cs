@@ -23,14 +23,21 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         public MenuItemCollection Menu { get; }
 
         /// <summary>
+        /// The alias of the tree the menu is rendering for
+        /// </summary>
+        public string TreeAlias { get; }
+
+
+        /// <summary>
         /// The query string of the current request
         /// </summary>
         public FormCollection QueryString { get; }
 
-        public MenuRenderingNotification(string nodeId, MenuItemCollection menu, FormCollection queryString)
+        public MenuRenderingNotification(string nodeId, MenuItemCollection menu, FormCollection queryString, string treeAlias)
         {
             NodeId = nodeId;
             Menu = menu;
+            TreeAlias = treeAlias;
             QueryString = queryString;
         }
     }
