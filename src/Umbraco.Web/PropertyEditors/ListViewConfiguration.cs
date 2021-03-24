@@ -60,6 +60,12 @@ namespace Umbraco.Web.PropertyEditors
             Description = "The bulk actions that are allowed from the list view")]
         public BulkActionPermissionSettings BulkActionPermissions { get; set; } = new BulkActionPermissionSettings(); // TODO: managing defaults?
 
+        [ConfigurationField("treesource", "Node Type", "treesource", Description = "Content type to be used in listview")]
+        public MultiNodePickerConfigurationTreeSource TreeSource { get; set; }
+
+        [ConfigurationField("excludeContentTypes", "Exclude Content Types", "treesourcetypepicker", Description = "Exclude selected content types from the list view")]
+        public string ExcludeContentTypes { get; set; }
+
         [ConfigurationField("icon", "Content app icon", "views/propertyeditors/listview/icon.prevalues.html", Description = "The icon of the listview content app")]
         public string Icon { get; set; }
 

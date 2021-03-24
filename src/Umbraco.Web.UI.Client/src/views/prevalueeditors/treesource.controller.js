@@ -13,13 +13,21 @@ angular.module('umbraco')
 	            type: "content"
 	        };
         }
-        if (!$scope.model.config) {
-            $scope.model.config = {
-                idType: "udi"
-            };
-        }
 
-        if($scope.model.value.id && $scope.model.value.type !== "member"){
+        // setup the default config
+        var config = {
+            idType: "udi",
+            showXpath: true,
+            allowSelectNode: true
+        };
+
+        // map the user config
+        Utilities.extend(config, $scope.model.config);
+
+        // map back to the model
+        $scope.model.config = config;
+
+        if ($scope.model.value.id && $scope.model.value.type !== "member"){
             entityResource.getById($scope.model.value.id, entityType()).then(function(item){
                 populate(item);
             });
@@ -73,7 +81,7 @@ angular.module('umbraco')
 
 		//we always need to ensure we dont submit anything broken
 	    var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
-	    	if($scope.model.value.type === "member"){
+	    	if ($scope.model.value.type === "member"){
 	    		$scope.model.value.id = null;
 	    		$scope.model.value.query = "";
 	    	}

@@ -20,18 +20,20 @@
 	</umb-node-preview>
 
     <div ng-if="!node && model.value.type !== 'member'" class="mt2">
+
         <div ng-hide="showSearch || model.value.query">
             <button type="button" class="umb-node-preview-add"
+                    ng-if="model.config.allowSelectNode"
                     ng-click="openContentPicker()">
                 <localize key="general_choose">Choose a root node</localize>
             </button>
-            <div class="mt2" ng-show="model.value.type == 'content'">
+            <div class="mt2" ng-show="model.config.showXpath && model.value.type == 'content'">
                 <i class="icon icon-search" aria-hidden="true"></i>
                 <button type="button" class="btn-link" ng-click="showSearch = true">Query for root node with xpath</button>
             </div>
         </div>
 
-        <div ng-show="showSearch || model.value.query">
+        <div ng-show="model.config.showXpath && (showSearch || model.value.query)">
 
             <input type="text"
                    ng-model="model.value.query"
