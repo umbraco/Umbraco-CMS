@@ -171,6 +171,7 @@ stages:
                 - task: Npm@1
                   displayName: Run Cypress (Desktop)
                   condition: always()
+                  continueOnError: true
                   inputs:
                       workingDir: src\Umbraco.Tests.AcceptanceTest
                       command: 'custom'
@@ -266,6 +267,7 @@ stages:
                 - task: Npm@1
                   displayName: Run Cypress (Desktop)
                   condition: always()
+                  continueOnError: true
                   inputs:
                       workingDir: src/Umbraco.Tests.AcceptanceTest
                       command: 'custom'
