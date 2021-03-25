@@ -522,6 +522,8 @@
 
         function updateClipboard() {
 
+            vm.clipboardItems = [];
+
             var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
                 var pasteEntry = {

@@ -31,14 +31,15 @@
                     id="{{vm.model.alias}}"
                     type="button"
                     class="btn-reset umb-block-list__create-button umb-outline"
-                    ng-class="{ '--disabled': vm.availableBlockTypes.length === 0 }"
+                    ng-disabled="vm.availableBlockTypes.length === 0"
                     ng-click="vm.requestShowCreate(vm.layout.length, $event)">
-                <localize key="grid_addElement">Add content</localize>
+                <localize ng-if="vm.availableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
+                <localize ng-if="vm.availableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.availableBlockTypes[0].elementTypeModel.name]">Add content</localize>
             </button>
             <button
                 type="button"
                 class="btn-reset umb-block-list__clipboard-button umb-outline"
-                ng-class="{ '--disabled': vm.clipboardItems.length === 0 }"
+                ng-disabled="vm.clipboardItems.length === 0"
                 ng-click="vm.requestShowClipboard(vm.layout.length, $event)"
                 localize="title"
                 title="@blockEditor_tabClipboard">
