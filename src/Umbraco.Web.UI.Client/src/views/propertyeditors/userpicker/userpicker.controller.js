@@ -10,6 +10,12 @@ function userPickerController($scope, usersResource , iconHelper, editorService,
 
     var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
 
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
+    }
+
     $scope.openUserPicker = function () {
 
         var currentSelection = [];
@@ -42,7 +48,7 @@ function userPickerController($scope, usersResource , iconHelper, editorService,
             submit: function () {
                 $scope.renderModel.splice(index, 1);
                 $scope.userName = '';
-
+                setDirty();
                 overlayService.close();
             },
             close: function () {
@@ -68,11 +74,13 @@ function userPickerController($scope, usersResource , iconHelper, editorService,
         if (currIds.indexOf(itemId) < 0) {
             item.icon = item.icon ? iconHelper.convertFromLegacyIcon(item.icon) : "icon-user";
             $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon, avatars: item.avatars });
+            setDirty();
         }
     };
 
     $scope.clear = function() {
         $scope.renderModel = [];
+        setDirty();
     };
 
     var unsubscribe = $scope.$on("formSubmitting", function (ev, args) {
