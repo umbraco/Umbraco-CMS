@@ -18,7 +18,6 @@ namespace Umbraco.Cms.Core.Services.Implement
     {
         private readonly IDictionaryRepository _dictionaryRepository;
         private readonly ILanguageRepository _languageRepository;
-        private readonly IEventAggregator _eventAggregator;
         private readonly IAuditRepository _auditRepository;
 
         public LocalizationService(
@@ -27,14 +26,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             IEventMessagesFactory eventMessagesFactory,
             IDictionaryRepository dictionaryRepository,
             IAuditRepository auditRepository,
-            ILanguageRepository languageRepository,
-            IEventAggregator eventAggregator)
+            ILanguageRepository languageRepository)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dictionaryRepository = dictionaryRepository;
             _auditRepository = auditRepository;
             _languageRepository = languageRepository;
-            _eventAggregator = eventAggregator;
         }
 
         /// <summary>
@@ -101,7 +98,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var savingNotification = new DictionaryItemSavingNotification(item, eventMessages);
 
-                if (_eventAggregator.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return item;
@@ -111,7 +108,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // ensure the lazy Language callback is assigned
                 EnsureDictionaryItemLanguageCallback(item);
 
-                _eventAggregator.Publish(new DictionaryItemSavedNotification(item, eventMessages).WithStateFrom(savingNotification));
+                scope.Notifications.Publish(new DictionaryItemSavedNotification(item, eventMessages).WithStateFrom(savingNotification));
 
                 scope.Complete();
 
@@ -244,7 +241,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var savingNotification = new DictionaryItemSavingNotification(dictionaryItem, eventMessages);
-                if (_eventAggregator.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -256,7 +253,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // ensure the lazy Language callback is assigned
 
                 EnsureDictionaryItemLanguageCallback(dictionaryItem);
-                _eventAggregator.Publish(new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
+                scope.Notifications.Publish(new DictionaryItemSavedNotification(dictionaryItem, eventMessages).WithStateFrom(savingNotification));
 
                 Audit(AuditType.Save, "Save DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
                 scope.Complete();
@@ -275,14 +272,14 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var deletingNotification = new DictionaryItemDeletingNotification(dictionaryItem, eventMessages);
-                if (_eventAggregator.PublishCancelable(deletingNotification))
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
                 }
 
                 _dictionaryRepository.Delete(dictionaryItem);
-                _eventAggregator.Publish(new DictionaryItemDeletedNotification(dictionaryItem, eventMessages).WithStateFrom(deletingNotification));
+                scope.Notifications.Publish(new DictionaryItemDeletedNotification(dictionaryItem, eventMessages).WithStateFrom(deletingNotification));
 
                 Audit(AuditType.Delete, "Delete DictionaryItem", userId, dictionaryItem.Id, "DictionaryItem");
 
@@ -388,14 +385,14 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var savingNotification = new LanguageSavingNotification(language, eventMessages);
-                if (_eventAggregator.PublishCancelable(savingNotification))
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
                 }
 
                 _languageRepository.Save(language);
-                _eventAggregator.Publish(new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
+                scope.Notifications.Publish(new LanguageSavedNotification(language, eventMessages).WithStateFrom(savingNotification));
 
                 Audit(AuditType.Save, "Save Language", userId, language.Id, ObjectTypes.GetName(UmbracoObjectTypes.Language));
 
@@ -431,7 +428,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 EventMessages eventMessages = EventMessagesFactory.Get();
                 var deletingLanguageNotification = new LanguageDeletingNotification(language, eventMessages);
-                if (_eventAggregator.PublishCancelable(deletingLanguageNotification))
+                if (scope.Notifications.PublishCancelable(deletingLanguageNotification))
                 {
                     scope.Complete();
                     return;
@@ -440,7 +437,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // NOTE: Other than the fall-back language, there aren't any other constraints in the db, so possible references aren't deleted
                 _languageRepository.Delete(language);
 
-                _eventAggregator.Publish(new LanguageDeletedNotification(language, eventMessages).WithStateFrom(deletingLanguageNotification));
+                scope.Notifications.Publish(new LanguageDeletedNotification(language, eventMessages).WithStateFrom(deletingLanguageNotification));
 
                 Audit(AuditType.Delete, "Delete Language", userId, language.Id, ObjectTypes.GetName(UmbracoObjectTypes.Language));
                 scope.Complete();
@@ -475,47 +472,5 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return _dictionaryRepository.GetDictionaryItemKeyMap();
             }
         }
-
-        #region Events
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<ILocalizationService, DeleteEventArgs<ILanguage>> DeletingLanguage;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<ILocalizationService, DeleteEventArgs<ILanguage>> DeletedLanguage;
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<ILocalizationService, DeleteEventArgs<IDictionaryItem>> DeletingDictionaryItem;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<ILocalizationService, DeleteEventArgs<IDictionaryItem>> DeletedDictionaryItem;
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<ILocalizationService, SaveEventArgs<IDictionaryItem>> SavingDictionaryItem;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<ILocalizationService, SaveEventArgs<IDictionaryItem>> SavedDictionaryItem;
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<ILocalizationService, SaveEventArgs<ILanguage>> SavingLanguage;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<ILocalizationService, SaveEventArgs<ILanguage>> SavedLanguage;
-        #endregion
     }
 }
