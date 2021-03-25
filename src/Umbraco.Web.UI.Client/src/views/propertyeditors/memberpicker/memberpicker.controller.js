@@ -27,8 +27,7 @@ function memberPickerController($scope, entityResource, iconHelper, editorServic
             } else {
                 $scope.clear();
                 $scope.add(data);
-            }
-            setDirty();
+            }            
         }
     };
 
@@ -66,6 +65,7 @@ function memberPickerController($scope, entityResource, iconHelper, editorServic
 
     $scope.remove = function (index) {
         $scope.renderModel.splice(index, 1);
+        setDirty();
     };
 
     $scope.add = function (item) {
@@ -82,7 +82,8 @@ function memberPickerController($scope, entityResource, iconHelper, editorServic
 
         if (currIds.indexOf(itemId) < 0) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon});
+            $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon });
+            setDirty();
         }
     };
 
