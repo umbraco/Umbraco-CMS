@@ -375,21 +375,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var cache = _cache.RuntimeCache;
             var cacheKey = CacheKeys.MediaRecycleBinCacheKey;
-                    
-            var hasChildren = cache.GetCacheItem<bool?>(cacheKey);
-            bool recycleBinSmells;
 
-            if (!(hasChildren is null))
-            {
-                recycleBinSmells = (bool) hasChildren;
-            }
-            else
-            {
-                recycleBinSmells = CountChildren(Constants.System.RecycleBinMedia) > 0;
-                cache.InsertCacheItem<bool>(cacheKey, () => recycleBinSmells);
-            }
-
-            return recycleBinSmells;
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(Constants.System.RecycleBinMedia) > 0);
         }
 
         #endregion
@@ -523,7 +511,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
-                        content[i] = (Models.Media) cached;
+                        content[i] = (Models.Media)cached;
                         continue;
                     }
                 }

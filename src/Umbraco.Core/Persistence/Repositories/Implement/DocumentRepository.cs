@@ -916,21 +916,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             var cache = _appCaches.RuntimeCache;
             var cacheKey = CacheKeys.ContentRecycleBinCacheKey;
-                    
-            var hasChildren = cache.GetCacheItem<bool?>(cacheKey);
-            bool recycleBinSmells;
 
-            if (!(hasChildren is null))
-            {
-                recycleBinSmells = (bool) hasChildren;
-            }
-            else
-            {
-                recycleBinSmells = CountChildren(Constants.System.RecycleBinContent) > 0;
-                cache.InsertCacheItem<bool>(cacheKey, () => recycleBinSmells);
-            }
-
-            return recycleBinSmells;
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(Constants.System.RecycleBinContent) > 0);
         }
 
         #endregion
