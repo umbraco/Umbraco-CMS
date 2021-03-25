@@ -31,6 +31,10 @@ umb-media-card {
         }
     }
 
+    &.--hasError {
+        border: 2px solid @errorBackground;
+    }
+
     &.--sortable-placeholder {
         &::after {
             content: "";
@@ -60,14 +64,6 @@ umb-media-card {
         text-align: center;
         //padding-bottom: 10/16*100%;
         //background-color: @gray-12;
-
-        &.--error {
-            border: 2px solid @errorBackground;
-            border-bottom: none;
-            border-top-left-radius: 6px;
-            border-top-right-radius: 6px;
-            box-sizing: border-box;
-        }
 
         img {
             object-fit: contain;

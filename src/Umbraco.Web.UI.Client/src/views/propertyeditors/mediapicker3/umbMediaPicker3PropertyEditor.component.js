@@ -61,8 +61,8 @@
 
         vm.$onInit = function() {
 
-            vm.singleMode = vm.model.config.singleMode || false;
             vm.validationLimit = vm.model.config.validationLimit;
+            vm.singleMode = vm.validationLimit.max === 1;
 
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -129,7 +129,7 @@
                 startNodeId: vm.model.config.startNodeId,
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
                 dataTypeKey: vm.model.dataTypeKey,
-                multiPicker: vm.isSingleMode !== true,
+                multiPicker: vm.singleMode !== true,
                 submit: function (model) {
                     editorService.close();
 

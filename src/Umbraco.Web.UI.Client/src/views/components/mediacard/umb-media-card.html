@@ -1,5 +1,5 @@
 
-    <div class="__showcase" ng-class="{'--error':vm.media.trashed}">
+    <div class="__showcase">
 
         <div ng-if="vm.loading" class="umb-button__progress"></div>
 
@@ -26,7 +26,7 @@
         </umb-file-icon>
 
     </div>
-    <button type="button" ng-click="vm.onNameClicked(); $event.stopPropagation();" class="btn-reset __info" ng-class="{'--error':vm.media.trashed}" ng-if="vm.media !== null">
+    <button type="button" ng-click="vm.onNameClicked(); $event.stopPropagation();" class="btn-reset __info" ng-if="vm.media !== null">
         <div class="__name" ng-bind="vm.media.name"></div>
         <div class="__subname" ng-if="vm.media.description" ng-bind="vm.media.description"></div>
     </button>

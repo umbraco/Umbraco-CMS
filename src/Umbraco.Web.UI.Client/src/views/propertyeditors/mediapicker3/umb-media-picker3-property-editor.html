@@ -2,7 +2,7 @@
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-    <div class="umb-media-card-grid">
+    <div class="umb-media-card-grid" ng-class="{'--singleMode':(vm.validationLimit.max === 1 && vm.model.value.length <= 1)}">
 
         <div style="display:contents;" ui-sortable="vm.sortableOptions" ng-model="vm.model.value" ng-if="vm.loading !== true">
 
@@ -22,7 +22,8 @@
                 <umb-media-card
                     media-key="media.mediaKey"
                     on-name-clicked="vm.editMedia(media, $index)"
-                    ng-class="{'--active':vm.activeMediaEntry === media}">
+                    ng-class="{'--active': vm.activeMediaEntry === media}"
+                    has-error="vm.propertyForm.maxCount.$valid === false && $index >= vm.validationLimit.max">
                     <div class="__actions">
                         <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveMedia(media); $event.stopPropagation();">
                             <i class="icon icon-wrong" aria-hidden="true"></i>
@@ -34,7 +35,7 @@
             </div>
         </div>
 
-        <button ng-if="vm.loading !== true && ((vm.singleMode === true && vm.model.value.length === 0) || vm.singleMode === false)"
+        <button ng-if="vm.loading !== true && ((vm.singleMode === true && vm.model.value.length === 0) || vm.singleMode !== true)"
                 id="{{vm.model.alias}}"
                 type="button"
                 class="btn-reset umb-media-card-grid__create-button umb-outline"
@@ -46,22 +47,22 @@
                 </div>
         </button>
 
-        <input type="hidden" name="minCount" ng-model="vm.model.value" val-server="minCount" />
-        <input type="hidden" name="maxCount" ng-model="vm.model.value" val-server="maxCount" />
+    </div>
 
-        <div ng-messages="vm.propertyForm.minCount.$error">
-            <div class="help text-error" ng-message="minCount">
-                <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.model.value.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
-            </div>
-            <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.minCount.errorMsg">></span>
-        </div>
-        <div ng-messages="vm.propertyForm.maxCount.$error">
-            <div class="help text-error" ng-message="maxCount">
-                <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.model.value.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
-            </div>
-            <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.maxCount.errorMsg"></span>
-        </div>
+    <input type="hidden" name="minCount" ng-model="vm.model.value" val-server="minCount" />
+    <input type="hidden" name="maxCount" ng-model="vm.model.value" val-server="maxCount" />
 
+    <div ng-messages="vm.propertyForm.minCount.$error">
+        <div class="help text-error" ng-message="minCount">
+            <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.model.value.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
+        </div>
+        <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.minCount.errorMsg">></span>
+    </div>
+    <div ng-messages="vm.propertyForm.maxCount.$error">
+        <div class="help text-error" ng-message="maxCount">
+            <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.model.value.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
+        </div>
+        <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.maxCount.errorMsg"></span>
     </div>
 
 </div>

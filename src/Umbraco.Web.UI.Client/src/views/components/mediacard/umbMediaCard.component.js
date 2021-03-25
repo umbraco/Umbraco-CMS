@@ -10,22 +10,33 @@
             transclude: true,
             bindings: {
                 mediaKey: "<",
+                hasError: "<",
                 onNameClicked: "&?"
             }
         });
 
-    function MediaCardController($scope, entityResource, mediaHelper, eventsService, localizationService) {
+    function MediaCardController($scope, $element, entityResource, mediaHelper, eventsService, localizationService) {
 
         var unsubscribe = [];
         var vm = this;
         vm.paddingBottom = 100;// Square while loading.
         vm.loading = true;
 
-        var unwatch = $scope.$watch("vm.mediaKey", (newValue, oldValue) => {
+        unsubscribe.push($scope.$watch("vm.mediaKey", (newValue, oldValue) => {
             if(newValue !== oldValue) {
                 vm.updateThumbnail();
             }
-        });
+        }));
+
+        function checkErrorState() {
+            if (vm.hasError === true || (vm.media && vm.media.trashed === true)) {
+                $element.addClass("--hasError")
+            } else {
+                $element.removeClass("--hasError")
+            }
+        }
+        checkErrorState();
+        unsubscribe.push($scope.$watch(["vm.media.trashed", "vm.hasError"], checkErrorState));
 
         vm.$onInit = function () {
 

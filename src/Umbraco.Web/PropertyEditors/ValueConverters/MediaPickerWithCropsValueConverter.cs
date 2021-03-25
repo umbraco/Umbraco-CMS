@@ -111,7 +111,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         private bool IsMultipleDataType(PublishedDataType dataType)
         {
             var config = dataType.ConfigurationAs<MediaPicker3Configuration>();
-            return !config.SingleMode;
+            return config.ValidationLimit.Max != 1;
         }
 
         private object FirstOrDefault(IList mediaItems)

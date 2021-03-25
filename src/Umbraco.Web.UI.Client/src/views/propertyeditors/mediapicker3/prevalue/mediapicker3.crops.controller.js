@@ -29,9 +29,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.MediaPicker3.CropC
             crop.editMode = true;
 
             $scope.model.value.push(crop);
-
+            $scope.validate(crop);
         }
         $scope.setChanges = function (crop) {
+            $scope.validate(crop);
             if(
                 crop.hasWidthError !== true &&
                 crop.hasHeightError !== true &&
@@ -45,6 +46,11 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.MediaPicker3.CropC
                 crop.alias = (crop.label || "").toCamelCase();
             }
         };
+        $scope.validate = function(crop) {
+            $scope.validateWidth(crop);
+            $scope.validateHeight(crop);
+            $scope.validateAlias(crop);
+        }
         $scope.validateWidth = function (crop) {
             crop.hasWidthError = !(Utilities.isNumber(crop.width) && crop.width > 0);
         };
