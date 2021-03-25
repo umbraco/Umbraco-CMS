@@ -1,9 +1,8 @@
-﻿using System.IO;
-using Newtonsoft.Json;
+﻿using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Dashboards;
-using Umbraco.Core.IO;
+using Umbraco.Core.Services;
 
 namespace Umbraco.Web.Dashboards
 {
@@ -11,6 +10,9 @@ namespace Umbraco.Web.Dashboards
     public class ContentDashboard : IDashboard
     {
         private readonly IContentDashboardSettings _dashboardSettings;
+        private readonly IUserService _userService;
+        private IAccessRule[] _accessRulesFromConfig;
+
         public string Alias => "contentIntro";
 
         public string[] Sections => new[] { "content" };
@@ -21,7 +23,7 @@ namespace Umbraco.Web.Dashboards
         {
             get
             {
-                var rules = _dashboardSettings.GetAccessRulesFromConfig();
+                var rules = AccessRulesFromConfig;
 
                 if (rules.Length == 0)
                 {
@@ -36,9 +38,39 @@ namespace Umbraco.Web.Dashboards
             }
         }
 
-        public ContentDashboard(IContentDashboardSettings dashboardSettings)
+        private IAccessRule[] AccessRulesFromConfig
+        {
+            get
+            {
+                if (_accessRulesFromConfig is null)
+                {
+                    var rules = new List<IAccessRule>();
+
+                    if (_dashboardSettings.AllowContentDashboardAccessToAllUsers)
+                    {
+                        var allUserGroups = _userService.GetAllUserGroups();
+
+                        foreach (var userGroup in allUserGroups)
+                        {
+                            rules.Add(new AccessRule
+                            {
+                                Type = AccessRuleType.Grant,
+                                Value = userGroup.Alias
+                            });
+                        }
+                    }
+
+                    _accessRulesFromConfig = rules.ToArray();
+                }
+
+                return _accessRulesFromConfig;
+            }
+        }
+
+        public ContentDashboard(IContentDashboardSettings dashboardSettings, IUserService userService)
         {
             _dashboardSettings = dashboardSettings;
+            _userService = userService;
         }
     }
 }

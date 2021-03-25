@@ -1,43 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Services;
+﻿using System.Configuration;
 
 namespace Umbraco.Core.Dashboards
 {
     public class ContentDashboardSettings: IContentDashboardSettings
     {
-        private readonly IGlobalSettings _globalSettings;
-        private readonly IUserService _userService;
 
-        public ContentDashboardSettings(IGlobalSettings globalSettings, IUserService userService)
+        /// <summary>
+        /// Gets a value indicating whether the content dashboard should be available to all users.
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if the dashboard is visible for all user groups; otherwise, <c>false</c>
+        ///     and the default access rules for that dashboard will be in use.
+        /// </value>
+        public bool AllowContentDashboardAccessToAllUsers
         {
-            _globalSettings = globalSettings;
-            _userService = userService;
-        }
-
-        public IAccessRule[] GetAccessRulesFromConfig()
-        {
-            var rules = new List<IAccessRule>();
-
-            if (_globalSettings.AllowContentDashboardAccessToAllUsers)
+            get
             {
-                var allUserGroups = _userService.GetAllUserGroups();
-
-                foreach (var userGroup in allUserGroups)
-                {
-                    rules.Add(new AccessRule
-                    {
-                        Type = AccessRuleType.Grant,
-                        Value = userGroup.Alias
-                    });
-                }
+                bool.TryParse(ConfigurationManager.AppSettings[Constants.AppSettings.AllowContentDashboardAccessToAllUsers], out var value);
+                return value;
             }
-
-            return rules.ToArray();
         }
     }
 }

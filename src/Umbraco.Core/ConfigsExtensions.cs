@@ -8,7 +8,6 @@ using Umbraco.Core.Dashboards;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Manifest;
-using Umbraco.Core.Services;
 
 namespace Umbraco.Core
 {
@@ -50,9 +49,7 @@ namespace Umbraco.Core
                 factory.GetInstance<ManifestParser>(),
                 factory.GetInstance<IRuntimeState>().Debug));
 
-            configs.Add<IContentDashboardSettings>(factory =>
-                new ContentDashboardSettings(factory.GetInstance<IGlobalSettings>(),
-                    factory.GetInstance<IUserService>()));
+            configs.Add<IContentDashboardSettings>(() => new ContentDashboardSettings());
         }
     }
 }
