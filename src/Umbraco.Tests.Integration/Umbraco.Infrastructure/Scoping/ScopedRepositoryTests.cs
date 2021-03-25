@@ -256,14 +256,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             };
             service.Save(item);
 
+            // Refresh the cache manually because we can't unbind
+            service.GetDictionaryItemById(item.Id);
+            service.GetLanguageById(lang.Id);
+
             // global cache contains the entity
             var globalCached = (IDictionaryItem)globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(item.Id, globalCached.Id);
             Assert.AreEqual("item-key", globalCached.ItemKey);
-
-            // _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(ServerMessenger, CacheRefresherCollection), GetRequiredService<IUmbracoContextFactory>(), GetRequiredService<ILogger<DistributedCacheBinder>>());
-            // _distributedCacheBinder.BindEvents(true);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (IScope scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
