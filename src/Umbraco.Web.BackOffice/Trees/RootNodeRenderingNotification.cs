@@ -15,14 +15,20 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         public TreeNode Node { get; }
 
         /// <summary>
+        /// The alias of the tree the menu is rendering for
+        /// </summary>
+        public string TreeAlias { get; }
+
+        /// <summary>
         /// The query string of the current request
         /// </summary>
         public FormCollection QueryString { get; }
 
-        public RootNodeRenderingNotification(TreeNode node, FormCollection queryString)
+        public RootNodeRenderingNotification(TreeNode node, FormCollection queryString, string treeAlias)
         {
             Node = node;
             QueryString = queryString;
+            TreeAlias = treeAlias;
         }
     }
 }
