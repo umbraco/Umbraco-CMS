@@ -39,6 +39,7 @@
             <button
                 type="button"
                 class="btn-reset umb-block-list__clipboard-button umb-outline"
+                ng-class="{'--jump': vm.jumpClipboardButton}"
                 ng-disabled="vm.clipboardItems.length === 0"
                 ng-click="vm.requestShowClipboard(vm.layout.length, $event)"
                 localize="title"

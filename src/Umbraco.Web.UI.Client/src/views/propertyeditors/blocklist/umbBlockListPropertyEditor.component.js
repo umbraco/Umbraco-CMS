@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService) {
+    function BlockListController($scope, $timeout, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService) {
 
         var unsubscribe = [];
         var modelObject;
@@ -190,7 +190,7 @@
             vm.availableContentTypesAliases = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
 
-            updateClipboard();
+            updateClipboard(true);
 
             vm.loading = false;
 
@@ -520,7 +520,9 @@
             }
         }
 
-        function updateClipboard() {
+        function updateClipboard(firstTime) {
+
+            var oldAmount = vm.clipboardItems.length;
 
             vm.clipboardItems = [];
 
@@ -564,6 +566,24 @@
             vm.clipboardItems.sort( (a, b) => {
                 return b.date - a.date
             });
+
+            if(firstTime !== true && vm.clipboardItems.length > oldAmount) {
+                jumpClipboard();
+            }
+        }
+
+        var jumpClipboardTimeout;
+        function jumpClipboard() {
+
+            if(jumpClipboardTimeout) {
+                return;
+            }
+
+            vm.jumpClipboardButton = true;
+            jumpClipboardTimeout = $timeout(() => {
+                vm.jumpClipboardButton = false;
+                jumpClipboardTimeout = null;
+            }, 2000);
         }
 
         function requestCopyAllBlocks() {
