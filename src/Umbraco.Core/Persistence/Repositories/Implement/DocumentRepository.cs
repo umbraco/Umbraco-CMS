@@ -912,6 +912,27 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public override int RecycleBinId => Constants.System.RecycleBinContent;
 
+        public bool RecycleBinSmells()
+        {
+            var cache = _appCaches.RuntimeCache;
+            var cacheKey = CacheKeys.ContentRecycleBinCacheKey;
+                    
+            var hasChildren = cache.GetCacheItem<bool?>(cacheKey);
+            bool recycleBinSmells;
+
+            if (!(hasChildren is null))
+            {
+                recycleBinSmells = (bool) hasChildren;
+            }
+            else
+            {
+                recycleBinSmells = CountChildren(Constants.System.RecycleBinContent) > 0;
+                cache.InsertCacheItem<bool>(cacheKey, () => recycleBinSmells);
+            }
+
+            return recycleBinSmells;
+        }
+
         #endregion
 
         #region Read Repository implementation for Guid keys

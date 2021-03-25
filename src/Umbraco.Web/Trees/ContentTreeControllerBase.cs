@@ -151,11 +151,6 @@ namespace Umbraco.Web.Trees
         protected abstract bool RecycleBinSmells { get; }
 
         /// <summary>
-        /// Gets the name of the recycle bin cache key.
-        /// </summary>
-        public abstract string RecycleBinSmellsCacheKey { get; }
-
-        /// <summary>
         /// Returns the user's start node for this tree
         /// </summary>
         protected abstract int[] UserStartNodes { get; }
@@ -334,28 +329,13 @@ namespace Umbraco.Web.Trees
                 //and for some reason when there are no dashboards, this parameter is missing  
                 if (IsDialog(queryStrings) == false && id == Constants.System.RootString && queryStrings.HasKey("application"))
                 {
-                    var cache = _appCaches.RuntimeCache;
-                    
-                    var hasChildren = cache.GetCacheItem<bool?>(RecycleBinSmellsCacheKey);
-                    bool recycleBinSmells;
-
-                    if (!(hasChildren is null))
-                    {
-                        recycleBinSmells = (bool) hasChildren;
-                    }
-                    else
-                    {
-                        recycleBinSmells = RecycleBinSmells;
-                        cache.InsertCacheItem<bool>(RecycleBinSmellsCacheKey, () => recycleBinSmells);
-                    }
-
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),
                         id,
                         queryStrings,
                         Services.TextService.Localize("general/recycleBin"),
                         "icon-trash",
-                        recycleBinSmells,
+                        RecycleBinSmells,
                         queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
                 }
 

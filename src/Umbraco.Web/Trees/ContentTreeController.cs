@@ -44,8 +44,6 @@ namespace Umbraco.Web.Trees
 
         protected override bool RecycleBinSmells => Services.ContentService.RecycleBinSmells();
 
-        public override string RecycleBinSmellsCacheKey => CacheKeys.ContentRecycleBinCacheKey;
-
         private int[] _userStartNodes;
 
         protected override int[] UserStartNodes

@@ -24,6 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepository>, IMediaRepository
     {
+        private readonly AppCaches _cache;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
@@ -32,6 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditorCollection, DataValueReferenceFactoryCollection dataValueReferenceFactories)
             : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories)
         {
+            _cache = cache;
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache, logger);
@@ -368,6 +370,27 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Recycle Bin
 
         public override int RecycleBinId => Constants.System.RecycleBinMedia;
+
+        public bool RecycleBinSmells()
+        {
+            var cache = _cache.RuntimeCache;
+            var cacheKey = CacheKeys.MediaRecycleBinCacheKey;
+                    
+            var hasChildren = cache.GetCacheItem<bool?>(cacheKey);
+            bool recycleBinSmells;
+
+            if (!(hasChildren is null))
+            {
+                recycleBinSmells = (bool) hasChildren;
+            }
+            else
+            {
+                recycleBinSmells = CountChildren(Constants.System.RecycleBinMedia) > 0;
+                cache.InsertCacheItem<bool>(cacheKey, () => recycleBinSmells);
+            }
+
+            return recycleBinSmells;
+        }
 
         #endregion
 
