@@ -168,11 +168,14 @@
             method: removeAllEntries,
             isDisabled: true
         };
+
         // helper to force the current form into the dirty state
         function setDirty() {
-            if ($scope.$parent.$parent.propertyForm) {
-                $scope.$parent.$parent.propertyForm.$setDirty();
+
+            if (vm.umbProperty) {
+                vm.umbProperty.setDirty();
             }
+
         };
 
         function addNode(alias) {

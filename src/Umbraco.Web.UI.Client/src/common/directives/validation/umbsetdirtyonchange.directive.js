@@ -19,23 +19,26 @@
             var ngModel = ctrls.length > 1 ? ctrls[1] : null;
             
             if (ngModel) {
+                // TODO: Should we validate that this is a hidden input? It should only be used with that else it doesn't make sense.
+
                 //if an ngModel is supplied, assign a render function which is called when the model is changed
                 let origRender = ngModel.$render;                
                 let bindCount = 0;
+                let viewValue = null;
 
                 ngModel.$render = function () {
 
                     // set dirty only after init bind
-                    if (bindCount > 0) {
+                    if (bindCount > 0 && viewValue != ngModel.$viewValue) {
                         ngModel.$setDirty();
                     }
-
-                    bindCount++;
-
-                    //call any previously set render method
-                    if (origRender) {
-                        origRender.apply(ngModel);
+                    else {
+                        viewValue = ngModel.$viewValue;
+                        bindCount++;
                     }
+
+                    //call the previously set render method
+                    origRender.apply(ngModel);
                 }
             }
             else {

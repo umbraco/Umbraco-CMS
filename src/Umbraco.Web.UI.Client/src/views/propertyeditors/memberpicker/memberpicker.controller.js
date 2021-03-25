@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function memberPickerController($scope, entityResource, iconHelper, angularHelper, editorService){
+function memberPickerController($scope, entityResource, iconHelper, editorService){
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -28,9 +28,15 @@ function memberPickerController($scope, entityResource, iconHelper, angularHelpe
                 $scope.clear();
                 $scope.add(data);
             }
-            angularHelper.getCurrentForm($scope).$setDirty();
+            setDirty();
         }
     };
+
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
+    }
 
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options

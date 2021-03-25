@@ -15,7 +15,7 @@
  * @param {any} editorService
  * @param {any} userService
  */
-function contentPickerController($scope, $q, $routeParams, $location, entityResource, editorState, iconHelper, angularHelper, navigationService, localizationService, editorService, userService, overlayService) {
+function contentPickerController($scope, $q, $routeParams, $location, entityResource, editorState, iconHelper, navigationService, localizationService, editorService, userService, overlayService) {
 
     var vm = {
         labels: {
@@ -112,7 +112,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         scroll: true,
         zIndex: 6000,
         update: function (e, ui) {
-            angularHelper.getCurrentForm($scope).$setDirty();
+            setDirty();
         }
     };
 
@@ -180,7 +180,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
                 $scope.clear();
                 $scope.add(data);
             }
-            angularHelper.getCurrentForm($scope).$setDirty();
+            setDirty();
         },
         treeAlias: $scope.model.config.startNode.type,
         section: $scope.model.config.startNode.type,
@@ -257,9 +257,9 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
                 _.each(model.selection, function (item, i) {
                     $scope.add(item);
                 });
-                angularHelper.getCurrentForm($scope).$setDirty();
+                setDirty();
             }
-            angularHelper.getCurrentForm($scope).$setDirty();
+            setDirty();
             editorService.close();
         }
 
@@ -288,7 +288,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         var currIds = $scope.model.value ? $scope.model.value.split(',') : [];
         if (currIds.length > 0) {
             currIds.splice(index, 1);
-            angularHelper.getCurrentForm($scope).$setDirty();
+            setDirty();
             $scope.model.value = currIds.join();
         }
 
@@ -374,6 +374,12 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             unsubscribe();
         }
     });
+
+    function setDirty() {
+        if ($scope.contentPickerForm) {
+            $scope.contentPickerForm.modelValue.$setDirty();
+        }
+    }
 
     /** Syncs the renderModel based on the actual model.value and returns a promise */
     function syncRenderModel(doValidation) {
