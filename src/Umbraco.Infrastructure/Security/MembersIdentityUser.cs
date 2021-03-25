@@ -125,5 +125,7 @@ namespace Umbraco.Cms.Core.Security
         public string MemberTypeAlias { get; set; }
 
         private static string UserIdToString(int userId) => string.Intern(userId.ToString());
+
+        // TODO: Should we support custom member properties for persistence/retrieval?
     }
 }

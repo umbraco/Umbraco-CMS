@@ -111,11 +111,6 @@ namespace Umbraco.Cms.Web.Common.Security
             return viewProperties;
         }
 
-        public Task<RegisterMemberStatus> RegisterMemberAsync(RegisterModel model, bool logMemberIn = true)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <inheritdoc/>
         public async Task<ProfileModel> GetCurrentMemberProfileModelAsync()
         {

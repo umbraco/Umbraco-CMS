@@ -15,14 +15,6 @@ namespace Umbraco.Cms.Core.Security
         RegisterModel CreateRegistrationModel(string memberTypeAlias = null);
 
         /// <summary>
-        /// Registers a new member.
-        /// </summary>
-        /// <param name="model">Register member model.</param>
-        /// <param name="logMemberIn">Flag for whether to log the member in upon successful registration.</param>
-        /// <returns>Result of registration operation.</returns>
-        Task<RegisterMemberStatus> RegisterMemberAsync(RegisterModel model, bool logMemberIn = true);
-
-        /// <summary>
         /// Creates a new profile model filled in with the current members details if they are logged in which allows for editing
         /// profile properties.
         /// </summary>
