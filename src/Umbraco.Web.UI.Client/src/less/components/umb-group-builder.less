@@ -1,18 +1,58 @@
 /* ---------- TABS ----------  */
 
 .umb-group-builder__tabs {
+  background-color: @white;
+  height: 70px;
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.umb-group-builder__tabs-list {
+  height: 100%;
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   align-items: center;
-  background-color: @white;
-  height: 70px;
-  border-bottom: 1px solid @gray-9;
-  margin-bottom: 20px;
+  overflow-x: auto;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 
   li {
     height: 100%;
+  }
+}
+
+.umb-group-builder__tabs-list::-webkit-scrollbar {
+  display: none;
+}
+
+.umb-group-builder__tabs-overflow {
+  height: 100%;
+  background: @white;
+  width: 30px;
+  background-color: @white;
+  position: absolute;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1;
+}
+
+.umb-group-builder__tabs-overflow--left {
+  left: 0;
+
+  .caret {
+    transform: rotate(90deg) translate(0, 2px);
+  }
+}
+
+.umb-group-builder__tabs-overflow--right {
+  right: 0;
+
+  .caret {
+    transform: rotate(270deg) translate(0, -2px);
   }
 }
 
@@ -116,6 +156,7 @@
 
 .umb-group-builder__tab-name {
   font-weight: bold;
+  white-space: nowrap;
 }
 
 .umb-group-builder__tab-val-message {
@@ -130,6 +171,7 @@
   border-bottom: none;
   border-top: none;
   padding-right: 20px;
+  min-width: 100px;
 }
 
 .umb-group-builder__tab-inherited-label {
