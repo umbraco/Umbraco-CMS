@@ -346,8 +346,10 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var moveEventInfo = new MoveEventInfo<IDataType>(toMove, toMove.Path, parentId);
-                var moveEventArgs = new MoveEventArgs<IDataType>(evtMsgs, moveEventInfo);
-                if (scope.Events.DispatchCancelable(Moving, this, moveEventArgs))
+                // var moveEventArgs = new MoveEventArgs<IDataType>(evtMsgs, moveEventInfo);
+
+                var movingDataTypeNotification = new DataTypeMovingNotification(moveEventInfo, evtMsgs);
+                if (scope.Notifications.PublishCancelable(movingDataTypeNotification))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs);
@@ -364,9 +366,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     }
                     moveInfo.AddRange(_dataTypeRepository.Move(toMove, container));
 
-                    moveEventArgs.MoveInfoCollection = moveInfo;
-                    moveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Moved, this, moveEventArgs);
+                    scope.Notifications.Publish(new DataTypeMovedNotification(moveEventInfo, evtMsgs).WithStateFrom(movingDataTypeNotification));
+                    
                     scope.Complete();
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)
@@ -386,12 +387,15 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId">Id of the user issuing the save</param>
         public void Save(IDataType dataType, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
+            var evtMsgs = EventMessagesFactory.Get();
             dataType.CreatorId = userId;
 
             using (var scope = ScopeProvider.CreateScope())
             {
                 var saveEventArgs = new SaveEventArgs<IDataType>(dataType);
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+
+                var savingDataTypeNotification = new DataTypeSavingNotification(dataType, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingDataTypeNotification))
                 {
                     scope.Complete();
                     return;
@@ -409,8 +413,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _dataTypeRepository.Save(dataType);
 
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs);
+                scope.Notifications.Publish(new DataTypeSavedNotification(dataType, evtMsgs).WithStateFrom(savingDataTypeNotification));
+
                 Audit(AuditType.Save, userId, dataType.Id);
                 scope.Complete();
             }
@@ -434,12 +438,14 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="raiseEvents">Boolean indicating whether or not to raise events</param>
         public void Save(IEnumerable<IDataType> dataTypeDefinitions, int userId, bool raiseEvents)
         {
+            var evtMsgs = EventMessagesFactory.Get();
             var dataTypeDefinitionsA = dataTypeDefinitions.ToArray();
-            var saveEventArgs = new SaveEventArgs<IDataType>(dataTypeDefinitionsA);
+            //var saveEventArgs = new SaveEventArgs<IDataType>(dataTypeDefinitionsA);
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                var savingDataTypeNotification = new DataTypeSavingNotification(dataTypeDefinitions, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingDataTypeNotification))
                 {
                     scope.Complete();
                     return;
@@ -453,8 +459,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
+                    scope.Notifications.Publish(new DataTypeSavedNotification(dataTypeDefinitions, evtMsgs).WithStateFrom(savingDataTypeNotification));
                 }
                 Audit(AuditType.Save, userId, -1);
 
@@ -473,10 +478,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId">Optional Id of the user issuing the deletion</param>
         public void Delete(IDataType dataType, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
+            var evtMsgs = EventMessagesFactory.Get();
             using (var scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<IDataType>(dataType);
-                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                var deletingDataTypeNotification = new DataTypeDeletingNotification(dataType, evtMsgs);
+                if (scope.Notifications.PublishCancelable(deletingDataTypeNotification))
                 {
                     scope.Complete();
                     return;
@@ -511,8 +517,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _dataTypeRepository.Delete(dataType);
 
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Deleted, this, deleteEventArgs);
+                scope.Notifications.Publish(new DataTypeDeletedNotification(dataType, evtMsgs).WithStateFrom(deletingDataTypeNotification));
+
                 Audit(AuditType.Delete, userId, dataType.Id);
 
                 scope.Complete();
@@ -532,36 +538,5 @@ namespace Umbraco.Cms.Core.Services.Implement
             _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.DataType)));
         }
 
-        #region Event Handlers
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        //public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataType>> Deleting;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataType>> Deleted;
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataType>> Saving;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<IDataType>> Saved;
-
-        /// <summary>
-        /// Occurs before Move
-        /// </summary>
-        public static event TypedEventHandler<IDataTypeService, MoveEventArgs<IDataType>> Moving;
-
-        /// <summary>
-        /// Occurs after Move
-        /// </summary>
-        public static event TypedEventHandler<IDataTypeService, MoveEventArgs<IDataType>> Moved;
-        #endregion
     }
 }
