@@ -67,12 +67,6 @@ namespace Umbraco.Cms.Core.Cache
             Bind(() => LocalizationService.SavedDictionaryItem += LocalizationService_SavedDictionaryItem,
                 () => LocalizationService.SavedDictionaryItem -= LocalizationService_SavedDictionaryItem);
 
-            // bind to data type events
-            Bind(() => DataTypeService.Deleted += DataTypeService_Deleted,
-                () => DataTypeService.Deleted -= DataTypeService_Deleted);
-            Bind(() => DataTypeService.Saved += DataTypeService_Saved,
-                () => DataTypeService.Saved -= DataTypeService_Saved);
-
             // bind to stylesheet events
             Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
                 () => FileService.SavedStylesheet -= FileService_SavedStylesheet);
