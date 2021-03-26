@@ -484,8 +484,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                     memberGroupService,
                     mockPasswordConfig.Object,
                     contentTypeBaseServiceProvider.Object,
-                    propertyEditorCollection),
-                httpContextAccessor);
+                    propertyEditorCollection));
 
             var map = new MapDefinitionCollection(new List<IMapDefinition>()
             {

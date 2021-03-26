@@ -19,15 +19,12 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         private readonly CommonMapper _commonMapper;
         private readonly CommonTreeNodeMapper _commonTreeNodeMapper;
         private readonly MemberTabsAndPropertiesMapper _tabsAndPropertiesMapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public MemberMapDefinition(CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, MemberTabsAndPropertiesMapper tabsAndPropertiesMapper, IHttpContextAccessor httpContextAccessor)
+        public MemberMapDefinition(CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, MemberTabsAndPropertiesMapper tabsAndPropertiesMapper)
         {
             _commonMapper = commonMapper;
             _commonTreeNodeMapper = commonTreeNodeMapper;
-
             _tabsAndPropertiesMapper = tabsAndPropertiesMapper;
-            _httpContextAccessor = httpContextAccessor;
         }
 
         public void DefineMaps(UmbracoMapper mapper)
