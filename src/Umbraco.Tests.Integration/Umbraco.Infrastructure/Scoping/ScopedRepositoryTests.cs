@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
@@ -55,7 +55,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 .AddNotificationHandler<DictionaryItemDeletedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<DictionaryItemSavedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<LanguageSavedNotification, DistributedCacheBinder>()
-                .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>();
+                .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MemberGroupDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MemberGroupSavedNotification, DistributedCacheBinder>();
             builder.AddNotificationHandler<LanguageSavedNotification, PublishedSnapshotServiceEventHandler>();
         }
 
