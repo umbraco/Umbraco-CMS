@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// <summary>
     /// Manages server registrations in the database.
     /// </summary>
-    public sealed class ServerRegistrationService : ScopeRepositoryService, IServerRegistrationService
+    public sealed class ServerRegistrationService : RepositoryService, IServerRegistrationService
     {
         private readonly IServerRegistrationRepository _serverRegistrationRepository;
         private readonly IHostingEnvironment _hostingEnvironment;

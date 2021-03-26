@@ -331,6 +331,7 @@ namespace Umbraco.Web.Scheduling
             {
                 _runningTask = Task.Run(async () => await Pump().ConfigureAwait(false), _shutdownToken);
             }
+
             _logger.LogDebug("{LogPrefix} Starting", _logPrefix);
         }
 
@@ -727,14 +728,20 @@ namespace Umbraco.Web.Scheduling
             // with a single aspnet thread during shutdown and we don't want to delay other calls to IRegisteredObject.Stop.
             if (!immediate)
             {
-                return Task.Run(StopInitial, CancellationToken.None);
+                using (ExecutionContext.SuppressFlow())
+                {
+                    return Task.Run(StopInitial, CancellationToken.None);
+                }
             }
             else
             {
                 lock (_locker)
                 {
                     if (_terminated) return Task.CompletedTask;
-                    return Task.Run(StopImmediate, CancellationToken.None);
+                    using (ExecutionContext.SuppressFlow())
+                    {
+                        return Task.Run(StopImmediate, CancellationToken.None);
+                    }
                 }
             }
         }

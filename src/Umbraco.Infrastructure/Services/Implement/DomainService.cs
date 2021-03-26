@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class DomainService : ScopeRepositoryService, IDomainService
+    public class DomainService : RepositoryService, IDomainService
     {
         private readonly IDomainRepository _domainRepository;
 

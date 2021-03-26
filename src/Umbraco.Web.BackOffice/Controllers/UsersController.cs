@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -39,6 +40,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -69,6 +71,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly LinkGenerator _linkGenerator;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
+        private readonly IPasswordChanger<BackOfficeIdentityUser> _passwordChanger;
         private readonly ILogger<UsersController> _logger;
 
         public UsersController(
@@ -90,7 +93,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             ILoggerFactory loggerFactory,
             LinkGenerator linkGenerator,
             IBackOfficeExternalLoginProviders externalLogins,
-            UserEditorAuthorizationHelper userEditorAuthorizationHelper)
+            UserEditorAuthorizationHelper userEditorAuthorizationHelper,
+            IPasswordChanger<BackOfficeIdentityUser> passwordChanger)
         {
             _mediaFileSystem = mediaFileSystem;
             _contentSettings = contentSettings.Value;
@@ -111,6 +115,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _linkGenerator = linkGenerator;
             _externalLogins = externalLogins;
             _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
+            _passwordChanger = passwordChanger;
             _logger = _loggerFactory.CreateLogger<UsersController>();
         }
 
@@ -661,21 +666,32 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
-            var intId = changingPasswordModel.Id.TryConvertTo<int>();
+            Attempt<int> intId = changingPasswordModel.Id.TryConvertTo<int>();
             if (intId.Success == false)
             {
                 return NotFound();
             }
 
-            var found = _userService.GetUserById(intId.Result);
+            IUser found = _userService.GetUserById(intId.Result);
             if (found == null)
             {
                 return NotFound();
             }
 
-            // TODO: Why don't we inject this? Then we can just inject a logger
-            var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
-            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, changingPasswordModel, _userManager);
+            IUser currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+
+            // if it's the current user, the current user cannot reset their own password
+            if (currentUser.Username == found.Username)
+            {
+                return new ValidationErrorResult("Password reset is not allowed");
+            }
+
+            if (!currentUser.IsAdmin() && found.IsAdmin())
+            {
+                return new ValidationErrorResult("The current user cannot change the password for the specified user");
+            }
+
+            Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);
 
             if (passwordChangeResult.Success)
             {
@@ -684,7 +700,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return result;
             }
 
-            foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+            foreach (string memberName in passwordChangeResult.Result.ChangeError.MemberNames)
             {
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
@@ -767,7 +783,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     continue;
                 }
 
-                var unlockResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
+                var unlockResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now.AddMinutes(-1));
                 if (unlockResult.Succeeded == false)
                 {
                     return new ValidationErrorResult(

@@ -42,6 +42,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [IsBackOffice]
     public class BackOfficeController : UmbracoController
     {
+        // See here for examples of what a lot of this is doing: https://github.com/dotnet/aspnetcore/blob/main/src/Identity/samples/IdentitySample.Mvc/Controllers/AccountController.cs
+        // along with our AuthenticationController
+
         // NOTE: Each action must either be explicitly authorized or explicitly [AllowAnonymous], the latter is optional because
         // this controller itself doesn't require authz but it's more clear what the intention is.
 
@@ -339,11 +342,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <summary>
         /// Callback path when the user initiates a link login request from the back office to the external provider from the <see cref="LinkLogin(string)"/> action
         /// </summary>
+        /// <remarks>
+        /// An example of this is here https://github.com/dotnet/aspnetcore/blob/main/src/Identity/samples/IdentitySample.Mvc/Controllers/AccountController.cs#L155
+        /// which this is based on
+        /// </remarks>
         [Authorize(Policy = AuthorizationPolicies.BackOfficeAccess)]
         [HttpGet]
         public async Task<IActionResult> ExternalLinkLoginCallback()
         {
-            var user = await _userManager.GetUserAsync(User);
+            BackOfficeIdentityUser user = await _userManager.GetUserAsync(User);
             if (user == null)
             {
                 // ... this should really not happen
@@ -351,22 +358,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
             }
 
-            var loginInfo = await _signInManager.GetExternalLoginInfoAsync(await _userManager.GetUserIdAsync(user));
+            ExternalLoginInfo info = await _signInManager.GetExternalLoginInfoAsync(await _userManager.GetUserIdAsync(user));
 
-            if (loginInfo == null)
+            if (info == null)
             {
                 //Add error and redirect for it to be displayed
                 TempData[ViewDataExtensions.TokenExternalSignInError] = new[] { "An error occurred, could not get external login info" };
                 return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
             }
 
-            var addLoginResult = await _userManager.AddLoginAsync(user, loginInfo);
+            IdentityResult addLoginResult = await _userManager.AddLoginAsync(user, info);
             if (addLoginResult.Succeeded)
             {
-                // Update any authentication tokens if login succeeded
-                // TODO: This is a new thing that we need to implement and because we can store data with the external login now, this is exactly
-                // what this is for but we'll need to peek under the code here to figure out exactly what goes on.
-                //await _signInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
+                // Update any authentication tokens if succeeded
+                await _signInManager.UpdateExternalAuthenticationTokensAsync(info);
 
                 return RedirectToLocal(Url.Action(nameof(Default), this.GetControllerName()));
             }
@@ -426,12 +431,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // Sign in the user with this external login provider (which auto links, etc...)
             var result = await _signInManager.ExternalLoginSignInAsync(loginInfo, isPersistent: false);
-
+            
             var errors = new List<string>();
 
             if (result == Microsoft.AspNetCore.Identity.SignInResult.Success)
             {
-
+                // Update any authentication tokens if succeeded
+                await _signInManager.UpdateExternalAuthenticationTokensAsync(loginInfo);
             }
             else if (result == Microsoft.AspNetCore.Identity.SignInResult.TwoFactorRequired)
             {

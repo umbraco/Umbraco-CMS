@@ -65,6 +65,13 @@ namespace Umbraco.Cms.Core.Compose
                 .AddNotificationHandler<ContentMovingNotification, RedirectTrackingHandler>()
                 .AddNotificationHandler<ContentMovedNotification, RedirectTrackingHandler>();
 
+            // Add notification handlers for DistributedCache
+            builder
+                .AddNotificationHandler<DictionaryItemDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<DictionaryItemSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<LanguageSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>();
+
             // add notification handlers for auditing
             builder
                 .AddNotificationHandler<MemberSavedNotification, AuditNotificationsHandler>()

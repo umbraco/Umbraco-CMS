@@ -35,6 +35,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
         private readonly BackgroundIndexRebuilder _backgroundIndexRebuilder;
         private readonly TaskHelper _taskHelper;
+        private readonly IRuntimeState _runtimeState;
         private readonly IScopeProvider _scopeProvider;
         private readonly ServiceContext _services;
         private readonly IMainDom _mainDom;
@@ -60,7 +61,8 @@ namespace Umbraco.Cms.Infrastructure.Search
             IValueSetBuilder<IMedia> mediaValueSetBuilder,
             IValueSetBuilder<IMember> memberValueSetBuilder,
             BackgroundIndexRebuilder backgroundIndexRebuilder,
-            TaskHelper taskHelper)
+            TaskHelper taskHelper,
+            IRuntimeState runtimeState)
         {
             _services = services;
             _scopeProvider = scopeProvider;
@@ -71,6 +73,7 @@ namespace Umbraco.Cms.Infrastructure.Search
             _memberValueSetBuilder = memberValueSetBuilder;
             _backgroundIndexRebuilder = backgroundIndexRebuilder;
             _taskHelper = taskHelper;
+            _runtimeState = runtimeState;
             _mainDom = mainDom;
             _profilingLogger = profilingLogger;
             _logger = logger;
@@ -114,7 +117,10 @@ namespace Umbraco.Cms.Infrastructure.Search
                 s_deactivate_handlers = true;
             }
 
-
+            if (_mainDom.IsMainDom && _runtimeState.Level >= RuntimeLevel.Run)
+            {
+                _backgroundIndexRebuilder.RebuildIndexes(true);
+            }
         }
 
 

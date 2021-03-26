@@ -22,10 +22,16 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         public FormCollection QueryString { get; }
 
-        public TreeNodesRenderingNotification(TreeNodeCollection nodes, FormCollection queryString)
+        /// <summary>
+        /// The alias of the tree rendered
+        /// </summary>
+        public string TreeAlias { get; }
+
+        public TreeNodesRenderingNotification(TreeNodeCollection nodes, FormCollection queryString, string treeAlias)
         {
             Nodes = nodes;
             QueryString = queryString;
+            TreeAlias = treeAlias;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// <summary>
     /// Represents the MemberService.
     /// </summary>
-    public class MemberService : ScopeRepositoryService, IMemberService
+    public class MemberService : RepositoryService, IMemberService
     {
         private readonly IMemberRepository _memberRepository;
         private readonly IMemberTypeRepository _memberTypeRepository;

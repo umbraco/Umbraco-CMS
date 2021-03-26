@@ -9,6 +9,8 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.WebAssets;
@@ -35,11 +37,11 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds all required components to run the Umbraco back office
         /// </summary>
-        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder, IWebHostEnvironment webHostEnvironment) => builder
+        public static IUmbracoBuilder AddBackOffice(this IUmbracoBuilder builder) => builder
                 .AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
-                .AddRuntimeMinifier(webHostEnvironment)
+                .AddRuntimeMinifier()
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
@@ -87,6 +89,8 @@ namespace Umbraco.Extensions
 
             builder.Services.AddUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
             builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
+            builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
+            builder.Services.AddUnique<IPasswordChanger<MembersIdentityUser>, PasswordChanger<MembersIdentityUser>>();
 
             builder.AddNotificationHandler<UserLoginSuccessNotification, BackOfficeUserManagerAuditer>();
             builder.AddNotificationHandler<UserLogoutSuccessNotification, BackOfficeUserManagerAuditer>();

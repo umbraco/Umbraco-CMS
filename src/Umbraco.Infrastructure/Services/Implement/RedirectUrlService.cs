@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Scoping;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    internal class RedirectUrlService : ScopeRepositoryService, IRedirectUrlService
+    internal class RedirectUrlService : RepositoryService, IRedirectUrlService
     {
         private readonly IRedirectUrlRepository _redirectUrlRepository;
 

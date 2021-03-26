@@ -22,5 +22,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         Task SignInAsync(BackOfficeIdentityUser user, bool isPersistent, string authenticationMethod = null);
         Task<ClaimsPrincipal> CreateUserPrincipalAsync(BackOfficeIdentityUser user);
         Task<SignInResult> TwoFactorSignInAsync(string provider, string code, bool isPersistent, bool rememberClient);
+        Task<IdentityResult> UpdateExternalAuthenticationTokensAsync(ExternalLoginInfo externalLogin);
     }
 }

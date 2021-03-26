@@ -187,7 +187,14 @@ namespace Umbraco.Cms.Core.Runtime
                 _listenTask = _mainDomLock.ListenAsync();
                 _listenCompleteTask = _listenTask.ContinueWith(t =>
                 {
-                    _logger.LogDebug("Listening task completed with {TaskStatus}", _listenTask.Status);
+                    if (_listenTask.Exception != null)
+                    {
+                        _logger.LogWarning("Listening task completed with {TaskStatus}, Exception: {Exception}", _listenTask.Status, _listenTask.Exception);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Listening task completed with {TaskStatus}", _listenTask.Status);
+                    }
 
                     OnSignal("signal");
                 }, TaskScheduler.Default); // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
