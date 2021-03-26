@@ -194,7 +194,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [OutgoingEditorModelEvent]
         public MemberDisplay GetByKey(Guid key)
         {
-            //TODO: convert to identity
             IMember foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {
@@ -394,9 +393,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     member.Properties[property.Alias].SetValue(property.Value);
                 }
             }
-
-            //TODO: do we need to resave the key?
-            // contentItem.PersistedContent.Key = contentItem.Key;
 
             // now the member has been saved via identity, resave the member with mapped content properties
             _memberService.Save(member);
@@ -655,7 +651,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult DeleteByKey(Guid key)
         {
-            //TODO: move to MembersUserStore
             IMember foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {
