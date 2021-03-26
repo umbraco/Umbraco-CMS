@@ -499,20 +499,6 @@
         border-color: @inputBorderFocus;
     }
 }
-.umb-cropper-gravity img {
-    position: relative;
-    max-width: 100%;
-    height: auto;
-    top: 0;
-    left: 0;
- }
-.umb-cropper-gravity .overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    cursor: move;
-    z-index: @zindexCropperOverlay;
-}
 
 .umb-cropper .viewport {
     position: absolute;
@@ -545,22 +531,6 @@
     font-size: 12px;
     opacity: 0.7;
     padding: 0px 6px;
-}
-
-.umb-cropper-gravity .overlay{
-    width: 14px;
-    height: 14px;
-    text-align: center;
-    border-radius: 20px;
-    background: @pinkLight;
-    border: 3px solid @white;
-    opacity: 0.8;
-}
-
-.umb-cropper-gravity .overlay i {
-    font-size: 26px;
-    line-height: 26px;
-    opacity: 0.8 !important;
 }
 
 .umb-cropper .crop-controls-wrapper {
@@ -633,7 +603,7 @@
         flex:0;
     }
 
-    .gravity-container {
+    .umb-cropper-gravity .gravity-container {
         border: 1px solid @gray-8;
         box-sizing: border-box;
         line-height: 0;
@@ -641,26 +611,83 @@
         height: 100%;
         overflow: hidden;
         .checkeredBackground();
-        display: flex;
-        justify-content: center;
-        align-items: center;
         contain: content;
 
         .viewport {
             position: relative;
-            margin-left: auto;
-            margin-right: auto;
-            max-height: 100%;
-            max-width: 100%;
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
             img {
                 display: block;
+                max-width: 100%;
+                max-height: 100%;
             }
 
             &:hover {
                 cursor: pointer;
             }
         }
+    }
+
+    
+    .umb-cropper-gravity img {
+        position: relative;
+        max-width: 100%;
+        height: auto;
+        top: 0;
+        left: 0;
+    }
+    
+    .umb-cropper-gravity .overlayViewport {
+        position: absolute;
+        top:0;
+        bottom:0;
+        left:0;
+        right:0;
+        contain: strict;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .umb-cropper-gravity .overlay {
+        position: relative;
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        cursor: crosshair;
+    }
+    .umb-cropper-gravity .overlay .focalPoint {
+        position: absolute;
+        top: 0;
+        left: 0;
+        cursor: move;
+        z-index: @zindexCropperOverlay;
+
+        width: 14px;
+        height: 14px;
+        // this element should have no width or height as its preventing the jQuery draggable-plugin to go all the way to the sides:
+        margin-left: -10px;
+        margin-top: -10px;
+        margin-right: -10px;
+        margin-bottom: -10px;
+        
+        text-align: center;
+        border-radius: 20px;
+        background: @pinkLight;
+        border: 3px solid @white;
+        opacity: 0.8;
+    }
+
+    .umb-cropper-gravity .overlay .focalPoint i {
+        font-size: 26px;
+        line-height: 26px;
+        opacity: 0.8 !important;
     }
 
     .imagecropper {

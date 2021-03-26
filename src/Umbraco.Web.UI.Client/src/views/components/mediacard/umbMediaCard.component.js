@@ -58,9 +58,6 @@
 
         vm.updateThumbnail = function () {
 
-            // TODO: test that we update a media if its saved..
-            console.log("updateThumbnail", vm.mediaKey)
-
             vm.loading = true;
 
             entityResource.getById(vm.mediaKey, "Media").then(function (mediaEntity) {

@@ -206,6 +206,10 @@ function mediaEditController($scope, $routeParams, $location, $http, $q, appStat
                         init();
                     }
 
+                    eventsService.emit("editors.media.saved", {media: data});
+
+                    return data;
+
                 }, function(err) {
 
                     formHelper.resetForm({ scope: $scope, hasErrors: true });

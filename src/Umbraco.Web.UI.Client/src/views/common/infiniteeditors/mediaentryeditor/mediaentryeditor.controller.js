@@ -1,6 +1,6 @@
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaEntryEditorController",
-        function ($scope, localizationService, entityResource, overlayService, eventsService, mediaHelper) {
+        function ($scope, localizationService, entityResource, editorService, overlayService, eventsService, mediaHelper) {
 
             var unsubscribe = [];
             var vm = this;
@@ -8,6 +8,7 @@ angular.module("umbraco")
             vm.loading = true;
             vm.model = $scope.model;
             vm.mediaEntry = vm.model.mediaEntry;
+            vm.currentCrop = null;
 
             localizationService.localizeMany([
                 vm.model.createFlow ? "general_cancel" : "general_close",
@@ -17,15 +18,13 @@ angular.module("umbraco")
                 vm.submitLabel = data[1];
             });
 
-            console.log("MediaEntryEditorController", vm.model, vm.mediaEntry);
-
             function init() {
 
                 updateMedia();
 
                 unsubscribe.push(eventsService.on("editors.media.saved", function(name, args) {
                     // if this media item uses the updated media type we want to reload the media file
-                    if(args && args.media && args.media.key === vm.model.mediaEntry.mediaKey) {
+                    if(args && args.media && args.media.key === vm.mediaEntry.mediaKey) {
                         updateMedia();
                     }
                 }));
@@ -33,11 +32,8 @@ angular.module("umbraco")
 
             function updateMedia() {
 
-                // TODO: test that we update a media if its saved..
-                console.log("updateMedia", vm.model.mediaEntry.mediaKey);
-
                 vm.loading = true;
-                entityResource.getById(vm.model.mediaEntry.mediaKey, "Media").then(function (mediaEntity) {
+                entityResource.getById(vm.mediaEntry.mediaKey, "Media").then(function (mediaEntity) {
                     vm.media = mediaEntity;
                     vm.imageSrc = mediaHelper.resolveFileFromEntity(mediaEntity, true);
                     vm.loading = false;
@@ -82,9 +78,10 @@ angular.module("umbraco")
             }
 
             vm.openMedia = openMedia;
-            function openMedia(item) {
+            function openMedia() {
+
                 var mediaEditor = {
-                    id: item.id,
+                    id: vm.mediaEntry.mediaKey,
                     submit: function () {
                         editorService.close();
                     },
@@ -125,10 +122,8 @@ angular.module("umbraco")
             function resetCrop() {
                 if (vm.currentCrop) {
                     $scope.$evalAsync( () => {
-                        console.log(vm.currentCrop);
                         vm.model.propertyEditor.resetCrop(vm.currentCrop);
                         vm.forceUpdateCrop = Math.random();
-                        console.log(vm.forceUpdateCrop);
                     });
                 }
             }

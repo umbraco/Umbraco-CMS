@@ -39,6 +39,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.MediaPicker3.CropC
                 crop.hasAliasError !== true
             ) {
                 crop.editMode = false;
+                window.dispatchEvent(new Event('resize.umbImageGravity'));
             }
         };
         $scope.useForAlias = function (crop) {
