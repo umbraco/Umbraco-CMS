@@ -31,13 +31,14 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly ILocalizationService _localizationService;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IJsonSerializer _jsonSerializer;
+        private readonly IEventAggregator _eventAggregator;
 
         public DataTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository, IDataTypeContainerRepository dataTypeContainerRepository,
             IAuditRepository auditRepository, IEntityRepository entityRepository, IContentTypeRepository contentTypeRepository,
             IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService,
             IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
+            IJsonSerializer jsonSerializer, IEventAggregator eventAggregator)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataTypeRepository = dataTypeRepository;
@@ -50,6 +51,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _localizationService = localizationService;
             _shortStringHelper = shortStringHelper;
             _jsonSerializer = jsonSerializer;
+            _eventAggregator = eventAggregator;
         }
 
         #region Containers
@@ -68,7 +70,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                         CreatorId = userId
                     };
 
-                    if (scope.Events.DispatchCancelable(SavingContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
+                    var savingEntityContainerNotification = new EntityContainerSavingNotification(container, evtMsgs);
+                    if (scope.Notifications.PublishCancelable(savingEntityContainerNotification))
                     {
                         scope.Complete();
                         return OperationResult.Attempt.Cancel(evtMsgs, container);
@@ -77,7 +80,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _dataTypeContainerRepository.Save(container);
                     scope.Complete();
 
-                    scope.Events.Dispatch(SavedContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                    scope.Notifications.Publish(new EntityContainerSavedNotification(container, evtMsgs).WithStateFrom(savingEntityContainerNotification));
+
                     // TODO: Audit trail ?
 
                     return OperationResult.Attempt.Succeed(evtMsgs, container);
@@ -153,7 +157,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                if (scope.Events.DispatchCancelable(SavingContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs)))
+                var savingEntityContainerNotification = new EntityContainerSavingNotification(container, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingEntityContainerNotification))
                 {
                     scope.Complete();
                     return OperationResult.Attempt.Cancel(evtMsgs);
@@ -161,7 +166,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _dataTypeContainerRepository.Save(container);
 
-                scope.Events.Dispatch(SavedContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs));
+                scope.Notifications.Publish(new EntityContainerSavedNotification(container, evtMsgs).WithStateFrom(savingEntityContainerNotification));
                 scope.Complete();
             }
 
@@ -186,7 +191,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                     return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs));
                 }
 
-                if (scope.Events.DispatchCancelable(DeletingContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs)))
+                var deletingEntityContainerNotification = new EntityContainerDeletingNotification(container, evtMsgs);
+                if (scope.Notifications.PublishCancelable(deletingEntityContainerNotification))
                 {
                     scope.Complete();
                     return Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, evtMsgs));
@@ -194,7 +200,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _dataTypeContainerRepository.Delete(container);
 
-                scope.Events.Dispatch(DeletedContainer, this, new DeleteEventArgs<EntityContainer>(container, evtMsgs));
+                scope.Notifications.Publish(new EntityContainerDeletedNotification(container, evtMsgs).WithStateFrom(deletingEntityContainerNotification));
                 scope.Complete();
             }
 
@@ -220,8 +226,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _dataTypeContainerRepository.Save(container);
                     scope.Complete();
 
-                    // TODO: triggering SavedContainer with a different name?!
-                    scope.Events.Dispatch(SavedContainer, this, new SaveEventArgs<EntityContainer>(container, evtMsgs), "RenamedContainer");
+                    scope.Notifications.Publish(new EntityContainerRenamedNotification(container, evtMsgs));
 
                     return OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, container);
                 }
@@ -529,21 +534,15 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         #region Event Handlers
 
-        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<EntityContainer>> SavingContainer;
-        public static event TypedEventHandler<IDataTypeService, SaveEventArgs<EntityContainer>> SavedContainer;
-        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<EntityContainer>> DeletingContainer;
-        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<EntityContainer>> DeletedContainer;
-
         /// <summary>
         /// Occurs before Delete
         /// </summary>
-        public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataType>> Deleting;
+        //public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataType>> Deleting;
 
         /// <summary>
         /// Occurs after Delete
         /// </summary>
         public static event TypedEventHandler<IDataTypeService, DeleteEventArgs<IDataType>> Deleted;
-
         /// <summary>
         /// Occurs before Save
         /// </summary>
