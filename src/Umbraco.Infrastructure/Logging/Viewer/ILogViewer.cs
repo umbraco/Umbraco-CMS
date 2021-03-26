@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Logging.Viewer
 
         /// <summary>
         /// A count of number of errors
-        /// By counting Warnings with Exceptions, Errors & Fatal messages
+        /// By counting Warnings with Exceptions, Errors &amp; Fatal messages
         /// </summary>
         int GetNumberOfErrors(LogTimePeriod logTimePeriod);
 

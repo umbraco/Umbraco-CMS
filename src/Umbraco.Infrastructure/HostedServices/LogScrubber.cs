@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _profilingLogger = profilingLogger;
         }
 
-        internal override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object state)
         {
             switch (_serverRegistrar.CurrentServerRole)
             {

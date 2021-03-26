@@ -1,0 +1,26 @@
+{
+    "$schema": "http://json.schemastore.org/vs-2017.3.host",
+    "order" : 0,
+    "icon": "icon.png",
+    "description": {
+        "id": "UmbracoSolution",
+        "text": "Umbraco Web Application - An empty Umbraco CMS web application"
+    },
+    "symbolInfo": [
+        {
+            "id": "PackageTestSiteName",
+            "name": {
+                "text": "Optional: Specific the name of a package that this should be a test site for.",
+            },
+            "isVisible": "true"
+        },
+        {
+            "id": "UseSqlCe",
+            "name": {
+                "text": "Use Sql Compact Edition (SqlCE)"
+            },
+            "isVisible": "true"
+        }
+    ]
+
+}

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -407,13 +407,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _mediaByGuidReadRepository.Exists(id);
         }
 
-        /// <summary>
-        /// A reading repository purely for looking up by GUID
-        /// </summary>
-        /// <remarks>
-        /// TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
-        /// Then we can do the same thing with repository instances and we wouldn't need to leave all these methods as not implemented because we wouldn't need to implement them
-        /// </remarks>
+        
+        // A reading repository purely for looking up by GUID
+        // TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
+        // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this        
         private class MediaByGuidReadRepository : EntityRepositoryBase<Guid, IMedia>
         {
             private readonly MediaRepository _outerRepo;
@@ -423,8 +420,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 _outerRepo = outerRepo;
             }
-
-            protected override Guid NodeObjectTypeId => _outerRepo.NodeObjectTypeId;
 
             protected override IMedia PerformGet(Guid id)
             {

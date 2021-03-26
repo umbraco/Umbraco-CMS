@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -11,7 +11,7 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public sealed class AuditService : ScopeRepositoryService, IAuditService
+    public sealed class AuditService : RepositoryService, IAuditService
     {
         private readonly Lazy<bool> _isAvailable;
         private readonly IAuditRepository _auditRepository;

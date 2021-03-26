@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -29,6 +31,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
         private ContentTypeService ContentTypeService => (ContentTypeService)GetRequiredService<IContentTypeService>();
+
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
+            .AddNotificationHandler<ContentMovedToRecycleBinNotification, ContentNotificationHandler>();
 
         [Test]
         public void CanSaveAndGetIsElement()
@@ -112,7 +117,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items_1()
         {
-            ContentService.Trashed += ContentServiceOnTrashed;
+            ContentNotificationHandler.MovedContentToRecycleBin = MovedContentToRecycleBin;
 
             try
             {
@@ -151,14 +156,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             }
             finally
             {
-                ContentService.Trashed -= ContentServiceOnTrashed;
+                ContentNotificationHandler.MovedContentToRecycleBin = null;
             }
         }
 
         [Test]
         public void Deleting_Content_Types_With_Hierarchy_Of_Content_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items_2()
         {
-            ContentService.Trashed += ContentServiceOnTrashed;
+            ContentNotificationHandler.MovedContentToRecycleBin = MovedContentToRecycleBin;
 
             try
             {
@@ -194,13 +199,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             }
             finally
             {
-                ContentService.Trashed -= ContentServiceOnTrashed;
+                ContentNotificationHandler.MovedContentToRecycleBin = null;
             }
         }
 
-        private void ContentServiceOnTrashed(IContentService sender, MoveEventArgs<IContent> e)
+        private void MovedContentToRecycleBin(ContentMovedToRecycleBinNotification notification)
         {
-            foreach (MoveEventInfo<IContent> item in e.MoveInfoCollection)
+            foreach (MoveEventInfo<IContent> item in notification.MoveInfoCollection)
             {
                 // if this item doesn't exist then Fail!
                 IContent exists = ContentService.GetById(item.Entity.Id);
@@ -1728,6 +1733,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             }
 
             return list.ToArray();
+        }
+
+        public class ContentNotificationHandler :
+            INotificationHandler<ContentMovedToRecycleBinNotification>
+        {
+            public void Handle(ContentMovedToRecycleBinNotification notification) => MovedContentToRecycleBin?.Invoke(notification);
+
+            public static Action<ContentMovedToRecycleBinNotification> MovedContentToRecycleBin { get; set; }
         }
     }
 }

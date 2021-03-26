@@ -29,5 +29,23 @@ namespace Umbraco.Cms.Core.Events
         /// <param name="notification">The notification object.</param>
         void Publish<TNotification>(TNotification notification)
             where TNotification : INotification;
+
+        /// <summary>
+        /// Publishes a cancelable notification to the notification subscribers
+        /// </summary>
+        /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
+        /// <param name="notification"></param>
+        /// <returns>True if the notification was cancelled by a subscriber, false otherwise</returns>
+        bool PublishCancelable<TCancelableNotification>(TCancelableNotification notification)
+            where TCancelableNotification : ICancelableNotification;
+
+        /// <summary>
+        /// Publishes a cancelable notification async to the notification subscribers
+        /// </summary>
+        /// <typeparam name="TNotification">The type of notification being handled.</typeparam>
+        /// <param name="notification"></param>
+        /// <returns>True if the notification was cancelled by a subscriber, false otherwise</returns>
+        Task<bool> PublishCancelableAsync<TCancelableNotification>(TCancelableNotification notification)
+            where TCancelableNotification : ICancelableNotification;
     }
 }

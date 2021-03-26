@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _httpClientFactory = httpClientFactory;
         }
 
-        internal override async Task PerformExecuteAsync(object state)
+        public override async Task PerformExecuteAsync(object state)
         {
             if (_keepAliveSettings.DisableKeepAliveTask)
             {

@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
-    <RootNamespace>Umbraco.Cms.Web.UI.NetCore</RootNamespace>    
+    <RootNamespace>Umbraco.Cms.Web.UI.NetCore</RootNamespace>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
@@ -54,12 +54,10 @@
   <ItemGroup>
     <None Include="config\**\*.*">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
     <None Include="umbraco\**\*.*">
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
     <None Remove="App_Data\**" />
@@ -81,6 +79,7 @@
 
   <PropertyGroup>
     <RazorCompileOnBuild>false</RazorCompileOnBuild>
+    <RazorCompileOnPublish>false</RazorCompileOnPublish>
   </PropertyGroup>
 
 </Project>

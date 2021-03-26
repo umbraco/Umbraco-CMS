@@ -32,6 +32,7 @@ using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
+using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -314,7 +315,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             // Sign the user in with username/password, this also gives a chance for developers to
             // custom verify the credentials and auto-link user accounts with a custom IBackOfficePasswordChecker
-            var result = await _signInManager.PasswordSignInAsync(
+            SignInResult result = await _signInManager.PasswordSignInAsync(
                 loginModel.Username, loginModel.Password, isPersistent: true, lockoutOnFailure: true);
 
             if (result.Succeeded)
@@ -331,7 +332,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     return new ValidationErrorResult($"The registered {typeof(IBackOfficeTwoFactorOptions)} of type {_backOfficeTwoFactorOptions.GetType()} did not return a view for two factor auth ");
                 }
 
-                var attemptedUser = _userService.GetByUsername(loginModel.Username);
+                IUser attemptedUser = _userService.GetByUsername(loginModel.Username);
 
                 // create a with information to display a custom two factor send code view
                 var verifyResponse = new ObjectResult(new
@@ -390,7 +391,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     await _emailSender.SendAsync(mailMessage);
 
-                    _userManager.RaiseForgotPasswordRequestedEvent(User, user.Id.ToString());
+                    _userManager.NotifyForgotPasswordRequested(User, user.Id.ToString());
                 }
             }
 
@@ -554,7 +555,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                 }
 
-                _userManager.RaiseForgotPasswordChangedSuccessEvent(User, model.UserId.ToString());
+                _userManager.NotifyForgotPasswordChanged(User, model.UserId.ToString());
                 return Ok();
             }
 
@@ -578,7 +579,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _logger.LogInformation("User {UserName} from IP address {RemoteIpAddress} has logged out", User.Identity == null ? "UNKNOWN" : User.Identity.Name, HttpContext.Connection.RemoteIpAddress);
 
             var userId = result.Principal.Identity.GetUserId();
-            var args = _userManager.RaiseLogoutSuccessEvent(User, userId);
+            var args = _userManager.NotifyLogoutSuccess(User, userId);
             if (!args.SignOutRedirectUrl.IsNullOrWhiteSpace())
             {
                 return new ObjectResult(new

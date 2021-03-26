@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 
         /// <summary>
         /// Used to bulk update the permissions set for a content item. This will replace all permissions
-        /// assigned to an entity with a list of user id & permission pairs.
+        /// assigned to an entity with a list of user id &amp; permission pairs.
         /// </summary>
         /// <param name="permissionSet"></param>
         void ReplaceContentPermissions(EntityPermissionSet permissionSet);

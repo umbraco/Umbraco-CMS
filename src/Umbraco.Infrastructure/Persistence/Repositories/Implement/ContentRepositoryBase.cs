@@ -27,10 +27,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     internal sealed class ContentRepositoryBase
     {
         /// <summary>
-        ///
         /// This is used for unit tests ONLY
         /// </summary>
-        public static bool ThrowOnWarning = false;
+        public static bool ThrowOnWarning { get; set; } = false;
     }
 
     public abstract class ContentRepositoryBase<TId, TEntity, TRepository> : EntityRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
@@ -71,6 +70,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         }
 
         protected abstract TRepository This { get; }
+
+        /// <summary>
+        /// Gets the node object type for the repository's entity
+        /// </summary>
+        protected abstract Guid NodeObjectTypeId { get; }
 
         protected ILanguageRepository LanguageRepository { get; }
         protected IDataTypeService DataTypeService { get; }

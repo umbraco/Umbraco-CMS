@@ -102,6 +102,7 @@ namespace Umbraco.Cms.Core.Security
 
             // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
             var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.Logins));
+            var isTokensPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.LoginTokens));
 
             UpdateMemberProperties(userEntity, user);
 
@@ -123,6 +124,16 @@ namespace Umbraco.Cms.Core.Security
                         x.LoginProvider,
                         x.ProviderKey,
                         x.UserData)));
+            }
+
+            if (isTokensPropertyDirty)
+            {
+                _externalLoginService.Save(
+                    userEntity.Id,
+                    user.LoginTokens.Select(x => new ExternalLoginToken(
+                        x.LoginProvider,
+                        x.Name,
+                        x.Value)));
             }
 
             return Task.FromResult(IdentityResult.Success);
@@ -151,6 +162,7 @@ namespace Umbraco.Cms.Core.Security
                 {
                     // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
                     var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.Logins));
+                    var isTokensPropertyDirty = user.IsPropertyDirty(nameof(BackOfficeIdentityUser.LoginTokens));
 
                     if (UpdateMemberProperties(found, user))
                     {
@@ -165,6 +177,16 @@ namespace Umbraco.Cms.Core.Security
                                 x.LoginProvider,
                                 x.ProviderKey,
                                 x.UserData)));
+                    }
+
+                    if (isTokensPropertyDirty)
+                    {
+                        _externalLoginService.Save(
+                            found.Id,
+                            user.LoginTokens.Select(x => new ExternalLoginToken(
+                                x.LoginProvider,
+                                x.Name,
+                                x.Value)));
                     }
                 }
 
@@ -543,7 +565,9 @@ namespace Umbraco.Cms.Core.Security
         {
             if (user != null)
             {
-                user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetAll(UserIdToInt(user.Id))));
+                var userId = UserIdToInt(user.Id);
+                user.SetLoginsCallback(new Lazy<IEnumerable<IIdentityUserLogin>>(() => _externalLoginService.GetExternalLogins(userId)));
+                user.SetTokensCallback(new Lazy<IEnumerable<IIdentityUserToken>>(() => _externalLoginService.GetExternalLoginTokens(userId)));
             }
 
             return user;
@@ -757,24 +781,102 @@ namespace Umbraco.Cms.Core.Security
         [EditorBrowsable(EditorBrowsableState.Never)]
         public override Task<IList<BackOfficeIdentityUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
-        // TODO: We should support these
 
         /// <summary>
-        /// Not supported in Umbraco
+        /// Overridden to support Umbraco's own data storage requirements
+        /// </summary>
+        /// <remarks>
+        /// The base class's implementation of this calls into FindTokenAsync and AddUserTokenAsync, both methods will only work with ORMs that are change
+        /// tracking ORMs like EFCore.
+        /// </remarks>
+        /// <inheritdoc />
+        public override Task SetTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+            if (token == null)
+            {
+                user.LoginTokens.Add(new IdentityUserToken(loginProvider, name, value, user.Id));
+            }
+            else
+            {
+                token.Value = value;
+            }
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Overridden to support Umbraco's own data storage requirements
+        /// </summary>
+        /// <remarks>
+        /// The base class's implementation of this calls into FindTokenAsync, RemoveUserTokenAsync and AddUserTokenAsync, both methods will only work with ORMs that are change
+        /// tracking ORMs like EFCore.
+        /// </remarks>
+        /// <inheritdoc />
+        public override Task RemoveTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+            if (token != null)
+            {
+                user.LoginTokens.Remove(token);
+            }
+
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Overridden to support Umbraco's own data storage requirements
+        /// </summary>
+        /// <remarks>
+        /// The base class's implementation of this calls into FindTokenAsync, RemoveUserTokenAsync and AddUserTokenAsync, both methods will only work with ORMs that are change
+        /// tracking ORMs like EFCore.
+        /// </remarks>
+        /// <inheritdoc />
+        public override Task<string> GetTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            ThrowIfDisposed();
+
+            if (user == null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+            IIdentityUserToken token = user.LoginTokens.FirstOrDefault(x => x.LoginProvider.InvariantEquals(loginProvider) && x.Name.InvariantEquals(name));
+
+            return Task.FromResult(token?.Value);
+        }
+
+        /// <summary>
+        /// Not supported in Umbraco, see comments above on GetTokenAsync, RemoveTokenAsync, SetTokenAsync
         /// </summary>
         /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
         protected override Task<IdentityUserToken<string>> FindTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken) => throw new NotImplementedException();
 
         /// <summary>
-        /// Not supported in Umbraco
+        /// Not supported in Umbraco, see comments above on GetTokenAsync, RemoveTokenAsync, SetTokenAsync
         /// </summary>
         /// <inheritdoc />
         [EditorBrowsable(EditorBrowsableState.Never)]
         protected override Task AddUserTokenAsync(IdentityUserToken<string> token) => throw new NotImplementedException();
 
         /// <summary>
-        /// Not supported in Umbraco
+        /// Not supported in Umbraco, see comments above on GetTokenAsync, RemoveTokenAsync, SetTokenAsync
         /// </summary>
         /// <inheritdoc />
         [EditorBrowsable(EditorBrowsableState.Never)]

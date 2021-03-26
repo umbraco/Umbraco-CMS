@@ -28,9 +28,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         { }
 
         /// <inheritdoc />
-        protected override Guid NodeObjectTypeId => throw new NotSupportedException();
-
-        /// <inheritdoc />
         protected override IAuditEntry PerformGet(int id)
         {
             var sql = Sql()
