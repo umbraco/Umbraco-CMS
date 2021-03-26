@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                     Value = _localizedTextService.UmbracoDictionaryTranslate(CultureDictionary, member.ContentType.Name),
                     View = _propertyEditorCollection[Constants.PropertyEditors.Aliases.Label].GetValueEditor().View
                 },
-                GetLoginProperty(_memberTypeService, member, _localizedTextService),
+                GetLoginProperty(member, _localizedTextService),
                 new ContentPropertyDisplay
                 {
                     Alias = $"{Constants.PropertyEditors.InternalGenericPropertiesPrefix}email",
@@ -208,7 +208,6 @@ namespace Umbraco.Cms.Core.Models.Mapping
         /// <summary>
         /// Returns the login property display field
         /// </summary>
-        /// <param name="memberTypeService"></param>
         /// <param name="member"></param>
         /// <param name="display"></param>
         /// <param name="localizedText"></param>
@@ -218,7 +217,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
         /// the membership provider is a custom one, we cannot allow changing the username because MembershipProvider's do not actually natively
         /// allow that.
         /// </remarks>
-        internal static ContentPropertyDisplay GetLoginProperty(IMemberTypeService memberTypeService, IMember member, ILocalizedTextService localizedText)
+        internal static ContentPropertyDisplay GetLoginProperty(IMember member, ILocalizedTextService localizedText)
         {
             var prop = new ContentPropertyDisplay
             {
@@ -234,10 +233,9 @@ namespace Umbraco.Cms.Core.Models.Mapping
 
         internal IDictionary<string, bool> GetMemberGroupValue(string username)
         {
-            var userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
+            IEnumerable<string> userRoles = username.IsNullOrWhiteSpace() ? null : _memberService.GetAllRoles(username);
 
             // create a dictionary of all roles (except internal roles) + "false"
-            //TODO: use member role manager instead
             var result = _memberGroupService.GetAll()
                 .Select(x => x.Name)
                 // if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
@@ -246,11 +244,16 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 .ToDictionary(x => x, x => false);
 
             // if user has no roles, just return the dictionary
-            if (userRoles == null) return result;
+            if (userRoles == null)
+            {
+                return result;
+            }
 
             // else update the dictionary to "true" for the user roles (except internal roles)
             foreach (var userRole in userRoles.Where(x => x.StartsWith(Constants.Conventions.Member.InternalRolePrefix) == false))
+            {
                 result[userRole] = true;
+            }
 
             return result;
         }

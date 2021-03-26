@@ -363,13 +363,6 @@ namespace Umbraco.Cms.Core.Security
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
 
-            MemberIdentityUser user = await FindUserAsync(userId, cancellationToken);
-            if (user == null)
-            {
-                //TODO: error throw or null result?
-                return await Task.FromResult((IdentityUserLogin<string>)null);
-            }
-
             if (string.IsNullOrWhiteSpace(loginProvider))
             {
                 throw new ArgumentNullException(nameof(loginProvider));
@@ -380,11 +373,16 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(providerKey));
             }
 
+            MemberIdentityUser user = await FindUserAsync(userId, cancellationToken);
+            if (user == null)
+            {
+                return await Task.FromResult((IdentityUserLogin<string>)null);
+            }
+
             IList<UserLoginInfo> logins = await GetLoginsAsync(user, cancellationToken);
             UserLoginInfo found = logins.FirstOrDefault(x => x.ProviderKey == providerKey && x.LoginProvider == loginProvider);
             if (found == null)
             {
-                //TODO: error throw or null result?
                 return await Task.FromResult((IdentityUserLogin<string>)null);
             }
 
