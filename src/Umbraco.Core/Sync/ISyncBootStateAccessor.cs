@@ -17,19 +17,4 @@ namespace Umbraco.Core.Sync
         /// <returns></returns>
         SyncBootState GetSyncBootState();
     }
-    public enum SyncBootState
-    {
-        /// <summary>
-        /// Unknown state. Treat as HasSyncState
-        /// </summary>
-        Unknown = 0,
-        /// <summary>
-        /// Cold boot. No Sync state
-        /// </summary>
-        ColdBoot = 1,
-        /// <summary>
-        /// Warm boot. Sync state present
-        /// </summary>
-        HasSyncState = 2
-    }
 }

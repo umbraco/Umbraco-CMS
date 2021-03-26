@@ -72,7 +72,7 @@ namespace Umbraco.Web.Compose
 
             composition.SetDatabaseServerMessengerOptions(GetDefaultOptions);
             composition.SetServerMessenger<BatchedDatabaseServerMessenger>();
-            composition.Register<ISyncBootStateAccessor, BatchedDatabaseServerMessenger>(Lifetime.Singleton);
+            composition.Register<ISyncBootStateAccessor>(factory=> factory.GetInstance<IServerMessenger>() as BatchedDatabaseServerMessenger, Lifetime.Singleton);
         }
     }
 
