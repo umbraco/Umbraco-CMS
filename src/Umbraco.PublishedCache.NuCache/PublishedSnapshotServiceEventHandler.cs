@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
+using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache
@@ -16,7 +17,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     /// <summary>
     /// Subscribes to Umbraco events to ensure nucache remains consistent with the source data
     /// </summary>
-    public class PublishedSnapshotServiceEventHandler : IDisposable
+    public class PublishedSnapshotServiceEventHandler : IDisposable, INotificationHandler<LanguageSavedNotification>
     {
         private readonly IRuntimeState _runtime;
         private bool _disposedValue;
@@ -79,9 +80,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             ContentTypeService.ScopedRefreshedEntity += OnContentTypeRefreshedEntity;
             MediaTypeService.ScopedRefreshedEntity += OnMediaTypeRefreshedEntity;
             MemberTypeService.ScopedRefreshedEntity += OnMemberTypeRefreshedEntity;
-
-            // TODO: This should be a cache refresher call!
-            LocalizationService.SavedLanguage += OnLanguageSaved;
         }
 
         private void TearDownRepositoryEvents()
@@ -95,7 +93,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
             MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
             MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
-            LocalizationService.SavedLanguage -= OnLanguageSaved; // TODO: Shouldn't this be a cache refresher event?
         }
 
         // note: if the service is not ready, ie _isReady is false, then we still handle repository events,
@@ -156,13 +153,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             }
         }
 
+        // TODO: This should be a cache refresher call!
         /// <summary>
         /// If a <see cref="ILanguage"/> is ever saved with a different culture, we need to rebuild all of the content nucache database table
         /// </summary>
-        private void OnLanguageSaved(ILocalizationService sender, SaveEventArgs<ILanguage> e)
+        public void Handle(LanguageSavedNotification notification)
         {
             // culture changed on an existing language
-            var cultureChanged = e.SavedEntities.Any(x => !x.WasPropertyDirty(nameof(ILanguage.Id)) && x.WasPropertyDirty(nameof(ILanguage.IsoCode)));
+            var cultureChanged = notification.SavedEntities.Any(x => !x.WasPropertyDirty(nameof(ILanguage.Id)) && x.WasPropertyDirty(nameof(ILanguage.IsoCode)));
             if (cultureChanged)
             {
                 // Rebuild all content for all content types

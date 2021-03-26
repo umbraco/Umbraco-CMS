@@ -47,9 +47,6 @@ namespace Umbraco.Cms.Tests.Integration.Cache
                 new EventDefinition<IUserService, SaveEventArgs<UserGroupWithUsers>>(null, UserService, new SaveEventArgs<UserGroupWithUsers>(Enumerable.Empty<UserGroupWithUsers>())),
                 new EventDefinition<IUserService, DeleteEventArgs<IUserGroup>>(null, UserService, new DeleteEventArgs<IUserGroup>(Enumerable.Empty<IUserGroup>())),
 
-                new EventDefinition<ILocalizationService, SaveEventArgs<IDictionaryItem>>(null, LocalizationService, new SaveEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),
-                new EventDefinition<ILocalizationService, DeleteEventArgs<IDictionaryItem>>(null, LocalizationService, new DeleteEventArgs<IDictionaryItem>(Enumerable.Empty<IDictionaryItem>())),
-
                 new EventDefinition<IDataTypeService, SaveEventArgs<IDataType>>(null, DataTypeService, new SaveEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
                 new EventDefinition<IDataTypeService, DeleteEventArgs<IDataType>>(null, DataTypeService, new DeleteEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
 
@@ -58,9 +55,6 @@ namespace Umbraco.Cms.Tests.Integration.Cache
 
                 new EventDefinition<IDomainService, SaveEventArgs<IDomain>>(null, DomainService, new SaveEventArgs<IDomain>(Enumerable.Empty<IDomain>())),
                 new EventDefinition<IDomainService, DeleteEventArgs<IDomain>>(null, DomainService, new DeleteEventArgs<IDomain>(Enumerable.Empty<IDomain>())),
-
-                new EventDefinition<ILocalizationService, SaveEventArgs<ILanguage>>(null, LocalizationService, new SaveEventArgs<ILanguage>(Enumerable.Empty<ILanguage>())),
-                new EventDefinition<ILocalizationService, DeleteEventArgs<ILanguage>>(null, LocalizationService, new DeleteEventArgs<ILanguage>(Enumerable.Empty<ILanguage>())),
 
                 new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>())),
                 new EventDefinition<IContentTypeService, DeleteEventArgs<IContentType>>(null, ContentTypeService, new DeleteEventArgs<IContentType>(Enumerable.Empty<IContentType>())),
