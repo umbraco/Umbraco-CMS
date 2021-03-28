@@ -78,20 +78,22 @@ function umbRequestHelper($http, $q, notificationsService, eventsService, formHe
          * @description
          * This will return the webapi Url for the requested key based on the servervariables collection
          *
-         * @param {string} apiName The webapi name that is found in the servervariables["umbracoUrls"] dictionary
+         * @param {string} apiName The webapi name that is found in the servervariables["umbracoUrls"] dictionary as default, add serverVariableName param to override this
          * @param {string} actionName The webapi action name
          * @param {object} queryStrings Can be either a string or an array containing key/value pairs
+         * @param {string} serverVariableName Override the default servervariables["umbracoUrls"] dictionary
          */
-        getApiUrl: function (apiName, actionName, queryStrings) {
-            if (!Umbraco || !Umbraco.Sys || !Umbraco.Sys.ServerVariables || !Umbraco.Sys.ServerVariables["umbracoUrls"]) {
-                throw "No server variables defined!";
+        getApiUrl: function (apiName, actionName, queryStrings, serverVariableName = "umbracoUrls") {
+
+            if (!Umbraco || !Umbraco.Sys || !Umbraco.Sys.ServerVariables || !Umbraco.Sys.ServerVariables[serverVariableName]) {
+                throw "No server variables defined for " + serverVariableName;
             }
 
-            if (!Umbraco.Sys.ServerVariables["umbracoUrls"][apiName]) {
+            if (!Umbraco.Sys.ServerVariables[serverVariableName][apiName]) {
                 throw "No url found for api name " + apiName;
             }
 
-            return Umbraco.Sys.ServerVariables["umbracoUrls"][apiName] + actionName +
+            return Umbraco.Sys.ServerVariables[serverVariableName][apiName] + actionName +
                 (!queryStrings ? "" : "?" + (Utilities.isString(queryStrings) ? queryStrings : this.dictionaryToQueryString(queryStrings)));
 
         },
