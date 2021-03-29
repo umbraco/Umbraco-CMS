@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -10,7 +10,7 @@ using Umbraco.Cms.Infrastructure.Services.Notifications;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class MemberGroupService : RepositoryService, IMemberGroupService
+    internal class MemberGroupService : RepositoryService, IMemberGroupService
     {
         private readonly IMemberGroupRepository _memberGroupRepository;
 
