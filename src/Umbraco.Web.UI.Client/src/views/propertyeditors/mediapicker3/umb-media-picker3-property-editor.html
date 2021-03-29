@@ -23,7 +23,8 @@
                     media-key="media.mediaKey"
                     on-name-clicked="vm.editMedia(media, $index, $event)"
                     ng-class="{'--active': vm.activeMediaEntry === media}"
-                    has-error="vm.propertyForm.maxCount.$valid === false && $index >= vm.validationLimit.max">
+                    has-error="vm.propertyForm.maxCount.$valid === false && $index >= vm.validationLimit.max"
+                    allowed-types="vm.allowedTypes">
                     <div class="__actions">
                         <button ng-if="vm.supportCopy" type="button" class="btn-reset __action umb-outline" localize="title" title="actions_copy" ng-click="vm.copyMedia(media); $event.stopPropagation();">
                             <i class="icon icon-documents" aria-hidden="true"></i>

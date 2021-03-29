@@ -56,6 +56,20 @@ umb-media-card {
         box-shadow: none;
     }
 
+    .__status {
+
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        padding: 2px;
+
+        &.--error {
+            background-color: @errorBackground;
+            color: @errorText;
+        }
+    }
+
     .__showcase {
         position: relative;
         max-width: 100%;
@@ -77,7 +91,7 @@ umb-media-card {
             .umb-file-icon {
                 position: absolute;
                 top: 0;
-                bottom: 30px;
+                bottom: 0;
                 left: 10px;
                 right: 10px;
                 display: flex;

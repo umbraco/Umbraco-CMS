@@ -1099,6 +1099,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmRemoveMediaEntryMessage">Fjern?</key>
     <key alias="confirmRemoveAllMediaEntryMessage">Fjern brugen af alle medier?</key>
     <key alias="tabClipboard">Udklipsholder</key>
+    <key alias="notAllowed">Ikke tilladt</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>

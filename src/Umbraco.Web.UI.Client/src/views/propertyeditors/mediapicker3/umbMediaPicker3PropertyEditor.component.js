@@ -63,6 +63,7 @@
 
             vm.validationLimit = vm.model.config.validationLimit;
             vm.singleMode = vm.validationLimit.max === 1;
+            vm.allowedTypes = vm.model.config.filter ? vm.model.config.filter.split(",") : null;
 
             copyAllMediasAction = {
                 labelKey: "clipboard_labelForCopyAllEntries",
@@ -171,13 +172,11 @@
                 mediaPicker.filter = vm.model.config.filter;
             }
 
-            console.log("vm.model.config.filter", vm.model.config.filter)
-
             mediaPicker.clickClearClipboard = function ($event) {
-                clipboardService.clearEntriesOfType(clipboardService.TYPES.Media, vm.model.config.filter || null);
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.Media, vm.allowedTypes || null);
             };
 
-            mediaPicker.clipboardItems = clipboardService.retriveEntriesOfType(clipboardService.TYPES.MEDIA, vm.model.config.filter || null);
+            mediaPicker.clipboardItems = clipboardService.retriveEntriesOfType(clipboardService.TYPES.MEDIA, vm.allowedTypes || null);
             mediaPicker.clipboardItems.sort( (a, b) => {
                 return b.date - a.date
             });

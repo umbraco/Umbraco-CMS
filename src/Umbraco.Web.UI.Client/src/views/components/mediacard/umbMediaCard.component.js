@@ -13,6 +13,7 @@
                 icon: "<?",
                 name: "<?",
                 hasError: "<",
+                allowedTypes: "<?",
                 onNameClicked: "&?"
             }
         });
@@ -31,16 +32,23 @@
         }));
 
         function checkErrorState() {
-            if (vm.hasError === true || (vm.media && vm.media.trashed === true)) {
+
+            vm.notAllowed = (vm.media &&vm.allowedTypes && vm.allowedTypes.length > 0 && vm.allowedTypes.indexOf(vm.media.metaData.ContentTypeAlias) === -1);
+
+            if (
+                vm.hasError === true || vm.notAllowed === true || (vm.media && vm.media.trashed === true)
+            ) {
                 $element.addClass("--hasError")
+                vm.mediaCardForm.$setValidity('error', false)
             } else {
                 $element.removeClass("--hasError")
+                vm.mediaCardForm.$setValidity('error', true)
             }
         }
-        checkErrorState();
-        unsubscribe.push($scope.$watch(["vm.media.trashed", "vm.hasError"], checkErrorState));
 
         vm.$onInit = function () {
+
+            unsubscribe.push($scope.$watch(["vm.media.trashed", "vm.hasError"], checkErrorState));
 
             vm.updateThumbnail();
 
@@ -64,6 +72,7 @@
 
                 entityResource.getById(vm.mediaKey, "Media").then(function (mediaEntity) {
                     vm.media = mediaEntity;
+                    checkErrorState();
                     vm.thumbnail = mediaHelper.resolveFileFromEntity(mediaEntity, true);
 
                     vm.loading = false;
