@@ -16,10 +16,10 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Common
         [Test]
         public void AddMembersIdentity_ExpectMembersUserStoreResolvable()
         {
-            IUserStore<MembersIdentityUser> userStore = Services.GetService<IUserStore<MembersIdentityUser>>();
+            IUserStore<MemberIdentityUser> userStore = Services.GetService<IUserStore<MemberIdentityUser>>();
 
             Assert.IsNotNull(userStore);
-            Assert.AreEqual(typeof(MembersUserStore), userStore.GetType());
+            Assert.AreEqual(typeof(MemberUserStore), userStore.GetType());
         }
 
         [Test]

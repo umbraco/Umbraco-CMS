@@ -2434,6 +2434,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 .Select(_umbracoMapper.Map<MemberDisplay>)
                 .ToArray();
 
+            //TODO: change to role manager
             var allGroups = _memberGroupService.GetAll().ToArray();
             var groups = entry.Rules
                 .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
