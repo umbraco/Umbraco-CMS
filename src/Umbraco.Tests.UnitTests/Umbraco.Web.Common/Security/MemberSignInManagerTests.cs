@@ -24,7 +24,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
             _mockLogger = new Mock<ILogger<IMemberManager>>();
             return new MemberSignInManager(
                     _memberManager.Object,
-                    Mock.Of<IIpResolver>(),
                     Mock.Of<IHttpContextAccessor>(),
                     Mock.Of<IUserClaimsPrincipalFactory<MemberIdentityUser>>(),
                     Mock.Of<IOptions<IdentityOptions>>(),
