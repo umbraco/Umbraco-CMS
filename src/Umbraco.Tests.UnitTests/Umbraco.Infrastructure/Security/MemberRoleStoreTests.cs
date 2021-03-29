@@ -6,8 +6,11 @@ using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.Common.Builders;
+using Umbraco.Cms.Tests.Common.Builders.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 {
@@ -16,20 +19,29 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
     {
         private Mock<IMemberGroupService> _mockMemberGroupService;
         private IdentityErrorDescriber ErrorDescriber => new IdentityErrorDescriber();
+        private UmbracoIdentityRoleBuilder _roleBuilder;
+        private MemberGroupBuilder _groupBuilder;
 
-        public MemberRoleStore<IdentityRole> CreateSut()
+        public MemberRoleStore CreateSut()
         {
             _mockMemberGroupService = new Mock<IMemberGroupService>();
-            return new MemberRoleStore<IdentityRole>(
+            return new MemberRoleStore(
                 _mockMemberGroupService.Object,
                 ErrorDescriber);
+        }
+
+        [SetUp]
+        public void SetUp()
+        {
+            _roleBuilder = new UmbracoIdentityRoleBuilder();
+            _groupBuilder = new MemberGroupBuilder();
         }
 
         [Test]
         public void GivenICreateAMemberRole_AndTheGroupIsNull_ThenIShouldGetAFailedIdentityResult()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeCancellationToken = new CancellationToken();
 
             // act
@@ -44,12 +56,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenICreateAMemberRole_AndTheGroupIsPopulatedCorrectly_ThenIShouldGetASuccessResultAsync()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole
-            {
-                Id = "777",
-                Name = "testname"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithTestName("777").Build();
             var fakeCancellationToken = new CancellationToken() { };
 
             IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
@@ -72,12 +80,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheGroupExistsWithTheSameName_ThenIShouldGetASuccessResultAsyncButNoUpdatesMade()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole
-            {
-                Id = "777",
-                Name = "fakeGroupName"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithName("fakeGroupName").WithId("777").Build();            
             var fakeCancellationToken = new CancellationToken() { };
 
             IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
@@ -101,12 +105,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheGroupExistsWithADifferentSameName_ThenIShouldGetASuccessResultAsyncWithUpdatesMade()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole
-            {
-                Id = "777",
-                Name = "fakeGroup777"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithName("fakeGroup777").WithId("777").Build();
             var fakeCancellationToken = new CancellationToken() { };
 
             IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
@@ -131,12 +131,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheGroupDoesntExist_ThenIShouldGetAFailureResultAsync()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole
-            {
-                Id = "777",
-                Name = "testname"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithTestName("777").Build();
             var fakeCancellationToken = new CancellationToken() { };
 
             // act
@@ -152,12 +148,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIUpdateAMemberRole_AndTheIdCannotBeParsedToAnInt_ThenIShouldGetAFailureResultAsync()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole
-            {
-                Id = "7a77",
-                Name = "testname"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithTestName("7a77").Build();
             var fakeCancellationToken = new CancellationToken() { };
 
             // act
@@ -173,7 +165,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public void GivenIUpdateAMemberRole_AndTheRoleIsNull_ThenAnExceptionShouldBeThrown()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeCancellationToken = new CancellationToken() { };
 
             // act
@@ -188,12 +180,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIDeleteAMemberRole_AndItExists_ThenTheMemberGroupShouldBeDeleted_AndIShouldGetASuccessResultAsync()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole
-            {
-                Id = "777",
-                Name = "testname"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithTestName("777").Build();
             var fakeCancellationToken = new CancellationToken() { };
 
             IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
@@ -213,15 +201,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         }
 
         [Test]
-        public async Task GivenIDeleteAMemberRole_AndTheIdCannotBeParsedToAnInt_ThenTheMemberGroupShouldNotBeDeleted_AndIShouldGetAFailResultAsync()
+        public async Task GivenIDeleteAMemberRole_AndTheIdCannotBeParsedToAnInt_ThenTheMemberGroupShouldNotBeDeleted_AndIShouldGetAnArgumentException()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole
-            {
-                Id = "7a77",
-                Name = "testname"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithTestName("7a77").Build();            
             var fakeCancellationToken = new CancellationToken() { };
 
             IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
@@ -229,12 +213,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
 
             // act
-            IdentityResult identityResult = await sut.DeleteAsync(fakeRole, fakeCancellationToken);
-
-            // assert
-            Assert.IsTrue(identityResult.Succeeded == false);
-            Assert.IsTrue(identityResult.Errors.Any(x => x.Code == "IdentityIdParseError" && x.Description == "Cannot parse ID to int"));
-            _mockMemberGroupService.VerifyNoOtherCalls();
+            Assert.ThrowsAsync<ArgumentException>(async () => await sut.DeleteAsync(fakeRole, fakeCancellationToken));
         }
 
 
@@ -242,12 +221,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIDeleteAMemberRole_AndItDoesntExist_ThenTheMemberGroupShouldNotBeDeleted_AndIShouldGetAFailResultAsync()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole
-            {
-                Id = "777",
-                Name = "testname"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithTestName("777").Build();
             var fakeCancellationToken = new CancellationToken() { };
 
             IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
@@ -268,20 +243,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIFindAMemberRoleByRoleKey_AndRoleKeyExists_ThenIShouldGetASuccessResultAsync()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole("fakeGroupName")
-            {
-                Id = "777"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithName("fakeGroupName").WithId("777").Build();
             int fakeRoleId = 777;
 
-            IMemberGroup fakeMemberGroup = new MemberGroup()
-            {
-                Name = "fakeGroupName",
-                CreatorId = 123,
-                Id = 777,
-                Key = Guid.NewGuid()
-            };
+            IMemberGroup fakeMemberGroup = _groupBuilder.WithName("fakeGroupName").WithCreatorId(123).WithId(777).WithKey(Guid.NewGuid()).Build();
 
             _mockMemberGroupService.Setup(x => x.GetById(fakeRoleId)).Returns(fakeMemberGroup);
 
@@ -299,12 +265,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAnIntOrGuid_ThenIShouldGetAFailureResultAsync()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole
-            {
-                Id = "7a77",
-                Name = "testname"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithTestName("7a77").Build();
             var fakeCancellationToken = new CancellationToken() { };
 
             // act
@@ -319,21 +281,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAnIntButCanBeToGuid_ThenIShouldGetASuccessResultAsync()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole("fakeGroupName")
-            {
-                Id = "777"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithName("fakeGroupName").WithId("777").Build();
 
             var fakeRoleGuid = Guid.NewGuid();
 
-            IMemberGroup fakeMemberGroup = new MemberGroup()
-            {
-                Name = "fakeGroupName",
-                CreatorId = 123,
-                Id = 777,
-                Key = fakeRoleGuid
-            };
+            IMemberGroup fakeMemberGroup = _groupBuilder.WithName("fakeGroupName").WithCreatorId(123).WithId(777).WithKey(fakeRoleGuid).Build();
 
             _mockMemberGroupService.Setup(x => x.GetById(fakeRoleGuid)).Returns(fakeMemberGroup);
 
@@ -352,21 +305,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIFindAMemberRoleByRoleId_AndIdCannotBeParsedToAGuidButCanBeToInt_ThenIShouldGetASuccessResultAsync()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole("fakeGroupName")
-            {
-                Id = "777"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithName("fakeGroupName").WithId("777").Build();
 
             var fakeRoleId = 777;
 
-            IMemberGroup fakeMemberGroup = new MemberGroup()
-            {
-                Name = "fakeGroupName",
-                CreatorId = 123,
-                Id = 777,
-                Key = Guid.NewGuid()
-            };
+            IMemberGroup fakeMemberGroup = _groupBuilder.WithName("fakeGroupName").WithCreatorId(123).WithId(777).WithKey(Guid.NewGuid()).Build();
 
             _mockMemberGroupService.Setup(x => x.GetById(fakeRoleId)).Returns(fakeMemberGroup);
 
@@ -385,11 +329,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public async Task GivenIFindAMemberRoleByRoleName_AndRoleNameExists_ThenIShouldGetASuccessResultAsync()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole("fakeGroupName")
-            {
-                Id = "777"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithName("fakeGroupName").WithId("777").Build();
 
             IMemberGroup mockMemberGroup = Mock.Of<IMemberGroup>(m =>
                 m.Name == "fakeGroupName" &&
@@ -412,11 +353,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public void GivenIFindAMemberRoleByRoleName_AndTheNameIsNull_ThenIShouldGetAnArgumentException()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole
-            {
-                Id = "777"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithId("777").Build();
             var fakeCancellationToken = new CancellationToken() { };
 
             // act
@@ -432,7 +370,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public void GivenIGetAMemberRoleId_AndTheRoleIsNull_ThenIShouldGetAnArgumentException()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
+            MemberRoleStore sut = CreateSut();
             var fakeCancellationToken = new CancellationToken() { };
 
             // act
@@ -446,11 +384,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public void GivenIGetAMemberRoleId_AndTheRoleIsNotNull_ThenIShouldGetTheMemberRole()
         {
             // arrange
-            MemberRoleStore<IdentityRole> sut = CreateSut();
-            var fakeRole = new IdentityRole("fakeGroupName")
-            {
-                Id = "777"
-            };
+            MemberRoleStore sut = CreateSut();
+            UmbracoIdentityRole fakeRole = _roleBuilder.WithName("fakeGroupName").WithId("777").Build();
             string fakeRoleId = fakeRole.Id;
 
             var fakeCancellationToken = new CancellationToken();

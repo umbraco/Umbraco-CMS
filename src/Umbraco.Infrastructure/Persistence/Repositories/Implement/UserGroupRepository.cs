@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -291,8 +291,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
-
         protected override void PersistNewItem(IUserGroup entity)
         {
             entity.AddingEntity();
@@ -402,8 +400,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 throw new InvalidOperationException("This method won't be implemented.");
             }
-
-            protected override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
             #endregion
 

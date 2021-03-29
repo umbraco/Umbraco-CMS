@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -124,11 +124,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                                "DELETE FROM umbracoRelation WHERE id = @id"
                            };
             return list;
-        }
-
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
         }
 
         #endregion

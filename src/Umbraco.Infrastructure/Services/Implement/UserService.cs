@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// <summary>
     /// Represents the UserService, which is an easy access to operations involving <see cref="IProfile"/>, <see cref="IMembershipUser"/> and eventually Backoffice Users.
     /// </summary>
-    public class UserService : ScopeRepositoryService, IUserService
+    public class UserService : RepositoryService, IUserService
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserGroupRepository _userGroupRepository;

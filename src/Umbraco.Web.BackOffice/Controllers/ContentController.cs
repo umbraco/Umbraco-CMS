@@ -36,7 +36,6 @@ using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -158,7 +157,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // Authorize...
             var resource = new ContentPermissionsResource(content, ActionRights.ActionLetter);
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, content, AuthorizationPolicies.ContentPermissionByResource);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, resource, AuthorizationPolicies.ContentPermissionByResource);
             if (!authorizationResult.Succeeded)
             {
                 return Forbid();

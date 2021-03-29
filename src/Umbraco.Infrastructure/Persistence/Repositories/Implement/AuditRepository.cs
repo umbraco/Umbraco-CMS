@@ -117,11 +117,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             throw new NotImplementedException();
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
-
         public void CleanLogs(int maximumAgeOfLogsInMinutes)
         {
             var oldestPermittedLogEntry = DateTime.Now.Subtract(new TimeSpan(0, maximumAgeOfLogsInMinutes, 0));

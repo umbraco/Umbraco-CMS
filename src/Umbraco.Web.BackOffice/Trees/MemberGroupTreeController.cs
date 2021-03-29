@@ -28,29 +28,23 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             IMemberGroupService memberGroupService,
             IEventAggregator eventAggregator)
             : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator)
-        {
-            _memberGroupService = memberGroupService;
-        }
+            => _memberGroupService = memberGroupService;
 
-        //TODO: change to role store
         protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormCollection queryStrings)
-        {
-            return _memberGroupService.GetAll()
+            => _memberGroupService.GetAll()
                 .OrderBy(x => x.Name)
                 .Select(dt => CreateTreeNode(dt.Id.ToString(), id, queryStrings, dt.Name, Constants.Icons.MemberGroup, false));
-        }
 
         protected override ActionResult<TreeNode> CreateRootNode(FormCollection queryStrings)
         {
-            var rootResult = base.CreateRootNode(queryStrings);
+            ActionResult<TreeNode> rootResult = base.CreateRootNode(queryStrings);
             if (!(rootResult.Result is null))
             {
                 return rootResult;
             }
-            var root = rootResult.Value;
+            TreeNode root = rootResult.Value;
 
             //check if there are any groups
-            //TODO: change to role store
             root.HasChildren = _memberGroupService.GetAll().Any();
             return root;
         }

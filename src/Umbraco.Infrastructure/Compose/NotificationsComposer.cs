@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
@@ -62,6 +63,13 @@ namespace Umbraco.Cms.Core.Compose
                 .AddNotificationHandler<ContentPublishedNotification, RedirectTrackingHandler>()
                 .AddNotificationHandler<ContentMovingNotification, RedirectTrackingHandler>()
                 .AddNotificationHandler<ContentMovedNotification, RedirectTrackingHandler>();
+
+            // Add notification handlers for DistributedCache
+            builder
+                .AddNotificationHandler<DictionaryItemDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<DictionaryItemSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<LanguageSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>();
         }
     }
 }

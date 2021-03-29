@@ -55,6 +55,30 @@ namespace Umbraco.Cms.Core.Events
             PublishNotification(notification);
             Task.WaitAll(PublishNotificationAsync(notification));
         }
+
+        public bool PublishCancelable<TCancelableNotification>(TCancelableNotification notification)
+            where TCancelableNotification : ICancelableNotification
+        {
+            if (notification == null)
+            {
+                throw new ArgumentNullException(nameof(notification));
+            }
+
+            Publish(notification);
+            return notification.Cancel;
+        }
+
+        public async Task<bool> PublishCancelableAsync<TCancelableNotification>(TCancelableNotification notification)
+            where TCancelableNotification : ICancelableNotification
+        {
+            if (notification == null)
+            {
+                throw new ArgumentNullException(nameof(notification));
+            }
+
+            await PublishAsync(notification);
+            return notification.Cancel;
+        }
     }
 
     /// <summary>

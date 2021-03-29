@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// <summary>
     /// Represents the File Service, which is an easy access to operations involving <see cref="IFile"/> objects like Scripts, Stylesheets and Templates
     /// </summary>
-    public class FileService : ScopeRepositoryService, IFileService
+    public class FileService : RepositoryService, IFileService
     {
         private readonly IStylesheetRepository _stylesheetRepository;
         private readonly IScriptRepository _scriptRepository;

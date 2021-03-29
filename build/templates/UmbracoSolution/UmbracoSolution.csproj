@@ -9,6 +9,11 @@
         <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" Condition="'$(UseSqlCe)' == 'true'" />
     </ItemGroup>
 
+    <Import Project="..\PackageTestSiteName\build\PackageTestSiteName.targets" Condition="'$(PackageTestSiteName)' != ''"/>
+    <ItemGroup Condition="'$(PackageTestSiteName)' != ''">
+        <ProjectReference Include="..\PackageTestSiteName\PackageTestSiteName.csproj"/>
+    </ItemGroup>
+
     <ItemGroup>
         <Compile Remove="umbraco\Data\**" />
         <Compile Remove="umbraco\logs\**" />
@@ -28,12 +33,10 @@
         <None Remove="umbraco\MediaCache\**" />
         <None Include="config\**\*.*">
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
         </None>
         <None Include="umbraco\**\*.*">
             <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>Always</CopyToPublishDirectory>
         </None>
     </ItemGroup>

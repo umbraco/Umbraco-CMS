@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class RelationService : ScopeRepositoryService, IRelationService
+    public class RelationService : RepositoryService, IRelationService
     {
         private readonly IEntityService _entityService;
         private readonly IRelationRepository _relationRepository;

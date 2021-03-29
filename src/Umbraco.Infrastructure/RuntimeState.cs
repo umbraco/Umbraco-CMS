@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
-using Umbraco.Core.Events;
 
 namespace Umbraco.Cms.Core
 {

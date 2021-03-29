@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Security
@@ -10,7 +11,7 @@ namespace Umbraco.Cms.Core.Security
     /// <summary>
     /// A custom user store that uses Umbraco member data
     /// </summary>
-    public class MemberRoleStore<TRole> : IRoleStore<TRole> where TRole : IdentityRole
+    public class MemberRoleStore : IRoleStore<UmbracoIdentityRole>
     {
         private readonly IMemberGroupService _memberGroupService;
         private bool _disposed;
@@ -33,7 +34,7 @@ namespace Umbraco.Cms.Core.Security
         public IdentityErrorDescriber ErrorDescriber { get; set; }
 
         /// <inheritdoc />
-        public Task<IdentityResult> CreateAsync(TRole role, CancellationToken cancellationToken = default)
+        public Task<IdentityResult> CreateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -57,7 +58,7 @@ namespace Umbraco.Cms.Core.Security
 
 
         /// <inheritdoc />
-        public Task<IdentityResult> UpdateAsync(TRole role, CancellationToken cancellationToken = default)
+        public Task<IdentityResult> UpdateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -79,19 +80,17 @@ namespace Umbraco.Cms.Core.Security
                 {
                     _memberGroupService.Save(memberGroup);
                 }
-                //TODO: if nothing changed, do we need to report this?
+
                 return Task.FromResult(IdentityResult.Success);
             }
             else
             {
-                //TODO: throw exception when not found, or return failure?
                 return Task.FromResult(IdentityResult.Failed(_memberGroupNotFoundError));
             }
-
         }
 
         /// <inheritdoc />
-        public Task<IdentityResult> DeleteAsync(TRole role, CancellationToken cancellationToken = default)
+        public Task<IdentityResult> DeleteAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -103,8 +102,7 @@ namespace Umbraco.Cms.Core.Security
 
             if (!int.TryParse(role.Id, out int roleId))
             {
-                //TODO: what identity error should we return in this case?
-                return Task.FromResult(IdentityResult.Failed(_intParseError));
+                throw new ArgumentException("The Id of the role is not an integer");
             }
 
             IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
@@ -121,8 +119,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-
-        public Task<string> GetRoleIdAsync(TRole role, CancellationToken cancellationToken = default)
+        public Task<string> GetRoleIdAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -136,7 +133,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public Task<string> GetRoleNameAsync(TRole role, CancellationToken cancellationToken = default)
+        public Task<string> GetRoleNameAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -150,47 +147,28 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public Task SetRoleNameAsync(TRole role, string roleName, CancellationToken cancellationToken = default)
+        public Task SetRoleNameAsync(UmbracoIdentityRole role, string roleName, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
-
             if (role == null)
             {
                 throw new ArgumentNullException(nameof(role));
             }
-
-            if (!int.TryParse(role.Id, out int roleId))
-            {
-                //TODO: what identity error should we return in this case?
-                return Task.FromResult(IdentityResult.Failed(ErrorDescriber.DefaultError()));
-            }
-
-            IMemberGroup memberGroup = _memberGroupService.GetById(roleId);
-
-            if (memberGroup != null)
-            {
-                //TODO: confirm logic
-                memberGroup.Name = roleName;
-                _memberGroupService.Save(memberGroup);
-                role.Name = roleName;
-            }
-            else
-            {
-                return Task.FromResult(IdentityResult.Failed(_memberGroupNotFoundError));
-            }
-
+            role.Name = roleName;
             return Task.CompletedTask;
         }
 
         /// <inheritdoc />
-        public Task<string> GetNormalizedRoleNameAsync(TRole role, CancellationToken cancellationToken = default) => GetRoleNameAsync(role, cancellationToken);
+        public Task<string> GetNormalizedRoleNameAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
+            => GetRoleNameAsync(role, cancellationToken);
 
         /// <inheritdoc />
-        public Task SetNormalizedRoleNameAsync(TRole role, string normalizedName, CancellationToken cancellationToken = default) => SetRoleNameAsync(role, normalizedName, cancellationToken);
+        public Task SetNormalizedRoleNameAsync(UmbracoIdentityRole role, string normalizedName, CancellationToken cancellationToken = default)
+            => SetRoleNameAsync(role, normalizedName, cancellationToken);
 
         /// <inheritdoc />
-        public Task<TRole> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
+        public Task<UmbracoIdentityRole> FindByIdAsync(string roleId, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -223,7 +201,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public Task<TRole> FindByNameAsync(string name, CancellationToken cancellationToken = default)
+        public Task<UmbracoIdentityRole> FindByNameAsync(string name, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
             ThrowIfDisposed();
@@ -241,16 +219,16 @@ namespace Umbraco.Cms.Core.Security
         /// </summary>
         /// <param name="memberGroup"></param>
         /// <returns></returns>
-        private TRole MapFromMemberGroup(IMemberGroup memberGroup)
+        private UmbracoIdentityRole MapFromMemberGroup(IMemberGroup memberGroup)
         {
-            var result = new IdentityRole
+            var result = new UmbracoIdentityRole
             {
                 Id = memberGroup.Id.ToString(),
                 Name = memberGroup.Name
-                //TODO: Are we interested in NormalizedRoleName?
+                // TODO: Implement this functionality, requires DB and logic updates
+                //ConcurrencyStamp
             };
-
-            return result as TRole;
+            return result;
         }
 
         /// <summary>
@@ -259,20 +237,21 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="role"></param>
         /// <param name="memberGroup"></param>
         /// <returns></returns>
-        private bool MapToMemberGroup(TRole role, IMemberGroup memberGroup)
+        private bool MapToMemberGroup(UmbracoIdentityRole role, IMemberGroup memberGroup)
         {
             var anythingChanged = false;
 
-            if (!string.IsNullOrEmpty(role.Name) && memberGroup.Name != role.Name)
+            if (role.IsPropertyDirty(nameof(UmbracoIdentityRole.Name))
+                && !string.IsNullOrEmpty(role.Name) && memberGroup.Name != role.Name)
             {
+                // TODO: Need to support ConcurrencyStamp and logic
+
                 memberGroup.Name = role.Name;
                 anythingChanged = true;
             }
 
             return anythingChanged;
         }
-
-        //TODO: is any dispose action necessary here?
 
         /// <summary>
         /// Dispose the store

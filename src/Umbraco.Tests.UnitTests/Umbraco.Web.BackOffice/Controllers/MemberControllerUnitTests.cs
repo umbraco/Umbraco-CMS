@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Common;
@@ -18,12 +19,14 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -36,7 +39,6 @@ using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Mapping;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Security;
-using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 using MemberMapDefinition = Umbraco.Cms.Web.BackOffice.Mapping.MemberMapDefinition;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
@@ -85,7 +87,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .ReturnsAsync(() => IdentityResult.Success);
 
             var value = new MemberDisplay();
-            string reason = "Validation failed";
 
             // act
             ActionResult<MemberDisplay> result = sut.PostSave(fakeMemberData).Result;
@@ -204,7 +205,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => IdentityResult.Success);
 
-            string password = "fakepassword9aw89rnyco3938cyr^%&*()i8Y";
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.UpdateAsync(It.IsAny<MemberIdentityUser>()))
                 .ReturnsAsync(() => IdentityResult.Success);
@@ -215,6 +215,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             SetupPasswordSuccess(umbracoMembersUserManager, passwordChanger);
 
             Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
+            Mock.Get(memberService).Setup(x => x.GetById(It.IsAny<int>())).Returns(() => member);
             Mock.Get(memberService).SetupSequence(
                     x => x.GetByEmail(It.IsAny<string>()))
                 .Returns(() => null)
@@ -336,13 +337,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.AddToRolesAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<IEnumerable<string>>()))
+                .ReturnsAsync(() => IdentityResult.Success);
 
             Mock.Get(memberService).SetupSequence(
                     x => x.GetByEmail(It.IsAny<string>()))
                 .Returns(() => member);
 
             MemberController sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager, dataTypeService, backOfficeSecurityAccessor, passwordChanger, globalSettings, user);
-            string reason = "Validation failed";
 
             // act
             ActionResult<MemberDisplay> result = sut.PostSave(fakeMemberData).Result;
@@ -357,19 +360,18 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         [Test]
         [AutoMoqData]
         public async Task PostSaveMember_SaveExistingMember_WithNoRoles_Add1Role_ExpectSuccessResponse(
-           [Frozen] IMemberManager umbracoMembersUserManager,
-           IMemberService memberService,
-           IMemberTypeService memberTypeService,
-           IMemberGroupService memberGroupService,
-           IDataTypeService dataTypeService,
-           IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-           IBackOfficeSecurity backOfficeSecurity,
-           IPasswordChanger<MemberIdentityUser> passwordChanger,
-           IOptions<GlobalSettings> globalSettings,
-        IUser user)
+            [Frozen] IMemberManager umbracoMembersUserManager,
+            IMemberService memberService,
+            IMemberTypeService memberTypeService,
+            IMemberGroupService memberGroupService,
+            IDataTypeService dataTypeService,
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            IBackOfficeSecurity backOfficeSecurity,
+            IPasswordChanger<MemberIdentityUser> passwordChanger,
+            IOptions<GlobalSettings> globalSettings,
+            IUser user)
         {
             // arrange
-            string password = "fakepassword9aw89rnyco3938cyr^%&*()i8Y";
             var roleName = "anyrole";
             IMember member = SetupMemberTestData(out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.Save);
             fakeMemberData.Groups = new List<string>()
@@ -386,9 +388,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.UpdateAsync(It.IsAny<MemberIdentityUser>()))
                 .ReturnsAsync(() => IdentityResult.Success);
+            Mock.Get(umbracoMembersUserManager)
+                .Setup(x => x.AddToRolesAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<IEnumerable<string>>()))
+                .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
             Mock.Get(memberService).Setup(x => x.GetByUsername(It.IsAny<string>())).Returns(() => member);
+            Mock.Get(memberService).Setup(x => x.GetById(It.IsAny<int>())).Returns(() => member);
 
             SetupUserAccess(backOfficeSecurityAccessor, backOfficeSecurity, user);
             SetupPasswordSuccess(umbracoMembersUserManager, passwordChanger);
@@ -465,7 +471,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Mock.Get(dataEditor).Setup(x => x.GetValueEditor()).Returns(new TextOnlyValueEditor(Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"), textService.Object, Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>()));
 
             var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(new[] { dataEditor }));
-            
+
             IMapDefinition memberMapDefinition = new MemberMapDefinition(
                 commonMapper,
                 new CommonTreeNodeMapper(Mock.Of<LinkGenerator>()),
@@ -478,8 +484,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                     memberGroupService,
                     mockPasswordConfig.Object,
                     contentTypeBaseServiceProvider.Object,
-                    propertyEditorCollection),
-                httpContextAccessor);
+                    propertyEditorCollection));
 
             var map = new MapDefinitionCollection(new List<IMapDefinition>()
             {
@@ -517,7 +522,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 dataTypeService,
                 backOfficeSecurityAccessor,
                 new ConfigurationEditorJsonSerializer(),
-                passwordChanger);
+                passwordChanger,
+                Mock.Of<IScopeProvider>(x => x.CreateScope(
+                    It.IsAny<IsolationLevel>(),
+                    It.IsAny<RepositoryCacheMode>(),
+                    It.IsAny<IEventDispatcher>(),
+                    It.IsAny<bool?>(),
+                    It.IsAny<bool>(),
+                    It.IsAny<bool>()) == Mock.Of<IScope>()));
         }
 
         /// <summary>
