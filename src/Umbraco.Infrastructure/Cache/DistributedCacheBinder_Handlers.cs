@@ -31,7 +31,9 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<UserSavedNotification>,
         INotificationHandler<UserDeletedNotification>,
         INotificationHandler<UserGroupWithUsersSavedNotification>,
-        INotificationHandler<UserGroupDeletedNotification>
+        INotificationHandler<UserGroupDeletedNotification>,
+        INotificationHandler<MemberGroupDeletedNotification>,
+        INotificationHandler<MemberGroupSavedNotification>
     {
         private List<Action> _unbinders;
 
@@ -99,12 +101,6 @@ namespace Umbraco.Cms.Core.Cache
                 () => MacroService.Saved -= MacroService_Saved);
             Bind(() => MacroService.Deleted += MacroService_Deleted,
                 () => MacroService.Deleted -= MacroService_Deleted);
-
-            // bind to member events
-            Bind(() => MemberGroupService.Saved += MemberGroupService_Saved,
-                () => MemberGroupService.Saved -= MemberGroupService_Saved);
-            Bind(() => MemberGroupService.Deleted += MemberGroupService_Deleted,
-                () => MemberGroupService.Deleted -= MemberGroupService_Deleted);
 
             // bind to media events - handles all media changes
             Bind(() => MediaService.TreeChanged += MediaService_TreeChanged,
@@ -387,19 +383,27 @@ namespace Umbraco.Cms.Core.Cache
 
         #region MemberGroupService
 
-        private void MemberGroupService_Deleted(IMemberGroupService sender, DeleteEventArgs<IMemberGroup> e)
+        /// <summary>
+        /// Fires when a member group is deleted
+        /// </summary>
+        /// <param name="notification"></param>
+        public void Handle(MemberGroupDeletedNotification notification)
         {
-            foreach (var m in e.DeletedEntities.ToArray())
+            foreach (IMemberGroup entity in notification.DeletedEntities)
             {
-                _distributedCache.RemoveMemberGroupCache(m.Id);
+                _distributedCache.RemoveMemberGroupCache(entity.Id);
             }
         }
 
-        private void MemberGroupService_Saved(IMemberGroupService sender, SaveEventArgs<IMemberGroup> e)
+        /// <summary>
+        /// Fires when a member group is saved
+        /// </summary>
+        /// <param name="notification"></param>
+        public void Handle(MemberGroupSavedNotification notification)
         {
-            foreach (var m in e.SavedEntities.ToArray())
+            foreach (IMemberGroup entity in notification.SavedEntities)
             {
-                _distributedCache.RemoveMemberGroupCache(m.Id);
+                _distributedCache.RemoveMemberGroupCache(entity.Id);
             }
         }
 

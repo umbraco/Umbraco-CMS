@@ -12,15 +12,18 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
-        public MemberGroupRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberGroupRepository> logger)
-            : base(scopeAccessor, cache, logger)
-        { }
+        private readonly IEventMessagesFactory _eventMessagesFactory;
+
+        public MemberGroupRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberGroupRepository> logger, IEventMessagesFactory eventMessagesFactory)
+            : base(scopeAccessor, cache, logger) =>
+            _eventMessagesFactory = eventMessagesFactory;
 
         protected override IMemberGroup PerformGet(int id)
         {
@@ -156,10 +159,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             };
             PersistNewItem(grp);
 
-            if (AmbientScope.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(grp)))
+            var evtMsgs = _eventMessagesFactory.Get();
+            if (AmbientScope.Notifications.PublishCancelable(new MemberGroupSavingNotification(grp, evtMsgs)))
+            {
                 return null;
+            }
 
-            AmbientScope.Events.Dispatch(SavedMemberGroup, this, new SaveEventArgs<IMemberGroup>(grp));
+            AmbientScope.Notifications.Publish(new MemberGroupSavedNotification(grp, evtMsgs));
+
             return grp;
         }
 
@@ -240,13 +247,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var missingRoles = roleNames.Except(existingRoles, StringComparer.CurrentCultureIgnoreCase);
             var missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
 
-            if (AmbientScope.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups)))
+            var evtMsgs = _eventMessagesFactory.Get();
+            if (AmbientScope.Notifications.PublishCancelable(new MemberGroupSavingNotification(missingGroups, evtMsgs)))
+            {
                 return;
+            }
 
             foreach (var m in missingGroups)
                 PersistNewItem(m);
 
-            AmbientScope.Events.Dispatch(SavedMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups));
+            AmbientScope.Notifications.Publish(new MemberGroupSavedNotification(missingGroups, evtMsgs));
 
             //now go get all the dto's for roles with these role names
             var rolesForNames = Database.Fetch<NodeDto>(existingSql).ToArray();
@@ -310,17 +320,5 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             [Column("MemberGroup")]
             public int MemberGroupId { get; set; }
         }
-
-        // TODO: understand why we need these two repository-level events, move them back to service
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        internal static event TypedEventHandler<IMemberGroupRepository, SaveEventArgs<IMemberGroup>> SavingMemberGroup;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        internal static event TypedEventHandler<IMemberGroupRepository, SaveEventArgs<IMemberGroup>> SavedMemberGroup;
     }
 }

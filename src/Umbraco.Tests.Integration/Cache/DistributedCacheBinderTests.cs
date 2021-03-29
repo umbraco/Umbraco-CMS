@@ -65,9 +65,6 @@ namespace Umbraco.Cms.Tests.Integration.Cache
                 new EventDefinition<IMacroService, SaveEventArgs<IMacro>>(null, MacroService, new SaveEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
                 new EventDefinition<IMacroService, DeleteEventArgs<IMacro>>(null, MacroService, new DeleteEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
 
-                new EventDefinition<IMemberGroupService, SaveEventArgs<IMemberGroup>>(null, MemberGroupService, new SaveEventArgs<IMemberGroup>(Enumerable.Empty<IMemberGroup>())),
-                new EventDefinition<IMemberGroupService, DeleteEventArgs<IMemberGroup>>(null, MemberGroupService, new DeleteEventArgs<IMemberGroup>(Enumerable.Empty<IMemberGroup>())),
-
                 // not managed
                 //new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "SavedBlueprint"),
                 //new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>()), "DeletedBlueprint"),
