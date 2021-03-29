@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class PublicAccessService : RepositoryService, IPublicAccessService
+    internal class PublicAccessService : RepositoryService, IPublicAccessService
     {
         private readonly IPublicAccessRepository _publicAccessRepository;
 
@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 entry = _publicAccessRepository.GetMany().FirstOrDefault(x => x.ProtectedNodeId == content.Id);
                 if (entry == null)
-                    return OperationResult.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback // causes rollback
+                    return OperationResult.Attempt.Cannot<PublicAccessEntry>(evtMsgs); // causes rollback
 
                 var existingRule = entry.Rules.FirstOrDefault(x => x.RuleType == ruleType && x.RuleValue == ruleValue);
                 if (existingRule == null)
@@ -140,7 +140,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.Complete();
 
                 scope.Notifications.Publish(new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
-                scope.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs, entry);
@@ -177,7 +176,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.Complete();
 
                 scope.Notifications.Publish(new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
-                scope.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);
@@ -204,7 +202,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.Complete();
 
                 scope.Notifications.Publish(new PublicAccessEntrySavedNotification(entry, evtMsgs).WithStateFrom(savingNotifiation));
-                scope.Events.Dispatch(Saved, this, new SaveEventArgs<PublicAccessEntry>(entry, false));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);
@@ -231,16 +228,9 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.Complete();
 
                 scope.Notifications.Publish(new PublicAccessEntryDeletedNotification(entry, evtMsgs).WithStateFrom(deletingNotification));
-                scope.Events.Dispatch(Deleted, this, new DeleteEventArgs<PublicAccessEntry>(entry, false));
             }
 
             return OperationResult.Attempt.Succeed(evtMsgs);
         }
-
-        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for PublicAccessEntrySavedNotification instead.")]
-        public static event TypedEventHandler<IPublicAccessService, SaveEventArgs<PublicAccessEntry>> Saved;
-
-        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for PublicAccessEntryDeletedNotification instead.")]
-        public static event TypedEventHandler<IPublicAccessService, DeleteEventArgs<PublicAccessEntry>> Deleted;
     }
 }

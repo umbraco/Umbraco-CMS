@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -796,7 +796,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 if (raiseEvents)
                 {
                     scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
-                    scope.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(member, false));
                 }
 
                 Audit(AuditType.Save, 0, member.Id);
@@ -835,7 +834,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 if (raiseEvents)
                 {
                     scope.Notifications.Publish(new MemberSavedNotification(membersA, evtMsgs).WithStateFrom(savingNotification));
-                    scope.Events.Dispatch(Saved, this, new SaveEventArgs<IMember>(membersA, false));
                 }
                 Audit(AuditType.Save, 0, -1, "Save multiple Members");
 
@@ -877,7 +875,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             // a member has no descendants
             _memberRepository.Delete(member);
             scope.Notifications.Publish(new MemberDeletedNotification(member, evtMsgs).WithState(notificationState));
-            scope.Events.Dispatch(Deleted, this, new DeleteEventArgs<IMember>(member, false));
 
             // media files deleted by QueuingEventDispatcher
         }
@@ -1070,16 +1067,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         #region Private Methods
 
         private void Audit(AuditType type, int userId, int objectId, string message = null) => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Member), message));
-
-        #endregion
-
-        #region Event Handlers
-
-        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for MemberDeletedNotification instead.")]
-        public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleted;
-
-        [Obsolete("Will be removed in an upcoming version. Implement an INotificationHandler for MemberSavedNotification instead.")]
-        public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
 
         #endregion
 
