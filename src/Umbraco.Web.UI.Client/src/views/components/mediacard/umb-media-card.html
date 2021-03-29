@@ -10,11 +10,11 @@
             ng-attr-title="{{vm.media.trashed ? (vm.labels.trashed || 'Trashed') + ': ' + vm.media.name : vm.media.name}}"
             alt="{{vm.media.name}}" />
 
-        <!--
-        <div class="__thumbnail" ng-if="vm.loading === false && vm.thumbnail"
-            ng-style="{'background-image':'url('+vm.thumbnail+')'}"
-            ng-class="{'trashed': vm.media.trashed}">
-        </div>-->
+        <umb-file-icon ng-if="vm.loading === false && vm.icon"
+            icon="{{vm.icon}}"
+            size="s"
+            text="{{vm.name}}">
+        </umb-file-icon>
 
         <!-- FILE -->
         <umb-file-icon ng-if="vm.loading === false && !vm.thumbnail"
@@ -26,8 +26,8 @@
         </umb-file-icon>
 
     </div>
-    <button type="button" ng-click="vm.onNameClicked(); $event.stopPropagation();" class="btn-reset __info" ng-if="vm.media !== null">
-        <div class="__name" ng-bind="vm.media.name"></div>
+    <button type="button" ng-click="vm.onNameClicked($event)" class="btn-reset __info" ng-if="vm.media !== null || vm.name">
+        <div class="__name" ng-bind="vm.media.name || vm.name"></div>
         <div class="__subname" ng-if="vm.media.description" ng-bind="vm.media.description"></div>
     </button>
 

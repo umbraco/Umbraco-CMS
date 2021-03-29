@@ -571,6 +571,47 @@ angular.module("umbraco")
                 }
             }
 
+
+            vm.navigation = [];
+
+            localizationService.localizeMany(["sections_media", "mediaPicker_tabClipboard"]).then(
+                function (data) {
+
+                    vm.navigation = [{
+                        "alias": "empty",
+                        "name": data[0],
+                        "icon": "icon-umb-media",
+                        "active": true,
+                        "view": ""
+                    }];
+
+                    if(dialogOptions.clipboardItems) {
+                        vm.navigation.push({
+                            "alias": "clipboard",
+                            "name": data[1],
+                            "icon": "icon-paste-in",
+                            "view": "",
+                            "disabled": dialogOptions.clipboardItems.length === 0
+                        });
+                    }
+
+                    vm.activeTab = vm.navigation[0];
+                }
+            );
+
+            vm.onNavigationChanged = function(tab) {
+                vm.activeTab.active = false;
+                vm.activeTab = tab;
+                vm.activeTab.active = true;
+            }
+
+            vm.clickClearClipboard = function() {
+                vm.onNavigationChanged(vm.navigation[0]);
+                vm.navigation[1].disabled = true;// disabled ws determined when creating the navigation, so we need to update it here.
+                dialogOptions.clipboardItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
+                dialogOptions.clickClearClipboard();
+            }
+
             onInit();
 
         });

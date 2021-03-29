@@ -9,7 +9,9 @@
             controllerAs: "vm",
             transclude: true,
             bindings: {
-                mediaKey: "<",
+                mediaKey: "<?",
+                icon: "<?",
+                name: "<?",
                 hasError: "<",
                 onNameClicked: "&?"
             }
@@ -20,7 +22,7 @@
         var unsubscribe = [];
         var vm = this;
         vm.paddingBottom = 100;// Square while loading.
-        vm.loading = true;
+        vm.loading = false;
 
         unsubscribe.push($scope.$watch("vm.mediaKey", (newValue, oldValue) => {
             if(newValue !== oldValue) {
@@ -52,29 +54,30 @@
 
 
         vm.$onDestroy = function () {
-            unwatch();
             unsubscribe.forEach(x => x());
         }
 
         vm.updateThumbnail = function () {
 
-            vm.loading = true;
+            if(vm.mediaKey && vm.mediaKey !== "") {
+                vm.loading = true;
 
-            entityResource.getById(vm.mediaKey, "Media").then(function (mediaEntity) {
-                vm.media = mediaEntity;
-                vm.thumbnail = mediaHelper.resolveFileFromEntity(mediaEntity, true);
+                entityResource.getById(vm.mediaKey, "Media").then(function (mediaEntity) {
+                    vm.media = mediaEntity;
+                    vm.thumbnail = mediaHelper.resolveFileFromEntity(mediaEntity, true);
 
-                vm.loading = false;
-            }, function () {
-                localizationService.localize("mediaPicker_deletedItem").then(function (localized) {
-                    vm.media = {
-                        name: localized,
-                        icon: "icon-picture",
-                        trashed: true
-                    };
                     vm.loading = false;
+                }, function () {
+                    localizationService.localize("mediaPicker_deletedItem").then(function (localized) {
+                        vm.media = {
+                            name: localized,
+                            icon: "icon-picture",
+                            trashed: true
+                        };
+                        vm.loading = false;
+                    });
                 });
-            });
+            }
 
         }
 

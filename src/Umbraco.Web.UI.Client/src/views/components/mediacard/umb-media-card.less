@@ -113,6 +113,10 @@ umb-media-card {
             color: @ui-action-type;
             margin-left: 16px;
             margin-bottom: -1px;
+            
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .__subname {
             color: @gray-4;
@@ -138,19 +142,23 @@ umb-media-card {
     .__actions {
         position: absolute;
         top: 10px;
-        right: 0;
+        right: 10px;
+        font-size: 0;
+        background-color: rgba(255, 255, 255, .96);
+        border-radius: 16px;
+        padding-left: 5px;
+        padding-right: 5px;
+
         opacity: 0;
         transition: opacity 120ms;
         .__action {
             display: inline-block;
-            border-radius: 50%;
-            width: 28px;
-            height: 28px;
-            margin-right: 10px;
-            background-color: white;
-            color:@ui-action-type;
+            padding: 5px;
+            font-size: 18px;
+            
+            color: @ui-action-discreet-type;
             &:hover {
-                color: @ui-action-type-hover;
+                color: @ui-action-discreet-type-hover;
             }
         }
     }

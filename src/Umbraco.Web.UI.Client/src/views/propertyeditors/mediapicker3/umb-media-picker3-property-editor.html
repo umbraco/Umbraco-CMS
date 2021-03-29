@@ -21,13 +21,15 @@
 
                 <umb-media-card
                     media-key="media.mediaKey"
-                    on-name-clicked="vm.editMedia(media, $index)"
+                    on-name-clicked="vm.editMedia(media, $index, $event)"
                     ng-class="{'--active': vm.activeMediaEntry === media}"
                     has-error="vm.propertyForm.maxCount.$valid === false && $index >= vm.validationLimit.max">
                     <div class="__actions">
-                        <button type="button" class="btn-reset __action umb-outline" ng-click="vm.requestRemoveMedia(media); $event.stopPropagation();">
-                            <i class="icon icon-wrong" aria-hidden="true"></i>
-                            <localize key="general_remove" class="sr-only">Remove</localize>
+                        <button ng-if="vm.supportCopy" type="button" class="btn-reset __action umb-outline" localize="title" title="actions_copy" ng-click="vm.copyMedia(media); $event.stopPropagation();">
+                            <i class="icon icon-documents" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn-reset __action umb-outline" localize="title" title="general_remove" ng-click="vm.removeMedia(media); $event.stopPropagation();">
+                            <i class="icon icon-trash" aria-hidden="true"></i>
                         </button>
                     </div>
                 </umb-media-card>

@@ -131,16 +131,15 @@
         function onDestroy() {
             window.removeEventListener('resize.umbImageGravity', onResizeHandler);
             window.removeEventListener('resize', onResizeHandler);
-
-            if (focalPointElement && draggable) {
+            /*
+            if (focalPointElement) {
                 // TODO: This should be destroyed but this will throw an exception:
                 // "cannot call methods on draggable prior to initialization; attempted to call method 'destroy'"
                 // I've tried lots of things and cannot get this to work, we weren't destroying before so hopefully
                 // there's no mem leaks?
-                console.log(focalPointElement.draggable)
                 focalPointElement.draggable("destroy");
-                draggable = null;
             }
+            */
             if (imageElement) {
                 imageElement.off("load");
             }

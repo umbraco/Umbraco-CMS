@@ -28,7 +28,7 @@
             }
         });
 
-    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService) {
+    function MediaPicker3Controller($scope, editorService, clipboardService, localizationService, overlayService, userService, entityResource) {
 
         var unsubscribe = [];
 
@@ -80,10 +80,11 @@
                 isDisabled: true
             };
 
-            var propertyActions = [
-                copyAllMediasAction,
-                removeAllMediasAction
-            ];
+            var propertyActions = [];
+            if(vm.supportCopy) {
+                propertyActions.push(copyAllMediasAction);
+            }
+            propertyActions.push(removeAllMediasAction);
 
             if (vm.umbProperty) {
                 vm.umbProperty.setPropertyActions(propertyActions);
@@ -130,6 +131,22 @@
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
                 dataTypeKey: vm.model.dataTypeKey,
                 multiPicker: vm.singleMode !== true,
+                clickPasteItem: function(item, mouseEvent) {
+                    console.log("clickPasteItem", item, mouseEvent)
+                    if (Array.isArray(item.data)) {
+                        var indexIncrementor = 0;
+                        item.data.forEach(function (entry) {
+                            if (requestPasteFromClipboard(createIndex + indexIncrementor, entry, item.type)) {
+                                indexIncrementor++;
+                            }
+                        });
+                    } else {
+                        requestPasteFromClipboard(createIndex, item.data, item.type);
+                    }
+                    if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+                        mediaPicker.close();
+                    }
+                },
                 submit: function (model) {
                     editorService.close();
 
@@ -154,10 +171,21 @@
                 mediaPicker.filter = vm.model.config.filter;
             }
 
+            console.log("vm.model.config.filter", vm.model.config.filter)
+
+            mediaPicker.clickClearClipboard = function ($event) {
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.Media, vm.model.config.filter || null);
+            };
+
+            mediaPicker.clipboardItems = clipboardService.retriveEntriesOfType(clipboardService.TYPES.MEDIA, vm.model.config.filter || null);
+            mediaPicker.clipboardItems.sort( (a, b) => {
+                return b.date - a.date
+            });
+
             editorService.mediaPicker(mediaPicker);
         }
 
-        // To be used by infinte editor. (defined here cause we need configuration from property editor)
+        // To be used by infinite editor. (defined here cause we need configuration from property editor)
         function changeMediaFor(mediaEntry, onSuccess) {
             var mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
@@ -218,7 +246,7 @@
 
         }
 
-
+        vm.removeMedia = removeMedia;
         function removeMedia(media) {
             var index = vm.model.value.indexOf(media);
             if(index !== -1) {
@@ -235,7 +263,10 @@
         }
 
         vm.editMedia = editMedia;
-        function editMedia(mediaEntry, options) {
+        function editMedia(mediaEntry, options, $event) {
+
+            if($event)
+            $event.stopPropagation();
 
             options = options || {};
 
@@ -276,23 +307,57 @@
         }
 
         var requestCopyAllMedias = function() {
-            // TODO..
+            var mediaKeys = vm.model.value.map(x => x.mediaKey)
+            entityResource.getByIds(mediaKeys, "Media").then(function (entities) {
+
+                // gather aliases
+                var aliases = entities.map(mediaEntity => mediaEntity.metaData.ContentTypeAlias)
+
+                // remove duplicate aliases
+                aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
+
+                // get node name
+                var contentNodeName = "?";
+                var contentNodeIcon = null;
+                if(vm.umbVariantContent) {
+                    contentNodeName = vm.umbVariantContent.editor.content.name;
+                    if(vm.umbVariantContentEditors) {
+                        contentNodeIcon = vm.umbVariantContentEditors.content.icon.split(" ")[0];
+                    } else if (vm.umbElementEditorContent) {
+                        contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon.split(" ")[0];
+                    }
+                } else if (vm.umbElementEditorContent) {
+                    contentNodeName = vm.umbElementEditorContent.model.documentType.name;
+                    contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon.split(" ")[0];
+                }
+
+                localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
+                    clipboardService.copyArray(clipboardService.TYPES.MEDIA, aliases, vm.model.value, localizedLabel, contentNodeIcon || "icon-thumbnail-list", vm.model.id);
+                });
+            });
         }
-        function copyMedia(media) {
-            //clipboardService.copy(clipboardService.TYPES.MEDIA, block.content.contentTypeAlias, {"layout": block.layout, "data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
+
+        vm.copyMedia = copyMedia;
+        function copyMedia(mediaEntry) {
+            entityResource.getById(mediaEntry.mediaKey, "Media").then(function (mediaEntity) {
+                clipboardService.copy(clipboardService.TYPES.MEDIA, mediaEntity.metaData.ContentTypeAlias, mediaEntry, mediaEntity.name, mediaEntity.icon, mediaEntity.udi);
+            });
         }
-        function requestPasteFromClipboard(index, pasteEntry, pasteType) {
+        function requestPasteFromClipboard(createIndex, pasteEntry, pasteType) {
 
             if (pasteEntry === undefined) {
                 return false;
             }
 
-            //TODO...
+            pasteEntry.key = String.CreateGuid();
+            updateMediaEntryData(pasteEntry);
+            vm.model.value.splice(createIndex, 0, pasteEntry);
 
             return true;
 
         }
 
+        /*
         vm.requestRemoveMedia = requestRemoveMedia;
         function requestRemoveMedia(media) {
             localizationService.localizeMany(["general_delete", "mediaPicker_confirmRemoveMediaEntryMessage", "general_remove"]).then(function (data) {
@@ -312,6 +377,7 @@
                 overlayService.confirmDelete(overlay);
             });
         }
+        */
         function requestRemoveAllMedia() {
             localizationService.localizeMany(["mediaPicker_confirmRemoveAllMediaEntryMessage", "general_remove"]).then(function (data) {
                 overlayService.confirmDelete({

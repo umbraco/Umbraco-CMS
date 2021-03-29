@@ -1098,6 +1098,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmCancelMediaEntryHasChanges">Du har foretaget ændringer til bruge af dette media. Er du sikker på at du vil annullere?</key>
     <key alias="confirmRemoveMediaEntryMessage">Fjern?</key>
     <key alias="confirmRemoveAllMediaEntryMessage">Fjern brugen af alle medier?</key>
+    <key alias="tabClipboard">Udklipsholder</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>
