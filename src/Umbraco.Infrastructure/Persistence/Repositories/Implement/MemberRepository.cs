@@ -314,7 +314,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // persist the member dto
             dto.NodeId = nodeDto.NodeId;
 
-            // TODO: password parts of this file need updating
             // if the password is empty, generate one with the special prefix
             // this will hash the guid with a salt so should be nicely random
             if (entity.RawPasswordValue.IsNullOrWhiteSpace())
