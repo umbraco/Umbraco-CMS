@@ -10,8 +10,8 @@ function noDirtyCheck() {
         require: 'ngModel',
         link: function (scope, elm, attrs, ctrl) {
 
-            // If no attribute value is "false", then skip and use default behaviour.
-            var dirtyCheck = !!attrs.noDirtyCheck && Object.toBoolean(attrs.noDirtyCheck) === false;
+            // If value if "no-dirty-check" attribute truthy, then skip and use default behaviour.
+            var dirtyCheck = Object.toBoolean(attrs.noDirtyCheck) === true;
             if (dirtyCheck)
                 return;
 
