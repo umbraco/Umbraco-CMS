@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Web.Common.Security
 {
+
     public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswordConfigurationSettings>, IMemberManager
     {
         public MemberManager(

@@ -13,6 +13,15 @@ namespace Umbraco.Extensions
         // is re-issued and we don't want to merge old values of these.
         private static readonly string[] s_ignoredClaims = new[] { ClaimTypes.CookiePath, Constants.Security.SessionIdClaimType };
 
+        public static void MergeAllClaims(this ClaimsIdentity destination, ClaimsIdentity source)
+        {
+            foreach (Claim claim in source.Claims
+                .Where(claim => !destination.HasClaim(claim.Type, claim.Value)))
+            {
+                destination.AddClaim(new Claim(claim.Type, claim.Value));
+            }
+        }
+
         public static void MergeClaimsFromBackOfficeIdentity(this ClaimsIdentity destination, ClaimsIdentity source)
         {
             foreach (Claim claim in source.Claims

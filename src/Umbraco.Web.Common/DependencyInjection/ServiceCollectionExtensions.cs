@@ -12,6 +12,7 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Security;
 
@@ -67,10 +68,11 @@ namespace Umbraco.Extensions
             services.BuildMembersIdentity()
                 .AddDefaultTokenProviders()
                 .AddMemberManager<IMemberManager, MemberManager>()
+                .AddClaimsPrincipalFactory<MemberClaimsPrincipalFactory>()
                 .AddUserStore<MemberUserStore>()
                 .AddRoleStore<MemberRoleStore>()
-                .AddRoleValidator<RoleValidator<IdentityRole>>()
-                .AddRoleManager<RoleManager<IdentityRole>>();
+                .AddRoleValidator<RoleValidator<UmbracoIdentityRole>>()
+                .AddRoleManager<RoleManager<UmbracoIdentityRole>>();
 
         private static MemberIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
         {
@@ -78,7 +80,7 @@ namespace Umbraco.Extensions
             services.TryAddScoped<IUserValidator<MemberIdentityUser>, UserValidator<MemberIdentityUser>>();
             services.TryAddScoped<IPasswordValidator<MemberIdentityUser>, PasswordValidator<MemberIdentityUser>>();
             services.TryAddScoped<IPasswordHasher<MemberIdentityUser>, PasswordHasher<MemberIdentityUser>>();
-            return new MemberIdentityBuilder(typeof(IdentityRole), services);
+            return new MemberIdentityBuilder(typeof(UmbracoIdentityRole), services);
         }
 
         private static void RemoveIntParamenterIfValueGreatherThen(IDictionary<string, string> commands, string parameter, int maxValue)

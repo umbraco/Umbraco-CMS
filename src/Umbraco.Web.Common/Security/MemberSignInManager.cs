@@ -39,27 +39,6 @@ namespace Umbraco.Cms.Web.Common.Security
         protected override string TwoFactorRememberMeAuthenticationType => IdentityConstants.TwoFactorRememberMeScheme;
 
         /// <inheritdoc />
-        public override async Task<SignInResult> PasswordSignInAsync(MemberIdentityUser user, string password, bool isPersistent, bool lockoutOnFailure)
-        {
-            // overridden to handle logging/events
-            SignInResult result = await base.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
-            return await HandleSignIn(user, user.UserName, result);
-        }
-
-        /// <inheritdoc />
-        public override async Task<SignInResult> PasswordSignInAsync(string userName, string password, bool isPersistent, bool lockoutOnFailure)
-        {
-            // overridden to handle logging/events
-            MemberIdentityUser user = await UserManager.FindByNameAsync(userName);
-            if (user == null)
-            {
-                return await HandleSignIn(null, userName, SignInResult.Failed);
-            }
-
-            return await PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
-        }
-
-        /// <inheritdoc />
         public override Task<MemberIdentityUser> GetTwoFactorAuthenticationUserAsync()
             => throw new NotImplementedException("Two factor is not yet implemented for members");
 

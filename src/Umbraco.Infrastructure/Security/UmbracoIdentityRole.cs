@@ -10,6 +10,14 @@ namespace Umbraco.Cms.Core.Models.Identity
         private string _id;
         private string _name;
 
+        public UmbracoIdentityRole(string roleName) : base(roleName)
+        {
+        }
+
+        public UmbracoIdentityRole()
+        {
+        }
+
         public event PropertyChangedEventHandler PropertyChanged
         {
             add
