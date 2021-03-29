@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
@@ -18,7 +19,11 @@ namespace Umbraco.Cms.Core.Cache
     /// <summary>
     /// Default <see cref="IDistributedCacheBinder"/> implementation.
     /// </summary>
-    public partial class DistributedCacheBinder
+    public partial class DistributedCacheBinder :
+        INotificationHandler<DictionaryItemDeletedNotification>,
+        INotificationHandler<DictionaryItemSavedNotification>,
+        INotificationHandler<LanguageSavedNotification>,
+        INotificationHandler<LanguageDeletedNotification>
     {
         private List<Action> _unbinders;
 
@@ -61,11 +66,6 @@ namespace Umbraco.Cms.Core.Cache
             Bind(() => UserService.UserGroupPermissionsAssigned += UserService_UserGroupPermissionsAssigned,
                 () => UserService.UserGroupPermissionsAssigned -= UserService_UserGroupPermissionsAssigned);
 
-            // bind to dictionary events
-            Bind(() => LocalizationService.DeletedDictionaryItem += LocalizationService_DeletedDictionaryItem,
-                () => LocalizationService.DeletedDictionaryItem -= LocalizationService_DeletedDictionaryItem);
-            Bind(() => LocalizationService.SavedDictionaryItem += LocalizationService_SavedDictionaryItem,
-                () => LocalizationService.SavedDictionaryItem -= LocalizationService_SavedDictionaryItem);
 
             // bind to stylesheet events
             Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
@@ -78,12 +78,6 @@ namespace Umbraco.Cms.Core.Cache
                 () => DomainService.Saved -= DomainService_Saved);
             Bind(() => DomainService.Deleted += DomainService_Deleted,
                 () => DomainService.Deleted -= DomainService_Deleted);
-
-            // bind to language events
-            Bind(() => LocalizationService.SavedLanguage += LocalizationService_SavedLanguage,
-                () => LocalizationService.SavedLanguage -= LocalizationService_SavedLanguage);
-            Bind(() => LocalizationService.DeletedLanguage += LocalizationService_DeletedLanguage,
-                () => LocalizationService.DeletedLanguage -= LocalizationService_DeletedLanguage);
 
             // bind to content type events
             Bind(() => ContentTypeService.Changed += ContentTypeService_Changed,
@@ -190,17 +184,20 @@ namespace Umbraco.Cms.Core.Cache
         #endregion
 
         #region LocalizationService / Dictionary
-
-        private void LocalizationService_SavedDictionaryItem(ILocalizationService sender, SaveEventArgs<IDictionaryItem> e)
+        public void Handle(DictionaryItemSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (IDictionaryItem entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshDictionaryCache(entity.Id);
+            }
         }
 
-        private void LocalizationService_DeletedDictionaryItem(ILocalizationService sender, DeleteEventArgs<IDictionaryItem> e)
+        public void Handle(DictionaryItemDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (IDictionaryItem entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveDictionaryCache(entity.Id);
+            }
         }
 
         #endregion
@@ -242,23 +239,25 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Fires when a language is deleted
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LocalizationService_DeletedLanguage(ILocalizationService sender, DeleteEventArgs<ILanguage> e)
+        /// <param name="notification"></param>
+        public void Handle(LanguageDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (ILanguage entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveLanguageCache(entity);
+            }
         }
 
         /// <summary>
         /// Fires when a language is saved
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void LocalizationService_SavedLanguage(ILocalizationService sender, SaveEventArgs<ILanguage> e)
+        /// <param name="notification"></param>
+        public void Handle(LanguageSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (ILanguage entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshLanguageCache(entity);
+            }
         }
 
         #endregion

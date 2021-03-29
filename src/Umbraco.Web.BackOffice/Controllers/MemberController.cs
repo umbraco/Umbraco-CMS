@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly IPasswordChanger<MembersIdentityUser> _passwordChanger;
+        private readonly IPasswordChanger<MemberIdentityUser> _passwordChanger;
         private readonly IScopeProvider _scopeProvider;
 
         /// <summary>
@@ -92,7 +92,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IJsonSerializer jsonSerializer,
-            IPasswordChanger<MembersIdentityUser> passwordChanger,
+            IPasswordChanger<MemberIdentityUser> passwordChanger,
             IScopeProvider scopeProvider)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, jsonSerializer)
         {
@@ -362,7 +362,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 throw new InvalidOperationException($"No member type found with alias {contentItem.ContentTypeAlias}");
             }
 
-            var identityMember = MembersIdentityUser.CreateNew(
+            var identityMember = MemberIdentityUser.CreateNew(
                 contentItem.Username,
                 contentItem.Email,
                 memberType.Alias,
@@ -393,9 +393,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     member.Properties[property.Alias].SetValue(property.Value);
                 }
             }
-
-            //TODO: do we need to resave the key?
-            // contentItem.PersistedContent.Key = contentItem.Key;
 
             // now the member has been saved via identity, resave the member with mapped content properties
             _memberService.Save(member);
@@ -459,7 +456,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             bool needsResync = false;
 
-            MembersIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
+            MemberIdentityUser identityMember = await _memberManager.FindByIdAsync(contentItem.Id.ToString());
             if (identityMember == null)
             {
                 return new ValidationErrorResult("Member was not found");
@@ -603,7 +600,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <param name="groups">The groups to updates</param>
         /// <param name="identityMember">The member as an identity user</param>
-        private async Task<ActionResult<bool>> AddOrUpdateRoles(IEnumerable<string> groups, MembersIdentityUser identityMember)
+        private async Task<ActionResult<bool>> AddOrUpdateRoles(IEnumerable<string> groups, MemberIdentityUser identityMember)
         {
             var hasChanges = false;
 
@@ -654,7 +651,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [HttpPost]
         public IActionResult DeleteByKey(Guid key)
         {
-            //TODO: move to MembersUserStore
             IMember foundMember = _memberService.GetByKey(key);
             if (foundMember == null)
             {

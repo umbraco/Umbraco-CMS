@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.Models.Entities;
 
 namespace Umbraco.Cms.Core.Models.Identity
 {
+
     /// <summary>
     /// Abstract class for use in Umbraco Identity for users and members
     /// </summary>
