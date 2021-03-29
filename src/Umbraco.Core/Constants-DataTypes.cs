@@ -25,6 +25,10 @@ namespace Umbraco.Core
             public const int DropDownSingle = -39;
             public const int DropDownMultiple = -42;
             public const int Upload = -90;
+            public const int UploadVideo = -100;
+            public const int UploadSound = -101;
+            public const int UploadDocument = -102;
+            public const int UploadVectorImage = -103;
 
             public const int DefaultContentListView = -95;
             public const int DefaultMediaListView = -96;
@@ -306,6 +310,46 @@ namespace Umbraco.Core
                 /// Guid for Upload
                 /// </summary>
                 public static readonly Guid UploadGuid = new Guid(Upload);
+
+                /// <summary>
+                /// Guid for UploadVideo as string
+                /// </summary>
+                public const string UploadVideo = "70575fe7-9812-4396-bbe1-c81a76db71b5";
+
+                /// <summary>
+                /// Guid for UploadVideo
+                /// </summary>
+                public static readonly Guid UploadVideoGuid = new Guid(UploadVideo);
+
+                /// <summary>
+                /// Guid for UploadSound as string
+                /// </summary>
+                public const string UploadSound = "8f430dd6-4e96-447e-9dc0-cb552c8cd1f3";
+
+                /// <summary>
+                /// Guid for UploadSound
+                /// </summary>
+                public static readonly Guid UploadSoundGuid = new Guid(UploadSound);
+
+                /// <summary>
+                /// Guid for UploadDocument as string
+                /// </summary>
+                public const string UploadDocument = "bc1e266c-dac4-4164-bf08-8a1ec6a7143d";
+
+                /// <summary>
+                /// Guid for UploadDocument
+                /// </summary>
+                public static readonly Guid UploadDocumentGuid = new Guid(UploadDocument);
+
+                /// <summary>
+                /// Guid for UploadVectorImage as string
+                /// </summary>
+                public const string UploadVectorImage = "215cb418-2153-4429-9aef-8c0f0041191b";
+
+                /// <summary>
+                /// Guid for UploadVectorImage
+                /// </summary>
+                public static readonly Guid UploadVectorImageGuid = new Guid(UploadVectorImage);
 
 
                 /// <summary>
