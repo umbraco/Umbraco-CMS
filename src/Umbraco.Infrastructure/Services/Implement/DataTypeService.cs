@@ -223,10 +223,17 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                     container.Name = name;
 
+                    var renamingEntityContainerNotification = new EntityContainerRenamingNotification(container, evtMsgs);
+                    if (scope.Notifications.PublishCancelable(renamingEntityContainerNotification))
+                    {
+                        scope.Complete();
+                        return OperationResult.Attempt.Cancel(evtMsgs, container);
+                    }
+
                     _dataTypeContainerRepository.Save(container);
                     scope.Complete();
 
-                    scope.Notifications.Publish(new EntityContainerRenamedNotification(container, evtMsgs));
+                    scope.Notifications.Publish(new EntityContainerRenamedNotification(container, evtMsgs).WithStateFrom(renamingEntityContainerNotification));
 
                     return OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, container);
                 }
