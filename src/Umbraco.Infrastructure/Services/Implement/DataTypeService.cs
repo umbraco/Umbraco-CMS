@@ -346,7 +346,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 var moveEventInfo = new MoveEventInfo<IDataType>(toMove, toMove.Path, parentId);
-                // var moveEventArgs = new MoveEventArgs<IDataType>(evtMsgs, moveEventInfo);
 
                 var movingDataTypeNotification = new DataTypeMovingNotification(moveEventInfo, evtMsgs);
                 if (scope.Notifications.PublishCancelable(movingDataTypeNotification))
@@ -440,7 +439,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             var evtMsgs = EventMessagesFactory.Get();
             var dataTypeDefinitionsA = dataTypeDefinitions.ToArray();
-            //var saveEventArgs = new SaveEventArgs<IDataType>(dataTypeDefinitionsA);
 
             using (var scope = ScopeProvider.CreateScope())
             {
