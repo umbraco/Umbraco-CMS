@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.Security
             id.MergeAllClaims(baseIdentity);
 
             // ensure our required claims are there
-            baseIdentity.AddRequiredClaims(
+            id.AddRequiredClaims(
                 user.Id,
                 user.UserName,
                 user.Name,
@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Core.Security
 
             // now we can flow any custom claims that the actual user has currently
             // assigned which could be done in the OnExternalLogin callback
-            baseIdentity.MergeClaimsFromBackOfficeIdentity(user);
+            id.MergeClaimsFromBackOfficeIdentity(user);
 
             return id;
         }
