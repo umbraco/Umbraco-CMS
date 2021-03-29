@@ -84,6 +84,8 @@
                             trashed: true
                         };
                         vm.loading = false;
+                        $element.addClass("--hasError")
+                        vm.mediaCardForm.$setValidity('error', false)
                     });
                 });
             }
