@@ -303,7 +303,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         private string EnsureUniqueNodeName(string nodeName, int id = 0)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.DataTypeDefinitionRepository.EnsureUniqueNodeName", tsql => tsql
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.DataTypeRepository.EnsureUniqueNodeName, tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
                 .From<NodeDto>()
                 .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType")));

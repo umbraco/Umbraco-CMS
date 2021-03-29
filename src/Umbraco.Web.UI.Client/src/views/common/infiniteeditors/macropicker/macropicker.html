@@ -17,22 +17,18 @@
 
                         <div ng-switch-when="macroSelect" class="macro-select">
 
-                            <div class="form-search">
-                                <i class="icon-search"></i>
-                                <input type="text"
-                                        style="width: 100%"
-                                        ng-model="searchTerm"
-                                        class="umb-search-field search-query input-block-level"
-                                        localize="placeholder"
-                                        placeholder="@placeholders_filter"
-                                        umb-auto-focus
-                                        no-dirty-check />
-                            </div>
+                            <umb-search-filter
+                                input-id="macro-search"
+                                model="searchTerm"
+                                label-key="placeholders_filter"
+                                text="Type to filter..."
+                                css-class="w-100 mb-15"
+                                auto-focus="true">
+                            </umb-search-filter>
 
                             <ul class="umb-card-grid -three-in-row">
-                                <li ng-repeat="availableItem in macros | orderBy:'name' | filter:searchTerm"
-                                    ng-click="selectMacro(availableItem)">
-                                    <button class="btn-reset umb-card-grid-item" title="{{availableItem.name}}">
+                                <li ng-repeat="availableItem in macros | orderBy:'name' | filter:searchTerm">
+                                    <button class="btn-reset umb-card-grid-item" title="{{availableItem.name}}" ng-click="selectMacro(availableItem)">
                                         <span>
                                             <i class="icon-settings-alt" aria-hidden="true"></i>
                                             {{availableItem.name}}

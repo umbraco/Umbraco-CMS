@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
+using System.Threading;
 using System.Web;
 using System.Web.Hosting;
 using Umbraco.Core.Cache;
@@ -10,6 +12,8 @@ using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
+using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Sync;
@@ -94,7 +98,7 @@ namespace Umbraco.Core.Runtime
                     HostingEnvironment.ApplicationID,
                     HostingEnvironment.ApplicationPhysicalPath,
                     NetworkHelper.MachineName);
-                logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+                logger.Debug<CoreRuntime, string>("Runtime: {Runtime}", GetType().FullName);
 
                 // application environment
                 ConfigureUnhandledException();
@@ -149,7 +153,7 @@ namespace Umbraco.Core.Runtime
                 {
                     MainDom = new MainDom(Logger, new MainDomSemaphoreLock(Logger));
                 }
-                
+
 
                 // create the composition
                 composition = new Composition(register, typeLoader, ProfilingLogger, _state, configs);
@@ -157,6 +161,9 @@ namespace Umbraco.Core.Runtime
 
                 // run handlers
                 RuntimeOptions.DoRuntimeEssentials(composition, appCaches, typeLoader, databaseFactory);
+
+                // determines if unattended install is enabled and performs it if required
+                DoUnattendedInstall(databaseFactory);
 
                 // register runtime-level services
                 // there should be none, really - this is here "just in case"
@@ -175,13 +182,23 @@ namespace Umbraco.Core.Runtime
                 using (ProfilingLogger.DebugDuration<CoreRuntime>("Scanning enable/disable composer attributes"))
                 {
                     enableDisableAttributes = typeLoader.GetAssemblyAttributes(typeof(EnableComposerAttribute), typeof(DisableComposerAttribute));
-                }   
+                }
 
                 var composers = new Composers(composition, composerTypes, enableDisableAttributes, ProfilingLogger);
                 composers.Compose();
 
                 // create the factory
                 _factory = Current.Factory = composition.CreateFactory();
+
+                // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
+                if (_state.Reason == RuntimeLevelReason.UpgradeMigrations && _state.Level == RuntimeLevel.Run)
+                {
+                    // do the upgrade
+                    DoUnattendedUpgrade(_factory.GetInstance<DatabaseBuilder>());
+
+                    // upgrade is done, set reason to Run
+                    _state.Reason = RuntimeLevelReason.Run;
+                }
 
                 // create & initialize the components
                 _components = _factory.GetInstance<ComponentCollection>();
@@ -225,6 +242,74 @@ namespace Umbraco.Core.Runtime
             return _factory;
         }
 
+        private void DoUnattendedInstall(IUmbracoDatabaseFactory databaseFactory)
+        {
+            // unattended install is not enabled
+            if (RuntimeOptions.InstallUnattended == false) return;
+
+            var localVersion = UmbracoVersion.LocalVersion; // the local, files, version
+            var codeVersion = _state.SemanticVersion; // the executing code version
+
+            // local version and code version is not equal, an unattended install cannot be performed
+            if (localVersion != codeVersion) return;
+
+            // no connection string set
+            if (databaseFactory.Configured == false) return;
+
+            var tries = 5;
+            var connect = false;
+            for (var i = 0;;)
+            {
+                connect = databaseFactory.CanConnect;
+                if (connect || ++i == tries) break;
+                Logger.Debug<CoreRuntime>("Could not immediately connect to database, trying again.");
+                Thread.Sleep(1000);
+            }
+
+            // could not connect to the database
+            if (connect == false) return;
+
+            using (var database = databaseFactory.CreateDatabase())
+            {
+                var hasUmbracoTables = database.IsUmbracoInstalled(Logger);
+
+                // database has umbraco tables, assume Umbraco is already installed
+                if (hasUmbracoTables) return;
+
+                // all conditions fulfilled, do the install
+                Logger.Info<CoreRuntime>("Starting unattended install.");
+                
+                try
+                {
+                    database.BeginTransaction();
+                    var creator = new DatabaseSchemaCreator(database, Logger);
+                    creator.InitializeDatabaseSchema();
+                    database.CompleteTransaction();
+                    Logger.Info<CoreRuntime>("Unattended install completed.");
+                }
+                catch (Exception ex)
+                {
+                    Logger.Error<CoreRuntime>(ex, "Error during unattended install.");
+                    database.AbortTransaction();
+
+                    throw new UnattendedInstallException(
+                        "The database configuration failed with the following message: " + ex.Message
+                        + "\n Please check log file for additional information (can be found in '/App_Data/Logs/')");
+                }
+            }
+        }
+
+        private void DoUnattendedUpgrade(DatabaseBuilder databaseBuilder)
+        {
+            var plan = new UmbracoPlan();
+            using (ProfilingLogger.TraceDuration<CoreRuntime>("Starting unattended upgrade.", "Unattended upgrade completed."))
+            {
+                var result = databaseBuilder.UpgradeSchemaAndData(plan);
+                if (result.Success == false)
+                    throw new UnattendedInstallException("An error occurred while running the unattended upgrade.\n" + result.Message);
+            }
+        }
+
         protected virtual void ConfigureUnhandledException()
         {
             //take care of unhandled exceptions - there is nothing we can do to
@@ -265,16 +350,16 @@ namespace Umbraco.Core.Runtime
             }
         }
 
-        // internal for tests
-        internal void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, IProfilingLogger profilingLogger)
+        // internal/virtual for tests (i.e. hack, do not port to netcore)
+        internal virtual void DetermineRuntimeLevel(IUmbracoDatabaseFactory databaseFactory, IProfilingLogger profilingLogger)
         {
             using (var timer = profilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined."))
             {
                 try
                 {
-                    _state.DetermineRuntimeLevel(databaseFactory, profilingLogger);
+                    _state.DetermineRuntimeLevel(databaseFactory);
 
-                    profilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
+                    profilingLogger.Debug<CoreRuntime,RuntimeLevel,RuntimeLevelReason>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
 
                     if (_state.Level == RuntimeLevel.Upgrade)
                     {

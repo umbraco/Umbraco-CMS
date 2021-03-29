@@ -1,5 +1,8 @@
 ﻿using System;
 using System.Threading;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.SessionState;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin;
@@ -166,11 +169,31 @@ namespace Umbraco.Web.Security
                 // Enables the application to validate the security stamp when the user
                 // logs in. This is a security feature which is used when you
                 // change a password or add an external login to your account.
-                OnValidateIdentity = SecurityStampValidator
-                    .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
+                OnValidateIdentity = context =>
+                {
+                    // capture the current ticket for the request
+                    var identity = context.Identity;
+
+                    return SecurityStampValidator
+                        .OnValidateIdentity<BackOfficeUserManager, BackOfficeIdentityUser, int>(
+                        // This will re-verify the security stamp at a throttled 30 mins
+                        // (the standard/default set in aspnet identity).
+                        // This ensures that if the security stamp has changed - i.e. passwords,
+                        // external logins, or other security profile data changed behind the
+                        // scenes while being logged in, that they are logged out and have
+                        // to re-verify their identity.
                         TimeSpan.FromMinutes(30),
-                        (manager, user) => manager.GenerateUserIdentityAsync(user),
-                        identity => identity.GetUserId<int>()),
+                        async (manager, user) =>
+                        {
+                            var regenerated = await manager.GenerateUserIdentityAsync(user);
+
+                            // Keep any custom claims from the original identity
+                            regenerated.MergeClaimsFromBackOfficeIdentity(identity);
+
+                            return regenerated;
+                        },
+                        identity => identity.GetUserId<int>())(context);
+                }
 
             };
 
@@ -266,7 +289,7 @@ namespace Umbraco.Web.Security
             {
                 //Then our custom middlewares
                 app.Use(typeof(ForceRenewalCookieAuthenticationMiddleware), app, options, Current.UmbracoContextAccessor);
-                app.Use(typeof(FixWindowsAuthMiddlware));
+                app.Use(typeof(FixWindowsAuthMiddlware));                
             }
 
             //Marks all of the above middlewares to execute on Authenticate
@@ -374,6 +397,19 @@ namespace Umbraco.Web.Security
             if (stage < PipelineStage.PostAuthenticate)
                 throw new InvalidOperationException("The stage specified for UseUmbracoPreviewAuthentication must be greater than or equal to " + PipelineStage.PostAuthenticate);
 
+            app.UseStageMarker(stage);
+            return app;
+        }
+
+        /// <summary>
+        /// Enable the back office to detect and handle errors registered with external login providers
+        /// </summary>
+        /// <param name="app"></param>
+        /// <param name="stage"></param>
+        /// <returns></returns>
+        public static IAppBuilder UseUmbracoBackOfficeExternalLoginErrors(this IAppBuilder app, PipelineStage stage = PipelineStage.Authorize)
+        {            
+            app.Use(typeof(BackOfficeExternalLoginProviderErrorMiddlware));
             app.UseStageMarker(stage);
             return app;
         }

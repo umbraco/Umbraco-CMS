@@ -6,7 +6,9 @@ using System.Web;
 using System.Web.Configuration;
 using System.Web.Hosting;
 using System.Xml.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.IO;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Core.Configuration
 {
@@ -23,6 +25,7 @@ namespace Umbraco.Core.Configuration
         // TODO these should not be static
         private static string _reservedPaths;
         private static string _reservedUrls;
+        private static int _sqlWriteLockTimeOut;
 
         //ensure the built on (non-changeable) reserved paths are there at all times
         internal const string StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,"; //must end with a comma!
@@ -68,9 +71,9 @@ namespace Umbraco.Core.Configuration
         internal static bool? HasSmtpServer { get; set; }
 
         /// <summary>
-        /// Gets the reserved urls from web.config.
+        /// Gets the reserved URLs from web.config.
         /// </summary>
-        /// <value>The reserved urls.</value>
+        /// <value>The reserved URLs.</value>
         public string ReservedUrls
         {
             get
@@ -354,10 +357,10 @@ namespace Umbraco.Core.Configuration
         }
 
         /// <summary>
-        /// Gets a value indicating whether umbraco should hide top level nodes from generated urls.
+        /// Gets a value indicating whether umbraco should hide top level nodes from generated URLs.
         /// </summary>
         /// <value>
-        ///     <c>true</c> if umbraco hides top level nodes from urls; otherwise, <c>false</c>.
+        ///     <c>true</c> if umbraco hides top level nodes from URLs; otherwise, <c>false</c>.
         /// </value>
         public bool HideTopLevelNodeFromPath
         {
@@ -390,6 +393,50 @@ namespace Umbraco.Core.Configuration
                     return false;
                 }
             }
+        }
+
+
+        /// <summary>
+        /// An int value representing the time in milliseconds to lock the database for a write operation
+        /// </summary>
+        /// <remarks>
+        /// The default value is 5000 milliseconds
+        /// </remarks>
+        /// <value>The timeout in milliseconds.</value>
+        public int SqlWriteLockTimeOut
+        {
+            get
+            {
+                if (_sqlWriteLockTimeOut != default) return _sqlWriteLockTimeOut;
+
+                var timeOut = GetSqlWriteLockTimeoutFromConfigFile(Current.Logger);
+
+                _sqlWriteLockTimeOut = timeOut;
+                return _sqlWriteLockTimeOut;
+            }
+        }
+
+        internal static int GetSqlWriteLockTimeoutFromConfigFile(ILogger logger)
+        {
+            var timeOut = 5000; // 5 seconds
+            var appSettingSqlWriteLockTimeOut = ConfigurationManager.AppSettings[Constants.AppSettings.SqlWriteLockTimeOut];
+            if (int.TryParse(appSettingSqlWriteLockTimeOut, out var configuredTimeOut))
+            {
+                // Only apply this setting if it's not excessively high or low
+                const int minimumTimeOut = 100;
+                const int maximumTimeOut = 20000;
+                if (configuredTimeOut >= minimumTimeOut && configuredTimeOut <= maximumTimeOut) // between 0.1 and 20 seconds
+                {
+                    timeOut = configuredTimeOut;
+                }
+                else
+                {
+                    logger.Warn<GlobalSettings>(
+                        $"The `{Constants.AppSettings.SqlWriteLockTimeOut}` setting in web.config is not between the minimum of {minimumTimeOut} ms and maximum of {maximumTimeOut} ms, defaulting back to {timeOut}");
+                }
+            }
+
+            return timeOut;
         }
     }
 }

@@ -23,94 +23,94 @@ namespace Umbraco.Core.IO
 
         internal IFileSystem InnerFileSystem { get; set; }
 
-        public IEnumerable<string> GetDirectories(string path)
+        public virtual IEnumerable<string> GetDirectories(string path)
         {
             return InnerFileSystem.GetDirectories(path);
         }
 
-        public void DeleteDirectory(string path)
+        public virtual void DeleteDirectory(string path)
         {
             InnerFileSystem.DeleteDirectory(path);
         }
 
-        public void DeleteDirectory(string path, bool recursive)
+        public virtual void DeleteDirectory(string path, bool recursive)
         {
             InnerFileSystem.DeleteDirectory(path, recursive);
         }
 
-        public bool DirectoryExists(string path)
+        public virtual bool DirectoryExists(string path)
         {
             return InnerFileSystem.DirectoryExists(path);
         }
 
-        public void AddFile(string path, Stream stream)
+        public virtual void AddFile(string path, Stream stream)
         {
             InnerFileSystem.AddFile(path, stream);
         }
 
-        public void AddFile(string path, Stream stream, bool overrideExisting)
+        public virtual void AddFile(string path, Stream stream, bool overrideExisting)
         {
             InnerFileSystem.AddFile(path, stream, overrideExisting);
         }
 
-        public IEnumerable<string> GetFiles(string path)
+        public virtual IEnumerable<string> GetFiles(string path)
         {
             return InnerFileSystem.GetFiles(path);
         }
 
-        public IEnumerable<string> GetFiles(string path, string filter)
+        public virtual IEnumerable<string> GetFiles(string path, string filter)
         {
             return InnerFileSystem.GetFiles(path, filter);
         }
 
-        public Stream OpenFile(string path)
+        public virtual Stream OpenFile(string path)
         {
             return InnerFileSystem.OpenFile(path);
         }
 
-        public void DeleteFile(string path)
+        public virtual void DeleteFile(string path)
         {
             InnerFileSystem.DeleteFile(path);
         }
 
-        public bool FileExists(string path)
+        public virtual bool FileExists(string path)
         {
             return InnerFileSystem.FileExists(path);
         }
 
-        public string GetRelativePath(string fullPathOrUrl)
+        public virtual string GetRelativePath(string fullPathOrUrl)
         {
             return InnerFileSystem.GetRelativePath(fullPathOrUrl);
         }
 
-        public string GetFullPath(string path)
+        public virtual string GetFullPath(string path)
         {
             return InnerFileSystem.GetFullPath(path);
         }
 
-        public string GetUrl(string path)
+        public virtual string GetUrl(string path)
         {
             return InnerFileSystem.GetUrl(path);
         }
 
-        public DateTimeOffset GetLastModified(string path)
+        public virtual DateTimeOffset GetLastModified(string path)
         {
             return InnerFileSystem.GetLastModified(path);
         }
 
-        public DateTimeOffset GetCreated(string path)
+        public virtual DateTimeOffset GetCreated(string path)
         {
             return InnerFileSystem.GetCreated(path);
         }
 
-        public long GetSize(string path)
+        public virtual long GetSize(string path)
         {
             return InnerFileSystem.GetSize(path);
         }
 
-        public bool CanAddPhysical => InnerFileSystem.CanAddPhysical;
+        public virtual bool CanAddPhysical => InnerFileSystem.CanAddPhysical;
 
-        public void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
+        public virtual void AddFile(string path, string physicalPath, bool overrideIfExists = true, bool copy = false)
         {
             InnerFileSystem.AddFile(path, physicalPath, overrideIfExists, copy);
         }

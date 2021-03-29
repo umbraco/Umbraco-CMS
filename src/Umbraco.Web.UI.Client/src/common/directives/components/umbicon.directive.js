@@ -15,16 +15,7 @@ Simple icon
 
 Icon with additional attribute. It can be treated like any other dom element
 <pre>
-    <umb-icon icon="icon-alert" class="icon-class" ng-click="doSomething()"></umb-icon>
-</pre>
-
-Manual svg string
-This format is only used in the iconpicker.html
-<pre>
-    <umb-icon 
-        icon="icon-alert"
-        svg-string='<svg height="50" width="50"><circle cx="25" cy="25" r="25" fill="red" /></svg>'>
-    </umb-icon>
+    <umb-icon icon="icon-alert" class="icon-class"></umb-icon>
 </pre>
 @example
  **/
@@ -43,13 +34,19 @@ This format is only used in the iconpicker.html
                 svgString: "=?"
             },
 
-            link: function (scope) {
-                
+            link: function (scope, element) {
                 if (scope.svgString === undefined && scope.svgString !== null && scope.icon !== undefined && scope.icon !== null) {
-                    var icon = scope.icon.split(" ")[0]; // Ensure that only the first part of the icon is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
+                    const observer = new IntersectionObserver(_lazyRequestIcon, {rootMargin: "100px"});
+                    const iconEl = element[0];
 
-                    _requestIcon(icon);
+                    observer.observe(iconEl);
+
+                    // make sure to disconnect the observer when the scope is destroyed
+                    scope.$on('$destroy', function () {
+                        observer.disconnect();
+                    });
                 }
+
                 scope.$watch("icon", function (newValue, oldValue) {
                     if (newValue && oldValue) {
                         var newicon = newValue.split(" ")[0];
@@ -61,15 +58,25 @@ This format is only used in the iconpicker.html
                     }
                 });
 
+                function _lazyRequestIcon(entries, observer) {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting === true) {
+                            observer.disconnect();
+
+                            var icon = scope.icon.split(" ")[0]; // Ensure that only the first part of the icon is used as sometimes the color is added too, e.g. see umbeditorheader.directive scope.openIconPicker
+                            _requestIcon(icon);
+                        }
+                    });
+                }
+
                 function _requestIcon(icon) {
                     // Reset svg string before requesting new icon.
                     scope.svgString = null;
 
                     iconHelper.getIcon(icon)
                         .then(data => {
-                            if (data !== null && data.svgString !== undefined) {
+                            if (data && data.svgString) {
                                 // Watch source SVG string
-                                //icon.svgString.$$unwrapTrustedValue();
                                 scope.svgString = data.svgString;
                             }
                         });

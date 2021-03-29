@@ -312,7 +312,7 @@
                 "event": "click",
                 "eventElement": "#tree [data-element='tree-item-templates'] [data-element='tree-item-expand']",
                 "view": "templatetree",
-                "skipStepIfVisible": "#tree [data-element='tree-item-templates'] > div > button[data-element=tree-item-expand].icon-navigation-down"
+                "skipStepIfVisible": "#tree [data-element='tree-item-templates'] > div > button[data-element=tree-item-expand] span.icon-navigation-down"
             },
             {
                 "element": "#tree [data-element='tree-item-templates'] [data-element='tree-item-Home Page']",

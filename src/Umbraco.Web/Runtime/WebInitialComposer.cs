@@ -40,6 +40,7 @@ using Current = Umbraco.Web.Composing.Current;
 using Umbraco.Web.PropertyEditors;
 using Umbraco.Core.Models;
 using Umbraco.Web.Models;
+using Ganss.XSS;
 
 namespace Umbraco.Web.Runtime
 {
@@ -137,8 +138,16 @@ namespace Umbraco.Web.Runtime
             composition.RegisterUnique<IEventMessagesAccessor, HybridEventMessagesAccessor>();
             composition.RegisterUnique<ITreeService, TreeService>();
             composition.RegisterUnique<ISectionService, SectionService>();
-
             composition.RegisterUnique<IDashboardService, DashboardService>();
+            composition.RegisterUnique<IIconService, IconService>();
+            composition.Register<IHtmlSanitizer>(_ =>
+            {
+                var sanitizer = new HtmlSanitizer();
+                sanitizer.AllowedAttributes.UnionWith(Umbraco.Core.Constants.SvgSanitizer.Attributes);
+                sanitizer.AllowedCssProperties.UnionWith(Umbraco.Core.Constants.SvgSanitizer.Attributes);
+                sanitizer.AllowedTags.UnionWith(Umbraco.Core.Constants.SvgSanitizer.Tags);
+                return sanitizer;
+            },Lifetime.Singleton);
 
             composition.RegisterUnique<IExamineManager>(factory => ExamineManager.Instance);
 
@@ -270,7 +279,6 @@ namespace Umbraco.Web.Runtime
             // note: IEmbedProvider is not IDiscoverable - think about it if going for type scanning
             composition.OEmbedProviders()
                 .Append<YouTube>()
-                .Append<Instagram>()
                 .Append<Twitter>()
                 .Append<Vimeo>()
                 .Append<DailyMotion>()

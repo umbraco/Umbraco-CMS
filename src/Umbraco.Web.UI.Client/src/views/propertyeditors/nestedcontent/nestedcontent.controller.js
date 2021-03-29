@@ -105,12 +105,13 @@
         localizationService.localizeMany(["grid_addElement", "content_createEmpty", "actions_copy"]).then(function (data) {
             labels.grid_addElement = data[0];
             labels.content_createEmpty = data[1];
-            labels.copy_icon_title = data[2]
+            labels.copy_icon_title = data[2];
         });
 
-        function setCurrentNode(node) {
+        function setCurrentNode(node, focusNode) {
             updateModel();
             vm.currentNode = node;
+            vm.focusOnNode = focusNode;
         }
 
         var copyAllEntries = function () {
@@ -180,7 +181,7 @@
 
             var newNode = createNode(scaffold, null);
 
-            setCurrentNode(newNode);
+            setCurrentNode(newNode, true);
             setDirty();
             validate();
         };
@@ -202,7 +203,6 @@
             });
 
             const dialog = {
-                view: "itempicker",
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
@@ -277,9 +277,9 @@
 
         vm.editNode = function (idx) {
             if (vm.currentNode && vm.currentNode.key === vm.nodes[idx].key) {
-                setCurrentNode(null);
+                setCurrentNode(null, false);
             } else {
-                setCurrentNode(vm.nodes[idx]);
+                setCurrentNode(vm.nodes[idx], true);
             }
         };
 
@@ -352,7 +352,7 @@
                         item["$index"] = (idx + 1);
 
                         var newName = contentType.nameExp(item);
-                        if (newName && (newName = $.trim(newName))) {
+                        if (newName && (newName = newName.trim())) {
                             name = newName;
                         }
 
@@ -442,6 +442,26 @@
         function clearNodeForCopy(clonedData) {
             delete clonedData.key;
             delete clonedData.$$hashKey;
+
+            var variant = clonedData.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    var prop = tab.properties[p];
+
+                    // If we have ncSpecific data, lets revert to standard data model.
+                    if (prop.propertyAlias) {
+                        prop.alias = prop.propertyAlias;
+                        delete prop.propertyAlias;
+                    }
+
+                    if(prop.ncMandatory !== undefined) {
+                        prop.validation.mandatory = prop.ncMandatory;
+                        delete prop.ncMandatory;
+                    }
+                }
+            }
+
         }
 
         vm.showCopy = clipboardService.isSupported();
@@ -467,19 +487,30 @@
             // generate a new key.
             newNode.key = String.CreateGuid();
 
+            // Ensure we have NC data in place:
+            var variant = newNode.variants[0];
+            for (var t = 0; t < variant.tabs.length; t++) {
+                var tab = variant.tabs[t];
+                for (var p = 0; p < tab.properties.length; p++) {
+                    extendPropertyWithNCData(tab.properties[p]);
+                }
+            }
+
             vm.nodes.push(newNode);
             setDirty();
             //updateModel();// done by setting current node...
 
-            setCurrentNode(newNode);
+            setCurrentNode(newNode, true);
         }
 
         function checkAbilityToPasteContent() {
             vm.showPaste = clipboardService.hasEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
         }
 
-        eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
-
+        var storageUpdate = eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
+        $scope.$on('$destroy', function () {
+            storageUpdate();
+        });
         var notSupported = [
             "Umbraco.Tags",
             "Umbraco.UploadField",
@@ -561,7 +592,7 @@
 
                 // If there is only one item, set it as current node
                 if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
-                    setCurrentNode(vm.nodes[0]);
+                    setCurrentNode(vm.nodes[0], false);
                 }
 
                 validate();
@@ -574,6 +605,30 @@
 
                 updatePropertyActionStates();
                 checkAbilityToPasteContent();
+            }
+        }
+
+        function extendPropertyWithNCData(prop) {
+
+            if (prop.propertyAlias === undefined) {
+                // store the original alias before we change below, see notes
+                prop.propertyAlias = prop.alias;
+
+                // NOTE: This is super ugly, the reason it is like this is because it controls the label/html id in the umb-property component at a higher level.
+                // not pretty :/ but we can't change this now since it would require a bunch of plumbing to be able to change the id's higher up.
+                prop.alias = model.alias + "___" + prop.alias;
+            }
+
+            // TODO: Do we need to deal with this separately?
+            // Force validation to occur server side as this is the
+            // only way we can have consistency between mandatory and
+            // regex validation messages. Not ideal, but it works.
+            if(prop.ncMandatory === undefined) {
+                prop.ncMandatory = prop.validation.mandatory;
+                prop.validation = {
+                    mandatory: false,
+                    pattern: ""
+                };
             }
         }
 
@@ -590,22 +645,7 @@
                 for (var p = 0; p < tab.properties.length; p++) {
                     var prop = tab.properties[p];
 
-                    // store the original alias before we change below, see notes
-                    prop.propertyAlias = prop.alias;
-
-                    // NOTE: This is super ugly, the reason it is like this is because it controls the label/html id in the umb-property component at a higher level.
-                    // not pretty :/ but we can't change this now since it would require a bunch of plumbing to be able to change the id's higher up.
-                    prop.alias = model.alias + "___" + prop.alias;
-
-                    // TODO: Do we need to deal with this separately?
-                    // Force validation to occur server side as this is the
-                    // only way we can have consistency between mandatory and
-                    // regex validation messages. Not ideal, but it works.
-                    prop.ncMandatory = prop.validation.mandatory;
-                    prop.validation = {
-                        mandatory: false,
-                        pattern: ""
-                    };
+                    extendPropertyWithNCData(prop);
 
                     if (fromNcEntry && fromNcEntry[prop.propertyAlias]) {
                         prop.value = fromNcEntry[prop.propertyAlias];

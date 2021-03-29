@@ -52,6 +52,11 @@ namespace Umbraco.Core
                 public const string ColorPicker = "Umbraco.ColorPicker";
 
                 /// <summary>
+                /// EyeDropper Color Picker.
+                /// </summary>
+                public const string ColorPickerEyeDropper = "Umbraco.ColorPicker.EyeDropper";
+
+                /// <summary>
                 /// Content Picker.
                 /// </summary>
                 public const string ContentPicker = "Umbraco.ContentPicker";
@@ -192,7 +197,7 @@ namespace Umbraco.Core
                 public const string NestedContent = "Umbraco.NestedContent";
 
                 /// <summary>
-                /// Alias for the multi url picker editor.
+                /// Alias for the multi URL picker editor.
                 /// </summary>
                 public const string MultiUrlPicker = "Umbraco.MultiUrlPicker";
             }

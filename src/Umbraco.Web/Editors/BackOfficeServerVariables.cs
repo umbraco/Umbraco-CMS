@@ -1,4 +1,6 @@
-﻿using System;
+﻿using ClientDependency.Core.Config;
+using Microsoft.Owin;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Configuration;
@@ -7,21 +9,17 @@ using System.Runtime.Serialization;
 using System.Web;
 using System.Web.Configuration;
 using System.Web.Mvc;
-using ClientDependency.Core.Config;
-using Microsoft.Owin;
-using Microsoft.Owin.Security;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
-using Umbraco.Web.Controllers;
 using Umbraco.Web.Features;
 using Umbraco.Web.HealthCheck;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Profiling;
 using Umbraco.Web.PropertyEditors;
+using Umbraco.Web.Security;
 using Umbraco.Web.Trees;
 using Constants = Umbraco.Core.Constants;
 
@@ -59,7 +57,7 @@ namespace Umbraco.Web.Editors
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "iconApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "canSendRequiredEmail", "usernameIsEmail"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -102,6 +100,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         internal Dictionary<string, object> GetServerVariables()
         {
+            var userMembershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
+
             var defaultVals = new Dictionary<string, object>
             {
                 {
@@ -109,7 +109,7 @@ namespace Umbraco.Web.Editors
                     {
                         // TODO: Add 'umbracoApiControllerBaseUrl' which people can use in JS
                         // to prepend their URL. We could then also use this in our own resources instead of
-                        // having each url defined here explicitly - we can do that in v8! for now
+                        // having each URL defined here explicitly - we can do that in v8! for now
                         // for umbraco services we'll stick to explicitly defining the endpoints.
 
                         {"externalLoginsUrl", _urlHelper.Action("ExternalLogin", "BackOffice")},
@@ -332,8 +332,8 @@ namespace Umbraco.Web.Editors
                     "umbracoSettings", new Dictionary<string, object>
                     {
                         {"umbracoPath", _globalSettings.Path},
-                        {"mediaPath", IOHelper.ResolveUrl(SystemDirectories.Media).TrimEnd('/')},
-                        {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd('/')},
+                        {"mediaPath", IOHelper.ResolveUrl(SystemDirectories.Media).TrimEnd(Constants.CharArrays.ForwardSlash)},
+                        {"appPluginsPath", IOHelper.ResolveUrl(SystemDirectories.AppPlugins).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {
                             "imageFileTypes",
                             string.Join(",", Current.Configs.Settings().Content.ImageFileTypes)
@@ -352,12 +352,15 @@ namespace Umbraco.Web.Editors
                         },
                         {"keepUserLoggedIn", Current.Configs.Settings().Security.KeepUserLoggedIn},
                         {"usernameIsEmail", Current.Configs.Settings().Security.UsernameIsEmail},
-                        {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd('/')},
+                        {"cssPath", IOHelper.ResolveUrl(SystemDirectories.Css).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {"allowPasswordReset", Current.Configs.Settings().Security.AllowPasswordReset},
                         {"loginBackgroundImage",  Current.Configs.Settings().Content.LoginBackgroundImage},
+                        {"loginLogoImage", Current.Configs.Settings().Content.LoginLogoImage },
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                         {"showAllowSegmentationForDocumentTypes", false},
+                        {"minimumPasswordLength", userMembershipProvider.MinRequiredPasswordLength},
+                        {"minimumPasswordNonAlphaNum", userMembershipProvider.MinRequiredNonAlphanumericCharacters},
                     }
                 },
                 {
@@ -379,8 +382,7 @@ namespace Umbraco.Web.Editors
                     "externalLogins", new Dictionary<string, object>
                     {
                         {
-                            "providers", _owinContext.Authentication.GetExternalAuthenticationTypes()
-                                .Where(p => p.Properties.ContainsKey("UmbracoBackOffice"))
+                            "providers", _owinContext.Authentication.GetBackOfficeExternalLoginProviders()
                                 .Select(p => new
                                 {
                                     authType = p.AuthenticationType, caption = p.Caption,
