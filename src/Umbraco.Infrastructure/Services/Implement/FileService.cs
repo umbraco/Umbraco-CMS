@@ -576,7 +576,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     _templateRepository.Save(template);
                 }
 
-                scope.Notifications.Publish(new TemplateSavingNotification(templatesA, eventMessages).WithStateFrom(savingNotification));
+                scope.Notifications.Publish(new TemplateSavedNotification(templatesA, eventMessages).WithStateFrom(savingNotification));
 
                 Audit(AuditType.Save, userId, -1, UmbracoObjectTypes.Template.GetName());
                 scope.Complete();
