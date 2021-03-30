@@ -31,14 +31,13 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly ILocalizationService _localizationService;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly IEventAggregator _eventAggregator;
 
         public DataTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository, IDataTypeContainerRepository dataTypeContainerRepository,
             IAuditRepository auditRepository, IEntityRepository entityRepository, IContentTypeRepository contentTypeRepository,
             IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService,
             IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer, IEventAggregator eventAggregator)
+            IJsonSerializer jsonSerializer)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             _dataTypeRepository = dataTypeRepository;
@@ -51,7 +50,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             _localizationService = localizationService;
             _shortStringHelper = shortStringHelper;
             _jsonSerializer = jsonSerializer;
-            _eventAggregator = eventAggregator;
         }
 
         #region Containers
