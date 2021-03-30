@@ -49,7 +49,7 @@
 
         function onInit() {
             vm.inputId = vm.inputId || "umb-radio_" + String.CreateGuid();
-            vm.disableDirtyCheck = ($attrs.disableDirtyCheck !== undefined) && (vm.disableDirtyCheck === undefined || Object.toBoolean(vm.disableDirtyCheck) === true);
+            vm.disableDirtyCheck = $attrs.hasOwnProperty("disableDirtyCheck") && vm.disableDirtyCheck !== '0' && vm.disableDirtyCheck !== 0 && vm.disableDirtyCheck .toString().toLowerCase() !== 'false';
             vm.icon = vm.icon || vm.iconClass || null;
 
             // If a labelKey is passed let's update the returned text if it's does not contain an opening square bracket [
