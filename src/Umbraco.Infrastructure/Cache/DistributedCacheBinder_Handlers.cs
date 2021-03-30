@@ -33,7 +33,8 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<UserGroupWithUsersSavedNotification>,
         INotificationHandler<UserGroupDeletedNotification>,
         INotificationHandler<MemberGroupDeletedNotification>,
-        INotificationHandler<MemberGroupSavedNotification>
+        INotificationHandler<MemberGroupSavedNotification>,
+        INotificationHandler<TemplateDeletedNotification>
     {
         private List<Action> _unbinders;
 
@@ -70,12 +71,6 @@ namespace Umbraco.Cms.Core.Cache
             Bind(() => DataTypeService.Saved += DataTypeService_Saved,
                 () => DataTypeService.Saved -= DataTypeService_Saved);
 
-            // bind to stylesheet events
-            Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
-                () => FileService.SavedStylesheet -= FileService_SavedStylesheet);
-            Bind(() => FileService.DeletedStylesheet += FileService_DeletedStylesheet,
-                () => FileService.DeletedStylesheet -= FileService_DeletedStylesheet);
-
             // bind to domain events
             Bind(() => DomainService.Saved += DomainService_Saved,
                 () => DomainService.Saved -= DomainService_Saved);
@@ -93,8 +88,6 @@ namespace Umbraco.Cms.Core.Cache
             // bind to template events
             Bind(() => FileService.SavedTemplate += FileService_SavedTemplate,
                 () => FileService.SavedTemplate -= FileService_SavedTemplate);
-            Bind(() => FileService.DeletedTemplate += FileService_DeletedTemplate,
-                () => FileService.DeletedTemplate -= FileService_DeletedTemplate);
 
             // bind to macro events
             Bind(() => MacroService.Saved += MacroService_Saved,
@@ -317,12 +310,13 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Removes cache for template
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void FileService_DeletedTemplate(IFileService sender, DeleteEventArgs<ITemplate> e)
+        /// <param name="notification"></param>
+        public void Handle(TemplateDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (ITemplate entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveTemplateCache(entity.Id);
+            }
         }
 
         /// <summary>
@@ -335,10 +329,6 @@ namespace Umbraco.Cms.Core.Cache
             foreach (var entity in e.SavedEntities)
                 _distributedCache.RefreshTemplateCache(entity.Id);
         }
-
-        // TODO: our weird events handling wants this for now
-        private void FileService_DeletedStylesheet(IFileService sender, DeleteEventArgs<IStylesheet> e) { }
-        private void FileService_SavedStylesheet(IFileService sender, SaveEventArgs<IStylesheet> e) { }
 
         #endregion
 

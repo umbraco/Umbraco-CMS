@@ -12,6 +12,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
@@ -96,25 +97,26 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public void DeleteStylesheet(string path, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var stylesheet = _stylesheetRepository.Get(path);
+                IStylesheet stylesheet = _stylesheetRepository.Get(path);
                 if (stylesheet == null)
                 {
                     scope.Complete();
                     return;
                 }
 
-                var deleteEventArgs = new DeleteEventArgs<IStylesheet>(stylesheet);
-                if (scope.Events.DispatchCancelable(DeletingStylesheet, this, deleteEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var deletingNotification = new StylesheetDeletingNotification(stylesheet, eventMessages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
-                    return; // causes rollback // causes rollback
+                    return; // causes rollback
                 }
 
                 _stylesheetRepository.Delete(stylesheet);
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(DeletedStylesheet, this, deleteEventArgs);
+
+                scope.Notifications.Publish(new StylesheetDeletedNotification(stylesheet, eventMessages).WithStateFrom(deletingNotification));
                 Audit(AuditType.Delete, userId, -1, "Stylesheet");
 
                 scope.Complete();
@@ -219,25 +221,25 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public void DeleteScript(string path, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var script = _scriptRepository.Get(path);
+                IScript script = _scriptRepository.Get(path);
                 if (script == null)
                 {
                     scope.Complete();
                     return;
                 }
 
-                var deleteEventArgs = new DeleteEventArgs<IScript>(script);
-                if (scope.Events.DispatchCancelable(DeletingScript, this, deleteEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var deletingNotification = new ScriptDeletingNotification(script, eventMessages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
                 }
 
                 _scriptRepository.Delete(script);
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(DeletedScript, this, deleteEventArgs);
+                scope.Notifications.Publish(new ScriptDeletedNotification(script, eventMessages).WithStateFrom(deletingNotification));
 
                 Audit(AuditType.Delete, userId, -1, "Script");
                 scope.Complete();
@@ -586,17 +588,18 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId"></param>
         public void DeleteTemplate(string alias, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var template = _templateRepository.Get(alias);
+                ITemplate template = _templateRepository.Get(alias);
                 if (template == null)
                 {
                     scope.Complete();
                     return;
                 }
 
-                var args = new DeleteEventArgs<ITemplate>(template);
-                if (scope.Events.DispatchCancelable(DeletingTemplate, this, args))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var deletingNotification = new TemplateDeletingNotification(template, eventMessages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
@@ -604,8 +607,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _templateRepository.Delete(template);
 
-                args.CanCancel = false;
-                scope.Events.Dispatch(DeletedTemplate, this, args);
+                scope.Notifications.Publish(new TemplateDeletedNotification(template, eventMessages).WithStateFrom(deletingNotification));
 
                 Audit(AuditType.Delete, userId, template.Id, ObjectTypes.GetName(UmbracoObjectTypes.Template));
                 scope.Complete();
@@ -1062,36 +1064,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         // TODO: Method to change name and/or alias of view template
 
         #region Event Handlers
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<ITemplate>> DeletingTemplate;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<ITemplate>> DeletedTemplate;
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<IScript>> DeletingScript;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<IScript>> DeletedScript;
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<IStylesheet>> DeletingStylesheet;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<IStylesheet>> DeletedStylesheet;
 
         /// <summary>
         /// Occurs before Save

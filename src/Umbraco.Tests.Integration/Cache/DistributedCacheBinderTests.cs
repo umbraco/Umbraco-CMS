@@ -45,9 +45,6 @@ namespace Umbraco.Cms.Tests.Integration.Cache
                 new EventDefinition<IDataTypeService, SaveEventArgs<IDataType>>(null, DataTypeService, new SaveEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
                 new EventDefinition<IDataTypeService, DeleteEventArgs<IDataType>>(null, DataTypeService, new DeleteEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
 
-                new EventDefinition<IFileService, SaveEventArgs<IStylesheet>>(null, FileService, new SaveEventArgs<IStylesheet>(Enumerable.Empty<IStylesheet>())),
-                new EventDefinition<IFileService, DeleteEventArgs<IStylesheet>>(null, FileService, new DeleteEventArgs<IStylesheet>(Enumerable.Empty<IStylesheet>())),
-
                 new EventDefinition<IDomainService, SaveEventArgs<IDomain>>(null, DomainService, new SaveEventArgs<IDomain>(Enumerable.Empty<IDomain>())),
                 new EventDefinition<IDomainService, DeleteEventArgs<IDomain>>(null, DomainService, new DeleteEventArgs<IDomain>(Enumerable.Empty<IDomain>())),
 
@@ -60,7 +57,6 @@ namespace Umbraco.Cms.Tests.Integration.Cache
                 new EventDefinition<IMemberTypeService, DeleteEventArgs<IMemberType>>(null, MemberTypeService, new DeleteEventArgs<IMemberType>(Enumerable.Empty<IMemberType>())),
 
                 new EventDefinition<IFileService, SaveEventArgs<ITemplate>>(null, FileService, new SaveEventArgs<ITemplate>(Enumerable.Empty<ITemplate>())),
-                new EventDefinition<IFileService, DeleteEventArgs<ITemplate>>(null, FileService, new DeleteEventArgs<ITemplate>(Enumerable.Empty<ITemplate>())),
 
                 new EventDefinition<IMacroService, SaveEventArgs<IMacro>>(null, MacroService, new SaveEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
                 new EventDefinition<IMacroService, DeleteEventArgs<IMacro>>(null, MacroService, new DeleteEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
