@@ -30,6 +30,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         var element = $(args.element);
         element.addClass('above-backdrop');
     });
+    
 
     //A list of query strings defined that when changed will not cause a reload of the route
     var nonRoutingQueryStrings = ["mculture", "cculture", "csegment", "lq", "sr"];
@@ -125,6 +126,13 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             backdropService.close();
             leftColumn.removeClass(aboveClass);
         }
+    }
+
+    function showBackdrop() {
+        var backDropOptions = {
+            'element': $('#leftcolumn')[0]
+        };
+        backdropService.open(backDropOptions);
     }
 
     var service = {
@@ -427,13 +435,9 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         showMenu: function (args) {
             var self = this;
 
-            var backDropOptions = {
-                'element': $('#leftcolumn')[0]
-            };
-
             return treeService.getMenu({ treeNode: args.node })
                 .then(function (data) {
-                    backdropService.open(backDropOptions);
+                    showBackdrop();
                     //check for a default
                     //NOTE: event will be undefined when a call to hideDialog is made so it won't re-load the default again.
                     // but perhaps there's a better way to deal with with an additional parameter in the args ? it works though.
@@ -544,6 +548,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
                 }
             }
             else {
+                showBackdrop();
                 service.showDialog({
                     node: node,
                     action: action,

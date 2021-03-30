@@ -1,12 +1,12 @@
 <div class="umb-control-group -no-border">
-    <div class="form-search form-search-filter">
+    <div class="umb-search-filter" ng-class="vm.cssClass">
         <label for="{{vm.inputId}}" class="sr-only">{{vm.text}}</label>
-        <i class="icon-search" aria-hidden="true"></i>
+        <umb-icon icon="icon-search" class="icon-search"></umb-icon>
         <input type="text"
                id="{{vm.inputId}}"
                ng-change="vm.change()"
                ng-model="vm.model"
-               class="umb-search-field search-query search-input input-block-level"
+               class="umb-search-filter__input"
                placeholder="{{vm.text}}"
                umb-auto-focus="{{vm.autoFocus}}"
                prevent-enter-submit="{{vm.preventSubmitOnEnter}}"

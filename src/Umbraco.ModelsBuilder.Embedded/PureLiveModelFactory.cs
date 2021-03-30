@@ -308,7 +308,7 @@ namespace Umbraco.ModelsBuilder.Embedded
                     {
                         try
                         {
-                            _logger.Error<PureLiveModelFactory>("Failed to build models.", e);
+                            _logger.Error<PureLiveModelFactory>(e, "Failed to build models.");
                             _logger.Warn<PureLiveModelFactory>("Running without models."); // be explicit
                             _errors.Report("Failed to build PureLive models.", e);
                         }
@@ -542,8 +542,10 @@ namespace Umbraco.ModelsBuilder.Embedded
                 if (modelInfos.TryGetValue(typeName, out var modelInfo))
                     throw new InvalidOperationException($"Both types {type.FullName} and {modelInfo.ModelType.FullName} want to be a model type for content type with alias \"{typeName}\".");
 
-                // fixme use Core's ReflectionUtilities.EmitCtor !!
+                // TODO: use Core's ReflectionUtilities.EmitCtor !!
                 // Yes .. DynamicMethod is uber slow
+                // TODO: But perhaps https://docs.microsoft.com/en-us/dotnet/api/system.reflection.emit.constructorbuilder?view=netcore-3.1 is better still?
+                // See CtorInvokeBenchmarks
                 var meth = new DynamicMethod(string.Empty, typeof(IPublishedElement), ctorArgTypes, type.Module, true);
                 var gen = meth.GetILGenerator();
                 gen.Emit(OpCodes.Ldarg_0);

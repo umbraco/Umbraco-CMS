@@ -10,16 +10,15 @@
                 <label for="package-query" class="sr-only">
                     <localize key="packager_packageSearch">Search for packages</localize>
                 </label>
-                <input
-                    class="-full-width-input"
-                    type="text"
-                    name="query"
-                    id="package-query"
-                    localize="placeholder"
-                    placeholder="@packager_packageSearch"
-                    ng-model="vm.searchQuery"
-                    ng-change="vm.search()"
-                    no-dirty-check>
+                <input type="text"
+                       class="-full-width-input"
+                       name="query"
+                       id="package-query"
+                       localize="placeholder"
+                       placeholder="@packager_packageSearch"
+                       ng-model="vm.searchQuery"
+                       ng-change="vm.search()"
+                       no-dirty-check />
             </div>
         </div>
 
@@ -295,7 +294,7 @@
                             <div class="umb-package-details__section-title"><localize key="packager_packageExternalSources">External sources</localize></div>
                             <div>
                                 <div class="umb-package-details__information-item" ng-repeat="externalSource in vm.package.externalSources">
-                                    <a class="umb-package-details__link" target="_blank" href="{{ externalSource.url }}">
+                                    <a class="umb-package-details__link" href="{{ externalSource.url }}" target="_blank" rel="noopener noreferrer">
                                         <i class="icon-out" aria-hidden="true"></i>
                                         {{ externalSource.name }}
                                     </a>
@@ -336,7 +335,7 @@
 
                             <div class="umb-info-local-item">
                                 <strong>Author</strong>
-                                <a href="{{ vm.localPackage.authorLink }}" target="_blank">{{ vm.localPackage.author }}</a>
+                                <a href="{{ vm.localPackage.authorLink }}" target="_blank" rel="noopener noreferrer">{{ vm.localPackage.author }}</a>
                             </div>
 
                             <div class="umb-info-local-item">
@@ -346,7 +345,7 @@
 
                             <div class="umb-info-local-item">
                                 <strong><localize key="packager_packageLicense">License</localize></strong>
-                                <a href="{{ vm.localPackage.licenseUrl }}" target="_blank">{{ vm.localPackage.license }}</a>
+                                <a href="{{ vm.localPackage.licenseUrl }}" target="_blank" rel="noopener noreferrer">{{ vm.localPackage.license }}</a>
                             </div>
 
                             <div class="umb-info-local-item">
@@ -356,12 +355,15 @@
                             </div>
 
                             <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
+
                                 <umb-checkbox model="vm.localPackage.packageLicenseAccept" required="true">
-                                    <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="#" ng-href="{{vm.localPackage.licenseUrl}}" target="_blank"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
+                                    <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="#" ng-href="{{vm.localPackage.licenseUrl}}" target="_blank" rel="noopener noreferrer"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
                                 </umb-checkbox>
+
                                 <umb-button ng-if="vm.installState.type !== 'error'"
                                             class="mt3"
                                             type="button"
+                                            size="m"
                                             button-style="success"
                                             disabled="localPackageForm.$invalid"
                                             action="vm.installPackage(vm.localPackage)"

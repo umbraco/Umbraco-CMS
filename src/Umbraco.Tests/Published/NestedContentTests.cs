@@ -34,7 +34,7 @@ namespace Umbraco.Tests.Published
             var proflog = new ProfilingLogger(logger, profiler);
 
             PropertyEditorCollection editors = null;
-            var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(), Mock.Of<IContentTypeService>());
+            var editor = new NestedContentPropertyEditor(logger, new Lazy<PropertyEditorCollection>(() => editors), Mock.Of<IDataTypeService>(), Mock.Of<IContentTypeService>(), Mock.Of<ILocalizedTextService>());
             editors = new PropertyEditorCollection(new DataEditorCollection(new DataEditor[] { editor }));
 
             var dataType1 = new DataType(editor)
@@ -100,8 +100,8 @@ namespace Umbraco.Tests.Published
                 .Returns((string alias) =>
                 {
                     return alias == "contentN1"
-                        ? (IList) new List<TestElementModel>()
-                        : (IList) new List<IPublishedElement>();
+                        ? (IList)new List<TestElementModel>()
+                        : (IList)new List<IPublishedElement>();
                 });
 
             var contentCache = new Mock<IPublishedContentCache>();
@@ -142,9 +142,9 @@ namespace Umbraco.Tests.Published
                 yield return factory.CreatePropertyType(contentType, "propertyN1", 3);
             }
 
-            var contentType1 = factory.CreateContentType(1, "content1", CreatePropertyTypes1);
-            var contentType2 = factory.CreateContentType(2, "content2", CreatePropertyTypes2);
-            var contentTypeN1 = factory.CreateContentType(2, "contentN1", CreatePropertyTypesN1, isElement: true);
+            var contentType1 = factory.CreateContentType(Guid.NewGuid(), 1, "content1", CreatePropertyTypes1);
+            var contentType2 = factory.CreateContentType(Guid.NewGuid(), 2, "content2", CreatePropertyTypes2);
+            var contentTypeN1 = factory.CreateContentType(Guid.NewGuid(), 2, "contentN1", CreatePropertyTypesN1, isElement: true);
 
             // mocked content cache returns content types
             contentCache
@@ -164,7 +164,7 @@ namespace Umbraco.Tests.Published
             (var contentType1, _) = CreateContentTypes();
 
             // nested single converter returns the proper value clr type TestModel, and cache level
-            Assert.AreEqual(typeof (TestElementModel), contentType1.GetPropertyType("property1").ClrType);
+            Assert.AreEqual(typeof(TestElementModel), contentType1.GetPropertyType("property1").ClrType);
             Assert.AreEqual(PropertyCacheLevel.Element, contentType1.GetPropertyType("property1").CacheLevel);
 
             var key = Guid.NewGuid();
@@ -172,7 +172,7 @@ namespace Umbraco.Tests.Published
             var content = new SolidPublishedContent(contentType1)
             {
                 Key = key,
-                Properties = new []
+                Properties = new[]
                 {
                     new TestPublishedProperty(contentType1.GetPropertyType("property1"), $@"[
                     {{ ""key"": ""{keyA}"", ""propertyN1"": ""foo"", ""ncContentTypeAlias"": ""contentN1"" }}
@@ -183,7 +183,7 @@ namespace Umbraco.Tests.Published
 
             // nested single converter returns proper TestModel value
             Assert.IsInstanceOf<TestElementModel>(value);
-            var valueM = (TestElementModel) value;
+            var valueM = (TestElementModel)value;
             Assert.AreEqual("foo", valueM.PropValue);
             Assert.AreEqual(keyA, valueM.Key);
         }
@@ -194,7 +194,7 @@ namespace Umbraco.Tests.Published
             (_, var contentType2) = CreateContentTypes();
 
             // nested many converter returns the proper value clr type IEnumerable<TestModel>, and cache level
-            Assert.AreEqual(typeof (IEnumerable<TestElementModel>), contentType2.GetPropertyType("property2").ClrType);
+            Assert.AreEqual(typeof(IEnumerable<TestElementModel>), contentType2.GetPropertyType("property2").ClrType);
             Assert.AreEqual(PropertyCacheLevel.Element, contentType2.GetPropertyType("property2").CacheLevel);
 
             var key = Guid.NewGuid();
@@ -216,7 +216,7 @@ namespace Umbraco.Tests.Published
             // nested many converter returns proper IEnumerable<TestModel> value
             Assert.IsInstanceOf<IEnumerable<IPublishedElement>>(value);
             Assert.IsInstanceOf<IEnumerable<TestElementModel>>(value);
-            var valueM = ((IEnumerable<TestElementModel>) value).ToArray();
+            var valueM = ((IEnumerable<TestElementModel>)value).ToArray();
             Assert.AreEqual("foo", valueM[0].PropValue);
             Assert.AreEqual(keyA, valueM[0].Key);
             Assert.AreEqual("bar", valueM[1].PropValue);

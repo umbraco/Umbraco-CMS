@@ -96,7 +96,7 @@ namespace Umbraco.Web.PropertyEditors
                 // Add the UDI to the img element as new data attribute
                 img.SetAttributeValue("data-udi", udi.ToString());
 
-                // Get the new persisted image url
+                // Get the new persisted image URL
                 var mediaTyped = _umbracoContextAccessor?.UmbracoContext?.Media.GetById(udi.Guid);
                 if (mediaTyped == null)
                     throw new PanicException($"Could not find media by id {udi.Guid} or there was no UmbracoContext available.");
@@ -132,7 +132,7 @@ namespace Umbraco.Web.PropertyEditors
                     }
                     catch (Exception ex)
                     {
-                        _logger.Error(typeof(HtmlImageSourceParser), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
+                        _logger.Error<string>(typeof(HtmlImageSourceParser), ex, "Could not delete temp file or folder {FileName}", absoluteTempImagePath);
                     }
                 }
             }

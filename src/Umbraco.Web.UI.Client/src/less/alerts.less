@@ -7,6 +7,7 @@
 // -------------------------
 
 .alert {
+  position: relative;
   padding: 8px 35px 8px 14px;
   margin-bottom: @baseLineHeight;
   background-color: @warningBackground;
@@ -97,4 +98,30 @@
 }
 .alert-block p + p {
   margin-top: 5px;
+}
+
+
+// Property error alerts
+// -------------------------
+.alert.property-error {
+
+    display: inline-block;
+    font-size: 14px;
+    padding: 6px 16px 6px 12px;
+    margin-bottom: 6px;
+
+    &::after {
+        content:'';
+        position: absolute;
+        bottom:-6px;
+        left: 6px;
+        width: 0;
+        height: 0;
+        border-left: 6px solid transparent;
+        border-right: 6px solid transparent;
+        border-top: 6px solid;
+    }
+    &.alert-error::after {
+        border-top-color: @errorBackground;
+    }
 }

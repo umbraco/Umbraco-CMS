@@ -62,6 +62,10 @@ namespace Umbraco.Core.Persistence.Dtos
         [Length(2000)]
         public string Description { get; set; }
 
+        [Column("labelOnTop")]
+        [Constraint(Default = "0")]
+        public bool LabelOnTop { get; set; }
+
         [Column("variations")]
         [Constraint(Default = "1" /*ContentVariation.InvariantNeutral*/)]
         public byte Variations { get; set; }

@@ -511,6 +511,16 @@ namespace Umbraco.Core.Services.Implement
 
                 // delete content
                 DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
+                
+                // Next find all other document types that have a reference to this content type
+                var referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes.Any(p=>p.Id.Value==item.Id));
+                foreach (var reference in referenceToAllowedContentTypes)
+                {                                        
+                    reference.AllowedContentTypes = reference.AllowedContentTypes.Where(p => p.Id.Value != item.Id);                   
+                    var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
+                    // Fire change event
+                    OnChanged(scope, changedRef.ToEventArgs());                  
+                }
 
                 // finally delete the content type
                 // - recursively deletes all descendants
@@ -518,7 +528,7 @@ namespace Umbraco.Core.Services.Implement
                 //  (contents of any descendant type have been deleted but
                 //   contents of any composed (impacted) type remain but
                 //   need to have their property data cleared)
-                Repository.Delete(item);
+                Repository.Delete(item);                               
 
                 //...
                 var changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
@@ -869,7 +879,7 @@ namespace Umbraco.Core.Services.Implement
 
         public IEnumerable<EntityContainer> GetContainers(TItem item)
         {
-            var ancestorIds = item.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var ancestorIds = item.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x =>
                 {
                     var asInt = x.TryConvertTo<int>();

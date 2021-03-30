@@ -38,6 +38,8 @@
         vm.selectAppAnchor = selectAppAnchor;
         vm.requestSplitView = requestSplitView;
 
+        vm.getScope = getScope;// used by property editors to get a scope that is the root of split view, content apps etc.
+
         //Used to track how many content views there are (for split view there will be 2, it could support more in theory)
         vm.editors = [];
 
@@ -185,8 +187,7 @@
             }
         }
 
-        eventsService.on("editors.content.splitViewRequest", (_, args) => requestSplitView(args));
-
+        var unbindSplitViewRequest = eventsService.on("editors.content.splitViewRequest", (_, args) => requestSplitView(args));
         /** Closes the split view */
         function closeSplitView(editorIndex) {
             // TODO: hacking animation states - these should hopefully be easier to do when we upgrade angular
@@ -199,7 +200,11 @@
 
             $location.search({"cculture": culture, "csegment": vm.editors[0].content.segment});
             splitViewChanged();
+            unbindSplitViewRequest();
         }
+        
+        // if split view was never closed, the listener is not disposed when changing nodes - this unbinds it
+        $scope.$on('$destroy', () => unbindSplitViewRequest());
 
         /**
          * Changes the currently selected variant
@@ -244,6 +249,10 @@
                 vm.onSelectAppAnchor({"app": app, "anchor": anchor});
             }
         }
+        function getScope() {
+            return $scope;
+        }
+
     }
 
     angular.module('umbraco.directives').component('umbVariantContentEditors', umbVariantContentEditors);

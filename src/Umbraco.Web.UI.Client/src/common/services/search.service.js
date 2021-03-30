@@ -12,7 +12,7 @@
  *
  * <pre>
  *      searchService.searchMembers({term: 'bob'}).then(function(results){
- *          angular.forEach(results, function(result){
+ *          results.forEach(function(result){
  *                  //returns:
  *                  {name: "name", id: 1234, menuUrl: "url", editorPath: "url", metaData: {}, subtitle: "/path/etc" }
  *           })
@@ -67,10 +67,11 @@ angular.module('umbraco.services')
                 }
 
                 return entityResource.search(args.term, "Document", args.searchFrom, args.canceler, args.dataTypeKey)
-                    _.each(data, function (item) {
+                    .then(data => {
                         data.forEach(item => searchResultFormatter.configureContentResult(item));
                         return data;
                     });
+                
             },
 
             /**

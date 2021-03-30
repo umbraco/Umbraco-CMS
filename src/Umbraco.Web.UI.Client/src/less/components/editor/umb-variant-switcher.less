@@ -50,6 +50,19 @@ button.umb-variant-switcher__toggle {
             font-weight: bold;
             background-color: @errorBackground;
             color: @errorText;
+
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-name: umb-variant-switcher__toggle--badge-bounce;
+            animation-timing-function: ease;
+            @keyframes umb-variant-switcher__toggle--badge-bounce {
+                0%   { transform: translateY(0); }
+                20%  { transform: translateY(-6px); }
+                40%  { transform: translateY(0); }
+                55%  { transform: translateY(-3px); }
+                70%  { transform: translateY(0); }
+                100% { transform: translateY(0); }
+            }
         }
     }
 }
@@ -183,10 +196,6 @@ button.umb-variant-switcher__toggle {
 
 .umb-variant-switcher__item.--current {
     color: @ui-light-active-type;
-    //background-color: @pinkExtraLight;
-    .umb-variant-switcher__name-wrapper {
-        border-left: 4px solid @ui-active;
-    }
     .umb-variant-switcher__name {
         //color: @ui-light-active-type;
         font-weight: 700;
@@ -241,6 +250,19 @@ button.umb-variant-switcher__toggle {
             font-weight: bold;
             background-color: @errorBackground;
             color: @errorText;
+            
+            animation-duration: 1.4s;
+            animation-iteration-count: infinite;
+            animation-name: umb-variant-switcher__name--badge-bounce;
+            animation-timing-function: ease;
+            @keyframes umb-variant-switcher__name--badge-bounce {
+                0%   { transform: translateY(0); }
+                20%  { transform: translateY(-6px); }
+                40%  { transform: translateY(0); }
+                55%  { transform: translateY(-3px); }
+                70%  { transform: translateY(0); }
+                100% { transform: translateY(0); }
+            }
         }
     }
 }

@@ -10,7 +10,7 @@
     "use strict";
 
     function MemberTypesEditController($scope, $routeParams, $q,
-        memberTypeResource, dataTypeResource, editorState, iconHelper,
+        memberTypeResource, editorState, iconHelper,
         navigationService, contentEditingHelper, notificationsService, localizationService,
         overlayHelper, contentTypeHelper, angularHelper, eventsService) {
 
@@ -19,6 +19,7 @@
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
         var memberTypeId = $routeParams.id;
         var create = $routeParams.create;
+        var memberTypeIcon = "";
 
         vm.save = save;
         vm.close = close;
@@ -110,7 +111,6 @@
                     hotKeyWhenHidden: true,
                     labelKey: vm.saveButtonKey,
                     letter: "S",
-                    type: "submit",
                     handler: function () { vm.save(); }
                 };
                 vm.page.subButtons = [{
@@ -259,6 +259,10 @@
                     var args = { memberType: vm.contentType };
                     eventsService.emit("editors.memberType.saved", args);
 
+                    if (memberTypeIcon !== vm.contentType.icon) {
+                        eventsService.emit("editors.tree.icon.changed", args);
+                    }
+
                     vm.page.saveButtonState = "success";
 
                     if(infiniteMode && $scope.model.submit) {
@@ -299,6 +303,8 @@
             editorState.set(contentType);
 
             vm.contentType = contentType;
+
+            memberTypeIcon = contentType.icon;
         }
 
         function convertLegacyIcons(contentType) {

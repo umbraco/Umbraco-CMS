@@ -208,8 +208,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 if (dto.EditData == null)
                 {
                     if (Debugger.IsAttached)
-                        throw new Exception("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
-                    Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.", dto.Id);
+                        throw new InvalidOperationException("Missing cmsContentNu edited content for node " + dto.Id + ", consider rebuilding.");
+                    Current.Logger.Warn<DatabaseDataSource,int>("Missing cmsContentNu edited content for node {NodeId}, consider rebuilding.", dto.Id);
                 }
                 else
                 {
@@ -235,8 +235,8 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 if (dto.PubData == null)
                 {
                     if (Debugger.IsAttached)
-                        throw new Exception("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
-                    Current.Logger.Warn<DatabaseDataSource>("Missing cmsContentNu published content for node {NodeId}, consider rebuilding.", dto.Id);
+                        throw new InvalidOperationException("Missing cmsContentNu published content for node " + dto.Id + ", consider rebuilding.");
+                    Current.Logger.Warn<DatabaseDataSource,int>("Missing cmsContentNu published content for node {NodeId}, consider rebuilding.", dto.Id);
                 }
                 else
                 {
@@ -274,7 +274,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
         private static ContentNodeKit CreateMediaNodeKit(ContentSourceDto dto)
         {
             if (dto.EditData == null)
-                throw new Exception("No data for media " + dto.Id);
+                throw new InvalidOperationException("No data for media " + dto.Id);
 
             var nested = DeserializeNestedData(dto.EditData);
 
@@ -303,17 +303,18 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
             return s;
         }
 
+        private static readonly JsonSerializerSettings NestedContentDataJsonSerializerSettings = new JsonSerializerSettings
+            {
+                Converters = new List<JsonConverter> { new ForceInt32Converter() }
+            };
+
         private static ContentNestedData DeserializeNestedData(string data)
         {
             // by default JsonConvert will deserialize our numeric values as Int64
             // which is bad, because they were Int32 in the database - take care
 
-            var settings = new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> { new ForceInt32Converter() }
-            };
 
-            return JsonConvert.DeserializeObject<ContentNestedData>(data, settings);
+            return JsonConvert.DeserializeObject<ContentNestedData>(data, NestedContentDataJsonSerializerSettings);
         }
     }
 }

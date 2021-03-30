@@ -57,7 +57,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 if (string.IsNullOrWhiteSpace(value) == false)
                 {
-                    return value.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+                    return value.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
                 }
 
                 return null;

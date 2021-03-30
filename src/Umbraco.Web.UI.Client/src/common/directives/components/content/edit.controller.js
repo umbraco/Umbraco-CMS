@@ -2,9 +2,10 @@
     'use strict';
 
     function ContentEditController($rootScope, $scope, $routeParams, $q, $window,
-        appState, contentResource, entityResource, navigationService, notificationsService,
+        appState, contentResource, entityResource, navigationService, notificationsService, contentAppHelper,
         serverValidationManager, contentEditingHelper, localizationService, formHelper, umbRequestHelper,
-        editorState, $http, eventsService, overlayService, $location, localStorageService, treeService) {
+        editorState, $http, eventsService, overlayService, $location, localStorageService, treeService,
+        $exceptionHandler) {
 
         var evts = [];
         var infiniteMode = $scope.infiniteModel && $scope.infiniteModel.infiniteMode;
@@ -222,7 +223,6 @@
             //we are editing so get the content item from the server
             return $scope.getMethod()($scope.contentId)
                 .then(function (data) {
-
                     $scope.content = data;
 
                     appendRuntimeData();
@@ -270,7 +270,7 @@
          * @param {any} app the active content app
          */
         function createButtons(content) {
-            
+
             var isBlueprint = content.isBlueprint;
 
             if ($scope.page.isNew && $location.path().search(/contentBlueprints/i) !== -1) {
@@ -281,7 +281,7 @@
             $scope.page.saveButtonStyle = content.trashed || content.isElement || isBlueprint ? "primary" : "info";
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
-            if ($scope.activeApp && $scope.activeApp.alias !== "umbContent" && $scope.activeApp.alias !== "umbInfo" && $scope.activeApp.alias !== "umbListView") {
+            if ($scope.activeApp && !contentAppHelper.isContentBasedApp($scope.activeApp)) {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
                 $scope.page.showSaveButton = false;
@@ -465,7 +465,7 @@
 
                 syncTreeNode($scope.content, data.path, false, args.reloadChildren);
 
-                eventsService.emit("content.saved", { content: $scope.content, action: args.action });
+                eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: true });
 
                 resetNestedFieldValiation(fieldsToRollback);
                 ensureDirtyIsSetIfAnyVariantIsDirty();
@@ -473,7 +473,14 @@
                 return $q.when(data);
             },
                 function (err) {
+
+
                     syncTreeNode($scope.content, $scope.content.path);
+
+                    if (err && err.status === 400 && err.data) {
+                        // content was saved but is invalid.
+                        eventsService.emit("content.saved", { content: $scope.content, action: args.action, valid: false });
+                    }
 
                     resetNestedFieldValiation(fieldsToRollback);
 
@@ -521,6 +528,12 @@
             }
         }
 
+        function handleHttpException(err) {
+            if (err && !err.status) {
+                $exceptionHandler(err);
+            }
+        }
+
         /** Just shows a simple notification that there are client side validation issues to be fixed */
         function showValidationNotification() {
             //TODO: We need to make the validation UI much better, there's a lot of inconsistencies in v8 including colors, issues with the property groups and validation errors between variants
@@ -561,6 +574,7 @@
                     view: "views/content/overlays/unpublish.html",
                     variants: $scope.content.variants, //set a model property for the dialog
                     skipFormValidation: true, //when submitting the overlay form, skip any client side validation
+                    includeUnpublished: false,
                     submitButtonLabelKey: "content_unpublish",
                     submitButtonStyle: "warning",
                     submit: function (model) {
@@ -580,7 +594,9 @@
                                 eventsService.emit("content.unpublished", { content: $scope.content });
                                 overlayService.close();
                             }, function (err) {
+                                formHelper.resetForm({ scope: $scope, hasErrors: true });
                                 $scope.page.buttonGroupState = 'error';
+                                handleHttpException(err);
                             });
 
 
@@ -626,8 +642,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    //don't reject, we've handled the error
-                                    return $q.when(err);
+                                    handleHttpException(err);
                                 });
                         },
                         close: function () {
@@ -648,8 +663,9 @@
                     action: "sendToPublish"
                 }).then(function () {
                     $scope.page.buttonGroupState = "success";
-                }, function () {
+                }, function (err) {
                     $scope.page.buttonGroupState = "error";
+                    handleHttpException(err);
                 });;
             }
         };
@@ -685,8 +701,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    //don't reject, we've handled the error
-                                    return $q.when(err);
+                                    handleHttpException(err);
                                 });
                         },
                         close: function () {
@@ -709,8 +724,9 @@
                     action: "publish"
                 }).then(function () {
                     $scope.page.buttonGroupState = "success";
-                }, function () {
+                }, function (err) {
                     $scope.page.buttonGroupState = "error";
+                    handleHttpException(err);
                 });
             }
         };
@@ -748,8 +764,7 @@
                                     model.submitButtonState = "error";
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
-                                    //don't reject, we've handled the error
-                                    return $q.when(err);
+                                    handleHttpException(err);
                                 });
                         },
                         close: function (oldModel) {
@@ -772,8 +787,9 @@
                     action: "save"
                 }).then(function () {
                     $scope.page.saveButtonState = "success";
-                }, function () {
+                }, function (err) {
                     $scope.page.saveButtonState = "error";
+                    handleHttpException(err);
                 });
             }
 
@@ -826,8 +842,7 @@
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
                             dialog.variants = Utilities.copy($scope.content.variants);
-                            //don't reject, we've handled the error
-                            return $q.when(err);
+                            handleHttpException(err);
                         });
 
                     },
@@ -886,8 +901,7 @@
                             model.submitButtonState = "error";
                             //re-map the dialog model since we've re-bound the properties
                             dialog.variants = $scope.content.variants;
-                            //don't reject, we've handled the error
-                            return $q.when(err);
+                            handleHttpException(err);
                         });
 
                     },
@@ -973,7 +987,7 @@
         $scope.appChanged = function (activeApp) {
 
             $scope.activeApp = activeApp;
-            
+
             _.forEach($scope.content.apps, function (app) {
                 app.active = false;
                 if (app.alias === $scope.activeApp.alias) {

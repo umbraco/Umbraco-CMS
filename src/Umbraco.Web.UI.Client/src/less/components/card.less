@@ -104,19 +104,18 @@
 	margin: 0 auto;
 	list-style: none;
     width: 100%;
-
 	display: flex;
 	flex-flow: row wrap;
 	justify-content: flex-start;
 }
 
 .umb-card-grid li {
-	overflow: hidden;
 	font-size: 12px;
 	text-align: center;
 	box-sizing: border-box;
 	position: relative;
     width: 100px;
+    margin-bottom: 5px;
 }
 
 .umb-card-grid.-six-in-row li {
@@ -142,31 +141,46 @@
 .umb-card-grid .umb-card-grid-item {
     position: relative;
 	display: block;
-	width: 100%;
-	//height: 100%;
-    padding-top: 100%;
+    width: 100%;
+    height: 100%;
+    padding: 10px 5px;
     border-radius: @baseBorderRadius * 2;
     transition: background-color 120ms;
+    font-size: 13px;
+    line-height: 1.3em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
 
     > span {
-        position: absolute;
-        top: 10px;
-        bottom: 10px;
-        left: 10px;
-        right: 10px;
+        position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
         flex-direction: column;
         background-color: transparent;
+        word-break: break-word;
     }
 }
 
 
-.umb-card-grid .umb-card-grid-item:hover,
-.umb-card-grid .umb-card-grid-item:focus {
+.umb-card-grid .umb-card-grid-item:hover {
 	background-color: @ui-option-hover;
 	color: @ui-option-type-hover;
+}
+.umb-card-grid .umb-card-grid-item:focus {
+	color: @ui-option-type-hover;
+}
+
+.umb-card-grid .umb-card-grid-item.--creator {
+    > span {
+        border: 2px dashed @ui-action-discreet-border;
+        border-radius: @baseBorderRadius;
+        &:hover {
+            border-color: @ui-action-discreet-border-hover;
+        }
+    }
 }
 
 .umb-card-grid .umb-card-grid-item-slot {

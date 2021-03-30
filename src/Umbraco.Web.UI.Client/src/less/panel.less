@@ -263,9 +263,14 @@
 
 .umb-dialog a.muted:hover,
 .umb-dialog a.muted:focus,
+.umb-dialog button.muted:hover,
+.umb-dialog button.muted:focus,
 .umb-panel a.muted:hover,
-.umb-panel a.muted:focus {
+.umb-panel a.muted:focus,
+.umb-panel button.muted:hover,
+.umb-panel button.muted:focus {
     color: darken(@gray-5, 10%);
+    text-decoration: underline;
 }
 
 .umb-dialog .text-warning,
@@ -344,6 +349,7 @@
 
 .umb-panel-header-icon {
   cursor: pointer;
+  font-size: 2rem;
   margin-right: 5px;
   margin-top: -6px;
   height: 50px;
@@ -413,6 +419,8 @@ input.umb-panel-header-name-input.name-is-empty {
 .umb-panel-header-name {
    font-size: 16px;
    font-weight: bold;
+   margin: 0;
+   line-height: 1.2;
 }
 
 

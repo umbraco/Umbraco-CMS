@@ -6,15 +6,15 @@
         </div>
 
         <div class="flex mb3">
-            <umb-toggle
-                checked="vm.includeUnpublished"
-                input-id="includeUnpublished"
-                on-click="vm.toggleIncludeUnpublished()"
-                class="mr2">
+            <umb-toggle checked="vm.includeUnpublished"
+                        on-click="vm.toggleIncludeUnpublished()"
+                        class="mr2"
+                        input-id="includeUnpublished"
+                        label-on="{{vm.labels.includeUnpublished}}"
+                        label-off="{{vm.labels.includeUnpublished}}"
+                        label-position="right"
+                        show-labels="true">
             </umb-toggle>
-            <label for="includeUnpublished">
-                <localize key="content_includeUnpublished">Include drafts and unpublished content items.</localize>
-            </label>
         </div>
 
     </div>
@@ -26,15 +26,14 @@
         </div>
 
         <div class="flex mb3">
-            <umb-toggle
-                checked="vm.includeUnpublished"
-                input-id="includeUnpublished"
-                on-click="vm.toggleIncludeUnpublished()"
-                class="mr2">
+            <umb-toggle checked="vm.includeUnpublished"
+                        on-click="vm.toggleIncludeUnpublished()"
+                        class="mr2"
+                        label-on="{{vm.labels.includeUnpublished}}"
+                        label-off="{{vm.labels.includeUnpublished}}"
+                        label-position="right"
+                        show-labels="true">
             </umb-toggle>
-            <label for="includeUnpublished">
-                <localize key="content_includeUnpublished">Include drafts and unpublished content items.</localize>
-            </label>
         </div>
 
         <div class="umb-list umb-list--condensed">
@@ -44,9 +43,9 @@
                     <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': publishVariantSelectorForm.publishVariantSelector.$invalid}">
 
                         <umb-checkbox input-id="{{variant.htmlId}}"
-                            name="publishVariantSelector"
-                            model="variant.publish"
-                            on-change="vm.changeSelection(variant)"
+                                      name="publishVariantSelector"
+                                      model="variant.publish"
+                                      on-change="vm.changeSelection(variant)"
                             server-validation-field="{{variant.htmlId}}">
 
                             <span class="umb-variant-selector-entry__title" ng-if="!(variant.segment && variant.language)">
@@ -61,7 +60,7 @@
                             <span class="umb-variant-selector-entry__description" ng-if="!publishVariantSelectorForm.publishVariantSelector.$invalid && !(variant.notifications && variant.notifications.length > 0)">
                                 <umb-variant-state variant="variant"></umb-variant-state>
                                 <span ng-if="variant.isMandatory"> - </span>
-                                <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.publish === false) }"><localize key="languages_mandatoryLanguage"></localize></span>
+                                <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.publish === false) }"><localize key="general_mandatory"></localize></span>
                             </span>
                             <span class="umb-variant-selector-entry__description" ng-messages="publishVariantSelectorForm.publishVariantSelector.$error" show-validation-on-submit>
                                 <span class="text-error" ng-message="valServerField">{{publishVariantSelectorForm.publishVariantSelector.errorMsg}}</span>

@@ -1,42 +1,38 @@
 function textAreaController($scope, validationMessageService) {
 
     // macro parameter editor doesn't contains a config object,
-    // so we create a new one to hold any properties 
+    // so we create a new one to hold any properties
     if (!$scope.model.config) {
         $scope.model.config = {};
     }
-    $scope.model.count = 0;
 
-    if (!$scope.model.config.maxChars) {
-        $scope.model.config.maxChars = false;
-    }
-
-    $scope.model.maxlength = false;
-    if ($scope.model.config && $scope.model.config.maxChars) {
-        $scope.model.maxlength = true;
-    }
+    $scope.maxChars = $scope.model.config.maxChars || 0;
+    $scope.maxCharsLimit = ($scope.model.config && $scope.model.config.maxChars > 0);
+    $scope.charsCount = 0;
+    $scope.nearMaxLimit = false;
+    $scope.validLength = true;
 
     $scope.$on("formSubmitting", function() {
-        if ($scope.isLengthValid()) {
+        if ($scope.validLength) {
             $scope.textareaFieldForm.textarea.$setValidity("maxChars", true);
         } else {
             $scope.textareaFieldForm.textarea.$setValidity("maxChars", false);
         }
     });
 
-    $scope.isLengthValid = function() {
-        if (!$scope.model.maxlength) {
-            return true;
-        } 
-        return $scope.model.config.maxChars >= $scope.model.count;
+    function checkLengthVadility() {
+        $scope.validLength = !($scope.maxCharsLimit === true && $scope.charsCount > $scope.maxChars);
     }
 
-    $scope.model.change = function () {
+    $scope.change = function () {
         if ($scope.model.value) {
-            $scope.model.count = $scope.model.value.length;
+            $scope.charsCount = $scope.model.value.length;
+            checkLengthVadility();
+            $scope.nearMaxLimit = $scope.maxCharsLimit === true && $scope.validLength === true && $scope.charsCount > Math.max($scope.maxChars*.8, $scope.maxChars-50);
         }
     }
-    $scope.model.change();
+    $scope.model.onValueChanged = $scope.change;
+    $scope.change();
 
     // Set the message to use for when a mandatory field isn't completed.
     // Will either use the one provided on the property type or a localised default.

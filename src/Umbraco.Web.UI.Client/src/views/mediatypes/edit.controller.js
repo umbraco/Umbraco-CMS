@@ -10,7 +10,7 @@
     "use strict";
 
     function MediaTypesEditController($scope, $routeParams, $q,
-        mediaTypeResource, dataTypeResource, editorState, contentEditingHelper, 
+        mediaTypeResource, editorState, contentEditingHelper, 
         navigationService, iconHelper, contentTypeHelper, notificationsService,
         localizationService, overlayHelper, eventsService, angularHelper) {
 
@@ -19,6 +19,7 @@
         var mediaTypeId = $routeParams.id;
         var create = $routeParams.create;
         var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var mediaTypeIcon = "";
 
         vm.save = save;
         vm.close = close;
@@ -189,7 +190,6 @@
                     hotKeyWhenHidden: true,
                     labelKey: vm.saveButtonKey,
                     letter: "S",
-                    type: "submit",
                     handler: function () { vm.save(); }
                 };
                 vm.page.subButtons = [{
@@ -282,7 +282,7 @@
         function save() {
 
             // only save if there is no overlays open
-            if(overlayHelper.getNumberOfOverlays() === 0) {
+            if (overlayHelper.getNumberOfOverlays() === 0) {
 
                 var deferred = $q.defer();
 
@@ -339,9 +339,13 @@
                     var args = { mediaType: vm.contentType };
                     eventsService.emit("editors.mediaType.saved", args);
 
+                    if (mediaTypeIcon !== vm.contentType.icon) {
+                        eventsService.emit("editors.tree.icon.changed", args);
+                    }
+
                     vm.page.saveButtonState = "success";
 
-                    if(infiniteMode && $scope.model.submit) {
+                    if (infiniteMode && $scope.model.submit) {
                         $scope.model.submit();
                     }
 
@@ -378,6 +382,8 @@
             editorState.set(contentType);
 
             vm.contentType = contentType;
+
+            mediaTypeIcon = contentType.icon;
         }
 
         function convertLegacyIcons(contentType) {

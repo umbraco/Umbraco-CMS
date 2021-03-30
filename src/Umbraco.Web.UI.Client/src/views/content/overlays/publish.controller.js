@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PublishController($scope, localizationService) {
+    function PublishController($scope, localizationService, contentEditingHelper) {
 
         var vm = this;
         vm.loading = true;
@@ -13,11 +13,11 @@
          * Returns true if publish meets the requirements of mandatory languages 
          * */
         function canPublish() {
-            
+
             var hasSomethingToPublish = false;
 
             vm.variants.forEach(variant => {
-                // if variant is mandatory and not already published:
+                // if varaint is mandatory and not already published:
                 if (variant.publish === false && notPublishedMandatoryFilter(variant)) {
                     return false;
                 }
@@ -38,8 +38,9 @@
 
         function hasAnyDataFilter(variant) {
 
-            if (variant.name == null || variant.name.length === 0) {
-                return false;
+            // if we have a name, then we have data.
+            if (variant.name != null && variant.name.length > 0) {
+                return true;
             }
 
             if(variant.isDirty === true) {
@@ -82,7 +83,7 @@
         }
 
         function notPublishedMandatoryFilter(variant) {
-            return variant.state !== "Published" && isMandatoryFilter(variant);
+            return variant.state !== "Published" && variant.state !== "PublishedPendingChanges" && variant.isMandatory === true;
         }
 
         /**
@@ -116,16 +117,19 @@
             vm.isNew = vm.variants.some(variant => variant.state === 'NotCreated');
 
             vm.variants.forEach(variant => {
-                
+
                 // reset to not be published
                 variant.publish = variant.save = false;
 
+                
                 variant.isMandatory = isMandatoryFilter(variant);
 
+                
                 // if this is a new node and we have data on this variant.
                 if (vm.isNew === true && hasAnyDataFilter(variant)) {
                     variant.save = true;
                 }
+                
             });
 
             vm.availableVariants = vm.variants.filter(publishableVariantFilter);
@@ -139,25 +143,7 @@
             });
 
             if (vm.availableVariants.length !== 0) {
-                vm.availableVariants.sort((a, b) => {
-                    if (a.language && b.language) {
-                        if (a.language.name < b.language.name) {
-                            return -1;
-                        }
-                        if (a.language.name > b.language.name) {
-                            return 1;
-                        }
-                    } 
-                    if (a.segment && b.segment) {
-                        if (a.segment < b.segment) {
-                            return -1;
-                        }
-                        if (a.segment > b.segment) {
-                            return 1;
-                        }
-                    }
-                    return 0;
-                });
+                vm.availableVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.availableVariants);
             }
 
             $scope.model.disableSubmitButton = !canPublish();

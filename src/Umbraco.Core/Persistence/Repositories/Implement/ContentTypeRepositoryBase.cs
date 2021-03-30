@@ -448,8 +448,14 @@ AND umbracoNode.id <> @id",
                     // The composed property is only considered segment variant when the base content type is also segment variant.
                     // Example: Culture variant content type with a Culture+Segment variant property type will become ContentVariation.Culture
                     var target = newContentTypeVariation & composedPropertyType.Variations;
+                    // Determine the previous variation
+                    // We have to compare with the old content type variation because the composed property might already have changed
+                    // Example: A property with variations in an element type with variations is used in a document without
+                    //          when you enable variations the property has already enabled variations from the element type,
+                    //          but it's still a change from nothing because the document did not have variations, but it does now.
+                    var from = oldContentTypeVariation & composedPropertyType.Variations;
 
-                    propertyTypeVariationChanges[composedPropertyType.Id] = (composedPropertyType.Variations, target);
+                    propertyTypeVariationChanges[composedPropertyType.Id] = (from, target);
                 }
             }
 
@@ -1184,7 +1190,7 @@ AND umbracoNode.id <> @id",
         {
             // first clear dependencies
             Database.Delete<TagRelationshipDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
-            Database.Delete<PropertyDataDto>("WHERE propertytypeid = @Id", new { Id = propertyTypeId });
+            Database.Delete<PropertyDataDto>("WHERE propertyTypeId = @Id", new { Id = propertyTypeId });
 
             // then delete the property type
             Database.Delete<PropertyTypeDto>("WHERE contentTypeId = @Id AND id = @PropertyTypeId",
@@ -1197,7 +1203,7 @@ AND umbracoNode.id <> @id",
             {
                 var ex = new InvalidOperationException($"Property Type '{pt.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
 
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>("Property Type '{PropertyTypeName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                Logger.Error<ContentTypeRepositoryBase<TEntity>, string>("Property Type '{PropertyTypeName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
                     pt.Name);
 
                 throw ex;
@@ -1210,7 +1216,7 @@ AND umbracoNode.id <> @id",
             {
                 var ex = new InvalidOperationException($"{typeof(TEntity).Name} '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
 
-                Logger.Error<ContentTypeRepositoryBase<TEntity>>("{EntityTypeName} '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
+                Logger.Error<ContentTypeRepositoryBase<TEntity>, string, string>("{EntityTypeName} '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.",
                     typeof(TEntity).Name,
                     entity.Name);
 
@@ -1242,7 +1248,7 @@ AND umbracoNode.id <> @id",
                 }
                 else
                 {
-                    Logger.Warn<ContentTypeRepositoryBase<TEntity>>("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
+                    Logger.Warn<ContentTypeRepositoryBase<TEntity>, string, string>("Could not assign a data type for the property type {PropertyTypeAlias} since no data type was found with a property editor {PropertyEditorAlias}", propertyType.Alias, propertyType.PropertyEditorAlias);
                 }
             }
         }
@@ -1312,7 +1318,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         /// <inheritdoc />
         public bool HasContainerInPath(string contentPath)
         {
-            var ids = contentPath.Split(',').Select(int.Parse).ToArray();
+            var ids = contentPath.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray();
             return HasContainerInPath(ids);
         }
 

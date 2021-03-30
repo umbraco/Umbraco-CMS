@@ -5,6 +5,7 @@ using Umbraco.Core.Configuration;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Routing
 {
@@ -31,7 +32,7 @@ namespace Umbraco.Web.Routing
         /// <inheritdoc />
         public virtual UrlInfo GetUrl(UmbracoContext umbracoContext, IPublishedContent content, UrlMode mode, string culture, Uri current)
         {
-            if (!current.IsAbsoluteUri) throw new ArgumentException("Current url must be absolute.", nameof(current));
+            if (!current.IsAbsoluteUri) throw new ArgumentException("Current URL must be absolute.", nameof(current));
 
             // will not use cache if previewing
             var route = umbracoContext.Content.GetRouteById(content.Id, culture);
@@ -43,7 +44,7 @@ namespace Umbraco.Web.Routing
         {
             if (string.IsNullOrWhiteSpace(route))
             {
-                _logger.Debug<DefaultUrlProvider>("Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.", id);
+                _logger.Debug<DefaultUrlProvider,int>("Couldn't find any page with nodeId={NodeId}. This is most likely caused by the page not being published.", id);
                 return null;
             }
 
@@ -55,7 +56,7 @@ namespace Umbraco.Web.Routing
                 ? null
                 : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, int.Parse(route.Substring(0, pos)), current, culture);
 
-            // assemble the url from domainUri (maybe null) and path
+            // assemble the URL from domainUri (maybe null) and path
             var url = AssembleUrl(domainUri, path, current, mode).ToString();
 
             return UrlInfo.Url(url, culture);
@@ -66,15 +67,15 @@ namespace Umbraco.Web.Routing
         #region GetOtherUrls
 
         /// <summary>
-        /// Gets the other urls of a published content.
+        /// Gets the other URLs of a published content.
         /// </summary>
         /// <param name="umbracoContext">The Umbraco context.</param>
         /// <param name="id">The published content id.</param>
-        /// <param name="current">The current absolute url.</param>
-        /// <returns>The other urls for the published content.</returns>
+        /// <param name="current">The current absolute URL.</param>
+        /// <returns>The other URLs for the published content.</returns>
         /// <remarks>
-        /// <para>Other urls are those that <c>GetUrl</c> would not return in the current context, but would be valid
-        /// urls for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
+        /// <para>Other URLs are those that <c>GetUrl</c> would not return in the current context, but would be valid
+        /// URLs for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
         public virtual IEnumerable<UrlInfo> GetOtherUrls(UmbracoContext umbracoContext, int id, Uri current)
         {
@@ -166,14 +167,14 @@ namespace Umbraco.Web.Routing
             }
 
             // UriFromUmbraco will handle vdir
-            // meaning it will add vdir into domain urls too!
+            // meaning it will add vdir into domain URLs too!
             return UriUtility.UriFromUmbraco(uri, _globalSettings, _requestSettings);
         }
 
         string CombinePaths(string path1, string path2)
         {
-            string path = path1.TrimEnd('/') + path2;
-            return path == "/" ? path : path.TrimEnd('/');
+            string path = path1.TrimEnd(Constants.CharArrays.ForwardSlash) + path2;
+            return path == "/" ? path : path.TrimEnd(Constants.CharArrays.ForwardSlash);
         }
 
         #endregion

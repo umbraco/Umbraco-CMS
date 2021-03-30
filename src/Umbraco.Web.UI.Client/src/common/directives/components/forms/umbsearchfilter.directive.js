@@ -77,7 +77,8 @@
             labelKey: "@?",
             onChange: "&?",
             autoFocus: "<?",
-            preventSubmitOnEnter: "<?"
+            preventSubmitOnEnter: "<?",
+            cssClass: "@?"
         }
     };
 

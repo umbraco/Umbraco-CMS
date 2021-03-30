@@ -1,10 +1,10 @@
 (function () {
     "use strict";
 
-    function PublishDescendantsController($scope, localizationService) {
+    function PublishDescendantsController($scope, localizationService, contentEditingHelper) {
 
         var vm = this;
-        vm.includeUnpublished = false;
+        vm.includeUnpublished = $scope.model.includeUnpublished || false;
 
         vm.changeSelection = changeSelection;
         vm.toggleIncludeUnpublished = toggleIncludeUnpublished;
@@ -12,12 +12,23 @@
         function onInit() {
 
             vm.variants = $scope.model.variants;
-            vm.displayVariants = vm.variants.slice(0);// shallow copy, we dont want to share the array-object(because we will be performing a sort method) but each entry should be shared (because we need validation and notifications).
+            vm.displayVariants = vm.variants.slice(0); // shallow copy, we don't want to share the array-object (because we will be performing a sort method) but each entry should be shared (because we need validation and notifications).
             vm.labels = {};
 
+            // get localized texts for use in directives
             if (!$scope.model.title) {
                 localizationService.localize("buttons_publishDescendants").then(value => {
                     $scope.model.title = value;
+                });
+            }
+            if (!vm.labels.includeUnpublished) {
+                localizationService.localize("content_includeUnpublished").then(function (value) {
+                    vm.labels.includeUnpublished = value;
+                });
+            }
+            if (!vm.labels.includeUnpublished) {
+                localizationService.localize("content_includeUnpublished").then(value => {
+                    vm.labels.includeUnpublished = value;
                 });
             }
 
@@ -27,25 +38,7 @@
 
             if (vm.variants.length > 1) {
 
-                vm.displayVariants.sort((a, b) => {
-                    if (a.language && b.language) {
-                        if (a.language.name < b.language.name) {
-                            return -1;
-                        }
-                        if (a.language.name > b.language.name) {
-                            return 1;
-                        }
-                    }
-                    if (a.segment && b.segment) {
-                        if (a.segment < b.segment) {
-                            return -1;
-                        }
-                        if (a.segment > b.segment) {
-                            return 1;
-                        }
-                    }
-                    return 0;
-                });
+                vm.displayVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.displayVariants);
 
                 var active = vm.variants.find(v => v.active);
 
@@ -67,6 +60,8 @@
 
         function toggleIncludeUnpublished() {
             vm.includeUnpublished = !vm.includeUnpublished;
+            // make sure this value is pushed back to the scope
+            $scope.model.includeUnpublished = vm.includeUnpublished;
         }
 
         /** Returns true if publishing is possible based on if there are un-published mandatory languages */
