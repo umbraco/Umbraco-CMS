@@ -75,10 +75,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public void SaveStylesheet(IStylesheet stylesheet, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IStylesheet>(stylesheet);
-                if (scope.Events.DispatchCancelable(SavingStylesheet, this, saveEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var savingNotification = new StylesheetSavingNotification(stylesheet, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -86,8 +87,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
 
                 _stylesheetRepository.Save(stylesheet);
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(SavedStylesheet, this, saveEventArgs);
+                scope.Notifications.Publish(new StylesheetSavedNotification(stylesheet, eventMessages).WithStateFrom(savingNotification));
                 Audit(AuditType.Save, userId, -1, "Stylesheet");
 
                 scope.Complete();
@@ -200,18 +200,18 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public void SaveScript(IScript script, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IScript>(script);
-                if (scope.Events.DispatchCancelable(SavingScript, this, saveEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var savingNotification = new ScriptSavingNotification(script, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
                 }
 
                 _scriptRepository.Save(script);
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(SavedScript, this, saveEventArgs);
+                scope.Notifications.Publish(new ScriptSavedNotification(script, eventMessages).WithStateFrom(savingNotification));
 
                 Audit(AuditType.Save, userId, -1, "Script");
                 scope.Complete();
@@ -761,7 +761,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (snippetName.IsNullOrWhiteSpace() == false)
             {
                 //create the file
-                var snippetPathAttempt = TryGetSnippetPath(snippetName);
+                Attempt<string> snippetPathAttempt = TryGetSnippetPath(snippetName);
                 if (snippetPathAttempt.Success == false)
                 {
                     throw new InvalidOperationException("Could not load snippet with name " + snippetName);
@@ -784,21 +784,25 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
             }
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var newEventArgs = new NewEventArgs<IPartialView>(partialView, true, partialView.Alias, -1);
-                if (scope.Events.DispatchCancelable(CreatingPartialView, this, newEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var creatingNotification = new PartialViewCreatingNotification(partialView, eventMessages);
+                if (scope.Notifications.PublishCancelable(creatingNotification))
                 {
                     scope.Complete();
                     return Attempt<IPartialView>.Fail();
                 }
 
-                var repository = GetPartialViewRepository(partialViewType);
-                if (partialViewContent != null) partialView.Content = partialViewContent;
+                IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
+                if (partialViewContent != null)
+                {
+                    partialView.Content = partialViewContent;
+                }
+
                 repository.Save(partialView);
 
-                newEventArgs.CanCancel = false;
-                scope.Events.Dispatch(CreatedPartialView, this, newEventArgs);
+                scope.Notifications.Publish(new PartialViewCreatedNotification(partialView, eventMessages).WithStateFrom(creatingNotification));
 
                 Audit(AuditType.Save, userId, -1, partialViewType.ToString());
 
@@ -820,26 +824,26 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         private bool DeletePartialViewMacro(string path, PartialViewType partialViewType, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var repository = GetPartialViewRepository(partialViewType);
-                var partialView = repository.Get(path);
+                IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
+                IPartialView partialView = repository.Get(path);
                 if (partialView == null)
                 {
                     scope.Complete();
                     return true;
                 }
 
-                var deleteEventArgs = new DeleteEventArgs<IPartialView>(partialView);
-                if (scope.Events.DispatchCancelable(DeletingPartialView, this, deleteEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var deletingNotification = new PartialViewDeletingNotification(partialView, eventMessages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return false;
                 }
 
                 repository.Delete(partialView);
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(DeletedPartialView, this, deleteEventArgs);
+                scope.Notifications.Publish(new PartialViewDeletedNotification(partialView, eventMessages).WithStateFrom(deletingNotification));
                 Audit(AuditType.Delete, userId, -1, partialViewType.ToString());
 
                 scope.Complete();
@@ -860,20 +864,21 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         private Attempt<IPartialView> SavePartialView(IPartialView partialView, PartialViewType partialViewType, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IPartialView>(partialView);
-                if (scope.Events.DispatchCancelable(SavingPartialView, this, saveEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var savingNotification = new PartialViewSavingNotification(partialView, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return Attempt<IPartialView>.Fail();
                 }
 
-                var repository = GetPartialViewRepository(partialViewType);
+                IPartialViewRepository repository = GetPartialViewRepository(partialViewType);
                 repository.Save(partialView);
-                saveEventArgs.CanCancel = false;
+
                 Audit(AuditType.Save, userId, -1, partialViewType.ToString());
-                scope.Events.Dispatch(SavedPartialView, this, saveEventArgs);
+                scope.Notifications.Publish(new PartialViewSavedNotification(partialView, eventMessages).WithStateFrom(savingNotification));
 
                 scope.Complete();
             }
@@ -1064,59 +1069,5 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         // TODO: Method to change name and/or alias of view template
-
-        #region Event Handlers
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<IScript>> SavingScript;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<IScript>> SavedScript;
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<IStylesheet>> SavingStylesheet;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<IStylesheet>> SavedStylesheet;
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<IPartialView>> SavingPartialView;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<IPartialView>> SavedPartialView;
-
-        /// <summary>
-        /// Occurs before Create
-        /// </summary>
-        public static event TypedEventHandler<IFileService, NewEventArgs<IPartialView>> CreatingPartialView;
-
-        /// <summary>
-        /// Occurs after Create
-        /// </summary>
-        public static event TypedEventHandler<IFileService, NewEventArgs<IPartialView>> CreatedPartialView;
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<IPartialView>> DeletingPartialView;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IFileService, DeleteEventArgs<IPartialView>> DeletedPartialView;
-
-        #endregion
     }
 }
