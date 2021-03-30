@@ -65,9 +65,9 @@
             public const string MediaVideo = "icon-video";
 
             /// <summary>
-            /// System media sound icon
+            /// System media audio icon
             /// </summary>
-            public const string MediaSound = "icon-sound-waves";
+            public const string MediaAudio = "icon-sound-waves";
 
             /// <summary>
             /// System media document icon
@@ -77,7 +77,7 @@
             /// <summary>
             /// System media vector icon
             /// </summary>
-            public const string MediaVector = "icon-picture";
+            public const string MediaVectorGraphics = "icon-picture";
 
             /// <summary>
             /// System media folder icon
@@ -113,7 +113,7 @@
             /// System packages icon
             /// </summary>
             public const string Packages = "icon-box";
-            
+
             /// <summary>
             /// System property editor icon
             /// </summary>

@@ -23,19 +23,19 @@
             public const string Video = "2F0A61B6-CF92-4FF4-B437-751AB35EB254";
 
             /// <summary>
-            /// Guid for a Video PropertyTypeGroup object.
+            /// Guid for a Audio PropertyTypeGroup object.
             /// </summary>
-            public const string Sound = "335FB495-0A87-4E82-B902-30EB367B767C";
+            public const string Audio = "335FB495-0A87-4E82-B902-30EB367B767C";
 
             /// <summary>
-            /// Guid for a Video PropertyTypeGroup object.
+            /// Guid for a Document PropertyTypeGroup object.
             /// </summary>
             public const string Document = "9AF3BD65-F687-4453-9518-5F180D1898EC";
 
             /// <summary>
-            /// Guid for a Video PropertyTypeGroup object.
+            /// Guid for a VectorGraphics PropertyTypeGroup object.
             /// </summary>
-            public const string Vector = "F199B4D7-9E84-439F-8531-F87D9AF37711";
+            public const string VectorGraphics = "F199B4D7-9E84-439F-8531-F87D9AF37711";
 
             /// <summary>
             /// Guid for a Image PropertyTypeGroup object.
