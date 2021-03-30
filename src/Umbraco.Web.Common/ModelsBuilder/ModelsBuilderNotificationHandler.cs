@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             }
 
             // don't do anything if this special key is not found
-            if (!notification.AdditionalData.ContainsKey("CreateTemplateForContentType"))
+            if (notification.AdditionalData is null || !notification.AdditionalData.ContainsKey("CreateTemplateForContentType"))
             {
                 return;
             }
