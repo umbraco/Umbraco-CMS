@@ -1213,8 +1213,8 @@ namespace Umbraco.Web
                                     { "NodeTypeAlias", n.ContentType.Alias },
                                     { "CreateDate", n.CreateDate },
                                     { "UpdateDate", n.UpdateDate },
-                                    { "CreatorName", n.CreatorName(services.UserService) },
-                                    { "WriterName", n.WriterName(services.UserService) },
+                                    { "CreatorName", n.CreatorName },
+                                    { "WriterName", n.WriterName },
                                     { "Url", n.Url() }
                                 };
 
