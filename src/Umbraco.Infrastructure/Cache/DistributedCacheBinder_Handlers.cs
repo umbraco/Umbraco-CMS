@@ -189,14 +189,18 @@ namespace Umbraco.Cms.Core.Cache
 
         public void Handle(DataTypeSavedNotification notification)
         {
-            foreach (var entity in notification.SavedEntities)
+            foreach (IDataType entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshDataTypeCache(entity);
+            }
         }
 
         public void Handle(DataTypeDeletedNotification notification)
         {
-            foreach (var entity in notification.DeletedEntities)
+            foreach (IDataType entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveDataTypeCache(entity);
+            }
         }
 
         #endregion
