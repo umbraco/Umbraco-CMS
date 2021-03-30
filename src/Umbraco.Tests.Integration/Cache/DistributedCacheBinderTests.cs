@@ -56,8 +56,6 @@ namespace Umbraco.Cms.Tests.Integration.Cache
                 new EventDefinition<IMemberTypeService, SaveEventArgs<IMemberType>>(null, MemberTypeService, new SaveEventArgs<IMemberType>(Enumerable.Empty<IMemberType>())),
                 new EventDefinition<IMemberTypeService, DeleteEventArgs<IMemberType>>(null, MemberTypeService, new DeleteEventArgs<IMemberType>(Enumerable.Empty<IMemberType>())),
 
-                new EventDefinition<IFileService, SaveEventArgs<ITemplate>>(null, FileService, new SaveEventArgs<ITemplate>(Enumerable.Empty<ITemplate>())),
-
                 new EventDefinition<IMacroService, SaveEventArgs<IMacro>>(null, MacroService, new SaveEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
                 new EventDefinition<IMacroService, DeleteEventArgs<IMacro>>(null, MacroService, new DeleteEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
 

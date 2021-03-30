@@ -16,5 +16,13 @@ namespace Umbraco.Cms.Infrastructure.Services.Notifications
         public TemplateSavingNotification(IEnumerable<ITemplate> target, EventMessages messages) : base(target, messages)
         {
         }
+
+        public TemplateSavingNotification(ITemplate target, EventMessages messages,
+            Dictionary<string, object> additionalData) : base(target, messages) => AdditionalData = additionalData;
+
+        public TemplateSavingNotification(IEnumerable<ITemplate> target, EventMessages messages,
+            Dictionary<string, object> additionalData) : base(target, messages) => AdditionalData = additionalData;
+
+        public Dictionary<string, object> AdditionalData;
     }
 }

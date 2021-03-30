@@ -320,9 +320,9 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // This fixes: http://issues.umbraco.org/issue/U4-7953
                 contentTypeName);
 
-            var evtMsgs = EventMessagesFactory.Get();
+            EventMessages eventMessages = EventMessagesFactory.Get();
 
-            // TODO: This isn't pretty because we we're required to maintain backwards compatibility so we could not change
+            // TODO: This isn't pretty because we're required to maintain backwards compatibility so we could not change
             // the event args here. The other option is to create a different event with different event
             // args specifically for this method... which also isn't pretty. So fix this in v8!
             var additionalData = new Dictionary<string, object>
@@ -344,27 +344,23 @@ namespace Umbraco.Cms.Core.Services.Implement
                 template.Content = content;
             }
 
-
-
-
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<ITemplate>(template, true, evtMsgs, additionalData);
-                if (scope.Events.DispatchCancelable(SavingTemplate, this, saveEventArgs))
+                var savingEvent = new TemplateSavingNotification(template, eventMessages, additionalData);
+                if (scope.Notifications.PublishCancelable(savingEvent))
                 {
                     scope.Complete();
-                    return OperationResult.Attempt.Fail<OperationResultType, ITemplate>(OperationResultType.FailedCancelledByEvent, evtMsgs, template);
+                    return OperationResult.Attempt.Fail<OperationResultType, ITemplate>(OperationResultType.FailedCancelledByEvent, eventMessages, template);
                 }
 
                 _templateRepository.Save(template);
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(SavedTemplate, this, saveEventArgs);
+                scope.Notifications.Publish(new TemplateSavedNotification(template, eventMessages, savingEvent.AdditionalData).WithStateFrom(savingEvent));
 
                 Audit(AuditType.Save, userId, template.Id, ObjectTypes.GetName(UmbracoObjectTypes.Template));
                 scope.Complete();
             }
 
-            return OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(OperationResultType.Success, evtMsgs, template);
+            return OperationResult.Attempt.Succeed<OperationResultType, ITemplate>(OperationResultType.Success, eventMessages, template);
         }
 
         /// <summary>
@@ -538,9 +534,11 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
 
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                if (scope.Events.DispatchCancelable(SavingTemplate, this, new SaveEventArgs<ITemplate>(template)))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var savingNotification = new TemplateSavingNotification(template, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -548,7 +546,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _templateRepository.Save(template);
 
-                scope.Events.Dispatch(SavedTemplate, this, new SaveEventArgs<ITemplate>(template, false));
+                scope.Notifications.Publish(new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingNotification));
 
                 Audit(AuditType.Save, userId, template.Id, UmbracoObjectTypes.Template.GetName());
                 scope.Complete();
@@ -562,19 +560,23 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId">Optional id of the user</param>
         public void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            var templatesA = templates.ToArray();
-            using (var scope = ScopeProvider.CreateScope())
+            ITemplate[] templatesA = templates.ToArray();
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                if (scope.Events.DispatchCancelable(SavingTemplate, this, new SaveEventArgs<ITemplate>(templatesA)))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var savingNotification = new TemplateSavingNotification(templatesA, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
                 }
 
-                foreach (var template in templatesA)
+                foreach (ITemplate template in templatesA)
+                {
                     _templateRepository.Save(template);
+                }
 
-                scope.Events.Dispatch(SavedTemplate, this, new SaveEventArgs<ITemplate>(templatesA, false));
+                scope.Notifications.Publish(new TemplateSavingNotification(templatesA, eventMessages).WithStateFrom(savingNotification));
 
                 Audit(AuditType.Save, userId, -1, UmbracoObjectTypes.Template.GetName());
                 scope.Complete();
@@ -1064,16 +1066,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         // TODO: Method to change name and/or alias of view template
 
         #region Event Handlers
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<ITemplate>> SavingTemplate;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IFileService, SaveEventArgs<ITemplate>> SavedTemplate;
 
         /// <summary>
         /// Occurs before Save

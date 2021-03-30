@@ -34,7 +34,8 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<UserGroupDeletedNotification>,
         INotificationHandler<MemberGroupDeletedNotification>,
         INotificationHandler<MemberGroupSavedNotification>,
-        INotificationHandler<TemplateDeletedNotification>
+        INotificationHandler<TemplateDeletedNotification>,
+        INotificationHandler<TemplateSavedNotification>
     {
         private List<Action> _unbinders;
 
@@ -84,10 +85,6 @@ namespace Umbraco.Cms.Core.Cache
                 () => MediaTypeService.Changed -= MediaTypeService_Changed);
             Bind(() => MemberTypeService.Changed += MemberTypeService_Changed,
                 () => MemberTypeService.Changed -= MemberTypeService_Changed);
-
-            // bind to template events
-            Bind(() => FileService.SavedTemplate += FileService_SavedTemplate,
-                () => FileService.SavedTemplate -= FileService_SavedTemplate);
 
             // bind to macro events
             Bind(() => MacroService.Saved += MacroService_Saved,
@@ -322,12 +319,13 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Refresh cache for template
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void FileService_SavedTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
+        /// <param name="notification"></param>
+        public void Handle(TemplateSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (ITemplate entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshTemplateCache(entity.Id);
+            }
         }
 
         #endregion
