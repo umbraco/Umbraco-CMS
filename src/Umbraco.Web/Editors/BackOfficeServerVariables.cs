@@ -57,7 +57,7 @@ namespace Umbraco.Web.Editors
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "iconApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -100,6 +100,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         internal Dictionary<string, object> GetServerVariables()
         {
+            var userMembershipProvider = Core.Security.MembershipProviderExtensions.GetUsersMembershipProvider();
+
             var defaultVals = new Dictionary<string, object>
             {
                 {
@@ -357,6 +359,8 @@ namespace Umbraco.Web.Editors
                         {"showUserInvite", EmailSender.CanSendRequiredEmail},
                         {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail},
                         {"showAllowSegmentationForDocumentTypes", false},
+                        {"minimumPasswordLength", userMembershipProvider.MinRequiredPasswordLength},
+                        {"minimumPasswordNonAlphaNum", userMembershipProvider.MinRequiredNonAlphanumericCharacters},
                     }
                 },
                 {

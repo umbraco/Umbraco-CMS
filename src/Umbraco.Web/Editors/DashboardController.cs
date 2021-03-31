@@ -17,6 +17,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dashboards;
+using Umbraco.Core.Models;
 using Umbraco.Web.Services;
 
 namespace Umbraco.Web.Editors
@@ -52,8 +53,9 @@ namespace Umbraco.Web.Editors
             var allowedSections = string.Join(",", user.AllowedSections);
             var language = user.Language;
             var version = UmbracoVersion.SemanticVersion.ToSemanticString();
+            var isAdmin = user.IsAdmin();
 
-            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}", section, allowedSections, language, version);
+            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}&admin={4}", section, allowedSections, language, version, isAdmin);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
             var content = AppCaches.RuntimeCache.GetCacheItem<JObject>(key);
