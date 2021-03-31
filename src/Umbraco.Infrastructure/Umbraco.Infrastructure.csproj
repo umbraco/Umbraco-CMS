@@ -102,7 +102,7 @@
             <_Parameter1>DynamicProxyGenAssembly2</_Parameter1>
         </AssemblyAttribute>
 
-        <!-- Making internals visible to Umbraco Forms as we have with V8 (note those with V9 suffix can be removed once migration is complete) -->
+        <!-- Making internals visible to Umbraco Forms -->
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
           <_Parameter1>Umbraco.Forms.Core</_Parameter1>
         </AssemblyAttribute>
@@ -111,15 +111,6 @@
         </AssemblyAttribute>
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
           <_Parameter1>Umbraco.Forms.Web</_Parameter1>
-        </AssemblyAttribute>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-          <_Parameter1>Umbraco.Forms.Core.V9</_Parameter1>
-        </AssemblyAttribute>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-          <_Parameter1>Umbraco.Forms.Core.Providers.V9</_Parameter1>
-        </AssemblyAttribute>
-        <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-          <_Parameter1>Umbraco.Forms.Web.V9</_Parameter1>
         </AssemblyAttribute>
     </ItemGroup>
 
