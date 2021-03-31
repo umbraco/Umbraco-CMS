@@ -11,6 +11,10 @@ namespace Umbraco.Cms.Core.Events
         {
         }
 
+        protected DeletedNotification(IEnumerable<T> target, EventMessages messages) : base(target, messages)
+        {
+        }
+
         public IEnumerable<T> DeletedEntities => Target;
     }
 }
