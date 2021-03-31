@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
-    public class MediaTreeChangeNotification : TreeChangeNotification<TreeChange<IMedia>>
+    public class MediaTreeChangeNotification : TreeChangeNotification<IMedia>
     {
         public MediaTreeChangeNotification(TreeChange<IMedia> target, EventMessages messages) : base(target, messages)
         {
