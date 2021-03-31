@@ -35,6 +35,9 @@ namespace Umbraco.Web.Mvc
                     requestContext,
                     ControllerExtensions.GetControllerName(Current.DefaultRenderMvcControllerType));
 
+            if (controllerType == null)
+                throw new InvalidOperationException($"Could not resolve a controller with the name {controllerName} or the default name {ControllerExtensions.GetControllerName(Current.DefaultRenderMvcControllerType)}");
+
             return _innerFactory.GetControllerInstance(requestContext, controllerType);
         }
 

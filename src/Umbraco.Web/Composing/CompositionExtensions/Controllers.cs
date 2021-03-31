@@ -60,9 +60,9 @@ namespace Umbraco.Web.Composing.CompositionExtensions
             var nonUmbracoWebPluginController = composition.TypeLoader.GetTypes<PluginController>().Where(x => x.Assembly != umbracoWebAssembly);
             composition.RegisterControllers(nonUmbracoWebPluginController);
 
-            // can and register every IRenderMvcController in everything (IRenderMvcController is IDiscoverable)
-            var renderMvcControllers = composition.TypeLoader.GetTypes<IRenderMvcController>().Where(x => x.Assembly != umbracoWebAssembly);
-            composition.RegisterControllers(renderMvcControllers);
+            // can and register every IRenderController in everything (IRenderController is IDiscoverable)
+            var renderControllers = composition.TypeLoader.GetTypes<IRenderController>().Where(x => x.Assembly != umbracoWebAssembly);
+            composition.RegisterControllers(renderControllers);
 
             // scan and register every IHttpController in Umbraco.Web
             var umbracoWebHttpControllers = composition.TypeLoader.GetTypes<IHttpController>(specificAssemblies: new[] { umbracoWebAssembly });
