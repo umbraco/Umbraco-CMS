@@ -34,6 +34,8 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<UserGroupDeletedNotification>,
         INotificationHandler<MemberGroupDeletedNotification>,
         INotificationHandler<MemberGroupSavedNotification>,
+        INotificationHandler<DataTypeDeletedNotification>,
+        INotificationHandler<DataTypeSavedNotification>,
         INotificationHandler<MacroSavedNotification>,
         INotificationHandler<MacroDeletedNotification>
     {
@@ -65,12 +67,6 @@ namespace Umbraco.Cms.Core.Cache
                 _unbinders = new List<Action>();
 
             _logger.LogInformation("Initializing Umbraco internal event handlers for cache refreshing.");
-
-            // bind to data type events
-            Bind(() => DataTypeService.Deleted += DataTypeService_Deleted,
-                () => DataTypeService.Deleted -= DataTypeService_Deleted);
-            Bind(() => DataTypeService.Saved += DataTypeService_Saved,
-                () => DataTypeService.Saved -= DataTypeService_Saved);
 
             // bind to stylesheet events
             Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
@@ -187,16 +183,20 @@ namespace Umbraco.Cms.Core.Cache
 
         #region DataTypeService
 
-        private void DataTypeService_Saved(IDataTypeService sender, SaveEventArgs<IDataType> e)
+        public void Handle(DataTypeSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (IDataType entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshDataTypeCache(entity);
+            }
         }
 
-        private void DataTypeService_Deleted(IDataTypeService sender, DeleteEventArgs<IDataType> e)
+        public void Handle(DataTypeDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (IDataType entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveDataTypeCache(entity);
+            }
         }
 
         #endregion
