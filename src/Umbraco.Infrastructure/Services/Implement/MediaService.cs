@@ -723,10 +723,13 @@ namespace Umbraco.Cms.Core.Services.Implement
                 IEnumerable<TreeChange<IMedia>> treeChanges = mediasA.Select(x => new TreeChange<IMedia>(x, TreeChangeTypes.RefreshNode));
 
                 scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
-                foreach (var media in mediasA)
+                foreach (IMedia media in mediasA)
                 {
                     if (media.HasIdentity == false)
+                    {
                         media.CreatorId = userId;
+                    }
+
                     _mediaRepository.Save(media);
                 }
 

@@ -1,8 +1,6 @@
 using System.Collections.Generic;
-using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Services.Changes;
 
-namespace Umbraco.Cms.Infrastructure.Services.Notifications
+namespace Umbraco.Cms.Core.Events
 {
     public abstract class TreeChangeNotification<T> : EnumerableObjectNotification<T>
     {
