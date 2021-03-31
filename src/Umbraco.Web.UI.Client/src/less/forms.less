@@ -308,7 +308,14 @@ select[size] {
 input[type="file"],
 input[type="radio"],
 input[type="checkbox"] {
-  .umb-outline();
+  &:focus {
+    border-color: @inputBorderFocus;
+    outline: 0;
+
+    .tabbing-active & {
+      outline: 2px solid @ui-outline;
+    }
+  }
 }
 
 
