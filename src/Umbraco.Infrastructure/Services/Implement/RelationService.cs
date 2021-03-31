@@ -5,8 +5,10 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
@@ -501,10 +503,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public void Delete(IRelation relation)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<IRelation>(relation);
-                if (scope.Events.DispatchCancelable(DeletingRelation, this, deleteEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var deletingNotification = new RelationDeletingNotification(relation, eventMessages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
@@ -512,8 +515,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _relationRepository.Delete(relation);
                 scope.Complete();
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(DeletedRelation, this, deleteEventArgs);
+                scope.Notifications.Publish(new RelationDeletedNotification(relation, eventMessages).WithStateFrom(deletingNotification));
             }
         }
 
@@ -540,19 +542,21 @@ namespace Umbraco.Cms.Core.Services.Implement
         public void DeleteRelationsOfType(IRelationType relationType)
         {
             var relations = new List<IRelation>();
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
+                IQuery<IRelation> query = Query<IRelation>().Where(x => x.RelationTypeId == relationType.Id);
                 relations.AddRange(_relationRepository.Get(query).ToList());
 
                 //TODO: N+1, we should be able to do this in a single call
 
-                foreach (var relation in relations)
+                foreach (IRelation relation in relations)
+                {
                     _relationRepository.Delete(relation);
+                }
 
                 scope.Complete();
 
-                scope.Events.Dispatch(DeletedRelation, this, new DeleteEventArgs<IRelation>(relations, false));
+                scope.Notifications.Publish(new RelationDeletedNotification(relations, EventMessagesFactory.Get()));
             }
         }
 
@@ -589,15 +593,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         #endregion
 
         #region Events Handlers
-        /// <summary>
-        /// Occurs before Deleting a Relation
-        /// </summary>
-        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelation>> DeletingRelation;
-
-        /// <summary>
-        /// Occurs after a Relation is Deleted
-        /// </summary>
-        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelation>> DeletedRelation;
 
         /// <summary>
         /// Occurs before Saving a Relation
