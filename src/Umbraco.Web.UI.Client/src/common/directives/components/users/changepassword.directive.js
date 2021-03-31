@@ -24,7 +24,8 @@
                 requiresQuestionAnswer: true/false,
                 enableReset: true/false,
                 enablePasswordRetrieval: true/false,
-                minPasswordLength: 10
+                minPasswordLength: 10,
+                maxPasswordLength: 256
             }
             */
 
@@ -54,6 +55,8 @@
             if (vm.config.minPasswordLength === undefined) {
                 vm.config.minPasswordLength = 0;
             }
+
+            vm.config.maxPasswordLength = 256;
 
             //set the model defaults
             if (!Utilities.isObject(vm.passwordValues)) {

@@ -113,10 +113,11 @@
                         //localize the text
                         localizationService.localize("errorHandling_errorInPasswordFormat", [
                             vm.invitedUserPasswordModel.passwordPolicies.minPasswordLength,
-                            vm.invitedUserPasswordModel.passwordPolicies.minNonAlphaNumericChars
-                        ]).then(function (data) {
-                            vm.invitedUserPasswordModel.passwordPolicyText = data;
-                        });
+                            vm.invitedUserPasswordModel.passwordPolicies.maxPasswordLength,
+                                vm.invitedUserPasswordModel.passwordPolicies.minNonAlphaNumericChars
+                            ]).then(function (data) {
+                                vm.invitedUserPasswordModel.passwordPolicyText = data;
+                            });
                     })
                 ]).then(function () {
                     vm.inviteStep = Number(inviteVal);
@@ -320,7 +321,7 @@
 
             vm.showSetPasswordConfirmation = false;
 
-            if (password && confirmPassword && password.length > 0 && confirmPassword.length > 0) {
+            if (password && confirmPassword && password.length > 0 && confirmPassword.length > 0 && password.length < 257 && confirmPassword.length < 257) {
                 vm.setPasswordForm.password.$setValidity('auth', true);
                 vm.setPasswordForm.confirmPassword.$setValidity('auth', true);
             }
@@ -361,7 +362,6 @@
                 }
             });
         }
-
 
         ////
 

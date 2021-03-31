@@ -150,6 +150,7 @@ namespace Umbraco.Tests.Membership
             Assert.AreEqual(5, provider.MaxInvalidPasswordAttempts);
             Assert.AreEqual(10, provider.PasswordAttemptWindow);
             Assert.AreEqual(provider.DefaultMinPasswordLength, provider.MinRequiredPasswordLength);
+            Assert.AreEqual(provider.DefaultMaxPasswordLength, 256);
             Assert.AreEqual(provider.DefaultMinNonAlphanumericChars, provider.MinRequiredNonAlphanumericCharacters);
             Assert.AreEqual(null, provider.PasswordStrengthRegularExpression);
             Assert.AreEqual(provider.DefaultUseLegacyEncoding, provider.UseLegacyEncoding);
@@ -169,22 +170,30 @@ namespace Umbraco.Tests.Membership
                 }));
         }
 
-        [TestCase("hello", 0, "", 5, true)]
-        [TestCase("hello", 0, "", 4, true)]
-        [TestCase("hello", 0, "", 6, false)]
-        [TestCase("hello", 1, "", 5, false)]
-        [TestCase("hello!", 1, "", 0, true)]
-        [TestCase("hello!", 2, "", 0, false)]
-        [TestCase("hello!!", 2, "", 0, true)]
+        [TestCase("hello", 0, "", 5, 256, true)]
+        [TestCase("hello", 0, "", 4, 256, true)]
+        [TestCase("hello", 0, "", 6, 256, false)]
+        [TestCase("hello", 1, "", 5, 256, false)]
+        [TestCase("hello!", 1, "", 0, 256, true)]
+        [TestCase("hello!", 2, "", 0, 256, false)]
+        [TestCase("hello!!", 2, "", 0, 256, true)]
+        // 256 characters
+        [TestCase("4EacmSKTOL2MkARRMamUvl9q3ZbUCrSLS725fy6q8K81CIHvoCCzssPh1AWhhxHNhBWE6itn65UPfFP0Yx0X9ny4J5b6gksYMzDLjliwsX1l2ELWZQ5PlHLe9uDpdctNZXqnsTTYaix1GP1LkyJLF9Put6CzACMbJApMQi6zYupM5bkWK7zvyZWsUHziebtOKWqAD8FiFoDb7QgtNtgYDYHHWo2eRbTogw6tOgmFc86i8tHv1cNluAQe0u2AVYXE", 0, "", 0, 256, true)]
+        // 257 characters
+        [TestCase("bXK4Hqi9cxfz8XsqookzkysSRuVed3Kign3HwqIsp0RmshY2Yl3wLRYEvxxuwmSowqkPfoSfVDgWtriBGAnay1AbKH6mVVoA2PWuI3t9d80RZBTdbIdb9qAhH1BaFmxRg4wXgraO2O9GatcMg9x0g80mSjmF7HMkzMxoH2NYNjCfTDCkXdGyS50B06RIQsXVaZLnGcpN0tXFpKlHIQMRZXX8sBZPT4kIE28qFfSy0jAGHyv6iVlzSaJrY2Vooexgj", 0, "", 0, 256, false)]
         //8 characters or more in length, at least 1 lowercase letter,at least 1 character that is not a lower letter.
-        [TestCase("hello", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, false)]
-        [TestCase("helloooo", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, false)]
-        [TestCase("helloooO", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, true)]
-        [TestCase("HELLOOOO", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, false)]
-        [TestCase("HELLOOOo", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, true)]
-        public void Valid_Password(string password, int minRequiredNonAlphanumericChars, string strengthRegex, int minLength, bool pass)
+        [TestCase("hello", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, 256, false)]
+        [TestCase("helloooo", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, 256, false)]
+        [TestCase("helloooO", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, 256, true)]
+        [TestCase("HELLOOOO", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, 256, false)]
+        [TestCase("HELLOOOo", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, 256, true)]
+        // 256 characters
+        [TestCase("4EacmSKTOL2MkARRMamUvl9q3ZbUCrSLS725fy6q8K81CIHvoCCzssPh1AWhhxHNhBWE6itn65UPfFP0Yx0X9ny4J5b6gksYMzDLjliwsX1l2ELWZQ5PlHLe9uDpdctNZXqnsTTYaix1GP1LkyJLF9Put6CzACMbJApMQi6zYupM5bkWK7zvyZWsUHziebtOKWqAD8FiFoDb7QgtNtgYDYHHWo2eRbTogw6tOgmFc86i8tHv1cNluAQe0u2AVYXE", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, 256, true)]
+        // 257 characters
+        [TestCase("bXK4Hqi9cxfz8XsqookzkysSRuVed3Kign3HwqIsp0RmshY2Yl3wLRYEvxxuwmSowqkPfoSfVDgWtriBGAnay1AbKH6mVVoA2PWuI3t9d80RZBTdbIdb9qAhH1BaFmxRg4wXgraO2O9GatcMg9x0g80mSjmF7HMkzMxoH2NYNjCfTDCkXdGyS50B06RIQsXVaZLnGcpN0tXFpKlHIQMRZXX8sBZPT4kIE28qFfSy0jAGHyv6iVlzSaJrY2Vooexg@", 0, "(?=.{8,})[a-z]+[^a-z]+|[^a-z]+[a-z]+", 0, 256, false)]
+        public void Valid_Password(string password, int minRequiredNonAlphanumericChars, string strengthRegex, int minLength, int maxLength, bool pass)
         {
-            var result = MembershipProviderBase.IsPasswordValid(password, minRequiredNonAlphanumericChars, strengthRegex, minLength);
+            var result = MembershipProviderBase.IsPasswordValid(password, minRequiredNonAlphanumericChars, strengthRegex, minLength, maxLength);
             Assert.AreEqual(pass, result.Success);
         }
 

@@ -27,7 +27,7 @@ namespace Umbraco.Core.Security
             var result = await base.ValidateAsync(item);
             if (result.Succeeded == false)
                 return result;
-            var providerValidate = MembershipProviderBase.IsPasswordValid(item, Provider.MinRequiredNonAlphanumericCharacters, Provider.PasswordStrengthRegularExpression, Provider.MinRequiredPasswordLength);
+            var providerValidate = MembershipProviderBase.IsPasswordValid(item, Provider.MinRequiredNonAlphanumericCharacters, Provider.PasswordStrengthRegularExpression, Provider.MinRequiredPasswordLength, 256);
             if (providerValidate.Success == false)
             {
                 return IdentityResult.Failed("Could not set password, password rules violated: " + providerValidate.Result);
