@@ -35,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
         public bool IgnoreUserStartNodes { get; set; }
 
-        [ConfigurationField("crops", "Image Croppings", "views/propertyeditors/MediaPicker3/prevalue/mediapicker3.crops.html")]
+        [ConfigurationField("crops", "Image Croppings", "views/propertyeditors/MediaPicker3/prevalue/mediapicker3.crops.html", Description = "Local croppings, stored on document")]
         public CropConfiguration[] Crops { get; set; }
 
         public class CropConfiguration
@@ -51,10 +51,6 @@ namespace Umbraco.Web.PropertyEditors
 
             [JsonProperty("height")]
             public int Height { get; set; }
-            /*
-            [JsonProperty("mandatory")]
-            public bool Mandatory { get; set; }
-            */
         }
     }
 }
