@@ -305,7 +305,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 _mediaRepository.Save(media);
 
                 scope.Notifications.Publish(new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
-                scope.Notifications.Publish(new MediaTreeChangeNotification(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshNode), eventMessages));
+                scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshNode, eventMessages));
             }
 
             if (withIdentity == false)
@@ -691,7 +691,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 {
                     scope.Notifications.Publish(new MediaSavedNotification(media, eventMessages).WithStateFrom(savingNotification));
                 }
-                scope.Notifications.Publish(new MediaTreeChangeNotification(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshNode), eventMessages));
+                scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshNode, eventMessages));
 
                 Audit(AuditType.Save, userId, media.Id);
                 scope.Complete();
@@ -768,7 +768,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 DeleteLocked(scope, media, messages);
 
-                scope.Notifications.Publish(new MediaTreeChangeNotification(new TreeChange<IMedia>(media, TreeChangeTypes.Remove), messages));
+                scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.Remove, messages));
                 Audit(AuditType.Delete, userId, media.Id);
 
                 scope.Complete();
@@ -913,7 +913,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 PerformMoveLocked(media, Cms.Core.Constants.System.RecycleBinMedia, null, userId, moves, true);
 
-                scope.Notifications.Publish(new MediaTreeChangeNotification(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch), messages));
+                scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
                 MoveEventInfo<IMedia>[] moveInfo = moves.Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId)).ToArray();
                 scope.Notifications.Publish(new MediaMovedToRecycleBinNotification(moveInfo, messages).WithStateFrom(movingToRecycleBinNotification));
                 Audit(AuditType.Move, userId, media.Id, "Move Media to recycle bin");
@@ -967,7 +967,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 var trashed = media.Trashed ? false : (bool?)null;
 
                 PerformMoveLocked(media, parentId, parent, userId, moves, trashed);
-                scope.Notifications.Publish(new MediaTreeChangeNotification(new TreeChange<IMedia>(media, TreeChangeTypes.RefreshBranch), messages));
+                scope.Notifications.Publish(new MediaTreeChangeNotification(media, TreeChangeTypes.RefreshBranch, messages));
 
                 MoveEventInfo<IMedia>[] moveInfo = moves //changes
                     .Select(x => new MoveEventInfo<IMedia>(x.Item1, x.Item2, x.Item1.ParentId))
