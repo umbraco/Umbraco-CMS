@@ -330,24 +330,26 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             // Ensure that the RelationType has an identity before using it to relate two entities
             if (relationType.HasIdentity == false)
+            {
                 Save(relationType);
+            }
 
             //TODO: We don't check if this exists first, it will throw some sort of data integrity exception if it already exists, is that ok?
 
             var relation = new Relation(parentId, childId, relationType);
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IRelation>(relation);
-                if (scope.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var savingNotification = new RelationSavingNotification(relation, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return relation; // TODO: returning sth that does not exist here?!
                 }
 
                 _relationRepository.Save(relation);
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(SavedRelation, this, saveEventArgs);
+                scope.Notifications.Publish(new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
                 scope.Complete();
                 return relation;
             }
@@ -448,8 +450,9 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IRelation>(relation);
-                if (scope.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var savingNotification = new RelationSavingNotification(relation, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -457,36 +460,38 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _relationRepository.Save(relation);
                 scope.Complete();
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(SavedRelation, this, saveEventArgs);
+                scope.Notifications.Publish(new RelationSavedNotification(relation, eventMessages).WithStateFrom(savingNotification));
             }
         }
 
         public void Save(IEnumerable<IRelation> relations)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IRelation>(relations);
-                if (scope.Events.DispatchCancelable(SavingRelation, this, saveEventArgs))
+                IRelation[] relationsA = relations.ToArray();
+
+                EventMessages messages = EventMessagesFactory.Get();
+                var savingNotification = new RelationSavingNotification(relationsA, messages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
                 }
 
-                _relationRepository.Save(relations);
+                _relationRepository.Save(relationsA);
                 scope.Complete();
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(SavedRelation, this, saveEventArgs);
+                scope.Notifications.Publish(new RelationSavedNotification(relationsA, messages).WithStateFrom(savingNotification));
             }
         }
 
         /// <inheritdoc />
         public void Save(IRelationType relationType)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IRelationType>(relationType);
-                if (scope.Events.DispatchCancelable(SavingRelationType, this, saveEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var savingNotification = new RelationTypeSavingNotification(relationType, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -495,8 +500,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 _relationTypeRepository.Save(relationType);
                 Audit(AuditType.Save, Cms.Core.Constants.Security.SuperUserId, relationType.Id, $"Saved relation type: {relationType.Name}");
                 scope.Complete();
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(SavedRelationType, this, saveEventArgs);
+                scope.Notifications.Publish(new RelationTypeSavedNotification(relationType, eventMessages).WithStateFrom(savingNotification));
             }
         }
 
@@ -522,10 +526,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <inheritdoc />
         public void Delete(IRelationType relationType)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<IRelationType>(relationType);
-                if (scope.Events.DispatchCancelable(DeletingRelationType, this, deleteEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var deletingNotification = new RelationTypeDeletingNotification(relationType, eventMessages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
@@ -533,8 +538,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 _relationTypeRepository.Delete(relationType);
                 scope.Complete();
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(DeletedRelationType, this, deleteEventArgs);
+                scope.Notifications.Publish(new RelationTypeDeletedNotification(relationType, eventMessages).WithStateFrom(deletingNotification));
             }
         }
 
@@ -590,39 +594,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.RelationType), message));
         }
-        #endregion
-
-        #region Events Handlers
-
-        /// <summary>
-        /// Occurs before Saving a Relation
-        /// </summary>
-        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelation>> SavingRelation;
-
-        /// <summary>
-        /// Occurs after a Relation is Saved
-        /// </summary>
-        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelation>> SavedRelation;
-
-        /// <summary>
-        /// Occurs before Deleting a RelationType
-        /// </summary>
-        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelationType>> DeletingRelationType;
-
-        /// <summary>
-        /// Occurs after a RelationType is Deleted
-        /// </summary>
-        public static event TypedEventHandler<IRelationService, DeleteEventArgs<IRelationType>> DeletedRelationType;
-
-        /// <summary>
-        /// Occurs before Saving a RelationType
-        /// </summary>
-        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelationType>> SavingRelationType;
-
-        /// <summary>
-        /// Occurs after a RelationType is Saved
-        /// </summary>
-        public static event TypedEventHandler<IRelationService, SaveEventArgs<IRelationType>> SavedRelationType;
         #endregion
     }
 }
