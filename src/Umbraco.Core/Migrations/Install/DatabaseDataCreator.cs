@@ -369,7 +369,7 @@ namespace Umbraco.Core.Migrations.Install
                 NodeId = Constants.DataTypes.UploadDocument,
                 EditorAlias = Constants.PropertyEditors.Aliases.UploadField,
                 DbType = "Nvarchar",
-                Configuration = "{\"fileExtensions\":[{\"id\":0, \"value\":\"pdf\"}, {\"id\":1, \"value\":\"docx\"}, {\"id\":2, \"value\":\"doc\"}, {\"id\":3, \"value\":\"xlsx\"}, {\"id\":4, \"value\":\"xls\"}, {\"id\":5, \"value\":\"pptx\"}, {\"id\":6, \"value\":\"ppt\"}, {\"id\":7, \"value\":\"epub\"}, {\"id\":8, \"value\":\"txt\"}, {\"id\":9, \"value\":\"rtf\"}]}"
+                Configuration = "{\"fileExtensions\":[{\"id\":0, \"value\":\"pdf\"}, {\"id\":1, \"value\":\"docx\"}, {\"id\":2, \"value\":\"doc\"}, {\"id\":3, \"value\":\"xlsx\"}, {\"id\":4, \"value\":\"xls\"}, {\"id\":5, \"value\":\"csv\"}, {\"id\":6, \"value\":\"pptx\"}, {\"id\":7, \"value\":\"ppt\"}, {\"id\":8, \"value\":\"epub\"}, {\"id\":9, \"value\":\"txt\"}, {\"id\":10, \"value\":\"rtf\"}]}"
             });
 
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto
