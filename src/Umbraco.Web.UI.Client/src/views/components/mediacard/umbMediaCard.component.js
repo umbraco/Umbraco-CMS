@@ -48,7 +48,7 @@
 
         vm.$onInit = function () {
 
-            unsubscribe.push($scope.$watch(["vm.media.trashed", "vm.hasError"], checkErrorState));
+            unsubscribe.push($scope.$watchGroup(["vm.media.trashed", "vm.hasError"], checkErrorState));
 
             vm.updateThumbnail();
 
