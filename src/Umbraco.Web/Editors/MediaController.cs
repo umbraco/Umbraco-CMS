@@ -726,18 +726,6 @@ namespace Umbraco.Web.Editors
                                         }
                                     }
                                 }
-
-
-                                /*
-                                IDataEditor editor = Current.Data[propertyTypeAlias];
-                                List<ValueListItem> fileExtensions = (List<ValueListItem>)editor.DefaultConfiguration.GetValue("fileExtensions", null);
-                                if (fileExtensions != null) {
-                                    if (fileExtensions.Where(x => x.Value == ext).Count() != 0) {
-                                        mediaType = MediaType.Alias;
-                                        break;
-                                    }
-                                }
-                                */
                             }
 
                         }
