@@ -42,9 +42,6 @@ namespace Umbraco.Cms.Tests.Integration.Cache
 
             var definitions = new IEventDefinition[]
             {
-                new EventDefinition<IDataTypeService, SaveEventArgs<IDataType>>(null, DataTypeService, new SaveEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
-                new EventDefinition<IDataTypeService, DeleteEventArgs<IDataType>>(null, DataTypeService, new DeleteEventArgs<IDataType>(Enumerable.Empty<IDataType>())),
-
                 new EventDefinition<IFileService, SaveEventArgs<IStylesheet>>(null, FileService, new SaveEventArgs<IStylesheet>(Enumerable.Empty<IStylesheet>())),
                 new EventDefinition<IFileService, DeleteEventArgs<IStylesheet>>(null, FileService, new DeleteEventArgs<IStylesheet>(Enumerable.Empty<IStylesheet>())),
 
