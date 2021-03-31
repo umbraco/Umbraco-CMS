@@ -350,6 +350,16 @@ namespace Umbraco.Web.PropertyEditors
 
             private IContentType GetElementType(NestedContentRowValue item)
             {
+                if (item == null)
+                {
+                    return null;
+                }
+
+                if (string.IsNullOrWhiteSpace(item.ContentTypeAlias))
+                {
+                    return null;
+                }
+
                 _contentTypes.Value.TryGetValue(item.ContentTypeAlias, out var contentType);
                 return contentType;
             }
