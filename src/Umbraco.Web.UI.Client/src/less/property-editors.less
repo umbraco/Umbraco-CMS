@@ -604,7 +604,7 @@
     }
 
     .umb-cropper-gravity .gravity-container {
-        border: 1px solid @gray-8;
+        border: 1px solid @inputBorder;
         box-sizing: border-box;
         line-height: 0;
         width: 100%;
@@ -612,6 +612,10 @@
         overflow: hidden;
         .checkeredBackground();
         contain: content;
+
+        &:focus, &:focus-within {
+            border-color: @inputBorderFocus;
+        }
 
         .viewport {
             position: relative;
