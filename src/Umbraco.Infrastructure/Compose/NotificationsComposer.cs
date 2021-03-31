@@ -82,7 +82,8 @@ namespace Umbraco.Cms.Core.Compose
                 .AddNotificationHandler<MemberGroupDeletedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<MemberGroupSavedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<DataTypeDeletedNotification, DistributedCacheBinder>()
-                .AddNotificationHandler<DataTypeSavedNotification, DistributedCacheBinder>();
+                .AddNotificationHandler<DataTypeSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MediaTreeChangeNotification, DistributedCacheBinder>();
 
             // add notification handlers for auditing
             builder
