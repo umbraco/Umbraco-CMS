@@ -77,7 +77,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             // prepare
             // note: same alias could be used for media, content... but always different ids = ok
-            var aliases = contentTypeDtos.ToDictionary(x => x.NodeId, x => x.Alias);
+            var aliases = contentTypeDtos.ToFastDictionary(x => x.NodeId, x => x.Alias);
 
             // create
             var allowedDtoIx = 0;

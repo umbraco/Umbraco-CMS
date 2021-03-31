@@ -69,7 +69,7 @@ namespace Umbraco.Core.Persistence
         {
             var isBuilt = true;
             var args = new object[_args.Count];
-            var properties = nargs.GetType().GetProperties().ToDictionary(x => x.Name, x => x.GetValue(nargs));
+            var properties = nargs.GetType().GetProperties().ToFastDictionary(x => x.Name, x => x.GetValue(nargs));
             for (var i = 0; i < _args.Count; i++)
             {
                 object value;

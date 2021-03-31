@@ -4,6 +4,7 @@ using Umbraco.Web.Mvc;
 using System.Linq;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core;
 
 namespace Umbraco.Web.Macros
 {
@@ -35,7 +36,7 @@ namespace Umbraco.Web.Macros
                 _macro.Id,
                 _macro.Alias,
                 _macro.Name,
-                _macro.Properties.ToDictionary(x => x.Key, x => (object)x.Value));
+                _macro.Properties.ToFastDictionary(x => x.Key, x => (object)x.Value));
             return PartialView(_macro.MacroSource, model);
         }
     }

@@ -64,7 +64,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             // map to what the editor expects
             var i = 1;
-            var items = configuration?.Items.ToDictionary(x => x.Id.ToString(), x => new { value = x.Value, sortOrder = i++ }) ?? new object();
+            var items = configuration?.Items.ToFastDictionary(x => x.Id.ToString(), x => new { value = x.Value, sortOrder = i++ }) ?? new object();
             
             var multiple = configuration?.Multiple ?? false;
 

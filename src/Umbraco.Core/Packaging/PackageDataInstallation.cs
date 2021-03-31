@@ -182,12 +182,14 @@ namespace Umbraco.Core.Packaging
                     LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),
                     MacrosInstalled = ImportMacros(compiledPackage.Macros, userId),
-                    TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),
-                    DocumentTypesInstalled = ImportDocumentTypes(compiledPackage.DocumentTypes, userId)
+                    TemplatesInstalled = ImportTemplates(compiledPackage.Templates.ToList(), userId),                    
                 };
 
+                var docTypesInstalled = ImportDocumentTypes(compiledPackage.DocumentTypes, userId);
+                installationSummary.DocumentTypesInstalled = docTypesInstalled;
+
                 //we need a reference to the imported doc types to continue
-                var importedDocTypes = installationSummary.DocumentTypesInstalled.ToDictionary(x => x.Alias, x => x);
+                var importedDocTypes = docTypesInstalled.ToFastDictionary(x => x.Alias, x => x);
 
                 installationSummary.StylesheetsInstalled = ImportStylesheets(compiledPackage.Stylesheets, userId);
                 installationSummary.ContentInstalled = ImportContent(compiledPackage.Documents, importedDocTypes, userId);

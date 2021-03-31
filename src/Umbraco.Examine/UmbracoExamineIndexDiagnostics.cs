@@ -21,7 +21,7 @@ namespace Umbraco.Examine
         {
             get
             {
-                var d = base.Metadata.ToDictionary(x => x.Key, x => x.Value);
+                var d = base.Metadata.CopyToDictionary();
 
                 d[nameof(UmbracoExamineIndex.EnableDefaultEventHandler)] = _index.EnableDefaultEventHandler;
                 d[nameof(UmbracoExamineIndex.PublishedValuesOnly)] = _index.PublishedValuesOnly;

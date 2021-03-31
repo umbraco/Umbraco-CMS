@@ -470,10 +470,10 @@ namespace Umbraco.Tests.Clr
 
             var getters4 = type4
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
-                .ToDictionary(x => x.Name, x => (object) ReflectionUtilities.EmitPropertyGetter<Class4, object>(x));
+                .ToFastDictionary(x => x.Name, x => (object) ReflectionUtilities.EmitPropertyGetter<Class4, object>(x));
 
             Console.WriteLine("Getting object4 values...");
-            var values4 = getters4.ToDictionary(kvp => kvp.Key, kvp => ((Func<Class4, object>) kvp.Value)(object4));
+            var values4 = getters4.ToFastDictionary(kvp => kvp.Key, kvp => ((Func<Class4, object>) kvp.Value)(object4));
 
             Console.WriteLine("Writing object4 values...");
             foreach ((var name, var value) in values4)
@@ -489,7 +489,7 @@ namespace Umbraco.Tests.Clr
 
             var getters5 = type5
                 .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.FlattenHierarchy)
-                .ToDictionary(x => x.Name, x => (object) ReflectionUtilities.EmitPropertyGetter<Class5, object>(x));
+                .ToFastDictionary(x => x.Name, x => (object) ReflectionUtilities.EmitPropertyGetter<Class5, object>(x));
 
             var object5 = new Class5
             {
@@ -502,7 +502,7 @@ namespace Umbraco.Tests.Clr
             };
 
             Console.WriteLine("Getting object5 values...");
-            var values5 = getters5.ToDictionary(kvp => kvp.Key, kvp => ((Func<Class5, object>) kvp.Value)(object5));
+            var values5 = getters5.ToFastDictionary(kvp => kvp.Key, kvp => ((Func<Class5, object>) kvp.Value)(object5));
 
             Console.WriteLine("Writing object5 values...");
             foreach ((var name, var value) in values5)

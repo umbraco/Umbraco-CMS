@@ -223,7 +223,7 @@ namespace Umbraco.Tests.TestHelpers
 
             public TestDataTypeService(params IDataType[] dataTypes)
             {
-                DataTypes = dataTypes.ToDictionary(x => x.Id, x => x);
+                DataTypes = dataTypes.ToFastDictionary(x => x.Id, x => x);
             }
 
             public TestDataTypeService(IEnumerable<IDataType> dataTypes)

@@ -284,7 +284,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var dtos = Database.FetchByGroups<VariantInfoDto, int>(v.Select(x => x.Id), 2000, GetVariantInfos);
 
             // group by node id (each group contains all languages)
-            var xdtos = dtos.GroupBy(x => x.NodeId).ToDictionary(x => x.Key, x => x);
+            var xdtos = dtos.ToLookup(x => x.NodeId);
 
             foreach (var e in v)
             {
