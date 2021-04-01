@@ -57,7 +57,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
         });
 
         if (currIds.indexOf(item) < 0) {
-            $scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
+            $scope.renderModel.push({ name: item, id: item, icon: 'icon-users-alt' });
         }	
     };
 
