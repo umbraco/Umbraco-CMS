@@ -143,6 +143,7 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -Icon -Trashed -ParentId -Alias
         private void Map(IMemberGroup source, MemberGroupDisplay target, MapperContext context)
         {
+            target.Icon = Constants.Icons.MemberGroup;
             target.Id = source.Id;
             target.Key = source.Key;
             target.Name = source.Name;
