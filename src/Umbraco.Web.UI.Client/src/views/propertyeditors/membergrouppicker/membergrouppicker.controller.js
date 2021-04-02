@@ -6,6 +6,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
 
     vm.openMemberGroupPicker = openMemberGroupPicker;
     vm.remove = remove;
+    vm.clear = clear;
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -54,6 +55,10 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
 
     function remove(index){
         $scope.renderModel.splice(index, 1);
+    }
+
+    function clear() {
+        $scope.renderModel = [];
     }
 
     function renderModelIds() {
