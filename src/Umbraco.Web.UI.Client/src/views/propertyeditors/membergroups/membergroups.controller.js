@@ -1,16 +1,20 @@
 ﻿function memberGroupController($scope, editorService, memberGroupResource) {
-    //set the selected to the keys of the dictionary who's value is true
-    $scope.getSelected = function () {
-        var selected = [];
-        for (var n in $scope.model.value) {
-            if ($scope.model.value[n] === true) {
-                selected.push(n);
-            }
-        }
-        return selected;
-    };
 
-    $scope.pickGroup = function() {
+    var vm = this;
+
+    vm.pickGroup = pickGroup;
+    vm.removeGroup = removeGroup;
+
+    vm.groups = [];
+
+    //set the selected to the keys of the dictionary who's value is true
+    for (var n in $scope.model.value) {
+        if ($scope.model.value[n] === true) {
+            vm.groups.push(n);
+        }
+    }
+
+    function pickGroup() {
         editorService.memberGroupPicker({
             multiPicker: true,
             submit: function (model) {
@@ -32,7 +36,7 @@
         });
     }
 
-    $scope.removeGroup = function (group) {
+    function removeGroup(group) {
         $scope.model.value[group] = false;
     }
 }

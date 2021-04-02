@@ -2,6 +2,11 @@
 //with a specified callback, this callback will receive an object with a selection on it
 function memberGroupPicker($scope, editorService, memberGroupResource){
 
+    var vm = this;
+
+    vm.openMemberGroupPicker = openMemberGroupPicker;
+    vm.remove = remove;
+
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
         return str.replace(rgxtrim, '');
@@ -18,7 +23,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
         });
     }
 
-    $scope.openMemberGroupPicker = function() {
+    function openMemberGroupPicker() {
         var memberGroupPicker = {
             multiPicker: true,
             submit: function (model) {
@@ -45,11 +50,11 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
             }
         };
         editorService.memberGroupPicker(memberGroupPicker);
-    };
+    }
 
-    $scope.remove = function(index){
+    function remove(index){
         $scope.renderModel.splice(index, 1);
-    };
+    }
 
     function renderModelIds() {
         return _.map($scope.renderModel, function (i) {
