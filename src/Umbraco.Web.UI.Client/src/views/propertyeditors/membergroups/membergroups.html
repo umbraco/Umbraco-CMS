@@ -1,6 +1,6 @@
 <div ng-controller="Umbraco.PropertyEditors.MemberGroupController as vm">
 
-    <umb-node-preview ng-repeat="group in vm.groups | orderBy"
+    <umb-node-preview ng-repeat="group in getSelected() | orderBy"
                       icon="'icon-users-alt'"
                       name="group"
                       allow-remove="true"

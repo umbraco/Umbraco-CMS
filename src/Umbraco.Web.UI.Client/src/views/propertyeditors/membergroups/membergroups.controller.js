@@ -5,14 +5,16 @@
     vm.pickGroup = pickGroup;
     vm.removeGroup = removeGroup;
 
-    vm.groups = [];
-
     //set the selected to the keys of the dictionary who's value is true
-    for (var n in $scope.model.value) {
-        if ($scope.model.value[n] === true) {
-            vm.groups.push(n);
+    $scope.getSelected = function () {
+        var selected = [];
+        for (var n in $scope.model.value) {
+            if ($scope.model.value[n] === true) {
+                selected.push(n);
+            }
         }
-    }
+        return selected;
+    };
 
     function pickGroup() {
         editorService.memberGroupPicker({
