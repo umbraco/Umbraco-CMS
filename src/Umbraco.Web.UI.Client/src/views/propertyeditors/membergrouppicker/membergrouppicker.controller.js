@@ -2,6 +2,12 @@
 //with a specified callback, this callback will receive an object with a selection on it
 function memberGroupPicker($scope, editorService, memberGroupResource, localizationService, overlayService){
 
+    var vm = this;
+
+    vm.openMemberGroupPicker = openMemberGroupPicker;
+    vm.remove = remove;
+    vm.clear = clear;
+
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
         return str.replace(rgxtrim, '');
@@ -38,7 +44,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
         removeAllEntriesAction.isDisabled = groupIds.length === 0;
     }
 
-    $scope.openMemberGroupPicker = function() {
+    function openMemberGroupPicker() {
         var memberGroupPicker = {
             multiPicker: true,
             submit: function (model) {
@@ -73,25 +79,17 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
         editorService.memberGroupPicker(memberGroupPicker);
     };
 
-    $scope.remove =function(index){
+    function remove(index) {
         $scope.renderModel.splice(index, 1);
-    };
-
-    $scope.add = function (item) {
 
         var currIds = renderModelIds();
+        removeAllEntriesAction.isDisabled = currIds.length === 0;
+    }
 
-        if (currIds.indexOf(item) < 0) {
-            $scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
-        }
-
-        removeAllEntriesAction.isDisabled = groupIds.length === 0;
-    };
-
-    $scope.clear = function() {
+    function clear() {
         $scope.renderModel = [];
         removeAllEntriesAction.isDisabled = true;
-    };
+    }
 
     function removeAllEntries() {
         localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(data => {
@@ -102,7 +100,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
                     overlayService.close();
                 },
                 submit: () => {
-                    $scope.clear();
+                    vm.clear();
                     overlayService.close();
                 }
             });
