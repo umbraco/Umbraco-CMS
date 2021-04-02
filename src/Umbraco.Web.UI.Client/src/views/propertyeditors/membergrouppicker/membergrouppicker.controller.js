@@ -50,10 +50,11 @@ function memberGroupPicker($scope, editorService, memberGroupResource, localizat
 
                 var currIds = renderModelIds();
 
-                removeAllEntriesAction.isDisabled = currIds.length === 0;
-
                 // figure out which groups are new and fetch them
                 var newGroupIds = _.difference(selectedGroupIds, currIds);
+
+                removeAllEntriesAction.isDisabled = currIds.length === 0 && newGroupIds.length === 0;
+
                 if (newGroupIds && newGroupIds.length) {
                     memberGroupResource.getByIds(newGroupIds).then(function (groups) {
                         $scope.renderModel = _.union($scope.renderModel, groups);
