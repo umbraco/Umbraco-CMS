@@ -47,22 +47,8 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
         editorService.memberGroupPicker(memberGroupPicker);
     };
 
-    $scope.remove =function(index){
+    $scope.remove = function(index){
         $scope.renderModel.splice(index, 1);
-    };
-
-    $scope.add = function (item) {
-        var currIds = _.map($scope.renderModel, function (i) {
-            return i.id;
-        });
-
-        if (currIds.indexOf(item) < 0) {
-            $scope.renderModel.push({ name: item, id: item, icon: 'icon-users-alt' });
-        }	
-    };
-
-    $scope.clear = function() {
-        $scope.renderModel = [];
     };
 
     function renderModelIds() {
