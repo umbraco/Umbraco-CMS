@@ -143,7 +143,7 @@ angular.module("umbraco")
                     var area = event.target.getScope_HackForSortable().area;
                     var allowedEditors = area.$allowedEditors.map(e => e.alias);
 
-                    if (($.inArray(ui.item[0].getScope_HackForSortable().control.editor.alias, allowedEditors) < 0 && allowedEditors) ||
+                    if (($.inArray(ui.item[0].getScope_HackForSortable().control.editor.alias, allowedEditors) < 0) ||
                         (startingArea != area && area.maxItems != '' && area.maxItems > 0 && area.maxItems < area.controls.length + 1)) {
 
                         $scope.$apply(function () {
