@@ -142,11 +142,10 @@
                     submit();
                 }
 
-
             }, function (err) {
-                if (suppressNotification) {
-                    vm.page.saveButtonState = "error";
+                vm.page.saveButtonState = "error";
 
+                if (suppressNotification) {
                     localizationService.localizeMany(["speechBubbles_validationFailedHeader", "speechBubbles_validationFailedMessage"]).then(function (data) {
                         var header = data[0];
                         var message = data[1];
