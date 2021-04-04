@@ -29,10 +29,6 @@
                     var defaultFocusedElement = getAutoFocusElement(focusableElements);
                     var firstFocusableElement = focusableElements[0];
                     var lastFocusableElement = focusableElements[focusableElements.length -1];
-
-                    // We need to add the tabbing-active class in order to highlight the focused button since the default style is
-                    // outline: none; set in the stylesheet specifically
-                    bodyElement.classList.add('tabbing-active');
     
                     // If there is no default focused element put focus on the first focusable element in the nodelist
                     if(defaultFocusedElement === null ){
