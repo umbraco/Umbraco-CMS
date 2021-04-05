@@ -18,14 +18,16 @@
                         <div ng-switch-when="macroSelect" class="macro-select">
                             <label for="macro-search" class="sr-only">{{model.title}}</label>
                             <umb-search-filter input-id="macro-search"
-                                               model="searchTerm"
+                                               model="model.searchTerm"
                                                label-key="placeholders_filter"
                                                text="Type to filter..."
                                                css-class="w-100 mb-15"
+                                               on-change="displayA11YMessageForFilter()"
                                                auto-focus="true">
                             </umb-search-filter>
+                            <p ng-bind="a11yInfo" class="sr-only" role="alert"></p>
                             <ul class="umb-card-grid -three-in-row">
-                                <li ng-repeat="availableItem in macros | orderBy:'name' | filter:searchTerm">
+                                <li ng-repeat="availableItem in macros | orderBy:'name' | filter:model.searchTerm">
                                     <button class="btn-reset umb-card-grid-item" title="{{availableItem.name}}" ng-click="selectMacro(availableItem)">
                                         <span>
                                             <i class="icon-settings-alt" aria-hidden="true"></i>
