@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Security
     /// <summary>
     /// The identity user used for the member
     /// </summary>
-    public class MembersIdentityUser : UmbracoIdentityUser
+    public class MemberIdentityUser : UmbracoIdentityUser
     {
         private string _name;
         private string _passwordConfig;
@@ -23,29 +23,29 @@ namespace Umbraco.Cms.Core.Security
             groups => groups.GetHashCode());
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MembersIdentityUser"/> class.
+        /// Initializes a new instance of the <see cref="MemberIdentityUser"/> class.
         /// </summary>
-        public MembersIdentityUser(int userId)
+        public MemberIdentityUser(int userId)
         {
             // use the property setters - they do more than just setting a field
             Id = UserIdToString(userId);
         }
 
-        public MembersIdentityUser()
+        public MemberIdentityUser()
         {
         }
 
         /// <summary>
         ///  Used to construct a new instance without an identity
         /// </summary>
-        public static MembersIdentityUser CreateNew(string username, string email, string memberTypeAlias, string name = null)
+        public static MemberIdentityUser CreateNew(string username, string email, string memberTypeAlias, string name = null)
         {
             if (string.IsNullOrWhiteSpace(username))
             {
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(username));
             }
 
-            var user = new MembersIdentityUser();
+            var user = new MemberIdentityUser();
             user.DisableChangeTracking();
             user.UserName = username;
             user.Email = email;
