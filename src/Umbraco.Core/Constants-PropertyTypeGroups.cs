@@ -28,9 +28,9 @@
             public const string Audio = "335FB495-0A87-4E82-B902-30EB367B767C";
 
             /// <summary>
-            /// Guid for a Document PropertyTypeGroup object.
+            /// Guid for a Article PropertyTypeGroup object.
             /// </summary>
-            public const string Document = "9AF3BD65-F687-4453-9518-5F180D1898EC";
+            public const string Article = "9AF3BD65-F687-4453-9518-5F180D1898EC";
 
             /// <summary>
             /// Guid for a VectorGraphics PropertyTypeGroup object.

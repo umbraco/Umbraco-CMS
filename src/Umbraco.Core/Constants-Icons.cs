@@ -70,9 +70,9 @@
             public const string MediaAudio = "icon-sound-waves";
 
             /// <summary>
-            /// System media document icon
+            /// System media article icon
             /// </summary>
-            public const string MediaDocument = "icon-article";
+            public const string MediaArticle = "icon-article";
 
             /// <summary>
             /// System media vector icon

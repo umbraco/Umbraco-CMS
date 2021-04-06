@@ -129,9 +129,9 @@ namespace Umbraco.Core
                 public const string Audio = "Audio";
 
                 /// <summary>
-                /// MediaType alias for an document.
+                /// MediaType alias for an article.
                 /// </summary>
-                public const string Document = "Document";
+                public const string Article = "Article";
 
                 /// <summary>
                 /// MediaType alias for an vector graphics.

@@ -27,7 +27,7 @@ namespace Umbraco.Core
             public const int Upload = -90;
             public const int UploadVideo = -100;
             public const int UploadAudio = -101;
-            public const int UploadDocument = -102;
+            public const int UploadArticle = -102;
             public const int UploadVectorGraphics = -103;
 
             public const int DefaultContentListView = -95;
@@ -332,14 +332,14 @@ namespace Umbraco.Core
                 public static readonly Guid UploadAudioGuid = new Guid(UploadAudio);
 
                 /// <summary>
-                /// Guid for UploadDocument as string
+                /// Guid for UploadArticle as string
                 /// </summary>
-                public const string UploadDocument = "bc1e266c-dac4-4164-bf08-8a1ec6a7143d";
+                public const string UploadArticle = "bc1e266c-dac4-4164-bf08-8a1ec6a7143d";
 
                 /// <summary>
-                /// Guid for UploadDocument
+                /// Guid for UploadArticle
                 /// </summary>
-                public static readonly Guid UploadDocumentGuid = new Guid(UploadDocument);
+                public static readonly Guid UploadArticleGuid = new Guid(UploadArticle);
 
                 /// <summary>
                 /// Guid for UploadVectorGraphics as string
