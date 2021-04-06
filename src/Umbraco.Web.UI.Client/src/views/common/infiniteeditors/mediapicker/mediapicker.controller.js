@@ -399,13 +399,18 @@ angular.module("umbraco")
             var debounceSearchMedia = _.debounce(function () {
                 $scope.$apply(function () {
                     if (vm.searchOptions.filter) {
+                        vm.searchOptions.pageNumber = 1;
+                        vm.searchOptions.totalItems = 0;
+                        vm.searchOptions.totalPages = 0
+                        vm.searchOptions.pageSize = 20;
                         searchMedia();
+
                     } else {
 
                         // reset pagination
                         vm.searchOptions = {
                             pageNumber: 1,
-                            pageSize: 100,
+                            pageSize: 20,
                             totalItems: 0,
                             totalPages: 0,
                             filter: '',
@@ -431,7 +436,11 @@ angular.module("umbraco")
             function changePagination(pageNumber) {
                 vm.loading = true;
                 vm.searchOptions.pageNumber = pageNumber;
-                searchMedia();
+                if (vm.filter !== '') {
+                    searchMedia();
+                } else {
+                    getChildren($scope.currentFolder.id)
+                }
             };
 
             function searchMedia() {
