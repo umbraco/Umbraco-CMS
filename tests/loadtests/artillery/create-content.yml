@@ -1,0 +1,37 @@
+# variables can be set by env vars: https://artillery.io/docs/guides/guides/test-script-reference.html#Using-dynamic-values-in-config
+
+config:
+  variables:
+    backOfficeApiPath: "/umbraco/backoffice/UmbracoApi"
+  processor: "./content.js"
+  phases:
+    - duration: 1
+      arrivalRate: 1
+scenarios:
+  - name: "Create content"
+    beforeScenario: "beforeScenario"
+    afterScenario: "afterScenario"
+    beforeRequest: "beforeRequest"
+    afterResponse: "afterResponse"
+    flow:
+    - post:
+        # Create a root node
+        url: "{{ backOfficeApiPath }}/Content/PostSave"
+        beforeRequest: "configureContentTypeAlias"
+        formData:
+          contentItem: '{"id":0,"contentTypeAlias":"{{ contentTypeAlias }}","parentId":-1,"action":"publishNew","variants":[{"name":"benchmarkTest__NEW_C_GUID__","properties":[{"id":0,"alias":"email","value":"test@example.com"},{"id":0,"alias":"description","value":"TESTING"},{"id":0,"alias":"publishedDate","value":"2021-03-22 12:00:00"}],"culture":null,"segment":null,"publish":true,"save":true,"releaseDate":null,"expireDate":null}],"expireDate":null,"releaseDate":null,"templateAlias":"{{ contentTypeAlias }}"}'
+        capture:
+          - regexp: \)]}',(.+)
+            flags: s
+            group: 1
+            # Capture the angular json response to be processed by afterResponse
+            as: jsonResponse
+    - loop:
+      - post:
+          # Create child nodes
+          url: "{{ backOfficeApiPath }}/Content/PostSave"
+          beforeRequest: "configureParentId"
+          formData:
+            contentItem: '{"id":0,"contentTypeAlias":"{{ contentTypeAlias }}","parentId": {{ parentId }},"action":"publishNew","variants":[{"name":"benchmarkTest__NEW_C_GUID__","properties":[{"id":0,"alias":"email","value":"test@example.com"},{"id":0,"alias":"description","value":"TESTING"},{"id":0,"alias":"publishedDate","value":"2021-03-22 12:00:00"}],"culture":null,"segment":null,"publish":true,"save":true,"releaseDate":null,"expireDate":null}],"expireDate":null,"releaseDate":null,"templateAlias":"{{ contentTypeAlias }}"}'
+      count: 10
+

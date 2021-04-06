@@ -178,3 +178,4 @@ cypress.env.json
 src/Umbraco.Web.UI/Umbraco/telemetrics-id.umb
 
 /src/Umbraco.Web.UI/config/umbracoSettings.config
+/tests/loadtests/output/*

@@ -1,0 +1,41 @@
+# variables can be set by env vars: https://artillery.io/docs/guides/guides/test-script-reference.html#Using-dynamic-values-in-config
+
+config:
+  variables:
+    backOfficeApiPath: "/umbraco/backoffice/UmbracoApi"
+  processor: "./umbracoDataFlow.js"
+  phases:
+    - duration: 1
+      arrivalRate: 1
+scenarios:
+  - name: "Login and default back office load"
+    beforeScenario: "beforeScenario"
+    afterScenario: "afterScenario"
+    beforeRequest: "beforeRequest"
+    afterResponse: "afterResponse"
+    flow:
+    - post:
+        url: "{{ backOfficeApiPath }}/Authentication/PostLogin"
+        json:
+          username: "{{ $processEnvironment.U_USERNAME }}"
+          password: "{{ $processEnvironment.U_PASS }}"
+    - get:
+        url: "{{ backOfficeApiPath }}/BackOfficeAssets/GetSupportedLocales"
+    - get:
+        url: "{{ backOfficeApiPath }}/UpdateCheck/GetCheck"
+    - get:
+        url: "{{ backOfficeApiPath }}/Tour/GetTours"
+    - get:
+        url: "{{ backOfficeApiPath }}/Section/GetSections"
+    - get:
+        url: "{{ backOfficeApiPath }}/Content/AllowsCultureVariation"
+    - get:
+        url: "{{ backOfficeApiPath }}/CurrentUser/GetUserTours"
+    - get:
+        url: "{{ backOfficeApiPath }}/Language/GetAllLanguages"
+    - get:
+        url: "/umbraco/LocalizedText"
+    - get:
+        url: "{{ backOfficeApiPath }}/Dashboard/GetDashboard?section=content"
+    - get:
+        url: "/umbraco/backoffice/UmbracoTrees/ApplicationTree/GetApplicationTrees?application=content&tree=&use=main&culture=en-US"
