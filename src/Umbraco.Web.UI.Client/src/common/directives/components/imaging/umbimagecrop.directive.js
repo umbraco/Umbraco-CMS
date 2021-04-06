@@ -73,11 +73,6 @@ angular.module("umbraco.directives")
 
                     function updateSlider() {
                         if(sliderRef) {
-
-                            // Set slider handle position
-                            console.log("set:", scope.dimensions.scale.current.toFixed(3), "   ", scope.dimensions.scale.min, "  max", scope.dimensions.scale.max)
-                            sliderRef.noUiSlider.set(scope.dimensions.scale.current);
-
                             // Update slider range min/max
                             sliderRef.noUiSlider.updateOptions({
                                 "range": {
@@ -85,6 +80,9 @@ angular.module("umbraco.directives")
                                     "max": scope.dimensions.scale.max
                                 }
                             });
+
+                            // Set slider handle position
+                            sliderRef.noUiSlider.set(scope.dimensions.scale.current);
                         }
                     }
 
