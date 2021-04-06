@@ -2212,6 +2212,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="newPartialView">Partial View</key>
     <key alias="newPartialViewMacro">Macro de Partial View</key>
     <key alias="newMember">Membre</key>
+    <key alias="searchContentTree">Chercher dans l'arborescence de contenu</key>
   </area>
   <area alias="references">
     <key alias="tabName">Références</key>
