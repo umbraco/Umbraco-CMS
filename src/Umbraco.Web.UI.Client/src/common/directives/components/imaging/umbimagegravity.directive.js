@@ -74,7 +74,8 @@
 
                     var offsetX = ui.position.left;
                     var offsetY = ui.position.top;
-                    calculateGravity(offsetX, offsetY);
+
+                    $scope.$evalAsync(calculateGravity(offsetX, offsetY));
 
                     $scope.$emit("imageFocalPointStop");
 
