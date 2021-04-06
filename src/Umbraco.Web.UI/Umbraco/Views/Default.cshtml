@@ -49,7 +49,7 @@
         <div style="margin: 10px;">
             <h3><img src="assets/img/application/logo.png" alt="Umbraco logo" style="vertical-align: text-bottom;" /> Umbraco</h3>
             <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
-            <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
+            <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
         </div>
     </noscript>
 
@@ -115,15 +115,12 @@
     @Html.BareMinimumServerVariablesScript(Url, Url.Action("ExternalLogin", "BackOffice", new { area = ViewData.GetUmbracoPath() }), Model.Features, Current.Configs.Global())
 
     <script>
-
         document.angularReady = function(app) {
             @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInProviderErrors())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
             @Html.AngularValueTinyMceAssets()
-
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";
-
         }
     </script>
 

@@ -144,13 +144,13 @@ namespace Umbraco.Core
             {
                 // there *is* a local version, but it does not match the code version
                 // need to upgrade
-                _logger.Debug<RuntimeState>("Local version '{LocalVersion}' < code version '{CodeVersion}', need to upgrade Umbraco.", localVersion, codeVersion);
+                _logger.Debug<RuntimeState, SemVersion, SemVersion>("Local version '{LocalVersion}' < code version '{CodeVersion}', need to upgrade Umbraco.", localVersion, codeVersion);
                 Level = RuntimeLevel.Upgrade;
                 Reason = RuntimeLevelReason.UpgradeOldVersion;
             }
             else if (localVersion > codeVersion)
             {
-                _logger.Warn<RuntimeState>("Local version '{LocalVersion}' > code version '{CodeVersion}', downgrading is not supported.", localVersion, codeVersion);
+                _logger.Warn<RuntimeState, SemVersion, SemVersion>("Local version '{LocalVersion}' > code version '{CodeVersion}', downgrading is not supported.", localVersion, codeVersion);
 
                 // in fact, this is bad enough that we want to throw
                 Reason = RuntimeLevelReason.BootFailedCannotDowngrade;
@@ -290,7 +290,7 @@ namespace Umbraco.Core
             CurrentMigrationState = KeyValueService.GetValue(database, stateValueKey);
             FinalMigrationState = upgrader.Plan.FinalState;
 
-            _logger.Debug<RuntimeState>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
+            _logger.Debug<RuntimeState, string, string>("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
 
             return CurrentMigrationState != FinalMigrationState;
         }
