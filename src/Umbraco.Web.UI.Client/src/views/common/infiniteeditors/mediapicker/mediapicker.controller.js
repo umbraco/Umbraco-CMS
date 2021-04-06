@@ -436,9 +436,12 @@ angular.module("umbraco")
             function changePagination(pageNumber) {
                 vm.loading = true;
                 vm.searchOptions.pageNumber = pageNumber;
-                if (vm.filter !== '') {
+                
+                if (vm.searchOptions.filter) {
+                    // Using search filter
                     searchMedia();
                 } else {
+                    // Browsing folder
                     getChildren($scope.currentFolder.id)
                 }
             };
