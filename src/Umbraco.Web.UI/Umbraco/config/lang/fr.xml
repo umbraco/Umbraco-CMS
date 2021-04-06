@@ -2372,4 +2372,8 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
         ]]>
     </key>
   </area>
+  <area alias="treeSearch">
+    <key alias="searchResult">élément retrouvé</key>
+    <key alias="searchResults">éléments retrouvés</key>
+  </area>
 </language>
