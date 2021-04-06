@@ -107,7 +107,7 @@ namespace Umbraco.Web.Search
 
             var registeredIndexers = _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 
-            _logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
+            _logger.Info<ExamineComponent,int>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)

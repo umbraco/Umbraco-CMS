@@ -77,7 +77,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="5.4.0" />
+    <PackageReference Include="LightInject" Version="6.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Web" Version="2.0.0" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core">
@@ -131,6 +131,8 @@
     <Compile Include="Constants-CharArrays.cs" />
     <Compile Include="Collections\EventClearingObservableCollection.cs" />
     <Compile Include="Constants-SqlTemplates.cs" />
+    <Compile Include="Logging\ILogger2.cs" />
+    <Compile Include="Logging\Logger2Extensions.cs" />
     <Compile Include="Dashboards\ContentDashboardSettings.cs" />
     <Compile Include="Dashboards\IContentDashboardSettings.cs" />
     <Compile Include="Exceptions\UnattendedInstallException.cs" />
@@ -158,6 +160,7 @@
     <Compile Include="Models\RelationTypeExtensions.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\InstallationRepository.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerConfiguration.cs" />
     <Compile Include="PropertyEditors\ComplexPropertyEditorContentEventHandler.cs" />
     <Compile Include="Services\IIconService.cs" />
     <Compile Include="Services\Implement\InstallationService.cs" />
@@ -258,7 +261,6 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
-    <Compile Include="Constants-SvgSanitizer.cs" />
     <Compile Include="Exceptions\PanicException.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />

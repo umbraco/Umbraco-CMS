@@ -65,13 +65,10 @@
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
     <PackageReference Include="Examine" Version="1.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
-    <PackageReference Include="HtmlSanitizer">
-      <Version>5.0.376</Version>
-    </PackageReference>
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
     </PackageReference>
-    <PackageReference Include="LightInject" Version="5.4.0" />
+    <PackageReference Include="LightInject" Version="6.4.0" />
     <PackageReference Include="LightInject.Annotation" Version="1.1.0" />
     <PackageReference Include="LightInject.Mvc" Version="2.0.0" />
     <PackageReference Include="LightInject.WebApi" Version="2.0.0" />
@@ -260,6 +257,8 @@
     <Compile Include="PropertyEditors\IFileExtensionConfigItem.cs" />
     <Compile Include="PropertyEditors\FileExtensionConfigItem.cs" />
     <Compile Include="PropertyEditors\IFileExtensionConfig.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\FileUploadConfiguration.cs" />
     <Compile Include="PropertyEditors\FileUploadConfigurationEditor.cs" />
@@ -1306,7 +1305,7 @@
     </PropertyGroup>
     <ItemGroup>
       <!-- we want to exclude all facade references ?! -->
-      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'System.Text.Encoding.CodePages'" />
+      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http'" />
     </ItemGroup>
     <Delete Files="$(TargetDir)$(TargetName).XmlSerializers.dll" ContinueOnError="true" />
     <!--

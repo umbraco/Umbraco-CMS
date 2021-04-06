@@ -60,6 +60,26 @@
             public const string MediaFile = "icon-document";
 
             /// <summary>
+            /// System media video icon
+            /// </summary>
+            public const string MediaVideo = "icon-video";
+
+            /// <summary>
+            /// System media audio icon
+            /// </summary>
+            public const string MediaAudio = "icon-sound-waves";
+
+            /// <summary>
+            /// System media article icon
+            /// </summary>
+            public const string MediaArticle = "icon-article";
+
+            /// <summary>
+            /// System media vector icon
+            /// </summary>
+            public const string MediaVectorGraphics = "icon-picture";
+
+            /// <summary>
             /// System media folder icon
             /// </summary>
             public const string MediaFolder = "icon-folder";
@@ -93,7 +113,7 @@
             /// System packages icon
             /// </summary>
             public const string Packages = "icon-box";
-            
+
             /// <summary>
             /// System property editor icon
             /// </summary>

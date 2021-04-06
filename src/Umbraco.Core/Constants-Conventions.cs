@@ -119,6 +119,26 @@ namespace Umbraco.Core
                 public const string Image = "Image";
 
                 /// <summary>
+                /// MediaType alias for an video-.
+                /// </summary>
+                public const string Video = "Video";
+
+                /// <summary>
+                /// MediaType alias for an audio.
+                /// </summary>
+                public const string Audio = "Audio";
+
+                /// <summary>
+                /// MediaType alias for an article.
+                /// </summary>
+                public const string Article = "Article";
+
+                /// <summary>
+                /// MediaType alias for an vector graphics.
+                /// </summary>
+                public const string VectorGraphics = "VectorGraphics";
+
+                /// <summary>
                 /// MediaType alias indicating allowing auto-selection.
                 /// </summary>
                 public const string AutoSelect = "umbracoAutoSelect";
