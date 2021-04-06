@@ -71,28 +71,29 @@
     const isScope = obj => obj && obj.$evalAsync && obj.$watch;
 
     const toJsonReplacer = (key, value) => {
-        var val = value;      
+        var val = value;
         if (typeof key === 'string' && key.charAt(0) === '$' && key.charAt(1) === '$') {
-          val = undefined;
+            val = undefined;
         } else if (isWindow(value)) {
-          val = '$WINDOW';
-        } else if (value &&  window.document === value) {
-          val = '$DOCUMENT';
+            val = '$WINDOW';
+        } else if (value && window.document === value) {
+            val = '$DOCUMENT';
         } else if (isScope(value)) {
-          val = '$SCOPE';
-        }      
+            val = '$SCOPE';
+        }
         return val;
-      }
+    };
+
     /**
      * Equivalent to angular.toJson
      */
     const toJson = (obj, pretty) => {
         if (isUndefined(obj)) return undefined;
         if (!isNumber(pretty)) {
-          pretty = pretty ? 2 : null;
+            pretty = pretty ? 2 : null;
         }
         return JSON.stringify(obj, toJsonReplacer, pretty);
-    }
+    };
 
     /**
      * Equivalent to angular.fromJson
@@ -102,7 +103,7 @@
             return val;
         }
         return JSON.parse(val);
-    }
+    };
 
     /**
      * Not equivalent to angular.forEach. But like the angularJS method this does not fail on null or undefined.
@@ -112,7 +113,7 @@
             return obj.forEach(iterator);
         }
         return obj;
-    }
+    };
 
     let _utilities = {
         noop: noop,

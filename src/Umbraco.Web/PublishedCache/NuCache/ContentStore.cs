@@ -598,7 +598,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 throw new ArgumentException("Kit content cannot have children.", nameof(kit));
             // ReSharper restore LocalizableElement
 
-            _logger.Debug<ContentStore>("Set content ID: {KitNodeId}", kit.Node.Id);
+            _logger.Debug<ContentStore,int>("Set content ID: {KitNodeId}", kit.Node.Id);
 
             // get existing
             _contentNodes.TryGetValue(kit.Node.Id, out var link);
@@ -863,7 +863,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             if (link?.Value == null) return false;
 
             var content = link.Value;
-            _logger.Debug<ContentStore>("Clear content ID: {ContentId}", content.Id);
+            _logger.Debug<ContentStore,int>("Clear content ID: {ContentId}", content.Id);
 
             // clear the entire branch
             ClearBranchLocked(content);
@@ -1670,7 +1670,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             {
                 if (_gen < 0) return;
 #if DEBUG
-                _logger.Debug<Snapshot>("Dispose snapshot ({Snapshot})", _genRef?.GenObj.Count.ToString() ?? "live");
+                _logger.Debug<Snapshot, string>("Dispose snapshot ({Snapshot})", _genRef?.GenObj.Count.ToString() ?? "live");
 #endif
                 _gen = -1;
                 if (_genRef != null)

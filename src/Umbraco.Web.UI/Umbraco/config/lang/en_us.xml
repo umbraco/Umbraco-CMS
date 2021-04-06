@@ -67,7 +67,7 @@
     <key alias="assignDomain">Allow access to assign culture and hostnames</key>
     <key alias="auditTrail">Allow access to view a node's history log</key>
     <key alias="browse">Allow access to view a node</key>
-    <key alias="changeDocType">Allow access to change document type for a node</key>
+    <key alias="changeDocType">Allow access to change Document Type for a node</key>
     <key alias="copy">Allow access to copy a node</key>
     <key alias="create">Allow access to create nodes</key>
     <key alias="delete">Allow access to delete nodes</key>
@@ -193,12 +193,12 @@
     <key alias="historyIncludingVariants">History (all variants)</key>
   </area>
   <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">To change the document type for the selected content, first select from the list of valid types for this location.</key>
+    <key alias="changeDocTypeInstruction">To change the Document Type for the selected content, first select from the list of valid types for this location.</key>
     <key alias="changeDocTypeInstruction2">Then confirm and/or amend the mapping of properties from the current type to the new, and click Save.</key>
     <key alias="contentRepublished">The content has been re-published.</key>
     <key alias="currentProperty">Current Property</key>
     <key alias="currentType">Current type</key>
-    <key alias="docTypeCannotBeChanged">The document type cannot be changed, as there are no alternatives valid for this location.  An alternative will be valid if it is allowed under the parent of the selected content item and that all existing child content items are allowed to be created under it.</key>
+    <key alias="docTypeCannotBeChanged">The Document Type cannot be changed, as there are no alternatives valid for this location.  An alternative will be valid if it is allowed under the parent of the selected content item and that all existing child content items are allowed to be created under it.</key>
     <key alias="docTypeChanged">Document Type Changed</key>
     <key alias="mapProperties">Map Properties</key>
     <key alias="mapToProperty">Map to Property</key>
@@ -207,7 +207,7 @@
     <key alias="none">none</key>
     <key alias="selectedContent">Content</key>
     <key alias="selectNewDocType">Select New Document Type</key>
-    <key alias="successMessage">The document type of the selected content has been successfully changed to [new type] and the following properties mapped:</key>
+    <key alias="successMessage">The Document Type of the selected content has been successfully changed to [new type] and the following properties mapped:</key>
     <key alias="to">to</key>
     <key alias="validationErrorPropertyWithMoreThanOneMapping">Could not complete property mapping as one or more properties have more than one mapping defined.</key>
     <key alias="validDocTypesNote">Only alternate types valid for the current location are displayed.</key>
@@ -272,6 +272,7 @@
     <key alias="statistics">Statistics</key>
     <key alias="titleOptional">Title (optional)</key>
     <key alias="altTextOptional">Alternative text (optional)</key>
+    <key alias="captionTextOptional">Caption (optional)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Unpublish</key>
     <key alias="unpublished">Draft</key>
@@ -287,14 +288,14 @@
     <key alias="childItems" version="7.0">Child items</key>
     <key alias="target" version="7.0">Target</key>
     <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">What does this mean?</a>]]></key>
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentDeleteAllItems">Are you sure you want to delete all items?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
-    <key alias="nestedContentNoContentTypes">No content types are configured for this property.</key>
-    <key alias="nestedContentAddElementType">Add element type</key>
-    <key alias="nestedContentSelectElementTypeModalTitle">Select element type</key>
-    <key alias="nestedContentGroupHelpText">Select the group whose properties should be displayed. If left blank, the first group on the element type will be used.</key>
+    <key alias="nestedContentNoContentTypes">No Content Types are configured for this property.</key>
+    <key alias="nestedContentAddElementType">Add Element Type</key>
+    <key alias="nestedContentSelectElementTypeModalTitle">Select Element Type</key>
+    <key alias="nestedContentGroupHelpText">Select the group whose properties should be displayed. If left blank, the first group on the Element Type will be used.</key>
     <key alias="nestedContentTemplateHelpTextPart1">Enter an angular expression to evaluate against each item for its name. Use</key>
     <key alias="nestedContentTemplateHelpTextPart2">to display the item index</key>
     <key alias="addTextBox">Add another text box</key>
@@ -361,24 +362,45 @@
     <key alias="allMembers">All Members</key>
     <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
   </area>
+  <area alias="contentType">
+     <key alias="copyFailed">Failed to copy content type</key>
+     <key alias="moveFailed">Failed to move content type</key>
+  </area>
+  <area alias="mediaType">
+     <key alias="copyFailed">Failed to copy media type</key>
+     <key alias="moveFailed">Failed to move media type</key>
+  </area>
+  <area alias="memberType">
+     <key alias="copyFailed">Failed to copy member type</key>
+  </area>
   <area alias="create">
     <key alias="chooseNode">Where do you want to create the new %0%</key>
     <key alias="createUnder">Create an item under</key>
-    <key alias="createContentBlueprint">Select the document type you want to make a content template for</key>
+    <key alias="createContentBlueprint">Select the Document Type you want to make a content template for</key>
     <key alias="enterFolderName">Enter a folder name</key>
     <key alias="updateData">Choose a type and a title</key>
-    <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
-    <key alias="noDocumentTypesAtRoot"><![CDATA[There are no document types available for creating content here. You must create these in <strong>Document Types</strong> within the <strong>Settings</strong> section.]]></key>
+    <key alias="noDocumentTypes" version="7.0"><![CDATA[There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
+    <key alias="noDocumentTypesAtRoot"><![CDATA[There are no Document Types available for creating content here. You must create these in <strong>Document Types</strong> within the <strong>Settings</strong> section.]]></key>
     <key alias="noDocumentTypesWithNoSettingsAccess">The selected page in the content tree doesn't allow for any pages to be created below it.</key>
-    <key alias="noDocumentTypesEditPermissions">Edit permissions for this document type</key>
-    <key alias="noDocumentTypesCreateNew">Create a new document type</key>
-    <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[There are no allowed document types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.]]></key>
-    <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed media types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
+    <key alias="noDocumentTypesEditPermissions">Edit permissions for this Document Type</key>
+    <key alias="noDocumentTypesCreateNew">Create a new Document Type</key>
+    <key alias="noDocumentTypesAllowedAtRoot"><![CDATA[There are no allowed Document Types available for creating content here. You must enable these in <strong>Document Types</strong> within the <strong>Settings</strong> section, by changing the <strong>Allow as root</strong> option under <strong>Permissions</strong>.]]></key>
+    <key alias="noMediaTypes" version="7.0"><![CDATA[There are no allowed Media Types available for creating media here. You must enable these in <strong>Media Types Types</strong> within the <strong>Settings</strong> section, by editing the <strong>Allowed child node types</strong> under <strong>Permissions</strong>.]]></key>
     <key alias="noMediaTypesWithNoSettingsAccess">The selected media in the tree doesn't allow for any other media to be created below it.</key>
-    <key alias="noMediaTypesEditPermissions">Edit permissions for this media type</key>
+    <key alias="noMediaTypesEditPermissions">Edit permissions for this Media Type</key>
     <key alias="documentTypeWithoutTemplate">Document Type without a template</key>
+    <key alias="documentTypeWithTemplate">Document Type with Template</key>
+    <key alias="documentTypeWithTemplateDescription">The data definition for a content page that can be created by editors in the content tree and is directly accessible via a URL.</key>
+    <key alias="documentType">Document Type</key>
+    <key alias="documentTypeDescription">The data definition for a content component that can be created by editors in the content tree and be picked on other pages but has no direct URL.</key>
+    <key alias="elementType">Element Type</key>
+    <key alias="elementTypeDescription">Defines the schema for a repeating set of properties, for example, in a 'Block List' or 'Nested Content' property editor.</key>
+    <key alias="composition">Composition</key>
+    <key alias="compositionDescription">Defines a re-usable set of properties that can be included in the definition of multiple other Document Types. For example, a set of 'Common Page Settings'.</key>
+    <key alias="folder">Folder</key>
+    <key alias="folderDescription">Used to organise the Document Types, Compositions and Element Types created in this Document Type tree.</key>
     <key alias="newFolder">New folder</key>
-    <key alias="newDataType">New data type</key>
+    <key alias="newDataType">New Data Type</key>
     <key alias="newJavascriptFile">New JavaScript file</key>
     <key alias="newEmptyPartialView">New empty partial view</key>
     <key alias="newPartialViewMacro">New partial view macro</key>
@@ -471,7 +493,7 @@
     <key alias="recycleBinDeleting">The items in the recycle bin are now being deleted. Please do not close this window while this operation takes place</key>
     <key alias="recycleBinIsEmpty">The recycle bin is now empty</key>
     <key alias="recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
     <key alias="regexSearchHelp">Search for a regular expression to add validation to a form field. Example: 'email, 'zip-code', 'URL'.</key>
     <key alias="removeMacro">Remove Macro</key>
     <key alias="requiredField">Required Field</key>
@@ -523,6 +545,7 @@
     <key alias="propertyuserpickerremovewarning"><![CDATA[This will remove the user <b>%0%</b>.]]></key>
     <key alias="userremovewarning"><![CDATA[This will remove the user <b>%0%</b> from the <b>%1%</b> group]]></key>
     <key alias="yesRemove">Yes, remove</key>
+    <key alias="tabClipboard">Clipboard</key>
   </area>
   <area alias="dictionary">
     <key alias="noItems">There are no dictionary items.</key>
@@ -561,7 +584,7 @@
     <key alias="toolsDescription">Tools to manage the index</key>
     <key alias="fields">fields</key>
     <key alias="indexCannotRead">The index cannot be read and will need to be rebuilt</key>
-    <key alias="processIsTakingLonger">The process is taking longer than expected, check the umbraco log to see if there have been any errors during this operation</key>
+    <key alias="processIsTakingLonger">The process is taking longer than expected, check the Umbraco log to see if there have been any errors during this operation</key>
     <key alias="indexCannotRebuild">This index cannot be rebuilt because it has no assigned</key>
     <key alias="iIndexPopulator">IIndexPopulator</key>
   </area>
@@ -591,7 +614,7 @@
   <area alias="editcontenttype">
     <key alias="createListView" version="7.2">Create custom list view</key>
     <key alias="removeListView" version="7.2">Remove custom list view</key>
-    <key alias="aliasAlreadyExists">A content type, media type or member type with this alias already exists</key>
+    <key alias="aliasAlreadyExists">A Content Type, Media Type or Member Type with this alias already exists</key>
   </area>
   <area alias="renamecontainer">
     <key alias="renamed">Renamed</key>
@@ -611,9 +634,9 @@
     <key alias="rteShowLabel">Show label</key>
     <key alias="rteWidthAndHeight">Width and height</key>
     <key alias="allPropTypes">All property types &amp; property data</key>
-    <key alias="willBeDeleted">using this data type will be deleted permanently, please confirm you want to delete these as well</key>
+    <key alias="willBeDeleted">using this Data Type will be deleted permanently, please confirm you want to delete these as well</key>
     <key alias="yesDelete">Yes, delete</key>
-    <key alias="andAllRelated">and all property types &amp; property data using this data type</key>
+    <key alias="andAllRelated">and all property types &amp; property data using this Data Type</key>
     <key alias="selectFolder">Select the folder to move</key>
     <key alias="inTheTree">to in the tree structure below</key>
     <key alias="wasMoved">was moved underneath</key>
@@ -649,7 +672,6 @@
     <key alias="tableColMergeLeft">Please place cursor at the left of the two cells you wish to merge</key>
     <key alias="tableSplitNotSplittable">You cannot split a cell that hasn't been merged.</key>
     <key alias="propertyHasErrors">This property is invalid</key>
-    <key alias="errorPropertyEditorNotSupportedInElementTypes">Property '%0%' uses editor '%1%' which is not supported in Element Types.</key>
   </area>
   <area alias="general">
     <key alias="options">Options</key>
@@ -670,6 +692,7 @@
     <key alias="clear">Clear</key>
     <key alias="close">Close</key>
     <key alias="closewindow">Close Window</key>
+    <key alias="closepane">Close Pane</key>
     <key alias="comment">Comment</key>
     <key alias="confirm">Confirm</key>
     <key alias="constrain">Constrain</key>
@@ -805,6 +828,7 @@
     <key alias="articles">Articles</key>
     <key alias="videos">Videos</key>
     <key alias="installing">Installing</key>
+    <key alias="avatar">Avatar for</key>
   </area>
   <area alias="colors">
     <key alias="blue">Blue</key>
@@ -903,7 +927,7 @@
     ]]></key>
     <key alias="runwayFromScratch">I want to start from scratch</key>
     <key alias="runwayFromScratchText"><![CDATA[
-        Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own document types and templates.
+        Your website is completely empty at the moment, so that's perfect if you want to start from scratch and create your own Document Types and templates.
         (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">learn how</a>)
         You can still choose to install Runway later on. Please go to the Developer section and choose Packages.
       ]]></key>
@@ -917,7 +941,7 @@
     <key alias="runwaySimpleSite">I want to start with a simple website</key>
     <key alias="runwaySimpleSiteText"><![CDATA[
       <p>
-      "Runway" is a simple website providing some basic document types and templates. The installer can set up Runway for you automatically,
+      "Runway" is a simple website providing some basic Document Types and templates. The installer can set up Runway for you automatically,
         but you can easily edit, extend or remove it. It's not necessary and you can perfectly use Umbraco without it. However,
         Runway offers an easy foundation based on best practices to get you started faster than ever.
         If you choose to install Runway, you can optionally select basic building blocks called Runway Modules to enhance your Runway pages.
@@ -944,7 +968,7 @@ Get help from our award winning community, browse the documentation or watch som
     <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
-To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
+To manage your website, simply open the Umbraco backoffice and start adding content, updating the templates and stylesheets or add new functionality]]></key>
     <key alias="Unavailable">Connection to database failed.</key>
     <key alias="Version3">Umbraco Version 3</key>
     <key alias="Version4">Umbraco Version 4</key>
@@ -972,7 +996,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="instruction">Log in below</key>
     <key alias="signInWith">Sign in with</key>
     <key alias="timeout">Session timed out</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Forgotten password?</key>
     <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
     <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
@@ -1023,14 +1047,14 @@ To manage your website, simply open the Umbraco back office and start adding con
 															Password reset requested
 														</h1>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															Your username to login to the Umbraco back-office is: <strong>%0%</strong>
+															Your username to login to the Umbraco backoffice is: <strong>%0%</strong>
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
 																<tbody>
 																	<tr>
 																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																				Click this link to reset your password
 																			</a>
 																		</td>
@@ -1151,7 +1175,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
 																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
 																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>EDIT</a> </td> </tr></tbody></table>
+																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>EDIT</a> </td> </tr></tbody></table>
 																	</td>
 																</tr>
 															</tbody>
@@ -1391,7 +1415,7 @@ To manage your website, simply open the Umbraco back office and start adding con
   </area>
   <area alias="settings">
     <key alias="defaulttemplate">Default template</key>
-    <key alias="importDocumentTypeHelp">To import a document type, find the ".udt" file on your computer by clicking the "Browse" button and click "Import" (you'll be asked for confirmation on the next screen)</key>
+    <key alias="importDocumentTypeHelp">To import a Document Type, find the ".udt" file on your computer by clicking the "Browse" button and click "Import" (you'll be asked for confirmation on the next screen)</key>
     <key alias="newtabname">New Tab Title</key>
     <key alias="nodetype">Node type</key>
     <key alias="objecttype">Type</key>
@@ -1402,7 +1426,6 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="tabs">Tabs</key>
     <key alias="contentTypeEnabled">Master Content Type enabled</key>
     <key alias="contentTypeUses">This Content Type uses</key>
-    <key alias="asAContentMasterType">as a Master Content Type. Tabs from Master Content Types are not shown and can only be edited on the Master Content Type itself</key>
     <key alias="noPropertiesDefinedOnTab">No properties defined on this tab. Click on the "add a new property" link at the top to create a new property.</key>
     <key alias="createMatchingTemplate">Create matching template</key>
     <key alias="addIcon">Add icon</key>
@@ -1498,8 +1521,8 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="resendInviteSuccess">Invitation has been re-sent to %0%</key>
     <key alias="contentReqCulturePublishError">Cannot publish the document since the required '%0%' is not published</key>
     <key alias="contentCultureValidationError">Validation failed for language '%0%'</key>
-    <key alias="documentTypeExportedSuccess">Document type was exported to file</key>
-    <key alias="documentTypeExportedError">An error occurred while exporting the document type</key>
+    <key alias="documentTypeExportedSuccess">Document Type was exported to file</key>
+    <key alias="documentTypeExportedError">An error occurred while exporting the Document Type</key>
     <key alias="scheduleErrReleaseDate1">The release date cannot be in the past</key>
     <key alias="scheduleErrReleaseDate2">Cannot schedule the document for publishing since the required '%0%' is not published</key>
     <key alias="scheduleErrReleaseDate3">Cannot schedule the document for publishing since the required '%0%' has a publish date later than a non mandatory language</key>
@@ -1665,10 +1688,10 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="childNodesHeading">Allowed child node types</key>
     <key alias="childNodesDescription">Allow content of the specified types to be created underneath content of this type.</key>
     <key alias="chooseChildNode">Choose child node</key>
-    <key alias="compositionsDescription">Inherit tabs and properties from an existing document type. New tabs will be added to the current document type or merged if a tab with an identical name exists.</key>
-    <key alias="compositionInUse">This content type is used in a composition, and therefore cannot be composed itself.</key>
-    <key alias="noAvailableCompositions">There are no content types available to use as a composition.</key>
-    <key alias="compositionRemoveWarning">Removing a composition will delete all the associated property data. Once you save the document type there's no way back.</key>
+    <key alias="compositionsDescription">Inherit tabs and properties from an existing Document Type. New tabs will be added to the current Document Type or merged if a tab with an identical name exists.</key>
+    <key alias="compositionInUse">This Content Type is used in a composition, and therefore cannot be composed itself.</key>
+    <key alias="noAvailableCompositions">There are no Content Types available to use as a composition.</key>
+    <key alias="compositionRemoveWarning">Removing a composition will delete all the associated property data. Once you save the Document Type there's no way back.</key>
     <key alias="availableEditors">Create new</key>
     <key alias="reuse">Use existing</key>
     <key alias="editorSettings">Editor settings</key>
@@ -1681,12 +1704,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="folderToMove">Select the folder to move</key>
     <key alias="folderToCopy">Select the folder to copy</key>
     <key alias="structureBelow">to in the tree structure below</key>
-    <key alias="allDocumentTypes">All Document types</key>
+    <key alias="allDocumentTypes">All Document Types</key>
     <key alias="allDocuments">All Documents</key>
     <key alias="allMediaItems">All media items</key>
-    <key alias="usingThisDocument">using this document type will be deleted permanently, please confirm you want to delete these as well.</key>
-    <key alias="usingThisMedia">using this media type will be deleted permanently, please confirm you want to delete these as well.</key>
-    <key alias="usingThisMember">using this member type will be deleted permanently, please confirm you want to delete these as well</key>
+    <key alias="usingThisDocument">using this Document Type will be deleted permanently, please confirm you want to delete these as well.</key>
+    <key alias="usingThisMedia">using this Media Type will be deleted permanently, please confirm you want to delete these as well.</key>
+    <key alias="usingThisMember">using this Member Type will be deleted permanently, please confirm you want to delete these as well</key>
     <key alias="andAllDocuments">and all documents using this type</key>
     <key alias="andAllMediaItems">and all media items using this type</key>
     <key alias="andAllMembers">and all members using this type</key>
@@ -1698,7 +1721,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="showOnMemberProfileDescription">Allow this property value to be displayed on the member profile page</key>
     <key alias="tabHasNoSortOrder">tab has no sort order</key>
     <key alias="compositionUsageHeading">Where is this composition used?</key>
-    <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following content types:</key>
+    <key alias="compositionUsageSpecification">This composition is currently used in the composition of the following Content Types:</key>
     <key alias="variantsHeading">Allow variations</key>
     <key alias="cultureVariantHeading">Allow vary by culture</key>
     <key alias="segmentVariantHeading">Allow segmentation</key>
@@ -1709,11 +1732,11 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="segmentVariantDescription">Allow editors to create segments of this content.</key>
     <key alias="allowVaryByCulture">Allow varying by culture</key>
     <key alias="allowVaryBySegment">Allow segmentation</key>
-    <key alias="elementType">Element type</key>
-    <key alias="elementHeading">Is an element type</key>
-    <key alias="elementDescription">An element type is meant to be used for instance in Nested Content, and not in the tree.</key>
-    <key alias="elementCannotToggle">A document type cannot be changed to an element type once it has been used to create one or more content items.</key>
-    <key alias="elementDoesNotSupport">This is not applicable for an element type</key>
+    <key alias="elementType">Element Type</key>
+    <key alias="elementHeading">Is an Element Type</key>
+    <key alias="elementDescription">An Element Type is meant to be used for instance in Nested Content, and not in the tree.</key>
+    <key alias="elementCannotToggle">A Document Type cannot be changed to an Element Type once it has been used to create one or more content items.</key>
+    <key alias="elementDoesNotSupport">This is not applicable for an Element Type</key>
     <key alias="propertyHasChanges">You have made changes to this property. Are you sure you want to discard them?</key>
     <key alias="displaySettingsHeadline">Appearance</key>
     <key alias="displaySettingsLabelOnTop">Label above (full-width)</key>
@@ -1872,10 +1895,12 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="changePassword">Change your password</key>
     <key alias="changePhoto">Change photo</key>
     <key alias="newPassword">New password</key>
+    <key alias="newPasswordFormatLengthTip">Minimum %0% character(s) to go!</key>
+    <key alias="newPasswordFormatNonAlphaTip">There should be at least %0% special character(s) in there.</key>
     <key alias="noLockouts">hasn't been locked out</key>
     <key alias="noPasswordChange">The password hasn't been changed</key>
     <key alias="confirmNewPassword">Confirm new password</key>
-    <key alias="changePasswordDescription">You can change your password for accessing the Umbraco Back Office by filling out the form below and click the 'Change Password' button</key>
+    <key alias="changePasswordDescription">You can change your password for accessing the Umbraco backoffice by filling out the form below and click the 'Change Password' button</key>
     <key alias="contentChannel">Content Channel</key>
     <key alias="createAnotherUser">Create another user</key>
     <key alias="createUserHelp">Create new users to give them access to Umbraco. When a new user is created a password will be generated that you can share with the user.</key>
@@ -2008,7 +2033,7 @@ To manage your website, simply open the Umbraco back office and start adding con
 																			<tbody>
 																				<tr>
 																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																						<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																							Click this link to accept the invite
 																						</a>
 																					</td>
@@ -2080,6 +2105,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="itemsSelected">items selected</key>
     <key alias="invalidDate">Invalid date</key>
     <key alias="invalidNumber">Not a number</key>
+    <key alias="invalidNumberStepSize">Not a valid numeric step size</key>
     <key alias="invalidEmail">Invalid email</key>
     <key alias="invalidNull">Value cannot be null</key>
     <key alias="invalidEmpty">Value cannot be empty</key>
@@ -2244,7 +2270,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="created">Created</key>
     <key alias="comment">Comment</key>
     <key alias="name">Name</key>
-    <key alias="noRelations">No relations for this relation type.</key>
+    <key alias="noRelations">No relations for this Relation Type</key>
     <key alias="tabRelationType">Relation Type</key>
     <key alias="tabRelations">Relations</key>
   </area>
@@ -2288,7 +2314,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="newPartialView">Partial View</key>
     <key alias="newPartialViewMacro">Partial View Macro</key>
     <key alias="newMember">Member</key>
-    <key alias="newDataType">Data type</key>
+    <key alias="newDataType">Data Type</key>
     <key alias="redirectDashboardSearchLabel">Search the redirect dashboard</key>
     <key alias="userGroupSearchLabel">Search the user group section</key>
     <key alias="userSearchLabel">Search the users section</key>
@@ -2309,6 +2335,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="contextMenuDescription">Select one of the options to edit the node.</key>
     <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
     <key alias="addImageCaption">Add image caption</key>
+    <key alias="searchContentTree">Search content tree</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2514,7 +2541,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="labelLabelTemplate">Label</key>
     <key alias="labelCustomView">Custom view</key>
     <key alias="labelCustomViewInfoTitle">Show custom view description</key>
-    <key alias="labelCustomViewDescription">Overwrite how this block appears in the BackOffice UI. Pick a .html file containing your presentation.</key>
+    <key alias="labelCustomViewDescription">Overwrite how this block appears in the backoffice UI. Pick a .html file containing your presentation.</key>
     <key alias="labelSettingsElementType">Settings model</key>
     <key alias="labelEditorSize">Overlay editor size</key>
     <key alias="addCustomView">Add custom view</key>
@@ -2536,6 +2563,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
     <key alias="elementTypeDoesNotExistHeadline">Error!</key>
     <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
+    <key alias="propertyEditorNotSupported">Property '%0%' uses editor '%1%' which is not supported in blocks.</key>
   </area>
   <area alias="contentTemplatesDashboard">
     <key alias="whatHeadline">What are Content Templates?</key>
@@ -2567,5 +2595,9 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="viewPublishedContentDescription">You are in Preview Mode, do you want exit in order to view the published version of your website?</key>
     <key alias="viewPublishedContentAcceptButton">View published version</key>
     <key alias="viewPublishedContentDeclineButton">Stay in preview mode</key>
+  </area>
+  <area alias="treeSearch">
+    <key alias="searchResult">item returned</key>
+    <key alias="searchResults">items returned</key>
   </area>
 </language>
