@@ -246,10 +246,9 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
             else
             {
-                // else, create or write template.Content to disk,
-                // but don't overwrite existing file.
+                // else, create or write template.Content to disk
                 content = originalAlias == null
-                    ? _viewHelper.CreateView(template, false)
+                    ? _viewHelper.CreateView(template, true)
                     : _viewHelper.UpdateViewFile(template, originalAlias);
             }
 
