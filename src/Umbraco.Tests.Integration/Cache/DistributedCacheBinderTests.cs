@@ -59,12 +59,6 @@ namespace Umbraco.Cms.Tests.Integration.Cache
                 // not managed
                 //new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "SavedBlueprint"),
                 //new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>()), "DeletedBlueprint"),
-
-                new EventDefinition<IRelationService, SaveEventArgs<IRelationType>>(null, RelationService, new SaveEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
-                new EventDefinition<IRelationService, DeleteEventArgs<IRelationType>>(null, RelationService, new DeleteEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
-
-                new EventDefinition<IRelationService, SaveEventArgs<IRelationType>>(null, RelationService, new SaveEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
-                new EventDefinition<IRelationService, DeleteEventArgs<IRelationType>>(null, RelationService, new DeleteEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
             };
 
             var ok = true;

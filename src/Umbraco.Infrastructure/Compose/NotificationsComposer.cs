@@ -83,6 +83,8 @@ namespace Umbraco.Cms.Core.Compose
                 .AddNotificationHandler<MemberGroupSavedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<DataTypeDeletedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<DataTypeSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<RelationTypeDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<RelationTypeSavedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<DomainDeletedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<DomainSavedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<MacroSavedNotification, DistributedCacheBinder>()

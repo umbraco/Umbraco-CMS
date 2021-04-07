@@ -36,6 +36,8 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<MemberGroupSavedNotification>,
         INotificationHandler<DataTypeDeletedNotification>,
         INotificationHandler<DataTypeSavedNotification>,
+        INotificationHandler<RelationTypeDeletedNotification>,
+        INotificationHandler<RelationTypeSavedNotification>,
         INotificationHandler<DomainDeletedNotification>,
         INotificationHandler<DomainSavedNotification>,
         INotificationHandler<MacroSavedNotification>,
@@ -103,12 +105,6 @@ namespace Umbraco.Cms.Core.Cache
             //    () => ContentService.SavedBlueprint -= ContentService_SavedBlueprint);
             //Bind(() => ContentService.DeletedBlueprint += ContentService_DeletedBlueprint,
             //    () => ContentService.DeletedBlueprint -= ContentService_DeletedBlueprint);
-
-            // bind to relation type events
-            Bind(() => RelationService.SavedRelationType += RelationService_SavedRelationType,
-                () => RelationService.SavedRelationType -= RelationService_SavedRelationType);
-            Bind(() => RelationService.DeletedRelationType += RelationService_DeletedRelationType,
-                () => RelationService.DeletedRelationType -= RelationService_DeletedRelationType);
         }
 
         #region PublicAccessService
@@ -411,18 +407,22 @@ namespace Umbraco.Cms.Core.Cache
 
         #region RelationType
 
-        private void RelationService_SavedRelationType(IRelationService sender, SaveEventArgs<IRelationType> args)
+        public void Handle(RelationTypeSavedNotification notification)
         {
-            var dc = _distributedCache;
-            foreach (var e in args.SavedEntities)
-                dc.RefreshRelationTypeCache(e.Id);
+            DistributedCache dc = _distributedCache;
+            foreach (IRelationType entity in notification.SavedEntities)
+            {
+                dc.RefreshRelationTypeCache(entity.Id);
+            }
         }
 
-        private void RelationService_DeletedRelationType(IRelationService sender, DeleteEventArgs<IRelationType> args)
+        public void Handle(RelationTypeDeletedNotification notification)
         {
-            var dc = _distributedCache;
-            foreach (var e in args.DeletedEntities)
-                dc.RemoveRelationTypeCache(e.Id);
+            DistributedCache dc = _distributedCache;
+            foreach (IRelationType entity in notification.DeletedEntities)
+            {
+                dc.RemoveRelationTypeCache(entity.Id);
+            }
         }
 
         #endregion
