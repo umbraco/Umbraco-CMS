@@ -37,7 +37,11 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<DataTypeDeletedNotification>,
         INotificationHandler<DataTypeSavedNotification>,
         INotificationHandler<RelationTypeDeletedNotification>,
-        INotificationHandler<RelationTypeSavedNotification>
+        INotificationHandler<RelationTypeSavedNotification>,
+        INotificationHandler<DomainDeletedNotification>,
+        INotificationHandler<DomainSavedNotification>,
+        INotificationHandler<MacroSavedNotification>,
+        INotificationHandler<MacroDeletedNotification>
     {
         private List<Action> _unbinders;
 
@@ -74,12 +78,6 @@ namespace Umbraco.Cms.Core.Cache
             Bind(() => FileService.DeletedStylesheet += FileService_DeletedStylesheet,
                 () => FileService.DeletedStylesheet -= FileService_DeletedStylesheet);
 
-            // bind to domain events
-            Bind(() => DomainService.Saved += DomainService_Saved,
-                () => DomainService.Saved -= DomainService_Saved);
-            Bind(() => DomainService.Deleted += DomainService_Deleted,
-                () => DomainService.Deleted -= DomainService_Deleted);
-
             // bind to content type events
             Bind(() => ContentTypeService.Changed += ContentTypeService_Changed,
                 () => ContentTypeService.Changed -= ContentTypeService_Changed);
@@ -93,12 +91,6 @@ namespace Umbraco.Cms.Core.Cache
                 () => FileService.SavedTemplate -= FileService_SavedTemplate);
             Bind(() => FileService.DeletedTemplate += FileService_DeletedTemplate,
                 () => FileService.DeletedTemplate -= FileService_DeletedTemplate);
-
-            // bind to macro events
-            Bind(() => MacroService.Saved += MacroService_Saved,
-                () => MacroService.Saved -= MacroService_Saved);
-            Bind(() => MacroService.Deleted += MacroService_Deleted,
-                () => MacroService.Deleted -= MacroService_Deleted);
 
             // bind to media events - handles all media changes
             Bind(() => MediaService.TreeChanged += MediaService_TreeChanged,
@@ -203,16 +195,20 @@ namespace Umbraco.Cms.Core.Cache
 
         #region DomainService
 
-        private void DomainService_Saved(IDomainService sender, SaveEventArgs<IDomain> e)
+        public void Handle(DomainSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (IDomain entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshDomainCache(entity);
+            }
         }
 
-        private void DomainService_Deleted(IDomainService sender, DeleteEventArgs<IDomain> e)
+        public void Handle(DomainDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (IDomain entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveDomainCache(entity);
+            }
         }
 
         #endregion
@@ -340,16 +336,20 @@ namespace Umbraco.Cms.Core.Cache
 
         #region MacroService
 
-        private void MacroService_Deleted(IMacroService sender, DeleteEventArgs<IMacro> e)
+        public void Handle(MacroDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (IMacro entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveMacroCache(entity);
+            }
         }
 
-        private void MacroService_Saved(IMacroService sender, SaveEventArgs<IMacro> e)
+        public void Handle(MacroSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (IMacro entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshMacroCache(entity);
+            }
         }
 
         #endregion

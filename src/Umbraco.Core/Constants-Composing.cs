@@ -9,6 +9,17 @@
         /// Defines constants for composition.
         /// </summary>
         public static class Composing
-        { }
+        {
+            public static readonly string[] UmbracoCoreAssemblyNames = new[]
+            {
+                "Umbraco.Core",
+                "Umbraco.Infrastructure",
+                "Umbraco.PublishedCache.NuCache",
+                "Umbraco.Examine.Lucene",
+                "Umbraco.Web.Common",
+                "Umbraco.Web.BackOffice",
+                "Umbraco.Web.Website",
+            };
+        }
     }
 }

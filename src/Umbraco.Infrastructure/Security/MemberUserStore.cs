@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Security
     /// <summary>
     /// A custom user store that uses Umbraco member data
     /// </summary>
-    public class MemberUserStore : UserStoreBase<MemberIdentityUser, IdentityRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityUserToken<string>, IdentityRoleClaim<string>>
+    public class MemberUserStore : UserStoreBase<MemberIdentityUser, UmbracoIdentityRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityUserToken<string>, IdentityRoleClaim<string>>
     {
         private const string genericIdentityErrorCode = "IdentityErrorUserStore";
         private readonly IMemberService _memberService;
@@ -562,7 +562,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc/>
-        protected override Task<IdentityRole> FindRoleAsync(string roleName, CancellationToken cancellationToken)
+        protected override Task<UmbracoIdentityRole> FindRoleAsync(string roleName, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(roleName))
             {
@@ -572,10 +572,10 @@ namespace Umbraco.Cms.Core.Security
             IMemberGroup group = _memberService.GetAllRoles().SingleOrDefault(x => x.Name == roleName);
             if (group == null)
             {
-                return Task.FromResult((IdentityRole)null);
+                return Task.FromResult((UmbracoIdentityRole)null);
             }
 
-            return Task.FromResult(new IdentityRole(group.Name)
+            return Task.FromResult(new UmbracoIdentityRole(group.Name)
             {
                 //TODO: what should the alias be?
                 Id = group.Id.ToString()

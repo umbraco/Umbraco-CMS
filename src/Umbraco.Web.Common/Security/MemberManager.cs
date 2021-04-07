@@ -10,9 +10,9 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Web.Common.Security
 {
+
     public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswordConfigurationSettings>, IMemberManager
     {
-
         public MemberManager(
             IIpResolver ipResolver,
             IUserStore<MemberIdentityUser> store,
@@ -24,7 +24,8 @@ namespace Umbraco.Cms.Web.Common.Security
             IServiceProvider services,
             ILogger<UserManager<MemberIdentityUser>> logger,
             IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
-            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors, services, logger, passwordConfiguration)
+            : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors,
+                services, logger, passwordConfiguration)
         {
         }
     }
