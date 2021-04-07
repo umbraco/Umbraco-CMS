@@ -1,11 +1,11 @@
 {
     "$schema": "http://json.schemastore.org/template",
     "author": "Umbraco HQ",
-    "description": "An empty Umbraco Solution ready to get started",
+    "description": "An empty Umbraco Project ready to get started",
     "classifications": [ "Web", "CMS", "Umbraco"],
     "groupIdentity": "Umbraco.Templates.UmbracoProject",
     "identity": "Umbraco.Templates.UmbracoProject.CSharp",
-    "name": "Umbraco Solution",
+    "name": "Umbraco Project",
     "shortName": "umbraco",
     "defaultName": "UmbracoProject1",
     "preferNameDirectory": true,
