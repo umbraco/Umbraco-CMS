@@ -6,6 +6,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web
 {
@@ -379,6 +380,12 @@ namespace Umbraco.Web
             options.CacheBusterValue = cacheBusterValue;
 
             return imageUrlGenerator.GetImageUrl(options);
+        }
+
+        public static string GetLocalCropUrl(this MediaPickerWithCropsValueConverter.MediaWithCrops mediaWithCrops, string alias, IImageUrlGenerator imageUrlGenerator, string cacheBusterValue)
+        {
+            return mediaWithCrops.LocalCrops.Src + mediaWithCrops.LocalCrops.GetCropUrl(alias, imageUrlGenerator, cacheBusterValue: cacheBusterValue);
+
         }
     }
 }

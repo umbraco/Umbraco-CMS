@@ -10,6 +10,7 @@ using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
 using Umbraco.Core.Logging;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web
 {
@@ -119,6 +120,13 @@ namespace Umbraco.Web
              string furtherOptions = null,
              ImageCropRatioMode? ratioMode = null,
              bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, Current.ImageUrlGenerator, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode, upScale);
+
+        public static string GetLocalCropUrl(this MediaPickerWithCropsValueConverter.MediaWithCrops mediaWithCrops,
+            string alias,
+            string cacheBusterValue = null)
+            => ImageCropperTemplateCoreExtensions.GetLocalCropUrl(mediaWithCrops, alias, Current.ImageUrlGenerator,  cacheBusterValue);
+
+
 
         /// <summary>
         /// Gets the ImageProcessor URL from the image path.
