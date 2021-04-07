@@ -346,8 +346,6 @@
     Write-Host "Copy files for dotnet templates"
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Program.cs", "$tmp\Templates\UmbracoProject")
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\UmbracoProject")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.json", "$tmp\Templates\UmbracoProject")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.Development.json", "$tmp\Templates\UmbracoProject")
     $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\Views", "*", "$tmp\Templates\UmbracoProject\Views")
 
   $this.RemoveDirectory("$tmp\Templates\UmbracoProject\bin")
