@@ -30,9 +30,9 @@ angular.module("umbraco")
             vm.showMediaList = false;
 
             vm.navigation = [];
-            vm.clipboardImages = [];
 
             var dialogOptions = $scope.model;
+            vm.clipboardItems = dialogOptions.clipboardItems;
 
             $scope.disableFolderSelect = (dialogOptions.disableFolderSelect && dialogOptions.disableFolderSelect !== "0") ? true : false;
             $scope.disableFocalPoint = (dialogOptions.disableFocalPoint && dialogOptions.disableFocalPoint !== "0") ? true : false;
@@ -116,22 +116,27 @@ angular.module("umbraco")
                                 "icon": "icon-umb-media",
                                 "active": true,
                                 "view": ""
-                            },
-                            {
-                                "alias": "clipboard",
-                                "name": data[1],
-                                "icon": "icon-paste-in",
-                                "view": "",
-                                "disabled": vm.clipboardImages.length === 0
                             }];
+
+                            if(vm.clipboardItems) {
+                                vm.navigation.push({
+                                    "alias": "clipboard",
+                                    "name": data[1],
+                                    "icon": "icon-paste-in",
+                                    "view": "",
+                                    "disabled": vm.clipboardItems.length === 0
+                                });
+                            }
 
                             vm.activeTab = vm.navigation[0];
                         });
+
                 }
             }
 
             function onInit() {
 
+                /*
                 clipboardService.retriveEntriesOfType(clipboardService.TYPES.IMAGE, ["Media"]).forEach(item => {
                     var media = item.data.media;
                     if ((($scope.disableFolderSelect || $scope.onlyImages) && media.isFolder) ||
@@ -141,6 +146,7 @@ angular.module("umbraco")
                     setDefaultData(media);
                     vm.clipboardImages.push(media);
                 });
+                */
 
                 setTitle();
 
@@ -437,8 +443,8 @@ angular.module("umbraco")
             function clickClearClipboard() {
                 vm.onNavigationChanged(vm.navigation[0]);
                 vm.navigation[1].disabled = true;
-                vm.clipboardImages = [];
-                clipboardService.clearEntriesOfType(clipboardService.TYPES.IMAGE, ["Media"]);
+                vm.clipboardItems = [];
+                dialogOptions.clickClearClipboard();
             };
 
             var debounceSearchMedia = _.debounce(function () {
@@ -619,47 +625,6 @@ angular.module("umbraco")
                 if ($scope.model && $scope.model.close) {
                     $scope.model.close($scope.model);
                 }
-            }
-
-
-            vm.navigation = [];
-
-            localizationService.localizeMany(["sections_media", "mediaPicker_tabClipboard"]).then(
-                function (data) {
-
-                    vm.navigation = [{
-                        "alias": "empty",
-                        "name": data[0],
-                        "icon": "icon-umb-media",
-                        "active": true,
-                        "view": ""
-                    }];
-
-                    if(dialogOptions.clipboardItems) {
-                        vm.navigation.push({
-                            "alias": "clipboard",
-                            "name": data[1],
-                            "icon": "icon-paste-in",
-                            "view": "",
-                            "disabled": dialogOptions.clipboardItems.length === 0
-                        });
-                    }
-
-                    vm.activeTab = vm.navigation[0];
-                }
-            );
-
-            vm.onNavigationChanged = function(tab) {
-                vm.activeTab.active = false;
-                vm.activeTab = tab;
-                vm.activeTab.active = true;
-            }
-
-            vm.clickClearClipboard = function() {
-                vm.onNavigationChanged(vm.navigation[0]);
-                vm.navigation[1].disabled = true;// disabled ws determined when creating the navigation, so we need to update it here.
-                dialogOptions.clipboardItems = [];// This dialog is not connected via the clipboardService events, so we need to update manually.
-                dialogOptions.clickClearClipboard();
             }
 
             onInit();

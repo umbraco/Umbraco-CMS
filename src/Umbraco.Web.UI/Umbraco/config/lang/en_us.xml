@@ -2408,6 +2408,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copy %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% from %1%</key>
+    <key alias="labelForArrayOfItems">Collection of %0%</key>
     <key alias="labelForRemoveAllEntries">Remove all items</key>
     <key alias="labelForClearClipboard">Clear clipboard</key>
   </area>

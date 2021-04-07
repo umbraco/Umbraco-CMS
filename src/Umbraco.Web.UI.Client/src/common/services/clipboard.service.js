@@ -325,46 +325,6 @@ function clipboardService($window, notificationsService, eventsService, localSto
 
     };
 
-    /**
-    * @ngdoc method
-    * @name umbraco.services.clipboardService#copy
-    * @methodOf umbraco.services.clipboardService
-    *
-    * @param {string} type A string defining the type of data to storing, example: 'elementType', 'contentNode'
-    * @param {string} alias A string defining the alias of the data to store, example: 'product'
-    * @param {object[]} data An array of objects containing the properties to be saved, this could be the object of a ElementType, ContentNode, ...
-    *
-    * @description
-    * Saves multiple JS-object to the clipboard.
-    */
-    service.copyMultiple = function (type, alias, data, firstLevelClearupMethod) {
-
-        var storage = retriveStorage();
-
-        data.forEach(item => {
-            var displayLabel = item.displayLabel || item.name;
-            var displayIcon = item.displayIcon || iconHelper.convertFromLegacyIcon(item.icon);
-            var uniqueKey = item.uniqueKey || item.key || console.error("missing unique key for this content");
-
-            // remove previous copies of this entry:
-            storage.entries = storage.entries.filter(
-                (entry) => {
-                    return entry.unique !== uniqueKey;
-                }
-            );
-
-            var entry = { unique: uniqueKey, type: type, alias: alias, data: prepareEntryForStorage(type, item, firstLevelClearupMethod), label: displayLabel, icon: displayIcon, date: Date.now() };
-            storage.entries.push(entry);
-        });
-
-        if (saveStorage(storage) === true) {
-            notificationsService.success("Clipboard", "Copied to clipboard.");
-        } else {
-            notificationsService.error("Clipboard", "Couldnt copy this data to clipboard.");
-        }
-
-    };
-
 
     /**
     * @ngdoc method

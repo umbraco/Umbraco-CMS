@@ -68,27 +68,29 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         return mediaItem;
                     });
 
-                    medias.forEach(media => {
-                        if (!media.extension && media.id && media.metaData) {
-                            media.extension = mediaHelper.getFileExtension(media.metaData.MediaPath);
-                        }
-
-                        // if there is no thumbnail, try getting one if the media is not a placeholder item
-                        if (!media.thumbnail && media.id && media.metaData) {
-                            media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
-                        }
-
-                        $scope.mediaItems.push(media);
-
-                        if ($scope.model.config.idType === "udi") {
-                            $scope.ids.push(media.udi);
-                        } else {
-                            $scope.ids.push(media.id);
-                        }
-                    });
+                    medias.forEach(media => appendMedia(media));
 
                     sync();
                 });
+            }
+        }
+
+        function appendMedia(media) {
+            if (!media.extension && media.id && media.metaData) {
+                media.extension = mediaHelper.getFileExtension(media.metaData.MediaPath);
+            }
+
+            // if there is no thumbnail, try getting one if the media is not a placeholder item
+            if (!media.thumbnail && media.id && media.metaData) {
+                media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+            }
+
+            $scope.mediaItems.push(media);
+
+            if ($scope.model.config.idType === "udi") {
+                $scope.ids.push(media.udi);
+            } else {
+                $scope.ids.push(media.id);
             }
         }
 
@@ -103,9 +105,9 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         function reloadUpdatedMediaItems(updatedMediaNodes) {
-            // because the images can be edited through the media picker we need to 
+            // because the images can be edited through the media picker we need to
             // reload. We only reload the images that is already picked but has been updated.
-            // We have to get the entities from the server because the media 
+            // We have to get the entities from the server because the media
             // can be edited without being selected
             $scope.mediaItems.forEach(media => {
                 if (updatedMediaNodes.indexOf(media.udi) !== -1) {
@@ -164,20 +166,50 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         function copyAllEntries() {
-            clipboardService.copyMultiple(clipboardService.TYPES.IMAGE,
-                "Media",
-                $scope.mediaItems.map(item => {
-                    return { "media": item, "key": item.udi }
-                }), clearNodeForCopy);
+            if($scope.mediaItems.length > 0) {
+
+                // gather aliases
+                var aliases = $scope.mediaItems.map(mediaEntity => mediaEntity.metaData.ContentTypeAlias);
+
+                // remove duplicate aliases
+                aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
+
+                var data = $scope.mediaItems.map(mediaEntity => { return {"mediaKey": mediaEntity.key }});
+
+                localizationService.localize("clipboard_labelForArrayOfItems", [$scope.model.label]).then(function(localizedLabel) {
+                    clipboardService.copyArray(clipboardService.TYPES.MEDIA, aliases, data, localizedLabel, "icon-thumbnail-list", $scope.model.id, clearNodeForCopy);
+                });
+            }
         }
 
-        function copyItem(item) {
-            clipboardService.copy(clipboardService.TYPES.IMAGE, "Media", { "media": item }, null, null, item.udi, clearNodeForCopy);
+        function copyItem(mediaItem) {
+
+            var mediaEntry = {};
+            mediaEntry.mediaKey = mediaItem.key;
+
+            clipboardService.copy(clipboardService.TYPES.MEDIA, mediaItem.metaData.ContentTypeAlias, mediaEntry, mediaItem.name, mediaItem.icon, mediaItem.udi, clearNodeForCopy);
         }
 
-        function clearNodeForCopy(item) {
-            delete item.media.selected;
-            delete item.media.selectable;
+        function clearNodeForCopy(mediaItem) {
+            delete mediaItem.selected;
+            delete mediaItem.selectable;
+        }
+
+        function pasteFromClipboard(pasteEntry, pasteType) {
+
+            if (pasteEntry === undefined) {
+                return;
+            }
+
+            entityResource.getById(pasteEntry.mediaKey, "Media").then(function (mediaEntity) {
+
+                if(disableFolderSelect === true && mediaEntity.metaData.ContentTypeAlias === "Folder") {
+                    return;
+                }
+
+                appendMedia(mediaEntity);
+                sync();
+            });
         }
 
         function editItem(item) {
@@ -191,7 +223,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     if (model && model.mediaNode) {
                         entityResource.getById(model.mediaNode.id, "Media")
                             .then(function (mediaEntity) {
-                                // if an image is selecting more than once 
+                                // if an image is selecting more than once
                                 // we need to update all the media items
                                 $scope.mediaItems.forEach(media => {
                                     if (media.id === model.mediaNode.id) {
@@ -217,6 +249,22 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 multiPicker: multiPicker,
                 onlyImages: onlyImages,
                 disableFolderSelect: disableFolderSelect,
+                clickPasteItem: function(item, mouseEvent) {
+                    if (Array.isArray(item.data)) {
+                        var indexIncrementor = 0;
+                        item.data.forEach(function (entry) {
+                            if (pasteFromClipboard(entry, item.type)) {
+                                indexIncrementor++;
+                            }
+                        });
+                    } else {
+                        pasteFromClipboard(item.data, item.type);
+                    }
+                    if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+                        editorService.close();
+                    }
+                    setDirty();
+                },
                 submit: function (model) {
 
                     editorService.close();
@@ -247,6 +295,21 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     reloadUpdatedMediaItems(model.updatedMediaNodes);
                 }
             }
+
+
+            var allowedTypes = null;
+            if(onlyImages) {
+                allowedTypes = ["Image"]; // Media Type Image Alias.
+            }
+
+            mediaPicker.clickClearClipboard = function ($event) {
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.Media, allowedTypes);
+            };
+
+            mediaPicker.clipboardItems = clipboardService.retriveEntriesOfType(clipboardService.TYPES.MEDIA, allowedTypes);
+            mediaPicker.clipboardItems.sort( (a, b) => {
+                return b.date - a.date
+            });
 
             editorService.mediaPicker(mediaPicker);
         }

@@ -314,7 +314,7 @@
             entityResource.getByIds(mediaKeys, "Media").then(function (entities) {
 
                 // gather aliases
-                var aliases = entities.map(mediaEntity => mediaEntity.metaData.ContentTypeAlias)
+                var aliases = entities.map(mediaEntity => mediaEntity.metaData.ContentTypeAlias);
 
                 // remove duplicate aliases
                 aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
@@ -343,7 +343,7 @@
         vm.copyMedia = copyMedia;
         function copyMedia(mediaEntry) {
             entityResource.getById(mediaEntry.mediaKey, "Media").then(function (mediaEntity) {
-                clipboardService.copy(clipboardService.TYPES.MEDIA, mediaEntity.metaData.ContentTypeAlias, mediaEntry, mediaEntity.name, mediaEntity.icon, mediaEntity.udi);
+                clipboardService.copy(clipboardService.TYPES.MEDIA, mediaEntity.metaData.ContentTypeAlias, mediaEntry, mediaEntity.name, mediaEntity.icon, mediaEntry.key);
             });
         }
         function requestPasteFromClipboard(createIndex, pasteEntry, pasteType) {

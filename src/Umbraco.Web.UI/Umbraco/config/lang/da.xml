@@ -1856,6 +1856,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Kopier %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% fra %1%</key>
+    <key alias="labelForArrayOfItems">Samling af %0%</key>
     <key alias="labelForRemoveAllEntries">Fjern alle elementer</key>
     <key alias="labelForClearClipboard">Ryd udklipsholder</key>
   </area>
