@@ -37,7 +37,9 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<DataTypeDeletedNotification>,
         INotificationHandler<DataTypeSavedNotification>,
         INotificationHandler<DomainDeletedNotification>,
-        INotificationHandler<DomainSavedNotification>
+        INotificationHandler<DomainSavedNotification>,
+        INotificationHandler<MacroSavedNotification>,
+        INotificationHandler<MacroDeletedNotification>
     {
         private List<Action> _unbinders;
 
@@ -87,12 +89,6 @@ namespace Umbraco.Cms.Core.Cache
                 () => FileService.SavedTemplate -= FileService_SavedTemplate);
             Bind(() => FileService.DeletedTemplate += FileService_DeletedTemplate,
                 () => FileService.DeletedTemplate -= FileService_DeletedTemplate);
-
-            // bind to macro events
-            Bind(() => MacroService.Saved += MacroService_Saved,
-                () => MacroService.Saved -= MacroService_Saved);
-            Bind(() => MacroService.Deleted += MacroService_Deleted,
-                () => MacroService.Deleted -= MacroService_Deleted);
 
             // bind to media events - handles all media changes
             Bind(() => MediaService.TreeChanged += MediaService_TreeChanged,
@@ -344,16 +340,20 @@ namespace Umbraco.Cms.Core.Cache
 
         #region MacroService
 
-        private void MacroService_Deleted(IMacroService sender, DeleteEventArgs<IMacro> e)
+        public void Handle(MacroDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (IMacro entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveMacroCache(entity);
+            }
         }
 
-        private void MacroService_Saved(IMacroService sender, SaveEventArgs<IMacro> e)
+        public void Handle(MacroSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (IMacro entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshMacroCache(entity);
+            }
         }
 
         #endregion
