@@ -15,6 +15,9 @@ namespace Umbraco.Web.PropertyEditors
             Description = "Limit to specific types")]
         public string Filter { get; set; }
 
+        [ConfigurationField("singleMode", "Single Mode", "boolean", Description = "Outputs a single entry, instead of IEnumerable")]
+        public bool SingleMode { get; set; }
+
         [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of medias")]
         public NumberRange ValidationLimit { get; set; } = new NumberRange();
 

@@ -61,8 +61,13 @@
 
         vm.$onInit = function() {
 
-            vm.validationLimit = vm.model.config.validationLimit;
-            vm.singleMode = vm.validationLimit.max === 1;
+            vm.validationLimit = vm.model.config.validationLimit || {};
+            // If single-mode we only allow 1 item as the maximum:
+            if(vm.model.config.singleMode) {
+                vm.validationLimit.max = 1;
+            }
+            // If single-mode isn't set and validation limit maximum is set to 1.
+            vm.singleMode = vm.model.config.singleMode || (vm.validationLimit.max === 1);
             vm.allowedTypes = vm.model.config.filter ? vm.model.config.filter.split(",") : null;
 
             copyAllMediasAction = {
