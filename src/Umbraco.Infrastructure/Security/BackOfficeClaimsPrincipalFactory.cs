@@ -23,20 +23,29 @@ namespace Umbraco.Cms.Core.Security
         {
         }
 
-        /// <inheritdoc />
-        /// <remarks>
-        /// Returns a ClaimsIdentity that has the required claims, and allows flowing of claims from external identity
-        /// </remarks>
-        public override async Task<ClaimsPrincipal> CreateAsync(BackOfficeIdentityUser user)
-        {
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
+        protected virtual string AuthenticationType { get; } = Constants.Security.BackOfficeAuthenticationType;
 
+        /// <inheritdoc />
+        protected override async Task<ClaimsIdentity> GenerateClaimsAsync(BackOfficeIdentityUser user)
+        {
+            // NOTE: Have a look at the base implementation https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/UserClaimsPrincipalFactory.cs#L79
+            // since it's setting an authentication type which is not what we want.
+            // so we override this method to change it.
+
+            // get the base 
             ClaimsIdentity baseIdentity = await base.GenerateClaimsAsync(user);
 
-            baseIdentity.AddRequiredClaims(
+            // now create a new one with the correct authentication type
+            var id = new ClaimsIdentity(
+                AuthenticationType,
+                Options.ClaimsIdentity.UserNameClaimType,
+                Options.ClaimsIdentity.RoleClaimType);
+
+            // and merge all others from the base implementation
+            id.MergeAllClaims(baseIdentity);
+
+            // ensure our required claims are there
+            id.AddRequiredClaims(
                 user.Id,
                 user.UserName,
                 user.Name,
@@ -49,23 +58,9 @@ namespace Umbraco.Cms.Core.Security
 
             // now we can flow any custom claims that the actual user has currently
             // assigned which could be done in the OnExternalLogin callback
-            baseIdentity.MergeClaimsFromBackOfficeIdentity(user);
+            id.MergeClaimsFromBackOfficeIdentity(user);
 
-            return new ClaimsPrincipal(baseIdentity);
-        }
-
-        /// <inheritdoc />
-        protected override async Task<ClaimsIdentity> GenerateClaimsAsync(BackOfficeIdentityUser user)
-        {
-            // TODO: Have a look at the base implementation https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/UserClaimsPrincipalFactory.cs#L79
-            // since it's setting an authentication type that is probably not what we want.
-            // also, this is the method that we should be returning our UmbracoBackOfficeIdentity from , not the method above,
-            // the method above just returns a principal that wraps the identity and we dont use a custom principal,
-            // see https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/UserClaimsPrincipalFactory.cs#L66
-
-            ClaimsIdentity identity = await base.GenerateClaimsAsync(user);
-
-            return identity;
+            return id;
         }
     }
 }

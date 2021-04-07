@@ -67,6 +67,7 @@ namespace Umbraco.Extensions
             services.BuildMembersIdentity()
                 .AddDefaultTokenProviders()
                 .AddMemberManager<IMemberManager, MemberManager>()
+                .AddClaimsPrincipalFactory<MemberClaimsPrincipalFactory>()
                 .AddUserStore<MemberUserStore>()
                 .AddRoleStore<MemberRoleStore>()
                 .AddRoleValidator<RoleValidator<UmbracoIdentityRole>>()
