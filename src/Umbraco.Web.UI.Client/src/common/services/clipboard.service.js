@@ -16,7 +16,6 @@ function clipboardService($window, notificationsService, eventsService, localSto
     const TYPES = {};
     TYPES.ELEMENT_TYPE = "elementType";
     TYPES.BLOCK = "block";
-    TYPES.IMAGE = "image";
     TYPES.RAW = "raw";
 
     var clearPropertyResolvers = {};
@@ -285,7 +284,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
     *
     * @param {string} type A string defining the type of data to storing, example: 'elementType', 'contentNode'
     * @param {string} alias A string defining the alias of the data to store, example: 'product'
-    * @param {object} data A object containing the properties to be saved, this could be the object of a ElementType, ContentNode, ...
+    * @param {object} entry A object containing the properties to be saved, this could be the object of a ElementType, ContentNode, ...
     * @param {string} displayLabel (optional) A string swetting the label to display when showing paste entries.
     * @param {string} displayIcon (optional) A string setting the icon to display when showing paste entries.
     * @param {string} uniqueKey (optional) A string prodiving an identifier for this entry, existing entries with this key will be removed to ensure that you only have the latest copy of this data.
@@ -310,46 +309,6 @@ function clipboardService($window, notificationsService, eventsService, localSto
 
         var entry = {unique:uniqueKey, type:type, alias:alias, data:prepareEntryForStorage(type, data, firstLevelClearupMethod), label:displayLabel, icon:displayIcon, date:Date.now()};
         storage.entries.push(entry);
-
-        if (saveStorage(storage) === true) {
-            notificationsService.success("Clipboard", "Copied to clipboard.");
-        } else {
-            notificationsService.error("Clipboard", "Couldnt copy this data to clipboard.");
-        }
-
-    };
-
-    /**
-    * @ngdoc method
-    * @name umbraco.services.clipboardService#copy
-    * @methodOf umbraco.services.clipboardService
-    *
-    * @param {string} type A string defining the type of data to storing, example: 'elementType', 'contentNode'
-    * @param {string} alias A string defining the alias of the data to store, example: 'product'
-    * @param {object[]} data An array of objects containing the properties to be saved, this could be the object of a ElementType, ContentNode, ...
-    *
-    * @description
-    * Saves multiple JS-object to the clipboard.
-    */
-    service.copyMultiple = function (type, alias, data, firstLevelClearupMethod) {
-
-        var storage = retriveStorage();
-
-        data.forEach(item => {
-            var displayLabel = item.displayLabel || item.name;
-            var displayIcon = item.displayIcon || iconHelper.convertFromLegacyIcon(item.icon);
-            var uniqueKey = item.uniqueKey || item.key || console.error("missing unique key for this content");
-
-            // remove previous copies of this entry:
-            storage.entries = storage.entries.filter(
-                (entry) => {
-                    return entry.unique !== uniqueKey;
-                }
-            );
-
-            var entry = { unique: uniqueKey, type: type, alias: alias, data: prepareEntryForStorage(type, item, firstLevelClearupMethod), label: displayLabel, icon: displayIcon, date: Date.now() };
-            storage.entries.push(entry);
-        });
 
         if (saveStorage(storage) === true) {
             notificationsService.success("Clipboard", "Copied to clipboard.");
