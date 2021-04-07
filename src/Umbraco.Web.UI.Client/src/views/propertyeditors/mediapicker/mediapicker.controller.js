@@ -177,7 +177,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 var data = $scope.mediaItems.map(mediaEntity => { return {"mediaKey": mediaEntity.key }});
 
                 localizationService.localize("clipboard_labelForArrayOfItems", [$scope.model.label]).then(function(localizedLabel) {
-                    clipboardService.copyArray(clipboardService.TYPES.MEDIA, aliases, data, localizedLabel, "icon-thumbnail-list", $scope.model.id, clearNodeForCopy);
+                    clipboardService.copyArray(clipboardService.TYPES.MEDIA, aliases, data, localizedLabel, "icon-thumbnail-list", $scope.model.id);
                 });
             }
         }
@@ -187,12 +187,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             var mediaEntry = {};
             mediaEntry.mediaKey = mediaItem.key;
 
-            clipboardService.copy(clipboardService.TYPES.MEDIA, mediaItem.metaData.ContentTypeAlias, mediaEntry, mediaItem.name, mediaItem.icon, mediaItem.udi, clearNodeForCopy);
-        }
-
-        function clearNodeForCopy(mediaItem) {
-            delete mediaItem.selected;
-            delete mediaItem.selectable;
+            clipboardService.copy(clipboardService.TYPES.MEDIA, mediaItem.metaData.ContentTypeAlias, mediaEntry, mediaItem.name, mediaItem.icon, mediaItem.udi);
         }
 
         function pasteFromClipboard(pasteEntry, pasteType) {

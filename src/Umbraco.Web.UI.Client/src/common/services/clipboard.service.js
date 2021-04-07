@@ -16,7 +16,6 @@ function clipboardService($window, notificationsService, eventsService, localSto
     const TYPES = {};
     TYPES.ELEMENT_TYPE = "elementType";
     TYPES.BLOCK = "block";
-    TYPES.IMAGE = "image";
     TYPES.RAW = "raw";
     TYPES.MEDIA = "media";
 
