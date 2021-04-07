@@ -8,6 +8,10 @@
         "UseSqlCe": {
             "longName": "SqlCe",
             "shortName": "ce"
+        },
+        "SkipRestore": {
+            "longName": "no-restore",
+            "shortName": ""
         }
     }
 }

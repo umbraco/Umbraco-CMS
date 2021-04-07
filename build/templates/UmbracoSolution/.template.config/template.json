@@ -18,6 +18,17 @@
         "path": "UmbracoSolution.csproj"
         }
     ],
+    "postActions": [
+        {
+            "condition": "(!SkipRestore)",
+            "description": "Restore NuGet packages required by this project.",
+            "manualInstructions": [{
+              "text": "Run 'dotnet restore'"
+            }],
+            "actionId": "210D431B-A78B-4D2F-B762-4ED3E3EA9025",
+            "continueOnError": true
+        }
+    ],
     "sourceName": "UmbracoSolution",
     "symbols": {
         "version": {
@@ -66,6 +77,12 @@
             ],
             "replaces": "net5.0",
             "defaultValue": "net5.0"
+        },
+        "SkipRestore": {
+            "type": "parameter",
+            "datatype": "bool",
+            "description": "If specified, skips the automatic restore of the project on create.",
+            "defaultValue": "false"
         }
     }
 }

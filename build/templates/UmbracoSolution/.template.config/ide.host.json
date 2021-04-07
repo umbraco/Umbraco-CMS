@@ -20,7 +20,13 @@
                 "text": "Use Sql Compact Edition (SqlCE)"
             },
             "isVisible": "true"
+        },
+        {
+            "id": "SkipRestore",
+            "name": {
+                "text": "Skips the automatic nuget restore of the project on create."
+            },
+            "isVisible": "true"
         }
     ]
-
 }
