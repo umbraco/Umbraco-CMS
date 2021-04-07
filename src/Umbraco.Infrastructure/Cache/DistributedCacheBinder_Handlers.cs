@@ -23,7 +23,19 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<DictionaryItemDeletedNotification>,
         INotificationHandler<DictionaryItemSavedNotification>,
         INotificationHandler<LanguageSavedNotification>,
-        INotificationHandler<LanguageDeletedNotification>
+        INotificationHandler<LanguageDeletedNotification>,
+        INotificationHandler<MemberSavedNotification>,
+        INotificationHandler<MemberDeletedNotification>,
+        INotificationHandler<PublicAccessEntrySavedNotification>,
+        INotificationHandler<PublicAccessEntryDeletedNotification>,
+        INotificationHandler<UserSavedNotification>,
+        INotificationHandler<UserDeletedNotification>,
+        INotificationHandler<UserGroupWithUsersSavedNotification>,
+        INotificationHandler<UserGroupDeletedNotification>,
+        INotificationHandler<MemberGroupDeletedNotification>,
+        INotificationHandler<MemberGroupSavedNotification>,
+        INotificationHandler<DataTypeDeletedNotification>,
+        INotificationHandler<DataTypeSavedNotification>
     {
         private List<Action> _unbinders;
 
@@ -53,24 +65,6 @@ namespace Umbraco.Cms.Core.Cache
                 _unbinders = new List<Action>();
 
             _logger.LogInformation("Initializing Umbraco internal event handlers for cache refreshing.");
-
-            // bind to user and user group events
-            Bind(() => UserService.SavedUserGroup += UserService_SavedUserGroup,
-                () => UserService.SavedUserGroup -= UserService_SavedUserGroup);
-            Bind(() => UserService.DeletedUserGroup += UserService_DeletedUserGroup,
-                () => UserService.DeletedUserGroup -= UserService_DeletedUserGroup);
-            Bind(() => UserService.SavedUser += UserService_SavedUser,
-                () => UserService.SavedUser -= UserService_SavedUser);
-            Bind(() => UserService.DeletedUser += UserService_DeletedUser,
-                () => UserService.DeletedUser -= UserService_DeletedUser);
-            Bind(() => UserService.UserGroupPermissionsAssigned += UserService_UserGroupPermissionsAssigned,
-                () => UserService.UserGroupPermissionsAssigned -= UserService_UserGroupPermissionsAssigned);
-
-            // bind to data type events
-            Bind(() => DataTypeService.Deleted += DataTypeService_Deleted,
-                () => DataTypeService.Deleted -= DataTypeService_Deleted);
-            Bind(() => DataTypeService.Saved += DataTypeService_Saved,
-                () => DataTypeService.Saved -= DataTypeService_Saved);
 
             // bind to stylesheet events
             Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
@@ -104,16 +98,6 @@ namespace Umbraco.Cms.Core.Cache
             Bind(() => MacroService.Deleted += MacroService_Deleted,
                 () => MacroService.Deleted -= MacroService_Deleted);
 
-            // bind to member events
-            Bind(() => MemberService.Saved += MemberService_Saved,
-                () => MemberService.Saved -= MemberService_Saved);
-            Bind(() => MemberService.Deleted += MemberService_Deleted,
-                () => MemberService.Deleted -= MemberService_Deleted);
-            Bind(() => MemberGroupService.Saved += MemberGroupService_Saved,
-                () => MemberGroupService.Saved -= MemberGroupService_Saved);
-            Bind(() => MemberGroupService.Deleted += MemberGroupService_Deleted,
-                () => MemberGroupService.Deleted -= MemberGroupService_Deleted);
-
             // bind to media events - handles all media changes
             Bind(() => MediaService.TreeChanged += MediaService_TreeChanged,
                 () => MediaService.TreeChanged -= MediaService_TreeChanged);
@@ -128,12 +112,6 @@ namespace Umbraco.Cms.Core.Cache
             //Bind(() => ContentService.DeletedBlueprint += ContentService_DeletedBlueprint,
             //    () => ContentService.DeletedBlueprint -= ContentService_DeletedBlueprint);
 
-            // bind to public access events
-            Bind(() => PublicAccessService.Saved += PublicAccessService_Saved,
-                () => PublicAccessService.Saved -= PublicAccessService_Saved);
-            Bind(() => PublicAccessService.Deleted += PublicAccessService_Deleted,
-                () => PublicAccessService.Deleted -= PublicAccessService_Deleted);
-
             // bind to relation type events
             Bind(() => RelationService.SavedRelationType += RelationService_SavedRelationType,
                 () => RelationService.SavedRelationType -= RelationService_SavedRelationType);
@@ -143,15 +121,15 @@ namespace Umbraco.Cms.Core.Cache
 
         #region PublicAccessService
 
-        private void PublicAccessService_Saved(IPublicAccessService sender, SaveEventArgs<PublicAccessEntry> e)
+        public void Handle(PublicAccessEntrySavedNotification notification)
         {
-
             _distributedCache.RefreshPublicAccess();
         }
 
-        private void PublicAccessService_Deleted(IPublicAccessService sender, DeleteEventArgs<PublicAccessEntry> e)
+        public void Handle(PublicAccessEntryDeletedNotification notification)
         {
             _distributedCache.RefreshPublicAccess();
+
         }
 
         #endregion
@@ -209,16 +187,20 @@ namespace Umbraco.Cms.Core.Cache
 
         #region DataTypeService
 
-        private void DataTypeService_Saved(IDataTypeService sender, SaveEventArgs<IDataType> e)
+        public void Handle(DataTypeSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (IDataType entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshDataTypeCache(entity);
+            }
         }
 
-        private void DataTypeService_Deleted(IDataTypeService sender, DeleteEventArgs<IDataType> e)
+        public void Handle(DataTypeDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (IDataType entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveDataTypeCache(entity);
+            }
         }
 
         #endregion
@@ -296,39 +278,36 @@ namespace Umbraco.Cms.Core.Cache
 
         #region UserService
 
-        private void UserService_UserGroupPermissionsAssigned(IUserService sender, SaveEventArgs<EntityPermission> e)
+        public void Handle(UserSavedNotification notification)
         {
-            // TODO: Not sure if we need this yet depends if we start caching permissions
-            //var groupIds = e.SavedEntities.Select(x => x.UserGroupId).Distinct();
-            //foreach (var groupId in groupIds)
-            //{
-            //    DistributedCache.Instance.RefreshUserGroupPermissionsCache(groupId);
-            //}
-        }
-
-        private void UserService_SavedUser(IUserService sender, SaveEventArgs<IUser> e)
-        {
-            foreach (var entity in e.SavedEntities)
+            foreach (IUser entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshUserCache(entity.Id);
+            }
         }
 
-        private void UserService_DeletedUser(IUserService sender, DeleteEventArgs<IUser> e)
+        public void Handle(UserDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (IUser entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveUserCache(entity.Id);
+            }
         }
 
-        private void UserService_SavedUserGroup(IUserService sender, SaveEventArgs<UserGroupWithUsers> e)
+        public void Handle(UserGroupWithUsersSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (UserGroupWithUsers entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshUserGroupCache(entity.UserGroup.Id);
+            }
         }
 
-        private void UserService_DeletedUserGroup(IUserService sender, DeleteEventArgs<IUserGroup> e)
+        public void Handle(UserGroupDeletedNotification notification)
         {
-
-            foreach (var entity in e.DeletedEntities)
+            foreach (IUserGroup entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveUserGroupCache(entity.Id);
+            }
         }
 
         #endregion
@@ -390,33 +369,41 @@ namespace Umbraco.Cms.Core.Cache
 
         #region MemberService
 
-        private void MemberService_Deleted(IMemberService sender, DeleteEventArgs<IMember> e)
+        public void Handle(MemberDeletedNotification notification)
         {
-            _distributedCache.RemoveMemberCache(e.DeletedEntities.ToArray());
+            _distributedCache.RemoveMemberCache(notification.DeletedEntities.ToArray());
         }
 
-        private void MemberService_Saved(IMemberService sender, SaveEventArgs<IMember> e)
+        public void Handle(MemberSavedNotification notification)
         {
-            _distributedCache.RefreshMemberCache(e.SavedEntities.ToArray());
+            _distributedCache.RefreshMemberCache(notification.SavedEntities.ToArray());
         }
 
         #endregion
 
         #region MemberGroupService
 
-        private void MemberGroupService_Deleted(IMemberGroupService sender, DeleteEventArgs<IMemberGroup> e)
+        /// <summary>
+        /// Fires when a member group is deleted
+        /// </summary>
+        /// <param name="notification"></param>
+        public void Handle(MemberGroupDeletedNotification notification)
         {
-            foreach (var m in e.DeletedEntities.ToArray())
+            foreach (IMemberGroup entity in notification.DeletedEntities)
             {
-                _distributedCache.RemoveMemberGroupCache(m.Id);
+                _distributedCache.RemoveMemberGroupCache(entity.Id);
             }
         }
 
-        private void MemberGroupService_Saved(IMemberGroupService sender, SaveEventArgs<IMemberGroup> e)
+        /// <summary>
+        /// Fires when a member group is saved
+        /// </summary>
+        /// <param name="notification"></param>
+        public void Handle(MemberGroupSavedNotification notification)
         {
-            foreach (var m in e.SavedEntities.ToArray())
+            foreach (IMemberGroup entity in notification.SavedEntities)
             {
-                _distributedCache.RemoveMemberGroupCache(m.Id);
+                _distributedCache.RemoveMemberGroupCache(entity.Id);
             }
         }
 

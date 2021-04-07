@@ -1,9 +1,8 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -14,7 +13,6 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Cms.Infrastructure.Sync;
@@ -55,7 +53,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 .AddNotificationHandler<DictionaryItemDeletedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<DictionaryItemSavedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<LanguageSavedNotification, DistributedCacheBinder>()
-                .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>();
+                .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<UserSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MemberGroupDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MemberGroupSavedNotification, DistributedCacheBinder>();
             builder.AddNotificationHandler<LanguageSavedNotification, PublishedSnapshotServiceEventHandler>();
         }
 
@@ -76,17 +78,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             var user = (IUser)new User(GlobalSettings, "name", "email", "username", "rawPassword");
             service.Save(user);
 
-            // global cache contains the entity
+            // User has been saved so the cache has been cleared of it
             var globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
+            Assert.IsNull(globalCached);
+            // Get user again to load it into the cache again, this also ensure we don't modify the one that's in the cache.
+            user = service.GetUserById(user.Id);
+
+            // global cache contains the entity
+            globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(user.Id, globalCached.Id);
             Assert.AreEqual("name", globalCached.Name);
-
-            // get user again - else we'd modify the one that's in the cache
-            user = service.GetUserById(user.Id);
-
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(ServerMessenger, CacheRefresherCollection), GetRequiredService<IUmbracoContextFactory>(), GetRequiredService<ILogger<DistributedCacheBinder>>());
-            _distributedCacheBinder.BindEvents(true);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (IScope scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
