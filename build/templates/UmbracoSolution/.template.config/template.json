@@ -19,7 +19,6 @@
         }
     ],
     "sourceName": "UmbracoSolution",
-    "preferNameDirectory": true,
     "symbols": {
         "version": {
             "type": "parameter",
