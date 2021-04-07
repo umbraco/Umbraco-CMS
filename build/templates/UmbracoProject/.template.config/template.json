@@ -83,6 +83,26 @@
             "datatype": "bool",
             "description": "If specified, skips the automatic restore of the project on create.",
             "defaultValue": "false"
+        },
+        "HttpPort": {
+            "type": "generated",
+            "generator": "port",
+            "replaces": "HTTP_PORT_FROM_TEMPLATE",
+            "parameters": {
+                "high": 65535,
+                "low": 1024,
+                "fallback": 9000
+            }
+        },
+        "HttpsPort": {
+            "type": "generated",
+            "generator": "port",
+            "replaces": "HTTPS_PORT_FROM_TEMPLATE",
+            "parameters": {
+                "high": 65535,
+                "low": 1024,
+                "fallback": 9001
+            }
         }
     }
 }
