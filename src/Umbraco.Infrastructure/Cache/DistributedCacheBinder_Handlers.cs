@@ -36,6 +36,8 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<MemberGroupSavedNotification>,
         INotificationHandler<DataTypeDeletedNotification>,
         INotificationHandler<DataTypeSavedNotification>,
+        INotificationHandler<DomainDeletedNotification>,
+        INotificationHandler<DomainSavedNotification>,
         INotificationHandler<MacroSavedNotification>,
         INotificationHandler<MacroDeletedNotification>
     {
@@ -73,12 +75,6 @@ namespace Umbraco.Cms.Core.Cache
                 () => FileService.SavedStylesheet -= FileService_SavedStylesheet);
             Bind(() => FileService.DeletedStylesheet += FileService_DeletedStylesheet,
                 () => FileService.DeletedStylesheet -= FileService_DeletedStylesheet);
-
-            // bind to domain events
-            Bind(() => DomainService.Saved += DomainService_Saved,
-                () => DomainService.Saved -= DomainService_Saved);
-            Bind(() => DomainService.Deleted += DomainService_Deleted,
-                () => DomainService.Deleted -= DomainService_Deleted);
 
             // bind to content type events
             Bind(() => ContentTypeService.Changed += ContentTypeService_Changed,
@@ -203,16 +199,20 @@ namespace Umbraco.Cms.Core.Cache
 
         #region DomainService
 
-        private void DomainService_Saved(IDomainService sender, SaveEventArgs<IDomain> e)
+        public void Handle(DomainSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (IDomain entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshDomainCache(entity);
+            }
         }
 
-        private void DomainService_Deleted(IDomainService sender, DeleteEventArgs<IDomain> e)
+        public void Handle(DomainDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (IDomain entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveDomainCache(entity);
+            }
         }
 
         #endregion
