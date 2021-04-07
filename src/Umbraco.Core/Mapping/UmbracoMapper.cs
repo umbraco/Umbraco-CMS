@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Exceptions;
 using Umbraco.Core.Scoping;
 
@@ -57,6 +58,14 @@ namespace Umbraco.Core.Mapping
             foreach (var profile in profiles)
                 profile.DefineMaps(this);
         }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UmbracoMapper"/> class.
+        /// </summary>
+        /// <param name="profiles"></param>
+        [Obsolete("This constructor is no longer used and will be removed in future versions, use the other constructor instead")]
+        public UmbracoMapper(MapDefinitionCollection profiles) : this(profiles, Current.ScopeProvider)
+        {}
 
         #region Define
 
