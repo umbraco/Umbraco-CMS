@@ -10,7 +10,7 @@
         {
             "id": "PackageTestSiteName",
             "name": {
-                "text": "Optional: Specific the name of a package that this should be a test site for.",
+                "text": "Optional: Specific the name of a package that this should be a test site for."
             },
             "isVisible": "true"
         },
