@@ -263,8 +263,8 @@ namespace Umbraco.Web
         }
 
         public static IHtmlString GetCropUrl(this UrlHelper urlHelper,
-            string cropAlias,
             ImageCropperValue imageCropperValue,
+            string cropAlias,
             int? width = null,
             int? height = null,
             int? quality = null,
