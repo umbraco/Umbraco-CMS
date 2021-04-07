@@ -101,7 +101,7 @@
             "parameters": {
                 "high": 65535,
                 "low": 1024,
-                "fallback": 9001
+                "fallback": 5001
             }
         }
     }
