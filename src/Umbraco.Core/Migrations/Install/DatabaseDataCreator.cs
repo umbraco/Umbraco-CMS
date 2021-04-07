@@ -145,10 +145,10 @@ namespace Umbraco.Core.Migrations.Install
             _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1049, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1049", SortOrder = 2, UniqueId = new Guid("9DBBCBBB-2327-434A-B355-AF1B84E5010A"), Text = "Multiple Media Picker (old)", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
             _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1050, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1050", SortOrder = 2, UniqueId = new Guid("B4E3535A-1753-47E2-8568-602CF8CFEE6F"), Text = "Multi URL Picker", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
 
-            _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1051, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1051", SortOrder = 2, UniqueId = Constants.DataTypes.Guids.MediaPicker3Guid, Text = "Media Picker", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
-            _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1052, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1052", SortOrder = 2, UniqueId = Constants.DataTypes.Guids.MediaPicker3MultipleGuid, Text = "Multiple Media Picker", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
-            _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1053, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1053", SortOrder = 2, UniqueId = Constants.DataTypes.Guids.MediaPicker3SingleImageGuid, Text = "Image Picker", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
-            _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1054, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1054", SortOrder = 2, UniqueId = Constants.DataTypes.Guids.MediaPicker3MultipleImagesGuid, Text = "Multiple Image Picker", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1051, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1051", SortOrder = 2, UniqueId = Constants.DataTypes.Guids.MediaPicker3Guid, Text = "Media Picker 3", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1052, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1052", SortOrder = 2, UniqueId = Constants.DataTypes.Guids.MediaPicker3MultipleGuid, Text = "Multiple Media Picker 3", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1053, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1053", SortOrder = 2, UniqueId = Constants.DataTypes.Guids.MediaPicker3SingleImageGuid, Text = "Image Media Picker 3", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1054, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1054", SortOrder = 2, UniqueId = Constants.DataTypes.Guids.MediaPicker3MultipleImagesGuid, Text = "Multiple Image Media Picker 3", NodeObjectType = Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
 
         }
 
@@ -390,24 +390,25 @@ namespace Umbraco.Core.Migrations.Install
                 NodeId = 1051,
                 EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                 DbType = "Ntext",
-                Configuration = "{\"validationLimit\":{\"min\":0,\"max\":1}}"
+                Configuration = "{\"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}"
             });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto {
                 NodeId = 1052,
                 EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
-                DbType = "Ntext"
+                DbType = "Ntext",
+                Configuration = "{\"multiple\": true}"
             });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto {
                 NodeId = 1053,
                 EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                 DbType = "Ntext",
-                Configuration = "{\"filter\":\"" + Constants.Conventions.MediaTypes.Image + "\", \"validationLimit\":{\"min\":0,\"max\":1}}"
+                Configuration = "{\"filter\":\"" + Constants.Conventions.MediaTypes.Image + "\", \"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}"
             });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto {
                 NodeId = 1054,
                 EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker3,
                 DbType = "Ntext",
-                Configuration = "{\"filter\":\"" + Constants.Conventions.MediaTypes.Image + "\" }"
+                Configuration = "{\"filter\":\"" + Constants.Conventions.MediaTypes.Image + "\", \"multiple\": true}"
             });
         }
 
