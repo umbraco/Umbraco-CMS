@@ -3,7 +3,7 @@
     "order" : 0,
     "icon": "icon.png",
     "description": {
-        "id": "UmbracoSolution",
+        "id": "UmbracoProject",
         "text": "Umbraco Web Application - An empty Umbraco CMS web application"
     },
     "symbolInfo": [

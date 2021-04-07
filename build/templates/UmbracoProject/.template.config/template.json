@@ -3,11 +3,11 @@
     "author": "Umbraco HQ",
     "description": "An empty Umbraco Solution ready to get started",
     "classifications": [ "Web", "CMS", "Umbraco"],
-    "groupIdentity": "Umbraco.Templates.UmbracoSolution",
-    "identity": "Umbraco.Templates.UmbracoSolution.CSharp",
+    "groupIdentity": "Umbraco.Templates.UmbracoProject",
+    "identity": "Umbraco.Templates.UmbracoProject.CSharp",
     "name": "Umbraco Solution",
     "shortName": "umbraco",
-    "defaultName": "UmbracoSolution1",
+    "defaultName": "UmbracoProject1",
     "preferNameDirectory": true,
     "tags": {
         "language": "C#",
@@ -15,7 +15,7 @@
     },
     "primaryOutputs": [
         {
-        "path": "UmbracoSolution.csproj"
+        "path": "UmbracoProject.csproj"
         }
     ],
     "postActions": [
@@ -29,7 +29,7 @@
             "continueOnError": true
         }
     ],
-    "sourceName": "UmbracoSolution",
+    "sourceName": "UmbracoProject",
     "symbols": {
         "version": {
             "type": "parameter",
@@ -43,7 +43,7 @@
             "generator": "coalesce",
             "parameters": {
                 "sourceVariableName": "name",
-                "defaultValue": "UmbracoSolution",
+                "defaultValue": "UmbracoProject",
                 "fallbackVariableName": "name"
             },
             "replaces":"Umbraco.Web.UI.NetCore"
