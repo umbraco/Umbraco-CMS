@@ -290,7 +290,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
     *
     * @param {string} type A string defining the type of data to storing, example: 'elementType', 'contentNode'
     * @param {string} alias A string defining the alias of the data to store, example: 'product'
-    * @param {object} data A object containing the properties to be saved, this could be the object of a ElementType, ContentNode, ...
+    * @param {object} entry A object containing the properties to be saved, this could be the object of a ElementType, ContentNode, ...
     * @param {string} displayLabel (optional) A string swetting the label to display when showing paste entries.
     * @param {string} displayIcon (optional) A string setting the icon to display when showing paste entries.
     * @param {string} uniqueKey (optional) A string prodiving an identifier for this entry, existing entries with this key will be removed to ensure that you only have the latest copy of this data.
