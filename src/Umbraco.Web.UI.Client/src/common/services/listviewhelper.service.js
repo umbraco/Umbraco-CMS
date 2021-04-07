@@ -572,13 +572,15 @@
         * Method for opening an item in a list view for editing.
         *
         * @param {Object} item The item to edit
+        * @param {Object} scope The scope with options
         */
         function editItem(item, scope) {
+
             if (!item.editPath) {
                 return;
             }
 
-            if (scope.options.useInfiniteEditor)
+            if (scope && scope.options && scope.options.useInfiniteEditor)
             {
                 var editorModel = {
                     id: item.id,

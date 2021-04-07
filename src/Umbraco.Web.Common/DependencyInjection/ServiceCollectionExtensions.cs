@@ -11,6 +11,7 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Security;
 
@@ -65,17 +66,20 @@ namespace Umbraco.Extensions
         public static void AddMembersIdentity(this IServiceCollection services) =>
             services.BuildMembersIdentity()
                 .AddDefaultTokenProviders()
-                .AddUserStore<MembersUserStore>()
-                .AddMembersManager<IMemberManager, MemberManager>();
+                .AddMemberManager<IMemberManager, MemberManager>()
+                .AddClaimsPrincipalFactory<MemberClaimsPrincipalFactory>()
+                .AddUserStore<MemberUserStore>()
+                .AddRoleStore<MemberRoleStore>()
+                .AddRoleValidator<RoleValidator<UmbracoIdentityRole>>()
+                .AddRoleManager<RoleManager<UmbracoIdentityRole>>();
 
-
-        private static MembersIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
+        private static MemberIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
         {
             // Services used by Umbraco members identity
-            services.TryAddScoped<IUserValidator<MembersIdentityUser>, UserValidator<MembersIdentityUser>>();
-            services.TryAddScoped<IPasswordValidator<MembersIdentityUser>, PasswordValidator<MembersIdentityUser>>();
-            services.TryAddScoped<IPasswordHasher<MembersIdentityUser>, PasswordHasher<MembersIdentityUser>>();
-            return new MembersIdentityBuilder(services);
+            services.TryAddScoped<IUserValidator<MemberIdentityUser>, UserValidator<MemberIdentityUser>>();
+            services.TryAddScoped<IPasswordValidator<MemberIdentityUser>, PasswordValidator<MemberIdentityUser>>();
+            services.TryAddScoped<IPasswordHasher<MemberIdentityUser>, PasswordHasher<MemberIdentityUser>>();
+            return new MemberIdentityBuilder(typeof(UmbracoIdentityRole), services);
         }
 
         private static void RemoveIntParamenterIfValueGreatherThen(IDictionary<string, string> commands, string parameter, int maxValue)

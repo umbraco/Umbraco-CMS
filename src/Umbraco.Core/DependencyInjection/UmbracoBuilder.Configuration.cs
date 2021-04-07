@@ -30,7 +30,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             builder.Services.AddSingleton<IValidateOptions<UnattendedSettings>, UnattendedSettingsValidator>();
 
             // Register configuration sections.
-            builder.Services.Configure<ConnectionStrings>(builder.Config.GetSection(Constants.Configuration.ConfigModelsBuilder), o => o.BindNonPublicProperties = true);
+
+            builder.Services.Configure<ModelsBuilderSettings>(builder.Config.GetSection(Constants.Configuration.ConfigModelsBuilder), o => o.BindNonPublicProperties = true);
             builder.Services.Configure<ConnectionStrings>(builder.Config.GetSection("ConnectionStrings"), o => o.BindNonPublicProperties = true);
 
             AddOptions<ActiveDirectorySettings>(builder, Constants.Configuration.ConfigActiveDirectory);

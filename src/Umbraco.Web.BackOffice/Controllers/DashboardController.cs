@@ -71,8 +71,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var allowedSections = string.Join(",", user.AllowedSections);
             var language = user.Language;
             var version = _umbracoVersion.SemanticVersion.ToSemanticString();
+            var isAdmin = user.IsAdmin();
 
-            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}", section, allowedSections, language, version);
+            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}&admin={4}", section, allowedSections, language, version, isAdmin);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
             var content = _appCaches.RuntimeCache.GetCacheItem<JObject>(key);
