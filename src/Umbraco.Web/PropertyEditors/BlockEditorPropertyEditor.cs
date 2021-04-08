@@ -203,7 +203,7 @@ namespace Umbraco.Web.PropertyEditors
                         var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
                         if (propEditor == null) continue;
 
-                        // prepare files, if any matching property and culture
+                        // prepare files, if any matching property
                         var files = editorValue.Files
                             .Where(x => x.PropertyAlias == prop.Value.PropertyType.Alias)
                             .ToArray();
