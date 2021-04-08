@@ -203,8 +203,22 @@ namespace Umbraco.Web.PropertyEditors
                         var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
                         if (propEditor == null) continue;
 
+                        // prepare files, if any matching property and culture
+                        var files = editorValue.Files
+                            .Where(x => x.PropertyAlias == propEditor.Alias)
+                            .ToArray();
+
+                        foreach (var file in files)
+                            file.FileName = file.FileName.ToSafeFileName();
+
                         // Create a fake content property data object
-                        var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
+                        //var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration);
+                        var contentPropData = new ContentPropertyData(prop.Value.Value, propConfiguration)
+                        {
+                            ContentKey = editorValue.ContentKey,
+                            PropertyTypeKey = prop.Value.PropertyType.Key,
+                            Files = files
+                        };
 
                         // Get the property editor to do it's conversion
                         var newValue = propEditor.GetValueEditor().FromEditor(contentPropData, prop.Value.Value);
