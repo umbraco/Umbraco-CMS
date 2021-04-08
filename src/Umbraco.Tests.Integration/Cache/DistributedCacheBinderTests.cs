@@ -45,9 +45,6 @@ namespace Umbraco.Cms.Tests.Integration.Cache
                 new EventDefinition<IFileService, SaveEventArgs<IStylesheet>>(null, FileService, new SaveEventArgs<IStylesheet>(Enumerable.Empty<IStylesheet>())),
                 new EventDefinition<IFileService, DeleteEventArgs<IStylesheet>>(null, FileService, new DeleteEventArgs<IStylesheet>(Enumerable.Empty<IStylesheet>())),
 
-                new EventDefinition<IDomainService, SaveEventArgs<IDomain>>(null, DomainService, new SaveEventArgs<IDomain>(Enumerable.Empty<IDomain>())),
-                new EventDefinition<IDomainService, DeleteEventArgs<IDomain>>(null, DomainService, new DeleteEventArgs<IDomain>(Enumerable.Empty<IDomain>())),
-
                 new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>())),
                 new EventDefinition<IContentTypeService, DeleteEventArgs<IContentType>>(null, ContentTypeService, new DeleteEventArgs<IContentType>(Enumerable.Empty<IContentType>())),
                 new EventDefinition<IMediaTypeService, SaveEventArgs<IMediaType>>(null, MediaTypeService, new SaveEventArgs<IMediaType>(Enumerable.Empty<IMediaType>())),
@@ -59,18 +56,9 @@ namespace Umbraco.Cms.Tests.Integration.Cache
                 new EventDefinition<IFileService, SaveEventArgs<ITemplate>>(null, FileService, new SaveEventArgs<ITemplate>(Enumerable.Empty<ITemplate>())),
                 new EventDefinition<IFileService, DeleteEventArgs<ITemplate>>(null, FileService, new DeleteEventArgs<ITemplate>(Enumerable.Empty<ITemplate>())),
 
-                new EventDefinition<IMacroService, SaveEventArgs<IMacro>>(null, MacroService, new SaveEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
-                new EventDefinition<IMacroService, DeleteEventArgs<IMacro>>(null, MacroService, new DeleteEventArgs<IMacro>(Enumerable.Empty<IMacro>())),
-
                 // not managed
                 //new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "SavedBlueprint"),
                 //new EventDefinition<IContentService, DeleteEventArgs<IContent>>(null, ContentService, new DeleteEventArgs<IContent>(Enumerable.Empty<IContent>()), "DeletedBlueprint"),
-
-                new EventDefinition<IRelationService, SaveEventArgs<IRelationType>>(null, RelationService, new SaveEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
-                new EventDefinition<IRelationService, DeleteEventArgs<IRelationType>>(null, RelationService, new DeleteEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
-
-                new EventDefinition<IRelationService, SaveEventArgs<IRelationType>>(null, RelationService, new SaveEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
-                new EventDefinition<IRelationService, DeleteEventArgs<IRelationType>>(null, RelationService, new DeleteEventArgs<IRelationType>(Enumerable.Empty<IRelationType>())),
             };
 
             var ok = true;
