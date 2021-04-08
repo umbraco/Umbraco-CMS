@@ -237,6 +237,18 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        /// <summary>
+        /// Copy the member type
+        /// </summary>
+        /// <param name="copy"></param>
+        /// <returns></returns>
+        public HttpResponseMessage PostCopy(MoveOrCopy copy)
+        {
+            return PerformCopy(
+                copy,
+                getContentType: i => Services.MemberTypeService.Get(i),
+                doCopy: (type, i) => Services.MemberTypeService.Copy(type, i));
+        }
 
     }
 }

@@ -49,7 +49,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         {
             var message = string.Empty;
             var success = false;
-            var url = _runtime.ApplicationUrl;
+            var url = _runtime.ApplicationUrl.GetLeftPart(UriPartial.Authority);
 
             // Access the site home page and check for the headers
             var request = WebRequest.Create(url);
@@ -69,7 +69,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             }
             catch (Exception ex)
             {
-                message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { url.ToString(), ex.Message });
+                message = _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
             }
 
             var actions = new List<HealthCheckAction>();

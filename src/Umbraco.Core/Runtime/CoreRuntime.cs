@@ -105,7 +105,7 @@ namespace Umbraco.Core.Runtime
                     HostingEnvironment.ApplicationID,
                     HostingEnvironment.ApplicationPhysicalPath,
                     NetworkHelper.MachineName);
-                logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+                logger.Debug<CoreRuntime, string>("Runtime: {Runtime}", GetType().FullName);
 
                 // application environment
                 ConfigureUnhandledException();
@@ -461,7 +461,7 @@ namespace Umbraco.Core.Runtime
                 {
                     _state.DetermineRuntimeLevel(databaseFactory);
 
-                    profilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
+                    profilingLogger.Debug<CoreRuntime,RuntimeLevel,RuntimeLevelReason>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
 
                     if (_state.Level == RuntimeLevel.Upgrade)
                     {

@@ -9,6 +9,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web
 {
@@ -270,7 +271,7 @@ namespace Umbraco.Web
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error(typeof(ImageCropperTemplateExtensions), ex, "Could not parse the json string: {Json}", json);
+                    Current.Logger.Error<string>(typeof(ImageCropperTemplateExtensions), ex, "Could not parse the json string: {Json}", json);
                 }
             }
 

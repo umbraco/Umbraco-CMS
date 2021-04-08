@@ -78,7 +78,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (HttpRequestException ex)
                 {
-                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard content from {Url}", url);
+                    Logger.Error<DashboardController, string>(ex.InnerException ?? ex, "Error getting dashboard content from {Url}", url);
 
                     //it's still new JObject() - we return it like this to avoid error codes which triggers UI warnings
                     AppCaches.RuntimeCache.InsertCacheItem<JObject>(key, () => result, new TimeSpan(0, 5, 0));
@@ -116,7 +116,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (HttpRequestException ex)
                 {
-                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting dashboard CSS from {Url}", url);
+                    Logger.Error<DashboardController, string>(ex.InnerException ?? ex, "Error getting dashboard CSS from {Url}", url);
 
                     //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
                     AppCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
@@ -180,7 +180,7 @@ namespace Umbraco.Web.Editors
                 }
                 catch (HttpRequestException ex)
                 {
-                    Logger.Error<DashboardController>(ex.InnerException ?? ex, "Error getting remote dashboard data from {UrlPrefix}{Url}", urlPrefix, url);
+                    Logger.Error<DashboardController, string, string>(ex.InnerException ?? ex, "Error getting remote dashboard data from {UrlPrefix}{Url}", urlPrefix, url);
 
                     //it's still string.Empty - we return it like this to avoid error codes which triggers UI warnings
                     AppCaches.RuntimeCache.InsertCacheItem<string>(key, () => result, new TimeSpan(0, 5, 0));
