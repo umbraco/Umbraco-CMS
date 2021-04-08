@@ -25,7 +25,7 @@
                                                on-change="displayA11YMessageForFilter()"
                                                auto-focus="true">
                             </umb-search-filter>
-                            <p ng-bind="a11yInfo" class="sr-only" role="alert"></p>
+                            <p ng-bind="a11yInfo" role="alert"></p>
                             <ul class="umb-card-grid -three-in-row">
                                 <li ng-repeat="availableItem in macros | orderBy:'name' | filter:model.searchTerm">
                                     <button class="btn-reset umb-card-grid-item" title="{{availableItem.name}}" ng-click="selectMacro(availableItem)">
