@@ -8,13 +8,6 @@
     },
     "symbolInfo": [
         {
-            "id": "PackageTestSiteName",
-            "name": {
-                "text": "Optional: Specify the name of a package that this should be a test site for."
-            },
-            "isVisible": "true"
-        },
-        {
             "id": "UseSqlCe",
             "name": {
                 "text": "Use Sql Compact Edition (SqlCE)"
@@ -29,30 +22,37 @@
             "isVisible": "true"
         },
         {
+            "id": "PackageTestSiteName",
+            "name": {
+                "text": "Optional: Specify the name of a package that this should be a test site for."
+            },
+            "isVisible": "true"
+        },
+        {
             "id": "FriendlyName",
             "name": {
-                "text": "Optional: The friendly name of the user for Umbraco login when using Unattended install (Without installer wizard UI)"
+                "text": "Optional: The friendly name of the user for Umbraco login when using Unattended install"
             },
             "isVisible": "true"
         },
         {
             "id": "Email",
             "name": {
-                "text": "Optional: Email to use for Umbraco login when using Unattended install (Without installer wizard UI)"
+                "text": "Optional: Email to use for Umbraco login when using Unattended install"
             },
             "isVisible": "true"
         },
         {
             "id": "Password",
             "name": {
-                "text": "Optional: Password to use for Umbraco login when using Unattended install (Without installer wizard UI)"
+                "text": "Optional: Password to use for Umbraco login when using Unattended install"
             },
             "isVisible": "true"
         },
         {
             "id": "ConnectionString",
             "name": {
-                "text": "Optional: Database connection string when using Unattended install (Without installer wizard UI)"
+                "text": "Optional: Database connection string when using Unattended install"
             },
             "isVisible": "true"
         }
