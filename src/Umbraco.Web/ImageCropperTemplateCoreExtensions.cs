@@ -382,7 +382,7 @@ namespace Umbraco.Web
             return imageUrlGenerator.GetImageUrl(options);
         }
 
-        public static string GetLocalCropUrl(this MediaPickerWithCropsValueConverter.MediaWithCrops mediaWithCrops, string alias, IImageUrlGenerator imageUrlGenerator, string cacheBusterValue)
+        public static string GetLocalCropUrl(this MediaWithCrops mediaWithCrops, string alias, IImageUrlGenerator imageUrlGenerator, string cacheBusterValue)
         {
             return mediaWithCrops.LocalCrops.Src + mediaWithCrops.LocalCrops.GetCropUrl(alias, imageUrlGenerator, cacheBusterValue: cacheBusterValue);
 

@@ -3,9 +3,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Web.Models;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -79,7 +81,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             {
                 return isMultiple ? mediaItems: null;
             }
-            
+
             var dtos = JsonConvert.DeserializeObject<IEnumerable<MediaWithCropsDto>>(inter.ToString());
 
             foreach(var media in dtos)
@@ -137,16 +139,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
 
             [DataMember(Name = "focalPoint")]
             public ImageCropperValue.ImageCropperFocalPoint FocalPoint { get; set; }
-        }
-
-        /// <summary>
-        /// Model used in Razor Views for rendering
-        /// </summary>
-        public class MediaWithCrops
-        {
-            public IPublishedContent MediaItem { get; set; }
-
-            public ImageCropperValue LocalCrops { get; set; }
         }
     }
 }

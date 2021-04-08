@@ -121,7 +121,7 @@ namespace Umbraco.Web
              ImageCropRatioMode? ratioMode = null,
              bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, Current.ImageUrlGenerator, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode, upScale);
 
-        public static string GetLocalCropUrl(this MediaPickerWithCropsValueConverter.MediaWithCrops mediaWithCrops,
+        public static string GetLocalCropUrl(this MediaWithCrops mediaWithCrops,
             string alias,
             string cacheBusterValue = null)
             => ImageCropperTemplateCoreExtensions.GetLocalCropUrl(mediaWithCrops, alias, Current.ImageUrlGenerator,  cacheBusterValue);
