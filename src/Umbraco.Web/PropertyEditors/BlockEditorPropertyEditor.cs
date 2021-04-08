@@ -205,7 +205,7 @@ namespace Umbraco.Web.PropertyEditors
 
                         // prepare files, if any matching property and culture
                         var files = editorValue.Files
-                            .Where(x => x.PropertyAlias == propEditor.Alias)
+                            .Where(x => x.PropertyAlias == prop.Value.PropertyType.Alias)
                             .ToArray();
 
                         foreach (var file in files)
