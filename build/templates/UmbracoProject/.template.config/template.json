@@ -103,6 +103,38 @@
                 "low": 1024,
                 "fallback": 5001
             }
+        },
+        "FriendlyName":{
+            "type": "parameter",
+            "datatype":"text",
+            "description": "The friendly name of the user for Umbraco login when using Unattended install (Without installer wizard UI)",
+            "replaces": "FRIENDLY_NAME_FROM_TEMPLATE",
+            "defaultValue": ""
+        },
+        "Email":{
+            "type": "parameter",
+            "datatype":"text",
+            "description": "Email to use for Umbraco login when using Unattended install (Without installer wizard UI)",
+            "replaces": "EMAIL_FROM_TEMPLATE",
+            "defaultValue": ""
+        },
+        "Password":{
+            "type": "parameter",
+            "datatype":"text",
+            "description": "Password to use for Umbraco login when using Unattended install (Without installer wizard UI)",
+            "replaces": "PASSWORD_FROM_TEMPLATE",
+            "defaultValue": ""
+        },
+        "ConnectionString":{
+            "type": "parameter",
+            "datatype":"text",
+            "description": "Database connection string when using Unattended install (Without installer wizard UI)",
+            "replaces": "CONNECTION_FROM_TEMPLATE",
+            "defaultValue": ""
+        },
+        "UsingUnattenedInstall":{
+            "type": "computed",
+            "value": "(FriendlyName != \"\" && Email != \"\" && Password != \"\" && ConnectionString != \"\")"
         }
     }
 }
