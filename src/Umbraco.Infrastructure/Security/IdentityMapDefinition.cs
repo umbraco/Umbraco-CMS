@@ -64,6 +64,7 @@ namespace Umbraco.Cms.Core.Security
         }
 
         // Umbraco.Code.MapAll -Id -Groups -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled
+        // Umbraco.Code.MapAll -ConcurrencyStamp -NormalizedEmail -NormalizedUserName -Roles
         private void Map(IUser source, BackOfficeIdentityUser target)
         {
             // well, the ctor has been fixed
