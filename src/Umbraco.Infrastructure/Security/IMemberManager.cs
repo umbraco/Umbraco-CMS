@@ -18,5 +18,11 @@ namespace Umbraco.Cms.Core.Security
             IEnumerable<string> allowTypes = null,
             IEnumerable<string> allowGroups = null,
             IEnumerable<int> allowMembers = null);
+
+        // TODO: We'll need to add some additional things here that people will be using in their code:
+
+        // bool MemberHasAccess(string path);
+        // IReadOnlyDictionary<string, bool> MemberHasAccess(IEnumerable<string> paths)
+        // Possibly some others from the old MembershipHelper
     }
 }

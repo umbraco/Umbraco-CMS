@@ -46,22 +46,22 @@ else
         <hr />
         <div asp-validation-summary="All" class="text-danger"></div>
         <div class="mb-3">
-            <label asp-for="@registerModel.Name"></label>
+            <label asp-for="@registerModel.Name" class="form-label"></label>
             <input asp-for="@registerModel.Name" class="form-control" aria-required="true" />
             <span asp-validation-for="@registerModel.Name" class="form-text text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="@registerModel.Email"></label>
+            <label asp-for="@registerModel.Email" class="form-label"></label>
             <input asp-for="@registerModel.Email" class="form-control" autocomplete="username" aria-required="true" />
             <span asp-validation-for="@registerModel.Email" class="form-text text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="@registerModel.Password"></label>
+            <label asp-for="@registerModel.Password" class="form-label"></label>
             <input asp-for="@registerModel.Password" class="form-control" autocomplete="new-password" aria-required="true" />
             <span asp-validation-for="@registerModel.Password" class="form-text text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="@registerModel.ConfirmPassword"></label>
+            <label asp-for="@registerModel.ConfirmPassword" class="form-label"></label>
             <input asp-for="@registerModel.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" />
             <span asp-validation-for="@registerModel.ConfirmPassword" class="form-text text-danger"></span>
         </div>
@@ -71,7 +71,7 @@ else
             for (var i = 0; i < registerModel.MemberProperties.Count; i++)
             {
                 <div class="mb-3">
-                    <label asp-for="@registerModel.MemberProperties[i].Value"></label>
+                    <label asp-for="@registerModel.MemberProperties[i].Value" class="form-label"></label>
                     <input asp-for="@registerModel.MemberProperties[i].Value" class="form-control" />
                     <span asp-validation-for="@registerModel.MemberProperties[i].Value" class="form-text text-danger"></span>
                 </div>

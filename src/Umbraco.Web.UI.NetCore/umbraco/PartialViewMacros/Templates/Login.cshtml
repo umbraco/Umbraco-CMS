@@ -23,12 +23,12 @@
         <hr />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="mb-3">
-            <label asp-for="@loginModel.Username" class="col-md-2 control-label"></label>
+            <label asp-for="@loginModel.Username" class="form-label"></label>
             <input asp-for="@loginModel.Username" class="form-control" />
             <span asp-validation-for="@loginModel.Username" class="form-text text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="@loginModel.Password" class="col-md-2 control-label"></label>
+            <label asp-for="@loginModel.Password" class="form-label"></label>
             <input asp-for="@loginModel.Password" class="form-control" />
             <span asp-validation-for="@loginModel.Password" class="form-text text-danger"></span>
         </div>

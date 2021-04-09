@@ -35,12 +35,12 @@
         <hr />
         <div asp-validation-summary="All" class="text-danger"></div>
         <div class="mb-3">
-            <label asp-for="@profileModel.Name"></label>
+            <label asp-for="@profileModel.Name" class="form-label"></label>
             <input asp-for="@profileModel.Name" class="form-control" aria-required="true" />
             <span asp-validation-for="@profileModel.Name" class="form-text text-danger"></span>
         </div>
         <div class="mb-3">
-            <label asp-for="@profileModel.Email"></label>
+            <label asp-for="@profileModel.Email" class="form-label"></label>
             <input asp-for="@profileModel.Email" class="form-control" autocomplete="username" aria-required="true" />
             <span asp-validation-for="@profileModel.Email" class="form-text text-danger"></span>
         </div>
@@ -48,17 +48,18 @@
         @if (!string.IsNullOrWhiteSpace(profileModel.UserName))
         {
             <div class="mb-3">
-                <label asp-for="@profileModel.UserName"></label>
+                <label asp-for="@profileModel.UserName" class="form-label"></label>
                 <input asp-for="@profileModel.UserName" class="form-control" autocomplete="username" aria-required="true" />
                 <span asp-validation-for="@profileModel.UserName" class="form-text text-danger"></span>
             </div>
         }
 
-for (var i = 0; i < profileModel.MemberProperties.Count; i++)
+        for (var i = 0; i < profileModel.MemberProperties.Count; i++)
         {
             <div class="mb-3">
-                <label asp-for="@profileModel.MemberProperties[i].Value"></label>
+                @Html.LabelFor(m => profileModel.MemberProperties[i].Value, profileModel.MemberProperties[i].Name)
                 <input asp-for="@profileModel.MemberProperties[i].Value" class="form-control" />
+                @Html.HiddenFor(m => profileModel.MemberProperties[i].Alias)
                 <span asp-validation-for="@profileModel.MemberProperties[i].Value" class="form-text text-danger"></span>
             </div>
         }

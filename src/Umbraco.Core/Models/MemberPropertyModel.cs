@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Models
     /// </summary>
     public class MemberPropertyModel
     {
-        [Editable(false)]
+        [Required]
         public string Alias { get; set; }
 
         //NOTE: This has to be a string currently, if it is an object it will bind as an array which we don't want.
