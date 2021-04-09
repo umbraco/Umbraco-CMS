@@ -6,13 +6,14 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Services.Notifications;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
     /// <summary>
     /// Represents the Macro Service, which is an easy access to operations involving <see cref="IMacro"/>
     /// </summary>
-    public class MacroService : RepositoryService, IMacroService
+    internal class MacroService : RepositoryService, IMacroService
     {
         private readonly IMacroRepository _macroRepository;
         private readonly IAuditRepository _auditRepository;
@@ -83,18 +84,19 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId">Optional id of the user deleting the macro</param>
         public void Delete(IMacro macro, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<IMacro>(macro);
-                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var deletingNotification = new MacroDeletingNotification(macro, eventMessages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
                 }
 
                 _macroRepository.Delete(macro);
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Deleted, this, deleteEventArgs);
+
+                scope.Notifications.Publish(new MacroDeletedNotification(macro, eventMessages).WithStateFrom(deletingNotification));
                 Audit(AuditType.Delete, userId, -1);
 
                 scope.Complete();
@@ -108,10 +110,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <param name="userId">Optional Id of the user deleting the macro</param>
         public void Save(IMacro macro, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IMacro>(macro);
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                var savingNotification = new MacroSavingNotification(macro, eventMessages);
+
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -123,8 +127,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
 
                 _macroRepository.Save(macro);
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs);
+
+                scope.Notifications.Publish(new MacroSavedNotification(macro, eventMessages).WithStateFrom(savingNotification));
                 Audit(AuditType.Save, userId, -1);
 
                 scope.Complete();
@@ -154,27 +158,5 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             _auditRepository.Save(new AuditItem(objectId, type, userId, "Macro"));
         }
-
-        #region Event Handlers
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IMacroService, DeleteEventArgs<IMacro>> Deleting;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IMacroService, DeleteEventArgs<IMacro>> Deleted;
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IMacroService, SaveEventArgs<IMacro>> Saving;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IMacroService, SaveEventArgs<IMacro>> Saved;
-        #endregion
     }
 }

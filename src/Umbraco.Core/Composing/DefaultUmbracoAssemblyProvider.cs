@@ -16,16 +16,6 @@ namespace Umbraco.Cms.Core.Composing
     {
         private readonly Assembly _entryPointAssembly;
         private readonly ILoggerFactory _loggerFactory;
-        private static readonly string[] UmbracoCoreAssemblyNames = new[]
-            {
-                "Umbraco.Core",
-                "Umbraco.Infrastructure",
-                "Umbraco.PublishedCache.NuCache",
-                "Umbraco.Examine.Lucene",
-                "Umbraco.Web.Common",
-                "Umbraco.Web.BackOffice",
-                "Umbraco.Web.Website",
-            };
 
         public DefaultUmbracoAssemblyProvider(Assembly entryPointAssembly, ILoggerFactory loggerFactory)
         {
@@ -43,7 +33,7 @@ namespace Umbraco.Cms.Core.Composing
         {
             get
             {
-                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, UmbracoCoreAssemblyNames, true, _loggerFactory);
+                var finder = new FindAssembliesWithReferencesTo(new[] { _entryPointAssembly }, Constants.Composing.UmbracoCoreAssemblyNames, true, _loggerFactory);
                 return finder.Find();
             }
         }

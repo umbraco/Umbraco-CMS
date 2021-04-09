@@ -19,6 +19,7 @@ namespace Umbraco.Extensions
             where TUserManager : UserManager<MemberIdentityUser>, TInterface
         {
             identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TUserManager));
+            identityBuilder.Services.AddScoped(typeof(UserManager<MemberIdentityUser>), factory => factory.GetRequiredService<TInterface>());
             return identityBuilder;
         }
     }
