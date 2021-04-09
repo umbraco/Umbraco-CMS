@@ -322,15 +322,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             EventMessages eventMessages = EventMessagesFactory.Get();
 
-            // TODO: This isn't pretty because we're required to maintain backwards compatibility so we could not change
-            // the event args here. The other option is to create a different event with different event
-            // args specifically for this method... which also isn't pretty. So fix this in v8!
-            var additionalData = new Dictionary<string, object>
-            {
-                { "CreateTemplateForContentType", true },
-                { "ContentTypeAlias", contentTypeAlias },
-            };
-
             if (contentTypeAlias != null && contentTypeAlias.Length > 255)
             {
                 throw new InvalidOperationException("Name cannot be more than 255 characters in length.");
