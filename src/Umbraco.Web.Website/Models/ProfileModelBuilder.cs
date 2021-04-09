@@ -15,6 +15,7 @@ namespace Umbraco.Cms.Web.Website.Models
         private readonly IMemberService _memberService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private string _redirectUrl;
+        private bool _lookupProperties;
 
         public ProfileModelBuilder(
             IMemberTypeService memberTypeService,
@@ -30,6 +31,12 @@ namespace Umbraco.Cms.Web.Website.Models
         public ProfileModelBuilder WithRedirectUrl(string redirectUrl)
         {
             _redirectUrl = redirectUrl;
+            return this;
+        }
+
+        public ProfileModelBuilder WithCustomProperties(bool lookupProperties)
+        {
+            _lookupProperties = lookupProperties;
             return this;
         }
 
@@ -78,7 +85,10 @@ namespace Umbraco.Cms.Web.Website.Models
                 throw new InvalidOperationException($"Could not find a member with key: {member.Key}.");
             } 
 
-            model.MemberProperties = GetMemberPropertiesViewModel(memberType, persistedMember);
+            if (_lookupProperties)
+            {
+                model.MemberProperties = GetMemberPropertiesViewModel(memberType, persistedMember);
+            }
 
             return model;
         }

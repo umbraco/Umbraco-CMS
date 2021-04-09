@@ -17,7 +17,7 @@
         .WithRedirectUrl(null)
         // Set to true if you want the member editable properties shown.
         // It will only displays properties marked as "Member can edit" on the "Info" tab of the Member Type.
-        .LookupProperties(true)
+        .WithCustomProperties(false)
         .Build();
 
     var success = TempData["FormSuccess"] != null;
@@ -71,8 +71,9 @@ else
             for (var i = 0; i < registerModel.MemberProperties.Count; i++)
             {
                 <div class="mb-3">
-                    <label asp-for="@registerModel.MemberProperties[i].Value" class="form-label"></label>
+                    @Html.LabelFor(m => registerModel.MemberProperties[i].Value, registerModel.MemberProperties[i].Name)
                     <input asp-for="@registerModel.MemberProperties[i].Value" class="form-control" />
+                    @Html.HiddenFor(m => registerModel.MemberProperties[i].Alias)
                     <span asp-validation-for="@registerModel.MemberProperties[i].Value" class="form-text text-danger"></span>
                 </div>
             }

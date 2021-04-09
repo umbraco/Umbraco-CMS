@@ -86,6 +86,7 @@ namespace Umbraco.Cms.Core.Security
 
                 // re-assign id
                 user.Id = UserIdToString(memberEntity.Id);
+                user.Key = memberEntity.Key;
 
                 // [from backofficeuser] we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
                 // var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MembersIdentityUser.Logins));

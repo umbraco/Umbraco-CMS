@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Web.Website.Models
             return this;
         }
 
-        public RegisterModelBuilder LookupProperties(bool lookupProperties)
+        public RegisterModelBuilder WithCustomProperties(bool lookupProperties)
         {
             _lookupProperties = lookupProperties;
             return this;

@@ -12,6 +12,8 @@
         .CreateProfileModel()
         // If null or not set, this will redirect to the current page
         .WithRedirectUrl(null)
+        // Include editable custom properties on the form
+        .WithCustomProperties(true)
         .BuildForCurrentMemberAsync();
 
     var success = TempData["FormSuccess"] != null;
@@ -21,7 +23,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.0/jquery.validate.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 
-@if(profileModel != null)
+@if (profileModel != null)
 {
     if (success)
     {
@@ -54,14 +56,17 @@
             </div>
         }
 
-        for (var i = 0; i < profileModel.MemberProperties.Count; i++)
+        @if (profileModel.MemberProperties != null)
         {
-            <div class="mb-3">
-                @Html.LabelFor(m => profileModel.MemberProperties[i].Value, profileModel.MemberProperties[i].Name)
-                <input asp-for="@profileModel.MemberProperties[i].Value" class="form-control" />
-                @Html.HiddenFor(m => profileModel.MemberProperties[i].Alias)
-                <span asp-validation-for="@profileModel.MemberProperties[i].Value" class="form-text text-danger"></span>
-            </div>
+            for (var i = 0; i < profileModel.MemberProperties.Count; i++)
+            {
+                <div class="mb-3">
+                    @Html.LabelFor(m => profileModel.MemberProperties[i].Value, profileModel.MemberProperties[i].Name)
+                    <input asp-for="@profileModel.MemberProperties[i].Value" class="form-control" />
+                    @Html.HiddenFor(m => profileModel.MemberProperties[i].Alias)
+                    <span asp-validation-for="@profileModel.MemberProperties[i].Value" class="form-text text-danger"></span>
+                </div>
+            }
         }
 
         <button type="submit" class="btn btn-primary">Update</button>
