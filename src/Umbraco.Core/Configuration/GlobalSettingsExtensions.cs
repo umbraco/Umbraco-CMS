@@ -44,7 +44,7 @@ namespace Umbraco.Core.Configuration
             var path = globalSettings.Path;
             if (path.StartsWith(SystemDirectories.Root)) // beware of TrimStart, see U4-2518
                 path = path.Substring(SystemDirectories.Root.Length);
-            return path.TrimStart('~').TrimStart('/').Replace('/', '-').Trim().ToLower();
+            return path.TrimStart(Constants.CharArrays.Tilde).TrimStart(Constants.CharArrays.ForwardSlash).Replace('/', '-').Trim().ToLower();
         }
 
     }

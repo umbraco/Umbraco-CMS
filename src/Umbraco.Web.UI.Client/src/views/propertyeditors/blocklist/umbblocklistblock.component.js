@@ -29,7 +29,7 @@
         }
     );
 
-    function BlockListBlockController($scope, $compile, $element, umbRequestHelper) {
+    function BlockListBlockController($scope, $compile, $element) {
         var model = this;
 
         model.$onInit = function () {
@@ -43,6 +43,9 @@
 
             // let the Block know about its form
             model.block.setParentForm(model.parentForm);
+
+            // let the Block know about the current index
+            model.block.index = model.index;
 
             $scope.block = model.block;
             $scope.api = model.api;
@@ -68,9 +71,14 @@
         // We need to watch for changes on primitive types and upate the $scope values.
         model.$onChanges = function (changes) {
             if (changes.index) {
-                $scope.index = changes.index.currentValue;
+                var index = changes.index.currentValue;
+                $scope.index = index;
+
+                // let the Block know about the current index:
+                model.block.index = index;
+                model.block.updateLabel();
             }
-        }
+        };
     }
 
 

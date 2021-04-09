@@ -34,7 +34,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
             if (IsRangeDataType(propertyType.DataType.Id))
             {
-                var rangeRawValues = source.ToString().Split(',');
+                var rangeRawValues = source.ToString().Split(Constants.CharArrays.Comma);
                 var minimumAttempt = rangeRawValues[0].TryConvertTo<decimal>();
                 var maximumAttempt = rangeRawValues[1].TryConvertTo<decimal>();
 

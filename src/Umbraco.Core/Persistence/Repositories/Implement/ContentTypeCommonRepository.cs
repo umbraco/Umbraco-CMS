@@ -171,9 +171,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 while (compositionIx < compositionDtos.Count && compositionDtos[compositionIx].ChildId == contentType.Id)
                 {
                     var parentDto = compositionDtos[compositionIx];
-                    if (!contentTypes.TryGetValue(parentDto.ParentId, out var parentContentType)) continue;
-                    contentType.AddContentType(parentContentType);
                     compositionIx++;
+
+                    if (!contentTypes.TryGetValue(parentDto.ParentId, out var parentContentType))
+                        continue;
+                    contentType.AddContentType(parentContentType);
                 }
             }
         }
@@ -303,7 +305,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 SortOrder = dto.SortOrder,
                 ValidationRegExp = dto.ValidationRegExp,
                 ValidationRegExpMessage = dto.ValidationRegExpMessage,
-                Variations = (ContentVariation)dto.Variations
+                Variations = (ContentVariation)dto.Variations,
+                LabelOnTop = dto.LabelOnTop
             };
         }
     }

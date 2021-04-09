@@ -12,6 +12,7 @@
     .absolute();
     background: @brownGrayLight;
     z-index: @zIndexEditor;
+    max-width: 100%;
 
     &--infiniteMode {
         transform: none;
@@ -32,6 +33,17 @@
 
     &--level0 {
         transform: none;
+    }
+
+    &--small .umb-property {
+        .control-header {
+            float: none;
+            width: 100%;
+        }
+
+        .controls {
+            margin-left: 0;
+        }
     }
 }
 

@@ -292,7 +292,7 @@
         <key alias="childItems" version="7.0">Eitemau blentyn</key>
         <key alias="target" version="7.0">Targed</key>
         <key alias="scheduledPublishServerTime">Mae hyn yn trawsnewid at yr amser ganlynol ar y gweinydd:</key>
-        <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Beth mae hyn yn golygu?</a>]]></key>
+        <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Beth mae hyn yn golygu?</a>]]></key>
         <key alias="nestedContentDeleteItem">Ydych chi'n sicr eich bod eisiau dileu'r eitem yma?</key>
         <key alias="nestedContentEditorNotSupported">Mae'r priodwedd %0% yn defnyddio'r golygydd %1% sydd ddim yn cyd-fynd â Chynnwys Amnyth.</key>
         <key alias="nestedContentDeleteAllItems">Wyt ti'n siŵr fod ti eisiau dileu pob eitem?</key>
@@ -483,7 +483,7 @@
         <key alias="recycleBinDeleting">Mae'r eitemau yn y bin ailgylchu yn cael eu dileu. Peidiwch â chau'r ffenestr yma wrth i'r gweithrediad gymryd lle</key>
         <key alias="recycleBinIsEmpty">Mae'r bin ailgylchu yn awr yn wag</key>
         <key alias="recycleBinWarning">Pan gaiff eitemau eu dileu o'r bin ailgylchu, byddent yn diflannu am byth</key>
-        <key alias="regexSearchError"><![CDATA[Mae problem gyda gwasanaeth gwe <a target='_blank' href='http://regexlib.com'>regexlib.com</a> ar hyn o bryd, nid oes gennym reolaeth dros hyn. Mae'n ddrwg iawn gennym ni am yr anghyfleustra.]]></key>
+        <key alias="regexSearchError"><![CDATA[Mae problem gyda gwasanaeth gwe <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> ar hyn o bryd, nid oes gennym reolaeth dros hyn. Mae'n ddrwg iawn gennym ni am yr anghyfleustra.]]></key>
         <key alias="regexSearchHelp">Chwiliwch am fynegiad cyson er mwyn ychwanegu dilysiad i faes ffurflen. Enghraifft: 'email, 'zip-code' 'url'</key>
         <key alias="removeMacro">Dileu Macro</key>
         <key alias="requiredField">Maes Gofynnol</key>
@@ -589,7 +589,7 @@
         <key alias="toolsDescription">Offer i reoli'r mynegai</key>
         <key alias="fields">meysydd</key>
         <key alias="indexCannotRead">Ni ellir darllen yr mynegai a bydd angen ei ailadeiladu</key>
-        <key alias="processIsTakingLonger">Mae'r broses yn cymryd mwy o amser na'r disgwyl, gwiriwch y log umbraco i weld os mae wedi bod unrhyw wall yn ystod y gweithrediad hwn</key>
+        <key alias="processIsTakingLonger">Mae'r broses yn cymryd mwy o amser na'r disgwyl, gwiriwch y log Umbraco i weld os mae wedi bod unrhyw wall yn ystod y gweithrediad hwn</key>
         <key alias="indexCannotRebuild">Ni ellir ailadeiladu'r mynegai hwn oherwydd nad yw wedi'i aseinio</key>
         <key alias="iIndexPopulator">IIndexPopulator</key>
     </area>
@@ -676,7 +676,6 @@
         <key alias="errorMandatoryWithoutTab">%0% yn faes ofynnol</key>
         <key alias="errorRegExp">%0% yn %1% mewn fformat annilys</key>
         <key alias="errorRegExpWithoutTab">%0% mewn fformat annilys</key>
-        <key alias="errorPropertyEditorNotSupportedInElementTypes">Briodwedd '%0%' yn defnyddio'r golygydd '%1%' sydd ddim wedi ei chynnal yn y teipiau elfen.</key>
     </area>
     <area alias="errors">
         <key alias="receivedErrorFromServer">Derbynwyd gwall o'r gweinydd</key>
@@ -701,7 +700,6 @@
         <key alias="tableColMergeLeft">Symudwch y cyrchwr ar ochr chwith y ddwy gell yr ydych eisiau cyfuno</key>
         <key alias="tableSplitNotSplittable">Ni allwch hollti cell sydd heb ei gyfuno.</key>
         <key alias="propertyHasErrors">Mae gan briodwedd hon gwallau</key>
-        <key alias="errorPropertyEditorNotSupportedInElementTypes">Priodwedd '%0%' yn defnyddio'r golygydd '%1%' sydd ddim yn cael ei gefnogi mewn Mathau o Elfen.</key>
         <key alias="xsltErrorHeader">Gwall yn y ffynhonnell XSLT</key>
         <key alias="xsltErrorText">Nid yw'r XSLTwedi'i achub gan ei fod yn cynnwys gwall(au)</key>
         <key alias="missingPropertyEditorErrorMessage">Mae gwall ffurfwedd gyda'r math o ddata sy'n cael ei ddefnyddio ar gyfer y priodwedd yma, gwiriwch y fath o ddata</key>
@@ -938,8 +936,8 @@
               <p>Er mwyn parhau, newidiwch y ffeil "web.config" (gan ddefnyddio Visual Studio neu eich hoff olygydd testun), rholiwch at y gwaelod, ychwanegwch y llinyn gyswllt ar gyfer eich cronfa ddata yn yr allwedd o'r enw "UmbracoDbDSN" ac achub y ffeil. </p>
               <p>
               Cliciwch y botwm <strong>ceisio eto</strong> pan rydych wedi
-              gorffen.<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
-			              Mwy o wybodaeth am newid y ffeil web.config yma.</a></p>]]>
+              gorffen.<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
+			              Mwy o wybodaeth am newid y ffeil web.config yma</a>.</p>]]>
         </key>
         <key alias="databaseText">
             <![CDATA[Er mwyn cwblhau'r cam yma, rhaid i chi berchen gwybodaeth am eich gweinydd gronfa ddata ("llinyn gyswllt").<br />
@@ -1004,7 +1002,7 @@
         <key alias="runwayFromScratchText">
             <![CDATA[
         Mae eich gwefan yn hollol wag ar hyn o bryd, felly mae hynny'n berffaith os rydych chi eisiau cychwyn eto a chreu eich mathau o ddogfennau a thempledi eich hunain.
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">dysgwch sut</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">dysgwch sut</a>)
         Gallwch ddewis i osod Runway yn hwyrach os hoffwch chi. Ewch at yr adran Datblygwr a dewiswch Pecynnau.
       ]]>
         </key>
@@ -1089,7 +1087,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="instruction">Mewngofnodwch isod</key>
         <key alias="signInWith">Mewngofnodwch gyda</key>
         <key alias="timeout">Sesiwn wedi cyrraedd terfyn amser</key>
-        <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+        <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
         <key alias="forgottenPassword">Wedi anghofio eich cyfrinair?</key>
         <key alias="forgottenPasswordInstruction">Bydd ebost yn cael ei anfon i'r cyfeiriad darparwyd gyda dolen i ailosod eich cyfrinair</key>
         <key alias="requestPasswordResetConfirmation">Bydd ebost gyda chyfarwyddiadau ailosod cyfrinair yn cael ei anfon at y cyfeiriad darparwyd os yw'n cyfateb â'n cofnodion</key>
@@ -1148,7 +1146,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
 																<tbody>
 																	<tr>
 																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																				Cliciwch y ddolen yma er mwyn ailosod eich cyfrinair
 																			</a>
 																		</td>
@@ -1271,7 +1269,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
 																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
 																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
 																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>GOLYGU</a> </td> </tr></tbody></table>
+																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>GOLYGU</a> </td> </tr></tbody></table>
 																	</td>
 																</tr>
 															</tbody>
@@ -1566,7 +1564,6 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="tabs">Tabiau</key>
         <key alias="contentTypeEnabled">Math o Gynnwys Meistr wedi'i alluogi</key>
         <key alias="contentTypeUses">Mae'r Math o Gynnwys yma yn defnyddio</key>
-        <key alias="asAContentMasterType">fel Math o Gynnwys Meistr. Nid yw tabiau o Fath o Gynnwys Meistr yn cael eu dangos a gall dim ond eu golygu ar y Math o Gynnwys Meistr ei hunan</key>
         <key alias="noPropertiesDefinedOnTab">Dim priodweddau wedi'u diffinio ar y tab yma. Cliciwch ar y ddolen "ychwanegu priodwedd newydd" ar y topi greu priodwedd newydd.</key>
         <key alias="masterDocumentType">Math o Ddogfen Feistr</key>
         <key alias="createMatchingTemplate">Creu templedi cydweddol</key>
@@ -2245,7 +2242,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
 																			<tbody>
 																				<tr>
 																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																						<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																							Cliciwch y ddolen yma i dderbyn y gwahoddiad
 																						</a>
 																					</td>
@@ -2438,7 +2435,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="helpText">
             <![CDATA[
             <p>Mae'r gwiriwr iechyd yn gwerthuso gwahanol rannau o'ch gwefan ar gyfer gosodiadau arfer gorau, cyfluniad, problemau posibl, ac ati. Gallwch chi drwsio problemau yn hawdd trwy wasgu botwm.
-            Gallwch chi ychwanegu eich gwiriadau iechyd eich hun, edrych ar <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">y ddogfennaeth i gael mwy o wybodaeth</a> am wiriadau iechyd arferu.</p>
+            Gallwch chi ychwanegu eich gwiriadau iechyd eich hun, edrych ar <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">y ddogfennaeth i gael mwy o wybodaeth</a> am wiriadau iechyd arferu.</p>
             ]]>
         </key>
         <key alias="tls12HealthCheckSuccess">Eich wefan gallu defnyddio y protocol gwarchodaeth TLS 1.2 wrth wneud cysylltiadau allanol i endpoints HTTPS</key>
@@ -2682,7 +2679,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="trainingHeadline">Oriau o fideos hyfforddiant Umbraco ddim ond un clic i fwrdd</key>
         <key alias="trainingDescription">
             <![CDATA[
-                <P>Eisiau meistroli Umbraco? Treuliwch gwpl o funudau yn dysgu rhai o'r arferion gorau gan wylio un o'r fideos hyn am sut i ddefnyddio Umbraco. Ac ymweld â <a href="http://umbraco.tv" target="_blank">umbraco.tv</a> am fwy o fideos am Umbraco</p>
+                <P>Eisiau meistroli Umbraco? Treuliwch gwpl o funudau yn dysgu rhai o'r arferion gorau gan wylio un o'r fideos hyn am sut i ddefnyddio Umbraco. Ac ymweld â <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> am fwy o fideos am Umbraco</p>
             ]]>
         </key>
         <key alias="getStarted">I roi cychwyn i chi</key>
@@ -2693,27 +2690,27 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="more">Ddarganfod fwy</key>
         <key alias="bulletPointOne">
             <![CDATA[
-            Darllenwch fwy am weithio efo'r eitemau yn yr adran Gosodiadau <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank">fewn yr adran Dogfennaeth</a> o Our Umbraco
+            Darllenwch fwy am weithio efo'r eitemau yn yr adran Gosodiadau <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">fewn yr adran Dogfennaeth</a> o Our Umbraco
         ]]>
         </key>
         <key alias="bulletPointTwo">
             <![CDATA[
-            Gofynnwch gwestiwn yn y <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank">Fforwm Cymunedol</a>
+            Gofynnwch gwestiwn yn y <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Fforwm Cymunedol</a>
         ]]>
         </key>
         <key alias="bulletPointThree">
             <![CDATA[
-            Gwyliwch ein <a class="btn-link -underline" href="https://umbraco.tv" target="_blank">fideos tiwtorial</a> (mae rhai am ddim, ond bydd angen tanysgrifiad am rhai eraill)
+            Gwyliwch ein <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">fideos tiwtorial</a> (mae rhai am ddim, ond bydd angen tanysgrifiad am rhai eraill)
         ]]>
         </key>
         <key alias="bulletPointFour">
             <![CDATA[
-            Darganfyddwch fwy am ein <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank">hoffer hybu cynhyrchiant a chefnogaeth fasnachol</a>
+            Darganfyddwch fwy am ein <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">hoffer hybu cynhyrchiant a chefnogaeth fasnachol</a>
         ]]>
         </key>
         <key alias="bulletPointFive">
             <![CDATA[
-            Darganfyddwch fwy am gyfleoedd <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">hyfforddi ac ardystio</a>
+            Darganfyddwch fwy am gyfleoedd <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">hyfforddi ac ardystio</a>
         ]]>
         </key>
     </area>
@@ -2763,6 +2760,7 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="blockHasChanges">Rydych chi wedi gwneud newidiadau i'r cynnwys hwn. Wyt ti'n siŵr eich bod chi am eu taflu ei fwrdd?</key>
         <key alias="confirmCancelBlockCreationHeadline">Gwaredu cread?</key>
         <key alias="confirmCancelBlockCreationMessage"><![CDATA[Ydych chi'n siŵr eich bod chi'n am ganslo'r cread?]]></key>
+        <key alias="propertyEditorNotSupported">Priodwedd '%0%' yn defnyddio'r golygydd '%1%' sydd ddim yn cael ei gefnogi mewn blociau.</key>
     </area>
     <area alias="contentTemplatesDashboard">
         <key alias="whatHeadline">Beth yw Templedi Gynnwys</key>
