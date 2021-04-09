@@ -97,16 +97,10 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                 return;
             }
 
-            // don't do anything if this special key is not found
-            if (notification.AdditionalData is null || !notification.AdditionalData.ContainsKey("CreateTemplateForContentType"))
-            {
-                return;
-            }
-
             // ensure we have the content type alias
-            if (!notification.AdditionalData.ContainsKey("ContentTypeAlias"))
+            if (notification.ContentTypeAlias is null)
             {
-                throw new InvalidOperationException("The additionalData key: ContentTypeAlias was not found");
+                throw new InvalidOperationException("ContentTypeAlias was not found on the notification");
             }
 
             foreach (ITemplate template in notification.SavedEntities)
@@ -117,7 +111,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                 {
                     // ensure is safe and always pascal cased, per razor standard
                     // + this is how we get the default model name in Umbraco.ModelsBuilder.Umbraco.Application
-                    var alias = notification.AdditionalData["ContentTypeAlias"].ToString();
+                    var alias = notification.ContentTypeAlias;
                     var name = template.Name; // will be the name of the content type since we are creating
                     var className = UmbracoServices.GetClrName(_shortStringHelper, name, alias);
 

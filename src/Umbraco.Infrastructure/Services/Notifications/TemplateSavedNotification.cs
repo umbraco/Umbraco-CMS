@@ -17,12 +17,24 @@ namespace Umbraco.Cms.Infrastructure.Services.Notifications
         {
         }
 
-        public TemplateSavedNotification(ITemplate target, EventMessages messages,
-            Dictionary<string, object> additionalData) : base(target, messages) => AdditionalData = additionalData;
+        public bool? CreateTemplateForContentType
+        {
+            get
+            {
+                State.TryGetValue("CreateTemplateForContentType", out var result);
+                return result as bool?;
+            }
+            set => State["CreateTemplateForContentType"] = value;
+        }
 
-        public TemplateSavedNotification(IEnumerable<ITemplate> target, EventMessages messages,
-            Dictionary<string, object> additionalData) : base(target, messages) => AdditionalData = additionalData;
-
-        public Dictionary<string, object> AdditionalData;
+        public string ContentTypeAlias
+        {
+            get
+            {
+                State.TryGetValue("ContentTypeAlias", out var result);
+                return result as string;
+            }
+            set => State["ContentTypeAlias"] = value;
+        }
     }
 }

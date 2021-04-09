@@ -346,7 +346,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var savingEvent = new TemplateSavingNotification(template, eventMessages, additionalData);
+                var savingEvent = new TemplateSavingNotification(template, eventMessages, true, contentTypeAlias);
                 if (scope.Notifications.PublishCancelable(savingEvent))
                 {
                     scope.Complete();
@@ -354,7 +354,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 }
 
                 _templateRepository.Save(template);
-                scope.Notifications.Publish(new TemplateSavedNotification(template, eventMessages, savingEvent.AdditionalData).WithStateFrom(savingEvent));
+                scope.Notifications.Publish(new TemplateSavedNotification(template, eventMessages).WithStateFrom(savingEvent));
 
                 Audit(AuditType.Save, userId, template.Id, ObjectTypes.GetName(UmbracoObjectTypes.Template));
                 scope.Complete();
