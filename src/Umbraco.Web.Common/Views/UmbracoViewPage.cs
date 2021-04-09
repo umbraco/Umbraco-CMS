@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Web.Common.Views
         {
             // filter / add preview banner
             // ASP.NET default value is text/html
-            if (Context.Response.ContentType.InvariantContains("text/html"))
+            if (Context.Response?.ContentType?.InvariantContains("text/html") ?? false)
             {
                 if ((UmbracoContext.IsDebug || UmbracoContext.InPreviewMode)
                     && tagHelperOutput.TagName != null

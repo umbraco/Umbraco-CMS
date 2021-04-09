@@ -29,12 +29,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         private Mock<IOptions<MemberIdentityOptions>> _mockIdentityOptions;
         private Mock<IPasswordHasher<MemberIdentityUser>> _mockPasswordHasher;
         private Mock<IMemberService> _mockMemberService;
-        private Mock<IUserValidator<MemberIdentityUser>> _mockUserValidators;
-        private Mock<IEnumerable<IPasswordValidator<MemberIdentityUser>>> _mockPasswordValidators;
-        private Mock<ILookupNormalizer> _mockNormalizer;
-        private IdentityErrorDescriber _mockErrorDescriber;
         private Mock<IServiceProvider> _mockServiceProviders;
-        private Mock<ILogger<UserManager<MemberIdentityUser>>> _mockLogger;
         private Mock<IOptions<MemberPasswordConfigurationSettings>> _mockPasswordConfiguration;
 
         public MemberManager CreateSut()
@@ -52,15 +47,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             _mockPasswordHasher = new Mock<IPasswordHasher<MemberIdentityUser>>();
 
             var userValidators = new List<IUserValidator<MemberIdentityUser>>();
-            _mockUserValidators = new Mock<IUserValidator<MemberIdentityUser>>();
             var validator = new Mock<IUserValidator<MemberIdentityUser>>();
             userValidators.Add(validator.Object);
 
-            _mockPasswordValidators = new Mock<IEnumerable<IPasswordValidator<MemberIdentityUser>>>();
-            _mockNormalizer = new Mock<ILookupNormalizer>();
-            _mockErrorDescriber = new IdentityErrorDescriber();
+            //_mockNormalizer = new Mock<ILookupNormalizer>();
+            //_mockErrorDescriber = new IdentityErrorDescriber();
             _mockServiceProviders = new Mock<IServiceProvider>();
-            _mockLogger = new Mock<ILogger<UserManager<MemberIdentityUser>>>();
             _mockPasswordConfiguration = new Mock<IOptions<MemberPasswordConfigurationSettings>>();
             _mockPasswordConfiguration.Setup(x => x.Value).Returns(() =>
                 new MemberPasswordConfigurationSettings()

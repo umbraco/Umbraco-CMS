@@ -9,13 +9,12 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Primitives;
 using Serilog;
 using Smidge;
 using Smidge.FileProcessors;
@@ -64,7 +63,6 @@ using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
 {
-
     // TODO: We could add parameters to configure each of these for flexibility
 
     /// <summary>
@@ -278,7 +276,7 @@ namespace Umbraco.Extensions
             // Password hasher
             builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
 
-            builder.Services.AddUnique<ICookieManager, AspNetCoreCookieManager>();
+            builder.Services.AddUnique<Cms.Core.Web.ICookieManager, AspNetCoreCookieManager>();
             builder.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
             builder.Services.AddUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 
@@ -296,7 +294,6 @@ namespace Umbraco.Extensions
 
             builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
             builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
-            builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, UmbracoWebsiteSecurityAccessor>();
 
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
             builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
@@ -318,7 +315,6 @@ namespace Umbraco.Extensions
 
             builder.Services.AddScoped<UmbracoHelper>();
             builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
-            builder.Services.AddScoped<IUmbracoWebsiteSecurity, UmbracoWebsiteSecurity>();
 
             builder.AddHttpClients();
 

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Security
+namespace Umbraco.Cms.Web.Common.Models
 {
     /// <summary>
     /// A base model containing a value to indicate to Umbraco where to redirect to after Posting if

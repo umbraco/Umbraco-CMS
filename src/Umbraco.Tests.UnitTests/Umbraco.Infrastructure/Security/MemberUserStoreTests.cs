@@ -168,6 +168,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 m.Email == "fakeemail@umbraco.com" &&
                 m.Username == "fakeUsername" &&
                 m.RawPasswordValue == "fakePassword" &&
+                m.Comments == "hello" &&
                 m.ContentTypeAlias == fakeMemberType.Alias &&
                 m.HasIdentity == true);
 
@@ -185,6 +186,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             _mockMemberService.Verify(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>()));
             _mockMemberService.Verify(x => x.Save(mockMember, It.IsAny<bool>()));
         }
+
+        // TODO: Test updating! 
 
 
         [Test]

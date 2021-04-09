@@ -1,9 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Web.Common.Models;
 
-namespace Umbraco.Cms.Core.Models.Security
+namespace Umbraco.Cms.Web.Website.Models
 {
     /// <summary>
     /// A readonly member profile model
@@ -11,8 +13,8 @@ namespace Umbraco.Cms.Core.Models.Security
     public class ProfileModel : PostRedirectModel
     {
         [Required]
-        [RegularExpression(@"[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*@(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?",
-            ErrorMessage = "Please enter a valid e-mail address")]
+        [EmailAddress]
+        [Display(Name = "Email")]
         public string Email { get; set; }
 
         /// <summary>
@@ -20,17 +22,11 @@ namespace Umbraco.Cms.Core.Models.Security
         /// </summary>
         public string Name { get; set; }
 
-        /// <summary>
-        /// The member's member type alias
-        /// </summary>
-        [ReadOnly(true)]
-        public string MemberTypeAlias { get; set; }
-
         [ReadOnly(true)]
         public string UserName { get; set; }
 
         [ReadOnly(true)]
-        public string Comment { get; set; }
+        public string Comments { get; set; }
 
         [ReadOnly(true)]
         public bool IsApproved { get; set; }
@@ -39,19 +35,16 @@ namespace Umbraco.Cms.Core.Models.Security
         public bool IsLockedOut { get; set; }
 
         [ReadOnly(true)]
-        public DateTime LastLockoutDate { get; set; }
+        public DateTime? LastLockoutDate { get; set; }
 
         [ReadOnly(true)]
-        public DateTime CreationDate { get; set; }
+        public DateTime CreatedDate { get; set; }
 
         [ReadOnly(true)]
-        public DateTime LastLoginDate { get; set; }
+        public DateTime? LastLoginDate { get; set; }
 
         [ReadOnly(true)]
-        public DateTime LastActivityDate { get; set; }
-
-        [ReadOnly(true)]
-        public DateTime LastPasswordChangedDate { get; set; }
+        public DateTime? LastPasswordChangedDate { get; set; }
 
         /// <summary>
         /// The list of member properties
@@ -59,6 +52,6 @@ namespace Umbraco.Cms.Core.Models.Security
         /// <remarks>
         /// Adding items to this list on the front-end will not add properties to the member in the database.
         /// </remarks>
-        public List<UmbracoProperty> MemberProperties { get; set; } = new List<UmbracoProperty>();
+        public List<MemberPropertyModel> MemberProperties { get; set; } = new List<MemberPropertyModel>();
     }
 }

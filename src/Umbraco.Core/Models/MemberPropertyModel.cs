@@ -1,12 +1,12 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Core.Models
 {
     /// <summary>
-    /// A simple representation of an Umbraco property
+    /// A simple representation of an Umbraco member property
     /// </summary>
-    public class UmbracoProperty
+    public class MemberPropertyModel
     {
         [Editable(false)]
         public string Alias { get; set; }

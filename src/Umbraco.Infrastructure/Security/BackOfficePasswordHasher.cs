@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Web.BackOffice.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// A password hasher for back office users
@@ -72,7 +72,8 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                         return base.VerifyHashedPassword(user, hashedPassword, providedPassword);
                     case Constants.Security.AspNetCoreV2PasswordHashAlgorithmName:
                         var legacyResult = _aspnetV2PasswordHasher.VerifyHashedPassword(user, hashedPassword, providedPassword);
-                        if (legacyResult == PasswordVerificationResult.Success) return PasswordVerificationResult.SuccessRehashNeeded;
+                        if (legacyResult == PasswordVerificationResult.Success)
+                            return PasswordVerificationResult.SuccessRehashNeeded;
                         return legacyResult;
                 }
             }

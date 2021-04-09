@@ -28,5 +28,8 @@ namespace Umbraco.Cms.Web.Common.Security
                 services, logger, passwordConfiguration)
         {
         }
+
+        public bool IsMemberAuthorized(IEnumerable<string> allowTypes = null, IEnumerable<string> allowGroups = null, IEnumerable<int> allowMembers = null)
+            => true; // TODO: Implement!
     }
 }

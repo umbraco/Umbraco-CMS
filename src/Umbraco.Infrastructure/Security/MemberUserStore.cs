@@ -646,6 +646,13 @@ namespace Umbraco.Cms.Core.Security
                 member.LastPasswordChangeDate = identityUserMember.LastPasswordChangeDateUtc.Value.ToLocalTime();
             }
 
+            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.Comments))
+                && member.Comments != identityUserMember.Comments && identityUserMember.Comments.IsNullOrWhiteSpace() == false)
+            {
+                anythingChanged = true;
+                member.Comments = identityUserMember.Comments;
+            }
+
             if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.EmailConfirmed))
                 || (member.EmailConfirmedDate.HasValue && member.EmailConfirmedDate.Value != default && identityUserMember.EmailConfirmed == false)
                 || ((member.EmailConfirmedDate.HasValue == false || member.EmailConfirmedDate.Value == default) && identityUserMember.EmailConfirmed))

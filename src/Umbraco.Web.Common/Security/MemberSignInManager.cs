@@ -10,10 +10,11 @@ using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Web.Common.Security
 {
+
     /// <summary>
     /// The sign in manager for members
     /// </summary>
-    public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>
+    public class MemberSignInManager : UmbracoSignInManager<MemberIdentityUser>, IMemberSignInManager
     {
         public MemberSignInManager(
             UserManager<MemberIdentityUser> memberManager,

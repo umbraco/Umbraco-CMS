@@ -20,10 +20,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
     public class MemberSignInManagerTests
     {
         private Mock<ILogger<SignInManager<MemberIdentityUser>>> _mockLogger;
-        private readonly Mock<UserManager<MemberIdentityUser>> _memberManager = MockUserManager();
+        private readonly Mock<MemberManager> _memberManager = MockUserManager();
 
-        public MemberClaimsPrincipalFactory CreateClaimsFactory(UserManager<MemberIdentityUser> userMgr)
-            => new MemberClaimsPrincipalFactory(userMgr, Options.Create(new MemberIdentityOptions()));
+        public UserClaimsPrincipalFactory<MemberIdentityUser> CreateClaimsFactory(MemberManager userMgr)
+            => new UserClaimsPrincipalFactory<MemberIdentityUser>(userMgr, Options.Create(new MemberIdentityOptions()));
 
         public MemberSignInManager CreateSut()
         {
@@ -54,10 +54,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
                     Mock.Of<IAuthenticationSchemeProvider>(),
                     Mock.Of<IUserConfirmation<MemberIdentityUser>>());
         }
-        private static Mock<UserManager<MemberIdentityUser>> MockUserManager()
+        private static Mock<MemberManager> MockUserManager()
         {
             var store = new Mock<IUserStore<MemberIdentityUser>>();
-            var mgr = new Mock<UserManager<MemberIdentityUser>>(store.Object, null, null, null, null, null, null, null, null);
+            var mgr = new Mock<MemberManager>(store.Object, null, null, null, null, null, null, null, null);
             return mgr;
         }
 

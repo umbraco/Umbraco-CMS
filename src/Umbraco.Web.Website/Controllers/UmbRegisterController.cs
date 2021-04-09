@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Security;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -14,28 +13,32 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Web.Website.Models;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Controllers
 {
     public class UmbRegisterController : SurfaceController
     {
-        private readonly MemberManager _memberManager;
+        private readonly IMemberManager _memberManager;
         private readonly IMemberService _memberService;
+        private readonly IMemberSignInManager _memberSignInManager;
 
         public UmbRegisterController(
-            MemberManager memberManager,
+            IMemberManager memberManager,
             IMemberService memberService,
             IUmbracoContextAccessor umbracoContextAccessor,
             IUmbracoDatabaseFactory databaseFactory,
             ServiceContext services,
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
-            IPublishedUrlProvider publishedUrlProvider)
+            IPublishedUrlProvider publishedUrlProvider,
+            IMemberSignInManager memberSignInManager)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
             _memberManager = memberManager;
             _memberService = memberService;
+            _memberSignInManager = memberSignInManager;
         }
 
         [HttpPost]
@@ -48,6 +51,8 @@ namespace Umbraco.Cms.Web.Website.Controllers
                 return CurrentUmbracoPage();
             }
 
+            MergeRouteValuesToModel(model);
+
             // U4-10762 Server error with "Register Member" snippet (Cannot save member with empty name)
             // If name field is empty, add the email address instead.
             if (string.IsNullOrEmpty(model.Name) && string.IsNullOrEmpty(model.Email) == false)
@@ -55,7 +60,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
                 model.Name = model.Email;
             }
 
-            IdentityResult result = await RegisterMemberAsync(model, model.LoginOnSuccess);
+            IdentityResult result = await RegisterMemberAsync(model, true);
             if (result.Succeeded)
             {
                 TempData["FormSuccess"] = true;
@@ -71,16 +76,38 @@ namespace Umbraco.Cms.Web.Website.Controllers
             }
             else
             {
-                AddModelErrors(result, "registerModel");
+                AddErrors(result);
                 return CurrentUmbracoPage();
             }
         }
 
-        private void AddModelErrors(IdentityResult result, string prefix = "")
+        /// <summary>
+        /// We pass in values via encrypted route values so they cannot be tampered with and merge them into the model for use
+        /// </summary>
+        /// <param name="model"></param>
+        private void MergeRouteValuesToModel(RegisterModel model)
         {
-            foreach (IdentityError error in result.Errors)
+            if (RouteData.Values.TryGetValue(nameof(RegisterModel.RedirectUrl), out var redirectUrl) && redirectUrl != null)
             {
-                ModelState.AddModelError(prefix, error.Description);
+                model.RedirectUrl = redirectUrl.ToString();
+            }
+
+            if (RouteData.Values.TryGetValue(nameof(RegisterModel.MemberTypeAlias), out var memberTypeAlias) && memberTypeAlias != null)
+            {
+                model.MemberTypeAlias = memberTypeAlias.ToString();
+            }
+
+            if (RouteData.Values.TryGetValue(nameof(RegisterModel.UsernameIsEmail), out var usernameIsEmail) && usernameIsEmail != null)
+            {
+                model.UsernameIsEmail = usernameIsEmail.ToString() == "True";
+            }
+        }
+
+        private void AddErrors(IdentityResult result)
+        {
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError("registerModel", error.Description);
             }
         }
 
@@ -94,7 +121,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         {
             model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
 
-            var identityUser = MembersIdentityUser.CreateNew(model.Username, model.Email, model.MemberTypeAlias, model.Name);
+            var identityUser = MemberIdentityUser.CreateNew(model.Username, model.Email, model.MemberTypeAlias, model.Name);
             IdentityResult identityResult = await _memberManager.CreateAsync(
                 identityUser,
                 model.Password);
@@ -103,10 +130,15 @@ namespace Umbraco.Cms.Web.Website.Controllers
             {
                 // Update the custom properties
                 // TODO: See TODO in MembersIdentityUser, Should we support custom member properties for persistence/retrieval?
-                IMember member = _memberService.GetByUsername(identityUser.UserName);
+                IMember member = _memberService.GetByKey(identityUser.Key);
+                if (member == null)
+                {
+                    // should never happen
+                    throw new InvalidOperationException($"Could not find a member with key: {member.Key}.");
+                }
                 if (model.MemberProperties != null)
                 {
-                    foreach (UmbracoProperty property in model.MemberProperties.Where(p => p.Value != null)
+                    foreach (MemberPropertyModel property in model.MemberProperties.Where(p => p.Value != null)
                         .Where(property => member.Properties.Contains(property.Alias)))
                     {
                         member.Properties[property.Alias].SetValue(property.Value);
@@ -116,8 +148,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
                 if (logMemberIn)
                 {
-                    // TODO: Log them in
-                    throw new NotImplementedException("Implement MemberSignInManager");
+                    await _memberSignInManager.SignInAsync(identityUser, false);
                 }
             }
 
