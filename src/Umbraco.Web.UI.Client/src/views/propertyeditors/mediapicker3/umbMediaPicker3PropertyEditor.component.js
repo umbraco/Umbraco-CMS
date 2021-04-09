@@ -352,9 +352,12 @@
                 return false;
             }
 
+            pasteEntry = clipboardService.parseContentForPaste(pasteEntry, pasteType);
+
             pasteEntry.key = String.CreateGuid();
             updateMediaEntryData(pasteEntry);
             vm.model.value.splice(createIndex, 0, pasteEntry);
+
 
             return true;
 

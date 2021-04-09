@@ -196,6 +196,8 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 return;
             }
 
+            pasteEntry = clipboardService.parseContentForPaste(pasteEntry, pasteType);
+
             entityResource.getById(pasteEntry.mediaKey, "Media").then(function (mediaEntity) {
 
                 if(disableFolderSelect === true && mediaEntity.metaData.ContentTypeAlias === "Folder") {

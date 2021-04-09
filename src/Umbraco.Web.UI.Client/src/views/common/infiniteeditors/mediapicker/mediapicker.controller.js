@@ -105,7 +105,7 @@ angular.module("umbraco")
 
             function setTitle() {
                 if (!$scope.model.title) {
-                    localizationService.localizeMany(["defaultdialogs_selectMedia", "defaultdialogs_tabClipboard"])
+                    localizationService.localizeMany(["defaultdialogs_selectMedia", "mediaPicker_tabClipboard"])
                         .then(function (data) {
                             $scope.model.title = data[0];
 
