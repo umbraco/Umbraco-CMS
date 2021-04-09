@@ -98,7 +98,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             }
 
             // Don't do anything if we're not requested to create a template for a content type
-            if (notification.CreateTemplateForContentType is null or false)
+            if (notification.CreateTemplateForContentType is false)
             {
                 return;
             }

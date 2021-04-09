@@ -35,12 +35,18 @@ namespace Umbraco.Cms.Infrastructure.Services.Notifications
             ContentTypeAlias = contentTypeAlias;
         }
 
-        public bool? CreateTemplateForContentType
+        public bool CreateTemplateForContentType
         {
             get
             {
                 State.TryGetValue(s_templateForContentTypeKey, out var result);
-                return result as bool?;
+
+                if (result is not bool createTemplate)
+                {
+                    return false;
+                }
+
+                return createTemplate;
             }
             set => State[s_templateForContentTypeKey] = value;
         }
