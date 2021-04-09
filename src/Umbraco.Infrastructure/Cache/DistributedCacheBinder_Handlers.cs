@@ -43,7 +43,8 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<DomainDeletedNotification>,
         INotificationHandler<DomainSavedNotification>,
         INotificationHandler<MacroSavedNotification>,
-        INotificationHandler<MacroDeletedNotification>
+        INotificationHandler<MacroDeletedNotification>,
+        INotificationHandler<MediaTreeChangeNotification>
     {
         private List<Action> _unbinders;
 
@@ -81,10 +82,6 @@ namespace Umbraco.Cms.Core.Cache
                 () => MediaTypeService.Changed -= MediaTypeService_Changed);
             Bind(() => MemberTypeService.Changed += MemberTypeService_Changed,
                 () => MemberTypeService.Changed -= MemberTypeService_Changed);
-
-            // bind to media events - handles all media changes
-            Bind(() => MediaService.TreeChanged += MediaService_TreeChanged,
-                () => MediaService.TreeChanged -= MediaService_TreeChanged);
 
             // bind to content events
             Bind(() => ContentService.TreeChanged += ContentService_TreeChanged,// handles all content changes
@@ -344,9 +341,9 @@ namespace Umbraco.Cms.Core.Cache
 
         #region MediaService
 
-        private void MediaService_TreeChanged(IMediaService sender, TreeChange<IMedia>.EventArgs args)
+        public void Handle(MediaTreeChangeNotification notification)
         {
-            _distributedCache.RefreshMediaCache(args.Changes.ToArray());
+            _distributedCache.RefreshMediaCache(notification.Changes.ToArray());
         }
 
         #endregion
