@@ -9,6 +9,9 @@ namespace Umbraco.Cms.Infrastructure.Services.Notifications
 {
     public class TemplateSavingNotification : SavingNotification<ITemplate>
     {
+        private const string s_templateForContentTypeKey = "CreateTemplateForContentType";
+        private const string s_contentTypeAliasKey = "ContentTypeAlias";
+
         public TemplateSavingNotification(ITemplate target, EventMessages messages) : base(target, messages)
         {
         }
@@ -36,20 +39,20 @@ namespace Umbraco.Cms.Infrastructure.Services.Notifications
         {
             get
             {
-                State.TryGetValue("CreateTemplateForContentType", out var result);
+                State.TryGetValue(s_templateForContentTypeKey, out var result);
                 return result as bool?;
             }
-            set => State["CreateTemplateForContentType"] = value;
+            set => State[s_templateForContentTypeKey] = value;
         }
 
         public string ContentTypeAlias
         {
             get
             {
-                State.TryGetValue("ContentTypeAlias", out var result);
+                State.TryGetValue(s_contentTypeAliasKey, out var result);
                 return result as string;
             }
-            set => State["ContentTypeAlias"] = value;
+            set => State[s_contentTypeAliasKey] = value;
         }
     }
 }
