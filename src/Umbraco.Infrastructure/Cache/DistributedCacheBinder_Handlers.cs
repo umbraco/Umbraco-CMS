@@ -34,6 +34,8 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<UserGroupDeletedNotification>,
         INotificationHandler<MemberGroupDeletedNotification>,
         INotificationHandler<MemberGroupSavedNotification>,
+        INotificationHandler<TemplateDeletedNotification>,
+        INotificationHandler<TemplateSavedNotification>,
         INotificationHandler<DataTypeDeletedNotification>,
         INotificationHandler<DataTypeSavedNotification>,
         INotificationHandler<RelationTypeDeletedNotification>,
@@ -72,12 +74,6 @@ namespace Umbraco.Cms.Core.Cache
 
             _logger.LogInformation("Initializing Umbraco internal event handlers for cache refreshing.");
 
-            // bind to stylesheet events
-            Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
-                () => FileService.SavedStylesheet -= FileService_SavedStylesheet);
-            Bind(() => FileService.DeletedStylesheet += FileService_DeletedStylesheet,
-                () => FileService.DeletedStylesheet -= FileService_DeletedStylesheet);
-
             // bind to content type events
             Bind(() => ContentTypeService.Changed += ContentTypeService_Changed,
                 () => ContentTypeService.Changed -= ContentTypeService_Changed);
@@ -85,12 +81,6 @@ namespace Umbraco.Cms.Core.Cache
                 () => MediaTypeService.Changed -= MediaTypeService_Changed);
             Bind(() => MemberTypeService.Changed += MemberTypeService_Changed,
                 () => MemberTypeService.Changed -= MemberTypeService_Changed);
-
-            // bind to template events
-            Bind(() => FileService.SavedTemplate += FileService_SavedTemplate,
-                () => FileService.SavedTemplate -= FileService_SavedTemplate);
-            Bind(() => FileService.DeletedTemplate += FileService_DeletedTemplate,
-                () => FileService.DeletedTemplate -= FileService_DeletedTemplate);
 
             // bind to media events - handles all media changes
             Bind(() => MediaService.TreeChanged += MediaService_TreeChanged,
@@ -309,28 +299,26 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Removes cache for template
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void FileService_DeletedTemplate(IFileService sender, DeleteEventArgs<ITemplate> e)
+        /// <param name="notification"></param>
+        public void Handle(TemplateDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (ITemplate entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveTemplateCache(entity.Id);
+            }
         }
 
         /// <summary>
         /// Refresh cache for template
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void FileService_SavedTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
+        /// <param name="notification"></param>
+        public void Handle(TemplateSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (ITemplate entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshTemplateCache(entity.Id);
+            }
         }
-
-        // TODO: our weird events handling wants this for now
-        private void FileService_DeletedStylesheet(IFileService sender, DeleteEventArgs<IStylesheet> e) { }
-        private void FileService_SavedStylesheet(IFileService sender, SaveEventArgs<IStylesheet> e) { }
 
         #endregion
 

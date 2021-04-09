@@ -42,9 +42,6 @@ namespace Umbraco.Cms.Tests.Integration.Cache
 
             var definitions = new IEventDefinition[]
             {
-                new EventDefinition<IFileService, SaveEventArgs<IStylesheet>>(null, FileService, new SaveEventArgs<IStylesheet>(Enumerable.Empty<IStylesheet>())),
-                new EventDefinition<IFileService, DeleteEventArgs<IStylesheet>>(null, FileService, new DeleteEventArgs<IStylesheet>(Enumerable.Empty<IStylesheet>())),
-
                 new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>())),
                 new EventDefinition<IContentTypeService, DeleteEventArgs<IContentType>>(null, ContentTypeService, new DeleteEventArgs<IContentType>(Enumerable.Empty<IContentType>())),
                 new EventDefinition<IMediaTypeService, SaveEventArgs<IMediaType>>(null, MediaTypeService, new SaveEventArgs<IMediaType>(Enumerable.Empty<IMediaType>())),
@@ -52,9 +49,6 @@ namespace Umbraco.Cms.Tests.Integration.Cache
 
                 new EventDefinition<IMemberTypeService, SaveEventArgs<IMemberType>>(null, MemberTypeService, new SaveEventArgs<IMemberType>(Enumerable.Empty<IMemberType>())),
                 new EventDefinition<IMemberTypeService, DeleteEventArgs<IMemberType>>(null, MemberTypeService, new DeleteEventArgs<IMemberType>(Enumerable.Empty<IMemberType>())),
-
-                new EventDefinition<IFileService, SaveEventArgs<ITemplate>>(null, FileService, new SaveEventArgs<ITemplate>(Enumerable.Empty<ITemplate>())),
-                new EventDefinition<IFileService, DeleteEventArgs<ITemplate>>(null, FileService, new DeleteEventArgs<ITemplate>(Enumerable.Empty<ITemplate>())),
 
                 // not managed
                 //new EventDefinition<IContentService, SaveEventArgs<IContent>>(null, ContentService, new SaveEventArgs<IContent>(Enumerable.Empty<IContent>()), "SavedBlueprint"),
