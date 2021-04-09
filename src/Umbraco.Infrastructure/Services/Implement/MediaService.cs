@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
@@ -854,7 +854,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             var evtMsgs = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 var deletingVersionsNotification = new MediaDeletingVersionsNotification(id, evtMsgs, specificVersion: versionId);
                 if (scope.Notifications.PublishCancelable(deletingVersionsNotification))
@@ -1047,7 +1047,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             var deleted = new List<IMedia>();
             EventMessages messages = EventMessagesFactory.Get(); // TODO: and then?
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
 
@@ -1300,7 +1300,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             if (mediaTypeAlias == null) throw new ArgumentNullException(nameof(mediaTypeAlias));
             if (string.IsNullOrWhiteSpace(mediaTypeAlias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(mediaTypeAlias));
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.ReadLock(Cms.Core.Constants.Locks.MediaTypes);
 

@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement

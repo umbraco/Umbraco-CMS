@@ -1,6 +1,6 @@
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
+using Umbraco.Cms.Core.Services.Notifications;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Compose
 {
