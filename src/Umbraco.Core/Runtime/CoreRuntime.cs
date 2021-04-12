@@ -202,6 +202,10 @@ namespace Umbraco.Core.Runtime
                 // determines if unattended install is enabled and performs it if required
                 DoUnattendedInstall(databaseFactory);
 
+                // determine our runtime level (AFTER UNATTENDED INSTALL)
+                // TODO: Feels kinda weird to call this again
+                DetermineRuntimeLevel(databaseFactory, ProfilingLogger);
+
                 // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
                 if (_state.Reason == RuntimeLevelReason.UpgradeMigrations && _state.Level == RuntimeLevel.Run)
                 {
@@ -328,7 +332,7 @@ namespace Umbraco.Core.Runtime
 
             admin.Email = unattendedEmail.Trim();
             admin.Name = unattendedName.Trim();
-            admin.Username = unattendedPassword.Trim();
+            admin.Username = unattendedEmail.Trim();
 
             Current.Services.UserService.Save(admin);
 
