@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, $timeout, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService) {
+    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper) {
 
         var unsubscribe = [];
         var modelObject;
@@ -53,8 +53,6 @@
         };
 
         vm.supportCopy = clipboardService.isSupported();
-        vm.clipboardItems = [];
-        unsubscribe.push(eventsService.on("clipboardService.storageUpdate", updateClipboard));
 
         vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
         vm.availableBlockTypes = []; // Available block entries of this property editor.
@@ -66,7 +64,6 @@
         });
 
         vm.$onInit = function() {
-
             if (vm.umbProperty && !vm.umbVariantContent) {// if we dont have vm.umbProperty, it means we are in the DocumentTypeEditor.
                 // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
                 // inheritance is (i.e.infinite editing)
@@ -190,8 +187,6 @@
             vm.availableContentTypesAliases = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
 
-            updateClipboard(true);
-
             vm.loading = false;
 
             $scope.$evalAsync();
@@ -246,30 +241,30 @@
 
             block.hideContentInOverlay = block.config.forceHideContentEditorInOverlay === true || inlineEditing === true;
             block.showSettings = block.config.settingsElementTypeKey != null;
-            block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;// if we have content, otherwise it doesn't make sense to copy.
 
+            // If we have content, otherwise it doesn't make sense to copy.
+            block.showCopy = vm.supportCopy && block.config.contentElementTypeKey != null;
 
             // Index is set by umbblocklistblock component and kept up to date by it.
             block.index = 0;
             block.setParentForm = function (parentForm) {
                 this._parentForm = parentForm;
-            }
+            };
             block.activate = activateBlock.bind(null, block);
             block.edit = function () {
                 var blockIndex = vm.layout.indexOf(this.layout);
                 editBlock(this, false, blockIndex, this._parentForm);
-            }
+            };
             block.editSettings = function () {
                 var blockIndex = vm.layout.indexOf(this.layout);
                 editBlock(this, true, blockIndex, this._parentForm);
-            }
+            };
             block.requestDelete = requestDeleteBlock.bind(null, block);
             block.delete = deleteBlock.bind(null, block);
             block.copy = copyBlock.bind(null, block);
 
             return block;
         }
-
 
         function addNewBlock(index, contentElementTypeKey) {
 
@@ -297,7 +292,6 @@
             vm.setBlockFocus(blockObject);
 
             return true;
-
         }
 
         function deleteBlock(block) {
@@ -321,7 +315,6 @@
             });
 
             modelObject.removeDataAndDestroyModel(block);
-
         }
 
         function deleteAllBlocks() {
@@ -413,33 +406,9 @@
             editorService.open(blockEditorModel);
         }
 
-        vm.requestShowCreate = requestShowCreate;
-        function requestShowCreate(createIndex, mouseEvent) {
-
-            if (vm.blockTypePicker) {
-                return;
-            }
-
-            if (vm.availableBlockTypes.length === 1) {
-                var wasAdded = false;
-                var blockType = vm.availableBlockTypes[0];
-
-                wasAdded = addNewBlock(createIndex, blockType.blockConfigModel.contentElementTypeKey);
-
-                if(wasAdded && !(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
-                    userFlowWhenBlockWasCreated(createIndex);
-                }
-            } else {
-                showCreateDialog(createIndex);
-            }
-
-        }
-        vm.requestShowClipboard = requestShowClipboard;
-        function requestShowClipboard(createIndex, mouseEvent) {
-            showCreateDialog(createIndex, true);
-        }
         vm.showCreateDialog = showCreateDialog;
-        function showCreateDialog(createIndex, openClipboard) {
+
+        function showCreateDialog(createIndex, $event) {
 
             if (vm.blockTypePicker) {
                 return;
@@ -455,7 +424,6 @@
                 $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 availableItems: vm.availableBlockTypes,
                 title: vm.labels.grid_addElement,
-                openClipboard: openClipboard,
                 orderBy: "$index",
                 view: "views/common/infiniteeditors/blockpicker/blockpicker.html",
                 size: (amountOfAvailableTypes > 8 ? "medium" : "small"),
@@ -476,15 +444,19 @@
                     }
                 },
                 submit: function(blockPickerModel, mouseEvent) {
-                    var wasAdded = false;
+                    var added = false;
                     if (blockPickerModel && blockPickerModel.selectedItem) {
-                        wasAdded = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
+                        added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
                     }
 
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         editorService.close();
-                        if (wasAdded) {
-                            userFlowWhenBlockWasCreated(createIndex);
+                        if (added && vm.layout.length > createIndex) {
+                            if (inlineEditing === true) {
+                                activateBlock(vm.layout[createIndex].$block);
+                            } else if (inlineEditing === false && vm.layout[createIndex].$block.hideContentInOverlay !== true) {
+                                editBlock(vm.layout[createIndex].$block, false, createIndex, blockPickerModel.$parentForm, {createFlow: true});
+                            }
                         }
                     }
                 },
@@ -503,28 +475,7 @@
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             };
 
-            blockPickerModel.clipboardItems = vm.clipboardItems;
-
-            // open block picker overlay
-            editorService.open(blockPickerModel);
-
-        };
-        function userFlowWhenBlockWasCreated(createIndex) {
-            if (vm.layout.length > createIndex) {
-                var blockObject = vm.layout[createIndex].$block;
-                if (inlineEditing === true) {
-                    blockObject.activate();
-                } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true) {
-                    blockObject.edit();
-                }
-            }
-        }
-
-        function updateClipboard(firstTime) {
-
-            var oldAmount = vm.clipboardItems.length;
-
-            vm.clipboardItems = [];
+            blockPickerModel.clipboardItems = [];
 
             var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
@@ -543,7 +494,7 @@
                         pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(scaffold.contentTypeKey);
                     }
                 }
-                vm.clipboardItems.push(pasteEntry);
+                blockPickerModel.clipboardItems.push(pasteEntry);
             });
 
             var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
@@ -560,33 +511,19 @@
                 if(Array.isArray(entry.data) === false) {
                     pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(entry.data.data.contentTypeKey);
                 }
-                vm.clipboardItems.push(pasteEntry);
+                blockPickerModel.clipboardItems.push(pasteEntry);
             });
 
-            vm.clipboardItems.sort( (a, b) => {
+            blockPickerModel.clipboardItems.sort( (a, b) => {
                 return b.date - a.date
             });
 
-            if(firstTime !== true && vm.clipboardItems.length > oldAmount) {
-                jumpClipboard();
-            }
-        }
+            // open block picker overlay
+            editorService.open(blockPickerModel);
 
-        var jumpClipboardTimeout;
-        function jumpClipboard() {
+        };
 
-            if(jumpClipboardTimeout) {
-                return;
-            }
-
-            vm.jumpClipboardButton = true;
-            jumpClipboardTimeout = $timeout(() => {
-                vm.jumpClipboardButton = false;
-                jumpClipboardTimeout = null;
-            }, 2000);
-        }
-
-        function requestCopyAllBlocks() {
+        var requestCopyAllBlocks = function () {
 
             var aliases = [];
 
@@ -596,7 +533,7 @@
                     aliases.push(entry.$block.content.contentTypeAlias);
 
                     // No need to clone the data as its begin handled by the clipboardService.
-                    return {"layout": entry.$block.layout, "data": entry.$block.data, "settingsData":entry.$block.settingsData}
+                    return { "layout": entry.$block.layout, "data": entry.$block.data, "settingsData": entry.$block.settingsData }
                 }
             );
 
@@ -605,9 +542,9 @@
 
             var contentNodeName = "?";
             var contentNodeIcon = null;
-            if(vm.umbVariantContent) {
+            if (vm.umbVariantContent) {
                 contentNodeName = vm.umbVariantContent.editor.content.name;
-                if(vm.umbVariantContentEditors) {
+                if (vm.umbVariantContentEditors) {
                     contentNodeIcon = vm.umbVariantContentEditors.content.icon.split(" ")[0];
                 } else if (vm.umbElementEditorContent) {
                     contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon.split(" ")[0];
@@ -617,13 +554,15 @@
                 contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon.split(" ")[0];
             }
 
-            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function(localizedLabel) {
+            localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, contentNodeName]).then(function (localizedLabel) {
                 clipboardService.copyArray(clipboardService.TYPES.BLOCK, aliases, elementTypesToCopy, localizedLabel, contentNodeIcon || "icon-thumbnail-list", vm.model.id);
             });
-        }
+        };
+
         function copyBlock(block) {
             clipboardService.copy(clipboardService.TYPES.BLOCK, block.content.contentTypeAlias, {"layout": block.layout, "data": block.data, "settingsData":block.settingsData}, block.label, block.content.icon, block.content.udi);
         }
+
         function requestPasteFromClipboard(index, pasteEntry, pasteType) {
 
             if (pasteEntry === undefined) {
@@ -661,7 +600,6 @@
             vm.currentBlockInFocus = blockObject;
 
             return true;
-
         }
 
         function requestDeleteBlock(block) {
@@ -682,6 +620,7 @@
                 overlayService.confirmDelete(overlay);
             });
         }
+
         function requestDeleteAllBlocks() {
             localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
                 overlayService.confirmDelete({
@@ -709,7 +648,7 @@
             requestDeleteBlock: requestDeleteBlock,
             deleteBlock: deleteBlock,
             openSettingsForBlock: openSettingsForBlock
-        }
+        };
 
         vm.sortableOptions = {
             axis: "y",
@@ -725,7 +664,6 @@
                 setDirty();
             }
         };
-
 
         function onAmountOfBlocksChanged() {
 

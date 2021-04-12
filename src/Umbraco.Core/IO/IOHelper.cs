@@ -81,6 +81,7 @@ namespace Umbraco.Core.IO
         public static string MapPath(string path, bool useHttpContext)
         {
             if (path == null) throw new ArgumentNullException("path");
+
             useHttpContext = useHttpContext && IsHosted;
 
             // Check if the path is already mapped
@@ -89,10 +90,8 @@ namespace Umbraco.Core.IO
             {
                 return path;
             }
-            // Check that we even have an HttpContext! otherwise things will fail anyways
-            // http://umbraco.codeplex.com/workitem/30946
 
-            if (useHttpContext && HttpContext.Current != null)
+            if (useHttpContext)
             {
                 //string retval;
                 if (String.IsNullOrEmpty(path) == false && (path.StartsWith("~") || path.StartsWith(SystemDirectories.Root)))

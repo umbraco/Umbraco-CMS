@@ -118,7 +118,7 @@ namespace Umbraco.Core.Scoping
                 }
 
                 // hard to inject into a static method :(
-                Current.Logger.Warn<ScopeProvider>("Missed {TypeName} Object {ObjectKey}", typeof(T).Name, objectKey.ToString("N").Substring(0, 8));
+                Current.Logger.Warn<ScopeProvider, string, string>("Missed {TypeName} Object {ObjectKey}", typeof(T).Name, objectKey.ToString("N").Substring(0, 8));
 #if DEBUG_SCOPES
                 //Current.Logger.Debug<ScopeProvider>("At:\r\n" + Head(Environment.StackTrace, 24));
 #endif

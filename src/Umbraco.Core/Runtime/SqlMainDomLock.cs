@@ -105,7 +105,7 @@ namespace Umbraco.Core.Runtime
                     // if we've inserted, then there was no MainDom so we can instantly acquire
 
                     InsertLockRecord(_lockId, db); // so update with our appdomain id
-                    _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                    _logger.Debug<SqlMainDomLock, string>("Acquired with ID {LockId}", _lockId);
                     return true;
                 }
 
@@ -328,7 +328,7 @@ namespace Umbraco.Core.Runtime
 
                     // so now we update the row with our appdomain id
                     InsertLockRecord(_lockId, db);
-                    _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                    _logger.Debug<SqlMainDomLock, string>("Acquired with ID {LockId}", _lockId);
                     return true;
                 }
                 else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
@@ -387,7 +387,7 @@ namespace Umbraco.Core.Runtime
 
                 // so now we update the row with our appdomain id
                 InsertLockRecord(_lockId, db);
-                _logger.Debug<SqlMainDomLock>("Acquired with ID {LockId}", _lockId);
+                _logger.Debug<SqlMainDomLock, string>("Acquired with ID {LockId}", _lockId);
                 return true;
             }
             catch (Exception ex)
