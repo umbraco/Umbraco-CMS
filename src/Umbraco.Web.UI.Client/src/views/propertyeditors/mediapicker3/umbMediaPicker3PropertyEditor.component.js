@@ -137,7 +137,7 @@
                 dataTypeKey: vm.model.dataTypeKey,
                 multiPicker: vm.singleMode !== true,
                 clickPasteItem: function(item, mouseEvent) {
-                    console.log("clickPasteItem", item, mouseEvent)
+
                     if (Array.isArray(item.data)) {
                         var indexIncrementor = 0;
                         item.data.forEach(function (entry) {
@@ -363,27 +363,6 @@
 
         }
 
-        /*
-        vm.requestRemoveMedia = requestRemoveMedia;
-        function requestRemoveMedia(media) {
-            localizationService.localizeMany(["general_delete", "mediaPicker_confirmRemoveMediaEntryMessage", "general_remove"]).then(function (data) {
-                const overlay = {
-                    title: data[0],
-                    content: localizationService.tokenReplace(data[1], [media.name]),
-                    submitButtonLabel: data[2],
-                    close: function () {
-                        overlayService.close();
-                    },
-                    submit: function () {
-                        removeMedia(media);
-                        overlayService.close();
-                    }
-                };
-
-                overlayService.confirmDelete(overlay);
-            });
-        }
-        */
         function requestRemoveAllMedia() {
             localizationService.localizeMany(["mediaPicker_confirmRemoveAllMediaEntryMessage", "general_remove"]).then(function (data) {
                 overlayService.confirmDelete({
@@ -402,7 +381,6 @@
 
 
         vm.sortableOptions = {
-            //containment: "parent",
             cursor: "grabbing",
             handle: "umb-media-card",
             cancel: "input,textarea,select,option",
