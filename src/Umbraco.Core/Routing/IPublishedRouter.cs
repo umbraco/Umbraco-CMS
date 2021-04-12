@@ -36,6 +36,6 @@ namespace Umbraco.Cms.Core.Routing
         /// In that case it's the same as if there was no content which means even if there was
         /// content matched we want to run the request through the last chance finders.</para>
         /// </remarks>
-        IPublishedRequestBuilder UpdateRequestToNotFound(IPublishedRequest request);
+        Task<IPublishedRequestBuilder> UpdateRequestToNotFoundAsync(IPublishedRequest request);
     }
 }

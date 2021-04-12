@@ -116,7 +116,7 @@ namespace Umbraco.Cms.Web.Website.Routing
 
             IPublishedRequest publishedRequest = await RouteRequestAsync(_umbracoContextAccessor.UmbracoContext);
 
-            UmbracoRouteValues umbracoRouteValues = _routeValuesFactory.Create(httpContext, publishedRequest);
+            UmbracoRouteValues umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
 
             // Store the route values as a httpcontext feature
             httpContext.Features.Set(umbracoRouteValues);

@@ -209,7 +209,7 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc />
-        public IPublishedRequestBuilder UpdateRequestToNotFound(IPublishedRequest request)
+        public async Task<IPublishedRequestBuilder> UpdateRequestToNotFoundAsync(IPublishedRequest request)
         {
             var builder = new PublishedRequestBuilder(request.Uri, _fileService);
 
@@ -217,7 +217,7 @@ namespace Umbraco.Cms.Core.Routing
             IPublishedContent content = request.PublishedContent;
             builder.SetPublishedContent(null);
 
-            HandlePublishedContent(builder); // will go 404
+            await HandlePublishedContentAsync(builder); // will go 404
             FindTemplate(builder, false);
 
             // if request has been flagged to redirect then return
@@ -383,7 +383,7 @@ namespace Umbraco.Cms.Core.Routing
             // so internal redirect, 404, etc has precedence over redirect
 
             // handle not-found, redirects, access...
-            HandlePublishedContent(request);
+            HandlePublishedContentAsync(request);
 
             // find a template
             FindTemplate(request, foundContentByFinders);
@@ -433,7 +433,7 @@ namespace Umbraco.Cms.Core.Routing
         /// Handles "not found", internal redirects, access validation...
         /// things that must be handled in one place because they can create loops
         /// </remarks>
-        private void HandlePublishedContent(IPublishedRequestBuilder request)
+        private async Task HandlePublishedContentAsync(IPublishedRequestBuilder request)
         {
             // because these might loop, we have to have some sort of infinite loop detection
             int i = 0, j = 0;
@@ -472,7 +472,7 @@ namespace Umbraco.Cms.Core.Routing
                 // ensure access
                 if (request.PublishedContent != null)
                 {
-                    EnsurePublishedContentAccess(request);
+                    await EnsurePublishedContentAccess(request);
                 }
 
                 // loop while we don't have page, ie the redirect or access
@@ -577,7 +577,7 @@ namespace Umbraco.Cms.Core.Routing
         /// Ensures that access to current node is permitted.
         /// </summary>
         /// <remarks>Redirecting to a different site root and/or culture will not pick the new site root nor the new culture.</remarks>
-        private void EnsurePublishedContentAccess(IPublishedRequestBuilder request)
+        private async Task EnsurePublishedContentAccess(IPublishedRequestBuilder request)
         {
             if (request.PublishedContent == null)
             {
@@ -592,7 +592,7 @@ namespace Umbraco.Cms.Core.Routing
             {
                 _logger.LogDebug("EnsurePublishedContentAccess: Page is protected, check for access");
 
-                PublicAccessStatus status = _publicAccessChecker.HasMemberAccessToContent(request.PublishedContent.Id);
+                PublicAccessStatus status = await _publicAccessChecker.HasMemberAccessToContentAsync(request.PublishedContent.Id);
                 switch (status)
                 {
                     case PublicAccessStatus.NotLoggedIn:

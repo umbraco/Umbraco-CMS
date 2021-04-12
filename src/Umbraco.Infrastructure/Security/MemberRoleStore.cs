@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Security
         //TODO: How revealing can the error messages be?
         private readonly IdentityError _intParseError = new IdentityError { Code = "IdentityIdParseError", Description = "Cannot parse ID to int" };
         private readonly IdentityError _memberGroupNotFoundError = new IdentityError { Code = "IdentityMemberGroupNotFound", Description = "Member group not found" };
-        private const string genericIdentityErrorCode = "IdentityErrorUserStore";
+        //private const string genericIdentityErrorCode = "IdentityErrorUserStore";
 
         public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
         {

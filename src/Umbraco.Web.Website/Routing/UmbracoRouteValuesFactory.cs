@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Umbraco.Cms.Core.Features;
@@ -63,7 +64,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         protected string DefaultControllerName => _defaultControllerName.Value;
 
         /// <inheritdoc/>
-        public UmbracoRouteValues Create(HttpContext httpContext, IPublishedRequest request)
+        public async Task<UmbracoRouteValues> CreateAsync(HttpContext httpContext, IPublishedRequest request)
         {
             if (httpContext is null)
             {
@@ -95,7 +96,7 @@ namespace Umbraco.Cms.Web.Website.Routing
 
             def = CheckHijackedRoute(httpContext, def, out bool hasHijackedRoute);
 
-            def = CheckNoTemplate(httpContext, def, hasHijackedRoute);
+            def = await CheckNoTemplateAsync(httpContext, def, hasHijackedRoute);
 
             return def;
         }
@@ -129,7 +130,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         /// <summary>
         /// Special check for when no template or hijacked route is done which needs to re-run through the routing pipeline again for last chance finders
         /// </summary>
-        private UmbracoRouteValues CheckNoTemplate(HttpContext httpContext, UmbracoRouteValues def, bool hasHijackedRoute)
+        private async Task<UmbracoRouteValues> CheckNoTemplateAsync(HttpContext httpContext, UmbracoRouteValues def, bool hasHijackedRoute)
         {
             IPublishedRequest request = def.PublishedRequest;
 
@@ -147,11 +148,11 @@ namespace Umbraco.Cms.Web.Website.Routing
                 // This is basically a 404 even if there is content found.
                 // We then need to re-run this through the pipeline for the last
                 // chance finders to work.
-                IPublishedRequestBuilder builder = _publishedRouter.UpdateRequestToNotFound(request);
+                IPublishedRequestBuilder builder = await _publishedRouter.UpdateRequestToNotFoundAsync(request);
 
                 if (builder == null)
                 {
-                    throw new InvalidOperationException($"The call to {nameof(IPublishedRouter.UpdateRequestToNotFound)} cannot return null");
+                    throw new InvalidOperationException($"The call to {nameof(IPublishedRouter.UpdateRequestToNotFoundAsync)} cannot return null");
                 }
 
                 request = builder.Build();
