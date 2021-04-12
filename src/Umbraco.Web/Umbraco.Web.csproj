@@ -159,7 +159,6 @@
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
-    <Compile Include="UmbracoBuilderExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />

@@ -1,15 +1,13 @@
 using System;
-using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Extensions;
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IUmbracoBuilder"/> class.
     /// </summary>
-    public static class UmbracoBuilderExtensions
+    public static class WebsiteUmbracoBuilderExtensions
     {
         #region Uniques
 
