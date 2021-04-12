@@ -50,8 +50,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             var validator = new Mock<IUserValidator<MemberIdentityUser>>();
             userValidators.Add(validator.Object);
 
-            //_mockNormalizer = new Mock<ILookupNormalizer>();
-            //_mockErrorDescriber = new IdentityErrorDescriber();
             _mockServiceProviders = new Mock<IServiceProvider>();
             _mockPasswordConfiguration = new Mock<IOptions<MemberPasswordConfigurationSettings>>();
             _mockPasswordConfiguration.Setup(x => x.Value).Returns(() =>
@@ -90,20 +88,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             //arrange
             MemberManager sut = CreateSut();
-            MemberIdentityUser fakeUser = new MemberIdentityUser()
+            var fakeUser = new MemberIdentityUser()
             {
                 PasswordConfig = "testConfig"
             };
-            CancellationToken fakeCancellationToken = new CancellationToken() { };
-            IdentityError[] identityErrors =
-            {
-                new IdentityError()
-                {
-                    Code = "IdentityError1",
-                    Description = "There was an identity error when creating a user"
-                }
-            };
-
+            
             //act
             IdentityResult identityResult = await sut.CreateAsync(fakeUser);
 
@@ -119,7 +108,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             //arrange
             MemberManager sut = CreateSut();
-            CancellationToken fakeCancellationToken = new CancellationToken() { };
             IdentityError[] identityErrors =
             {
                 new IdentityError()
@@ -130,11 +118,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             };
 
             //act
-            var identityResult = new Func<Task<IdentityResult>>(() => sut.CreateAsync(null));
-
-
-            //assert
-            Assert.That(identityResult, Throws.ArgumentNullException);
+            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.CreateAsync(null));
         }
 
         [Test]

@@ -56,9 +56,6 @@ namespace Umbraco.Cms.Core.Security
             return this;
         }
 
-        //public override IdentityBuilder AddClaimsPrincipalFactory<TFactory>() where TFactory : class
-        //    => AddScoped(typeof(IUserClaimsPrincipalFactory<>).MakeGenericType(UserType), typeof(TFactory));
-
         /// <summary>
         /// Adds a token provider for the <seealso cref="BackOfficeIdentityUser"/>.
         /// </summary>
@@ -74,12 +71,6 @@ namespace Umbraco.Cms.Core.Security
 
             Services.Configure<BackOfficeIdentityOptions>(options => options.Tokens.ProviderMap[providerName] = new TokenProviderDescriptor(provider));
             Services.AddTransient(provider);
-            return this;
-        }
-
-        private IdentityBuilder AddScoped(Type serviceType, Type concreteType)
-        {
-            Services.AddScoped(serviceType, concreteType);
             return this;
         }
     }
