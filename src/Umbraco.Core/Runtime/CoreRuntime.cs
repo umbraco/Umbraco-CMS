@@ -281,7 +281,7 @@ namespace Umbraco.Core.Runtime
                 try
                 {
                     var fileContents = File.ReadAllText(filePath);
-                    var credentials = JsonConvert.DeserializeObject<UnattenedUserConfig>(fileContents);
+                    var credentials = JsonConvert.DeserializeObject<UnattendedUserConfig>(fileContents);
 
                     unattendedName = credentials.Name;
                     unattendedEmail = credentials.Email;
@@ -579,7 +579,7 @@ namespace Umbraco.Core.Runtime
         public static event TypedEventHandler<IRuntime, UnattendedInstallEventArgs> UnattendedInstalled;
 
         [DataContract]
-        public class UnattenedUserConfig
+        public class UnattendedUserConfig
         {
             [DataMember(Name = "name")]
             public string Name { get; set; }
