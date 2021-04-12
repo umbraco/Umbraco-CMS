@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// Gets or sets a value for models namespace.
         /// </summary>
         /// <remarks>That value could be overriden by other (attribute in user's code...). Return default if no value was supplied.</remarks>
-        public string ModelsNamespace { get; set; }
+        public string ModelsNamespace { get; set; } = Constants.ModelsBuilder.DefaultModelsNamespace;
 
         /// <summary>
         /// Gets or sets a value indicating whether we should flag out-of-date models.
