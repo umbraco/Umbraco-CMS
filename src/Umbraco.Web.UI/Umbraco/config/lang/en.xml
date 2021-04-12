@@ -2543,6 +2543,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
     <key alias="elementTypeDoesNotExistHeadline">Error!</key>
     <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
+    <key alias="addBlock">Add content</key>
+    <key alias="addThis">Add %0%</key>
     <key alias="propertyEditorNotSupported">Property '%0%' uses editor '%1%' which is not supported in blocks.</key>
   </area>
   <area alias="contentTemplatesDashboard">
