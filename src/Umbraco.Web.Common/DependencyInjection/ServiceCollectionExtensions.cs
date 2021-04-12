@@ -64,13 +64,24 @@ namespace Umbraco.Extensions
         /// Adds the services required for using Members Identity
         /// </summary>
 
-        public static void AddMembersIdentity(this IServiceCollection services) =>
+        public static void AddMembersIdentity(this IServiceCollection services)
+        {
             services.AddIdentity<MemberIdentityUser, UmbracoIdentityRole>()
                 .AddDefaultTokenProviders()
                 .AddMemberManager<IMemberManager, MemberManager>()
                 .AddSignInManager<IMemberSignInManager, MemberSignInManager>()
                 .AddUserStore<MemberUserStore>()
                 .AddRoleStore<MemberRoleStore>();
+
+            services.ConfigureApplicationCookie(x =>
+            {
+                // TODO: We may want/need to configure these further
+
+                x.LoginPath = null;
+                x.AccessDeniedPath = null;
+                x.LogoutPath = null;
+            });
+        }
 
         private static void RemoveIntParamenterIfValueGreatherThen(IDictionary<string, string> commands, string parameter, int maxValue)
         {
