@@ -376,7 +376,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
     });
 
     function setDirty() {
-        if ($scope.contentPickerForm) {
+        if ($scope.contentPickerForm && $scope.contentPickerForm.modelValue) {
             $scope.contentPickerForm.modelValue.$setDirty();
         }
     }
