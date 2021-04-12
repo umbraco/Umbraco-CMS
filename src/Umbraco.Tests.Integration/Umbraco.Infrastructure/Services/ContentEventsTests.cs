@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
@@ -49,6 +50,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     throw new NotSupportedException();
                 }
 
+                // We're in between tests, don't do anything.
+                if (_events is null)
+                {
+                    return;
+                }
+
                 foreach (ContentCacheRefresher.JsonPayload payload in (ContentCacheRefresher.JsonPayload[])args.MessageObject)
                 {
                     var e = new EventInstance
@@ -67,15 +74,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
+            builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
             builder.AddNotificationHandler<ContentCacheRefresherNotification, TestNotificationHandler>();
+            builder.AddNotificationHandler<ContentTreeChangeNotification, DistributedCacheBinder>();
         }
 
         [SetUp]
         public void SetUp()
         {
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(new LocalServerMessenger(), CacheRefresherCollection), UmbracoContextFactory, GetRequiredService<ILogger<DistributedCacheBinder>>());
-            _distributedCacheBinder.BindEvents(true);
-
             _events = new List<EventInstance>();
 
             DocumentRepository.ScopedEntityRefresh += ContentRepositoryRefreshed;
@@ -95,15 +101,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [TearDown]
         public void TearDownTest()
         {
-            _distributedCacheBinder?.UnbindEvents();
-
             // Clear ALL events
             DocumentRepository.ScopedEntityRefresh -= ContentRepositoryRefreshed;
             DocumentRepository.ScopeEntityRemove -= ContentRepositoryRemoved;
             DocumentRepository.ScopeVersionRemove -= ContentRepositoryRemovedVersion;
         }
 
-        private DistributedCacheBinder _distributedCacheBinder;
         private static IList<EventInstance> _events;
         private static int _msgCount;
         private IContentType _contentType;
