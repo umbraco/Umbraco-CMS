@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Implement;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
