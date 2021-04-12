@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService) {
+    function BlockListController($scope, $timeout, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService) {
 
         var unsubscribe = [];
         var modelObject;
@@ -501,6 +501,28 @@
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             };
 
+            blockPickerModel.clipboardItems = vm.clipboardItems;
+
+            // open block picker overlay
+            editorService.open(blockPickerModel);
+
+        };
+        function userFlowWhenBlockWasCreated(createIndex) {
+            if (vm.layout.length > createIndex) {
+                var blockObject = vm.layout[createIndex].$block;
+                if (inlineEditing === true) {
+                    blockObject.activate();
+                } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true) {
+                    blockObject.edit();
+                }
+            }
+        }
+
+        function updateClipboard(firstTime) {
+
+            var oldAmount = vm.clipboardItems.length;
+
+            vm.clipboardItems = [];
 
             var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
