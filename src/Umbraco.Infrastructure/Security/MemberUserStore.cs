@@ -50,10 +50,12 @@ namespace Umbraco.Cms.Core.Security
         public override IQueryable<MemberIdentityUser> Users => throw new NotImplementedException();
 
         /// <inheritdoc />
-        public override Task<string> GetNormalizedUserNameAsync(MemberIdentityUser user, CancellationToken cancellationToken = default) => GetUserNameAsync(user, cancellationToken);
+        public override Task<string> GetNormalizedUserNameAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
+            => GetUserNameAsync(user, cancellationToken);
 
         /// <inheritdoc />
-        public override Task SetNormalizedUserNameAsync(MemberIdentityUser user, string normalizedName, CancellationToken cancellationToken = default) => SetUserNameAsync(user, normalizedName, cancellationToken);
+        public override Task SetNormalizedUserNameAsync(MemberIdentityUser user, string normalizedName, CancellationToken cancellationToken = default)
+            => SetUserNameAsync(user, normalizedName, cancellationToken);
 
         /// <inheritdoc />
         public override Task<IdentityResult> CreateAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)

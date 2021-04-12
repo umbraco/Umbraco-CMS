@@ -39,56 +39,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         }
 
         [Test]
-        public void GivenIGetNormalizedUserName_AndTheUserIsNull_ThenIShouldGetAnException()
-        {
-            // arrange
-            MemberUserStore sut = CreateSut();
-
-            // act
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.GetNormalizedUserNameAsync(null, CancellationToken.None));
-        }
-
-        [Test]
-        public async Task GivenIGetNormalizedUserName_AndTheEverythingIsPopulatedCorrectly_ThenIShouldGetACorrectUsername()
-        {
-            // arrange
-            MemberUserStore sut = CreateSut();
-            var fakeUser = new MemberIdentityUser()
-            {
-                UserName = "fakeuser"
-            };
-
-            // act
-            string actual = await sut.GetNormalizedUserNameAsync(fakeUser);
-
-            // assert
-            Assert.AreEqual(actual, fakeUser.UserName);
-        }
-
-        [Test]
-        public void GivenISetNormalizedUserName_AndTheUserIsNull_ThenIShouldGetAnException()
-        {
-            // arrange
-            MemberUserStore sut = CreateSut();
-
-            // act
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.SetNormalizedUserNameAsync(null, "username", CancellationToken.None));
-        }
-
-
-        [Test]
-        public void GivenISetNormalizedUserName_AndTheUserNameIsNull_ThenAnExceptionShouldBeThrown()
-        {
-            // arrange
-            MemberUserStore sut = CreateSut();
-            var fakeUser = new MemberIdentityUser();
-
-            // act
-            Assert.ThrowsAsync<ArgumentNullException>(async () => await sut.SetNormalizedUserNameAsync(fakeUser, null, CancellationToken.None));
-        }
-
-        [Test]
-        public async Task GivenISetNormalizedUserName_AndEverythingIsPopulated_ThenIShouldGetASuccessResult()
+        public async Task GivenISetNormalizedUserName_ThenIShouldGetASuccessResult()
         {
             // arrange
             MemberUserStore sut = CreateSut();
@@ -101,8 +52,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             await sut.SetNormalizedUserNameAsync(fakeUser, "NewName", CancellationToken.None);
 
             // assert
-            Assert.AreEqual("NewName", fakeUser.Name);
-            Assert.AreEqual("NewName", fakeUser.NormalizedUserName);
+            Assert.AreEqual("NewName", fakeUser.UserName);
+            Assert.AreEqual("NewName", await sut.GetNormalizedUserNameAsync(fakeUser, CancellationToken.None));
         }
 
         [Test]
