@@ -8,7 +8,7 @@
 
     angular.module('umbraco').run(['clipboardService', function (clipboardService) {
 
-        function clearNestedContentPropertiesForStorage(prop, propClearingMethod) {
+        function resolveNestedContentPropertiesForPaste(prop, propClearingMethod) {
 
             // if prop.editor is "Umbraco.NestedContent"
             if ((typeof prop === 'object' && prop.editor === "Umbraco.NestedContent")) {
@@ -17,8 +17,8 @@
                 for (var i = 0; i < value.length; i++) {
                     var obj = value[i];
 
-                    // remove the key
-                    delete obj.key;
+                    // generate a new key.
+                    obj.key = String.CreateGuid();
 
                     // Loop through all inner properties:
                     for (var k in obj) {
@@ -28,10 +28,10 @@
             }
         }
 
-        clipboardService.registerClearPropertyResolver(clearNestedContentPropertiesForStorage, clipboardService.TYPES.ELEMENT_TYPE)
+        clipboardService.registerPastePropertyResolver(resolveNestedContentPropertiesForPaste, clipboardService.TYPES.ELEMENT_TYPE)
 
 
-        function clearInnerNestedContentPropertiesForStorage(prop, propClearingMethod) {
+        function resolveInnerNestedContentPropertiesForPaste(prop, propClearingMethod) {
 
             // if we got an array, and it has a entry with ncContentTypeAlias this meants that we are dealing with a NestedContent property data.
             if ((Array.isArray(prop) && prop.length > 0 && prop[0].ncContentTypeAlias !== undefined)) {
@@ -39,8 +39,8 @@
                 for (var i = 0; i < prop.length; i++) {
                     var obj = prop[i];
 
-                    // remove the key
-                    delete obj.key;
+                    // generate a new key.
+                    obj.key = String.CreateGuid();
 
                     // Loop through all inner properties:
                     for (var k in obj) {
@@ -50,7 +50,7 @@
             }
         }
 
-        clipboardService.registerClearPropertyResolver(clearInnerNestedContentPropertiesForStorage, clipboardService.TYPES.RAW)
+        clipboardService.registerPastePropertyResolver(resolveInnerNestedContentPropertiesForPaste, clipboardService.TYPES.RAW)
     }]);
 
     angular
