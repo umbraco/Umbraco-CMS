@@ -66,6 +66,7 @@
             if(vm.model.config.multiple === false) {
                 vm.validationLimit.max = 1;
             }
+            vm.model.config.crops = vm.model.config.crops || [];
             vm.singleMode = vm.validationLimit.max === 1;
             vm.allowedTypes = vm.model.config.filter ? vm.model.config.filter.split(",") : null;
 
