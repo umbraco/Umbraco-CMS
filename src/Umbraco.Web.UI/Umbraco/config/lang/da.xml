@@ -1891,7 +1891,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
     <key alias="elementTypeDoesNotExistHeadline">Error!</key>
     <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
+    <key alias="addBlock">Tilføj indhold</key>
+    <key alias="addThis">Tilføj %0%</key>
     <key alias="propertyEditorNotSupported">Feltet %0% bruger editor %1% som ikke er supporteret for blokke.</key>
+  </area>
   </area>
     <area alias="contentTemplatesDashboard">
         <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
