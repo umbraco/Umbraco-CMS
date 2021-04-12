@@ -29,6 +29,7 @@ namespace Umbraco.Web.Trees
             root.HasChildren = Services.MemberTypeService.GetAll().Any();
             return root;
         }
+
         protected override IEnumerable<TreeNode> GetTreeNodesFromService(string id, FormDataCollection queryStrings)
         {
             return Services.MemberTypeService.GetAll()
