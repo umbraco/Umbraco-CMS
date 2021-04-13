@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -23,6 +24,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         private readonly IMemberManager _memberManager;
         private readonly IMemberService _memberService;
         private readonly IMemberSignInManager _memberSignInManager;
+        private readonly IScopeProvider _scopeProvider;
 
         public UmbRegisterController(
             IMemberManager memberManager,
@@ -33,12 +35,14 @@ namespace Umbraco.Cms.Web.Website.Controllers
             AppCaches appCaches,
             IProfilingLogger profilingLogger,
             IPublishedUrlProvider publishedUrlProvider,
-            IMemberSignInManager memberSignInManager)
+            IMemberSignInManager memberSignInManager,
+            IScopeProvider scopeProvider)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
             _memberManager = memberManager;
             _memberService = memberService;
             _memberSignInManager = memberSignInManager;
+            _scopeProvider = scopeProvider;
         }
 
         [HttpPost]
@@ -52,13 +56,6 @@ namespace Umbraco.Cms.Web.Website.Controllers
             }
 
             MergeRouteValuesToModel(model);
-
-            // U4-10762 Server error with "Register Member" snippet (Cannot save member with empty name)
-            // If name field is empty, add the email address instead.
-            if (string.IsNullOrEmpty(model.Name) && string.IsNullOrEmpty(model.Email) == false)
-            {
-                model.Name = model.Email;
-            }
 
             IdentityResult result = await RegisterMemberAsync(model, true);
             if (result.Succeeded)
@@ -119,6 +116,15 @@ namespace Umbraco.Cms.Web.Website.Controllers
         /// <returns>Result of registration operation.</returns>
         private async Task<IdentityResult> RegisterMemberAsync(RegisterModel model, bool logMemberIn = true)
         {
+            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+
+            // U4-10762 Server error with "Register Member" snippet (Cannot save member with empty name)
+            // If name field is empty, add the email address instead.
+            if (string.IsNullOrEmpty(model.Name) && string.IsNullOrEmpty(model.Email) == false)
+            {
+                model.Name = model.Email;
+            }
+
             model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
 
             var identityUser = MemberIdentityUser.CreateNew(model.Username, model.Email, model.MemberTypeAlias, model.Name);
