@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
@@ -23,6 +24,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
         private readonly IMemberManager _memberManager;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
+        private readonly IScopeProvider _scopeProvider;
 
         public UmbProfileController(
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -33,12 +35,14 @@ namespace Umbraco.Cms.Web.Website.Controllers
             IPublishedUrlProvider publishedUrlProvider,
             IMemberManager memberManager,
             IMemberService memberService,
-            IMemberTypeService memberTypeService)
+            IMemberTypeService memberTypeService,
+            IScopeProvider scopeProvider)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
         {
             _memberManager = memberManager;
             _memberService = memberService;
             _memberTypeService = memberTypeService;
+            _scopeProvider = scopeProvider;
         }
 
         [HttpPost]
@@ -101,6 +105,8 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
         private async Task<IdentityResult> UpdateMemberAsync(ProfileModel model, MemberIdentityUser currentMember)
         {
+            using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+                
             currentMember.Email = model.Email;
             currentMember.Name = model.Name;
             currentMember.UserName = model.UserName;
