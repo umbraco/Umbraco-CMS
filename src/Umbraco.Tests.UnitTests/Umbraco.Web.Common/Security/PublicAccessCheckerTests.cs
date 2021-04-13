@@ -9,8 +9,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
@@ -18,49 +21,242 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
     [TestFixture]
     public class PublicAccessCheckerTests
     {
-        private PublicAccessChecker CreateSut(out HttpContext httpContext, out IMemberManager memberManager)
+        private IHttpContextAccessor GetHttpContextAccessor(IMemberManager memberManager, out HttpContext httpContext)
         {
-            memberManager = Mock.Of<IMemberManager>();
-            IPublicAccessService publicAccessService = Mock.Of<IPublicAccessService>();
-            IContentService contentService = Mock.Of<IContentService>();
-
             var services = new ServiceCollection();
-            IMemberManager localMemberManager = memberManager;
-            services.AddScoped<IMemberManager>(x => localMemberManager);
+            services.AddScoped<IMemberManager>(x => memberManager);
             httpContext = new DefaultHttpContext
             {
                 RequestServices = services.BuildServiceProvider()
             };
 
             HttpContext localHttpContext = httpContext;
+            return Mock.Of<IHttpContextAccessor>(x => x.HttpContext == localHttpContext);
+        }
+
+        private PublicAccessChecker CreateSut(IMemberManager memberManager, IPublicAccessService publicAccessService, IContentService contentService, out HttpContext httpContext)
+        {
             var publicAccessChecker = new PublicAccessChecker(
-                Mock.Of<IHttpContextAccessor>(x => x.HttpContext == localHttpContext),
+                GetHttpContextAccessor(memberManager, out httpContext),
                 publicAccessService,
                 contentService);
 
             return publicAccessChecker;
         }
 
-        [Test]
-        public async Task GivenMemberNotLoggedIn_WhenIdentityIsChecked_ThenNotLoggedInResponse()
+        private ClaimsPrincipal GetLoggedInUser()
         {
-            PublicAccessChecker sut = CreateSut(out HttpContext httpContext, out IMemberManager memberManager);
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new Claim[] {
+                        new Claim(ClaimTypes.NameIdentifier, "1234"),
+                        new Claim(ClaimTypes.Name, "test@example.com")
+                    }, "TestAuthentication"));
+            return user;
+        }
+
+        private void MockGetRolesAsync(IMemberManager memberManager, IEnumerable<string> roles = null)
+        {
+            if (roles == null)
+            {
+                roles = new[]
+                {
+                    "role1",
+                    "role2"
+                };
+            }
+            Mock.Get(memberManager).Setup(x => x.GetRolesAsync(It.IsAny<MemberIdentityUser>()))
+                .Returns(Task.FromResult((IList<string>)new List<string>(roles)));
+        }
+
+        private void MockGetUserAsync(IMemberManager memberManager, MemberIdentityUser memberIdentityUser)
+            => Mock.Get(memberManager).Setup(x => x.GetUserAsync(It.IsAny<ClaimsPrincipal>())).Returns(Task.FromResult(memberIdentityUser));
+
+        private PublicAccessEntry GetPublicAccessEntry(string usernameRuleValue, string roleRuleValue)
+            => new PublicAccessEntry(Guid.NewGuid(), 123, 987, 987, new List<PublicAccessRule>
+                {
+                    new PublicAccessRule
+                    {
+                        RuleType = Constants.Conventions.PublicAccess.MemberUsernameRuleType,
+                        RuleValue = usernameRuleValue
+                    },
+                    new PublicAccessRule
+                    {
+                        RuleType = Constants.Conventions.PublicAccess.MemberRoleRuleType,
+                        RuleValue = roleRuleValue
+                    }
+                });
+
+        [AutoMoqData]
+        [Test]
+        public async Task GivenMemberNotLoggedIn_WhenIdentityIsChecked_ThenNotLoggedInResult(
+            IMemberManager memberManager,
+            IPublicAccessService publicAccessService,
+            IContentService contentService)
+        {
+            PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
             httpContext.User = new ClaimsPrincipal();
-            Mock.Get(memberManager).Setup(x => x.GetUserAsync(It.IsAny<ClaimsPrincipal>())).Returns(Task.FromResult(new MemberIdentityUser()));
+            MockGetUserAsync(memberManager, new MemberIdentityUser());
 
             var result = await sut.HasMemberAccessToContentAsync(123);
             Assert.AreEqual(PublicAccessStatus.NotLoggedIn, result);
         }
 
+        [AutoMoqData]
         [Test]
-        public async Task GivenMemberNotLoggedIn_WhenMemberIsRequested_AndIsNull_ThenNotLoggedInResponse()
+        public async Task GivenMemberNotLoggedIn_WhenMemberIsRequested_AndIsNull_ThenNotLoggedInResult(
+            IMemberManager memberManager,
+            IPublicAccessService publicAccessService,
+            IContentService contentService)
         {
-            PublicAccessChecker sut = CreateSut(out HttpContext httpContext, out IMemberManager memberManager);
-            httpContext.User = new ClaimsPrincipal(Mock.Of<IIdentity>(x => x.IsAuthenticated == true));
-            Mock.Get(memberManager).Setup(x => x.GetUserAsync(It.IsAny<ClaimsPrincipal>())).Returns(Task.FromResult((MemberIdentityUser)null));
+            PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
+            httpContext.User = GetLoggedInUser();
+            MockGetUserAsync(memberManager, null);
 
             var result = await sut.HasMemberAccessToContentAsync(123);
             Assert.AreEqual(PublicAccessStatus.NotLoggedIn, result);
+        }
+
+        [AutoMoqData]
+        [Test]
+        public async Task GivenMemberLoggedIn_WhenMemberHasNoRoles_ThenAccessDeniedResult(
+            IMemberManager memberManager,
+            IPublicAccessService publicAccessService,
+            IContentService contentService)
+        {
+            PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
+
+            httpContext.User = GetLoggedInUser();
+            MockGetUserAsync(memberManager, new MemberIdentityUser());
+            MockGetRolesAsync(memberManager, Enumerable.Empty<string>());
+
+            var result = await sut.HasMemberAccessToContentAsync(123);
+            Assert.AreEqual(PublicAccessStatus.AccessDenied, result);
+        }
+
+        [AutoMoqData]
+        [Test]
+        public async Task GivenMemberLoggedIn_WhenMemberIsLockedOut_ThenLockedOutResult(
+            IMemberManager memberManager,
+            IPublicAccessService publicAccessService,
+            IContentService contentService)
+        {
+            PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
+
+            httpContext.User = GetLoggedInUser();
+            MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = true, LockoutEnd = DateTime.UtcNow.AddDays(10) });
+            MockGetRolesAsync(memberManager);
+
+            var result = await sut.HasMemberAccessToContentAsync(123);
+            Assert.AreEqual(PublicAccessStatus.LockedOut, result);
+        }
+
+        [AutoMoqData]
+        [Test]
+        public async Task GivenMemberLoggedIn_WhenMemberIsNotApproved_ThenNotApprovedResult(
+            IMemberManager memberManager,
+            IPublicAccessService publicAccessService,
+            IContentService contentService)
+        {
+            PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
+
+            httpContext.User = GetLoggedInUser();
+            MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = false });
+            MockGetRolesAsync(memberManager);
+
+            var result = await sut.HasMemberAccessToContentAsync(123);
+            Assert.AreEqual(PublicAccessStatus.NotApproved, result);
+        }
+
+        [AutoMoqData]
+        [Test]
+        public async Task GivenMemberLoggedIn_WhenMemberHasRoles_AndContentDoesNotExist_ThenAccessAcceptedResult(
+            IMemberManager memberManager,
+            IPublicAccessService publicAccessService,
+            IContentService contentService)
+        {
+            PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
+            httpContext.User = GetLoggedInUser();
+            MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = true});
+            MockGetRolesAsync(memberManager);
+            Mock.Get(contentService).Setup(x => x.GetById(123)).Returns((IContent)null);
+
+            var result = await sut.HasMemberAccessToContentAsync(123);
+            Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
+        }
+
+        [AutoMoqData]
+        [Test]
+        public async Task GivenMemberLoggedIn_WhenMemberHasRoles_AndGetEntryForContentDoesNotExist_ThenAccessAcceptedResult(
+            IMemberManager memberManager,
+            IPublicAccessService publicAccessService,
+            IContentService contentService,
+            IContent content)
+        {
+            PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
+            httpContext.User = GetLoggedInUser();
+            MockGetUserAsync(memberManager, new MemberIdentityUser { IsApproved = true });
+            MockGetRolesAsync(memberManager);
+            Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
+            Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content)).Returns((PublicAccessEntry)null);
+
+            var result = await sut.HasMemberAccessToContentAsync(123);
+            Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
+        }
+
+        [AutoMoqData]
+        [Test]
+        public async Task GivenMemberLoggedIn_WhenMemberHasRoles_AndEntryRulesDontMatch_ThenAccessDeniedResult(
+            IMemberManager memberManager,
+            IPublicAccessService publicAccessService,
+            IContentService contentService,
+            IContent content)
+        {
+            PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
+            httpContext.User = GetLoggedInUser();
+            MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
+            MockGetRolesAsync(memberManager);
+            Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
+            Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content)).Returns(GetPublicAccessEntry(string.Empty, string.Empty));
+
+            var result = await sut.HasMemberAccessToContentAsync(123);
+            Assert.AreEqual(PublicAccessStatus.AccessDenied, result);
+        }
+
+        [AutoMoqData]
+        [Test]
+        public async Task GivenMemberLoggedIn_WhenMemberHasRoles_AndUsernameRuleMatches_ThenAccessAcceptedResult(
+            IMemberManager memberManager,
+            IPublicAccessService publicAccessService,
+            IContentService contentService,
+            IContent content)
+        {
+            PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
+            httpContext.User = GetLoggedInUser();
+            MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
+            MockGetRolesAsync(memberManager);
+            Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
+            Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content)).Returns(GetPublicAccessEntry("MyUsername", string.Empty));
+
+            var result = await sut.HasMemberAccessToContentAsync(123);
+            Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
+        }
+
+        [AutoMoqData]
+        [Test]
+        public async Task GivenMemberLoggedIn_WhenMemberHasRoles_AndRoleRuleMatches_ThenAccessAcceptedResult(
+            IMemberManager memberManager,
+            IPublicAccessService publicAccessService,
+            IContentService contentService,
+            IContent content)
+        {
+            PublicAccessChecker sut = CreateSut(memberManager, publicAccessService, contentService, out HttpContext httpContext);
+            httpContext.User = GetLoggedInUser();
+            MockGetUserAsync(memberManager, new MemberIdentityUser { UserName = "MyUsername", IsApproved = true });
+            MockGetRolesAsync(memberManager);
+            Mock.Get(contentService).Setup(x => x.GetById(123)).Returns(content);
+            Mock.Get(publicAccessService).Setup(x => x.GetEntryForContent(content)).Returns(GetPublicAccessEntry(string.Empty, "role1"));
+
+            var result = await sut.HasMemberAccessToContentAsync(123);
+            Assert.AreEqual(PublicAccessStatus.AccessAccepted, result);
         }
     }
 }

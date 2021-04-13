@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -36,9 +37,9 @@ namespace Umbraco.Cms.Web.Common.Security
             }
 
             var username = currentMember.UserName;
-            System.Collections.Generic.IList<string> userRoles = await memberManager.GetRolesAsync(currentMember);
+            IList<string> userRoles = await memberManager.GetRolesAsync(currentMember);
 
-            if (!_publicAccessService.HasAccess(publishedContentId, _contentService, username, userRoles))
+            if (userRoles.Count == 0)
             {
                 return PublicAccessStatus.AccessDenied;
             }
@@ -51,6 +52,11 @@ namespace Umbraco.Cms.Web.Common.Security
             if (currentMember.IsLockedOut)
             {
                 return PublicAccessStatus.LockedOut;
+            }
+
+            if (!_publicAccessService.HasAccess(publishedContentId, _contentService, username, userRoles))
+            {
+                return PublicAccessStatus.AccessDenied;
             }
 
             return PublicAccessStatus.AccessAccepted;

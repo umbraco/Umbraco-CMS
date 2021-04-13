@@ -30,6 +30,6 @@ namespace Umbraco.Cms.Web.Common.Security
         }
 
         public bool IsMemberAuthorized(IEnumerable<string> allowTypes = null, IEnumerable<string> allowGroups = null, IEnumerable<int> allowMembers = null)
-            => true; // TODO: Implement!
+            => throw new NotImplementedException(); // TODO: Implement!
     }
 }

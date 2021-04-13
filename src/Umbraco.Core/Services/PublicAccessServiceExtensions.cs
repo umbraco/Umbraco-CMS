@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -80,6 +80,21 @@ namespace Umbraco.Extensions
 
         private static bool HasAccess(PublicAccessEntry entry, string username, IEnumerable<string> roles)
         {
+            if (entry is null)
+            {
+                throw new ArgumentNullException(nameof(entry));
+            }
+
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new ArgumentException($"'{nameof(username)}' cannot be null or empty.", nameof(username));
+            }
+
+            if (roles is null)
+            {
+                throw new ArgumentNullException(nameof(roles));
+            }
+
             return entry.Rules.Any(x =>
                 (x.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType && username.Equals(x.RuleValue, StringComparison.OrdinalIgnoreCase))
                 || (x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType && roles.Contains(x.RuleValue))
