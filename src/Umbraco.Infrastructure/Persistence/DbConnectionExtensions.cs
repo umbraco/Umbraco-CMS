@@ -35,7 +35,7 @@ namespace Umbraco.Extensions
             return Cms.Core.Constants.DbProviderNames.SqlServer;
         }
 
-    public static bool IsConnectionAvailable(string connectionString, DbProviderFactory factory)
+        public static bool IsConnectionAvailable(string connectionString, DbProviderFactory factory)
         {
 
             var connection = factory.CreateConnection();
@@ -46,6 +46,7 @@ namespace Umbraco.Extensions
             connection.ConnectionString = connectionString;
             using (connection)
             {
+                // TODO: File needs to exist for this to be happy for SQLite
                 return connection.IsAvailable();
             }
         }

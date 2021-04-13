@@ -143,6 +143,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         #region Configure Connection String
 
         public const string EmbeddedDatabaseConnectionString = @"Data Source=|DataDirectory|\Umbraco.sdf;Flush Interval=1;";
+        public const string EmbeddedSQLiteDatabaseConnectionString = @"Data Source=./Umbraco.db;";
 
         /// <summary>
         /// Configures a connection string for the embedded database.
@@ -150,6 +151,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         public void ConfigureEmbeddedDatabaseConnection()
         {
             ConfigureEmbeddedDatabaseConnection(_databaseFactory);
+        }
+
+        public void ConfigureEmbeddedSQLiteDatabaseConnection()
+        {
+            ConfigureEmbeddedSQLiteDatabaseConnection(_databaseFactory);
         }
 
         private void ConfigureEmbeddedDatabaseConnection(IUmbracoDatabaseFactory factory)
@@ -166,6 +172,22 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
 
             factory.Configure(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
+        }
+
+        private void ConfigureEmbeddedSQLiteDatabaseConnection(IUmbracoDatabaseFactory factory)
+        {
+            _configManipulator.SaveConnectionString(EmbeddedSQLiteDatabaseConnectionString, Constants.DbProviderNames.SQLite);
+
+            var path = _hostingEnvironment.MapPathContentRoot("Umbraco.db");
+            if (File.Exists(path) == false)
+            {
+                // this should probably be in a "using (new SqlCeEngine)" clause but not sure
+                // of the side effects and it's been like this for quite some time now
+
+                _dbProviderFactoryCreator.CreateDatabase(Constants.DbProviderNames.SQLite);
+            }
+
+            factory.Configure(EmbeddedSQLiteDatabaseConnectionString, Constants.DbProviderNames.SQLite);
         }
 
         /// <summary>

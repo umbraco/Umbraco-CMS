@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -53,6 +53,11 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
             {
                 _databaseBuilder.ConfigureEmbeddedDatabaseConnection();
             }
+            else if(database.DatabaseType == DatabaseType.Sqlite)
+            {
+                _databaseBuilder.ConfigureEmbeddedSQLiteDatabaseConnection();
+
+            }
             else if (database.IntegratedAuth)
             {
                 _databaseBuilder.ConfigureIntegratedSecurityDatabaseConnection(database.Server, database.DatabaseName);
@@ -76,6 +81,7 @@ namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
                 {
                     new { name = "Microsoft SQL Server", id = DatabaseType.SqlServer.ToString() },
                     new { name = "Microsoft SQL Azure", id = DatabaseType.SqlAzure.ToString() },
+                    new { name = "SQLite Cross Platform Embedded", id = DatabaseType.Sqlite.ToString() },
                     new { name = "Custom connection string", id = DatabaseType.Custom.ToString() },
                 };
 
