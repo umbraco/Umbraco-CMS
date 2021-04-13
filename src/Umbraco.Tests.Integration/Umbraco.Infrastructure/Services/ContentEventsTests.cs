@@ -345,24 +345,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             _events.Add(e);
         }
 
-        private void ContentRepositoryRemoved(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
-        {
-            // reports the event as : "ContentRepository/Remove/X"
-            // where
-            // X is the event content ID
-            IContent[] entities = new[] { args.Entity }; // args.Entities
-
-            var e = new EventInstance
-            {
-                Message = _msgCount++,
-                Sender = "ContentRepository",
-                EventArgs = args,
-                Name = "Remove",
-                Args = string.Join(",", entities.Select(x => x.Id))
-            };
-            _events.Add(e);
-        }
-
         private void ContentRepositoryRemovedVersion(DocumentRepository sender, DocumentRepository.ScopedVersionEventArgs args)
         {
             // reports the event as : "ContentRepository/Remove/X:Y"
