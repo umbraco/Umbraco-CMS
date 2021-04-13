@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Compose
+namespace Umbraco.Cms.Core.Handlers
 {
     public sealed class PublicAccessHandler :
         INotificationHandler<MemberGroupSavedNotification>,

@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Compose
+namespace Umbraco.Cms.Core.Handlers
 {
     public sealed class AuditNotificationsHandler :
         INotificationHandler<MemberSavedNotification>,
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Core.Compose
             }
         }
 
-        public static IUser UnknownUser(GlobalSettings globalSettings) => new User(globalSettings) { Id = Cms.Core.Constants.Security.UnknownUserId, Name = Cms.Core.Constants.Security.UnknownUserName, Email = "" };
+        public static IUser UnknownUser(GlobalSettings globalSettings) => new User(globalSettings) { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
 
         private string PerformingIp => _ipResolver.GetCurrentRequestIpAddress();
 
