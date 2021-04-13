@@ -2,6 +2,9 @@
      ng-controller="Umbraco.PropertyEditors.ImageCropperController">
 
     <ng-form name="imageCropperForm">
+
+        <input type="hidden" name="modelValue" ng-model="model.value" />
+
         <umb-property-file-upload culture="{{model.culture}}"
                                   segment="{{model.segment}}"
                                   property-alias="{{model.alias}}"

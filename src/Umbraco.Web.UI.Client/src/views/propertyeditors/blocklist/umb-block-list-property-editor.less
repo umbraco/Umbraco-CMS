@@ -236,30 +236,98 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
         }
     }
 }
-.umb-block-list__create-button {
-    position: relative;
+
+.umb-block-list__actions {
     display: flex;
-    width: 100%;
-    align-items: center;
-    justify-content: center;
+
     border: 1px dashed @ui-action-discreet-border;
-    color: @ui-action-discreet-type;
-    font-weight: bold;
-    margin: 2px 0;
-    padding: 5px 15px;
-    box-sizing: border-box;
     border-radius: @baseBorderRadius;
-}
+    box-sizing: border-box;
 
-.umb-block-list__create-button:hover {
-    color: @ui-action-discreet-type-hover;
-    border-color: @ui-action-discreet-border-hover;
-    text-decoration: none;
-}
+    &:hover {
+        border-color: transparent;
+        > button {
 
-.umb-block-list__create-button.--disabled,
-.umb-block-list__create-button.--disabled:hover {
-    color: @gray-7;
-    border-color: @gray-7;
-    cursor: default;
+            border-color: @ui-action-discreet-border;
+
+            &.umb-block-list__clipboard-button {
+                opacity: 1;
+            }
+        }
+        
+    }
+
+    > button {
+        position: relative;
+        display: flex;
+        //width: 100%;
+        align-items: center;
+        justify-content: center;
+        
+        color: @ui-action-discreet-type;
+        font-weight: bold;
+        margin: -1px;
+        padding: 5px 15px;
+
+        border: 1px dashed transparent;
+        border-radius: @baseBorderRadius;
+        box-sizing: border-box;
+        
+        &:hover {
+            color: @ui-action-discreet-type-hover;
+            border-color: @ui-action-discreet-border-hover;
+            text-decoration: none;
+            z-index: 1;
+        }
+
+        &[disabled],
+        &[disabled]:hover {
+            color: @gray-7;
+            border-color: @gray-7;
+            cursor: default;
+        }
+
+        &.umb-block-list__create-button {
+            flex-grow: 1;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+    
+        &.umb-block-list__clipboard-button {
+            margin-left: 0;
+            padding: 5px 12px;
+            font-size: 18px;// Align with block action buttons.
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+
+            opacity: 0;
+            &:hover, &:focus {
+                opacity: 1;
+            }
+
+            &.--jump {
+
+                @keyframes umb-block-list__jump-clipboard-button {
+                    0% { opacity: 0; }
+                    10% { opacity: 1; }
+                    90% { opacity: 1; }
+                    100% { opacity: 0; }
+                }
+                animation: umb-block-list__jump-clipboard-button 2s;
+
+                i{
+                    @keyframes umb-block-list__jump-clipboard-button-i {
+                        10% { transform: scale(1); }
+                        10% { transform: scale(1.33); }
+                        20% { transform: scale(.82); }
+                        30% { transform: scale(1.24); }
+                        40% { transform: scale(.94); }
+                        50% { transform: scale(1); }
+                    }
+                    animation: umb-block-list__jump-clipboard-button-i 2s;
+                }
+            }
+            
+        }
+    }
 }
