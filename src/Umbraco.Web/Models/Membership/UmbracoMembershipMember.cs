@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Web.Security;
 using Umbraco.Cms.Core.Models.Membership;
 
@@ -19,7 +19,6 @@ namespace Umbraco.Web.Models.Membership
         private string _email;
         private string _comment;
         private bool _isApproved;
-        private DateTime _lastActivityDate;
 
         //NOTE: We are only overriding the properties that matter, we don't override things like IsOnline since that is handled with the sub-class and the membership providers.
 
@@ -41,8 +40,6 @@ namespace Umbraco.Web.Models.Membership
             _isLockedOut = member.IsLockedOut;
             _creationDate = member.CreateDate.ToUniversalTime();
             _lastLoginDate = member.LastLoginDate.ToUniversalTime();
-            // TODO: We currently don't really have any place to store this data!!
-            _lastActivityDate = member.LastLoginDate.ToUniversalTime();
             _lastPasswordChangedDate = member.LastPasswordChangeDate.ToUniversalTime();
             _lastLockoutDate = member.LastLockoutDate.ToUniversalTime();
         }
@@ -101,12 +98,6 @@ namespace Umbraco.Web.Models.Membership
         {
             get { return _lastLoginDate; }
             set { _lastLoginDate = value; }
-        }
-
-        public override DateTime LastActivityDate
-        {
-            get { return _lastActivityDate; }
-            set { _lastActivityDate = value; }
         }
 
         public override DateTime LastPasswordChangedDate

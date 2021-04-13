@@ -14,6 +14,7 @@ namespace Umbraco.Cms.Core.Security
     public class MemberIdentityUser : UmbracoIdentityUser
     {
         private string _name;
+        private string _comments;
         private string _passwordConfig;
         private IReadOnlyCollection<IReadOnlyUserGroup> _groups;
 
@@ -65,6 +66,24 @@ namespace Umbraco.Cms.Core.Security
             get => _name;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
         }
+
+        /// <summary>
+        /// Gets or sets the member's comments
+        /// </summary>
+        public string Comments
+        {
+            get => _comments;
+            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _comments, nameof(Comments));
+        }
+
+        // No change tracking because the persisted value is only set with the IsLockedOut flag
+        public DateTime? LastLockoutDateUtc { get; set; }
+
+        // No change tracking because the persisted value is readonly
+        public DateTime CreatedDateUtc { get; set; }
+
+        // No change tracking because the persisted value is readonly
+        public Guid Key { get; set; }
 
         /// <summary>
         /// Gets or sets the password config
@@ -125,5 +144,7 @@ namespace Umbraco.Cms.Core.Security
         public string MemberTypeAlias { get; set; }
 
         private static string UserIdToString(int userId) => string.Intern(userId.ToString());
+
+        // TODO: Should we support custom member properties for persistence/retrieval?
     }
 }

@@ -1,11 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
@@ -23,91 +25,35 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         public MemberUserStore CreateSut()
         {
             _mockMemberService = new Mock<IMemberService>();
+            var mockScope = new Mock<IScope>();
+            var mockScopeProvider = new Mock<IScopeProvider>();
+            mockScopeProvider
+                .Setup(x => x.CreateScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IEventDispatcher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
+                .Returns(mockScope.Object);
+
             return new MemberUserStore(
                 _mockMemberService.Object,
                 new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>())),
-                new Mock<IScopeProvider>().Object,
+                mockScopeProvider.Object,
                 new IdentityErrorDescriber());
         }
 
         [Test]
-        public void GivenIGetNormalizedUserName_AndTheUserIsNull_ThenIShouldGetAnException()
+        public async Task GivenISetNormalizedUserName_ThenIShouldGetASuccessResult()
         {
             // arrange
             MemberUserStore sut = CreateSut();
-            CancellationToken fakeCancellationToken = new CancellationToken() { };
-
-            // act
-            Action actual = () => sut.GetNormalizedUserNameAsync(null, fakeCancellationToken);
-
-            // assert
-            Assert.That(actual, Throws.ArgumentNullException);
-        }
-
-        [Test]
-        public async Task GivenIGetNormalizedUserName_AndTheEverythingIsPopulatedCorrectly_ThenIShouldGetACorrectUsername()
-        {
-            // arrange
-            MemberUserStore sut = CreateSut();
-            var fakeUser = new MemberIdentityUser()
-            {
-                UserName = "fakeuser"
-            };
-
-            // act
-            string actual = await sut.GetNormalizedUserNameAsync(fakeUser);
-
-            // assert
-            Assert.AreEqual(actual, fakeUser.UserName);
-        }
-
-        [Test]
-        public void GivenISetNormalizedUserName_AndTheUserIsNull_ThenIShouldGetAnException()
-        {
-            // arrange
-            MemberUserStore sut = CreateSut();
-            var fakeCancellationToken = new CancellationToken() { };
-
-            // act
-            Action actual = () => sut.SetNormalizedUserNameAsync(null, "username", fakeCancellationToken);
-
-            // assert
-            Assert.That(actual, Throws.ArgumentNullException);
-            _mockMemberService.VerifyNoOtherCalls();
-        }
-
-
-        [Test]
-        public void GivenISetNormalizedUserName_AndTheUserNameIsNull_ThenAnExceptionShouldBeThrown()
-        {
-            // arrange
-            MemberUserStore sut = CreateSut();
-            CancellationToken fakeCancellationToken = new CancellationToken() { };
-            var fakeUser = new MemberIdentityUser() { };
-
-            // act
-            Action actual = () => sut.SetNormalizedUserNameAsync(fakeUser, null, fakeCancellationToken);
-
-            // assert
-            _mockMemberService.VerifyNoOtherCalls();
-        }
-
-        [Test]
-        public void GivenISetNormalizedUserName_AndEverythingIsPopulated_ThenIShouldGetASuccessResult()
-        {
-            // arrange
-            MemberUserStore sut = CreateSut();
-            CancellationToken fakeCancellationToken = new CancellationToken() { };
             var fakeUser = new MemberIdentityUser()
             {
                 UserName = "MyName"
             };
 
             // act
-            Task actual = sut.SetNormalizedUserNameAsync(fakeUser, "NewName", fakeCancellationToken);
+            await sut.SetNormalizedUserNameAsync(fakeUser, "NewName", CancellationToken.None);
 
             // assert
-            Assert.IsTrue(actual.IsCompletedSuccessfully);
+            Assert.AreEqual("NewName", fakeUser.UserName);
+            Assert.AreEqual("NewName", await sut.GetNormalizedUserNameAsync(fakeUser, CancellationToken.None));
         }
 
         [Test]
@@ -130,8 +76,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             // arrange
             MemberUserStore sut = CreateSut();
-            var fakeUser = new MemberIdentityUser() { };
-            var fakeCancellationToken = new CancellationToken() { };
+            var fakeUser = new MemberIdentityUser();
 
             IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
             IMember mockMember = Mock.Of<IMember>(m =>
@@ -159,8 +104,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             // arrange
             MemberUserStore sut = CreateSut();
-            var fakeUser = new MemberIdentityUser() { };
-            var fakeCancellationToken = new CancellationToken() { };
+            var fakeUser = new MemberIdentityUser();
 
             IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
             IMember mockMember = Mock.Of<IMember>(m =>
@@ -168,6 +112,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 m.Email == "fakeemail@umbraco.com" &&
                 m.Username == "fakeUsername" &&
                 m.RawPasswordValue == "fakePassword" &&
+                m.Comments == "hello" &&
                 m.ContentTypeAlias == fakeMemberType.Alias &&
                 m.HasIdentity == true);
 
@@ -177,7 +122,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             _mockMemberService.Setup(x => x.Save(mockMember, raiseEvents));
 
             // act
-            IdentityResult identityResult = await sut.CreateAsync(fakeUser, fakeCancellationToken);
+            IdentityResult identityResult = await sut.CreateAsync(fakeUser, CancellationToken.None);
 
             // assert
             Assert.IsTrue(identityResult.Succeeded);
@@ -186,6 +131,72 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             _mockMemberService.Verify(x => x.Save(mockMember, It.IsAny<bool>()));
         }
 
+        [Test]
+        public async Task GivenIUpdateAUser_ThenIShouldGetASuccessResultAsync()
+        {
+            // arrange
+            MemberUserStore sut = CreateSut();
+            var fakeUser = new MemberIdentityUser
+            {
+                Id = "123",
+                Name = "fakeName",
+                Email = "fakeemail@umbraco.com",
+                UserName = "fakeUsername",
+                Comments = "hello",
+                LastLoginDateUtc = DateTime.UtcNow,
+                LastPasswordChangeDateUtc = DateTime.UtcNow,
+                EmailConfirmed = true,
+                AccessFailedCount = 3,
+                LockoutEnd = DateTime.UtcNow.AddDays(10),
+                IsApproved = true,
+                PasswordHash = "abcde",
+                SecurityStamp = "abc"
+            };
+
+            IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
+            IMember mockMember = Mock.Of<IMember>(m =>
+                m.Name == "a" &&
+                m.Email == "a@b.com" &&
+                m.Username == "c" &&
+                m.RawPasswordValue == "d" &&
+                m.Comments == "e" &&
+                m.ContentTypeAlias == fakeMemberType.Alias &&
+                m.HasIdentity == true &&
+                m.EmailConfirmedDate == DateTime.MinValue &&
+                m.FailedPasswordAttempts == 0 &&
+                m.LastLockoutDate == DateTime.MinValue &&
+                m.IsApproved == false &&
+                m.RawPasswordValue == "xyz" &&
+                m.SecurityStamp == "xyz");
+
+            bool raiseEvents = false;
+
+            _mockMemberService.Setup(x => x.Save(mockMember, raiseEvents));
+            _mockMemberService.Setup(x => x.GetById(123)).Returns(mockMember);
+
+            // act
+            IdentityResult identityResult = await sut.UpdateAsync(fakeUser, CancellationToken.None);
+
+            // assert
+            Assert.IsTrue(identityResult.Succeeded);
+            Assert.IsTrue(!identityResult.Errors.Any());
+
+            Assert.AreEqual(fakeUser.Name, mockMember.Name);
+            Assert.AreEqual(fakeUser.Email, mockMember.Email);
+            Assert.AreEqual(fakeUser.UserName, mockMember.Username);
+            Assert.AreEqual(fakeUser.Comments, mockMember.Comments);
+            Assert.AreEqual(fakeUser.LastPasswordChangeDateUtc.Value.ToLocalTime(), mockMember.LastPasswordChangeDate);
+            Assert.AreEqual(fakeUser.LastLoginDateUtc.Value.ToLocalTime(), mockMember.LastLoginDate);
+            Assert.AreEqual(fakeUser.AccessFailedCount, mockMember.FailedPasswordAttempts);
+            Assert.AreEqual(fakeUser.IsLockedOut, mockMember.IsLockedOut);
+            Assert.AreEqual(fakeUser.IsApproved, mockMember.IsApproved);
+            Assert.AreEqual(fakeUser.PasswordHash, mockMember.RawPasswordValue);
+            Assert.AreEqual(fakeUser.SecurityStamp, mockMember.SecurityStamp);
+            Assert.AreNotEqual(DateTime.MinValue, mockMember.EmailConfirmedDate.Value);
+
+            _mockMemberService.Verify(x => x.Save(mockMember, It.IsAny<bool>()));
+            _mockMemberService.Verify(x => x.GetById(123));
+        }
 
         [Test]
         public async Task GivenIDeleteUser_AndTheUserIsNotPresent_ThenIShouldGetAFailedResultAsync()

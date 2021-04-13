@@ -63,23 +63,24 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Adds the services required for using Members Identity
         /// </summary>
-        public static void AddMembersIdentity(this IServiceCollection services) =>
-            services.BuildMembersIdentity()
+
+        public static void AddMembersIdentity(this IServiceCollection services)
+        {
+            services.AddIdentity<MemberIdentityUser, UmbracoIdentityRole>()
                 .AddDefaultTokenProviders()
                 .AddMemberManager<IMemberManager, MemberManager>()
-                .AddClaimsPrincipalFactory<MemberClaimsPrincipalFactory>()
+                .AddSignInManager<IMemberSignInManager, MemberSignInManager>()
                 .AddUserStore<MemberUserStore>()
-                .AddRoleStore<MemberRoleStore>()
-                .AddRoleValidator<RoleValidator<UmbracoIdentityRole>>()
-                .AddRoleManager<RoleManager<UmbracoIdentityRole>>();
+                .AddRoleStore<MemberRoleStore>();
 
-        private static MemberIdentityBuilder BuildMembersIdentity(this IServiceCollection services)
-        {
-            // Services used by Umbraco members identity
-            services.TryAddScoped<IUserValidator<MemberIdentityUser>, UserValidator<MemberIdentityUser>>();
-            services.TryAddScoped<IPasswordValidator<MemberIdentityUser>, PasswordValidator<MemberIdentityUser>>();
-            services.TryAddScoped<IPasswordHasher<MemberIdentityUser>, PasswordHasher<MemberIdentityUser>>();
-            return new MemberIdentityBuilder(typeof(UmbracoIdentityRole), services);
+            services.ConfigureApplicationCookie(x =>
+            {
+                // TODO: We may want/need to configure these further
+
+                x.LoginPath = null;
+                x.AccessDeniedPath = null;
+                x.LogoutPath = null;
+            });
         }
 
         private static void RemoveIntParamenterIfValueGreatherThen(IDictionary<string, string> commands, string parameter, int maxValue)
