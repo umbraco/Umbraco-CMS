@@ -39,6 +39,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="released">Flag indicating if process is shutting now and operations should exit.</param>
         /// <param name="localIdentity">Local identity of the executing AppDomain.</param>
         /// <param name="lastPruned">Date of last prune operation.</param>
-        CacheInstructionServiceProcessInstructionsResult ProcessInstructions(bool released, string localIdentity, DateTime lastPruned);
+        /// <param name="lastId">Id of the latest processed instruction</param>
+        CacheInstructionServiceProcessInstructionsResult ProcessInstructions(bool released, string localIdentity, DateTime lastPruned, int lastId);
     }
 }

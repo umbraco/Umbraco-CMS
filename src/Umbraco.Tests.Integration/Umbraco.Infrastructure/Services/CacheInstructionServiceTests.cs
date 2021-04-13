@@ -152,7 +152,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // Create three instruction records, each with two instructions.  First two records are for a different identity.
             CreateAndDeliveryMultipleInstructions(sut);
 
-            CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1));
+            CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), -1);
 
             Assert.Multiple(() =>
             {
@@ -171,7 +171,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             CreateAndDeliveryMultipleInstructions(sut);
 
-            CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddHours(-1));
+            CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddHours(-1), -1);
 
             Assert.IsTrue(result.InstructionsWerePruned);
         }
@@ -183,13 +183,99 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             CreateAndDeliveryMultipleInstructions(sut);
 
-            CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(true, LocalIdentity, DateTime.UtcNow.AddSeconds(-1));
+            CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(true, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), -1);
 
             Assert.Multiple(() =>
             {
                 Assert.AreEqual(0, result.LastId);
                 Assert.AreEqual(0, result.NumberOfInstructionsProcessed);
                 Assert.IsFalse(result.InstructionsWerePruned);
+            });
+        }
+
+        [Test]
+        public void Processes_Instructions_Only_Once()
+        {
+            // This test shows what's happening in issue #10112
+            // The DatabaseServerMessenger will run its sync operation every five seconds which calls CacheInstructionService.ProcessInstructions,
+            // which is why the CacheRefresherNotification keeps dispatching, because the cache instructions gets constantly processed.
+            var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
+            CreateAndDeliveryMultipleInstructions(sut);
+
+            var lastId = -1;
+            // Run once
+            CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(3, result.LastId);                          // 3 records found.
+                Assert.AreEqual(2, result.NumberOfInstructionsProcessed);   // 2 records processed (as one is for the same identity).
+                Assert.IsFalse(result.InstructionsWerePruned);
+            });
+
+            // DatabaseServerMessenger stores the LastID after ProcessInstructions has been run.
+            lastId = result.LastId;
+
+            // The instructions has now been processed and shouldn't be processed on the next call...
+            // Run again.
+            CacheInstructionServiceProcessInstructionsResult secondResult = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(0, secondResult.LastId);                          // No instructions was processed so LastId is 0, this is consistent with behavior from V8
+                Assert.AreEqual(0, secondResult.NumberOfInstructionsProcessed);   // Nothing was processed.
+                Assert.IsFalse(secondResult.InstructionsWerePruned);
+            });
+        }
+
+        [Test]
+        public void Processes_New_Instructions()
+        {
+            var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
+            CreateAndDeliveryMultipleInstructions(sut);
+
+            var lastId = -1;
+            CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+
+            Assert.AreEqual(3, result.LastId); // Make sure LastId is 3, the rest is tested in other test.
+            lastId = result.LastId;
+
+            // Add new instruction
+            List<RefreshInstruction> instructions = CreateInstructions();
+            sut.DeliverInstructions(instructions, AlternateIdentity);
+
+            CacheInstructionServiceProcessInstructionsResult secondResult = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(4, secondResult.LastId);
+                Assert.AreEqual(1, secondResult.NumberOfInstructionsProcessed);
+                Assert.IsFalse(secondResult.InstructionsWerePruned);
+            });
+        }
+
+        [Test]
+        public void Correct_ID_For_Instruction_With_Same_Identity()
+        {
+            var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
+            CreateAndDeliveryMultipleInstructions(sut);
+
+            var lastId = -1;
+            CacheInstructionServiceProcessInstructionsResult result = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+
+            Assert.AreEqual(3, result.LastId); // Make sure LastId is 3, the rest is tested in other test.
+            lastId = result.LastId;
+
+            // Add new instruction
+            List<RefreshInstruction> instructions = CreateInstructions();
+            sut.DeliverInstructions(instructions, LocalIdentity);
+
+            CacheInstructionServiceProcessInstructionsResult secondResult = sut.ProcessInstructions(false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+
+            Assert.Multiple(() =>
+            {
+                Assert.AreEqual(4, secondResult.LastId);
+                Assert.AreEqual(0, secondResult.NumberOfInstructionsProcessed);
+                Assert.IsFalse(secondResult.InstructionsWerePruned);
             });
         }
 
