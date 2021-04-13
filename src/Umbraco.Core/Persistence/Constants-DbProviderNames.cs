@@ -1,4 +1,4 @@
-﻿ // ReSharper disable once CheckNamespace
+ // ReSharper disable once CheckNamespace
 namespace Umbraco.Cms.Core
 {
     static partial class Constants
@@ -7,6 +7,7 @@ namespace Umbraco.Cms.Core
         {
             public const string SqlServer = "System.Data.SqlClient";
             public const string SqlCe = "System.Data.SqlServerCe.4.0";
+            public const string SQLite = "System.Data.SQLite";
         }
     }
 }

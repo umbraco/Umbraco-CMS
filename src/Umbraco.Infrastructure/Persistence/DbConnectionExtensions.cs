@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.Common;
 using System.Linq;
@@ -22,6 +22,14 @@ namespace Umbraco.Extensions
                 && builder["Data source"].ToString().InvariantContains(".sdf"))
             {
                 return Cms.Core.Constants.DbProviderNames.SqlCe;
+            }
+
+            // SQLite DB connection strings use .db file extensions
+            else if (allKeys.InvariantContains("Data Source")
+                //this dictionary is case insensitive
+                && builder["Data source"].ToString().InvariantContains(".db"))
+            {
+                return Cms.Core.Constants.DbProviderNames.SQLite;
             }
 
             return Cms.Core.Constants.DbProviderNames.SqlServer;
