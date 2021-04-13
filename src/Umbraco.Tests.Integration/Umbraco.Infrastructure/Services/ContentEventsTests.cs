@@ -39,7 +39,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         private class TestNotificationHandler :
             INotificationHandler<ContentCacheRefresherNotification>,
-            INotificationHandler<ContentDeletedNotification>
+            INotificationHandler<ContentDeletedNotification>,
+            INotificationHandler<ContentDeletingVersionsNotification>
         {
             public void Handle(ContentCacheRefresherNotification args)
             {
@@ -83,6 +84,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 };
                 _events.Add(e);
             }
+
+            public void Handle(ContentDeletingVersionsNotification notification)
+            {
+                // reports the event as : "ContentRepository/Remove/X:Y"
+                // where
+                // X is the event content ID
+                // Y is the event content version GUID
+                var e = new EventInstance
+                {
+                    Message = _msgCount++,
+                    Sender = "ContentRepository",
+                    EventArgs = null, // Notification has no args
+                    Name = "RemoveVersion",
+                    Args = $"{notification.Id}:{notification.SpecificVersion}"
+                };
+                _events.Add(e);
+            }
         }
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
@@ -91,6 +109,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             builder
                 .AddNotificationHandler<ContentCacheRefresherNotification, TestNotificationHandler>()
                 .AddNotificationHandler<ContentDeletedNotification, TestNotificationHandler>()
+                .AddNotificationHandler<ContentDeletingVersionsNotification, TestNotificationHandler>()
                 ;
         }
 
@@ -103,7 +122,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             _events = new List<EventInstance>();
 
             DocumentRepository.ScopedEntityRefresh += ContentRepositoryRefreshed;
-            DocumentRepository.ScopeVersionRemove += ContentRepositoryRemovedVersion;
 
             // prepare content type
             Template template = TemplateBuilder.CreateTextPageTemplate();
@@ -122,7 +140,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             // Clear ALL events
             DocumentRepository.ScopedEntityRefresh -= ContentRepositoryRefreshed;
-            DocumentRepository.ScopeVersionRemove -= ContentRepositoryRemovedVersion;
         }
 
         private DistributedCacheBinder _distributedCacheBinder;

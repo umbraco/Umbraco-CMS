@@ -833,20 +833,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         public static event TypedEventHandler<TRepository, ScopedEntityEventArgs> ScopedEntityRefresh;
 
-        /// <summary>
-        /// Occurs when a version for an <see cref="TEntity"/> is being deleted from within the <see cref="IScope"/> (transaction)
-        /// </summary>
-        /// <remarks>
-        /// TODO: This doesn't seem to be necessary at all, the service "DeletingVersions" events for this would work just fine
-        /// since they are raised before the item is actually deleted just like this event.
-        /// </remarks>
-        public static event TypedEventHandler<TRepository, ScopedVersionEventArgs> ScopeVersionRemove;
-
         // used by tests to clear events
         internal static void ClearScopeEvents()
         {
             ScopedEntityRefresh = null;
-            ScopeVersionRemove = null;
         }
 
         /// <summary>
@@ -854,12 +844,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         protected void OnUowRefreshedEntity(ScopedEntityEventArgs args)
             => ScopedEntityRefresh.RaiseEvent(args, This);
-
-        /// <summary>
-        /// Raises the <see cref="ScopeVersionRemove"/> event
-        /// </summary>
-        protected void OnUowRemovingVersion(ScopedVersionEventArgs args)
-            => ScopeVersionRemove.RaiseEvent(args, This);
 
         #endregion
 

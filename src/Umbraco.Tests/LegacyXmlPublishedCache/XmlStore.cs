@@ -46,7 +46,9 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         IDisposable,
         INotificationHandler<ContentDeletingNotification>,
         INotificationHandler<MediaDeletingNotification>,
-        INotificationHandler<MemberDeletingNotification>
+        INotificationHandler<MemberDeletingNotification>,
+        INotificationHandler<ContentDeletingVersionsNotification>,
+        INotificationHandler<MediaDeletingVersionsNotification>
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
@@ -195,11 +197,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             // plug repository event handlers
             // these trigger within the transaction to ensure consistency
             // and are used to maintain the central, database-level XML cache
-            DocumentRepository.ScopeVersionRemove += OnContentRemovingVersion;
             DocumentRepository.ScopedEntityRefresh += OnContentRefreshedEntity;
-            MediaRepository.ScopeVersionRemove += OnMediaRemovingVersion;
             MediaRepository.ScopedEntityRefresh += OnMediaRefreshedEntity;
-            MemberRepository.ScopeVersionRemove += OnMemberRemovingVersion;
             MemberRepository.ScopedEntityRefresh += OnMemberRefreshedEntity;
 
             // plug
@@ -211,11 +210,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private void ClearEvents()
         {
-            DocumentRepository.ScopeVersionRemove -= OnContentRemovingVersion;
             DocumentRepository.ScopedEntityRefresh -= OnContentRefreshedEntity;
-            MediaRepository.ScopeVersionRemove -= OnMediaRemovingVersion;
             MediaRepository.ScopedEntityRefresh -= OnMediaRefreshedEntity;
-            MemberRepository.ScopeVersionRemove -= OnMemberRemovingVersion;
             MemberRepository.ScopedEntityRefresh -= OnMemberRefreshedEntity;
 
             ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
@@ -1511,19 +1507,14 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             // note: could be optimized by using "WHERE nodeId IN (...)" delete clauses
         }
 
-        private static void OnContentRemovingVersion(DocumentRepository sender, DocumentRepository.ScopedVersionEventArgs args)
+        public void Handle(ContentDeletingVersionsNotification notification)
         {
-            OnRemovedVersion(args.Scope.Database, args.EntityId, args.VersionId);
+            OnRemovedVersion(null, notification.Id, notification.SpecificVersion);
         }
 
-        private static void OnMediaRemovingVersion(MediaRepository sender, MediaRepository.ScopedVersionEventArgs args)
+        public void Handle(MediaDeletingVersionsNotification notification)
         {
-            OnRemovedVersion(args.Scope.Database, args.EntityId, args.VersionId);
-        }
-
-        private static void OnMemberRemovingVersion(MemberRepository sender, MemberRepository.ScopedVersionEventArgs args)
-        {
-            OnRemovedVersion(args.Scope.Database, args.EntityId, args.VersionId);
+            OnRemovedVersion(null, notification.Id, notification.SpecificVersion);
         }
 
         private static void OnRemovedVersion(IUmbracoDatabase db, int entityId, int versionId)

@@ -237,9 +237,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PerformDeleteVersion(int id, int versionId)
         {
-            // raise event first else potential FK issues
-            OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
-
             Database.Delete<PropertyDataDto>("WHERE versionId = @VersionId", new { versionId });
             Database.Delete<ContentVersionDto>("WHERE versionId = @VersionId", new { versionId });
         }
