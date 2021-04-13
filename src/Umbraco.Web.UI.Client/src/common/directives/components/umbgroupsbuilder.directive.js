@@ -399,14 +399,22 @@
                 scope.model.tabs = [...scope.model.tabs, tab];
 
                 scope.openTabId = tab.id;
+
+                scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
+                scope.$broadcast('umbOverflowChecker.checkOverflow');
             };
 
             scope.removeTab = function (index) {
                 scope.model.tabs.splice(index, 1);
+                scope.$broadcast('umbOverflowChecker.checkOverflow');
             };
 
             scope.canRemoveTab = function (tab) {
                 return tab.inherited !== true;
+            };
+
+            scope.setTabOverflowState = function (overflowLeft, overflowRight) {
+                scope.overflow = { left: overflowLeft, right: overflowRight };
             };
 
             scope.onChangeTabSortOrderValue = function (tab) {

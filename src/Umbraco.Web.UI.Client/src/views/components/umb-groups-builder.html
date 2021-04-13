@@ -32,38 +32,46 @@
 
     </umb-editor-sub-header>
 
-    <div ng-if="sortingMode && model.groups.length <= 1" class="umb-group-builder__no-data-text">
-        <localize key="contentTypeEditor_noGroups"></localize>
-    </div>
-
     <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>
     <a ng-if="!sortingMode" hotkey="alt+shift+g" ng-click="addGroupToActiveTab()"></a>
 
-    <ul ng-if="(sortingMode && model.tabs.length > 0) || (!sortingMode)" class="umb-group-builder__tabs" ui-sortable="sortableOptionsTab" ng-model="model.tabs">
-        <li ng-repeat="(tabIndex, tab) in model.tabs track by tab.id" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-id="{{tab.id}}" val-groups-in-tab="{ tab: tab, groups: model.groups }">
-            <umb-content-type-tab
-                tab="tab"
-                is-open="tab.id === openTabId"
-                on-click="changeTab(tab)"
-                sorting="sortingMode"
-                allow-remove="canRemoveTab(tab) && !sortingMode"
-                on-remove="removeTab(tabIndex)"
-                val-server-field-name="{{'Tabs[' + $index + '].Name'}}"
-                on-change-sort-order-value="onChangeTabSortOrderValue(tab)">
-            </umb-content-type-tab>
-        </li>
-        <li>
-            <button
-                ng-if="!sortingMode"
-                type="button"
-                hotkey="alt+shift+a"
-                ng-click="addTab(tab)"
-                data-element="tab-add"
-                class="btn-reset umb-group-builder__tab umb-group-builder__tab--placeholder">
-                Add tab
-            </button>
-        </li>
-    </ul>
+    <div class="umb-group-builder__tabs" ng-if="(sortingMode && model.tabs.length > 0) || (!sortingMode)">
+        <div ng-show="overflow.left > 0" class="umb-group-builder__tabs-overflow umb-group-builder__tabs-overflow--left">
+            <span class="caret"></span>
+        </div>
+        <ul class="umb-group-builder__tabs-list" ui-sortable="sortableOptionsTab" ng-model="model.tabs" umb-overflow-checker on-overflow="setTabOverflowState(overflowLeft, overflowRight)">
+            <li ng-repeat="(tabIndex, tab) in model.tabs track by tab.id" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-id="{{tab.id}}" val-groups-in-tab="{ tab: tab, groups: model.groups }">
+                <umb-content-type-tab
+                    tab="tab"
+                    is-open="tab.id === openTabId"
+                    on-click="changeTab(tab)"
+                    sorting="sortingMode"
+                    allow-remove="canRemoveTab(tab) && !sortingMode"
+                    on-remove="removeTab(tabIndex)"
+                    val-server-field-name="{{'Tabs[' + $index + '].Name'}}"
+                    on-change-sort-order-value="onChangeTabSortOrderValue(tab)">
+                </umb-content-type-tab>
+            </li>
+            <li>
+                <button
+                    ng-if="!sortingMode"
+                    type="button"
+                    hotkey="alt+shift+a"
+                    ng-click="addTab(tab)"
+                    data-element="tab-add"
+                    class="btn-reset umb-group-builder__tab umb-group-builder__tab--placeholder">
+                    Add tab
+                </button>
+            </li>
+        </ul>
+        <div ng-show="overflow.right < 0" class="umb-group-builder__tabs-overflow umb-group-builder__tabs-overflow--right">
+            <span class="caret"></span>
+        </div>
+    </div>
+
+    <div ng-if="sortingMode && model.groups.length === 0" class="umb-group-builder__no-data-text">
+        <localize key="contentTypeEditor_noGroups"></localize>
+    </div>
 
     <div class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
         <div ng-repeat="(groupIndex, group) in model.groups track by group.id" ng-show="group.tabId === openTabId" ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}" data-group-id="{{group.id}}">
