@@ -397,13 +397,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
         }
 
-        protected override void PersistDeletedItem(IMember entity)
-        {
-            // raise event first else potential FK issues
-            OnUowRemovingEntity(new ScopedEntityEventArgs(AmbientScope, entity));
-            base.PersistDeletedItem(entity);
-        }
-
         #endregion
 
         public IEnumerable<IMember> FindMembersInRole(string roleName, string usernameToMatch, StringPropertyMatchType matchType = StringPropertyMatchType.StartsWith)

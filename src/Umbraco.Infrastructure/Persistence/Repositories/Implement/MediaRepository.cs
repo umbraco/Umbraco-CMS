@@ -375,13 +375,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
         }
 
-        protected override void PersistDeletedItem(IMedia entity)
-        {
-            // raise event first else potential FK issues
-            OnUowRemovingEntity(new ScopedEntityEventArgs(AmbientScope, entity));
-            base.PersistDeletedItem(entity);
-        }
-
         #endregion
 
         #region Recycle Bin
@@ -407,10 +400,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _mediaByGuidReadRepository.Exists(id);
         }
 
-        
+
         // A reading repository purely for looking up by GUID
         // TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
-        // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this        
+        // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
         private class MediaByGuidReadRepository : EntityRepositoryBase<Guid, IMedia>
         {
             private readonly MediaRepository _outerRepo;

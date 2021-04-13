@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
@@ -17,12 +18,21 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     /// <summary>
     /// Subscribes to Umbraco events to ensure nucache remains consistent with the source data
     /// </summary>
-    public class PublishedSnapshotServiceEventHandler : IDisposable, INotificationHandler<LanguageSavedNotification>
+    public class PublishedSnapshotServiceEventHandler :
+        IDisposable,
+        INotificationHandler<LanguageSavedNotification>,
+        INotificationHandler<ContentDeletingNotification>,
+        INotificationHandler<MediaDeletingNotification>,
+        INotificationHandler<MemberDeletingNotification>,
+        INotificationHandler<ContentEmptyingRecycleBinNotification>,
+        INotificationHandler<MediaEmptyingRecycleBinNotification>
     {
         private readonly IRuntimeState _runtime;
         private bool _disposedValue;
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly INuCacheContentService _publishedContentService;
+        private readonly IContentService _contentService;
+        private readonly IMediaService _mediaService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedSnapshotServiceEventHandler"/> class.
@@ -30,11 +40,15 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public PublishedSnapshotServiceEventHandler(
             IRuntimeState runtime,
             IPublishedSnapshotService publishedSnapshotService,
-            INuCacheContentService publishedContentService)
+            INuCacheContentService publishedContentService,
+            IContentService contentService,
+            IMediaService mediaService)
         {
             _runtime = runtime;
             _publishedSnapshotService = publishedSnapshotService;
             _publishedContentService = publishedContentService;
+            _contentService = contentService;
+            _mediaService = mediaService;
         }
 
         /// <summary>
@@ -69,11 +83,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             // plug repository event handlers
             // these trigger within the transaction to ensure consistency
             // and are used to maintain the central, database-level XML cache
-            DocumentRepository.ScopeEntityRemove += OnContentRemovingEntity;
             DocumentRepository.ScopedEntityRefresh += DocumentRepository_ScopedEntityRefresh;
-            MediaRepository.ScopeEntityRemove += OnMediaRemovingEntity;
             MediaRepository.ScopedEntityRefresh += MediaRepository_ScopedEntityRefresh;
-            MemberRepository.ScopeEntityRemove += OnMemberRemovingEntity;
             MemberRepository.ScopedEntityRefresh += MemberRepository_ScopedEntityRefresh;
 
             // plug
@@ -84,11 +95,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         private void TearDownRepositoryEvents()
         {
-            DocumentRepository.ScopeEntityRemove -= OnContentRemovingEntity;
             DocumentRepository.ScopedEntityRefresh -= DocumentRepository_ScopedEntityRefresh;
-            MediaRepository.ScopeEntityRemove -= OnMediaRemovingEntity;
             MediaRepository.ScopedEntityRefresh -= MediaRepository_ScopedEntityRefresh;
-            MemberRepository.ScopeEntityRemove -= OnMemberRemovingEntity;
             MemberRepository.ScopedEntityRefresh -= MemberRepository_ScopedEntityRefresh;
             ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
             MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
@@ -102,14 +110,46 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // we need them to be "repository" events ie to trigger from within the repository transaction,
         // because they need to be consistent with the content that is being refreshed/removed - and that
         // should be guaranteed by a DB transaction
-        private void OnContentRemovingEntity(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
-            => _publishedContentService.DeleteContentItem(args.Entity);
+        public void Handle(ContentDeletingNotification notification) => HandleContentEntitiesDeleted(notification.DeletedEntities);
 
-        private void OnMediaRemovingEntity(MediaRepository sender, MediaRepository.ScopedEntityEventArgs args)
-            => _publishedContentService.DeleteContentItem(args.Entity);
+        public void Handle(ContentEmptyingRecycleBinNotification notification) => HandleContentEntitiesDeleted(notification.DeletedEntities);
 
-        private void OnMemberRemovingEntity(MemberRepository sender, MemberRepository.ScopedEntityEventArgs args)
-            => _publishedContentService.DeleteContentItem(args.Entity);
+        public void Handle(MediaDeletingNotification notification) => HandleMediaEntitiesDeleted(notification.DeletedEntities);
+
+        public void Handle(MediaEmptyingRecycleBinNotification notification) => HandleMediaEntitiesDeleted(notification.DeletedEntities);
+
+        public void Handle(MemberDeletingNotification notification) => _publishedContentService.DeleteContentItems(notification.DeletedEntities);
+
+        private void HandleContentEntitiesDeleted(IEnumerable<IContentBase> entities)
+        {
+            var entitiesToDelete = new HashSet<IContentBase>();
+            foreach (IContentBase entity in entities)
+            {
+                IEnumerable<IContent> descendants =
+                    _contentService.GetPagedDescendants(entity.Id, 0, int.MaxValue, out long totalRecords);
+                entitiesToDelete.Add(entity);
+                foreach (IContent descendant in descendants)
+                {
+                    entitiesToDelete.Add(descendant);
+                }
+            }
+            _publishedContentService.DeleteContentItems(entitiesToDelete);
+        }
+
+        private void HandleMediaEntitiesDeleted(IEnumerable<IContentBase> entities)
+        {
+            var entitiesToDelete = new HashSet<IContentBase>();
+            foreach (IContentBase entity in entities)
+            {
+                IEnumerable<IMedia> descendants = _mediaService.GetPagedDescendants(entity.Id, 0, int.MaxValue, out long totalRecords);
+                entitiesToDelete.Add(entity);
+                foreach (IMedia descendant in descendants)
+                {
+                    entitiesToDelete.Add(descendant);
+                }
+            }
+            _publishedContentService.DeleteContentItems(entitiesToDelete);
+        }
 
         private void MemberRepository_ScopedEntityRefresh(MemberRepository sender, ContentRepositoryBase<int, IMember, MemberRepository>.ScopedEntityEventArgs e)
             => _publishedContentService.RefreshEntity(e.Entity);

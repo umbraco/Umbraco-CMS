@@ -2070,28 +2070,24 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.ContentTree);
 
-                // v7 EmptyingRecycleBin and EmptiedRecycleBin events are greatly simplified since
-                // each deleted items will have its own deleting/deleted events. so, files and such
-                // are managed by Delete, and not here.
+                // emptying the recycle bin means deleting whatever is in there - do it properly!
+                var query = Query<IContent>().Where(x => x.ParentId == Cms.Core.Constants.System.RecycleBinContent);
+                var contents = _documentRepository.Get(query).ToArray();
 
-                // no idea what those events are for, keep a simplified version
-                var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(evtMsgs);
+                var emptyingRecycleBinNotification = new ContentEmptyingRecycleBinNotification(contents, evtMsgs);
                 if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(evtMsgs);
                 }
 
-                // emptying the recycle bin means deleting whatever is in there - do it properly!
-                var query = Query<IContent>().Where(x => x.ParentId == Cms.Core.Constants.System.RecycleBinContent);
-                var contents = _documentRepository.Get(query).ToArray();
                 foreach (var content in contents)
                 {
                     DeleteLocked(scope, content, evtMsgs);
                     deleted.Add(content);
                 }
 
-                scope.Notifications.Publish(new ContentEmptiedRecycleBinNotification(evtMsgs).WithStateFrom(emptyingRecycleBinNotification));
+                scope.Notifications.Publish(new ContentEmptiedRecycleBinNotification(deleted, evtMsgs).WithStateFrom(emptyingRecycleBinNotification));
                 scope.Events.Dispatch(TreeChanged, this, deleted.Select(x => new TreeChange<IContent>(x, TreeChangeTypes.Remove)).ToEventArgs());
                 Audit(AuditType.Delete, userId, Cms.Core.Constants.System.RecycleBinContent, "Recycle bin emptied");
 

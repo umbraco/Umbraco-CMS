@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -20,6 +21,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -40,7 +42,11 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     /// then passed to all <see cref="PublishedContentCache"/> instances that are created (one per request).</para>
     /// <para>This class should *not* be public.</para>
     /// </remarks>
-    internal class XmlStore : IDisposable
+    internal class XmlStore :
+        IDisposable,
+        INotificationHandler<ContentDeletingNotification>,
+        INotificationHandler<MediaDeletingNotification>,
+        INotificationHandler<MemberDeletingNotification>
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
@@ -189,13 +195,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             // plug repository event handlers
             // these trigger within the transaction to ensure consistency
             // and are used to maintain the central, database-level XML cache
-            DocumentRepository.ScopeEntityRemove += OnContentRemovingEntity;
             DocumentRepository.ScopeVersionRemove += OnContentRemovingVersion;
             DocumentRepository.ScopedEntityRefresh += OnContentRefreshedEntity;
-            MediaRepository.ScopeEntityRemove += OnMediaRemovingEntity;
             MediaRepository.ScopeVersionRemove += OnMediaRemovingVersion;
             MediaRepository.ScopedEntityRefresh += OnMediaRefreshedEntity;
-            MemberRepository.ScopeEntityRemove += OnMemberRemovingEntity;
             MemberRepository.ScopeVersionRemove += OnMemberRemovingVersion;
             MemberRepository.ScopedEntityRefresh += OnMemberRefreshedEntity;
 
@@ -208,13 +211,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private void ClearEvents()
         {
-            DocumentRepository.ScopeEntityRemove -= OnContentRemovingEntity;
             DocumentRepository.ScopeVersionRemove -= OnContentRemovingVersion;
             DocumentRepository.ScopedEntityRefresh -= OnContentRefreshedEntity;
-            MediaRepository.ScopeEntityRemove -= OnMediaRemovingEntity;
             MediaRepository.ScopeVersionRemove -= OnMediaRemovingVersion;
             MediaRepository.ScopedEntityRefresh -= OnMediaRefreshedEntity;
-            MemberRepository.ScopeEntityRemove -= OnMemberRemovingEntity;
             MemberRepository.ScopeVersionRemove -= OnMemberRemovingVersion;
             MemberRepository.ScopedEntityRefresh -= OnMemberRefreshedEntity;
 
@@ -1475,19 +1475,31 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         // it is not the case at the moment, instead a global lock is used whenever content is modified - well,
         // almost: rollback or unpublish do not implement it - nevertheless
 
-        private static void OnContentRemovingEntity(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
+        public void Handle(ContentDeletingNotification notification)
         {
-            OnRemovedEntity(args.Scope.Database, args.Entity);
+            foreach (IContent entity in notification.DeletedEntities)
+            {
+                // We used to do args.Scope.Database, but can't any more because it's not supported by the notification pattern
+                OnRemovedEntity(null, entity);
+            }
         }
 
-        private static void OnMediaRemovingEntity(MediaRepository sender, MediaRepository.ScopedEntityEventArgs args)
+        public void Handle(MediaDeletingNotification notification)
         {
-            OnRemovedEntity(args.Scope.Database, args.Entity);
+            foreach (IMedia entity in notification.DeletedEntities)
+            {
+                // We used to do args.Scope.Database, but can't any more because it's not supported by the notification pattern
+                OnRemovedEntity(null, entity);
+            }
         }
 
-        private static void OnMemberRemovingEntity(MemberRepository sender, MemberRepository.ScopedEntityEventArgs args)
+        public void Handle(MemberDeletingNotification notification)
         {
-            OnRemovedEntity(args.Scope.Database, args.Entity);
+            foreach (IMember entity in notification.DeletedEntities)
+            {
+                // We used to do args.Scope.Database, but can't any more because it's not supported by the notification pattern
+                OnRemovedEntity(null, entity);
+            }
         }
 
         private static void OnRemovedEntity(IUmbracoDatabase db, IContentBase item)

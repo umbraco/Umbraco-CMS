@@ -779,7 +779,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
          * The reason these events 'need' to fire in the transaction is to ensure data consistency with Nucache (currently
          * the only thing that uses them). For example, if the transaction succeeds and NuCache listened to ContentService.Saved
          * and then NuCache failed at persisting data after the trans completed, then NuCache would be out of sync. This way
-         * the entire trans is rolled back if NuCache files. This is part of the discussion about removing the static events,
+         * the entire trans is rolled back if NuCache fails. This is part of the discussion about removing the static events,
          * possibly there's 3 levels of eventing, "ing", "scoped" (in trans) and "ed" (after trans).
          * These particular events can be moved to the service level. However, see the notes below, it seems the only event we
          * really need is the ScopedEntityRefresh. The only tricky part with moving that to the service level is that the
@@ -834,15 +834,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public static event TypedEventHandler<TRepository, ScopedEntityEventArgs> ScopedEntityRefresh;
 
         /// <summary>
-        /// Occurs when an <see cref="TEntity"/> is being deleted from within the <see cref="IScope"/> (transaction)
-        /// </summary>
-        /// <remarks>
-        /// TODO: This doesn't seem to be necessary at all, the service "Deleting" events for this would work just fine
-        /// since they are raised before the item is actually deleted just like this event.
-        /// </remarks>
-        public static event TypedEventHandler<TRepository, ScopedEntityEventArgs> ScopeEntityRemove;
-
-        /// <summary>
         /// Occurs when a version for an <see cref="TEntity"/> is being deleted from within the <see cref="IScope"/> (transaction)
         /// </summary>
         /// <remarks>
@@ -855,7 +846,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         internal static void ClearScopeEvents()
         {
             ScopedEntityRefresh = null;
-            ScopeEntityRemove = null;
             ScopeVersionRemove = null;
         }
 
@@ -864,12 +854,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         protected void OnUowRefreshedEntity(ScopedEntityEventArgs args)
             => ScopedEntityRefresh.RaiseEvent(args, This);
-
-        /// <summary>
-        /// Raises the <see cref="ScopeEntityRemove"/> event
-        /// </summary>
-        protected void OnUowRemovingEntity(ScopedEntityEventArgs args)
-            => ScopeEntityRemove.RaiseEvent(args, This);
 
         /// <summary>
         /// Raises the <see cref="ScopeVersionRemove"/> event
