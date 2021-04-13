@@ -82,8 +82,6 @@
                 }
             });
 
-            console.log(focalPointElement.draggable)
-
             window.addEventListener('resize.umbImageGravity', onResizeHandler);
             window.addEventListener('resize', onResizeHandler);
 
@@ -211,7 +209,8 @@
             src: "<",
             center: "<",
             onImageLoaded: "&?",
-            onValueChanged: "&"
+            onValueChanged: "&",
+            disableFocalPoint: "<?"
         },
         controllerAs: 'vm',
         controller: umbImageGravityController

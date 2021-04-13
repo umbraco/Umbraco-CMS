@@ -62,6 +62,7 @@
                                 ng-if="vm.imageSrc"
                                 src="vm.imageSrc"
                                 center="vm.mediaEntry.focalPoint"
+                                disable-focal-point="!vm.model.enableFocalPointSetter"
                                 on-value-changed="vm.focalPointChanged(left, top)"
                                 on-image-loaded="vm.onImageLoaded(isCroppable, hasDimensions)">
                             </umb-image-gravity>

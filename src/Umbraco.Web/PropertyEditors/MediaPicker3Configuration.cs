@@ -38,7 +38,10 @@ namespace Umbraco.Web.PropertyEditors
             Description = "Selecting this option allows a user to choose nodes that they normally don't have access to.")]
         public bool IgnoreUserStartNodes { get; set; }
 
-        [ConfigurationField("crops", "Image Croppings", "views/propertyeditors/MediaPicker3/prevalue/mediapicker3.crops.html", Description = "Local croppings, stored on document")]
+        [ConfigurationField("enableLocalFocalPoint", "Enable Focal Point", "boolean")]
+        public bool EnableLocalFocalPoint { get; set; }
+
+        [ConfigurationField("crops", "Image Crops", "views/propertyeditors/MediaPicker3/prevalue/mediapicker3.crops.html", Description = "Local crops, stored on document")]
         public CropConfiguration[] Crops { get; set; }
 
         public class CropConfiguration

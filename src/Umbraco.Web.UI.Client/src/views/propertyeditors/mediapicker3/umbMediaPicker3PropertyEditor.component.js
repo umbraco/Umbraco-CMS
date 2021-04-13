@@ -289,6 +289,7 @@
                     changeMediaFor: changeMediaFor,
                     resetCrop: resetCrop
                 },
+                enableFocalPointSetter: vm.model.config.enableLocalFocalPoint || false,
                 view: "views/common/infiniteeditors/mediaEntryEditor/mediaEntryEditor.html",
                 size: "large",
                 submit: function(model) {
