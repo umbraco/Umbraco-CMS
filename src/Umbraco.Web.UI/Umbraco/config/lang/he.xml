@@ -181,7 +181,7 @@
     <key alias="recycleBinDeleting">הפריטים הנמצאים בסל המיחזור נמחקים כעת, השאר חלון זה פתוח עד לגמר פעולת המחיקה.</key>
     <key alias="recycleBinIsEmpty">סל המיחזור ריק כעת</key>
     <key alias="recycleBinWarning">מחיקת פריטים מסל המיחזור תמחוק את הפריטים לצמיתות</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
     <key alias="regexSearchHelp">חיפוש ביטויים להוספת אימות עבור שדות טופס. לדוגמא: 'כתובת אימייל', 'מיקוד', 'כתובת אתר' ועוד</key>
     <key alias="removeMacro">הסר מאקרו</key>
     <key alias="requiredField">שדה חובה</key>
@@ -449,7 +449,7 @@ Get help from our award winning community, browse the documentation or watch som
     <key alias="theEndInstallSuccess"><![CDATA[You can get <strong>started instantly</strong> by clicking the "Launch Umbraco" button below. <br />If you are <strong>new to Umbraco</strong>,
 you can find plenty of resources on our getting started pages.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Launch Umbraco</h3>
-To manage your website, simply open the Umbraco back office and start adding content, updating the templates and stylesheets or add new functionality]]></key>
+To manage your website, simply open the Umbraco backoffice and start adding content, updating the templates and stylesheets or add new functionality]]></key>
     <key alias="Unavailable">ההתחברות לבסיס הנתונים נכשלה.</key>
     <key alias="Version3">Umbraco גירסה 3</key>
     <key alias="Version4">Umbraco גירסה 4</key>
@@ -467,7 +467,7 @@ To manage your website, simply open the Umbraco back office and start adding con
     <key alias="renewSession">יש לבצע חידוש פעילות על מנת לשמור על התוכן</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">לוח הבקרה</key>
