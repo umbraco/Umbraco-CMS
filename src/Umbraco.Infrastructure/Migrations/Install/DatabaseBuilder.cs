@@ -80,8 +80,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// </summary>
         public bool CanConnect(string databaseType, string connectionString, string server, string database, string login, string password, bool integratedAuth)
         {
-            // we do not test SqlCE connection
-            if (databaseType.InvariantContains("sqlce"))
+            // we do not test SqlCE or SQLite connection
+            if (databaseType.InvariantContains("sqlce") || databaseType.InvariantContains("sqlite"))
                 return true;
 
             string providerName;
