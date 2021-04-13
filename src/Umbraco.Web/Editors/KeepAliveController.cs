@@ -1,8 +1,6 @@
 ﻿using System.Runtime.Serialization;
 using System.Web.Http;
-using Umbraco.Web.Mvc;
 using Umbraco.Web.WebApi;
-using Umbraco.Web.WebApi.Filters;
 
 namespace Umbraco.Web.Editors
 {
