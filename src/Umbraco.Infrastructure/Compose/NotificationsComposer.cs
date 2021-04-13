@@ -5,11 +5,9 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Compose
@@ -82,8 +80,17 @@ namespace Umbraco.Cms.Core.Compose
                 .AddNotificationHandler<MemberGroupDeletedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<MemberGroupSavedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<DataTypeDeletedNotification, DistributedCacheBinder>()
-                .AddNotificationHandler<DataTypeSavedNotification, DistributedCacheBinder>();
-
+                .AddNotificationHandler<DataTypeSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<TemplateDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<TemplateSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<RelationTypeDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<RelationTypeSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<DomainDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<DomainSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MacroSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MacroDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MediaTreeChangeNotification, DistributedCacheBinder>()
+                ;
             // add notification handlers for auditing
             builder
                 .AddNotificationHandler<MemberSavedNotification, AuditNotificationsHandler>()

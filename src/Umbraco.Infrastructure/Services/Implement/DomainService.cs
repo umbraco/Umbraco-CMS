@@ -4,6 +4,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Notifications;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -28,25 +29,24 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult> Delete(IDomain domain)
         {
-            var evtMsgs = EventMessagesFactory.Get();
+            EventMessages eventMessages = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<IDomain>(domain, evtMsgs);
-                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                var deletingNotification = new DomainDeletingNotification(domain, eventMessages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
-                    return OperationResult.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(eventMessages);
                 }
 
                 _domainRepository.Delete(domain);
                 scope.Complete();
 
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Deleted, this, deleteEventArgs);
+                scope.Notifications.Publish(new DomainDeletedNotification(domain, eventMessages).WithStateFrom(deletingNotification));
             }
 
-            return OperationResult.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(eventMessages);
         }
 
         public IDomain GetByName(string name)
@@ -83,48 +83,23 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult> Save(IDomain domainEntity)
         {
-            var evtMsgs = EventMessagesFactory.Get();
+            EventMessages eventMessages = EventMessagesFactory.Get();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IDomain>(domainEntity, evtMsgs);
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                var savingNotification = new DomainSavingNotification(domainEntity, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
-                    return OperationResult.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(eventMessages);
                 }
 
                 _domainRepository.Save(domainEntity);
                 scope.Complete();
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs);
+                scope.Notifications.Publish(new DomainSavedNotification(domainEntity, eventMessages).WithStateFrom(savingNotification));
             }
 
-            return OperationResult.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(eventMessages);
         }
-
-        #region Event Handlers
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IDomainService, DeleteEventArgs<IDomain>> Deleting;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IDomainService, DeleteEventArgs<IDomain>> Deleted;
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IDomainService, SaveEventArgs<IDomain>> Saving;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IDomainService, SaveEventArgs<IDomain>> Saved;
-
-
-        #endregion
     }
 }

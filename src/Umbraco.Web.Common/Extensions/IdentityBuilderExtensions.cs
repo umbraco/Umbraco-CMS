@@ -20,6 +20,7 @@ namespace Umbraco.Extensions
         {
             identityBuilder.AddUserManager<TUserManager>();
             identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TUserManager));
+            identityBuilder.Services.AddScoped(typeof(UserManager<MemberIdentityUser>), factory => factory.GetRequiredService<TInterface>());
             return identityBuilder;
         }
 
