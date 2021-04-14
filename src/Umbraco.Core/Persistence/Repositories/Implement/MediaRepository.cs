@@ -377,7 +377,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var cacheKey = CacheKeys.MediaRecycleBinCacheKey;
 
             // always cache either true or false
-            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(Constants.System.RecycleBinMedia) > 0);
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(RecycleBinId) > 0);
         }
 
         #endregion
