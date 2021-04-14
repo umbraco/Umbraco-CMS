@@ -73,7 +73,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 new BackOfficeIdentityErrorDescriber(),
                 _mockServiceProviders.Object,
                 new Mock<ILogger<UserManager<MemberIdentityUser>>>().Object,
-                _mockPasswordConfiguration.Object);
+                _mockPasswordConfiguration.Object,
+                Mock.Of<IPublicAccessService>(),
+                Mock.Of<IHttpContextAccessor>());
 
             validator.Setup(v => v.ValidateAsync(
                     userManager,

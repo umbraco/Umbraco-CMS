@@ -137,7 +137,6 @@
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Macros\MemberUserKeyProvider.cs" />
-    <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Security\BackOfficeSecurity.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
@@ -182,7 +181,6 @@
     <Compile Include="UrlHelperRenderExtensions.cs" />
     <Compile Include="WebApi\IsBackOfficeAttribute.cs" />
     <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
-    <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\NamespaceHttpControllerSelector.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerBase.cs" />

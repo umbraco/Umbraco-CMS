@@ -1,9 +1,10 @@
-﻿using System.Xml.XPath;
+using System.Xml.XPath;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.PublishedCache
 {
+    // TODO: Kill this, why do we want this at all?
     public interface IPublishedMemberCache : IXPathNavigable
     {
         IPublishedContent GetByProviderKey(object key);
