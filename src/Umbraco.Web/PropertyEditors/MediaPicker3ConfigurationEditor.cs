@@ -22,8 +22,6 @@ namespace Umbraco.Web.PropertyEditors
 
             Field(nameof(MediaPicker3Configuration.Filter))
                 .Config = new Dictionary<string, object> { { "itemType", "media" } };
-
         }
-
     }
 }

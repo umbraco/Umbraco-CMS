@@ -31,7 +31,7 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
 
         /// <summary>
         /// It is a converter for any value type that is "JSON"
-        /// Unless its in the Excluded Property Editors list
+        /// Unless it's in the Excluded Property Editors list
         /// The new MediaPicker 3 stores JSON but we want to use its own ValueConvertor
         /// </summary>
         /// <param name="propertyType"></param>

@@ -6,7 +6,6 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
-using Umbraco.Web.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web
 {

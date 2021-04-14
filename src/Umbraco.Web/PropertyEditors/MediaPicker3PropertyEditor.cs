@@ -17,8 +17,6 @@ namespace Umbraco.Web.PropertyEditors
         Icon = Constants.Icons.MediaImage)]
     public class MediaPicker3PropertyEditor : DataEditor
     {
-
-
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaPicker3PropertyEditor"/> class.
         /// </summary>
@@ -35,7 +33,7 @@ namespace Umbraco.Web.PropertyEditors
         internal class MediaPicker3PropertyValueEditor : DataValueEditor
         {
             ///<remarks>
-            /// Note no FromEditor() and ToEditor() methods
+            /// Note: no FromEditor() and ToEditor() methods
             /// We do not want to transform the way the data is stored in the DB and would like to keep a raw JSON string
             /// </remarks>
             public MediaPicker3PropertyValueEditor(DataEditorAttribute attribute) : base(attribute)
@@ -47,11 +45,6 @@ namespace Umbraco.Web.PropertyEditors
             //{
             //    throw new NotImplementedException();
             //}    
-
         }
-
-
-
     }
-
 }

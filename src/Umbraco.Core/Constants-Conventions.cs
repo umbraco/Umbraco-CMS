@@ -119,7 +119,7 @@ namespace Umbraco.Core
                 public const string Image = "Image";
 
                 /// <summary>
-                /// MediaType alias for an video-.
+                /// MediaType alias for a video.
                 /// </summary>
                 public const string Video = "Video";
 
@@ -134,7 +134,7 @@ namespace Umbraco.Core
                 public const string Article = "Article";
 
                 /// <summary>
-                /// MediaType alias for an vector graphics.
+                /// MediaType alias for vector graphics.
                 /// </summary>
                 public const string VectorGraphics = "VectorGraphics";
 

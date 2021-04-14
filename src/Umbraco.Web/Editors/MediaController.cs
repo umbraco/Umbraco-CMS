@@ -37,8 +37,6 @@ using Umbraco.Web.ContentApps;
 using Umbraco.Web.Editors.Binders;
 using Umbraco.Web.Editors.Filters;
 using Umbraco.Core.Models.Entities;
-using static Umbraco.Web.PropertyEditors.FileUploadConfiguration;
-using Umbraco.Web.PropertyEditors;
 
 namespace Umbraco.Web.Editors
 {
@@ -730,12 +728,11 @@ namespace Umbraco.Web.Editors
 
                         }
 
-                        // If media type is still File then lets check if its a image.
+                        // If media type is still File then let's check if it's an image.
                         if (mediaType == Constants.Conventions.MediaTypes.File && Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }
-
                     }
                     else
                     {

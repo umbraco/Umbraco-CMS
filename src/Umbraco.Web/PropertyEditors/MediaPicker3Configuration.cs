@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Collections.Generic;
 using Umbraco.Core;
 using Umbraco.Core.PropertyEditors;
 
@@ -10,7 +9,6 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class MediaPicker3Configuration : IIgnoreUserStartNodesConfig
     {
-
         [ConfigurationField("filter", "Accepted types", "treesourcetypepicker",
             Description = "Limit to specific types")]
         public string Filter { get; set; }

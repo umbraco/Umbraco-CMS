@@ -98,7 +98,7 @@ namespace Umbraco.Core
                 public const string MediaPicker3 = "4309A3EA-0D78-4329-A06C-C80B036AF19A";
 
                 /// <summary>
-                /// Guid for Media Picker
+                /// Guid for Media Picker v3
                 /// </summary>
                 public static readonly Guid MediaPicker3Guid = new Guid(MediaPicker3);
 
@@ -108,7 +108,7 @@ namespace Umbraco.Core
                 public const string MediaPicker3Multiple = "1B661F40-2242-4B44-B9CB-3990EE2B13C0";
 
                 /// <summary>
-                /// Guid for Media Picker
+                /// Guid for Media Picker v3 multiple
                 /// </summary>
                 public static readonly Guid MediaPicker3MultipleGuid = new Guid(MediaPicker3Multiple);
 
@@ -119,18 +119,18 @@ namespace Umbraco.Core
                 public const string MediaPicker3SingleImage = "AD9F0CF2-BDA2-45D5-9EA1-A63CFC873FD3";
 
                 /// <summary>
-                /// Guid for Media Picker
+                /// Guid for Media Picker v3 single-image
                 /// </summary>
                 public static readonly Guid MediaPicker3SingleImageGuid = new Guid(MediaPicker3SingleImage);
 
 
                 /// <summary>
-                /// Guid for Media Picker v3 images multi-image as string
+                /// Guid for Media Picker v3 multi-image as string
                 /// </summary>
                 public const string MediaPicker3MultipleImages = "0E63D883-B62B-4799-88C3-157F82E83ECC";
 
                 /// <summary>
-                /// Guid for Media Picker
+                /// Guid for Media Picker v3 multi-image
                 /// </summary>
                 public static readonly Guid MediaPicker3MultipleImagesGuid = new Guid(MediaPicker3MultipleImages);
 
