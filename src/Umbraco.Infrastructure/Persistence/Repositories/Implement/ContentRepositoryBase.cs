@@ -800,34 +800,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             public TEntity Entity { get; }
         }
 
-        public class ScopedVersionEventArgs : EventArgs
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ScopedVersionEventArgs"/> class.
-            /// </summary>
-            public ScopedVersionEventArgs(IScope scope, int entityId, int versionId)
-            {
-                Scope = scope;
-                EntityId = entityId;
-                VersionId = versionId;
-            }
-
-            /// <summary>
-            /// Gets the current <see cref="IScope"/>
-            /// </summary>
-            public IScope Scope { get; }
-
-            /// <summary>
-            /// Gets the entity id
-            /// </summary>
-            public int EntityId { get; }
-
-            /// <summary>
-            /// Gets the version id
-            /// </summary>
-            public int VersionId { get; }
-        }
-
         /// <summary>
         /// Occurs when an <see cref="TEntity"/> is created or updated from within the <see cref="IScope"/> (transaction)
         /// </summary>
