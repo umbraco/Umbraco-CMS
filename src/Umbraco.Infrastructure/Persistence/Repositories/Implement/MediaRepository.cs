@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -46,8 +47,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             MediaUrlGeneratorCollection mediaUrlGenerators,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
-            IJsonSerializer serializer)
-            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService)
+            IJsonSerializer serializer,
+            IEventAggregator eventAggregator)
+            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService, eventAggregator)
         {
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
@@ -304,7 +306,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             PersistRelations(entity);
 
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new MediaRefreshNotification(entity, new EventMessages()));
 
             entity.ResetDirtyProperties();
         }
@@ -367,7 +369,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 PersistRelations(entity);
             }
 
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new MediaRefreshNotification(entity, new EventMessages()));
 
             entity.ResetDirtyProperties();
         }

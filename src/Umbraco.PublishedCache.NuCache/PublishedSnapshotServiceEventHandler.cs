@@ -25,7 +25,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         INotificationHandler<MediaDeletingNotification>,
         INotificationHandler<MemberDeletingNotification>,
         INotificationHandler<ContentEmptyingRecycleBinNotification>,
-        INotificationHandler<MediaEmptyingRecycleBinNotification>
+        INotificationHandler<MediaEmptyingRecycleBinNotification>,
+        INotificationHandler<ContentRefreshNotification>,
+        INotificationHandler<MediaRefreshNotification>,
+        INotificationHandler<MemberRefreshNotification>
     {
         private readonly IRuntimeState _runtime;
         private bool _disposedValue;
@@ -77,15 +80,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         private void InitializeRepositoryEvents()
         {
-            // TODO: The reason these events are in the repository is for legacy, the events should exist at the service
-            // level now since we can fire these events within the transaction... so move the events to service level
-
             // plug repository event handlers
             // these trigger within the transaction to ensure consistency
             // and are used to maintain the central, database-level XML cache
-            DocumentRepository.ScopedEntityRefresh += DocumentRepository_ScopedEntityRefresh;
-            MediaRepository.ScopedEntityRefresh += MediaRepository_ScopedEntityRefresh;
-            MemberRepository.ScopedEntityRefresh += MemberRepository_ScopedEntityRefresh;
 
             // plug
             ContentTypeService.ScopedRefreshedEntity += OnContentTypeRefreshedEntity;
@@ -95,9 +92,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         private void TearDownRepositoryEvents()
         {
-            DocumentRepository.ScopedEntityRefresh -= DocumentRepository_ScopedEntityRefresh;
-            MediaRepository.ScopedEntityRefresh -= MediaRepository_ScopedEntityRefresh;
-            MemberRepository.ScopedEntityRefresh -= MemberRepository_ScopedEntityRefresh;
             ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
             MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
             MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
@@ -151,14 +145,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             _publishedContentService.DeleteContentItems(entitiesToDelete);
         }
 
-        private void MemberRepository_ScopedEntityRefresh(MemberRepository sender, ContentRepositoryBase<int, IMember, MemberRepository>.ScopedEntityEventArgs e)
-            => _publishedContentService.RefreshEntity(e.Entity);
+        public void Handle(MemberRefreshNotification notification) => _publishedContentService.RefreshEntity(notification.Entity);
 
-        private void MediaRepository_ScopedEntityRefresh(MediaRepository sender, ContentRepositoryBase<int, IMedia, MediaRepository>.ScopedEntityEventArgs e)
-            => _publishedContentService.RefreshEntity(e.Entity);
+        public void Handle(MediaRefreshNotification notification) => _publishedContentService.RefreshEntity(notification.Entity);
 
-        private void DocumentRepository_ScopedEntityRefresh(DocumentRepository sender, ContentRepositoryBase<int, IContent, DocumentRepository>.ScopedEntityEventArgs e)
-            => _publishedContentService.RefreshContent(e.Entity);
+        public void Handle(ContentRefreshNotification notification) => _publishedContentService.RefreshContent(notification.Entity);
 
         private void OnContentTypeRefreshedEntity(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
         {

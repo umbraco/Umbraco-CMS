@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -38,8 +39,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
-            IJsonSerializer serializer)
-            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService)
+            IJsonSerializer serializer,
+            IEventAggregator eventAggregator)
+            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
         {
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
@@ -329,7 +331,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             PersistRelations(entity);
 
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new MemberRefreshNotification(entity, new EventMessages()));
 
             entity.ResetDirtyProperties();
         }
@@ -389,7 +391,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             PersistRelations(entity);
 
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new MemberRefreshNotification(entity, new EventMessages()));
 
             entity.ResetDirtyProperties();
         }

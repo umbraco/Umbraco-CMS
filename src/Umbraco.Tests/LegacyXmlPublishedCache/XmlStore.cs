@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -48,7 +49,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         INotificationHandler<MediaDeletingNotification>,
         INotificationHandler<MemberDeletingNotification>,
         INotificationHandler<ContentDeletingVersionsNotification>,
-        INotificationHandler<MediaDeletingVersionsNotification>
+        INotificationHandler<MediaDeletingVersionsNotification>,
+        INotificationHandler<ContentRefreshNotification>,
+        INotificationHandler<MediaRefreshNotification>,
+        INotificationHandler<MemberRefreshNotification>
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
@@ -197,9 +201,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             // plug repository event handlers
             // these trigger within the transaction to ensure consistency
             // and are used to maintain the central, database-level XML cache
-            DocumentRepository.ScopedEntityRefresh += OnContentRefreshedEntity;
-            MediaRepository.ScopedEntityRefresh += OnMediaRefreshedEntity;
-            MemberRepository.ScopedEntityRefresh += OnMemberRefreshedEntity;
 
             // plug
             ContentTypeService.ScopedRefreshedEntity += OnContentTypeRefreshedEntity;
@@ -210,10 +211,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private void ClearEvents()
         {
-            DocumentRepository.ScopedEntityRefresh -= OnContentRefreshedEntity;
-            MediaRepository.ScopedEntityRefresh -= OnMediaRefreshedEntity;
-            MemberRepository.ScopedEntityRefresh -= OnMemberRefreshedEntity;
-
             ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
             MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
             MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
@@ -1537,10 +1534,10 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             return PropertiesImpactingAllVersions.Any(content.IsPropertyDirty);
         }
 
-        private void OnContentRefreshedEntity(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
+        public void Handle(ContentRefreshNotification notification)
         {
-            var db = args.Scope.Database;
-            var entity = args.Entity;
+            var db = Mock.Of<IUmbracoDatabase>(); // Notification no longer carries the scope, so we can't get the DB
+            var entity = notification.Entity;
 
             // serialize edit values for preview
             var editXml = _entitySerializer.Serialize(entity, false).ToDataString();
@@ -1578,10 +1575,10 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         }
 
-        private void OnMediaRefreshedEntity(MediaRepository sender, MediaRepository.ScopedEntityEventArgs args)
+        public void Handle(MediaRefreshNotification notification)
         {
-            var db = args.Scope.Database;
-            var entity = args.Entity;
+            var db = Mock.Of<IUmbracoDatabase>(); // Notification no longer carries the scope, so we can't get the DB
+            var entity = notification.Entity;
 
             // for whatever reason we delete some xml when the media is trashed
             // at least that's what the MediaService implementation did
@@ -1594,10 +1591,10 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             OnRepositoryRefreshed(db, dto1);
         }
 
-        private void OnMemberRefreshedEntity(MemberRepository sender, MemberRepository.ScopedEntityEventArgs args)
+        public void Handle(MemberRefreshNotification notification)
         {
-            var db = args.Scope.Database;
-            var entity = args.Entity;
+            var db = Mock.Of<IUmbracoDatabase>(); // Notification no longer carries the scope, so we can't get the DB
+            var entity = notification.Entity;
 
             var xml = _entitySerializer.Serialize(entity).ToDataString();
 

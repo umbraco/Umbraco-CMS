@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence;
@@ -65,8 +66,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
-            IJsonSerializer serializer)
-            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService)
+            IJsonSerializer serializer,
+            IEventAggregator eventAggregator)
+            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
@@ -494,7 +496,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.SetCultureEdited(editedCultures);
 
             // trigger here, before we reset Published etc
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
 
             // flip the entity's published property
             // this also flips its published state
@@ -708,7 +710,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             // trigger here, before we reset Published etc
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
 
             if (!isMoving)
             {
