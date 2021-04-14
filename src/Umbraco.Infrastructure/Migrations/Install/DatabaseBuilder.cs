@@ -181,9 +181,6 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             var path = _hostingEnvironment.MapPathContentRoot("Umbraco.db");
             if (File.Exists(path) == false)
             {
-                // this should probably be in a "using (new SqlCeEngine)" clause but not sure
-                // of the side effects and it's been like this for quite some time now
-
                 _dbProviderFactoryCreator.CreateDatabase(Constants.DbProviderNames.SQLite);
             }
 
