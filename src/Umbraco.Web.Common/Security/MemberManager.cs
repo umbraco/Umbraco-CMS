@@ -7,7 +7,6 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 
-
 namespace Umbraco.Cms.Web.Common.Security
 {
 

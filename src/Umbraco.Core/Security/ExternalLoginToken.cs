@@ -1,6 +1,6 @@
-﻿using System;
+using System;
 
-namespace Umbraco.Cms.Core.Models.Identity
+namespace Umbraco.Cms.Core.Security
 {
     /// <inheritdoc />
     public class ExternalLoginToken : IExternalLoginToken

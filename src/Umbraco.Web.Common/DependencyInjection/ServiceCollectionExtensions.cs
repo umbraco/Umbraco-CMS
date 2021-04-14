@@ -3,7 +3,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using SixLabors.ImageSharp.Memory;
 using SixLabors.ImageSharp.Web.Caching;
 using SixLabors.ImageSharp.Web.Commands;
@@ -11,7 +10,6 @@ using SixLabors.ImageSharp.Web.DependencyInjection;
 using SixLabors.ImageSharp.Web.Processors;
 using SixLabors.ImageSharp.Web.Providers;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.Common.Security;
 
@@ -66,12 +64,15 @@ namespace Umbraco.Extensions
 
         public static void AddMembersIdentity(this IServiceCollection services)
         {
+            // TODO: We may need to use services.AddIdentityCore instead if this is doing too much
+
             services.AddIdentity<MemberIdentityUser, UmbracoIdentityRole>()
                 .AddDefaultTokenProviders()
-                .AddMemberManager<IMemberManager, MemberManager>()
-                .AddSignInManager<IMemberSignInManager, MemberSignInManager>()
                 .AddUserStore<MemberUserStore>()
-                .AddRoleStore<MemberRoleStore>();
+                .AddRoleStore<MemberRoleStore>()
+                .AddRoleManager<IMemberRoleManager, MemberRoleManager>()                
+                .AddMemberManager<IMemberManager, MemberManager>()
+                .AddSignInManager<IMemberSignInManager, MemberSignInManager>();
 
             services.ConfigureApplicationCookie(x =>
             {

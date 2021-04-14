@@ -6,7 +6,7 @@ using System.ComponentModel;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Models.Entities;
 
-namespace Umbraco.Cms.Core.Models.Identity
+namespace Umbraco.Cms.Core.Security
 {
 
     /// <summary>

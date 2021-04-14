@@ -1,6 +1,6 @@
 using System;
 
-namespace Umbraco.Cms.Core.Models.Identity
+namespace Umbraco.Cms.Core.Security
 {
 
     /// <inheritdoc />
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Models.Identity
         public string LoginProvider { get; }
 
         /// <inheritdoc />
-        public string ProviderKey { get;  }
+        public string ProviderKey { get; }
 
         /// <inheritdoc />
         public string UserData { get; }

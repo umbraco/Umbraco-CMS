@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Models.Identity
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// Used to persist an external login token for a user

@@ -24,6 +24,15 @@ namespace Umbraco.Extensions
             return identityBuilder;
         }
 
+        public static IdentityBuilder AddRoleManager<TInterface, TRoleManager>(this IdentityBuilder identityBuilder)
+            where TRoleManager : RoleManager<UmbracoIdentityRole>, TInterface
+        {
+            identityBuilder.AddRoleManager<TRoleManager>();
+            identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TRoleManager));
+            identityBuilder.Services.AddScoped(typeof(RoleManager<MemberIdentityUser>), factory => factory.GetRequiredService<TInterface>());
+            return identityBuilder;
+        }
+
         /// <summary>
         /// Adds a <see cref="SignInManager{TUser}"/> implementation for <seealso cref="MemberIdentityUser"/>
         /// </summary>
