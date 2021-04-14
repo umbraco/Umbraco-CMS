@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 
         public override IEnumerable<Tuple<string, string, string, bool>> GetDefinedIndexes(IDatabase db)
         {
-            // PRAGMA index_info('foo');
+            // PRAGMA index_info('My_Table');
             // SELECT name as INDEX_NAME, tbl_name as TABLE_NAME, sql, type FROM sqlite_master where type == 'index'
 
 
@@ -48,7 +48,14 @@ FROM
 
         public override Sql<ISqlContext> SelectTop(Sql<ISqlContext> sql, int top)
         {
-            throw new NotImplementedException();
+            // SQLite uses LIMIT as opposed to TOP
+            // SELECT TOP 5 * FROM My_Table
+            // SELECT * FROM My_Table LIMIT 5;
+
+            var result = new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " TOP " + top), sql.Arguments);
+            var other = new Sql<ISqlContext>(sql.SqlContext, sql.SQL.Insert(sql.SQL.IndexOf(' '), " LIMIT " + top), sql.Arguments);
+
+            return other;
         }
 
         public override bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName)
@@ -68,12 +75,25 @@ FROM
 
         protected override string FormatIdentity(ColumnDefinition column)
         {
-            throw new NotImplementedException();
+            return column.IsIdentity ? GetIdentityString(column) : string.Empty;
         }
 
         protected override string FormatSystemMethods(SystemMethods systemMethod)
         {
-            throw new NotImplementedException();
+            switch (systemMethod)
+            {
+                case SystemMethods.NewGuid:
+                    return "NEWID()"; // No NEWID() in SQLite perhaps try RANDOM()
+                case SystemMethods.CurrentDateTime:
+                    return "DATE()"; // No GETDATE() trying DATE()
+            }
+
+            return null;
+        }
+
+        private static string GetIdentityString(ColumnDefinition column)
+        {
+            return "AUTOINCREMENT"; // AUTOINCREMENT as opposed to IDENTITY(1,1)
         }
     }
 }
