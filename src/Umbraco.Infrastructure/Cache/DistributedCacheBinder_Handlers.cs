@@ -44,7 +44,10 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<DomainSavedNotification>,
         INotificationHandler<MacroSavedNotification>,
         INotificationHandler<MacroDeletedNotification>,
-        INotificationHandler<MediaTreeChangeNotification>
+        INotificationHandler<MediaTreeChangeNotification>,
+        INotificationHandler<ContentTypeChangedNotification>,
+        INotificationHandler<MediaTypeChangedNotification>,
+        INotificationHandler<MemberTypeChangedNotification>
     {
         private List<Action> _unbinders;
 
@@ -74,14 +77,6 @@ namespace Umbraco.Cms.Core.Cache
                 _unbinders = new List<Action>();
 
             _logger.LogInformation("Initializing Umbraco internal event handlers for cache refreshing.");
-
-            // bind to content type events
-            Bind(() => ContentTypeService.Changed += ContentTypeService_Changed,
-                () => ContentTypeService.Changed -= ContentTypeService_Changed);
-            Bind(() => MediaTypeService.Changed += MediaTypeService_Changed,
-                () => MediaTypeService.Changed -= MediaTypeService_Changed);
-            Bind(() => MemberTypeService.Changed += MemberTypeService_Changed,
-                () => MemberTypeService.Changed -= MemberTypeService_Changed);
 
             // bind to content events
             Bind(() => ContentService.TreeChanged += ContentService_TreeChanged,// handles all content changes
@@ -230,28 +225,14 @@ namespace Umbraco.Cms.Core.Cache
 
         #region Content|Media|MemberTypeService
 
-        private void ContentTypeService_Changed(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
-        {
-            _distributedCache.RefreshContentTypeCache(args.Changes.ToArray());
-        }
+        public void Handle(ContentTypeChangedNotification notification) =>
+            _distributedCache.RefreshContentTypeCache(notification.Changes.ToArray());
 
-        private void MediaTypeService_Changed(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
-        {
-            _distributedCache.RefreshContentTypeCache(args.Changes.ToArray());
-        }
+        public void Handle(MediaTypeChangedNotification notification) =>
+            _distributedCache.RefreshContentTypeCache(notification.Changes.ToArray());
 
-        private void MemberTypeService_Changed(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
-        {
-            _distributedCache.RefreshContentTypeCache(args.Changes.ToArray());
-        }
-
-        // TODO: our weird events handling wants this for now
-        private void ContentTypeService_Saved(IContentTypeService sender, SaveEventArgs<IContentType> args) { }
-        private void MediaTypeService_Saved(IMediaTypeService sender, SaveEventArgs<IMediaType> args) { }
-        private void MemberTypeService_Saved(IMemberTypeService sender, SaveEventArgs<IMemberType> args) { }
-        private void ContentTypeService_Deleted(IContentTypeService sender, DeleteEventArgs<IContentType> args) { }
-        private void MediaTypeService_Deleted(IMediaTypeService sender, DeleteEventArgs<IMediaType> args) { }
-        private void MemberTypeService_Deleted(IMemberTypeService sender, DeleteEventArgs<IMemberType> args) { }
+        public void Handle(MemberTypeChangedNotification notification) =>
+            _distributedCache.RefreshContentTypeCache(notification.Changes.ToArray());
 
         #endregion
 

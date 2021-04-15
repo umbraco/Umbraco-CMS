@@ -7,9 +7,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Services.Notifications;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Extensions;
 
@@ -28,7 +26,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         INotificationHandler<MediaEmptyingRecycleBinNotification>,
         INotificationHandler<ContentRefreshNotification>,
         INotificationHandler<MediaRefreshNotification>,
-        INotificationHandler<MemberRefreshNotification>
+        INotificationHandler<MemberRefreshNotification>,
+        INotificationHandler<ContentTypeRefreshedNotification>,
+        INotificationHandler<MediaTypeRefreshedNotification>,
+        INotificationHandler<MemberTypeRefreshedNotification>
     {
         private readonly IRuntimeState _runtime;
         private bool _disposedValue;
@@ -70,31 +71,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 return false;
             }
 
-            // we always want to handle repository events, configured or not
-            // assuming no repository event will trigger before the whole db is ready
-            // (ideally we'd have Upgrading.App vs Upgrading.Data application states...)
-            InitializeRepositoryEvents();
-
             return true;
-        }
-
-        private void InitializeRepositoryEvents()
-        {
-            // plug repository event handlers
-            // these trigger within the transaction to ensure consistency
-            // and are used to maintain the central, database-level XML cache
-
-            // plug
-            ContentTypeService.ScopedRefreshedEntity += OnContentTypeRefreshedEntity;
-            MediaTypeService.ScopedRefreshedEntity += OnMediaTypeRefreshedEntity;
-            MemberTypeService.ScopedRefreshedEntity += OnMemberTypeRefreshedEntity;
-        }
-
-        private void TearDownRepositoryEvents()
-        {
-            ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
-            MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
-            MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
         }
 
         // note: if the service is not ready, ie _isReady is false, then we still handle repository events,
@@ -151,33 +128,33 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public void Handle(ContentRefreshNotification notification) => _publishedContentService.RefreshContent(notification.Entity);
 
-        private void OnContentTypeRefreshedEntity(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
+        public void Handle(ContentTypeRefreshedNotification notification)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
-            var contentTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
+            var contentTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (contentTypeIds.Any())
             {
                 _publishedSnapshotService.Rebuild(contentTypeIds: contentTypeIds);
             }
         }
 
-        private void OnMediaTypeRefreshedEntity(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
+        public void Handle(MediaTypeRefreshedNotification notification)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
-            var mediaTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
+            var mediaTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (mediaTypeIds.Any())
             {
                 _publishedSnapshotService.Rebuild(mediaTypeIds: mediaTypeIds);
             }
         }
 
-        private void OnMemberTypeRefreshedEntity(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
+        public void Handle(MemberTypeRefreshedNotification notification)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther;
-            var memberTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
+            var memberTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (memberTypeIds.Any())
             {
                 _publishedSnapshotService.Rebuild(memberTypeIds: memberTypeIds);
@@ -203,11 +180,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         {
             if (!_disposedValue)
             {
-                if (disposing)
-                {
-                    TearDownRepositoryEvents();
-                }
-
                 _disposedValue = true;
             }
         }

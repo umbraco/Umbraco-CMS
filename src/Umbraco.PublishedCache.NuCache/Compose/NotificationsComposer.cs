@@ -18,6 +18,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Compose
                 .AddNotificationHandler<ContentRefreshNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MediaRefreshNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MemberRefreshNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<ContentTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MediaTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MemberTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
             ;
     }
 }

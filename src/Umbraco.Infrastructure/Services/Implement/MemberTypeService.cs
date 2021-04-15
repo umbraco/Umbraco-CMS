@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         protected override ContentTypeRefreshNotification<IMemberType> GetContentTypeRefreshedNotification(
             IEnumerable<ContentTypeChange<IMemberType>> changes, EventMessages eventMessages) =>
-            new MemberTypeRefreshNotification(changes, eventMessages);
+            new MemberTypeRefreshedNotification(changes, eventMessages);
 
         #endregion
 

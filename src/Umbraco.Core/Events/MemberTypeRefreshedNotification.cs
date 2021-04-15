@@ -4,13 +4,13 @@ using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Core.Events
 {
-    public class MemberTypeRefreshNotification : ContentTypeRefreshNotification<IMemberType>
+    public class MemberTypeRefreshedNotification : ContentTypeRefreshNotification<IMemberType>
     {
-        public MemberTypeRefreshNotification(ContentTypeChange<IMemberType> target, EventMessages messages) : base(target, messages)
+        public MemberTypeRefreshedNotification(ContentTypeChange<IMemberType> target, EventMessages messages) : base(target, messages)
         {
         }
 
-        public MemberTypeRefreshNotification(IEnumerable<ContentTypeChange<IMemberType>> target, EventMessages messages) : base(target, messages)
+        public MemberTypeRefreshedNotification(IEnumerable<ContentTypeChange<IMemberType>> target, EventMessages messages) : base(target, messages)
         {
         }
     }

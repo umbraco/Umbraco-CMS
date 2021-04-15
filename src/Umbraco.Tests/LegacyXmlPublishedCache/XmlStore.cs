@@ -52,7 +52,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         INotificationHandler<MediaDeletingVersionsNotification>,
         INotificationHandler<ContentRefreshNotification>,
         INotificationHandler<MediaRefreshNotification>,
-        INotificationHandler<MemberRefreshNotification>
+        INotificationHandler<MemberRefreshNotification>,
+        INotificationHandler<ContentTypeRefreshedNotification>,
+        INotificationHandler<MediaTypeRefreshedNotification>,
+        INotificationHandler<MemberTypeRefreshedNotification>
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
@@ -186,35 +189,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private void Initialize(bool testing, bool enableRepositoryEvents)
         {
-            if (testing == false || enableRepositoryEvents)
-                InitializeRepositoryEvents();
-            if (testing)
-                return;
 
             // not so soon! if eg installing we may not be able to load content yet
             // so replace this by LazyInitializeContent() called in Xml ppty getter
             //InitializeContent();
-        }
-
-        private void InitializeRepositoryEvents()
-        {
-            // plug repository event handlers
-            // these trigger within the transaction to ensure consistency
-            // and are used to maintain the central, database-level XML cache
-
-            // plug
-            ContentTypeService.ScopedRefreshedEntity += OnContentTypeRefreshedEntity;
-            MediaTypeService.ScopedRefreshedEntity += OnMediaTypeRefreshedEntity;
-            MemberTypeService.ScopedRefreshedEntity += OnMemberTypeRefreshedEntity;
-
-        }
-
-        private void ClearEvents()
-        {
-            ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
-            MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
-            MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
-
         }
 
         private void LazyInitializeContent()
@@ -238,7 +216,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public void Dispose()
         {
-            ClearEvents();
         }
 
         #endregion
@@ -1638,29 +1615,31 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 });
         }
 
-        private void OnContentTypeRefreshedEntity(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
+        public void Handle(ContentTypeRefreshedNotification notification)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Create;
-            var contentTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
+            var contentTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (contentTypeIds.Any())
                 RebuildContentAndPreviewXml(contentTypeIds: contentTypeIds);
         }
 
-        private void OnMediaTypeRefreshedEntity(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
+        public void Handle(MediaTypeRefreshedNotification notification)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Create;
-            var mediaTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
+            var mediaTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (mediaTypeIds.Any())
+            {
                 RebuildMediaXml(contentTypeIds: mediaTypeIds);
+            }
         }
 
-        private void OnMemberTypeRefreshedEntity(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
+        public void Handle(MemberTypeRefreshedNotification notification)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Create;
-            var memberTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
+            var memberTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (memberTypeIds.Any())
                 RebuildMemberXml(contentTypeIds: memberTypeIds);
         }

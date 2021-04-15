@@ -38,12 +38,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         private IMemberService MemberService => GetRequiredService<IMemberService>();
 
-        [SetUp]
-        public void SetupTest() =>
-
-            // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            global::Umbraco.Cms.Core.Services.Implement.MemberTypeService.ClearScopeEvents();
-
         [Test]
         public void Can_Update_Member_Property_Values()
         {
