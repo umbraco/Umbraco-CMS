@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
@@ -120,7 +119,7 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
                                 // use the cache buster defined in config
                                 .SetCacheBusterType(_cacheBusterType))
                             .Build());
-            }            
+            }
         }
 
         public async Task<string> RenderCssHereAsync(string bundleName) => (await _smidge.SmidgeHelper.CssHereAsync(bundleName, _hostingEnvironment.IsDebugMode)).ToString();
@@ -171,7 +170,9 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
 
         public async Task<string> RenderJsHereAsync(string bundleName) => (await _smidge.SmidgeHelper.JsHereAsync(bundleName, _hostingEnvironment.IsDebugMode)).ToString();
 
-        public async Task<IEnumerable<string>> GetAssetPathsAsync(string bundleName) => await _smidge.SmidgeHelper.GenerateJsUrlsAsync(bundleName, _hostingEnvironment.IsDebugMode);
+
+        public async Task<IEnumerable<string>> GetJsAssetPathsAsync(string bundleName) => await _smidge.SmidgeHelper.GenerateJsUrlsAsync(bundleName, _hostingEnvironment.IsDebugMode);
+        public async Task<IEnumerable<string>> GetCssAssetPathsAsync(string bundleName) => await _smidge.SmidgeHelper.GenerateCssUrlsAsync(bundleName, _hostingEnvironment.IsDebugMode);
 
         /// <inheritdoc />
         public async Task<string> MinifyAsync(string fileContent, AssetType assetType)
