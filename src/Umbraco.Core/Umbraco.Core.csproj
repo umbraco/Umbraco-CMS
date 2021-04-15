@@ -48,6 +48,8 @@
         </AssemblyAttribute>
 
       <!-- Making internals visible to Umbraco Forms -->
+      <!--
+      Temporarily removing to see what we need
       <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
         <_Parameter1>Umbraco.Forms.Core</_Parameter1>
       </AssemblyAttribute>
@@ -57,6 +59,7 @@
       <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
         <_Parameter1>Umbraco.Forms.Web</_Parameter1>
       </AssemblyAttribute>
+      -->
     </ItemGroup>
 
     <ItemGroup>
