@@ -54,6 +54,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         protected abstract MovedNotification<TItem> GetMovedNotification(IEnumerable<MoveEventInfo<TItem>> moveInfo, EventMessages eventMessages);
 
+        protected abstract ContentTypeChangeNotification<TItem> GetContentTypeChangedNotification(IEnumerable<ContentTypeChange<TItem>> changes, EventMessages eventMessages);
+
         #endregion
 
         #region Validation
@@ -452,7 +454,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 OnUowRefreshedEntity(args);
 
-                OnChanged(scope, args);
+                scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
                 SavedNotification<TItem> savedNotification = GetSavedNotification(item, eventMessages);
                 savedNotification.WithStateFrom(savingNotification);
@@ -501,7 +503,7 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 OnUowRefreshedEntity(args);
 
-                OnChanged(scope, args);
+                scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
                 SavedNotification<TItem> savedNotification = GetSavedNotification(itemsA, eventMessages);
                 savedNotification.WithStateFrom(savingNotification);
@@ -553,7 +555,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     reference.AllowedContentTypes = reference.AllowedContentTypes.Where(p => p.Id.Value != item.Id);
                     var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
                     // Fire change event
-                    OnChanged(scope, changedRef.ToEventArgs());
+                    scope.Notifications.Publish(GetContentTypeChangedNotification(changedRef, eventMessages));
                 }
 
                 // finally delete the content type
@@ -565,13 +567,14 @@ namespace Umbraco.Cms.Core.Services.Implement
                 Repository.Delete(item);
 
                 //...
-                IEnumerable<ContentTypeChange<TItem>> changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
-                    .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)));
+                ContentTypeChange<TItem>[] changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
+                    .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
+                    .ToArray();
                 var args = changes.ToEventArgs();
 
                 OnUowRefreshedEntity(args);
 
-                OnChanged(scope, args);
+                scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
                 DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.DistinctBy(x => x.Id), eventMessages);
                 deletedNotification.WithStateFrom(deletingNotification);
@@ -622,13 +625,14 @@ namespace Umbraco.Cms.Core.Services.Implement
                     Repository.Delete(item);
                 }
 
-                IEnumerable<ContentTypeChange<TItem>> changes = allDescendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
-                    .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)));
+                ContentTypeChange<TItem>[] changes = allDescendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
+                    .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
+                    .ToArray();
                 var args = changes.ToEventArgs();
 
                 OnUowRefreshedEntity(args);
 
-                OnChanged(scope, args);
+                scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
                 DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.DistinctBy(x => x.Id), eventMessages);
                 deletedNotification.WithStateFrom(deletingNotification);

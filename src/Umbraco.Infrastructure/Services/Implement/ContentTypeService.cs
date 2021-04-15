@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -30,6 +31,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         private IContentService ContentService { get; }
 
         protected override Guid ContainedObjectType => Cms.Core.Constants.ObjectTypes.DocumentType;
+
+        #region Notifications
 
         protected override SavingNotification<IContentType> GetSavingNotification(IContentType item,
             EventMessages eventMessages) => new ContentTypeSavingNotification(item, eventMessages);
@@ -58,6 +61,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         protected override MovedNotification<IContentType> GetMovedNotification(
             IEnumerable<MoveEventInfo<IContentType>> moveInfo, EventMessages eventMessages) =>
             new ContentTypeMovedNotification(moveInfo, eventMessages);
+
+        protected override ContentTypeChangeNotification<IContentType> GetContentTypeChangedNotification(
+            IEnumerable<ContentTypeChange<IContentType>> changes, EventMessages eventMessages) =>
+            new ContentTypeChangedNotification(changes, eventMessages);
+
+        #endregion
 
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {

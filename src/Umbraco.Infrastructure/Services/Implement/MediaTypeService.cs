@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -27,6 +28,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         private IMediaService MediaService { get; }
 
         protected override Guid ContainedObjectType => Cms.Core.Constants.ObjectTypes.MediaType;
+
+        #region Notifications
 
         protected override SavingNotification<IMediaType> GetSavingNotification(IMediaType item,
             EventMessages eventMessages) => new MediaTypeSavingNotification(item, eventMessages);
@@ -55,6 +58,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         protected override MovedNotification<IMediaType> GetMovedNotification(
             IEnumerable<MoveEventInfo<IMediaType>> moveInfo, EventMessages eventMessages) =>
             new MediaTypeMovedNotification(moveInfo, eventMessages);
+
+        protected override ContentTypeChangeNotification<IMediaType> GetContentTypeChangedNotification(
+            IEnumerable<ContentTypeChange<IMediaType>> changes, EventMessages eventMessages) =>
+            new MediaTypeChangedNotification(changes, eventMessages);
+
+        #endregion
 
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {
