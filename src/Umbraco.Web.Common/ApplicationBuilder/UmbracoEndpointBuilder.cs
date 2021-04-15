@@ -6,7 +6,7 @@ using Umbraco.Cms.Core.Services;
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 {
     /// <summary>
-    /// A builder to allow encapsulating the enabled routing features in Umbraco
+    /// A builder to allow encapsulating the enabled endpoints in Umbraco
     /// </summary>
     internal class UmbracoEndpointBuilder : IUmbracoEndpointBuilder
     {
