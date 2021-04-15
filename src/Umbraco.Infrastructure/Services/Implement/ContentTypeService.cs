@@ -31,6 +31,34 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         protected override Guid ContainedObjectType => Cms.Core.Constants.ObjectTypes.DocumentType;
 
+        protected override SavingNotification<IContentType> GetSavingNotification(IContentType item,
+            EventMessages eventMessages) => new ContentTypeSavingNotification(item, eventMessages);
+
+        protected override SavingNotification<IContentType> GetSavingNotification(IEnumerable<IContentType> items,
+            EventMessages eventMessages) => new ContentTypeSavingNotification(items, eventMessages);
+
+        protected override SavedNotification<IContentType> GetSavedNotification(IContentType item,
+            EventMessages eventMessages) => new ContentTypeSavedNotification(item, eventMessages);
+
+        protected override SavedNotification<IContentType> GetSavedNotification(IEnumerable<IContentType> items,
+            EventMessages eventMessages) => new ContentTypeSavedNotification(items, eventMessages);
+
+        protected override DeletingNotification<IContentType> GetDeletingNotification(IContentType item,
+            EventMessages eventMessages) => new ContentTypeDeletingNotification(item, eventMessages);
+
+        protected override DeletingNotification<IContentType> GetDeletingNotification(IEnumerable<IContentType> items,
+            EventMessages eventMessages) => new ContentTypeDeletingNotification(items, eventMessages);
+
+        protected override DeletedNotification<IContentType> GetDeletedNotification(IEnumerable<IContentType> items,
+            EventMessages eventMessages) => new ContentTypeDeletedNotification(items, eventMessages);
+
+        protected override MovingNotification<IContentType> GetMovingNotification(MoveEventInfo<IContentType> moveInfo,
+            EventMessages eventMessages) => new ContentTypeMovingNotification(moveInfo, eventMessages);
+
+        protected override MovedNotification<IContentType> GetMovedNotification(
+            IEnumerable<MoveEventInfo<IContentType>> moveInfo, EventMessages eventMessages) =>
+            new ContentTypeMovedNotification(moveInfo, eventMessages);
+
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {
             using (var scope = ScopeProvider.CreateScope())

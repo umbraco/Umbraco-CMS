@@ -28,6 +28,34 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         protected override Guid ContainedObjectType => Cms.Core.Constants.ObjectTypes.MediaType;
 
+        protected override SavingNotification<IMediaType> GetSavingNotification(IMediaType item,
+            EventMessages eventMessages) => new MediaTypeSavingNotification(item, eventMessages);
+
+        protected override SavingNotification<IMediaType> GetSavingNotification(IEnumerable<IMediaType> items,
+            EventMessages eventMessages) => new MediaTypeSavingNotification(items, eventMessages);
+
+        protected override SavedNotification<IMediaType> GetSavedNotification(IMediaType item,
+            EventMessages eventMessages) => new MediaTypeSavedNotification(item, eventMessages);
+
+        protected override SavedNotification<IMediaType> GetSavedNotification(IEnumerable<IMediaType> items,
+            EventMessages eventMessages) => new MediaTypeSavedNotification(items, eventMessages);
+
+        protected override DeletingNotification<IMediaType> GetDeletingNotification(IMediaType item,
+            EventMessages eventMessages) => new MediaTypeDeletingNotification(item, eventMessages);
+
+        protected override DeletingNotification<IMediaType> GetDeletingNotification(IEnumerable<IMediaType> items,
+            EventMessages eventMessages) => new MediaTypeDeletingNotification(items, eventMessages);
+
+        protected override DeletedNotification<IMediaType> GetDeletedNotification(IEnumerable<IMediaType> items,
+            EventMessages eventMessages) => new MediaTypeDeletedNotification(items, eventMessages);
+
+        protected override MovingNotification<IMediaType> GetMovingNotification(MoveEventInfo<IMediaType> moveInfo,
+            EventMessages eventMessages) => new MediaTypeMovingNotification(moveInfo, eventMessages);
+
+        protected override MovedNotification<IMediaType> GetMovedNotification(
+            IEnumerable<MoveEventInfo<IMediaType>> moveInfo, EventMessages eventMessages) =>
+            new MediaTypeMovedNotification(moveInfo, eventMessages);
+
         protected override void DeleteItemsOfTypes(IEnumerable<int> typeIds)
         {
             foreach (var typeId in typeIds)

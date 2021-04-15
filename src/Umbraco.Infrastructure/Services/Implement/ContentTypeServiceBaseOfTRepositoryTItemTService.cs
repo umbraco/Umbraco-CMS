@@ -37,6 +37,25 @@ namespace Umbraco.Cms.Core.Services.Implement
         protected abstract int[] WriteLockIds { get; }
         protected abstract int[] ReadLockIds { get; }
 
+        #region Notifications
+
+        protected abstract SavingNotification<TItem> GetSavingNotification(TItem item, EventMessages eventMessages);
+        protected abstract SavingNotification<TItem> GetSavingNotification(IEnumerable<TItem> items, EventMessages eventMessages);
+
+        protected abstract SavedNotification<TItem> GetSavedNotification(TItem item, EventMessages eventMessages);
+        protected abstract SavedNotification<TItem> GetSavedNotification(IEnumerable<TItem> items, EventMessages eventMessages);
+
+        protected abstract DeletingNotification<TItem> GetDeletingNotification(TItem item, EventMessages eventMessages);
+        protected abstract DeletingNotification<TItem> GetDeletingNotification(IEnumerable<TItem> items, EventMessages eventMessages);
+
+        protected abstract DeletedNotification<TItem> GetDeletedNotification(IEnumerable<TItem> items, EventMessages eventMessages);
+
+        protected abstract MovingNotification<TItem> GetMovingNotification(MoveEventInfo<TItem> moveInfo, EventMessages eventMessages);
+
+        protected abstract MovedNotification<TItem> GetMovedNotification(IEnumerable<MoveEventInfo<TItem>> moveInfo, EventMessages eventMessages);
+
+        #endregion
+
         #region Validation
 
         public Attempt<string[]> ValidateComposition(TItem compo)
@@ -394,17 +413,20 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public void Save(TItem item, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<TItem>(item);
-                if (OnSavingCancelled(scope, saveEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                SavingNotification<TItem> savingNotification = GetSavingNotification(item, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
                 }
 
                 if (string.IsNullOrWhiteSpace(item.Name))
+                {
                     throw new ArgumentException("Cannot save item with empty name.");
+                }
 
                 if (item.Name != null && item.Name.Length > 255)
                 {
@@ -417,18 +439,24 @@ namespace Umbraco.Cms.Core.Services.Implement
                 ValidateLocked(item); // throws if invalid
 
                 item.CreatorId = userId;
-                if (item.Description == string.Empty) item.Description = null;
+                if (item.Description == string.Empty)
+                {
+                    item.Description = null;
+                }
+
                 Repository.Save(item); // also updates content/media/member items
 
                 // figure out impacted content types
-                var changes = ComposeContentTypeChanges(item).ToArray();
+                ContentTypeChange<TItem>[] changes = ComposeContentTypeChanges(item).ToArray();
                 var args = changes.ToEventArgs();
 
                 OnUowRefreshedEntity(args);
 
                 OnChanged(scope, args);
-                saveEventArgs.CanCancel = false;
-                OnSaved(scope, saveEventArgs);
+
+                SavedNotification<TItem> savedNotification = GetSavedNotification(item, eventMessages);
+                savedNotification.WithStateFrom(savingNotification);
+                scope.Notifications.Publish(savedNotification);
 
                 Audit(AuditType.Save, userId, item.Id);
                 scope.Complete();
@@ -437,12 +465,13 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public void Save(IEnumerable<TItem> items, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            var itemsA = items.ToArray();
+            TItem[] itemsA = items.ToArray();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<TItem>(itemsA);
-                if (OnSavingCancelled(scope, saveEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                SavingNotification<TItem> savingNotification = GetSavingNotification(itemsA, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -451,26 +480,32 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.WriteLock(WriteLockIds);
 
                 // all-or-nothing, validate them all first
-                foreach (var contentType in itemsA)
+                foreach (TItem contentType in itemsA)
                 {
                     ValidateLocked(contentType); // throws if invalid
                 }
-                foreach (var contentType in itemsA)
+                foreach (TItem contentType in itemsA)
                 {
                     contentType.CreatorId = userId;
-                    if (contentType.Description == string.Empty) contentType.Description = null;
+                    if (contentType.Description == string.Empty)
+                    {
+                        contentType.Description = null;
+                    }
+
                     Repository.Save(contentType);
                 }
 
                 // figure out impacted content types
-                var changes = ComposeContentTypeChanges(itemsA).ToArray();
+                ContentTypeChange<TItem>[] changes = ComposeContentTypeChanges(itemsA).ToArray();
                 var args = changes.ToEventArgs();
 
                 OnUowRefreshedEntity(args);
 
                 OnChanged(scope, args);
-                saveEventArgs.CanCancel = false;
-                OnSaved(scope, saveEventArgs);
+
+                SavedNotification<TItem> savedNotification = GetSavedNotification(itemsA, eventMessages);
+                savedNotification.WithStateFrom(savingNotification);
+                scope.Notifications.Publish(savedNotification);
 
                 Audit(AuditType.Save, userId, -1);
                 scope.Complete();
@@ -483,10 +518,11 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public void Delete(TItem item, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<TItem>(item);
-                if (OnDeletingCancelled(scope, deleteEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                DeletingNotification<TItem> deletingNotification = GetDeletingNotification(item, eventMessages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
@@ -495,14 +531,14 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.WriteLock(WriteLockIds);
 
                 // all descendants are going to be deleted
-                var descendantsAndSelf = GetDescendants(item.Id, true)
+                TItem[] descendantsAndSelf = GetDescendants(item.Id, true)
                     .ToArray();
-                var deleted = descendantsAndSelf;
+                TItem[] deleted = descendantsAndSelf;
 
                 // all impacted (through composition) probably lose some properties
                 // don't try to be too clever here, just report them all
                 // do this before anything is deleted
-                var changed = descendantsAndSelf.SelectMany(xx => GetComposedOf(xx.Id))
+                TItem[] changed = descendantsAndSelf.SelectMany(xx => GetComposedOf(xx.Id))
                     .Distinct()
                     .Except(descendantsAndSelf)
                     .ToArray();
@@ -511,8 +547,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                 DeleteItemsOfTypes(descendantsAndSelf.Select(x => x.Id));
 
                 // Next find all other document types that have a reference to this content type
-                var referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes.Any(p=>p.Id.Value==item.Id));
-                foreach (var reference in referenceToAllowedContentTypes)
+                IEnumerable<TItem> referenceToAllowedContentTypes = GetAll().Where(q => q.AllowedContentTypes.Any(p=>p.Id.Value==item.Id));
+                foreach (TItem reference in referenceToAllowedContentTypes)
                 {
                     reference.AllowedContentTypes = reference.AllowedContentTypes.Where(p => p.Id.Value != item.Id);
                     var changedRef = new List<ContentTypeChange<TItem>>() { new ContentTypeChange<TItem>(reference, ContentTypeChangeTypes.RefreshMain) };
@@ -529,16 +565,17 @@ namespace Umbraco.Cms.Core.Services.Implement
                 Repository.Delete(item);
 
                 //...
-                var changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
+                IEnumerable<ContentTypeChange<TItem>> changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
                     .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)));
                 var args = changes.ToEventArgs();
 
                 OnUowRefreshedEntity(args);
 
                 OnChanged(scope, args);
-                deleteEventArgs.DeletedEntities = deleted.DistinctBy(x => x.Id);
-                deleteEventArgs.CanCancel = false;
-                OnDeleted(scope, deleteEventArgs);
+
+                DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.DistinctBy(x => x.Id), eventMessages);
+                deletedNotification.WithStateFrom(deletingNotification);
+                scope.Notifications.Publish(deletedNotification);
 
                 Audit(AuditType.Delete, userId, item.Id);
                 scope.Complete();
@@ -547,12 +584,13 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public void Delete(IEnumerable<TItem> items, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            var itemsA = items.ToArray();
+            TItem[] itemsA = items.ToArray();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<TItem>(itemsA);
-                if (OnDeletingCancelled(scope, deleteEventArgs))
+                EventMessages eventMessages = EventMessagesFactory.Get();
+                DeletingNotification<TItem> deletingNotification = GetDeletingNotification(itemsA, eventMessages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
@@ -561,15 +599,15 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.WriteLock(WriteLockIds);
 
                 // all descendants are going to be deleted
-                var allDescendantsAndSelf = itemsA.SelectMany(xx => GetDescendants(xx.Id, true))
+                TItem[] allDescendantsAndSelf = itemsA.SelectMany(xx => GetDescendants(xx.Id, true))
                     .DistinctBy(x => x.Id)
                     .ToArray();
-                var deleted = allDescendantsAndSelf;
+                TItem[] deleted = allDescendantsAndSelf;
 
                 // all impacted (through composition) probably lose some properties
                 // don't try to be too clever here, just report them all
                 // do this before anything is deleted
-                var changed = allDescendantsAndSelf.SelectMany(x => GetComposedOf(x.Id))
+                TItem[] changed = allDescendantsAndSelf.SelectMany(x => GetComposedOf(x.Id))
                     .Distinct()
                     .Except(allDescendantsAndSelf)
                     .ToArray();
@@ -579,19 +617,22 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 // finally delete the content types
                 // (see notes in overload)
-                foreach (var item in itemsA)
+                foreach (TItem item in itemsA)
+                {
                     Repository.Delete(item);
+                }
 
-                var changes = allDescendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
+                IEnumerable<ContentTypeChange<TItem>> changes = allDescendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
                     .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)));
                 var args = changes.ToEventArgs();
 
                 OnUowRefreshedEntity(args);
 
                 OnChanged(scope, args);
-                deleteEventArgs.DeletedEntities = deleted.DistinctBy(x => x.Id);
-                deleteEventArgs.CanCancel = false;
-                OnDeleted(scope, deleteEventArgs);
+
+                DeletedNotification<TItem> deletedNotification = GetDeletedNotification(deleted.DistinctBy(x => x.Id), eventMessages);
+                deletedNotification.WithStateFrom(deletingNotification);
+                scope.Notifications.Publish(deletedNotification);
 
                 Audit(AuditType.Delete, userId, -1);
                 scope.Complete();
@@ -712,17 +753,17 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult<MoveOperationStatusType>> Move(TItem moving, int containerId)
         {
-            var evtMsgs = EventMessagesFactory.Get();
+            EventMessages eventMessages = EventMessagesFactory.Get();
 
             var moveInfo = new List<MoveEventInfo<TItem>>();
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 var moveEventInfo = new MoveEventInfo<TItem>(moving, moving.Path, containerId);
-                var moveEventArgs = new MoveEventArgs<TItem>(evtMsgs, moveEventInfo);
-                if (OnMovingCancelled(scope, moveEventArgs))
+                MovingNotification<TItem> movingNotification = GetMovingNotification(moveEventInfo, eventMessages);
+                if (scope.Notifications.PublishCancelable(movingNotification))
                 {
                     scope.Complete();
-                    return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, evtMsgs);
+                    return OperationResult.Attempt.Fail(MoveOperationStatusType.FailedCancelledByEvent, eventMessages);
                 }
 
                 scope.WriteLock(WriteLockIds); // also for containers
@@ -742,19 +783,18 @@ namespace Umbraco.Cms.Core.Services.Implement
                 catch (DataOperationException<MoveOperationStatusType> ex)
                 {
                     scope.Complete();
-                    return OperationResult.Attempt.Fail(ex.Operation, evtMsgs);
+                    return OperationResult.Attempt.Fail(ex.Operation, eventMessages);
                 }
 
                 // note: not raising any Changed event here because moving a content type under another container
                 // has no impact on the published content types - would be entirely different if we were to support
                 // moving a content type under another content type.
-
-                moveEventArgs.MoveInfoCollection = moveInfo;
-                moveEventArgs.CanCancel = false;
-                OnMoved(scope, moveEventArgs);
+                MovedNotification<TItem> movedNotification = GetMovedNotification(moveInfo, eventMessages);
+                movedNotification.WithStateFrom(movingNotification);
+                scope.Notifications.Publish(movedNotification);
             }
 
-            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, evtMsgs);
+            return OperationResult.Attempt.Succeed(MoveOperationStatusType.Success, eventMessages);
         }
 
         #endregion
@@ -767,8 +807,8 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult<OperationResultType, EntityContainer>> CreateContainer(int parentId, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            var evtMsgs = EventMessagesFactory.Get();
-            using (var scope = ScopeProvider.CreateScope())
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(WriteLockIds); // also for containers
 
@@ -781,54 +821,55 @@ namespace Umbraco.Cms.Core.Services.Implement
                         CreatorId = userId
                     };
 
-                    var saveEventArgs = new SaveEventArgs<EntityContainer>(container, evtMsgs);
-                    if (OnSavingContainerCancelled(scope, saveEventArgs))
+                    var savingNotification = new EntityContainerSavingNotification(container, eventMessages);
+                    if (scope.Notifications.PublishCancelable(savingNotification))
                     {
                         scope.Complete();
-                        return OperationResult.Attempt.Cancel(evtMsgs, container);
+                        return OperationResult.Attempt.Cancel(eventMessages, container);
                     }
 
                     _containerRepository.Save(container);
                     scope.Complete();
 
-                    saveEventArgs.CanCancel = false;
-                    OnSavedContainer(scope, saveEventArgs);
+                    var savedNotification = new EntityContainerSavedNotification(container, eventMessages);
+                    savedNotification.WithStateFrom(savingNotification);
+                    scope.Notifications.Publish(savedNotification);
                     // TODO: Audit trail ?
 
-                    return OperationResult.Attempt.Succeed(evtMsgs, container);
+                    return OperationResult.Attempt.Succeed(eventMessages, container);
                 }
                 catch (Exception ex)
                 {
                     scope.Complete();
-                    return OperationResult.Attempt.Fail<OperationResultType, EntityContainer>(OperationResultType.FailedCancelledByEvent, evtMsgs, ex);
+                    return OperationResult.Attempt.Fail<OperationResultType, EntityContainer>(OperationResultType.FailedCancelledByEvent, eventMessages, ex);
                 }
             }
         }
 
         public Attempt<OperationResult> SaveContainer(EntityContainer container, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            var evtMsgs = EventMessagesFactory.Get();
+            EventMessages eventMessages = EventMessagesFactory.Get();
 
-            var containerObjectType = ContainerObjectType;
+            Guid containerObjectType = ContainerObjectType;
             if (container.ContainerObjectType != containerObjectType)
             {
                 var ex = new InvalidOperationException("Not a container of the proper type.");
-                return OperationResult.Attempt.Fail(evtMsgs, ex);
+                return OperationResult.Attempt.Fail(eventMessages, ex);
             }
 
             if (container.HasIdentity && container.IsPropertyDirty("ParentId"))
             {
                 var ex = new InvalidOperationException("Cannot save a container with a modified parent, move the container instead.");
-                return OperationResult.Attempt.Fail(evtMsgs, ex);
+                return OperationResult.Attempt.Fail(eventMessages, ex);
             }
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
-                var args = new SaveEventArgs<EntityContainer>(container, evtMsgs);
-                if (OnSavingContainerCancelled(scope, args))
+                var savingNotification = new EntityContainerSavingNotification(container, eventMessages);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
-                    return OperationResult.Attempt.Cancel(evtMsgs);
+                    return OperationResult.Attempt.Cancel(eventMessages);
                 }
 
                 scope.WriteLock(WriteLockIds); // also for containers
@@ -836,13 +877,14 @@ namespace Umbraco.Cms.Core.Services.Implement
                 _containerRepository.Save(container);
                 scope.Complete();
 
-                args.CanCancel = false;
-                OnSavedContainer(scope, args);
+                var savedNotification = new EntityContainerSavedNotification(container, eventMessages);
+                savedNotification.WithStateFrom(savingNotification);
+                scope.Notifications.Publish(savedNotification);
             }
 
             // TODO: Audit trail ?
 
-            return OperationResult.Attempt.Succeed(evtMsgs);
+            return OperationResult.Attempt.Succeed(eventMessages);
         }
 
         public EntityContainer GetContainer(int containerId)
@@ -901,76 +943,83 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Attempt<OperationResult> DeleteContainer(int containerId, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            var evtMsgs = EventMessagesFactory.Get();
-            using (var scope = ScopeProvider.CreateScope())
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(WriteLockIds); // also for containers
 
-                var container = _containerRepository.Get(containerId);
-                if (container == null) return OperationResult.Attempt.NoOperation(evtMsgs);
+                EntityContainer container = _containerRepository.Get(containerId);
+                if (container == null)
+                {
+                    return OperationResult.Attempt.NoOperation(eventMessages);
+                }
 
                 // 'container' here does not know about its children, so we need
                 // to get it again from the entity repository, as a light entity
-                var entity = _entityRepository.Get(container.Id);
+                IEntitySlim entity = _entityRepository.Get(container.Id);
                 if (entity.HasChildren)
                 {
                     scope.Complete();
-                    return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, evtMsgs));
+                    return Attempt.Fail(new OperationResult(OperationResultType.FailedCannot, eventMessages));
                 }
 
-                var deleteEventArgs = new DeleteEventArgs<EntityContainer>(container, evtMsgs);
-                if (OnDeletingContainerCancelled(scope, deleteEventArgs))
+                var deletingNotification = new EntityContainerDeletingNotification(container, eventMessages);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
-                    return Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, evtMsgs));
+                    return Attempt.Fail(new OperationResult(OperationResultType.FailedCancelledByEvent, eventMessages));
                 }
 
                 _containerRepository.Delete(container);
                 scope.Complete();
 
-                deleteEventArgs.CanCancel = false;
-                OnDeletedContainer(scope, deleteEventArgs);
+                var deletedNotification = new EntityContainerDeletedNotification(container, eventMessages);
+                deletedNotification.WithStateFrom(deletingNotification);
+                scope.Notifications.Publish(deletedNotification);
 
-                return OperationResult.Attempt.Succeed(evtMsgs);
+                return OperationResult.Attempt.Succeed(eventMessages);
                 // TODO: Audit trail ?
             }
         }
 
         public Attempt<OperationResult<OperationResultType, EntityContainer>> RenameContainer(int id, string name, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
-            var evtMsgs = EventMessagesFactory.Get();
-            using (var scope = ScopeProvider.CreateScope())
+            EventMessages eventMessages = EventMessagesFactory.Get();
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(WriteLockIds); // also for containers
 
                 try
                 {
-                    var container = _containerRepository.Get(id);
+                    EntityContainer container = _containerRepository.Get(id);
 
                     //throw if null, this will be caught by the catch and a failed returned
                     if (container == null)
+                    {
                         throw new InvalidOperationException("No container found with id " + id);
+                    }
 
                     container.Name = name;
 
-                    var saveEventArgs = new SaveEventArgs<EntityContainer>(container, evtMsgs);
-                    if (OnRenamingContainerCancelled(scope, saveEventArgs))
+                    var renamingNotification = new EntityContainerRenamingNotification(container, eventMessages);
+                    if (scope.Notifications.PublishCancelable(renamingNotification))
                     {
                         scope.Complete();
-                        return OperationResult.Attempt.Cancel<EntityContainer>(evtMsgs);
+                        return OperationResult.Attempt.Cancel<EntityContainer>(eventMessages);
                     }
 
                     _containerRepository.Save(container);
                     scope.Complete();
 
-                    saveEventArgs.CanCancel = false;
-                    OnRenamedContainer(scope, saveEventArgs);
+                    var renamedNotification = new EntityContainerRenamedNotification(container, eventMessages);
+                    renamedNotification.WithStateFrom(renamingNotification);
+                    scope.Notifications.Publish(renamedNotification);
 
-                    return OperationResult.Attempt.Succeed(OperationResultType.Success, evtMsgs, container);
+                    return OperationResult.Attempt.Succeed(OperationResultType.Success, eventMessages, container);
                 }
                 catch (Exception ex)
                 {
-                    return OperationResult.Attempt.Fail<EntityContainer>(evtMsgs, ex);
+                    return OperationResult.Attempt.Fail<EntityContainer>(eventMessages, ex);
                 }
             }
         }
