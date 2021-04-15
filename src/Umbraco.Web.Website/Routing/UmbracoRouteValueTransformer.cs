@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -114,7 +115,7 @@ namespace Umbraco.Cms.Web.Website.Routing
                 return values;
             }
 
-            IPublishedRequest publishedRequest = await RouteRequestAsync(_umbracoContextAccessor.UmbracoContext);
+            IPublishedRequest publishedRequest = await RouteRequestAsync(httpContext, _umbracoContextAccessor.UmbracoContext);
 
             UmbracoRouteValues umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
 
@@ -137,7 +138,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             return values;
         }
 
-        private async Task<IPublishedRequest> RouteRequestAsync(IUmbracoContext umbracoContext)
+        private async Task<IPublishedRequest> RouteRequestAsync(HttpContext httpContext, IUmbracoContext umbracoContext)
         {
             // ok, process
 

@@ -9,6 +9,12 @@ namespace Umbraco.Cms.Core.Security
     public interface IMemberManager : IUmbracoUserManager<MemberIdentityUser>
     {
         /// <summary>
+        /// Returns the currently logged in member if there is one, else returns null
+        /// </summary>
+        /// <returns></returns>
+        Task<MemberIdentityUser> GetCurrentMemberAsync();
+
+        /// <summary>
         /// Checks if the current member is authorized based on the parameters provided.
         /// </summary>
         /// <param name="allowTypes">Allowed types.</param>

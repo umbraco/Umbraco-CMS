@@ -5,14 +5,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-using Smidge;
-using Smidge.Nuglify;
 using StackExchange.Profiling;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Plugins;
 
@@ -26,8 +25,12 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Configures and use services required for using Umbraco
         /// </summary>
-        public static IApplicationBuilder UseUmbraco(this IApplicationBuilder app)
+        public static IApplicationBuilder UseUmbraco(this IApplicationBuilder app, Action<IUmbracoApplicationBuilder> configureUmbraco)
         {
+            IOptions<UmbracoPipelineOptions> startupOptions = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
+
+            app.RunPrePipeline(startupOptions.Value);
+
             // TODO: Should we do some checks like this to verify that the corresponding "Add" methods have been called for the
             // corresponding "Use" methods?
             // https://github.com/dotnet/aspnetcore/blob/b795ac3546eb3e2f47a01a64feb3020794ca33bb/src/Mvc/Mvc.Core/src/Builder/MvcApplicationBuilderExtensions.cs#L132
@@ -66,10 +69,43 @@ namespace Umbraco.Extensions
             // Must be called after UseRouting and before UseEndpoints
             app.UseSession();
 
-            // Must come after the above!
-            app.UseUmbracoInstaller();
+            // DO NOT PUT ANY UseEndpoints declarations here!! Those must all come very last in the pipeline,
+            // endpoints are terminating middleware.
+
+            app.RunPostPipeline(startupOptions.Value);
+            app.RunPreEndpointsPipeline(startupOptions.Value);
+
+            // create our custom builder and execute the callback
+            // which will allow executing all IUmbracoApplicationBuilder ext methods
+            // to create endpoints.
+            var umbAppBuilder = new UmbracoApplicationBuilder(app);
+            configureUmbraco(umbAppBuilder);
 
             return app;
+        }
+
+        private static void RunPrePipeline(this IApplicationBuilder app, UmbracoPipelineOptions startupOptions)
+        {
+            foreach (IUmbracoPipelineFilter filter in startupOptions.PipelineFilters)
+            {
+                filter.OnPrePipeline(app);
+            }
+        }
+
+        private static void RunPostPipeline(this IApplicationBuilder app, UmbracoPipelineOptions startupOptions)
+        {
+            foreach (IUmbracoPipelineFilter filter in startupOptions.PipelineFilters)
+            {
+                filter.OnPostPipeline(app);
+            }
+        }
+
+        private static void RunPreEndpointsPipeline(this IApplicationBuilder app, UmbracoPipelineOptions startupOptions)
+        {
+            foreach (IUmbracoPipelineFilter filter in startupOptions.PipelineFilters)
+            {
+                filter.OnEndpoints(app);
+            }
         }
 
         /// <summary>
@@ -147,27 +183,6 @@ namespace Umbraco.Extensions
             if (!app.UmbracoCanBoot()) return app;
 
             app.UseMiddleware<UmbracoRequestLoggingMiddleware>();
-
-            return app;
-        }
-
-        /// <summary>
-        /// Enables runtime minification for Umbraco
-        /// </summary>
-        public static IApplicationBuilder UseUmbracoRuntimeMinification(this IApplicationBuilder app)
-        {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            if (!app.UmbracoCanBoot())
-            {
-                return app;
-            }
-
-            app.UseSmidge();
-            app.UseSmidgeNuglify();
 
             return app;
         }

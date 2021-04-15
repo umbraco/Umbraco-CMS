@@ -163,6 +163,20 @@ namespace Umbraco.Cms.Web.Common.Security
             return Task.FromResult((IReadOnlyDictionary<string, bool>)result);
         }
 
+        /// <inheritdoc />
+        public async Task<MemberIdentityUser> GetCurrentMemberAsync()
+        {
+            if (_currentMember == null)
+            {
+                if (!IsLoggedIn())
+                {
+                    return null;
+                }
+                _currentMember = await GetUserAsync(_httpContextAccessor.HttpContext.User);
+            }
+            return _currentMember;
+        }
+
         /// <summary>
         /// This will check if the member has access to this path
         /// </summary>
@@ -172,7 +186,7 @@ namespace Umbraco.Cms.Web.Common.Security
         private async Task<bool> HasAccessAsync(string path)
         {
             MemberIdentityUser currentMember = await GetCurrentMemberAsync();
-            if (currentMember == null)
+            if (currentMember == null || !currentMember.IsApproved || currentMember.IsLockedOut)
             {
                 return false;
             }   
@@ -188,7 +202,7 @@ namespace Umbraco.Cms.Web.Common.Security
             var result = new Dictionary<string, bool>();
             MemberIdentityUser currentMember = await GetCurrentMemberAsync();
 
-            if (currentMember == null)
+            if (currentMember == null || !currentMember.IsApproved || currentMember.IsLockedOut)
             {
                 return result;
             }
@@ -214,19 +228,6 @@ namespace Umbraco.Cms.Web.Common.Security
                     async () => await getUserRolesAsync());
             }
             return result;
-        }
-
-        private async Task<MemberIdentityUser> GetCurrentMemberAsync()
-        {
-            if (_currentMember == null)
-            {
-                if (!IsLoggedIn())
-                {
-                    return null;
-                }
-                _currentMember = await GetUserAsync(_httpContextAccessor.HttpContext.User);
-            }
-            return _currentMember;
-        }
+        }        
     }
 }

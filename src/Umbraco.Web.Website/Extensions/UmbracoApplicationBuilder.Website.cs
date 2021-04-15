@@ -1,6 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Website.Routing;
 
 namespace Umbraco.Extensions
@@ -8,36 +9,26 @@ namespace Umbraco.Extensions
     /// <summary>
     /// <see cref="IApplicationBuilder"/> extensions for the umbraco front-end website
     /// </summary>
-    public static class UmbracoWebsiteApplicationBuilderExtensions
+    public static partial class UmbracoApplicationBuilderExtensions
     {
         /// <summary>
-        /// Sets up services and routes for the front-end umbraco website
+        /// Sets up routes for the front-end umbraco website
         /// </summary>
-        public static IApplicationBuilder UseUmbracoWebsite(this IApplicationBuilder app)
+        public static IUmbracoApplicationBuilder UseWebsiteEndpoints(this IUmbracoApplicationBuilder app)
         {
             if (app == null)
             {
                 throw new ArgumentNullException(nameof(app));
             }
 
-            if (!app.UmbracoCanBoot())
+            if (!app.AppBuilder.UmbracoCanBoot())
             {
                 return app;
             }
 
-            app.UseUmbracoRoutes();
-
-            return app;
-        }
-
-        /// <summary>
-        /// Sets up routes for the umbraco front-end
-        /// </summary>
-        public static IApplicationBuilder UseUmbracoRoutes(this IApplicationBuilder app)
-        {
-            app.UseEndpoints(endpoints =>
+            app.AppBuilder.UseEndpoints(endpoints =>
             {
-                FrontEndRoutes surfaceRoutes = app.ApplicationServices.GetRequiredService<FrontEndRoutes>();
+                FrontEndRoutes surfaceRoutes = app.AppBuilder.ApplicationServices.GetRequiredService<FrontEndRoutes>();
                 surfaceRoutes.CreateRoutes(endpoints);
 
                 endpoints.MapDynamicControllerRoute<UmbracoRouteValueTransformer>("/{**slug}");

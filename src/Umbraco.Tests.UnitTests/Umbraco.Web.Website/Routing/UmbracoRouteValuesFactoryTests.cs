@@ -34,11 +34,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
         {
             var builder = new PublishedRequestBuilder(new Uri("https://example.com"), Mock.Of<IFileService>());
             builder.SetPublishedContent(Mock.Of<IPublishedContent>());
-            request = builder.Build();
+            IPublishedRequest builtRequest = request = builder.Build();
 
             publishedRouter = new Mock<IPublishedRouter>();
-            publishedRouter.Setup(x => x.UpdateRequestToNotFoundAsync(It.IsAny<IPublishedRequest>()))
-                .Returns((IPublishedRequest r) => Task.FromResult((IPublishedRequestBuilder)builder))
+            publishedRouter.Setup(x => x.UpdateRequestAsync(It.IsAny<IPublishedRequest>(), null))
+                .Returns((IPublishedRequest r, IPublishedContent c) => Task.FromResult(builtRequest))
                 .Verifiable();
 
             renderingDefaults = new UmbracoRenderingDefaults();
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
             UmbracoRouteValues result = await factory.CreateAsync(new DefaultHttpContext(), request);
 
             // The request has content, no template, no hijacked route and no disabled template features so UpdateRequestToNotFound will be called
-            publishedRouter.Verify(m => m.UpdateRequestToNotFoundAsync(It.IsAny<IPublishedRequest>()), Times.Once);
+            publishedRouter.Verify(m => m.UpdateRequestAsync(It.IsAny<IPublishedRequest>(), null), Times.Once);
         }
 
         [Test]

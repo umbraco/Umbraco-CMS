@@ -148,14 +148,13 @@ namespace Umbraco.Cms.Web.Website.Routing
                 // This is basically a 404 even if there is content found.
                 // We then need to re-run this through the pipeline for the last
                 // chance finders to work.
-                IPublishedRequestBuilder builder = await _publishedRouter.UpdateRequestToNotFoundAsync(request);
+                // Set to null since we are telling it there is no content.
+                request = await _publishedRouter.UpdateRequestAsync(request, null);
 
-                if (builder == null)
+                if (request == null)
                 {
-                    throw new InvalidOperationException($"The call to {nameof(IPublishedRouter.UpdateRequestToNotFoundAsync)} cannot return null");
+                    throw new InvalidOperationException($"The call to {nameof(IPublishedRouter.UpdateRequestAsync)} cannot return null");
                 }
-
-                request = builder.Build();
 
                 def = new UmbracoRouteValues(
                         request,

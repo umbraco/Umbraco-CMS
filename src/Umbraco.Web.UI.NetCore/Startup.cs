@@ -4,7 +4,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 using Umbraco.Extensions;
+using Microsoft.Extensions.Hosting;
 
 namespace Umbraco.Cms.Web.UI.NetCore
 {
@@ -51,10 +54,19 @@ namespace Umbraco.Cms.Web.UI.NetCore
         /// <summary>
         /// Configures the application
         /// </summary>
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseUmbracoBackOffice();
-            app.UseUmbracoWebsite();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseUmbraco(u =>
+            {
+                u.UseInstallerEndpoints();
+                u.UseBackOfficeEndpoints();
+                u.UseWebsiteEndpoints();
+            });            
         }
     }
 }
