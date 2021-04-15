@@ -1,6 +1,10 @@
-﻿using Umbraco.Core;
+﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+using Umbraco.Core;
 using Umbraco.Core.Logging;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Web.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Web.PropertyEditors
 {
@@ -30,7 +34,7 @@ namespace Umbraco.Web.PropertyEditors
 
         protected override IDataValueEditor CreateValueEditor() => new MediaPicker3PropertyValueEditor(Attribute);
 
-        internal class MediaPicker3PropertyValueEditor : DataValueEditor
+        internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
         {
             ///<remarks>
             /// Note: no FromEditor() and ToEditor() methods
@@ -40,11 +44,21 @@ namespace Umbraco.Web.PropertyEditors
             {
             }
 
-            // TODO: Perhaps needed?! from IDataValueReference
-            //public IEnumerable<UmbracoEntityReference> GetReferences(object value)
-            //{
-            //    throw new NotImplementedException();
-            //}    
+            public IEnumerable<UmbracoEntityReference> GetReferences(object value)
+            {
+                var rawJson = value == null ? string.Empty : value is string str ? str : value.ToString();
+
+                if (rawJson.IsNullOrWhiteSpace())
+                    yield break;
+
+                var mediaWithCropsDtos = JsonConvert.DeserializeObject<MediaPickerWithCropsValueConverter.MediaWithCropsDto[]>(rawJson);
+
+                foreach (var mediaWithCropsDto in mediaWithCropsDtos)
+                {
+                    yield return new UmbracoEntityReference(GuidUdi.Create(Constants.UdiEntityType.Media, mediaWithCropsDto.MediaKey));
+                }
+            }
+
         }
     }
 }
