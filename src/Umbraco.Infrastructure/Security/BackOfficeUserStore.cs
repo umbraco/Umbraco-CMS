@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Core.Security
             IExternalLoginService externalLoginService,
             IOptions<GlobalSettings> globalSettings,
             UmbracoMapper mapper,
-            BackOfficeIdentityErrorDescriber describer,
+            BackOfficeErrorDescriber describer,
             AppCaches appCaches)
             : base(describer)
         {

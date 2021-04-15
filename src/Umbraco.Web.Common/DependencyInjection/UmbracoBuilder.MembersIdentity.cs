@@ -32,7 +32,8 @@ namespace Umbraco.Extensions
                 .AddRoleStore<MemberRoleStore>()
                 .AddRoleManager<IMemberRoleManager, MemberRoleManager>()
                 .AddMemberManager<IMemberManager, MemberManager>()
-                .AddSignInManager<IMemberSignInManager, MemberSignInManager>();
+                .AddSignInManager<IMemberSignInManager, MemberSignInManager>()
+                .AddErrorDescriber<MembersErrorDescriber>();
 
             services.ConfigureApplicationCookie(x =>
             {

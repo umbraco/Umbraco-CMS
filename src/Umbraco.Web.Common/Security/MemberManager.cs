@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Web.Common.Security
             IPasswordHasher<MemberIdentityUser> passwordHasher,
             IEnumerable<IUserValidator<MemberIdentityUser>> userValidators,
             IEnumerable<IPasswordValidator<MemberIdentityUser>> passwordValidators,
-            BackOfficeIdentityErrorDescriber errors,
+            IdentityErrorDescriber errors,
             IServiceProvider services,
             ILogger<UserManager<MemberIdentityUser>> logger,
             IOptions<MemberPasswordConfigurationSettings> passwordConfiguration,
