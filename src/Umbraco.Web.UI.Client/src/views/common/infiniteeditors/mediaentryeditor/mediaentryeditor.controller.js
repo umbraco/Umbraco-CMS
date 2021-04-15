@@ -18,6 +18,8 @@ angular.module("umbraco")
                 vm.submitLabel = data[1];
             });
 
+            vm.title = "";
+
             function init() {
 
                 updateMedia();
@@ -39,6 +41,10 @@ angular.module("umbraco")
                     vm.loading = false;
                     vm.hasDimensions = false;
                     vm.isCroppable = false;
+
+                    localizationService.localize("mediaPicker_editMediaEntryLabel", [vm.media.name, vm.model.documentName]).then(function (data) {
+                        vm.title = data;
+                    });
                 }, function () {
                     localizationService.localize("mediaPicker_deletedItem").then(function (localized) {
                         vm.media = {

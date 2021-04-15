@@ -142,7 +142,7 @@ umb-media-card {
         }
     }
 
-    &:hover {
+    &:hover, &:focus, &:focus-within {
         .__info {
             opacity: 1;
         }
@@ -166,6 +166,7 @@ umb-media-card {
         opacity: 0;
         transition: opacity 120ms;
         .__action {
+            position: relative;
             display: inline-block;
             padding: 5px;
             font-size: 18px;

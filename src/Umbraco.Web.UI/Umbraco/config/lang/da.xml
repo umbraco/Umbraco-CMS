@@ -1100,10 +1100,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="pickedTrashedItem">Du har valgt et medie som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt medier som er slettede eller lagt i papirkurven</key>
     <key alias="trashed">Slettet</key>
-    <key alias="openMedia">Åben medie</key>
-    <key alias="replaceMedia">Udskift mediet</key>
+    <key alias="openMedia">Åben i mediebiblioteket</key>
+    <key alias="changeMedia">Skift medie</key>
     <key alias="resetMediaCrop">Nulstil medie beskæring</key>
-    <key alias="editMediaEntryLabel">Rediger medie tilretninger</key>
+    <key alias="editMediaEntryLabel">Rediger %0% på %1%</key>
     <key alias="confirmCancelMediaEntryCreationHeadline">Annuller indsættelse?</key>
     <key alias="confirmCancelMediaEntryCreationMessage"><![CDATA[Er du sikker på at du vil annullere indsættelsen?]]></key>
     <key alias="confirmCancelMediaEntryHasChanges">Du har foretaget ændringer til bruge af dette media. Er du sikker på at du vil annullere?</key>

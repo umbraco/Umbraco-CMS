@@ -136,18 +136,6 @@ angular.module("umbraco")
 
             function onInit() {
 
-                /*
-                clipboardService.retriveEntriesOfType(clipboardService.TYPES.IMAGE, ["Media"]).forEach(item => {
-                    var media = item.data.media;
-                    if ((($scope.disableFolderSelect || $scope.onlyImages) && media.isFolder) ||
-                        ($scope.onlyFolders && !media.isFolder)) {
-                        return;
-                    }
-                    setDefaultData(media);
-                    vm.clipboardImages.push(media);
-                });
-                */
-
                 setTitle();
 
                 userService.getCurrentUser().then(function (userData) {

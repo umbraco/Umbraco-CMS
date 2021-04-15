@@ -8,9 +8,7 @@
             name-locked="true"
             hide-alias="true"
             hide-icon="true"
-            hide-description="true"
-            navigation="vm.navigation"
-            on-select-navigation-item="vm.onNavigationChanged(item)">
+            hide-description="true">
         </umb-editor-header>
 
         <umb-editor-container ng-if="vm.activeTab.alias === 'empty'">
@@ -147,33 +145,6 @@
             </form>
 
         </umb-editor-container>
-        <!--
-        <umb-editor-container ng-if="vm.activeTab.alias === 'clipboard'">
-
-            <div style="margin-bottom:20px; text-align: right;">
-                <umb-button type="button"
-                            icon="icon-trash"
-                            button-style="link"
-                            label-key="clipboard_labelForClearClipboard"
-                            action="vm.clickClearClipboard()">
-                </umb-button>
-            </div>
-
-            <umb-media-grid ng-if="!vm.loading"
-                            items="vm.clipboardItems"
-                            on-click="vm.clickHandler"
-                            item-max-width="150"
-                            item-max-height="150"
-                            item-min-width="100"
-                            item-min-height="100"
-                            disable-folder-select={{disableFolderSelect}}
-                            only-images={{onlyImages}}
-                            only-folders={{onlyFolders}}
-                            show-media-list=vm.showMediaList>
-            </umb-media-grid>
-
-        </umb-editor-container>
-        -->
         <umb-editor-container ng-if="vm.activeTab.alias === 'clipboard'">
 
             <div style="margin-bottom:20px; text-align: right;">

@@ -100,17 +100,10 @@ angular.module("umbraco.directives")
 
                     function onScroll(event) {
                         // cross-browser wheel delta
-                        var event = window.event || event; // old IE support
                         var delta = Math.max(-50, Math.min(50, (event.wheelDelta || -event.detail)));
 
                         if(sliderRef) {
                             var currentScale =sliderRef.noUiSlider.get();
-                            /*
-                            if (delta > 0 && scope.dimensions.scale.max.toFixed(3) === currentScale.toFixed(3))
-                                return;
-                            if (delta < 0 && scope.dimensions.scale.min.toFixed(3) === currentScale.toFixed(3))
-                                return;
-                            */
 
                             var newScale = Math.min(Math.max(currentScale + delta*.001*scope.dimensions.image.ratio, scope.dimensions.scale.min), scope.dimensions.scale.max);
                             sliderRef.noUiSlider.set(newScale);
@@ -118,9 +111,6 @@ angular.module("umbraco.directives")
                                 scope.dimensions.scale.current = newScale;
                             });
 
-                            // for IE
-                            event.returnValue = false;
-                            // for Chrome and Firefox
                             if(event.preventDefault)  {
                                 event.preventDefault();
                             }
@@ -130,14 +120,6 @@ angular.module("umbraco.directives")
 
                     //live rendering of viewport and image styles
                     function updateStyles() {
-                        /*
-                        scope.viewportStyle = {
-                            'top': (parseInt(scope.dimensions.image.top + scope.dimensions.margin.top, 10)) + 'px',
-                            'left': (parseInt(scope.dimensions.image.left + scope.dimensions.margin.left, 10)) + 'px',
-                            'width': (parseInt(scope.dimensions.image.width, 10)) + 'px',
-                            'height': (parseInt(scope.dimensions.image.height, 10)) + 'px'
-                        };
-                        */
                         scope.maskStyle = {
                             'height': (parseInt(scope.dimensions.cropper.height, 10)) + 'px',
                             'width': (parseInt(scope.dimensions.cropper.width, 10)) + 'px',
@@ -152,7 +134,6 @@ angular.module("umbraco.directives")
                     var $viewport = element.find(".viewport");
                     var $image = element.find("img");
                     var $overlay = element.find(".overlay");
-                    //var $container = element.find(".crop-container");
 
                     $overlay.bind("focus", function () {
                         $overlay.bind("DOMMouseScroll mousewheel onmousewheel", onScroll);

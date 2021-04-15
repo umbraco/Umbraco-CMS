@@ -5,7 +5,7 @@
         <umb-editor-view umb-tabs ng-if="!page.loading">
 
             <umb-editor-header
-                name="vm.media.name"
+                name="vm.title"
                 name-required="false"
                 name-locked="true"
                 hide-alias="true"
@@ -78,7 +78,7 @@
                             </umb-file-icon>
 
                             <div class="umb-media-entry-editor__imageholder-actions">
-                                <button class="btn btn-link" aria-hidden="true" ng-click="vm.repickMedia()"><i class="icon-wrong"></i> <localize key="mediaPicker_replaceMedia">Replace media</localize></button>
+                                <button class="btn btn-link" aria-hidden="true" ng-click="vm.repickMedia()"><i class="icon-wrong"></i> <localize key="mediaPicker_changeMedia">Replace media</localize></button>
                                 <button class="btn btn-link" aria-hidden="true" ng-click="vm.openMedia()"><i class="icon-out"></i> <localize key="mediaPicker_openMedia">Open media</localize></button>
                             </div>
                         </div>
