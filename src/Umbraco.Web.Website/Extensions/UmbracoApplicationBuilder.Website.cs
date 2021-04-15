@@ -14,7 +14,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Sets up routes for the front-end umbraco website
         /// </summary>
-        public static IUmbracoApplicationBuilder UseWebsiteEndpoints(this IUmbracoApplicationBuilder app)
+        public static IUmbracoEndpointBuilder UseWebsiteEndpoints(this IUmbracoEndpointBuilder app)
         {
             if (app == null)
             {

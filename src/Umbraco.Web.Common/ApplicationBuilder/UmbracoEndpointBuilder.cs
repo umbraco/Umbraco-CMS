@@ -8,9 +8,9 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
     /// <summary>
     /// A builder to allow encapsulating the enabled routing features in Umbraco
     /// </summary>
-    internal class UmbracoApplicationBuilder : IUmbracoApplicationBuilder
+    internal class UmbracoEndpointBuilder : IUmbracoEndpointBuilder
     {
-        public UmbracoApplicationBuilder(IServiceProvider services, IRuntimeState runtimeState, IApplicationBuilder appBuilder, IEndpointRouteBuilder endpointRouteBuilder)
+        public UmbracoEndpointBuilder(IServiceProvider services, IRuntimeState runtimeState, IApplicationBuilder appBuilder, IEndpointRouteBuilder endpointRouteBuilder)
         {
             ApplicationServices = services;
             EndpointRouteBuilder = endpointRouteBuilder;

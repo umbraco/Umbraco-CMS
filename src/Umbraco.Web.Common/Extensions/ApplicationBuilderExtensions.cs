@@ -25,7 +25,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Configures and use services required for using Umbraco
         /// </summary>
-        public static IApplicationBuilder UseUmbraco(this IApplicationBuilder app, Action<IUmbracoApplicationBuilder> configureUmbraco)
+        public static IApplicationBuilder UseUmbraco(this IApplicationBuilder app, Action<IUmbracoEndpointBuilder> configureUmbraco)
         {
             IOptions<UmbracoPipelineOptions> startupOptions = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
 
@@ -80,7 +80,7 @@ namespace Umbraco.Extensions
             // to create endpoints.
             app.UseEndpoints(endpoints =>
             {
-                var umbAppBuilder = (IUmbracoApplicationBuilder)ActivatorUtilities.CreateInstance<UmbracoApplicationBuilder>(
+                var umbAppBuilder = (IUmbracoEndpointBuilder)ActivatorUtilities.CreateInstance<UmbracoEndpointBuilder>(
                     app.ApplicationServices,
                     new object[] { app, endpoints });
                 configureUmbraco(umbAppBuilder);

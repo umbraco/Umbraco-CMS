@@ -8,11 +8,11 @@ using Umbraco.Cms.Web.Common.Extensions;
 namespace Umbraco.Extensions
 {
     /// <summary>
-    /// <see cref="IUmbracoApplicationBuilder"/> extensions for Umbraco
+    /// <see cref="IUmbracoEndpointBuilder"/> extensions for Umbraco
     /// </summary>
     public static partial class UmbracoApplicationBuilderExtensions
     {
-        public static IUmbracoApplicationBuilder UseBackOfficeEndpoints(this IUmbracoApplicationBuilder app)
+        public static IUmbracoEndpointBuilder UseBackOfficeEndpoints(this IUmbracoEndpointBuilder app)
         {
             // NOTE: This method will have been called after UseRouting, UseAuthentication, UseAuthorization
             if (app == null)

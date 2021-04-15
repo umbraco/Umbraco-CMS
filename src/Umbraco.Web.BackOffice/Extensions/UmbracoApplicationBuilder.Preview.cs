@@ -6,11 +6,11 @@ using Umbraco.Cms.Web.Common.ApplicationBuilder;
 namespace Umbraco.Extensions
 {
     /// <summary>
-    /// <see cref="IUmbracoApplicationBuilder"/> extensions for Umbraco
+    /// <see cref="IUmbracoEndpointBuilder"/> extensions for Umbraco
     /// </summary>
     public static partial class UmbracoApplicationBuilderExtensions
     {
-        public static IUmbracoApplicationBuilder UseUmbracoPreviewEndpoints(this IUmbracoApplicationBuilder app)
+        public static IUmbracoEndpointBuilder UseUmbracoPreviewEndpoints(this IUmbracoEndpointBuilder app)
         {
             PreviewRoutes previewRoutes = app.ApplicationServices.GetRequiredService<PreviewRoutes>();
             previewRoutes.CreateRoutes(app.EndpointRouteBuilder);

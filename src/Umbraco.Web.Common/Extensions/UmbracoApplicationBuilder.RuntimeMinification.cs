@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Web.Common.Extensions
         /// <summary>
         /// Enables runtime minification for Umbraco
         /// </summary>
-        public static IUmbracoApplicationBuilder UseUmbracoRuntimeMinificationEndpoints(this IUmbracoApplicationBuilder app)
+        public static IUmbracoEndpointBuilder UseUmbracoRuntimeMinificationEndpoints(this IUmbracoEndpointBuilder app)
         {
             if (app == null)
             {
