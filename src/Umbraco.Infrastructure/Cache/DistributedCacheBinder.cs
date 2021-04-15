@@ -34,6 +34,7 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         // internal for tests
+        // TODO: Remove this once all static events are gone.
         internal static MethodInfo FindHandler(IEventDefinition eventDefinition)
         {
             var name = eventDefinition.Sender.GetType().Name + "_" + eventDefinition.EventName;
