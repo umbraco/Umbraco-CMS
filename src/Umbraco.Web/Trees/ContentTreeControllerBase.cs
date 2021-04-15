@@ -26,11 +26,9 @@ namespace Umbraco.Web.Trees
 {
     public abstract class ContentTreeControllerBase : TreeController
     {
-        private readonly AppCaches _appCaches;
 
         protected ContentTreeControllerBase(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper) : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
-            _appCaches = appCaches;
         }
 
         protected ContentTreeControllerBase()
