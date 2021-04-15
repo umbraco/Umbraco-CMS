@@ -70,7 +70,7 @@ namespace Umbraco.Extensions
             app.UseSession();
 
             // DO NOT PUT ANY UseEndpoints declarations here!! Those must all come very last in the pipeline,
-            // endpoints are terminating middleware.
+            // endpoints are terminating middleware. All of our endpoints are declared in ext of IUmbracoApplicationBuilder
 
             app.RunPostPipeline(startupOptions.Value);
             app.RunPreEndpointsPipeline(startupOptions.Value);
