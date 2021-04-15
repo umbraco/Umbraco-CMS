@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 namespace Umbraco.Cms.Core.PublishedCache
 {
     // TODO: Kill this, why do we want this at all?
+    // See https://dev.azure.com/umbraco/D-Team%20Tracker/_workitems/edit/11487
     public interface IPublishedMemberCache : IXPathNavigable
     {
         IPublishedContent GetByProviderKey(object key);
