@@ -16,8 +16,9 @@ namespace Umbraco.Cms.Core.Services.Implement
     public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType, IContentTypeService>, IContentTypeService
     {
         public ContentTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IContentService contentService,
-            IContentTypeRepository repository, IAuditRepository auditRepository, IDocumentTypeContainerRepository entityContainerRepository, IEntityRepository entityRepository)
-            : base(provider, loggerFactory, eventMessagesFactory, repository, auditRepository, entityContainerRepository, entityRepository)
+            IContentTypeRepository repository, IAuditRepository auditRepository, IDocumentTypeContainerRepository entityContainerRepository, IEntityRepository entityRepository,
+            IEventAggregator eventAggregator)
+            : base(provider, loggerFactory, eventMessagesFactory, repository, auditRepository, entityContainerRepository, entityRepository, eventAggregator)
         {
             ContentService = contentService;
         }
@@ -65,6 +66,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         protected override ContentTypeChangeNotification<IContentType> GetContentTypeChangedNotification(
             IEnumerable<ContentTypeChange<IContentType>> changes, EventMessages eventMessages) =>
             new ContentTypeChangedNotification(changes, eventMessages);
+
+        protected override ContentTypeRefreshNotification<IContentType> GetContentTypeRefreshedNotification(
+            IEnumerable<ContentTypeChange<IContentType>> changes, EventMessages eventMessages) =>
+            new ContentTypeRefreshedNotification(changes, eventMessages);
 
         #endregion
 

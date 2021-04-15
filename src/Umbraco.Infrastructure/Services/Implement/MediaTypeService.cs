@@ -13,8 +13,8 @@ namespace Umbraco.Cms.Core.Services.Implement
     {
         public MediaTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMediaService mediaService,
             IMediaTypeRepository mediaTypeRepository, IAuditRepository auditRepository, IMediaTypeContainerRepository entityContainerRepository,
-            IEntityRepository entityRepository)
-            : base(provider, loggerFactory, eventMessagesFactory, mediaTypeRepository, auditRepository, entityContainerRepository, entityRepository)
+            IEntityRepository entityRepository, IEventAggregator eventAggregator)
+            : base(provider, loggerFactory, eventMessagesFactory, mediaTypeRepository, auditRepository, entityContainerRepository, entityRepository, eventAggregator)
         {
             MediaService = mediaService;
         }
@@ -62,6 +62,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         protected override ContentTypeChangeNotification<IMediaType> GetContentTypeChangedNotification(
             IEnumerable<ContentTypeChange<IMediaType>> changes, EventMessages eventMessages) =>
             new MediaTypeChangedNotification(changes, eventMessages);
+
+        protected override ContentTypeRefreshNotification<IMediaType> GetContentTypeRefreshedNotification(
+            IEnumerable<ContentTypeChange<IMediaType>> changes, EventMessages eventMessages) =>
+            new MediaTypeRefreshedNotification(changes, eventMessages);
 
         #endregion
 

@@ -15,8 +15,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IMemberTypeRepository _memberTypeRepository;
 
         public MemberTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMemberService memberService,
-            IMemberTypeRepository memberTypeRepository, IAuditRepository auditRepository, IEntityRepository entityRepository)
-            : base(provider, loggerFactory, eventMessagesFactory, memberTypeRepository, auditRepository, null, entityRepository)
+            IMemberTypeRepository memberTypeRepository, IAuditRepository auditRepository, IEntityRepository entityRepository, IEventAggregator eventAggregator)
+            : base(provider, loggerFactory, eventMessagesFactory, memberTypeRepository, auditRepository, null, entityRepository, eventAggregator)
         {
             MemberService = memberService;
             _memberTypeRepository = memberTypeRepository;
@@ -65,6 +65,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         protected override ContentTypeChangeNotification<IMemberType> GetContentTypeChangedNotification(
             IEnumerable<ContentTypeChange<IMemberType>> changes, EventMessages eventMessages) =>
             new MemberTypeChangedNotification(changes, eventMessages);
+
+        protected override ContentTypeRefreshNotification<IMemberType> GetContentTypeRefreshedNotification(
+            IEnumerable<ContentTypeChange<IMemberType>> changes, EventMessages eventMessages) =>
+            new MemberTypeRefreshNotification(changes, eventMessages);
 
         #endregion
 

@@ -22,15 +22,18 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityContainerRepository _containerRepository;
         private readonly IEntityRepository _entityRepository;
+        private readonly IEventAggregator _eventAggregator;
 
         protected ContentTypeServiceBase(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
-            TRepository repository, IAuditRepository auditRepository, IEntityContainerRepository containerRepository, IEntityRepository entityRepository)
+            TRepository repository, IAuditRepository auditRepository, IEntityContainerRepository containerRepository, IEntityRepository entityRepository,
+            IEventAggregator eventAggregator)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
             Repository = repository;
             _auditRepository = auditRepository;
             _containerRepository = containerRepository;
             _entityRepository = entityRepository;
+            _eventAggregator = eventAggregator;
         }
 
         protected TRepository Repository { get; }
@@ -55,6 +58,12 @@ namespace Umbraco.Cms.Core.Services.Implement
         protected abstract MovedNotification<TItem> GetMovedNotification(IEnumerable<MoveEventInfo<TItem>> moveInfo, EventMessages eventMessages);
 
         protected abstract ContentTypeChangeNotification<TItem> GetContentTypeChangedNotification(IEnumerable<ContentTypeChange<TItem>> changes, EventMessages eventMessages);
+
+        // This notification is identical to GetTypeChangeNotification, however it needs to be a different notification type because it's published within the transaction
+        /// The purpose of this notification being published within the transaction is so that listeners can perform database
+        /// operations from within the same transaction and guarantee data consistency so that if anything goes wrong
+        /// the entire transaction can be rolled back. This is used by Nucache.
+        protected abstract ContentTypeRefreshNotification<TItem> GetContentTypeRefreshedNotification(IEnumerable<ContentTypeChange<TItem>> changes, EventMessages eventMessages);
 
         #endregion
 
@@ -450,9 +459,9 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 // figure out impacted content types
                 ContentTypeChange<TItem>[] changes = ComposeContentTypeChanges(item).ToArray();
-                var args = changes.ToEventArgs();
 
-                OnUowRefreshedEntity(args);
+                // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+                _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
 
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
@@ -499,9 +508,9 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 // figure out impacted content types
                 ContentTypeChange<TItem>[] changes = ComposeContentTypeChanges(itemsA).ToArray();
-                var args = changes.ToEventArgs();
 
-                OnUowRefreshedEntity(args);
+                // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+                _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages)); ;
 
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
@@ -566,13 +575,12 @@ namespace Umbraco.Cms.Core.Services.Implement
                 //   need to have their property data cleared)
                 Repository.Delete(item);
 
-                //...
                 ContentTypeChange<TItem>[] changes = descendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
                     .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
                     .ToArray();
-                var args = changes.ToEventArgs();
 
-                OnUowRefreshedEntity(args);
+                // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+                _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
 
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 
@@ -628,9 +636,9 @@ namespace Umbraco.Cms.Core.Services.Implement
                 ContentTypeChange<TItem>[] changes = allDescendantsAndSelf.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.Remove))
                     .Concat(changed.Select(x => new ContentTypeChange<TItem>(x, ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther)))
                     .ToArray();
-                var args = changes.ToEventArgs();
 
-                OnUowRefreshedEntity(args);
+                // Publish this in scope, see comment at GetContentTypeRefreshedNotification for more info.
+                _eventAggregator.Publish(GetContentTypeRefreshedNotification(changes, eventMessages));
 
                 scope.Notifications.Publish(GetContentTypeChangedNotification(changes, eventMessages));
 

@@ -53,12 +53,5 @@ namespace Umbraco.Cms.Core.Services.Implement
         public static event TypedEventHandler<TService, DeleteEventArgs<EntityContainer>> DeletingContainer;
         public static event TypedEventHandler<TService, DeleteEventArgs<EntityContainer>> DeletedContainer;
 
-        /// <summary>
-        /// Raises the <see cref="ScopedRefreshedEntity"/> event during the <see cref="IScope"/> (transaction)
-        /// </summary>
-        protected void OnUowRefreshedEntity(ContentTypeChange<TItem>.EventArgs args)
-        {
-            ScopedRefreshedEntity.RaiseEvent(args, This);
-        }
     }
 }
