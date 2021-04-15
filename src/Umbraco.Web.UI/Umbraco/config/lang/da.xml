@@ -278,7 +278,7 @@
     <key alias="childItems" version="7.0">Undersider</key>
     <key alias="target" version="7.0">Åben i vindue</key>
     <key alias="scheduledPublishServerTime">Dette oversætter til den følgende tid på serveren:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Hvad betyder det?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Hvad betyder det?</a>]]></key>
     <key alias="nestedContentDeleteItem">Er du sikker på, at du vil slette dette element?</key>
     <key alias="nestedContentDeleteAllItems">Er du sikker på, at du vil slette alle elementer?</key>
     <key alias="nestedContentEditorNotSupported">Egenskaben %0% anvender editoren %1% som ikke er understøttet af Nested Content.</key>
@@ -307,6 +307,7 @@
     <key alias="schedulePublishHelp">Vælg dato og klokkeslæt for at udgive og/eller afpublicere indholdet.</key>
     <key alias="createEmpty">Opret ny</key>
     <key alias="createFromClipboard">Indsæt fra udklipsmappen</key>
+    <key alias="nodeIsInTrash">Dette element er i papirkurven</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Opret en ny indholdsskabelon fra '%0%'</key>
@@ -334,6 +335,17 @@
     <key alias="createNewMember">Opret et nyt medlem</key>
     <key alias="allMembers">Alle medlemmer</key>
     <key alias="memberGroupNoProperties">Medlemgrupper har ingen yderligere egenskaber til redigering.</key>
+  </area>
+  <area alias="contentType">
+     <key alias="copyFailed">Kopiering af indholdstypen fejlede</key>
+     <key alias="moveFailed">Flytning af indholdstypen fejlede</key>
+  </area>
+  <area alias="mediaType">
+     <key alias="copyFailed">Kopiering af medietypen fejlede</key>
+     <key alias="moveFailed">Flytning af medietypen fejlede</key>
+  </area>
+  <area alias="memberType">
+     <key alias="copyFailed">Kopiering af medlemstypen fejlede</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Hvor ønsker du at oprette den nye %0%</key>
@@ -451,7 +463,7 @@
     <key alias="recycleBinDeleting">Elementerne i papirkurven slettes. Luk venligst ikke dette vindue mens sletningen foregår</key>
     <key alias="recycleBinIsEmpty">Papirkurven er nu tom</key>
     <key alias="recycleBinWarning">Når elementer slettes fra papirkurven, slettes de for altid</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice oplever i øjeblikket problemer, vi ikke har kontrol over. Beklager ulejligheden. ]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>'s webservice oplever i øjeblikket problemer, vi ikke har kontrol over. Beklager ulejligheden. ]]></key>
     <key alias="regexSearchHelp">Søg efter et regulært udtryk for at tilføje validering til et formularfelt. Eksempel: 'e-mail', 'postnr.', 'URL'</key>
     <key alias="removeMacro">Fjern makro</key>
     <key alias="requiredField">Obligatorisk</key>
@@ -623,7 +635,6 @@
     <key alias="tableColMergeLeft">Du skal stå til venstre for de 2 celler du ønsker at samle!</key>
     <key alias="tableSplitNotSplittable">Du kan ikke opdele en celle, som ikke allerede er delt.</key>
     <key alias="propertyHasErrors">Denne egenskab er ugyldig</key>
-    <key alias="errorPropertyEditorNotSupportedInElementTypes">Feltet %0% bruger editor %1% som ikke er supporteret for ElementTyper.</key>
   </area>
   <area alias="general">
     <key alias="about">Om</key>
@@ -824,7 +835,7 @@
     ]]></key>
     <key alias="databaseInstallDone"><![CDATA[Umbraco %0% er nu blevet kopieret til din database. Tryk på <string>Næste</strong> for at fortsætte.]]></key>
     <key alias="databaseNotFound"><![CDATA[<p>Databasen er ikke fundet. Kontrollér venligst at informationen i database forbindelsesstrengen i "web.config" filen er korrekt.</p>
-<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "umbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">Mere information om at redigere web.config her.</a></p>]]></key>
+<p>For at fortsætte bedes du venligst rette "web.config" filen (ved at bruge Visual Studio eller dit favoritprogram), scroll til bunden, tilføj forbindelsesstrengen til din database i feltet som hedder "umbracoDbDSN" og gem filen.</p><p>Klik på <strong>Forsøg igen</strong> knappen når du er færdig.<br/><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank" rel="noopener">Mere information om at redigere web.config her.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[For at afslutte dette skridt er du nødt til at have nogle informationer om din database parat ("database forbindelsesstrengen").<br/>Kontakt venligst din ISP hvis det er nødvendigt. Hvis du installerer på en lokal maskine eller server kan du muligvis få informationerne fra din systemadministrator.]]></key>
     <key alias="databaseUpgrade"><![CDATA[<p>Tryk på <strong>Opgradér</strong> knappen for at opgradere din database til Umbraco %0%</p><p>Bare rolig - intet indhold vil blive slettet og alt vil stadig fungere bagefter!</p>]]></key>
     <key alias="databaseUpgradeDone"><![CDATA[Din database er blevet opgraderet til den endelige version %0%.<br/>Tryk på <strong>Næste</strong> for at fortsætte.]]></key>
@@ -897,7 +908,7 @@
     <key alias="instruction">Log ind nedenfor</key>
     <key alias="signInWith">Log ind med</key>
     <key alias="timeout">Din session er udløbet</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Glemt adgangskode?</key>
     <key alias="forgottenPasswordInstruction">En e-mail vil blive sendt til den angivne adresse med et link til at nulstille din adgangskode</key>
     <key alias="requestPasswordResetConfirmation">En e-mail med instruktioner for nulstilling af adgangskoden vil blive sendt til den angivne adresse, hvis det matcher vores optegnelser</key>
@@ -949,7 +960,7 @@ Mange hilsner fra Umbraco robotten
     <p>Dette er en automatisk mail for at informere dig om at opgaven <strong>'%1%'</strong>
     er blevet udførtpå siden <a href="http://%4%/#/content/content/edit/%5%"><strong>'%2%'</strong></a> af brugeren <strong>'%3%'</strong> </p>
     <div style="margin: 8px 0; padding: 8px; display: block;"> <br />
-    <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <br /> </div> <p> <h3>Opdateringssammendrag:</h3> <table style="width: 100%;"> %6% </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISÉR&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SLET&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p>Hav en fortsat god dag!<br /><br /> De bedste hilsner fra umbraco robotten </p>]]></key>
+    <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <br /> </div> <p> <h3>Opdateringssammendrag:</h3> <table style="width: 100%;"> %6% </table> </p> <div style="margin: 8px 0; padding: 8px; display: block;"> <br /> <a style="color: white; font-weight: bold; background-color: #66cc66; text-decoration : none; margin-right: 20px; border: 8px solid #66cc66; width: 150px;" href="http://%4%/actions/publish.aspx?id=%5%">&nbsp;&nbsp;PUBLISÉR&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #5372c3; text-decoration : none; margin-right: 20px; border: 8px solid #5372c3; width: 150px;" href="http://%4%/#/content/content/edit/%5%">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;RET&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</a> &nbsp; <a style="color: white; font-weight: bold; background-color: #ca4a4a; text-decoration : none; margin-right: 20px; border: 8px solid #ca4a4a; width: 150px;" href="http://%4%/actions/delete.aspx?id=%5%">&nbsp;&nbsp;&nbsp;&nbsp;SLET&nbsp;&nbsp;&nbsp;&nbsp;</a> <br /> </div> <p>Hav en fortsat god dag!<br /><br /> De bedste hilsner fra Umbraco robotten </p>]]></key>
     <key alias="mailSubject">[%0%] Notificering om %1% udført på %2%</key>
     <key alias="notifications">Notificeringer</key>
   </area>
@@ -1589,7 +1600,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="noLockouts">er ikke blevet låst ude</key>
     <key alias="noPasswordChange">Kodeordet er ikke blevet ændret</key>
     <key alias="confirmNewPassword">Gentag dit nye kodeord</key>
-    <key alias="changePasswordDescription">Du kan ændre dit kodeord, som giver dig adgang til Umbraco Back Office ved at udfylde formularen og klikke på knappen 'Skift dit kodeord'</key>
+    <key alias="changePasswordDescription">Du kan ændre dit kodeord, som giver dig adgang til Umbraco backoffice ved at udfylde formularen og klikke på knappen 'Skift dit kodeord'</key>
     <key alias="contentChannel">Indholdskanal</key>
     <key alias="createAnotherUser">Opret endnu en bruger</key>
     <key alias="createUserHelp">Opret nye brugere for at give dem adgang til Umbraco. Når en ny bruger oprettes, genereres der en adgangskode, som du kan dele med brugeren.</key>
@@ -1666,7 +1677,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="sendInvite">Send invitation</key>
     <key alias="backToUsers">Tilbage til brugere</key>
     <key alias="inviteEmailCopySubject">Umbraco: Invitation</key>
-    <key alias="inviteEmailCopyFormat"><![CDATA[<html><body><p>Hej %0%, du er blevet inviteret af %1% til Umbraco backoffice.</p><p>Besked fra %1%: <em>%2%</em></p><p>Klik på dette <a href="%3%" target="_blank">link</a> for acceptere invitationen</p><p><small>Hvis du ikke kan klikke på linket, så kopier og indsæt denne URL i dit browservindue<br/><br/>%3%</small></p></body></html>]]></key>
+    <key alias="inviteEmailCopyFormat"><![CDATA[<html><body><p>Hej %0%, du er blevet inviteret af %1% til Umbraco backoffice.</p><p>Besked fra %1%: <em>%2%</em></p><p>Klik på dette <a href="%3%" target="_blank" rel="noopener">link</a> for acceptere invitationen</p><p><small>Hvis du ikke kan klikke på linket, så kopier og indsæt denne URL i dit browservindue<br/><br/>%3%</small></p></body></html>]]></key>
     <key alias="stateAll">Alle</key>
     <key alias="stateActive">Aktiv</key>
     <key alias="stateDisabled">Deaktiveret</key>
@@ -1691,10 +1702,16 @@ Mange hilsner fra Umbraco robotten
     <key alias="maxCount">Du kan kun have</key>
     <key alias="addUpTo">Tilføj op til </key>
     <key alias="items">elementer</key>
+    <key alias="urls">URL(er)</key>
+    <key alias="urlsSelected">URL(er) valgt</key>
     <key alias="itemsSelected">elementer valgt</key>
     <key alias="invalidDate">Ugyldig dato</key>
     <key alias="invalidNumber">Ikke et tal</key>
+    <key alias="invalidNumberStepSize">Ikke en gyldig numerisk trinstørrelse</key>
     <key alias="invalidEmail">Ugyldig e-mail</key>
+    <key alias="invalidNull">Værdien kan ikke være tom</key>
+    <key alias="invalidEmpty">Værdien kan ikke være tom</key>
+    <key alias="invalidPattern">Værdien er ugyldig, som ikke matcher det korrekte format</key>
     <key alias="entriesShort"><![CDATA[Minimum %0% element(er), tilføj <strong>%1%</strong> mere.]]></key>
     <key alias="entriesExceed"><![CDATA[Maksimum %0% element(er), <strong>%1%</strong> for mange.]]></key>
   </area>
@@ -1852,7 +1869,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="labelLabelTemplate">Label</key>
     <key alias="labelCustomView">Speciel visning</key>
     <key alias="labelCustomViewInfoTitle">Vis speciel visning beskrivelsen</key>
-    <key alias="labelCustomViewDescription">Overskrift hvordan denne block præsenteres i BackOffice interfacet. Vælg en .html fil der indeholder din præsensation.</key>
+    <key alias="labelCustomViewDescription">Overskrift hvordan denne block præsenteres i backoffice interfacet. Vælg en .html fil der indeholder din præsensation.</key>
     <key alias="labelSettingsElementType">Indstillings model</key>
     <key alias="labelEditorSize">Rederings lagets størrelse</key>
     <key alias="addCustomView">Tilføj speciel visning</key>
@@ -1874,7 +1891,28 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
     <key alias="elementTypeDoesNotExistHeadline">Error!</key>
     <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
+    <key alias="addBlock">Tilføj indhold</key>
+    <key alias="addThis">Tilføj %0%</key>
+    <key alias="propertyEditorNotSupported">Feltet %0% bruger editor %1% som ikke er supporteret for blokke.</key>
   </area>
+  </area>
+    <area alias="contentTemplatesDashboard">
+        <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
+        <key alias="whatDescription">Indholdsskabeloner er foruddefineret indhold der kan vælges når der oprettes nye indholdselementer.</key>
+        <key alias="createHeadline">Hvordan opretter jeg en Indholdsskabelon?</key>
+        <key alias="createDescription">
+            <![CDATA[
+            <p>Der er to måder at oprette Indholdsskabeloner på:</p>
+            <ul>
+                <li>Højreklik på en indholdsnode og vælg "Opret indholdsskabelon" for at oprette en ny Indholdsskabelon.</li>
+                <li>Højreklik på Indholdsskabeloner i sektionen Indstillinger og vælg den dokumenttype du vil oprette en Indholdsskabelon for.</li>
+            </ul>
+            <p>Når indholdsskabelonen har fået et navn, kan redaktører begynde at bruge indholdsskabelonen som udgangspunkt for deres nye side.</p>
+        ]]>
+        </key>
+        <key alias="manageHeadline">Hvordan vedligeholder jeg Indholdsskabeloner?</key>
+        <key alias="manageDescription">Du kan redigere og slette Indholdsskabeloner fra "Indholdsskabeloner" i sektionen Indstillinger. Fold dokumenttypen som Indholdsskabelonen er baseret på ud og klik på den for at redigere eller slette den.</key>
+    </area>
   <area alias="preview">
     <key alias="endLabel">Afslut</key>
     <key alias="endTitle">Afslut forhåndsvisning</key>

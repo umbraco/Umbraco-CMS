@@ -147,7 +147,7 @@ namespace Umbraco.Web.Security.Providers
             if (MemberService.Exists(username))
             {
                 status = MembershipCreateStatus.DuplicateUserName;
-                Current.Logger.Warn<UmbracoMembershipProvider<T, TEntity>>("Cannot create member as username already exists: {Username}", username);
+                Current.Logger.Warn<UmbracoMembershipProvider<T, TEntity>, string>("Cannot create member as username already exists: {Username}", username);
                 return null;
             }
 
@@ -155,7 +155,7 @@ namespace Umbraco.Web.Security.Providers
             if (MemberService.GetByEmail(email) != null && RequiresUniqueEmail)
             {
                 status = MembershipCreateStatus.DuplicateEmail;
-                Current.Logger.Warn<UmbracoMembershipProvider<T, TEntity>>("Cannot create member as a member with the same email address exists: {Email}", email);
+                Current.Logger.Warn<UmbracoMembershipProvider<T, TEntity>, string>("Cannot create member as a member with the same email address exists: {Email}", email);
                 return null;
             }
 
@@ -523,7 +523,7 @@ namespace Umbraco.Web.Security.Providers
 
             if (member == null)
             {
-                Current.Logger.Info<UmbracoMembershipProviderBase>("Login attempt failed for username {Username} from IP address {IpAddress}, the user does not exist", username, GetCurrentRequestIpAddress());
+                Current.Logger.Info<UmbracoMembershipProviderBase, string, string>("Login attempt failed for username {Username} from IP address {IpAddress}, the user does not exist", username, GetCurrentRequestIpAddress());
 
                 return new ValidateUserResult
                 {
@@ -533,7 +533,7 @@ namespace Umbraco.Web.Security.Providers
 
             if (member.IsApproved == false)
             {
-                Current.Logger.Info<UmbracoMembershipProviderBase>("Login attempt failed for username {Username} from IP address {IpAddress}, the user is not approved", username, GetCurrentRequestIpAddress());
+                Current.Logger.Info<UmbracoMembershipProviderBase, string, string>("Login attempt failed for username {Username} from IP address {IpAddress}, the user is not approved", username, GetCurrentRequestIpAddress());
 
                 return new ValidateUserResult
                 {
@@ -543,7 +543,7 @@ namespace Umbraco.Web.Security.Providers
             }
             if (member.IsLockedOut)
             {
-                Current.Logger.Info<UmbracoMembershipProviderBase>("Login attempt failed for username {Username} from IP address {IpAddress}, the user is locked", username, GetCurrentRequestIpAddress());
+                Current.Logger.Info<UmbracoMembershipProviderBase, string, string>("Login attempt failed for username {Username} from IP address {IpAddress}, the user is locked", username, GetCurrentRequestIpAddress());
 
                 return new ValidateUserResult
                 {
@@ -569,11 +569,11 @@ namespace Umbraco.Web.Security.Providers
                     member.IsLockedOut = true;
                     member.LastLockoutDate = DateTime.Now;
 
-                    Current.Logger.Info<UmbracoMembershipProviderBase>("Login attempt failed for username {Username} from IP address {IpAddress}, the user is now locked out, max invalid password attempts exceeded", username, GetCurrentRequestIpAddress());
+                    Current.Logger.Info<UmbracoMembershipProviderBase, string, string>("Login attempt failed for username {Username} from IP address {IpAddress}, the user is now locked out, max invalid password attempts exceeded", username, GetCurrentRequestIpAddress());
                 }
                 else
                 {
-                    Current.Logger.Info<UmbracoMembershipProviderBase>("Login attempt failed for username {Username} from IP address {IpAddress}", username, GetCurrentRequestIpAddress());
+                    Current.Logger.Info<UmbracoMembershipProviderBase, string, string>("Login attempt failed for username {Username} from IP address {IpAddress}", username, GetCurrentRequestIpAddress());
                 }
 
                 requiresFullSave = true;
@@ -589,7 +589,7 @@ namespace Umbraco.Web.Security.Providers
 
                 member.LastLoginDate = DateTime.Now;
 
-                Current.Logger.Info<UmbracoMembershipProviderBase>("Login attempt succeeded for username {Username} from IP address {IpAddress}", username, GetCurrentRequestIpAddress());
+                Current.Logger.Info<UmbracoMembershipProviderBase, string, string>("Login attempt succeeded for username {Username} from IP address {IpAddress}", username, GetCurrentRequestIpAddress());
             }
 
             // don't raise events for this! It just sets the member dates, if we do raise events this will

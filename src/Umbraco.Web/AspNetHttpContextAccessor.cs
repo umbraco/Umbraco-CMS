@@ -7,14 +7,8 @@ namespace Umbraco.Web
     {
         public HttpContext HttpContext
         {
-            get
-            {
-                return HttpContext.Current;
-            }
-            set
-            {
-                throw new NotSupportedException();
-            }
+            get => HttpContext.Current;
+            set => throw new NotSupportedException();
         }
     }
 }
