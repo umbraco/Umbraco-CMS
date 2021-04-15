@@ -21,18 +21,14 @@ namespace Umbraco.Extensions
                 throw new ArgumentNullException(nameof(app));
             }
 
-            if (!app.AppBuilder.UmbracoCanBoot())
+            if (!app.RuntimeState.UmbracoCanBoot())
             {
                 return app;
             }
 
-            app.AppBuilder.UseEndpoints(endpoints =>
-            {
-                FrontEndRoutes surfaceRoutes = app.AppBuilder.ApplicationServices.GetRequiredService<FrontEndRoutes>();
-                surfaceRoutes.CreateRoutes(endpoints);
-
-                endpoints.MapDynamicControllerRoute<UmbracoRouteValueTransformer>("/{**slug}");
-            });
+            FrontEndRoutes surfaceRoutes = app.ApplicationServices.GetRequiredService<FrontEndRoutes>();
+            surfaceRoutes.CreateRoutes(app.EndpointRouteBuilder);
+            app.EndpointRouteBuilder.MapDynamicControllerRoute<UmbracoRouteValueTransformer>("/{**slug}");
 
             return app;
         }

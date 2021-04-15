@@ -78,8 +78,13 @@ namespace Umbraco.Extensions
             // create our custom builder and execute the callback
             // which will allow executing all IUmbracoApplicationBuilder ext methods
             // to create endpoints.
-            var umbAppBuilder = new UmbracoApplicationBuilder(app);
-            configureUmbraco(umbAppBuilder);
+            app.UseEndpoints(endpoints =>
+            {
+                var umbAppBuilder = (IUmbracoApplicationBuilder)ActivatorUtilities.CreateInstance<UmbracoApplicationBuilder>(
+                    app.ApplicationServices,
+                    new object[] { app, endpoints });
+                configureUmbraco(umbAppBuilder);
+            });
 
             return app;
         }
@@ -112,12 +117,7 @@ namespace Umbraco.Extensions
         /// Returns true if Umbraco <see cref="IRuntimeState"/> is greater than <see cref="RuntimeLevel.BootFailed"/>
         /// </summary>
         public static bool UmbracoCanBoot(this IApplicationBuilder app)
-        {
-            var state = app.ApplicationServices.GetRequiredService<IRuntimeState>();
-
-            // can't continue if boot failed
-            return state.Level > RuntimeLevel.BootFailed;
-        }
+            => app.ApplicationServices.GetRequiredService<IRuntimeState>().UmbracoCanBoot();
 
         /// <summary>
         /// Enables core Umbraco functionality

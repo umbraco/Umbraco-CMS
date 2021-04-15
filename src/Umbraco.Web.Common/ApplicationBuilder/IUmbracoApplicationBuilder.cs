@@ -1,5 +1,7 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
+using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 {
@@ -8,9 +10,9 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
     /// </summary>
     public interface IUmbracoApplicationBuilder
     {
-        /// <summary>
-        /// Returns the <see cref="IApplicationBuilder"/>
-        /// </summary>
+        IRuntimeState RuntimeState { get; }
+        IServiceProvider ApplicationServices { get; }
+        IEndpointRouteBuilder EndpointRouteBuilder { get; }
         IApplicationBuilder AppBuilder { get; }
     }
 }

@@ -55,6 +55,8 @@ namespace Umbraco.Extensions
                 .AddDistributedCache()
                 .AddModelsBuilder();
 
+            builder.AddMembersIdentity();
+
             return builder;
         }
     }

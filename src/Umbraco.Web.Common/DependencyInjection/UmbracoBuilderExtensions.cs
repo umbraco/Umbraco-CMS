@@ -67,7 +67,7 @@ namespace Umbraco.Extensions
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality
     /// </summary>
-    public static class UmbracoBuilderExtensions
+    public static partial class UmbracoBuilderExtensions
     {
         /// <summary>
         /// Creates an <see cref="IUmbracoBuilder"/> and registers basic Umbraco services
@@ -266,7 +266,7 @@ namespace Umbraco.Extensions
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, VirtualPageApplicationModelProvider>());
-            builder.Services.AddUmbracoImageSharp(builder.Config);
+            builder.AddUmbracoImageSharp();
 
             // AspNetCore specific services
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();

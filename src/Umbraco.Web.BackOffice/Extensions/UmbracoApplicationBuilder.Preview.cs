@@ -12,11 +12,8 @@ namespace Umbraco.Extensions
     {
         public static IUmbracoApplicationBuilder UseUmbracoPreviewEndpoints(this IUmbracoApplicationBuilder app)
         {
-            app.AppBuilder.UseEndpoints(endpoints =>
-            {
-                PreviewRoutes previewRoutes = app.AppBuilder.ApplicationServices.GetRequiredService<PreviewRoutes>();
-                previewRoutes.CreateRoutes(endpoints);
-            });
+            PreviewRoutes previewRoutes = app.ApplicationServices.GetRequiredService<PreviewRoutes>();
+            previewRoutes.CreateRoutes(app.EndpointRouteBuilder);
 
             return app;
         }

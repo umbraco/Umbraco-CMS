@@ -20,16 +20,13 @@ namespace Umbraco.Extensions
                 throw new ArgumentNullException(nameof(app));
             }
 
-            if (!app.AppBuilder.UmbracoCanBoot())
+            if (!app.RuntimeState.UmbracoCanBoot())
             {
                 return app;
             }
 
-            app.AppBuilder.UseEndpoints(endpoints =>
-            {
-                BackOfficeAreaRoutes backOfficeRoutes = app.AppBuilder.ApplicationServices.GetRequiredService<BackOfficeAreaRoutes>();
-                backOfficeRoutes.CreateRoutes(endpoints);
-            });
+            BackOfficeAreaRoutes backOfficeRoutes = app.ApplicationServices.GetRequiredService<BackOfficeAreaRoutes>();
+            backOfficeRoutes.CreateRoutes(app.EndpointRouteBuilder);
 
             app.UseUmbracoRuntimeMinificationEndpoints();
             app.UseUmbracoPreviewEndpoints();

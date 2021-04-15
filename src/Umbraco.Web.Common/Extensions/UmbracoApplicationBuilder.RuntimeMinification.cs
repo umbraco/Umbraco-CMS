@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Web.Common.Extensions
                 throw new ArgumentNullException(nameof(app));
             }
 
-            if (!app.AppBuilder.UmbracoCanBoot())
+            if (!app.RuntimeState.UmbracoCanBoot())
             {
                 return app;
             }

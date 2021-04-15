@@ -1,71 +1,107 @@
+using System;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Actions;
-using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Web.BackOffice.Authorization;
+using Umbraco.Cms.Web.BackOffice.Middleware;
 using Umbraco.Cms.Web.BackOffice.Security;
-using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Security;
+using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Web.BackOffice.Authorization;
+
 
 namespace Umbraco.Extensions
 {
-    public static class ServiceCollectionExtensions
+    /// <summary>
+    /// Extension methods for <see cref="IUmbracoBuilder"/> for the Umbraco back office
+    /// </summary>
+    public static partial class UmbracoBuilderExtensions
     {
         /// <summary>
-        /// Adds the services required for using Umbraco back office Identity
+        /// Adds Umbraco back office authentication requirements
         /// </summary>
-        public static void AddUmbracoBackOfficeIdentity(this IServiceCollection services)
+        public static IUmbracoBuilder AddBackOfficeAuthentication(this IUmbracoBuilder builder)
         {
-            services.AddDataProtection();
+            builder.Services
 
-            services.BuildUmbracoBackOfficeIdentity()
-                .AddDefaultTokenProviders()
-                .AddUserStore<BackOfficeUserStore>()
-                .AddUserManager<IBackOfficeUserManager, BackOfficeUserManager>()
-                .AddSignInManager<IBackOfficeSignInManager, BackOfficeSignInManager>()
-                .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>()
-                .AddErrorDescriber<BackOfficeIdentityErrorDescriber>();
+                // This just creates a builder, nothing more
+                .AddAuthentication()
 
-            // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
-            services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();
-            services.ConfigureOptions<ConfigureBackOfficeSecurityStampValidatorOptions>();
+                // Add our custom schemes which are cookie handlers
+                .AddCookie(Constants.Security.BackOfficeAuthenticationType)
+                .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
+                {
+                    o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
+                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                })
+
+                // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
+                // they don't have to worry about manually adding this scheme or modifying the sign in manager
+                .AddCookie(Constants.Security.BackOfficeTwoFactorAuthenticationType, o =>
+                {
+                    o.Cookie.Name = Constants.Security.BackOfficeTwoFactorAuthenticationType;
+                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
+                });
+
+            builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
+
+            builder.Services
+                .AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>()
+                .ConfigureOptions<BackOfficeExternalLoginProviderErrorMiddleware>();
+
+            builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
+            builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
+            builder.Services.AddUnique<IPasswordChanger<MemberIdentityUser>, PasswordChanger<MemberIdentityUser>>();
+
+            builder.AddNotificationHandler<UserLoginSuccessNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserLogoutSuccessNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserLoginFailedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserForgotPasswordRequestedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserForgotPasswordChangedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserPasswordChangedNotification, BackOfficeUserManagerAuditer>();
+            builder.AddNotificationHandler<UserPasswordResetNotification, BackOfficeUserManagerAuditer>();
+
+            return builder;
         }
 
-        private static BackOfficeIdentityBuilder BuildUmbracoBackOfficeIdentity(this IServiceCollection services)
+        /// <summary>
+        /// Adds Umbraco back office authorization policies
+        /// </summary>
+        public static IUmbracoBuilder AddBackOfficeAuthorizationPolicies(this IUmbracoBuilder builder, string backOfficeAuthenticationScheme = Constants.Security.BackOfficeAuthenticationType)
         {
-            services.TryAddScoped<IIpResolver, AspNetCoreIpResolver>();
-            services.TryAddSingleton<IBackOfficeExternalLoginProviders, BackOfficeExternalLoginProviders>();
-            services.TryAddSingleton<IBackOfficeTwoFactorOptions, NoopBackOfficeTwoFactorOptions>();
-            
-            return new BackOfficeIdentityBuilder(services);
+            builder.AddBackOfficeAuthorizationPoliciesInternal(backOfficeAuthenticationScheme);
+
+            builder.Services.AddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
+
+            builder.Services.AddAuthorization(options
+                => options.AddPolicy(AuthorizationPolicies.UmbracoFeatureEnabled, policy
+                    => policy.Requirements.Add(new FeatureAuthorizeRequirement())));
+
+            return builder;
         }
 
         /// <summary>
         /// Add authorization handlers and policies
         /// </summary>
-        public static void AddBackOfficeAuthorizationPolicies(this IServiceCollection services, string backOfficeAuthenticationScheme = Constants.Security.BackOfficeAuthenticationType)
+        private static void AddBackOfficeAuthorizationPoliciesInternal(this IUmbracoBuilder builder, string backOfficeAuthenticationScheme = Constants.Security.BackOfficeAuthenticationType)
         {
             // NOTE: Even though we are registering these handlers globally they will only actually execute their logic for
             // any auth defining a matching requirement and scheme.
-            services.AddSingleton<IAuthorizationHandler, BackOfficeHandler>();
-            services.AddSingleton<IAuthorizationHandler, TreeHandler>();
-            services.AddSingleton<IAuthorizationHandler, SectionHandler>();
-            services.AddSingleton<IAuthorizationHandler, AdminUsersHandler>();
-            services.AddSingleton<IAuthorizationHandler, UserGroupHandler>();
-            services.AddSingleton<IAuthorizationHandler, ContentPermissionsQueryStringHandler>();
-            services.AddSingleton<IAuthorizationHandler, ContentPermissionsResourceHandler>();
-            services.AddSingleton<IAuthorizationHandler, ContentPermissionsPublishBranchHandler>();
-            services.AddSingleton<IAuthorizationHandler, MediaPermissionsResourceHandler>();
-            services.AddSingleton<IAuthorizationHandler, MediaPermissionsQueryStringHandler>();
-            services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, BackOfficeHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, TreeHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, SectionHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, AdminUsersHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, UserGroupHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, ContentPermissionsQueryStringHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, ContentPermissionsResourceHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, ContentPermissionsPublishBranchHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionsResourceHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, MediaPermissionsQueryStringHandler>();
+            builder.Services.AddSingleton<IAuthorizationHandler, DenyLocalLoginHandler>();
 
-            services.AddAuthorization(o => CreatePolicies(o, backOfficeAuthenticationScheme));
+            builder.Services.AddAuthorization(o => CreatePolicies(o, backOfficeAuthenticationScheme));
         }
 
         private static void CreatePolicies(AuthorizationOptions options, string backOfficeAuthenticationScheme)
