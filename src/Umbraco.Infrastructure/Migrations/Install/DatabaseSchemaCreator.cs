@@ -146,7 +146,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                     CreateTable(false, table, dataCreation);
             }
 
-            FireAfterCreation(new DatabaseSchemaCreatedNotification());
+            DatabaseSchemaCreatedNotification createdNotification = new DatabaseSchemaCreatedNotification().WithStateFrom(creatingNotification);
+            FireAfterCreation(createdNotification);
         }
 
         /// <summary>

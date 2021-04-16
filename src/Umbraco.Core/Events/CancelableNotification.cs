@@ -1,6 +1,6 @@
 namespace Umbraco.Cms.Core.Events
 {
-    public class CancelableNotification : ICancelableNotification
+    public class CancelableNotification : StatefulNotification, ICancelableNotification
     {
         public bool Cancel { get; set; }
         public void CancelOperation()
