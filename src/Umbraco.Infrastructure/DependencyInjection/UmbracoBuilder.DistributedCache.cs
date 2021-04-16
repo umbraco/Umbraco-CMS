@@ -26,14 +26,14 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         /// </remarks>
         public static IUmbracoBuilder AddDistributedCache(this IUmbracoBuilder builder)
         {
-            var distCacheBinder = new UniqueServiceDescriptor(typeof(IDistributedCacheBinder), typeof(DistributedCacheBinder), ServiceLifetime.Singleton);
-            if (builder.Services.Contains(distCacheBinder))
-            {
-                // if this is called more than once just exit
-                return builder;
-            }
-
-            builder.Services.Add(distCacheBinder);
+            // var distCacheBinder = new UniqueServiceDescriptor(typeof(DistributedCacheBinder), typeof(DistributedCacheBinder), ServiceLifetime.Singleton);
+            // if (builder.Services.Contains(distCacheBinder))
+            // {
+            //     // if this is called more than once just exit
+            //     return builder;
+            // }
+            //
+            // builder.Services.Add(distCacheBinder);
 
             builder.SetDatabaseServerMessengerCallbacks(GetCallbacks);
             builder.SetServerMessenger<BatchedDatabaseServerMessenger>();

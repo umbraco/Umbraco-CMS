@@ -1,16 +1,11 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Extensions;
 
@@ -19,7 +14,7 @@ namespace Umbraco.Cms.Core.Cache
     /// <summary>
     /// Default <see cref="IDistributedCacheBinder"/> implementation.
     /// </summary>
-    public partial class DistributedCacheBinder :
+    public class DistributedCacheBinder :
         INotificationHandler<DictionaryItemDeletedNotification>,
         INotificationHandler<DictionaryItemSavedNotification>,
         INotificationHandler<LanguageSavedNotification>,
@@ -50,35 +45,15 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<MemberTypeChangedNotification>,
         INotificationHandler<ContentTreeChangeNotification>
     {
-        private List<Action> _unbinders;
+        private readonly DistributedCache _distributedCache;
 
-        private void Bind(Action binder, Action unbinder)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DistributedCacheBinder"/> class.
+        /// </summary>
+        public DistributedCacheBinder(DistributedCache distributedCache)
         {
-            // bind now
-            binder();
-
-            // and register unbinder for later, if needed
-            _unbinders?.Add(unbinder);
+            _distributedCache = distributedCache;
         }
-
-        /// <inheritdoc />
-        public void UnbindEvents()
-        {
-            if (_unbinders == null)
-                throw new NotSupportedException();
-            foreach (var unbinder in _unbinders)
-                unbinder();
-            _unbinders = null;
-        }
-
-        /// <inheritdoc />
-        public void BindEvents(bool supportUnbinding = false)
-        {
-            if (supportUnbinding)
-                _unbinders = new List<Action>();
-
-            _logger.LogInformation("Initializing Umbraco internal event handlers for cache refreshing.");
-     }
 
         #region PublicAccessService
 

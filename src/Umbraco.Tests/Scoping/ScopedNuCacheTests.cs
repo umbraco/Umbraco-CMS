@@ -64,9 +64,6 @@ namespace Umbraco.Tests.Scoping
         {
             base.TearDown();
 
-            _distributedCacheBinder?.UnbindEvents();
-            _distributedCacheBinder = null;
-
             NotificationHandler.PublishedContent = null;
         }
 
@@ -140,8 +137,7 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = GetUmbracoContextNu("http://example.com/", setSingleton: true);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger<DistributedCacheBinder>>());
-            _distributedCacheBinder.BindEvents(true);
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers));
 
             // create document type, document
             var contentType = new ContentType(ShortStringHelper, -1) { Alias = "CustomDocument", Name = "Custom Document" };

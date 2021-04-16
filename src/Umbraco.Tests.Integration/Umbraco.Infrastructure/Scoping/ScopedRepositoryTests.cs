@@ -61,13 +61,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             builder.AddNotificationHandler<LanguageSavedNotification, PublishedSnapshotServiceEventHandler>();
         }
 
-        [TearDown]
-        public void Teardown()
-        {
-            _distributedCacheBinder?.UnbindEvents();
-            _distributedCacheBinder = null;
-        }
-
         [TestCase(true)]
         [TestCase(false)]
         public void DefaultRepositoryCachePolicy(bool complete)
