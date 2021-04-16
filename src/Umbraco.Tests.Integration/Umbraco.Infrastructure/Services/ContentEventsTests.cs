@@ -61,6 +61,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                     throw new NotSupportedException();
                 }
 
+                // We're in between tests, don't do anything.
+                if (_events is null)
+                {
+                    return;
+                }
+
                 foreach (ContentCacheRefresher.JsonPayload payload in (ContentCacheRefresher.JsonPayload[])args.MessageObject)
                 {
                     var e = new EventInstance
@@ -162,20 +168,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
             builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
+            builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
             builder
                 .AddNotificationHandler<ContentCacheRefresherNotification, TestNotificationHandler>()
                 .AddNotificationHandler<ContentDeletedNotification, TestNotificationHandler>()
                 .AddNotificationHandler<ContentDeletingVersionsNotification, TestNotificationHandler>()
                 .AddNotificationHandler<ContentRefreshNotification, TestNotificationHandler>()
                 ;
+            builder.AddNotificationHandler<ContentTreeChangeNotification, DistributedCacheBinder>();
         }
 
         [SetUp]
         public void SetUp()
         {
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(new LocalServerMessenger(), CacheRefresherCollection), UmbracoContextFactory, GetRequiredService<ILogger<DistributedCacheBinder>>());
-            _distributedCacheBinder.BindEvents(true);
-
             _events = new List<EventInstance>();
 
             // prepare content type
@@ -188,13 +193,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentTypeService.Save(_contentType);
         }
 
-        [TearDown]
-        public void TearDownTest()
-        {
-            _distributedCacheBinder?.UnbindEvents();
-        }
-
-        private DistributedCacheBinder _distributedCacheBinder;
         private static IList<EventInstance> _events;
         private static int _msgCount;
         private IContentType _contentType;

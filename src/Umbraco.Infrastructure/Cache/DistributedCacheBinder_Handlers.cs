@@ -47,7 +47,8 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<MediaTreeChangeNotification>,
         INotificationHandler<ContentTypeChangedNotification>,
         INotificationHandler<MediaTypeChangedNotification>,
-        INotificationHandler<MemberTypeChangedNotification>
+        INotificationHandler<MemberTypeChangedNotification>,
+        INotificationHandler<ContentTreeChangeNotification>
     {
         private List<Action> _unbinders;
 
@@ -77,17 +78,7 @@ namespace Umbraco.Cms.Core.Cache
                 _unbinders = new List<Action>();
 
             _logger.LogInformation("Initializing Umbraco internal event handlers for cache refreshing.");
-
-            // bind to content events
-            Bind(() => ContentService.TreeChanged += ContentService_TreeChanged,// handles all content changes
-                () => ContentService.TreeChanged -= ContentService_TreeChanged);
-
-            // TreeChanged should also deal with this
-            //Bind(() => ContentService.SavedBlueprint += ContentService_SavedBlueprint,
-            //    () => ContentService.SavedBlueprint -= ContentService_SavedBlueprint);
-            //Bind(() => ContentService.DeletedBlueprint += ContentService_DeletedBlueprint,
-            //    () => ContentService.DeletedBlueprint -= ContentService_DeletedBlueprint);
-        }
+     }
 
         #region PublicAccessService
 
@@ -106,9 +97,23 @@ namespace Umbraco.Cms.Core.Cache
 
         #region ContentService
 
-        private void ContentService_TreeChanged(IContentService sender, TreeChange<IContent>.EventArgs args)
+        /// <summary>
+        /// Handles cache refreshing for when content is copied
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        /// <remarks>
+        /// When an entity is copied new permissions may be assigned to it based on it's parent, if that is the
+        /// case then we need to clear all user permissions cache.
+        /// </remarks>
+        private void ContentService_Copied(IContentService sender, CopyEventArgs<IContent> e)
         {
-            _distributedCache.RefreshContentCache(args.Changes.ToArray());
+        }
+
+
+        public void Handle(ContentTreeChangeNotification notification)
+        {
+            _distributedCache.RefreshContentCache(notification.Changes.ToArray());
         }
 
         //private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
