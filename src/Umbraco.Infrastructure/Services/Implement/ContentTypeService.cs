@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// <summary>
     /// Represents the ContentType Service, which is an easy access to operations involving <see cref="IContentType"/>
     /// </summary>
-    public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType, IContentTypeService>, IContentTypeService
+    public class ContentTypeService : ContentTypeServiceBase<IContentTypeRepository, IContentType>, IContentTypeService
     {
         public ContentTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IContentService contentService,
             IContentTypeRepository repository, IAuditRepository auditRepository, IDocumentTypeContainerRepository entityContainerRepository, IEntityRepository entityRepository,
@@ -22,8 +22,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             ContentService = contentService;
         }
-
-        protected override IContentTypeService This => this;
 
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Cms.Core.Constants.Locks.ContentTypes };

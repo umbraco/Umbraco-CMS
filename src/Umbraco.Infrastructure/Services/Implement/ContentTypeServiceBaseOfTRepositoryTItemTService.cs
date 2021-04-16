@@ -14,10 +14,9 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public abstract class ContentTypeServiceBase<TRepository, TItem, TService> : ContentTypeServiceBase<TItem, TService>, IContentTypeBaseService<TItem>
+    public abstract class ContentTypeServiceBase<TRepository, TItem> : ContentTypeServiceBase, IContentTypeBaseService<TItem>
         where TRepository : IContentTypeRepositoryBase<TItem>
         where TItem : class, IContentTypeComposition
-        where TService : class, IContentTypeBaseService<TItem>
     {
         private readonly IAuditRepository _auditRepository;
         private readonly IEntityContainerRepository _containerRepository;

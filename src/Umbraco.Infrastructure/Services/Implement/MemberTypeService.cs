@@ -10,7 +10,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, IMemberType, IMemberTypeService>, IMemberTypeService
+    public class MemberTypeService : ContentTypeServiceBase<IMemberTypeRepository, IMemberType>, IMemberTypeService
     {
         private readonly IMemberTypeRepository _memberTypeRepository;
 
@@ -21,8 +21,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             MemberService = memberService;
             _memberTypeRepository = memberTypeRepository;
         }
-
-        protected override IMemberTypeService This => this;
 
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Cms.Core.Constants.Locks.MemberTypes };

@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMediaType, IMediaTypeService>, IMediaTypeService
+    public class MediaTypeService : ContentTypeServiceBase<IMediaTypeRepository, IMediaType>, IMediaTypeService
     {
         public MediaTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IMediaService mediaService,
             IMediaTypeRepository mediaTypeRepository, IAuditRepository auditRepository, IMediaTypeContainerRepository entityContainerRepository,
@@ -18,8 +18,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             MediaService = mediaService;
         }
-
-        protected override IMediaTypeService This => this;
 
         // beware! order is important to avoid deadlocks
         protected override int[] ReadLockIds { get; } = { Cms.Core.Constants.Locks.MediaTypes };
