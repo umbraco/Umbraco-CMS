@@ -1,4 +1,5 @@
-﻿using NPoco;
+using System;
+using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
@@ -30,6 +31,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Length(1000)]
         [Constraint(Default = "''")]
         public string Password { get; set; }
+
+        [Column("securityStampToken")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(255)]
+        public string SecurityStampToken { get; set; }
+
+        [Column("emailConfirmedDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? EmailConfirmedDate { get; set; }
+
+        // TODO: It would be SOOOOO much better to store all core member data here instead of hiding it in Umbraco properties
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]

@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Extensions;
 
@@ -15,7 +14,6 @@ namespace Umbraco.Cms.Core.Security
         private string _name;
         private string _comments;
         private string _passwordConfig;
-        private IReadOnlyCollection<IReadOnlyUserGroup> _groups;
 
         // Custom comparer for enumerables
         private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> s_groupsComparer = new DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>>(
@@ -91,33 +89,6 @@ namespace Umbraco.Cms.Core.Security
         {
             get => _passwordConfig;
             set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfig));
-        }
-
-        /// <summary>
-        /// Gets or sets the user groups
-        /// </summary>
-        public IReadOnlyCollection<IReadOnlyUserGroup> Groups
-        {
-            get => _groups;
-            set
-            {
-                _groups = value.Where(x => x.Alias != null).ToArray();
-
-                var roles = new List<IdentityUserRole<string>>();
-                foreach (IdentityUserRole<string> identityUserRole in _groups.Select(x => new IdentityUserRole<string>
-                {
-                    RoleId = x.Alias,
-                    UserId = Id
-                }))
-                {
-                    roles.Add(identityUserRole);
-                }
-
-                // now reset the collection
-                Roles = roles;
-
-                BeingDirty.SetPropertyValueAndDetectChanges(value, ref _groups, nameof(Groups), s_groupsComparer);
-            }
         }
 
         /// <summary>

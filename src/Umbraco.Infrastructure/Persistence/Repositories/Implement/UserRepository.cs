@@ -69,7 +69,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             get
             {
                 if (_passwordConfigInitialized)
+                {
                     return _passwordConfigJson;
+                }
 
                 var passwordConfig = new UserPasswordSettings
                 {
@@ -448,7 +450,9 @@ ORDER BY colName";
 
             // ensure security stamp if missing
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
+            {
                 entity.SecurityStamp = Guid.NewGuid().ToString();
+            }
 
             var userDto = UserFactory.BuildDto(entity);
 
@@ -496,7 +500,9 @@ ORDER BY colName";
 
             // ensure security stamp if missing
             if (entity.SecurityStamp.IsNullOrWhiteSpace())
+            {
                 entity.SecurityStamp = Guid.NewGuid().ToString();
+            }
 
             var userDto = UserFactory.BuildDto(entity);
 
@@ -537,9 +543,7 @@ ORDER BY colName";
             {
                 changedCols.Add("userPassword");
 
-                // special case - when using ASP.Net identity the user manager will take care of updating the security stamp, however
-                // when not using ASP.Net identity (i.e. old membership providers), we'll need to take care of updating this manually
-                // so we can just detect if that property is dirty, if it's not we'll set it manually
+                // If the security stamp hasn't already updated we need to force it
                 if (entity.IsPropertyDirty("SecurityStamp") == false)
                 {
                     userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
@@ -555,10 +559,14 @@ ORDER BY colName";
             if (changedCols.Contains("userLogin") || changedCols.Contains("userEmail"))
             {
                 userDto.EmailConfirmedDate = null;
-                userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
-
                 changedCols.Add("emailConfirmedDate");
-                changedCols.Add("securityStampToken");
+                
+                // If the security stamp hasn't already updated we need to force it
+                if (entity.IsPropertyDirty("SecurityStamp") == false)
+                {
+                    userDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
+                    changedCols.Add("securityStampToken");
+                }
             }
 
             //only update the changed cols

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
@@ -125,9 +125,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 content.DisableChangeTracking();
 
                 content.Id = dto.NodeId;
+                content.SecurityStamp = dto.SecurityStampToken;
+                content.EmailConfirmedDate = dto.EmailConfirmedDate;
+
                 content.Key = nodeDto.UniqueId;
                 content.VersionId = contentVersionDto.Id;
-
+                
                 // TODO: missing names?
 
                 content.Path = nodeDto.Path;

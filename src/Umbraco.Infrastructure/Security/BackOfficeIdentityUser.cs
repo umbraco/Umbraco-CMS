@@ -21,11 +21,6 @@ namespace Umbraco.Cms.Core.Security
         private int[] _startMediaIds;
         private int[] _startContentIds;
 
-        // Custom comparer for enumerables
-        private static readonly DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>> s_groupsComparer = new DelegateEqualityComparer<IReadOnlyCollection<IReadOnlyUserGroup>>(
-            (groups, enumerable) => groups.Select(x => x.Alias).UnsortedSequenceEqual(enumerable.Select(x => x.Alias)),
-            groups => groups.GetHashCode());
-
         private static readonly DelegateEqualityComparer<int[]> s_startIdsComparer = new DelegateEqualityComparer<int[]>(
             (groups, enumerable) => groups.UnsortedSequenceEqual(enumerable),
             groups => groups.GetHashCode());
@@ -66,8 +61,7 @@ namespace Umbraco.Cms.Core.Security
             _allowedSections = Array.Empty<string>();
             _culture = globalSettings.DefaultUILanguage;
 
-            // use the property setters - they do more than just setting a field
-            Groups = groups;
+            SetGroups(groups);
         }
 
         /// <summary>
@@ -139,7 +133,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets a readonly list of the user's allowed sections which are based on it's user groups
         /// </summary>
-        public string[] AllowedSections => _allowedSections ?? (_allowedSections = _groups.SelectMany(x => x.AllowedSections).Distinct().ToArray());
+        public string[] AllowedSections => _allowedSections ??= _groups.SelectMany(x => x.AllowedSections).Distinct().ToArray();
 
         /// <summary>
         /// Gets or sets the culture
@@ -153,31 +147,25 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         /// Gets or sets the user groups
         /// </summary>
-        public IReadOnlyCollection<IReadOnlyUserGroup> Groups
+        public void SetGroups(IReadOnlyCollection<IReadOnlyUserGroup> value)
         {
-            get => _groups;
-            set
+            // so they recalculate
+            _allowedSections = null;
+
+            _groups = value.Where(x => x.Alias != null).ToArray();
+
+            var roles = new List<IdentityUserRole<string>>();
+            foreach (IdentityUserRole<string> identityUserRole in _groups.Select(x => new IdentityUserRole<string>
             {
-                // so they recalculate
-                _allowedSections = null;
-
-                _groups = value.Where(x => x.Alias != null).ToArray();
-
-                var roles = new List<IdentityUserRole<string>>();
-                foreach (IdentityUserRole<string> identityUserRole in _groups.Select(x => new IdentityUserRole<string>
-                {
-                    RoleId = x.Alias,
-                    UserId = Id?.ToString()
-                }))
-                {
-                    roles.Add(identityUserRole);
-                }
-
-                // now reset the collection
-                Roles = roles;
-
-                BeingDirty.SetPropertyValueAndDetectChanges(value, ref _groups, nameof(Groups), s_groupsComparer);
+                RoleId = x.Alias,
+                UserId = Id?.ToString()
+            }))
+            {
+                roles.Add(identityUserRole);
             }
+
+            // now reset the collection
+            Roles = roles;
         }
 
         /// <summary>
