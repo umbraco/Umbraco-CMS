@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Infrastructure.Migrations.Events;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -22,13 +23,15 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         private readonly ILogger<DatabaseSchemaCreator> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IUmbracoVersion _umbracoVersion;
+        private readonly IEventAggregator _eventAggregator;
 
-        public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger<DatabaseSchemaCreator> logger, ILoggerFactory loggerFactory, IUmbracoVersion umbracoVersion)
+        public DatabaseSchemaCreator(IUmbracoDatabase database, ILogger<DatabaseSchemaCreator> logger, ILoggerFactory loggerFactory, IUmbracoVersion umbracoVersion, IEventAggregator eventAggregator)
         {
             _database = database ?? throw new ArgumentNullException(nameof(database));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _umbracoVersion = umbracoVersion ?? throw new ArgumentNullException(nameof(umbracoVersion));
+            _eventAggregator = eventAggregator;
 
             if (_database?.SqlContext?.SqlSyntax == null)
             {
@@ -133,17 +136,17 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             if (!_database.InTransaction)
                 throw new InvalidOperationException("Database is not in a transaction.");
 
-            var e = new DatabaseCreationEventArgs();
-            FireBeforeCreation(e);
+            var creatingNotification = new DatabaseSchemaCreatingNotification();
+            FireBeforeCreation(creatingNotification);
 
-            if (e.Cancel == false)
+            if (creatingNotification.Cancel == false)
             {
                 var dataCreation = new DatabaseDataCreator(_database, _loggerFactory.CreateLogger<DatabaseDataCreator>(), _umbracoVersion);
                 foreach (var table in OrderedTables)
                     CreateTable(false, table, dataCreation);
             }
 
-            FireAfterCreation(e);
+            FireAfterCreation(new DatabaseSchemaCreatedNotification());
         }
 
         /// <summary>
@@ -311,38 +314,21 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             }
         }
 
-        #region Events
+        #region Notifications
 
         /// <summary>
-        /// The save event handler
+        /// Publishes the <see cref="DatabaseSchemaCreatingNotification"/> notification.
         /// </summary>
-        internal delegate void DatabaseEventHandler(DatabaseCreationEventArgs e);
+        /// <param name="notification">Cancelable notification marking the creation having begun.</param>
+        internal virtual void FireBeforeCreation(DatabaseSchemaCreatingNotification notification) =>
+            _eventAggregator.Publish(notification);
 
         /// <summary>
-        /// Occurs when [before save].
+        /// Publishes the <see cref="DatabaseSchemaCreatedNotification"/> notification.
         /// </summary>
-        internal static event DatabaseEventHandler BeforeCreation;
-        /// <summary>
-        /// Raises the <see cref="BeforeCreation"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        internal virtual void FireBeforeCreation(DatabaseCreationEventArgs e)
-        {
-            BeforeCreation?.Invoke(e);
-        }
-
-        /// <summary>
-        /// Occurs when [after save].
-        /// </summary>
-        internal static event DatabaseEventHandler AfterCreation;
-        /// <summary>
-        /// Raises the <see cref="AfterCreation"/> event.
-        /// </summary>
-        /// <param name="e">The <see cref="System.EventArgs"/> instance containing the event data.</param>
-        internal virtual void FireAfterCreation(DatabaseCreationEventArgs e)
-        {
-            AfterCreation?.Invoke(e);
-        }
+        /// <param name="notification">Notification marking the creation having completed.</param>
+        internal virtual void FireAfterCreation(DatabaseSchemaCreatedNotification notification) =>
+            _eventAggregator.Publish(notification);
 
         #endregion
 
