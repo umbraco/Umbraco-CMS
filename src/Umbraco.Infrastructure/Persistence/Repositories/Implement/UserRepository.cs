@@ -538,6 +538,11 @@ ORDER BY colName";
                 .Select(col => col.Key)
                 .ToList();
 
+            if (entity.IsPropertyDirty("SecurityStamp"))
+            {
+                changedCols.Add("securityStampToken");
+            }
+
             // DO NOT update the password if it has not changed or if it is null or empty
             if (entity.IsPropertyDirty("RawPasswordValue") && entity.RawPasswordValue.IsNullOrWhiteSpace() == false)
             {

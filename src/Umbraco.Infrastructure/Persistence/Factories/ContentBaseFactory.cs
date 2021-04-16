@@ -215,7 +215,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 LoginName = entity.Username,
                 NodeId = entity.Id,
                 Password = entity.RawPasswordValue,
-
+                SecurityStampToken = entity.SecurityStamp,
+                EmailConfirmedDate = entity.EmailConfirmedDate,
                 ContentDto = contentDto,
                 ContentVersionDto = BuildContentVersionDto(entity, contentDto)
             };

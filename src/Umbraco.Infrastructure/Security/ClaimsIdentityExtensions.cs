@@ -22,7 +22,7 @@ namespace Umbraco.Extensions
             }
         }
 
-        public static void MergeClaimsFromBackOfficeIdentity(this ClaimsIdentity destination, ClaimsIdentity source)
+        public static void MergeClaimsFromCookieIdentity(this ClaimsIdentity destination, ClaimsIdentity source)
         {
             foreach (Claim claim in source.Claims
                 .Where(claim => !s_ignoredClaims.Contains(claim.Type))

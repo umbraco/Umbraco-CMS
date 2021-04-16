@@ -385,6 +385,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // but only the changed columns, 'cos we cannot update password if empty
             var changedCols = new List<string>();
 
+            if (entity.IsPropertyDirty("SecurityStamp"))
+            {
+                changedCols.Add("securityStampToken");
+            }
+
             if (entity.IsPropertyDirty("Email"))
             {
                 changedCols.Add("Email");
