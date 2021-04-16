@@ -106,19 +106,6 @@ namespace Umbraco.Cms.Core.Cache
 
         #region ContentService
 
-        /// <summary>
-        /// Handles cache refreshing for when content is copied
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        /// <remarks>
-        /// When an entity is copied new permissions may be assigned to it based on it's parent, if that is the
-        /// case then we need to clear all user permissions cache.
-        /// </remarks>
-        private void ContentService_Copied(IContentService sender, CopyEventArgs<IContent> e)
-        {
-        }
-
         private void ContentService_TreeChanged(IContentService sender, TreeChange<IContent>.EventArgs args)
         {
             _distributedCache.RefreshContentCache(args.Changes.ToArray());
