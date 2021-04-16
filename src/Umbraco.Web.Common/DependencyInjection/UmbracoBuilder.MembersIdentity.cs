@@ -35,6 +35,8 @@ namespace Umbraco.Extensions
                 .AddSignInManager<IMemberSignInManager, MemberSignInManager>()
                 .AddErrorDescriber<MembersErrorDescriber>();
 
+            services.AddScoped<IPasswordHasher<MemberIdentityUser>, MemberPasswordHasher>();
+
             services.ConfigureApplicationCookie(x =>
             {
                 // TODO: We may want/need to configure these further
