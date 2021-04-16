@@ -25,6 +25,10 @@ namespace Umbraco.Core
             public const int DropDownSingle = -39;
             public const int DropDownMultiple = -42;
             public const int Upload = -90;
+            public const int UploadVideo = -100;
+            public const int UploadAudio = -101;
+            public const int UploadArticle = -102;
+            public const int UploadVectorGraphics = -103;
 
             public const int DefaultContentListView = -95;
             public const int DefaultMediaListView = -96;
@@ -42,7 +46,7 @@ namespace Umbraco.Core
             /// Defines the identifiers for Umbraco data types as constants for easy centralized access/management.
             /// </summary>
             public static class Guids
-            {   
+            {
 
                 /// <summary>
                 /// Guid for Content Picker as string
@@ -307,6 +311,46 @@ namespace Umbraco.Core
                 /// </summary>
                 public static readonly Guid UploadGuid = new Guid(Upload);
 
+                /// <summary>
+                /// Guid for UploadVideo as string
+                /// </summary>
+                public const string UploadVideo = "70575fe7-9812-4396-bbe1-c81a76db71b5";
+
+                /// <summary>
+                /// Guid for UploadVideo
+                /// </summary>
+                public static readonly Guid UploadVideoGuid = new Guid(UploadVideo);
+
+                /// <summary>
+                /// Guid for UploadAudio as string
+                /// </summary>
+                public const string UploadAudio = "8f430dd6-4e96-447e-9dc0-cb552c8cd1f3";
+
+                /// <summary>
+                /// Guid for UploadAudio
+                /// </summary>
+                public static readonly Guid UploadAudioGuid = new Guid(UploadAudio);
+
+                /// <summary>
+                /// Guid for UploadArticle as string
+                /// </summary>
+                public const string UploadArticle = "bc1e266c-dac4-4164-bf08-8a1ec6a7143d";
+
+                /// <summary>
+                /// Guid for UploadArticle
+                /// </summary>
+                public static readonly Guid UploadArticleGuid = new Guid(UploadArticle);
+
+                /// <summary>
+                /// Guid for UploadVectorGraphics as string
+                /// </summary>
+                public const string UploadVectorGraphics = "215cb418-2153-4429-9aef-8c0f0041191b";
+
+                /// <summary>
+                /// Guid for UploadVectorGraphics
+                /// </summary>
+                public static readonly Guid UploadVectorGraphicsGuid = new Guid(UploadVectorGraphics);
+
 
                 /// <summary>
                 /// Guid for Label as string
@@ -367,8 +411,8 @@ namespace Umbraco.Core
                 /// Guid for Label decimal
                 /// </summary>
                 public static readonly Guid LabelDecimalGuid = new Guid(LabelDecimal);
-                
-                
+
+
             }
         }
     }
