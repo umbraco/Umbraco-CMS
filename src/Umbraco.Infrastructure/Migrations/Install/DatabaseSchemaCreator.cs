@@ -136,7 +136,8 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             if (!_database.InTransaction)
                 throw new InvalidOperationException("Database is not in a transaction.");
 
-            var creatingNotification = new DatabaseSchemaCreatingNotification();
+            var eventMessages = new EventMessages();
+            var creatingNotification = new DatabaseSchemaCreatingNotification(eventMessages);
             FireBeforeCreation(creatingNotification);
 
             if (creatingNotification.Cancel == false)
@@ -146,7 +147,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
                     CreateTable(false, table, dataCreation);
             }
 
-            DatabaseSchemaCreatedNotification createdNotification = new DatabaseSchemaCreatedNotification().WithStateFrom(creatingNotification);
+            DatabaseSchemaCreatedNotification createdNotification = new DatabaseSchemaCreatedNotification(eventMessages).WithStateFrom(creatingNotification);
             FireAfterCreation(createdNotification);
         }
 
