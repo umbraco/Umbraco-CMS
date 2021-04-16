@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core.Compose
         {
             get
             {
-                var identity = _backOfficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+                var identity = _backOfficeSecurityAccessor.BackOfficeSecurity?.CurrentUser;
                 var user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.Id));
                 return user ?? UnknownUser(_globalSettings);
             }
