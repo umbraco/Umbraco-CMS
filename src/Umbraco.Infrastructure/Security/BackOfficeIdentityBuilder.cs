@@ -35,13 +35,13 @@ namespace Umbraco.Cms.Core.Security
             // and strongly typed ILookupNormalizer and IdentityErrorDescriber since those are 'global' and we need to be unintrusive.
 
             // Services used by identity
-            services.TryAddScoped<IUserValidator<BackOfficeIdentityUser>, UserValidator<BackOfficeIdentityUser>>();
-            services.TryAddScoped<IPasswordValidator<BackOfficeIdentityUser>, PasswordValidator<BackOfficeIdentityUser>>();
-            services.TryAddScoped<IPasswordHasher<BackOfficeIdentityUser>>(
+            services.AddScoped<IUserValidator<BackOfficeIdentityUser>, UserValidator<BackOfficeIdentityUser>>();
+            services.AddScoped<IPasswordValidator<BackOfficeIdentityUser>, PasswordValidator<BackOfficeIdentityUser>>();
+            services.AddScoped<IPasswordHasher<BackOfficeIdentityUser>>(
                 services => new BackOfficePasswordHasher(
                     new LegacyPasswordSecurity(),
                     services.GetRequiredService<IJsonSerializer>()));
-            services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
+            services.AddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
         }
 
         // override to add itself, by default identity only wants a single IdentityErrorDescriber

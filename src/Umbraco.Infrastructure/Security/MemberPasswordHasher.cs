@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Security;
 
-namespace Umbraco.Cms.Infrastructure.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// A password hasher for members
@@ -11,14 +11,11 @@ namespace Umbraco.Cms.Infrastructure.Security
     /// <remarks>
     /// This will check for the ASP.NET Identity password hash flag before falling back to the legacy password hashing format ("HMACSHA256")
     /// </remarks>
-    public class MemberPasswordHasher : PasswordHasher<MembersIdentityUser>
+    public class MemberPasswordHasher : PasswordHasher<MemberIdentityUser>
     {
         private readonly LegacyPasswordSecurity _legacyPasswordHasher;
 
-        public MemberPasswordHasher(LegacyPasswordSecurity legacyPasswordHasher)
-        {
-            _legacyPasswordHasher = legacyPasswordHasher ?? throw new ArgumentNullException(nameof(legacyPasswordHasher));
-        }
+        public MemberPasswordHasher(LegacyPasswordSecurity legacyPasswordHasher) => _legacyPasswordHasher = legacyPasswordHasher ?? throw new ArgumentNullException(nameof(legacyPasswordHasher));
 
         /// <summary>
         /// Verifies a user's hashed password
@@ -28,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Security
         /// <param name="providedPassword"></param>
         /// <returns></returns>
         /// <exception cref="InvalidOperationException">Thrown when the correct hashing algorith cannot be determined</exception>
-        public override PasswordVerificationResult VerifyHashedPassword(MembersIdentityUser user, string hashedPassword, string providedPassword)
+        public override PasswordVerificationResult VerifyHashedPassword(MemberIdentityUser user, string hashedPassword, string providedPassword)
         {
             byte[] decodedHashedPassword = null;
             bool isAspNetIdentityHash = false;
@@ -47,7 +44,9 @@ namespace Umbraco.Cms.Infrastructure.Security
             if (isAspNetIdentityHash)
             {
                 if (decodedHashedPassword[0] == 0x00 || decodedHashedPassword[0] == 0x01)
+                {
                     return base.VerifyHashedPassword(user, hashedPassword, providedPassword);
+                }
 
                 throw new InvalidOperationException("unable to determine member password hashing algorith");
             }
