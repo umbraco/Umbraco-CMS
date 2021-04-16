@@ -46,6 +46,7 @@ namespace Umbraco.Web.Cache
         public override void Refresh(JsonPayload[] payloads)
         {
             AppCaches.RuntimeCache.ClearOfType<PublicAccessEntry>();
+            AppCaches.RuntimeCache.ClearByKey(CacheKeys.ContentRecycleBinCacheKey);
 
             var idsRemoved = new HashSet<int>();
             var isolatedCache = AppCaches.IsolatedCaches.GetOrCreate<IContent>();
