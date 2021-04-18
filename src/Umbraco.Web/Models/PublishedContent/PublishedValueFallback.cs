@@ -328,16 +328,17 @@ namespace Umbraco.Web.Models.PublishedContent
         private T GetMarkUpForFallbackLanguage<T>(string culture2, T value)
         {
             var typeOfT = typeof(T);
-            if (typeOfT.Name== "string" || typeOfT.Name== "IHtmlString")
-            { 
-                var newValue ="<span lang=\"" + culture2 + "\">" + value + "</span>";
-                if (typeOfT.Name == "string")
-                {
-                    return (T)Convert.ChangeType(newValue, typeof(T));
-                }
-
-                var htmlString = new MvcHtmlString(newValue);
-                return (T) (IHtmlString)htmlString;
+            if (typeOfT == typeof(string))
+            {
+                var newValue = "<span lang=\"" + culture2 + "\">" + value + "</span>";
+                return (T)Convert.ChangeType(newValue, typeof(T));
+            }
+            else if (typeOfT == typeof(IHtmlString))
+            {
+                // we want to return a block element here since the IHtmlString could contain futher block elements
+                var newValue = "<div lang=\"" + culture2 + "\">" + value + "</div>";
+                IHtmlString htmlString = new MvcHtmlString(newValue);
+                return (T)htmlString;
             }
 
             return value;
