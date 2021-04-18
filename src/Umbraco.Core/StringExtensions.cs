@@ -22,7 +22,7 @@ namespace Umbraco.Core
     ///</summary>
     public static class StringExtensions
     {
-
+        private const char DefaultEscapedStringEscapeChar = '\\';
         private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
         private static readonly char[] ToCSharpEscapeChars;
 
@@ -41,7 +41,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static int[] GetIdsFromPathReversed(this string path)
         {
-            var nodeIds = path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var nodeIds = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.TryConvertTo<int>())
                 .Where(x => x.Success)
                 .Select(x => x.Result)
@@ -256,7 +256,7 @@ namespace Umbraco.Core
             //remove any prefixed '&' or '?'
             for (var i = 0; i < queryStrings.Length; i++)
             {
-                queryStrings[i] = queryStrings[i].TrimStart('?', '&').TrimEnd('&');
+                queryStrings[i] = queryStrings[i].TrimStart(Constants.CharArrays.QuestionMarkAmpersand).TrimEnd(Constants.CharArrays.Ampersand);
             }
 
             var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
@@ -315,7 +315,7 @@ namespace Umbraco.Core
             if (value == null)
                 return null;
 
-            string[] parts = value.Split('\n');
+            string[] parts = value.Split(Constants.CharArrays.LineFeed);
 
             StringBuilder decryptedValue = new StringBuilder();
 
@@ -1347,7 +1347,7 @@ namespace Umbraco.Core
             {
                 return false;
             }
-            var idCheckList = csv.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            var idCheckList = csv.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
             return idCheckList.Contains(value);
         }
 
@@ -1362,7 +1362,7 @@ namespace Umbraco.Core
             fileName = fileName.StripFileExtension();
 
             // underscores and dashes to spaces
-            fileName = fileName.ReplaceMany(new[] { '_', '-' }, ' ');
+            fileName = fileName.ReplaceMany(Constants.CharArrays.UnderscoreDash, ' ');
 
             // any other conversions ?
 
@@ -1370,7 +1370,7 @@ namespace Umbraco.Core
             fileName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(fileName);
 
             // Replace multiple consecutive spaces with a single space
-            fileName = string.Join(" ", fileName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+            fileName = string.Join(" ", fileName.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries));
 
             return fileName;
         }
@@ -1490,5 +1490,44 @@ namespace Umbraco.Core
         /// </summary>
         public static string NullOrWhiteSpaceAsNull(this string text)
             => string.IsNullOrWhiteSpace(text) ? null : text;
+
+        /// <summary>
+        /// Splits a string with an escape character that allows for the split character to exist in a string
+        /// </summary>
+        /// <param name="value">The string to split</param>
+        /// <param name="splitChar">The character to split on</param>
+        /// <param name="escapeChar">The character which can be used to escape the character to split on</param>
+        /// <returns>The string split into substrings delimited by the split character</returns>
+        public static IEnumerable<string> EscapedSplit(this string value, char splitChar, char escapeChar = DefaultEscapedStringEscapeChar)
+        {
+            if (value == null) yield break;
+
+            var sb = new StringBuilder(value.Length);
+            var escaped = false;
+
+            foreach (var chr in value.ToCharArray())
+            {
+                if (escaped)
+                {
+                    escaped = false;
+                    sb.Append(chr);
+                }
+                else if (chr == splitChar)
+                {
+                    yield return sb.ToString();
+                    sb.Clear();
+                }
+                else if (chr == escapeChar)
+                {
+                    escaped = true;
+                }
+                else
+                {
+                    sb.Append(chr);
+                }
+            }
+
+            yield return sb.ToString();
+        }
     }
 }

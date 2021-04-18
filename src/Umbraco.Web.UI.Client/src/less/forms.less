@@ -65,10 +65,7 @@ label.control-label, .control-label {
 .form-search small {
     color: @gray-8;
 }
-
-.form-search .icon, 
-.form-search .icon-search,
-.form-search .umb-icon {
+.form-search .icon, .form-search .icon-search {
   position: absolute;
   z-index: 1;
   top: 50%;
@@ -311,7 +308,14 @@ select[size] {
 input[type="file"],
 input[type="radio"],
 input[type="checkbox"] {
-  .umb-outline();
+  &:focus {
+    border-color: @inputBorderFocus;
+    outline: 0;
+
+    .tabbing-active & {
+      outline: 2px solid @ui-outline;
+    }
+  }
 }
 
 
@@ -585,19 +589,21 @@ table.domains .help-inline {
     }
   }
   .add-on {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: auto;
     height: 22px;
     min-width: 18px;
-    padding: 5px 6px 3px 6px;
+    padding: 4px 6px;
     font-size: @baseFontSize;
     font-weight: normal;
     line-height: @baseLineHeight;
     text-align: center;
-    //text-shadow: 0 1px 0 @white;
     background-color: @white;
     border: 1px solid @inputBorder;
     color: @ui-option-type;
+
     &:hover {
         border-color:@inputBorderFocus;
         color: @ui-option-type-hover;
@@ -803,9 +809,12 @@ legend + .control-group {
 
 // adjustments for properties tab
 .form-horizontal .block-form .control-label {
-  display: block;
-  float: none;
-  width: 100%;
+    display: block;
+    float: none;
+    width: 100%;
+}
+.form-horizontal .block-form .controls {
+    margin-left: 0;
 }
 
 //make sure buttons are always on top

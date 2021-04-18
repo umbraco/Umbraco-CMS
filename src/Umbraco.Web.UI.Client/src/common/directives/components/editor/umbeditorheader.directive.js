@@ -341,24 +341,26 @@ Use this directive to construct a header inside the main editor window.
                         }
 
                     }
-                    scope.accessibility.a11yMessageVisible = !isEmptyOrSpaces(scope.accessibility.a11yMessage);
-                    scope.accessibility.a11yNameVisible = !isEmptyOrSpaces(scope.accessibility.a11yName);
+
+                    scope.accessibility.a11yMessageVisible = !isNullOrWhitespace(scope.accessibility.a11yMessage);
+                    scope.accessibility.a11yNameVisible = !isNullOrWhitespace(scope.accessibility.a11yName);
 
                 });
             }
 
-
-
-           function isEmptyOrSpaces(str) {
-               return str === null || str===undefined || str.trim ==='';
+            function isNullOrWhitespace(str) {
+               return str === null || str === undefined || str.trim() === '';
             }
 
             function SetPageTitle(title) {
-                    scope.$emit("$changeTitle", title);
+                scope.$emit("$changeTitle", title);
             }
 
-            $rootScope.$on('$setAccessibleHeader', function (event, isNew, editorFor, nameLocked, name, contentTypeName, setTitle) {
+            var unbindEventHandler = $rootScope.$on('$setAccessibleHeader', function (event, isNew, editorFor, nameLocked, name, contentTypeName, setTitle) {
                 setAccessibilityHeaderDirective(isNew, editorFor, nameLocked, name, contentTypeName, setTitle);
+            });
+            scope.$on('$destroy', function () {
+                unbindEventHandler();
             });
         }
 

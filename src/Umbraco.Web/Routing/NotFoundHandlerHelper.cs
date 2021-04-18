@@ -96,7 +96,7 @@ namespace Umbraco.Web.Routing
                         getPath: nodeid =>
                         {
                             var ent = entityService.Get(nodeid);
-                            return ent.Path.Split(',').Reverse();
+                            return ent.Path.Split(Constants.CharArrays.Comma).Reverse();
                         },
                         publishedContentExists: i => publishedContentQuery.Content(i) != null);
 
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Routing
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error<NotFoundHandlerHelper>(ex, "Could not parse xpath expression: {ContentXPath}", errorPage.ContentXPath);
+                    Current.Logger.Error<NotFoundHandlerHelper,string>(ex, "Could not parse xpath expression: {ContentXPath}", errorPage.ContentXPath);
                     return null;
                 }
             }
