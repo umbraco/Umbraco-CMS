@@ -328,7 +328,7 @@ namespace Umbraco.Web.Models.PublishedContent
         private T GetMarkUpForFallbackLanguage<T>(string culture2, T value)
         {
             var typeOfT = typeof(T);
-            if (typeOfT == typeof(string))
+            if (value is string)
             {
                 var newValue = "<span lang=\"" + culture2 + "\">" + value + "</span>";
                 return (T)Convert.ChangeType(newValue, typeof(T));
