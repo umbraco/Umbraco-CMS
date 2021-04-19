@@ -1,32 +1,55 @@
 using System;
-using System.Linq;
-using Umbraco.Extensions;
+using System.Text;
 
 namespace Umbraco.Cms.Core.Routing
 {
     public class WebPath
     {
+        private const char Separator = '/';
+
         public static string Combine(params string[] paths)
         {
-            const string separator = "/";
-
-            if (paths == null) throw new ArgumentNullException(nameof(paths));
-            if (!paths.Any()) return string.Empty;
-
-            var result = paths[0].TrimEnd(separator);
-
-            if(!(result.StartsWith(separator) || result.StartsWith("~" + separator)))
+            if (paths == null)
             {
-                result = separator + result;
+                throw new ArgumentNullException(nameof(paths));
             }
 
-            for (var index = 1; index < paths.Length; index++)
+            if (paths.Length == 0)
             {
-
-                result +=separator + paths[index].Trim(separator);
+                return string.Empty;
             }
 
-            return result;
+            var sb = new StringBuilder();
+
+            for (var index = 0; index < paths.Length; index++)
+            {
+                var path = paths[index];
+                var start = 0;
+                var count = path.Length;
+                var isFirst = index == 0;
+                var isLast = index == paths.Length - 1;
+
+                // don't trim start if it's the first
+                if (!isFirst && path[0] == Separator)
+                {
+                    start = 1;
+                }
+
+                // always trim end
+                if (path[path.Length - 1] == Separator)
+                {
+                    count = path.Length - 1;
+                }
+
+                sb.Append(path, start, count - start);
+
+                if (!isLast)
+                {
+                    sb.Append(Separator);
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }
