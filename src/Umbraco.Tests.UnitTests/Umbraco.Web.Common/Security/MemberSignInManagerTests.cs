@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
         private readonly Mock<MemberManager> _memberManager = MockMemberManager();
 
         public UserClaimsPrincipalFactory<MemberIdentityUser> CreateClaimsFactory(MemberManager userMgr)
-            => new UserClaimsPrincipalFactory<MemberIdentityUser>(userMgr, Options.Create(new MemberIdentityOptions()));
+            => new UserClaimsPrincipalFactory<MemberIdentityUser>(userMgr, Options.Create(new IdentityOptions()));
 
         public MemberSignInManager CreateSut()
         {
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
             => new Mock<MemberManager>(
                     Mock.Of<IIpResolver>(),
                     Mock.Of<IUserStore<MemberIdentityUser>>(),
-                    Options.Create(new MemberIdentityOptions()),
+                    Options.Create(new IdentityOptions()),
                     Mock.Of<IPasswordHasher<MemberIdentityUser>>(),
                     Enumerable.Empty<IUserValidator<MemberIdentityUser>>(),
                     Enumerable.Empty<IPasswordValidator<MemberIdentityUser>>(),
