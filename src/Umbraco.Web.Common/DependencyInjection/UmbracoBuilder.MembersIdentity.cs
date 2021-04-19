@@ -42,6 +42,7 @@ namespace Umbraco.Extensions
                 .AddSignInManager<IMemberSignInManager, MemberSignInManager>()
                 .AddErrorDescriber<MembersErrorDescriber>();
 
+            services.AddScoped<IMemberUserStore>(x => (IMemberUserStore)x.GetRequiredService<IUserStore<MemberIdentityUser>>());
             services.AddScoped<IPasswordHasher<MemberIdentityUser>, MemberPasswordHasher>();
 
             services.ConfigureOptions<ConfigureSecurityStampOptions>();

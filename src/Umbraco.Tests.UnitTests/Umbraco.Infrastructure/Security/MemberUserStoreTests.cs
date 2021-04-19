@@ -10,6 +10,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -35,7 +36,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 _mockMemberService.Object,
                 new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>())),
                 mockScopeProvider.Object,
-                new IdentityErrorDescriber());
+                new IdentityErrorDescriber(),
+                Mock.Of<IPublishedMemberCache>());
         }
 
         [Test]

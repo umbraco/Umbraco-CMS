@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Extensions
@@ -13,7 +13,8 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="content">The internal published content.</param>
         /// <returns>The strongly typed published content model.</returns>
-        public static IPublishedContent CreateModel(this IPublishedContent content, IPublishedModelFactory publishedModelFactory)
+        public static TPublishedContent CreateModel<TPublishedContent>(this TPublishedContent content, IPublishedModelFactory publishedModelFactory)
+            where TPublishedContent : class, IPublishedContent
         {
             if (publishedModelFactory == null) throw new ArgumentNullException(nameof(publishedModelFactory));
             if (content == null)
@@ -26,7 +27,7 @@ namespace Umbraco.Extensions
                 throw new InvalidOperationException("Factory returned null.");
 
             // if factory returns a different type, throw
-            if (!(model is IPublishedContent publishedContent))
+            if (!(model is TPublishedContent publishedContent))
                 throw new InvalidOperationException($"Factory returned model of type {model.GetType().FullName} which does not implement IPublishedContent.");
 
             return publishedContent;

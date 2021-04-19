@@ -11,19 +11,22 @@ using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Web.Common.Security
 {
 
     public class MemberManager : UmbracoUserManager<MemberIdentityUser, MemberPasswordConfigurationSettings>, IMemberManager
     {
+        private readonly IMemberUserStore _store;
         private readonly IPublicAccessService _publicAccessService;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private MemberIdentityUser _currentMember;
 
         public MemberManager(
             IIpResolver ipResolver,
-            IUserStore<MemberIdentityUser> store,
+            IMemberUserStore store,
             IOptions<MemberIdentityOptions> optionsAccessor,
             IPasswordHasher<MemberIdentityUser> passwordHasher,
             IEnumerable<IUserValidator<MemberIdentityUser>> userValidators,
@@ -37,6 +40,7 @@ namespace Umbraco.Cms.Web.Common.Security
             : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors,
                 services, logger, passwordConfiguration)
         {
+            _store = store;
             _publicAccessService = publicAccessService;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -228,6 +232,8 @@ namespace Umbraco.Cms.Web.Common.Security
                     async () => await getUserRolesAsync());
             }
             return result;
-        }        
+        }
+
+        public IPublishedMember AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Runtime.CompilerServices;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache
@@ -71,9 +71,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         //    return "NuCache.ContentCache.ContentByRoute[";
         //}
 
-        public static string MemberCacheMember(string name, bool previewing, object p)
-        {
-            return "NuCache.MemberCache." + name + "[" + DraftOrPub(previewing) + p + "]";
-        }
+        //public static string MemberCacheMember(string name, bool previewing, object p)
+        //{
+        //    return "NuCache.MemberCache." + name + "[" + DraftOrPub(previewing) + p + "]";
+        //}
     }
 }

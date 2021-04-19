@@ -112,9 +112,9 @@ namespace Umbraco.Tests.Testing
 
         protected UmbracoTestAttribute Options { get; private set; }
 
-        protected static bool FirstTestInSession = true;
+        protected static bool FirstTestInSession { get; set; } = true;
 
-        protected bool FirstTestInFixture = true;
+        protected bool FirstTestInFixture { get; set; } = true;
 
         internal TestObjects TestObjects { get; private set; }
 
@@ -233,10 +233,6 @@ namespace Umbraco.Tests.Testing
 
             var memberService = Mock.Of<IMemberService>();
             var memberTypeService = Mock.Of<IMemberTypeService>();
-            var membershipProvider = new MembersMembershipProvider(memberService, memberTypeService, Mock.Of<IUmbracoVersion>(), TestHelper.GetHostingEnvironment(), TestHelper.GetIpResolver());
-            var membershipHelper = new MembershipHelper(Mock.Of<IHttpContextAccessor>(), Mock.Of<IPublishedMemberCache>(), membershipProvider, Mock.Of<RoleProvider>(), memberService, memberTypeService, Mock.Of<IPublicAccessService>(), AppCaches.Disabled, loggerFactory, ShortStringHelper, Mock.Of<IEntityService>());
-
-            services.AddUnique(membershipHelper);
 
             TestObjects = new TestObjects();
             Compose();

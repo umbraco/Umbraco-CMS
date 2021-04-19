@@ -1,23 +1,17 @@
-using System.Xml.XPath;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Core.PublishedCache
 {
-    // TODO: Kill this, why do we want this at all?
-    // See https://dev.azure.com/umbraco/D-Team%20Tracker/_workitems/edit/11487
-    public interface IPublishedMemberCache : IXPathNavigable
+    public interface IPublishedMemberCache
     {
-        IPublishedContent GetByProviderKey(object key);
-        IPublishedContent GetById(int memberId);
-        IPublishedContent GetByUsername(string username);
-        IPublishedContent GetByEmail(string email);
-        IPublishedContent GetByMember(IMember member);
-
-        XPathNavigator CreateNavigator(bool preview);
-
-        // if the node does not exist, return null
-        XPathNavigator CreateNodeNavigator(int id, bool preview);
+        /// <summary>
+        /// Get an <see cref="IPublishedMember"/> from an <see cref="IMember"/>
+        /// </summary>
+        /// <param name="member"></param>
+        /// <returns></returns>
+        IPublishedMember Get(IMember member);
 
         /// <summary>
         /// Gets a content type identified by its unique identifier.

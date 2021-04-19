@@ -267,7 +267,6 @@ namespace Umbraco.Tests.TestHelpers
                 HostingEnvironment,
                 HostingLifetime,
                 ShortStringHelper,
-                new SiteDomainHelper(),
                 Factory.GetRequiredService<IEntityXmlSerializer>(),
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);

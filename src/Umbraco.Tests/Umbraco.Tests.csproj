@@ -142,6 +142,7 @@
     <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\TaskEventArgs.cs" />
     <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\ThreadingTaskImmutable.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
+    <Compile Include="LegacyXmlPublishedCache\PublishedMember.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />

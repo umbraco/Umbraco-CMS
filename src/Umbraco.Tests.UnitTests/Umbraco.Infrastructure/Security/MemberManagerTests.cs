@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -39,7 +40,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 _mockMemberService.Object,
                 new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>())),
                 new Mock<IScopeProvider>().Object,
-                new IdentityErrorDescriber());
+                new IdentityErrorDescriber(),
+                Mock.Of<IPublishedMemberCache>());
 
             _mockIdentityOptions = new Mock<IOptions<MemberIdentityOptions>>();
             var idOptions = new MemberIdentityOptions { Lockout = { AllowedForNewUsers = false } };

@@ -172,7 +172,6 @@
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
-    <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
     <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
     <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />

@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Cms.Core.Security
 {
@@ -8,6 +9,13 @@ namespace Umbraco.Cms.Core.Security
     /// </summary>
     public interface IMemberManager : IUmbracoUserManager<MemberIdentityUser>
     {
+        /// <summary>
+        /// Returns the <see cref="IPublishedMember"/> instance for the specified <see cref="MemberIdentityUser"/>
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        IPublishedMember AsPublishedMember(MemberIdentityUser user);
+
         /// <summary>
         /// Returns the currently logged in member if there is one, else returns null
         /// </summary>
