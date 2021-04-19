@@ -288,7 +288,7 @@
     <key alias="childItems" version="7.0">Child items</key>
     <key alias="target" version="7.0">Target</key>
     <key alias="scheduledPublishServerTime">This translates to the following time on the server:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">What does this mean?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">What does this mean?</a>]]></key>
     <key alias="nestedContentDeleteItem">Are you sure you want to delete this item?</key>
     <key alias="nestedContentDeleteAllItems">Are you sure you want to delete all items?</key>
     <key alias="nestedContentEditorNotSupported">Property %0% uses editor %1% which is not supported by Nested Content.</key>
@@ -361,6 +361,17 @@
     <key alias="createNewMember">Create a new member</key>
     <key alias="allMembers">All Members</key>
     <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
+  </area>
+  <area alias="contentType">
+     <key alias="copyFailed">Failed to copy content type</key>
+     <key alias="moveFailed">Failed to move content type</key>
+  </area>
+  <area alias="mediaType">
+     <key alias="copyFailed">Failed to copy media type</key>
+     <key alias="moveFailed">Failed to move media type</key>
+  </area>
+  <area alias="memberType">
+     <key alias="copyFailed">Failed to copy member type</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Where do you want to create the new %0%</key>
@@ -482,7 +493,7 @@
     <key alias="recycleBinDeleting">The items in the recycle bin are now being deleted. Please do not close this window while this operation takes place</key>
     <key alias="recycleBinIsEmpty">The recycle bin is now empty</key>
     <key alias="recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>'s webservice is currently experiencing some problems, which we have no control over. We are very sorry for this inconvenience.]]></key>
     <key alias="regexSearchHelp">Search for a regular expression to add validation to a form field. Example: 'email, 'zip-code', 'URL'.</key>
     <key alias="removeMacro">Remove Macro</key>
     <key alias="requiredField">Required Field</key>
@@ -680,6 +691,7 @@
     <key alias="clear">Clear</key>
     <key alias="close">Close</key>
     <key alias="closewindow">Close Window</key>
+    <key alias="closepane">Close Pane</key>
     <key alias="comment">Comment</key>
     <key alias="confirm">Confirm</key>
     <key alias="constrain">Constrain</key>
@@ -983,7 +995,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="instruction">Log in below</key>
     <key alias="signInWith">Sign in with</key>
     <key alias="timeout">Session timed out</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Forgotten password?</key>
     <key alias="forgottenPasswordInstruction">An email will be sent to the address specified with a link to reset your password</key>
     <key alias="requestPasswordResetConfirmation">An email with password reset instructions will be sent to the specified address if it matched our records</key>
@@ -1041,7 +1053,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
 																<tbody>
 																	<tr>
 																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																				Click this link to reset your password
 																			</a>
 																		</td>
@@ -1162,7 +1174,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
 																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
 																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
 																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>EDIT</a> </td> </tr></tbody></table>
+																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>EDIT</a> </td> </tr></tbody></table>
 																	</td>
 																</tr>
 															</tbody>
@@ -1882,6 +1894,8 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="changePassword">Change your password</key>
     <key alias="changePhoto">Change photo</key>
     <key alias="newPassword">New password</key>
+    <key alias="newPasswordFormatLengthTip">Minimum %0% character(s) to go!</key>
+    <key alias="newPasswordFormatNonAlphaTip">There should be at least %0% special character(s) in there.</key>
     <key alias="noLockouts">hasn't been locked out</key>
     <key alias="noPasswordChange">The password hasn't been changed</key>
     <key alias="confirmNewPassword">Confirm new password</key>
@@ -2018,7 +2032,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
 																			<tbody>
 																				<tr>
 																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																						<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																							Click this link to accept the invite
 																						</a>
 																					</td>
@@ -2320,6 +2334,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contextMenuDescription">Select one of the options to edit the node.</key>
     <key alias="contextDialogDescription">Perform action %0% on the %1% node</key>
     <key alias="addImageCaption">Add image caption</key>
+    <key alias="searchContentTree">Search content tree</key>
   </area>
   <area alias="references">
     <key alias="tabName">References</key>
@@ -2579,5 +2594,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="viewPublishedContentDescription">You are in Preview Mode, do you want exit in order to view the published version of your website?</key>
     <key alias="viewPublishedContentAcceptButton">View published version</key>
     <key alias="viewPublishedContentDeclineButton">Stay in preview mode</key>
+  </area>
+  <area alias="treeSearch">
+    <key alias="searchResult">item returned</key>
+    <key alias="searchResults">items returned</key>
   </area>
 </language>

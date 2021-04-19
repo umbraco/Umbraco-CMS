@@ -57,7 +57,6 @@
                                    {{::contentType.name}} <span ng-show="contentType.blueprints" style="text-transform: lowercase;">(<localize key="blueprints_blankBlueprint">blank</localize>)</span>
                                </button>
 
-
                                <button type="button" ng-repeat="blueprint in contentType.blueprints track by blueprint.id | orderBy:'name':false" ng-click="createFromBlueprint(entityType, contentType.alias, blueprint.id)">
                                    &nbsp;&nbsp;<i class="{{::contentType.icon}}" aria-hidden="true"></i>
                                    {{::blueprint.name}}
