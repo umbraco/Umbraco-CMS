@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Events
 {
-    [Obsolete("This is only used for the internal cache and will change, use saved notifications instead")]
+    [Obsolete("This is only used for the internal cache and will change, use tree change notifications instead")]
     [EditorBrowsable(EditorBrowsableState.Never)]
     public class ScopedEntityRemoveNotification : ObjectNotification<IContentBase>
     {
