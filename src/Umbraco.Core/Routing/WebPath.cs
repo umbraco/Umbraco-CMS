@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Routing
 {
     public class WebPath
     {
-        private const char Separator = '/';
+        public const char PathSeparator = '/';
 
         public static string Combine(params string[] paths)
         {
@@ -30,13 +30,13 @@ namespace Umbraco.Cms.Core.Routing
                 var isLast = index == paths.Length - 1;
 
                 // don't trim start if it's the first
-                if (!isFirst && path[0] == Separator)
+                if (!isFirst && path[0] == PathSeparator)
                 {
                     start = 1;
                 }
 
                 // always trim end
-                if (path[path.Length - 1] == Separator)
+                if (path[path.Length - 1] == PathSeparator)
                 {
                     count = path.Length - 1;
                 }
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core.Routing
 
                 if (!isLast)
                 {
-                    sb.Append(Separator);
+                    sb.Append(PathSeparator);
                 }
             }
 
