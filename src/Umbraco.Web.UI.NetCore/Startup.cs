@@ -61,15 +61,12 @@ namespace Umbraco.Cms.Web.UI.NetCore
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseUmbraco()
-                .WithBackOffice()
-                .WithWebsite()
-                .WithEndpoints(u =>
-                {
-                    u.UseInstallerEndpoints();
-                    u.UseBackOfficeEndpoints();
-                    u.UseWebsiteEndpoints();
-                });
+            app.UseUmbraco(u =>
+            {
+                u.UseInstallerEndpoints();
+                u.UseBackOfficeEndpoints();
+                u.UseWebsiteEndpoints();
+            });
         }
     }
 }
