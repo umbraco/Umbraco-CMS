@@ -19,17 +19,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     public class PublishedSnapshotServiceEventHandler :
         IDisposable,
         INotificationHandler<LanguageSavedNotification>,
-        INotificationHandler<ContentDeletingNotification>,
-        INotificationHandler<MediaDeletingNotification>,
         INotificationHandler<MemberDeletingNotification>,
-        INotificationHandler<ContentEmptyingRecycleBinNotification>,
-        INotificationHandler<MediaEmptyingRecycleBinNotification>,
         INotificationHandler<ContentRefreshNotification>,
         INotificationHandler<MediaRefreshNotification>,
         INotificationHandler<MemberRefreshNotification>,
         INotificationHandler<ContentTypeRefreshedNotification>,
         INotificationHandler<MediaTypeRefreshedNotification>,
-        INotificationHandler<MemberTypeRefreshedNotification>
+        INotificationHandler<MemberTypeRefreshedNotification>,
+        INotificationHandler<ScopedEntityRemoveNotification>
     {
         private readonly IRuntimeState _runtime;
         private bool _disposedValue;
@@ -81,46 +78,10 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // we need them to be "repository" events ie to trigger from within the repository transaction,
         // because they need to be consistent with the content that is being refreshed/removed - and that
         // should be guaranteed by a DB transaction
-        public void Handle(ContentDeletingNotification notification) => HandleContentEntitiesDeleted(notification.DeletedEntities);
-
-        public void Handle(ContentEmptyingRecycleBinNotification notification) => HandleContentEntitiesDeleted(notification.DeletedEntities);
-
-        public void Handle(MediaDeletingNotification notification) => HandleMediaEntitiesDeleted(notification.DeletedEntities);
-
-        public void Handle(MediaEmptyingRecycleBinNotification notification) => HandleMediaEntitiesDeleted(notification.DeletedEntities);
+        public void Handle(ScopedEntityRemoveNotification notification) =>
+            _publishedContentService.DeleteContentItem(notification.Entity);
 
         public void Handle(MemberDeletingNotification notification) => _publishedContentService.DeleteContentItems(notification.DeletedEntities);
-
-        private void HandleContentEntitiesDeleted(IEnumerable<IContentBase> entities)
-        {
-            var entitiesToDelete = new HashSet<IContentBase>();
-            foreach (IContentBase entity in entities)
-            {
-                IEnumerable<IContent> descendants =
-                    _contentService.GetPagedDescendants(entity.Id, 0, int.MaxValue, out long totalRecords);
-                entitiesToDelete.Add(entity);
-                foreach (IContent descendant in descendants)
-                {
-                    entitiesToDelete.Add(descendant);
-                }
-            }
-            _publishedContentService.DeleteContentItems(entitiesToDelete);
-        }
-
-        private void HandleMediaEntitiesDeleted(IEnumerable<IContentBase> entities)
-        {
-            var entitiesToDelete = new HashSet<IContentBase>();
-            foreach (IContentBase entity in entities)
-            {
-                IEnumerable<IMedia> descendants = _mediaService.GetPagedDescendants(entity.Id, 0, int.MaxValue, out long totalRecords);
-                entitiesToDelete.Add(entity);
-                foreach (IMedia descendant in descendants)
-                {
-                    entitiesToDelete.Add(descendant);
-                }
-            }
-            _publishedContentService.DeleteContentItems(entitiesToDelete);
-        }
 
         public void Handle(MemberRefreshNotification notification) => _publishedContentService.RefreshEntity(notification.Entity);
 

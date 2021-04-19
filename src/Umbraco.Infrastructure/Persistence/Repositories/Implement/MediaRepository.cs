@@ -374,6 +374,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
         }
 
+        protected override void PersistDeletedItem(IMedia entity)
+        {
+            // Raise event first else potential FK issues
+            OnUowRemovingEntity(entity);
+            base.PersistDeletedItem(entity);
+        }
+
         #endregion
 
         #region Recycle Bin

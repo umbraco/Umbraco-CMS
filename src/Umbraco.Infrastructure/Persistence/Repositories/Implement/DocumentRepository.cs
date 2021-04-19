@@ -788,6 +788,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PersistDeletedItem(IContent entity)
         {
+            // Raise event first else potential FK issues
+            OnUowRemovingEntity(entity);
+
             //We need to clear out all access rules but we need to do this in a manual way since
             // nothing in that table is joined to a content id
             var subQuery = SqlContext.Sql()

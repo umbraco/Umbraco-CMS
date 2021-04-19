@@ -792,6 +792,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         /// </summary>
         protected void OnUowRefreshedEntity(INotification notification) => _eventAggregator.Publish(notification);
 
+
+        protected void OnUowRemovingEntity(IContentBase entity) => _eventAggregator.Publish(new ScopedEntityRemoveNotification(entity, new EventMessages()));
         #endregion
 
         #region Classes

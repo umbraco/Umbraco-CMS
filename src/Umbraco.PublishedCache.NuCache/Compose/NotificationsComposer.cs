@@ -10,17 +10,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Compose
         public void Compose(IUmbracoBuilder builder) =>
             builder
                 .AddNotificationHandler<LanguageSavedNotification, PublishedSnapshotServiceEventHandler>()
-                .AddNotificationHandler<ContentDeletingNotification, PublishedSnapshotServiceEventHandler>()
-                .AddNotificationHandler<MediaDeletingNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MemberDeletingNotification, PublishedSnapshotServiceEventHandler>()
-                .AddNotificationHandler<ContentEmptyingRecycleBinNotification, PublishedSnapshotServiceEventHandler>()
-                .AddNotificationHandler<MediaEmptyingRecycleBinNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<ContentRefreshNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MediaRefreshNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MemberRefreshNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<ContentTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MediaTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MemberTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<ScopedEntityRemoveNotification, PublishedSnapshotServiceEventHandler>()
             ;
     }
 }
