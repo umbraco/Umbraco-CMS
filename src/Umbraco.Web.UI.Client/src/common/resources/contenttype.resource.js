@@ -432,13 +432,15 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                 throw "args.id cannot be null";
             }
 
+            var promise = localizationService.localize("contentType_moveFailed");
+
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostMove"),
                     {
                         parentId: args.parentId,
                         id: args.id
                     }, { responseType: 'text' }),
-                'Failed to move content');
+                promise);
         },
 
         /**
@@ -475,13 +477,15 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                 throw "args.id cannot be null";
             }
 
+            var promise = localizationService.localize("contentType_copyFailed");
+
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCopy"),
                     {
                         parentId: args.parentId,
                         id: args.id
                     }, { responseType: 'text' }),
-                'Failed to copy content');
+                promise);
         },
 
         /**
@@ -511,41 +515,8 @@ function contentTypeResource($q, $http, umbRequestHelper, umbDataFormatter, loca
                 $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateContainer", { parentId: parentId, name: encodeURIComponent(name) })),
                 'Failed to create a folder under parent id ' + parentId);
 
-        },
 
-        /**
-        * @ngdoc method
-        * @name umbraco.resources.contentTypeResource#createCollection
-        * @methodOf umbraco.resources.contentTypeResource
-        *
-        * @description
-        * Create a collection of a content types
-        *
-        * ##usage
-        * <pre>
-        * contentTypeResource.createCollection(1244,"testcollectionname",true,"collectionItemName",true,"icon-name","icon-name")
-        *    .then(function() {
-        *       Do stuff..
-        *    });
-        * </pre>
-        *
-        * @param {Int} parentId the ID of the parent content type underneath which to create the collection
-        * @param {String} collectionName the name of the collection
-        * @param {Boolean} collectionCreateTemplate true/false to specify whether to create a default template for the collection
-        * @param {String} collectionItemName the name of the collection item
-        * @param {Boolean} collectionItemCreateTemplate true/false to specify whether to create a default template for the collection item
-        * @param {String} collectionIcon the icon for the collection
-        * @param {String} collectionItemIcon the icon for the collection item
-        * @returns {Promise} resourcePromise object.
-        *
-        */
-        createCollection: function (parentId, collectionName, collectionCreateTemplate, collectionItemName, collectionItemCreateTemplate, collectionIcon, collectionItemIcon) {
-
-            return umbRequestHelper.resourcePromise(
-                $http.post(umbRequestHelper.getApiUrl("contentTypeApiBaseUrl", "PostCreateCollection", { parentId: parentId, collectionName: collectionName, collectionCreateTemplate: collectionCreateTemplate, collectionItemName: collectionItemName, collectionItemCreateTemplate: collectionItemCreateTemplate, collectionIcon: collectionIcon, collectionItemIcon: collectionItemIcon})),
-                'Failed to create collection under ' + parentId);
-
-        },
+        }, 
 
         /**
         * @ngdoc method
