@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Middleware
 {
@@ -14,13 +13,14 @@ namespace Umbraco.Cms.Web.BackOffice.Middleware
         {
             if (HttpMethods.IsGet(context.Request.Method) || HttpMethods.IsHead(context.Request.Method))
             {
-                await context.Response.WriteAsync("I'm alive");
                 context.Response.StatusCode = StatusCodes.Status200OK;
+                await context.Response.WriteAsync("I'm alive");
+
             }
             else
             {
                 context.Response.StatusCode = StatusCodes.Status404NotFound;
-            } 
+            }
         }
     }
 }
