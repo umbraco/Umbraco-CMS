@@ -77,6 +77,8 @@ namespace Umbraco.Extensions
 
         public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
         {
+            builder.Services.AddSingleton<KeepAliveMiddleware>();
+            builder.Services.ConfigureOptions<ConfigureGlobalOptionsForKeepAliveMiddlware>();
             builder.Services.AddUnique<ServerVariablesParser>();
             builder.Services.AddUnique<BackOfficeAreaRoutes>();
             builder.Services.AddUnique<PreviewRoutes>();
