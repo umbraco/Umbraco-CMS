@@ -343,7 +343,9 @@ namespace Umbraco.Web.Editors
                 contentItem.PersistedContent.RawPasswordValue = null;
 
                 //create/save the IMember
-                Services.MemberService.Save(contentItem.PersistedContent);
+                var result = Services.MemberService.Save(contentItem.PersistedContent);
+                if (!result.Success)
+                    return Mapper.Map<MemberDisplay>(contentItem.PersistedContent);
             }
 
             //Now let's do the role provider stuff - now that we've saved the content item (that is important since
