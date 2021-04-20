@@ -584,14 +584,6 @@ namespace Umbraco.Tests.Testing
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath(HostingEnvironment);
-
-            // clear static events
-            DocumentRepository.ClearScopeEvents();
-            MediaRepository.ClearScopeEvents();
-            MemberRepository.ClearScopeEvents();
-            ContentTypeService.ClearScopeEvents();
-            MediaTypeService.ClearScopeEvents();
-            MemberTypeService.ClearScopeEvents();
         }
 
         #endregion

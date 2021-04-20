@@ -11,6 +11,7 @@ using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -53,7 +54,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IRelationRepository relationRepository = GetRequiredService<IRelationRepository>();
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            return new MemberRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MemberRepository>(), MemberTypeRepository, MemberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, PasswordHasher, propertyEditors, dataValueReferences, DataTypeService, JsonSerializer);
+            return new MemberRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MemberRepository>(), MemberTypeRepository, MemberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, PasswordHasher, propertyEditors, dataValueReferences, DataTypeService, JsonSerializer, Mock.Of<IEventAggregator>());
         }
 
         [Test]

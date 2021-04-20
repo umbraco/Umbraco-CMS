@@ -6,10 +6,12 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
@@ -55,9 +57,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void SetUpData()
         {
             CreateTestData();
-
-            // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            global::Umbraco.Cms.Core.Services.Implement.ContentTypeService.ClearScopeEvents();
 
             ContentRepositoryBase.ThrowOnWarning = true;
         }
@@ -138,7 +137,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 propertyEditors,
                 dataValueReferences,
                 DataTypeService,
-                ConfigurationEditorJsonSerializer);
+                ConfigurationEditorJsonSerializer,
+                Mock.Of<IEventAggregator>());
             return repository;
         }
 

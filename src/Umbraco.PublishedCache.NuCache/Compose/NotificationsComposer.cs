@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services.Notifications;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Compose
@@ -7,6 +8,16 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Compose
     public sealed class NotificationsComposer : ICoreComposer
     {
         public void Compose(IUmbracoBuilder builder) =>
-            builder.AddNotificationHandler<LanguageSavedNotification, PublishedSnapshotServiceEventHandler>();
+            builder
+                .AddNotificationHandler<LanguageSavedNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MemberDeletingNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<ContentRefreshNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MediaRefreshNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MemberRefreshNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<ContentTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MediaTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MemberTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<ScopedEntityRemoveNotification, PublishedSnapshotServiceEventHandler>()
+            ;
     }
 }

@@ -44,8 +44,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentRepositoryBase.ThrowOnWarning = true;
             _globalSettings = new GlobalSettings();
 
-            // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            global::Umbraco.Cms.Core.Services.Implement.ContentTypeService.ClearScopeEvents();
             CreateTestData();
         }
 
