@@ -24,6 +24,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepository>, IMediaRepository
     {
+        private readonly AppCaches _cache;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly MediaByGuidReadRepository _mediaByGuidReadRepository;
@@ -32,6 +33,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditorCollection, DataValueReferenceFactoryCollection dataValueReferenceFactories)
             : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories)
         {
+            _cache = cache;
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _mediaByGuidReadRepository = new MediaByGuidReadRepository(this, scopeAccessor, cache, logger);
@@ -369,6 +371,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         public override int RecycleBinId => Constants.System.RecycleBinMedia;
 
+        public bool RecycleBinSmells()
+        {
+            var cache = _cache.RuntimeCache;
+            var cacheKey = CacheKeys.MediaRecycleBinCacheKey;
+
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(RecycleBinId) > 0);
+        }
+
         #endregion
 
         #region Read Repository implementation for Guid keys
@@ -500,7 +511,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
-                        content[i] = (Models.Media) cached;
+                        content[i] = (Models.Media)cached;
                         continue;
                     }
                 }
