@@ -72,9 +72,6 @@ namespace Umbraco.Cms.Core.Security
         public Guid Key { get; set; }
 
         /// <summary>
-        }
-
-        /// <summary>
         /// Gets or sets the alias of the member type
         /// </summary>
         public string MemberTypeAlias { get; set; }
