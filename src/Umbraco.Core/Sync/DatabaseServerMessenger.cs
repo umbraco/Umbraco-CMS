@@ -28,7 +28,7 @@ namespace Umbraco.Core.Sync
     // but only processes instructions coming from remote servers,
     // thus ensuring that instructions run only once
     //
-    public class DatabaseServerMessenger : ServerMessengerBase
+    public class DatabaseServerMessenger : ServerMessengerBase, ISyncBootStateAccessor
     {
         private readonly IRuntimeState _runtime;
         private readonly ManualResetEvent _syncIdle;
@@ -172,35 +172,7 @@ namespace Umbraco.Core.Sync
             lock (_locko)
             {
                 if (_released) return;
-
-                var coldboot = false;
-                if (_lastId < 0) // never synced before
-                {
-                    // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
-                    // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
-                    Logger.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install."
-                        + " The server will build its caches and indexes, and then adjust its last synced Id to the latest found in"
-                        + " the database and maintain cache updates based on that Id.");
-
-                    coldboot = true;
-                }
-                else
-                {
-                    //check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
-                    //row so we will sum these numbers to get the actual count.
-                    var count = database.ExecuteScalar<int>("SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
-                    if (count > Options.MaxProcessingInstructionCount)
-                    {
-                        //too many instructions, proceed to cold boot
-                        Logger.Warn<DatabaseServerMessenger,int,int>(
-                            "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
-                            + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
-                            + " to the latest found in the database and maintain cache updates based on that Id.",
-                            count, Options.MaxProcessingInstructionCount);
-
-                        coldboot = true;
-                    }
-                }
+                var coldboot = IsColdBoot(database);
 
                 if (coldboot)
                 {
@@ -221,6 +193,40 @@ namespace Umbraco.Core.Sync
 
                 _initialized = true;
             }
+        }
+
+        private bool IsColdBoot(IUmbracoDatabase database)
+        {
+            var coldboot = false;
+            if (_lastId < 0) // never synced before
+            {
+                // we haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
+                // server and it will need to rebuild it's own caches, eg Lucene or the xml cache file.
+                Logger.Warn<DatabaseServerMessenger>("No last synced Id found, this generally means this is a new server/install."
+                    + " The server will build its caches and indexes, and then adjust its last synced Id to the latest found in"
+                    + " the database and maintain cache updates based on that Id.");
+
+                    coldboot = true;
+                }
+                else
+                {
+                    //check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
+                    //row so we will sum these numbers to get the actual count.
+                    var count = database.ExecuteScalar<int>("SELECT SUM(instructionCount) FROM umbracoCacheInstruction WHERE id > @lastId", new {lastId = _lastId});
+                    if (count > Options.MaxProcessingInstructionCount)
+                    {
+                        //too many instructions, proceed to cold boot
+                        Logger.Warn<DatabaseServerMessenger,int,int>(
+                            "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
+                            + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
+                            + " to the latest found in the database and maintain cache updates based on that Id.",
+                            count, Options.MaxProcessingInstructionCount);
+
+                    coldboot = true;
+                }
+            }
+
+            return coldboot;
         }
 
         /// <summary>
@@ -547,6 +553,30 @@ namespace Umbraco.Core.Sync
         }
 
         #endregion
+
+        public SyncBootState GetSyncBootState()
+        {
+            try
+            {
+                ReadLastSynced(); // get _lastId
+                using (var scope = ScopeProvider.CreateScope())
+                {
+                    EnsureInstructions(scope.Database);
+                    bool isColdBoot = IsColdBoot(scope.Database);
+
+                    if (isColdBoot)
+                    {
+                        return SyncBootState.ColdBoot;
+                    }
+                    return SyncBootState.HasSyncState;
+                }
+            }
+            catch(Exception ex)
+            {
+                Logger.Warn<DatabaseServerMessenger>("Error determining Sync Boot State", ex);
+                return SyncBootState.Unknown;
+            }
+        }
 
         #region Notify refreshers
 

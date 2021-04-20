@@ -21,6 +21,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
@@ -62,6 +63,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private bool _localContentDbExists;
         private bool _localMediaDbExists;
 
+        private readonly ISyncBootStateAccessor _syncBootStateAccessor;
+
         // define constant - determines whether to use cache when previewing
         // to store eg routes, property converted values, anything - caching
         // means faster execution, but uses memory - not sure if we want it
@@ -80,7 +83,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDataSource dataSource, IGlobalSettings globalSettings,
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
-            UrlSegmentProviderCollection urlSegmentProviders, IContentCacheDataSerializerFactory contentCacheDataSerializerFactory, ContentDataSerializer contentDataSerializer = null)
+            UrlSegmentProviderCollection urlSegmentProviders,
+            ISyncBootStateAccessor syncBootStateAccessor,
+            IContentCacheDataSerializerFactory contentCacheDataSerializerFactory, 
+            ContentDataSerializer contentDataSerializer = null)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
             //if (Interlocked.Increment(ref _singletonCheck) > 1)
@@ -99,6 +105,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _urlSegmentProviders = urlSegmentProviders;
             _contentCacheDataSerializerFactory = contentCacheDataSerializerFactory;
             _contentDataSerializer = contentDataSerializer;
+
+            _syncBootStateAccessor = syncBootStateAccessor;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -218,7 +226,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             var okContent = false;
             var okMedia = false;
-
+            if (_syncBootStateAccessor.GetSyncBootState() == SyncBootState.ColdBoot)
+            {
+                _logger.Warn<PublishedSnapshotService>("Sync Service is in a Cold Boot state. Skip LoadCachesOnStartup as the Sync Service will trigger a full reload");
+                _isReady = true;
+                return;
+            }
             try
             {
                 if (_localContentDbExists)
@@ -234,7 +247,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (!okMedia)
                         _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
                 }
-
+                
                 if (!okContent)
                     LockAndLoadContent(scope => LoadContentFromDatabaseLocked(scope, true));
 
