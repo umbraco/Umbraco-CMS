@@ -107,9 +107,9 @@ namespace Umbraco.Cms.Web.Common
         /// </summary>
         /// <param name="alias">The alias.</param>
         /// <returns></returns>
-        public IHtmlEncodedString RenderMacro(string alias)
+        public async Task<IHtmlEncodedString> RenderMacroAsync(string alias)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, null);
+            return await _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, null);
         }
 
         /// <summary>
@@ -118,9 +118,9 @@ namespace Umbraco.Cms.Web.Common
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        public IHtmlEncodedString RenderMacro(string alias, object parameters)
+        public async Task<IHtmlEncodedString> RenderMacroAsync(string alias, object parameters)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
+            return await _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
         }
 
         /// <summary>
@@ -129,9 +129,9 @@ namespace Umbraco.Cms.Web.Common
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        public IHtmlEncodedString RenderMacro(string alias, IDictionary<string, object> parameters)
+        public async Task<IHtmlEncodedString> RenderMacroAsync(string alias, IDictionary<string, object> parameters)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters);
+            return await _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, parameters);
         }
 
         #endregion
