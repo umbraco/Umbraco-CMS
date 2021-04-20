@@ -1176,7 +1176,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
-                    var cached = IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent, int>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.DocumentVersionDto.ContentVersionDto.Id)
                     {
                         content[i] = (Content)cached;

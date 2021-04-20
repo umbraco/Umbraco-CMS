@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
     public class MemberManagerTests
     {
         private MemberUserStore _fakeMemberStore;
-        private Mock<IOptions<MemberIdentityOptions>> _mockIdentityOptions;
+        private Mock<IOptions<IdentityOptions>> _mockIdentityOptions;
         private Mock<IPasswordHasher<MemberIdentityUser>> _mockPasswordHasher;
         private Mock<IMemberService> _mockMemberService;
         private Mock<IServiceProvider> _mockServiceProviders;
@@ -41,8 +41,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 new Mock<IScopeProvider>().Object,
                 new IdentityErrorDescriber());
 
-            _mockIdentityOptions = new Mock<IOptions<MemberIdentityOptions>>();
-            var idOptions = new MemberIdentityOptions { Lockout = { AllowedForNewUsers = false } };
+            _mockIdentityOptions = new Mock<IOptions<IdentityOptions>>();
+            var idOptions = new IdentityOptions { Lockout = { AllowedForNewUsers = false } };
             _mockIdentityOptions.Setup(o => o.Value).Returns(idOptions);
             _mockPasswordHasher = new Mock<IPasswordHasher<MemberIdentityUser>>();
 

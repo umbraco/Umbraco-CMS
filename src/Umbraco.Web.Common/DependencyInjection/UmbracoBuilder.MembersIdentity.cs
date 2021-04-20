@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,7 +41,10 @@ namespace Umbraco.Extensions
                 .AddRoleManager<IMemberRoleManager, MemberRoleManager>()
                 .AddMemberManager<IMemberManager, MemberManager>()
                 .AddSignInManager<IMemberSignInManager, MemberSignInManager>()
-                .AddErrorDescriber<MembersErrorDescriber>();
+                .AddErrorDescriber<MembersErrorDescriber>()
+                .AddUserConfirmation<UmbracoUserConfirmation<MemberIdentityUser>>();
+
+            services.ConfigureOptions<ConfigureMemberIdentityOptions>();
 
             services.AddScoped<IPasswordHasher<MemberIdentityUser>, MemberPasswordHasher>();
 
