@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Infrastructure.DependencyInjection;
-using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 using Umbraco.Extensions;
 using Microsoft.Extensions.Hosting;
 
@@ -43,7 +41,7 @@ namespace Umbraco.Cms.Web.UI.NetCore
         {
 #pragma warning disable IDE0022 // Use expression body for methods
             services.AddUmbraco(_env, _config)
-                .AddBackOffice()               
+                .AddBackOffice()             
                 .AddWebsite()
                 .AddComposers()
                 .Build();
