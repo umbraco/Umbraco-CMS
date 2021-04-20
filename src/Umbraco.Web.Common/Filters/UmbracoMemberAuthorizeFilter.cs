@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,7 +12,7 @@ namespace Umbraco.Cms.Web.Common.Filters
     /// <summary>
     /// Ensures authorization is successful for a front-end member
     /// </summary>
-    public class UmbracoMemberAuthorizeFilter : IAuthorizationFilter
+    public class UmbracoMemberAuthorizeFilter : IAsyncAuthorizationFilter
     {
         public UmbracoMemberAuthorizeFilter()
         {
@@ -39,18 +40,18 @@ namespace Umbraco.Cms.Web.Common.Filters
         /// </summary>
         public string AllowMembers { get; private set; }
 
-        public void OnAuthorization(AuthorizationFilterContext context)
+        public async Task OnAuthorizationAsync(AuthorizationFilterContext context)
         {
             IMemberManager memberManager = context.HttpContext.RequestServices.GetRequiredService<IMemberManager>();
 
-            if (!IsAuthorized(memberManager))
+            if (!await IsAuthorizedAsync(memberManager))
             {
                 context.HttpContext.SetReasonPhrase("Resource restricted: either member is not logged on or is not of a permitted type or group.");
                 context.Result = new ForbidResult();
             }
         }
 
-        private bool IsAuthorized(IMemberManager memberManager)
+        private async Task<bool> IsAuthorizedAsync(IMemberManager memberManager)
         {
             if (AllowMembers.IsNullOrWhiteSpace())
             {
@@ -76,7 +77,7 @@ namespace Umbraco.Cms.Web.Common.Filters
                 }
             }
 
-            return memberManager.IsMemberAuthorized(AllowType.Split(Core.Constants.CharArrays.Comma), AllowGroup.Split(Core.Constants.CharArrays.Comma), members);
+            return await memberManager.IsMemberAuthorizedAsync(AllowType.Split(Core.Constants.CharArrays.Comma), AllowGroup.Split(Core.Constants.CharArrays.Comma), members);
         }
     }
 }

@@ -11,8 +11,10 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
@@ -24,7 +26,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
         private readonly Mock<MemberManager> _memberManager = MockMemberManager();
 
         public UserClaimsPrincipalFactory<MemberIdentityUser> CreateClaimsFactory(MemberManager userMgr)
-            => new UserClaimsPrincipalFactory<MemberIdentityUser>(userMgr, Options.Create(new MemberIdentityOptions()));
+            => new UserClaimsPrincipalFactory<MemberIdentityUser>(userMgr, Options.Create(new IdentityOptions()));
 
         public MemberSignInManager CreateSut()
         {
@@ -59,14 +61,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
             => new Mock<MemberManager>(
                     Mock.Of<IIpResolver>(),
                     Mock.Of<IUserStore<MemberIdentityUser>>(),
-                    Options.Create(new MemberIdentityOptions()),
+                    Options.Create(new IdentityOptions()),
                     Mock.Of<IPasswordHasher<MemberIdentityUser>>(),
                     Enumerable.Empty<IUserValidator<MemberIdentityUser>>(),
                     Enumerable.Empty<IPasswordValidator<MemberIdentityUser>>(),
-                    new BackOfficeIdentityErrorDescriber(),
+                    new MembersErrorDescriber(),
                     Mock.Of<IServiceProvider>(),
                     Mock.Of<ILogger<UserManager<MemberIdentityUser>>>(),
-                    Options.Create(new Cms.Core.Configuration.Models.MemberPasswordConfigurationSettings()));
+                    Options.Create(new MemberPasswordConfigurationSettings()),
+                    Mock.Of<IPublicAccessService>(),
+                    Mock.Of<IHttpContextAccessor>());
 
         [Test]
         public async Task WhenPasswordSignInAsyncIsCalled_AndEverythingIsSetup_ThenASignInResultSucceededShouldBeReturnedAsync()

@@ -137,7 +137,6 @@
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Macros\MemberUserKeyProvider.cs" />
-    <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Security\BackOfficeSecurity.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
@@ -149,7 +148,6 @@
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
     <Compile Include="Security\MembershipProviderBase.cs" />
     <Compile Include="Security\MembershipProviderExtensions.cs" />
-    <Compile Include="Security\PublicAccessChecker.cs" />
     <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UmbracoContext.cs" />
@@ -183,7 +181,6 @@
     <Compile Include="UrlHelperRenderExtensions.cs" />
     <Compile Include="WebApi\IsBackOfficeAttribute.cs" />
     <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
-    <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\NamespaceHttpControllerSelector.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerBase.cs" />
@@ -237,20 +234,20 @@
       Name="UmbGenerateSerializationAssemblies"
       Condition="'$(_SGenGenerateSerializationAssembliesConfig)' == 'On' or ('@(WebReferenceUrl)'!='' and '$(_SGenGenerateSerializationAssembliesConfig)' == 'Auto')"
   -->
-<!--  <Target Name="AfterBuild" DependsOnTargets="AssignTargetPaths;Compile;ResolveKeySource" Inputs="$(MSBuildAllProjects);@(IntermediateAssembly)" Outputs="$(IntermediateOutputPath)$(_SGenDllName)">-->
-<!--    <PropertyGroup>-->
-<!--      <SGenMSBuildArchitecture Condition="'$(SGenMSBuildArchitecture)' == ''">$(PlatformTargetAsMSBuildArchitecture)</SGenMSBuildArchitecture>-->
-<!--    </PropertyGroup>-->
-<!--    <ItemGroup>-->
-<!--      &lt;!&ndash; we want to exclude all facade references ?! &ndash;&gt;-->
-<!--      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'System.Text.Encoding.CodePages' and '%(ReferencePath.FileName)' != 'System.Buffers' and '%(ReferencePath.FileName)' != 'System.Configuration.ConfigurationManager'" />-->
-<!--    </ItemGroup>-->
-<!--    <Delete Files="$(TargetDir)$(TargetName).XmlSerializers.dll" ContinueOnError="true" />-->
-<!--    &lt;!&ndash;-->
-<!--     ShouldGenerateSerializer="$(SGenShouldGenerateSerializer)"-->
-<!--     &ndash;&gt;-->
-<!--    <SGen BuildAssemblyName="$(TargetFileName)" BuildAssemblyPath="$(IntermediateOutputPath)" References="@(FixedReferencePath)" ShouldGenerateSerializer="true" UseProxyTypes="$(SGenUseProxyTypes)" UseKeep="$(SGenUseKeep)" KeyContainer="$(KeyContainerName)" KeyFile="$(KeyOriginatorFile)" DelaySign="$(DelaySign)" ToolPath="$(SGenToolPath)" SdkToolsPath="$(TargetFrameworkSDKToolsDirectory)" EnvironmentVariables="$(SGenEnvironment)" MSBuildArchitecture="$(SGenMSBuildArchitecture)" SerializationAssembly="$(IntermediateOutputPath)$(_SGenDllName)" Platform="$(SGenPlatformTarget)" Types="$(SGenSerializationTypes)">-->
-<!--      <Output TaskParameter="SerializationAssembly" ItemName="SerializationAssembly" />-->
-<!--    </SGen>-->
-<!--  </Target>-->
+  <!--  <Target Name="AfterBuild" DependsOnTargets="AssignTargetPaths;Compile;ResolveKeySource" Inputs="$(MSBuildAllProjects);@(IntermediateAssembly)" Outputs="$(IntermediateOutputPath)$(_SGenDllName)">-->
+  <!--    <PropertyGroup>-->
+  <!--      <SGenMSBuildArchitecture Condition="'$(SGenMSBuildArchitecture)' == ''">$(PlatformTargetAsMSBuildArchitecture)</SGenMSBuildArchitecture>-->
+  <!--    </PropertyGroup>-->
+  <!--    <ItemGroup>-->
+  <!--      &lt;!&ndash; we want to exclude all facade references ?! &ndash;&gt;-->
+  <!--      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'System.Text.Encoding.CodePages' and '%(ReferencePath.FileName)' != 'System.Buffers' and '%(ReferencePath.FileName)' != 'System.Configuration.ConfigurationManager'" />-->
+  <!--    </ItemGroup>-->
+  <!--    <Delete Files="$(TargetDir)$(TargetName).XmlSerializers.dll" ContinueOnError="true" />-->
+  <!--    &lt;!&ndash;-->
+  <!--     ShouldGenerateSerializer="$(SGenShouldGenerateSerializer)"-->
+  <!--     &ndash;&gt;-->
+  <!--    <SGen BuildAssemblyName="$(TargetFileName)" BuildAssemblyPath="$(IntermediateOutputPath)" References="@(FixedReferencePath)" ShouldGenerateSerializer="true" UseProxyTypes="$(SGenUseProxyTypes)" UseKeep="$(SGenUseKeep)" KeyContainer="$(KeyContainerName)" KeyFile="$(KeyOriginatorFile)" DelaySign="$(DelaySign)" ToolPath="$(SGenToolPath)" SdkToolsPath="$(TargetFrameworkSDKToolsDirectory)" EnvironmentVariables="$(SGenEnvironment)" MSBuildArchitecture="$(SGenMSBuildArchitecture)" SerializationAssembly="$(IntermediateOutputPath)$(_SGenDllName)" Platform="$(SGenPlatformTarget)" Types="$(SGenSerializationTypes)">-->
+  <!--      <Output TaskParameter="SerializationAssembly" ItemName="SerializationAssembly" />-->
+  <!--    </SGen>-->
+  <!--  </Target>-->
 </Project>

@@ -65,8 +65,11 @@ namespace Umbraco.Cms.Web.Website.Controllers
                         : CurrentPage.AncestorOrSelf(1).Url(PublishedUrlProvider));
                 }
 
-                // Redirect to current page by default.
-                return RedirectToCurrentUmbracoPage();
+                // Redirect to current URL by default.
+                // This is different from the current 'page' because when using Public Access the current page
+                // will be the login page, but the URL will be on the requested page so that's where we need
+                // to redirect too.
+                return RedirectToCurrentUmbracoUrl();
             }
 
             if (result.RequiresTwoFactor)

@@ -5,7 +5,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
-using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Builders;

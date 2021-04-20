@@ -180,9 +180,14 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         public override void Configure(IApplicationBuilder app)
         {
-            app.UseUmbraco();
-            app.UseUmbracoBackOffice();
-            app.UseUmbracoWebsite();
+            app.UseUmbraco()
+                .WithBackOffice()
+                .WithWebsite()
+                .WithEndpoints(u =>
+                {
+                    u.UseBackOfficeEndpoints();
+                    u.UseWebsiteEndpoints();
+                });
         }
     }
 }

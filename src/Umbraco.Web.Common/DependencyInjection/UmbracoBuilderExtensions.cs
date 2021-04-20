@@ -54,7 +54,6 @@ using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
 using Umbraco.Cms.Web.Common.Profiler;
-using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Common.RuntimeMinification;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
@@ -68,7 +67,7 @@ namespace Umbraco.Extensions
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality
     /// </summary>
-    public static class UmbracoBuilderExtensions
+    public static partial class UmbracoBuilderExtensions
     {
         /// <summary>
         /// Creates an <see cref="IUmbracoBuilder"/> and registers basic Umbraco services
@@ -113,7 +112,7 @@ namespace Umbraco.Extensions
 
             // adds the umbraco startup filter which will call UseUmbraco early on before
             // other start filters are applied (depending on the ordering of IStartupFilters in DI).
-            services.AddTransient<IStartupFilter, UmbracoStartupFilter>();
+            services.AddTransient<IStartupFilter, UmbracoApplicationServicesCapture>();
 
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory);
         }
@@ -267,7 +266,7 @@ namespace Umbraco.Extensions
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, VirtualPageApplicationModelProvider>());
-            builder.Services.AddUmbracoImageSharp(builder.Config);
+            builder.AddUmbracoImageSharp();
 
             // AspNetCore specific services
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();

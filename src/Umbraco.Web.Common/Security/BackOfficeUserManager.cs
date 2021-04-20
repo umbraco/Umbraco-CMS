@@ -20,6 +20,7 @@ namespace Umbraco.Cms.Web.Common.Security
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IBackOfficeUserPasswordChecker _backOfficeUserPasswordChecker;
 
         public BackOfficeUserManager(
             IIpResolver ipResolver,
@@ -28,58 +29,48 @@ namespace Umbraco.Cms.Web.Common.Security
             IPasswordHasher<BackOfficeIdentityUser> passwordHasher,
             IEnumerable<IUserValidator<BackOfficeIdentityUser>> userValidators,
             IEnumerable<IPasswordValidator<BackOfficeIdentityUser>> passwordValidators,
-            BackOfficeIdentityErrorDescriber errors,
+            BackOfficeErrorDescriber errors,
             IServiceProvider services,
             IHttpContextAccessor httpContextAccessor,
             ILogger<UserManager<BackOfficeIdentityUser>> logger,
             IOptions<UserPasswordConfigurationSettings> passwordConfiguration,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IBackOfficeUserPasswordChecker backOfficeUserPasswordChecker)
             : base(ipResolver, store, optionsAccessor, passwordHasher, userValidators, passwordValidators, errors, services, logger, passwordConfiguration)
         {
             _httpContextAccessor = httpContextAccessor;
             _eventAggregator = eventAggregator;
+            _backOfficeUserPasswordChecker = backOfficeUserPasswordChecker;
         }
 
         /// <summary>
-        /// Gets or sets the default back office user password checker
+        /// Override to allow checking the password via the <see cref="IBackOfficeUserPasswordChecker"/> if one is configured
         /// </summary>
-        public IBackOfficeUserPasswordChecker BackOfficeUserPasswordChecker { get; set; } // TODO: This isn't a good way to set this, it needs to be injected
-
-        /// <inheritdoc />
-        /// <remarks>
-        /// By default this uses the standard ASP.Net Identity approach which is:
-        /// * Get password store
-        /// * Call VerifyPasswordAsync with the password store + user + password
-        /// * Uses the PasswordHasher.VerifyHashedPassword to compare the stored password
-        ///
-        /// In some cases people want simple custom control over the username/password check, for simplicity
-        /// sake, developers would like the users to simply validate against an LDAP directory but the user
-        /// data remains stored inside of Umbraco.
-        /// See: http://issues.umbraco.org/issue/U4-7032 for the use cases.
-        ///
-        /// We've allowed this check to be overridden with a simple callback so that developers don't actually
-        /// have to implement/override this class.
-        /// </remarks>
-        public override async Task<bool> CheckPasswordAsync(BackOfficeIdentityUser user, string password)
+        /// <param name="store"></param>
+        /// <param name="user"></param>
+        /// <param name="password"></param>
+        /// <returns></returns>
+        protected override async Task<PasswordVerificationResult> VerifyPasswordAsync(
+            IUserPasswordStore<BackOfficeIdentityUser> store,
+            BackOfficeIdentityUser user,
+            string password)
         {
-            if (BackOfficeUserPasswordChecker != null)
+            if (user.HasIdentity == false)
             {
-                BackOfficeUserPasswordCheckerResult result = await BackOfficeUserPasswordChecker.CheckPasswordAsync(user, password);
-
-                if (user.HasIdentity == false)
-                {
-                    return false;
-                }
-
-                // if the result indicates to not fallback to the default, then return true if the credentials are valid
-                if (result != BackOfficeUserPasswordCheckerResult.FallbackToDefaultChecker)
-                {
-                    return result == BackOfficeUserPasswordCheckerResult.ValidCredentials;
-                }
+                return PasswordVerificationResult.Failed;
             }
 
-            // use the default behavior
-            return await base.CheckPasswordAsync(user, password);
+            BackOfficeUserPasswordCheckerResult result = await _backOfficeUserPasswordChecker.CheckPasswordAsync(user, password);
+
+            // if the result indicates to not fallback to the default, then return true if the credentials are valid
+            if (result != BackOfficeUserPasswordCheckerResult.FallbackToDefaultChecker)
+            {
+                return result == BackOfficeUserPasswordCheckerResult.ValidCredentials
+                    ? PasswordVerificationResult.Success
+                    : PasswordVerificationResult.Failed;
+            }
+
+            return await base.VerifyPasswordAsync(store, user, password);
         }
 
         /// <summary>
@@ -139,7 +130,7 @@ namespace Umbraco.Cms.Web.Common.Security
 
             return result;
         }
-        
+
         /// <inheritdoc/>
         public override async Task<IdentityResult> SetLockoutEndDateAsync(BackOfficeIdentityUser user, DateTimeOffset? lockoutEnd)
         {
@@ -218,7 +209,7 @@ namespace Umbraco.Cms.Web.Common.Security
                 (currentUserId, ip) => new UserLogoutSuccessNotification(ip, userId, currentUserId)
             );
 
-            return new SignOutSuccessResult {SignOutRedirectUrl = notification.SignOutRedirectUrl};
+            return new SignOutSuccessResult { SignOutRedirectUrl = notification.SignOutRedirectUrl };
         }
 
         public void NotifyPasswordChanged(IPrincipal currentUser, string userId) => Notify(currentUser,
