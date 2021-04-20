@@ -857,7 +857,7 @@
               <p> Devam etmek için lütfen "web.config" dosyasını düzenleyin (Visual Studio veya favori metin düzenleyicinizi kullanarak), en alta kaydırın, veritabanınız için "UmbracoDbDSN" adlı anahtara bağlantı dizesini ekleyin ve dosyayı kaydedin. </p>
               <p>
               <strong> Yeniden dene </strong> düğmesini tıklayın.
-              bitti. <br /> <a href=https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank">
+              bitti. <br /> <a href=https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
                                                         Web.config'i düzenleme hakkında daha fazla bilgi burada. </a> </p>]]>
     </key>
     <key alias="databaseText">
@@ -1008,7 +1008,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="instruction">Aşağıda oturum açın</key>
     <key alias="signInWith">ile oturum açın</key>
     <key alias="timeout">Oturum zaman aşımına uğradı</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align: right;">&copy; 2015 - %0% <br /> <a href="https://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com </a> </p>]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align: right;">&copy; 2015 - %0% <br /> <a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com </a> </p>]]></key>
     <key alias="forgottenPassword">Şifrenizi mi unuttunuz?</key>
     <key alias="forgottenPasswordInstruction">Parolanızı sıfırlamak için bir bağlantıyla belirtilen adrese bir e-posta gönderilecektir</key>
     <key alias="requestPasswordResetConfirmation">Kayıtlarımızla eşleşirse, şifre sıfırlama talimatlarını içeren bir e-posta, belirtilen adrese gönderilecektir</key>
@@ -1067,7 +1067,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 																<tbody>
 																	<tr>
 																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																				Şifrenizi sıfırlamak için bu bağlantıyı tıklayın
 																			</a>
 																		</td>
@@ -1192,7 +1192,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
 																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
 																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
 																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>DÜZENLE</a> </td> </tr></tbody></table>
+																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>DÜZENLE</a> </td> </tr></tbody></table>
 																	</td>
 																</tr>
 															</tbody>
@@ -2063,7 +2063,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
                                                                     <tbody>
                                                                         <tr>
                                                                             <td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-                                                                                <a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+                                                                                <a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
                                                                                     Daveti Kabul Etmek İçin Bu Bağlantıyı Tıklayın
                                                                                 </a>
                                                                             </td>
@@ -2254,7 +2254,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
         <key alias="helpText">
           <![CDATA[
         <p> Durum denetleyicisi, sitenizin çeşitli alanlarını en iyi uygulama ayarları, yapılandırma, olası sorunlar vb. için değerlendirir. Sorunları bir düğmeye basarak kolayca düzeltebilirsiniz.
-        Kendi sağlık kontrollerinizi ekleyebilir, <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" class="btn-link -underline">özel durum kontrolleri hakkında daha fazla bilgi için belgeler </a>. </p>
+        Kendi sağlık kontrollerinizi ekleyebilir, <a href="https://our.umbraco.com/documentation/Extending/Healthcheck/" target="_blank" rel="noopener" class="btn-link -underline">özel durum kontrolleri hakkında daha fazla bilgi için belgeler </a>. </p>
         ]]>
         </key>
       </area>
@@ -2492,7 +2492,7 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="trainingHeadline">Umbraco eğitim videolarının saatleri yalnızca bir tıklama uzaklıkta</key>
     <key alias="trainingDescription">
       <![CDATA[
-            <p> Umbraco'da ustalaşmak mı istiyorsunuz? Umbraco'nun kullanımıyla ilgili bu videolardan birini izleyerek en iyi uygulamaları öğrenmek için birkaç dakikanızı ayırın. Daha da fazla Umbraco videosu için <a href="http://umbraco.tv" target="_blank">umbraco.tv </a> adresini ziyaret edin </p>
+            <p> Umbraco'da ustalaşmak mı istiyorsunuz? Umbraco'nun kullanımıyla ilgili bu videolardan birini izleyerek en iyi uygulamaları öğrenmek için birkaç dakikanızı ayırın. Daha da fazla Umbraco videosu için <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv </a> adresini ziyaret edin </p>
         ]]>
     </key>
     <key alias="getStarted">Başlamak için</key>
@@ -2503,27 +2503,27 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="more">Daha fazla bilgi edinin</key>
     <key alias="bulletPointOne">
       <![CDATA[
-        Ayarlar <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank">öğelerle çalışma hakkında daha fazla bilgi edinin Our Umbraco'nun Dokümantasyon bölümünde </a>
+        Ayarlar <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">öğelerle çalışma hakkında daha fazla bilgi edinin Our Umbraco'nun Dokümantasyon bölümünde </a>
     ]]>
     </key>
     <key alias="bulletPointTwo">
       <![CDATA[
-        <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank">Topluluk Forumu</a>'nda bir soru sorun
+        <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Topluluk Forumu</a>'nda bir soru sorun
     ]]>
     </key>
     <key alias="bulletPointThree">
       <![CDATA[
-        <a class="btn-link -underline" href="https://umbraco.tv" target="_blank">Eğitici videolarımızı</a> izleyin (bazıları ücretsiz, bazıları abonelik gerektirir)
+        <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">Eğitici videolarımızı</a> izleyin (bazıları ücretsiz, bazıları abonelik gerektirir)
     ]]>
     </key>
     <key alias="bulletPointFour">
       <![CDATA[
-        <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank">Üretkenliği artıran araçlarımız ve ticari desteğimiz </a> hakkında bilgi edinin
+        <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">Üretkenliği artıran araçlarımız ve ticari desteğimiz </a> hakkında bilgi edinin
     ]]>
     </key>
     <key alias="bulletPointFive">
       <![CDATA[
-        Gerçek hayattaki <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">eğitim ve sertifika </a> fırsatları hakkında bilgi edinin
+        Gerçek hayattaki <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">eğitim ve sertifika </a> fırsatları hakkında bilgi edinin
     ]]>
     </key>
   </area>

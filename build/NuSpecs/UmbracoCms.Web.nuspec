@@ -42,7 +42,7 @@
                 <dependency id="Microsoft.Owin.Security.Cookies" version="[4.0.1,4.999999)" />
                 <dependency id="Microsoft.Owin.Security.OAuth" version="[4.0.1,4.999999)" />
                 <dependency id="System.Threading.Tasks.Dataflow" version="[4.9.0,4.999999)" />
-                <dependency id="HtmlSanitizer" version="[5.0.376,5.999999)" />
+                <dependency id="System.Text.Encoding.CodePages" version="[4.7.1,4.999999)" />
                 <dependency id="MessagePack" version="[2.1.165,2.999999)" />
 
             </group>

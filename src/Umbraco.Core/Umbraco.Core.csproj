@@ -133,6 +133,8 @@
     <Compile Include="Constants-SqlTemplates.cs" />
     <Compile Include="Logging\ILogger2.cs" />
     <Compile Include="Logging\Logger2Extensions.cs" />
+    <Compile Include="Dashboards\ContentDashboardSettings.cs" />
+    <Compile Include="Dashboards\IContentDashboardSettings.cs" />
     <Compile Include="Exceptions\UnattendedInstallException.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\ContentTypeDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
@@ -270,7 +272,6 @@
     <Compile Include="CompositionExtensions_Essentials.cs" />
     <Compile Include="CompositionExtensions_FileSystems.cs" />
     <Compile Include="CompositionExtensions_Uniques.cs" />
-    <Compile Include="Constants-SvgSanitizer.cs" />
     <Compile Include="Exceptions\PanicException.cs" />
     <Compile Include="FactoryExtensions.cs" />
     <Compile Include="Composing\RegisterFactory.cs" />
