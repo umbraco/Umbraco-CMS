@@ -139,8 +139,10 @@ namespace Umbraco.Core.Cache
             var value = result == null ? null : GetSafeLazyValue(result);
             if (value != null) return value;
 
-            using (var lck = new UpgradeableReadLock(_locker))
+            try
             {
+                _locker.EnterUpgradeableReadLock();
+
                 result = _cache.Get(key) as Lazy<object>; // null if key not found
 
                 // cannot create value within the lock, so if result.IsValueCreated is false, just
@@ -153,14 +155,27 @@ namespace Umbraco.Core.Cache
                     var absolute = isSliding ? System.Web.Caching.Cache.NoAbsoluteExpiration : (timeout == null ? System.Web.Caching.Cache.NoAbsoluteExpiration : DateTime.Now.Add(timeout.Value));
                     var sliding = isSliding == false ? System.Web.Caching.Cache.NoSlidingExpiration : (timeout ?? System.Web.Caching.Cache.NoSlidingExpiration);
 
-                    lck.UpgradeToWriteLock();
+                    try
+                    {
+                        _locker.EnterWriteLock();
 
-                    // create a cache dependency if one is needed. 
-                    var dependency = dependentFiles != null && dependentFiles.Length > 0 ? new CacheDependency(dependentFiles) : null;
+                        // create a cache dependency if one is needed. 
+                        var dependency = dependentFiles != null && dependentFiles.Length > 0 ? new CacheDependency(dependentFiles) : null;
 
-                    //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
-                    _cache.Insert(key, result, dependency, absolute, sliding, priority, removedCallback);
+                        //NOTE: 'Insert' on System.Web.Caching.Cache actually does an add or update!
+                        _cache.Insert(key, result, dependency, absolute, sliding, priority, removedCallback);
+                    }
+                    finally
+                    {
+                        if (_locker.IsWriteLockHeld)
+                            _locker.ExitWriteLock();
+                    }
                 }
+            }
+            finally
+            {
+                if (_locker.IsUpgradeableReadLockHeld)
+                    _locker.ExitUpgradeableReadLock();
             }
 
             // using GetSafeLazy and GetSafeLazyValue ensures that we don't cache

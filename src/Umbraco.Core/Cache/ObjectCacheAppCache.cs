@@ -110,18 +110,33 @@ namespace Umbraco.Core.Cache
 
             Lazy<object> result;
 
-            using (var lck = new UpgradeableReadLock(_locker))
+            try
             {
+                _locker.EnterUpgradeableReadLock();
+
                 result = MemoryCache.Get(key) as Lazy<object>;
                 if (result == null || FastDictionaryAppCacheBase.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
                     result = FastDictionaryAppCacheBase.GetSafeLazy(factory);
                     var policy = GetPolicy(timeout, isSliding, removedCallback, dependentFiles);
 
-                    lck.UpgradeToWriteLock();
-                    //NOTE: This does an add or update
-                    MemoryCache.Set(key, result, policy);
+                    try
+                    {
+                        _locker.EnterWriteLock();
+                        //NOTE: This does an add or update
+                        MemoryCache.Set(key, result, policy);
+                    }
+                    finally
+                    {
+                        if (_locker.IsWriteLockHeld)
+                            _locker.ExitWriteLock();
+                    }
                 }
+            }
+            finally
+            {
+                if (_locker.IsUpgradeableReadLockHeld)
+                    _locker.ExitUpgradeableReadLock();
             }
 
             //return result.Value;

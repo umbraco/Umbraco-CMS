@@ -1,17 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace Umbraco.Core
 {
-    /// <summary>
-    /// Provides a convenience methodology for implementing locked access to resources.
-    /// </summary>
-    /// <remarks>
-    /// Intended as an infrastructure class.
-    /// </remarks>
+    [Obsolete("Use ReaderWriterLockSlim directly. This will be removed in future versions.")]
     public class UpgradeableReadLock : IDisposable
     {
         private readonly ReaderWriterLockSlim _rwLock;
