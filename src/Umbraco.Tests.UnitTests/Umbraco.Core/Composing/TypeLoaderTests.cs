@@ -18,7 +18,6 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
 using Umbraco.Cms.Web.Common.UmbracoContext;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
 {
@@ -160,6 +159,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Composing
         ////}
 
         [Test]
+        [Retry(5)] // TODO make this test non-flaky.
         public void Detect_Legacy_Plugin_File_List()
         {
             string filePath = _typeLoader.GetTypesListFilePath();
