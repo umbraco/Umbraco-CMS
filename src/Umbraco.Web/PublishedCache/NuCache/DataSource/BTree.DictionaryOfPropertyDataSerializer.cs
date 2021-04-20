@@ -10,10 +10,10 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     {
         public IDictionary<string, PropertyData[]> ReadFrom(Stream stream)
         {
-            var dict = new Dictionary<string, PropertyData[]>(StringComparer.InvariantCultureIgnoreCase);
 
             // read properties count
             var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);
+            var dict = new Dictionary<string, PropertyData[]>(pcount,StringComparer.InvariantCultureIgnoreCase);
 
             // read each property
             for (var i = 0; i < pcount; i++)
@@ -25,13 +25,13 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                 var vcount = PrimitiveSerializer.Int32.ReadFrom(stream);
 
                 // create pdata and add to the dictionary
-                var pdatas = new List<PropertyData>();
+                var pdatas = new PropertyData[vcount];
 
                 // for each value, read and add to pdata
                 for (var j = 0; j < vcount; j++)
                 {
                     var pdata = new PropertyData();
-                    pdatas.Add(pdata);
+                    pdatas[j] = pdata;
 
                     // everything that can be null is read/written as object
                     //  even though - culture and segment should never be null here, as 'null' represents
@@ -43,7 +43,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
                     pdata.Value = ReadObject(stream);
                 }
 
-                dict[key] = pdatas.ToArray();
+                dict[key] = pdatas;
             }
             return dict;
         }
