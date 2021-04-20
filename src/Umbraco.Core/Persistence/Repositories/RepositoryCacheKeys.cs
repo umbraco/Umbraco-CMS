@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
@@ -16,6 +16,6 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
             return Keys.TryGetValue(type, out var key) ? key : (Keys[type] = "uRepo_" + type.Name + "_");
         }
 
-        public static string GetKey<T>(object id) => GetKey<T>() + id;
+        public static string GetKey<T>(object id) => GetKey<T>() + id.ToString().ToUpperInvariant();
     }
 }
