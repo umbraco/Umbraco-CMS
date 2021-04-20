@@ -1353,7 +1353,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="pickedTrashedItem">You have picked a media item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked media items currently deleted or in the recycle bin</key>
     <key alias="trashed">Trashed</key>
-    <key alias="openMedia">Open item in Media</key>
+    <key alias="openMedia">Open in Media Library</key>
     <key alias="changeMedia">Change Media Item</key>
     <key alias="resetMediaCrop">Reset media crop</key>
     <key alias="editMediaEntryLabel">Edit %0% on %1%</key>
