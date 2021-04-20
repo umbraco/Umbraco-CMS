@@ -25,8 +25,7 @@ namespace Umbraco.Examine
         // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
         // context because they will fork a thread/task/whatever which should *not* capture our
         // call context (and the database it can contain)!
-        // TODO: FIX Examine to not flow the ExecutionContext so callers don't need to worry about this!
-
+        
         /// <summary>
         /// Used to store the path of a content object
         /// </summary>
@@ -99,13 +98,7 @@ namespace Umbraco.Examine
         {
             if (CanInitialize())
             {
-                // Use SafeCallContext to prevent the current CallContext flow to child
-                // tasks executed in the base class so we don't leak Scopes.
-                // TODO: See notes at the top of this class
-                using (new SafeCallContext())
-                {
-                    base.PerformDeleteFromIndex(itemIds, onComplete);
-                }
+                base.PerformDeleteFromIndex(itemIds, onComplete);
             }
         }
 
@@ -113,13 +106,7 @@ namespace Umbraco.Examine
         {
             if (CanInitialize())
             {
-                // Use SafeCallContext to prevent the current CallContext flow to child
-                // tasks executed in the base class so we don't leak Scopes.
-                // TODO: See notes at the top of this class
-                using (new SafeCallContext())
-                {
-                    base.PerformIndexItems(values, onComplete);
-                }
+                base.PerformIndexItems(values, onComplete);
             }
         }
 
