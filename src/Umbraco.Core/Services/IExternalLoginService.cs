@@ -1,5 +1,5 @@
 using System.Collections.Generic;
-using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Cms.Core.Services
 {

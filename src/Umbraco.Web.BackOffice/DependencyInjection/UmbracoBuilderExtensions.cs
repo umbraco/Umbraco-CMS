@@ -1,7 +1,5 @@
-using System;
 using System.Linq;
 using Ganss.XSS;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -9,8 +7,6 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Models.Identity;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Infrastructure.WebAssets;
@@ -23,16 +19,13 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Services;
 using Umbraco.Cms.Web.BackOffice.SignalR;
 using Umbraco.Cms.Web.BackOffice.Trees;
-using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Cms.Web.Common.Security;
-using IWebHostEnvironment = Microsoft.AspNetCore.Hosting.IWebHostEnvironment;
 
 namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the Umbraco back office
     /// </summary>
-    public static class UmbracoBuilderExtensions
+    public static partial class UmbracoBuilderExtensions
     {
         /// <summary>
         /// Adds all required components to run the Umbraco back office
@@ -58,86 +51,6 @@ namespace Umbraco.Extensions
                 .AddExamine();
 
         /// <summary>
-        /// Adds Umbraco back office authentication requirements
-        /// </summary>
-        public static IUmbracoBuilder AddBackOfficeAuthentication(this IUmbracoBuilder builder)
-        {
-            builder.Services
-
-                // This just creates a builder, nothing more
-                .AddAuthentication()
-
-                // Add our custom schemes which are cookie handlers
-                .AddCookie(Constants.Security.BackOfficeAuthenticationType)
-                .AddCookie(Constants.Security.BackOfficeExternalAuthenticationType, o =>
-                {
-                    o.Cookie.Name = Constants.Security.BackOfficeExternalAuthenticationType;
-                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                })
-
-                // Although we don't natively support this, we add it anyways so that if end-users implement the required logic
-                // they don't have to worry about manually adding this scheme or modifying the sign in manager
-                .AddCookie(Constants.Security.BackOfficeTwoFactorAuthenticationType, o =>
-                {
-                    o.Cookie.Name = Constants.Security.BackOfficeTwoFactorAuthenticationType;
-                    o.ExpireTimeSpan = TimeSpan.FromMinutes(5);
-                });
-
-            builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
-
-            builder.Services.AddUnique<BackOfficeExternalLoginProviderErrorMiddleware>();
-            builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
-            builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();
-            builder.Services.AddUnique<IPasswordChanger<MemberIdentityUser>, PasswordChanger<MemberIdentityUser>>();
-
-            builder.AddNotificationHandler<UserLoginSuccessNotification, BackOfficeUserManagerAuditer>();
-            builder.AddNotificationHandler<UserLogoutSuccessNotification, BackOfficeUserManagerAuditer>();
-            builder.AddNotificationHandler<UserLoginFailedNotification, BackOfficeUserManagerAuditer>();
-            builder.AddNotificationHandler<UserForgotPasswordRequestedNotification, BackOfficeUserManagerAuditer>();
-            builder.AddNotificationHandler<UserForgotPasswordChangedNotification, BackOfficeUserManagerAuditer>();
-            builder.AddNotificationHandler<UserPasswordChangedNotification, BackOfficeUserManagerAuditer>();
-            builder.AddNotificationHandler<UserPasswordResetNotification, BackOfficeUserManagerAuditer>();
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds Identity support for Umbraco back office
-        /// </summary>
-        public static IUmbracoBuilder AddBackOfficeIdentity(this IUmbracoBuilder builder)
-        {
-            builder.Services.AddUmbracoBackOfficeIdentity();
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds Identity support for Umbraco members
-        /// </summary>
-        public static IUmbracoBuilder AddMembersIdentity(this IUmbracoBuilder builder)
-        {
-            builder.Services.AddMembersIdentity();
-
-            return builder;
-        }
-
-        /// <summary>
-        /// Adds Umbraco back office authorization policies
-        /// </summary>
-        public static IUmbracoBuilder AddBackOfficeAuthorizationPolicies(this IUmbracoBuilder builder, string backOfficeAuthenticationScheme = Constants.Security.BackOfficeAuthenticationType)
-        {
-            builder.Services.AddBackOfficeAuthorizationPolicies(backOfficeAuthenticationScheme);
-
-            builder.Services.AddSingleton<IAuthorizationHandler, FeatureAuthorizeHandler>();
-
-            builder.Services.AddAuthorization(options
-                => options.AddPolicy(AuthorizationPolicies.UmbracoFeatureEnabled, policy
-                    => policy.Requirements.Add(new FeatureAuthorizeRequirement())));
-
-            return builder;
-        }
-
-        /// <summary>
         /// Adds Umbraco preview support
         /// </summary>
         public static IUmbracoBuilder AddPreviewSupport(this IUmbracoBuilder builder)
@@ -148,15 +61,6 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Adds support for external login providers in Umbraco
-        /// </summary>
-        public static IUmbracoBuilder AddBackOfficeExternalLogins(this IUmbracoBuilder umbracoBuilder, Action<BackOfficeExternalLoginsBuilder> builder)
-        {
-            builder(new BackOfficeExternalLoginsBuilder(umbracoBuilder.Services));
-            return umbracoBuilder;
-        }
-
-        /// <summary>
         /// Gets the back office tree collection builder
         /// </summary>
         public static TreeCollectionBuilder Trees(this IUmbracoBuilder builder)
@@ -164,6 +68,8 @@ namespace Umbraco.Extensions
 
         public static IUmbracoBuilder AddBackOfficeCore(this IUmbracoBuilder builder)
         {
+            builder.Services.AddSingleton<KeepAliveMiddleware>();
+            builder.Services.ConfigureOptions<ConfigureGlobalOptionsForKeepAliveMiddlware>();
             builder.Services.AddUnique<ServerVariablesParser>();
             builder.Services.AddUnique<BackOfficeAreaRoutes>();
             builder.Services.AddUnique<PreviewRoutes>();

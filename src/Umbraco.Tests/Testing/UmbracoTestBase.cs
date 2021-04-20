@@ -228,7 +228,7 @@ namespace Umbraco.Tests.Testing
             services.AddUnique(ipResolver);
             services.AddUnique<IPasswordHasher, AspNetPasswordHasher>();
             services.AddUnique(TestHelper.ShortStringHelper);
-            services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
+            //services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
 
             var memberService = Mock.Of<IMemberService>();

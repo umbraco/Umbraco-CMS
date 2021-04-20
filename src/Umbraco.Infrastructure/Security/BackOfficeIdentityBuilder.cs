@@ -41,17 +41,17 @@ namespace Umbraco.Cms.Core.Security
                 services => new BackOfficePasswordHasher(
                     new LegacyPasswordSecurity(),
                     services.GetRequiredService<IJsonSerializer>()));
-            services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
+            services.TryAddScoped<IUserConfirmation<BackOfficeIdentityUser>, UmbracoUserConfirmation<BackOfficeIdentityUser>>();
         }
 
+        // override to add itself, by default identity only wants a single IdentityErrorDescriber
         public override IdentityBuilder AddErrorDescriber<TDescriber>()
         {
-            if (!typeof(BackOfficeIdentityErrorDescriber).IsAssignableFrom(typeof(TDescriber)))
+            if (!typeof(BackOfficeErrorDescriber).IsAssignableFrom(typeof(TDescriber)))
             {
-                throw new InvalidOperationException($"The type {typeof(TDescriber)} does not inherit from {typeof(BackOfficeIdentityErrorDescriber)}");
+                throw new InvalidOperationException($"The type {typeof(TDescriber)} does not inherit from {typeof(BackOfficeErrorDescriber)}");
             }
 
-            // Add as itself, by default identity only wants a single IdentityErrorDescriber
             Services.AddScoped<TDescriber>();
             return this;
         }

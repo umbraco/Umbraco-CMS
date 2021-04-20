@@ -53,19 +53,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IUserService _userService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-        private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly UmbracoMapper _umbracoMapper;
-        private readonly IPublishedUrlProvider _publishedUrlProvider;
-        private readonly IPublicAccessService _publicAccessService;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;        
         private readonly IDomainService _domainService;
         private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;
-        private readonly IMemberService _memberService;
+        private readonly ILocalizationService _localizationService;        
         private readonly IFileService _fileService;
         private readonly INotificationService _notificationService;
-        private readonly ActionCollection _actionCollection;
-        private readonly IMemberGroupService _memberGroupService;
+        private readonly ActionCollection _actionCollection;        
         private readonly ISqlContext _sqlContext;
         private readonly IAuthorizationService _authorizationService;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
@@ -83,19 +79,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IContentService contentService,
             IUserService userService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            IEntityService entityService,
             IContentTypeService contentTypeService,
             UmbracoMapper umbracoMapper,
             IPublishedUrlProvider publishedUrlProvider,
-            IPublicAccessService publicAccessService,
             IDomainService domainService,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
-            IMemberService memberService,
             IFileService fileService,
             INotificationService notificationService,
             ActionCollection actionCollection,
-            IMemberGroupService memberGroupService,
             ISqlContext sqlContext,
             IJsonSerializer serializer,
             IAuthorizationService authorizationService)
@@ -106,19 +98,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _localizedTextService = localizedTextService;
             _userService = userService;
             _backofficeSecurityAccessor = backofficeSecurityAccessor;
-            _entityService = entityService;
             _contentTypeService = contentTypeService;
             _umbracoMapper = umbracoMapper;
             _publishedUrlProvider = publishedUrlProvider;
-            _publicAccessService = publicAccessService;
             _domainService = domainService;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
-            _memberService = memberService;
             _fileService = fileService;
             _notificationService = notificationService;
             _actionCollection = actionCollection;
-            _memberGroupService = memberGroupService;
             _sqlContext = sqlContext;
             _authorizationService = authorizationService;
             _logger = loggerFactory.CreateLogger<ContentController>();
@@ -2403,142 +2391,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return new ValidationErrorResult(notificationModel);
         }
 
-        [Authorize(Policy = AuthorizationPolicies.ContentPermissionProtectById)]
-        [HttpGet]
-        public IActionResult GetPublicAccess(int contentId)
-        {
-            var content = _contentService.GetById(contentId);
-            if (content == null)
-            {
-                return NotFound();
-            }
+        
 
-            var entry = _publicAccessService.GetEntryForContent(content);
-            if (entry == null || entry.ProtectedNodeId != content.Id)
-            {
-                return Ok();
-            }
-
-            var loginPageEntity = _entityService.Get(entry.LoginNodeId, UmbracoObjectTypes.Document);
-            var errorPageEntity = _entityService.Get(entry.NoAccessNodeId, UmbracoObjectTypes.Document);
-
-            // unwrap the current public access setup for the client
-            // - this API method is the single point of entry for both "modes" of public access (single user and role based)
-            var usernames = entry.Rules
-                .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType)
-                .Select(rule => rule.RuleValue).ToArray();
-
-            var members = usernames
-                .Select(username => _memberService.GetByUsername(username))
-                .Where(member => member != null)
-                .Select(_umbracoMapper.Map<MemberDisplay>)
-                .ToArray();
-
-            //TODO: change to role manager
-            var allGroups = _memberGroupService.GetAll().ToArray();
-            var groups = entry.Rules
-                .Where(rule => rule.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType)
-                .Select(rule => allGroups.FirstOrDefault(g => g.Name == rule.RuleValue))
-                .Where(memberGroup => memberGroup != null)
-                .Select(_umbracoMapper.Map<MemberGroupDisplay>)
-                .ToArray();
-
-            return Ok(new PublicAccess
-            {
-                Members = members,
-                Groups = groups,
-                LoginPage = loginPageEntity != null ? _umbracoMapper.Map<EntityBasic>(loginPageEntity) : null,
-                ErrorPage = errorPageEntity != null ? _umbracoMapper.Map<EntityBasic>(errorPageEntity) : null
-            });
-        }
-
-        // set up public access using role based access
-        [Authorize(Policy = AuthorizationPolicies.ContentPermissionProtectById)]
-        [HttpPost]
-        public IActionResult PostPublicAccess(int contentId, [FromQuery(Name = "groups[]")] string[] groups, [FromQuery(Name = "usernames[]")] string[] usernames, int loginPageId, int errorPageId)
-        {
-            if ((groups == null || groups.Any() == false) && (usernames == null || usernames.Any() == false))
-            {
-                return BadRequest();
-            }
-
-            var content = _contentService.GetById(contentId);
-            var loginPage = _contentService.GetById(loginPageId);
-            var errorPage = _contentService.GetById(errorPageId);
-            if (content == null || loginPage == null || errorPage == null)
-            {
-                return BadRequest();
-            }
-
-            var isGroupBased = groups != null && groups.Any();
-            var candidateRuleValues = isGroupBased
-                ? groups
-                : usernames;
-            var newRuleType = isGroupBased
-                ? Constants.Conventions.PublicAccess.MemberRoleRuleType
-                : Constants.Conventions.PublicAccess.MemberUsernameRuleType;
-
-            var entry = _publicAccessService.GetEntryForContent(content);
-
-            if (entry == null || entry.ProtectedNodeId != content.Id)
-            {
-                entry = new PublicAccessEntry(content, loginPage, errorPage, new List<PublicAccessRule>());
-
-                foreach (var ruleValue in candidateRuleValues)
-                {
-                    entry.AddRule(ruleValue, newRuleType);
-                }
-            }
-            else
-            {
-                entry.LoginNodeId = loginPage.Id;
-                entry.NoAccessNodeId = errorPage.Id;
-
-                var currentRules = entry.Rules.ToArray();
-                var obsoleteRules = currentRules.Where(rule =>
-                    rule.RuleType != newRuleType
-                    || candidateRuleValues.Contains(rule.RuleValue) == false
-                );
-                var newRuleValues = candidateRuleValues.Where(group =>
-                    currentRules.Any(rule =>
-                        rule.RuleType == newRuleType
-                        && rule.RuleValue == group
-                    ) == false
-                );
-                foreach (var rule in obsoleteRules)
-                {
-                    entry.RemoveRule(rule);
-                }
-                foreach (var ruleValue in newRuleValues)
-                {
-                    entry.AddRule(ruleValue, newRuleType);
-                }
-            }
-
-            return _publicAccessService.Save(entry).Success
-                ? (IActionResult)Ok()
-                : Problem();
-        }
-
-        [Authorize(Policy = AuthorizationPolicies.ContentPermissionProtectById)]
-        [HttpPost]
-        public IActionResult RemovePublicAccess(int contentId)
-        {
-            var content = _contentService.GetById(contentId);
-            if (content == null)
-            {
-                return NotFound();
-            }
-
-            var entry = _publicAccessService.GetEntryForContent(content);
-            if (entry == null)
-            {
-                return Ok();
-            }
-
-            return _publicAccessService.Delete(entry).Success
-                ? (IActionResult)Ok()
-                : Problem();
-        }
+        
     }
 }

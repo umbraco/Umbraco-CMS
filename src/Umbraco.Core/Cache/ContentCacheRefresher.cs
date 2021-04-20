@@ -55,9 +55,9 @@ namespace Umbraco.Cms.Core.Cache
             foreach (var payload in payloads.Where(x => x.Id != default))
             {
                 //By INT Id
-                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
+                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, int>(payload.Id));
                 //By GUID Key
-                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent>(payload.Key));
+                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, Guid?>(payload.Key));
 
                 _idKeyMap.ClearCache(payload.Id);
 

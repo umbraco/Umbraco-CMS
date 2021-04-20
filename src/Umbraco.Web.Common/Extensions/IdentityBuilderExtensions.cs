@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions
@@ -19,8 +20,19 @@ namespace Umbraco.Extensions
             where TUserManager : UserManager<MemberIdentityUser>, TInterface
         {
             identityBuilder.AddUserManager<TUserManager>();
-            identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TUserManager));
+            // use a UniqueServiceDescriptor so we can check if it's already been added
+            var memberManagerDescriptor = new UniqueServiceDescriptor(typeof(TInterface), typeof(TUserManager), ServiceLifetime.Scoped);
+            identityBuilder.Services.Add(memberManagerDescriptor);
             identityBuilder.Services.AddScoped(typeof(UserManager<MemberIdentityUser>), factory => factory.GetRequiredService<TInterface>());
+            return identityBuilder;
+        }
+
+        public static IdentityBuilder AddRoleManager<TInterface, TRoleManager>(this IdentityBuilder identityBuilder)
+            where TRoleManager : RoleManager<UmbracoIdentityRole>, TInterface
+        {
+            identityBuilder.AddRoleManager<TRoleManager>();
+            identityBuilder.Services.AddScoped(typeof(TInterface), typeof(TRoleManager));
+            identityBuilder.Services.AddScoped(typeof(RoleManager<MemberIdentityUser>), factory => factory.GetRequiredService<TInterface>());
             return identityBuilder;
         }
 

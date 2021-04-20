@@ -11,7 +11,7 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Common
     [TestFixture]
     public class MembersServiceCollectionExtensionsTests : UmbracoIntegrationTest
     {
-        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.Services.AddMembersIdentity();
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddMembersIdentity();
 
         [Test]
         public void AddMembersIdentity_ExpectMembersUserStoreResolvable()

@@ -189,19 +189,13 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="path">The full path of the document object to check</param>
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
-        public bool MemberHasAccess(string path)
-        {
-            return _membershipHelper.MemberHasAccess(path);
-        }
+        public bool MemberHasAccess(string path) => throw new NotImplementedException("Migrated to netcore");
 
         /// <summary>
         /// Whether or not the current member is logged in (based on the membership provider)
         /// </summary>
         /// <returns>True is the current user is logged in</returns>
-        public bool MemberIsLoggedOn()
-        {
-            return _membershipHelper.IsLoggedIn();
-        }
+        public bool MemberIsLoggedOn() => throw new NotImplementedException("Migrated to netcore");
 
         #endregion
 
