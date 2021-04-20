@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Security
     /// </summary>
     public class MemberIdentityUser : UmbracoIdentityUser
     {
-        private string _comments;        
+        private string _comments;
         private IReadOnlyCollection<IReadOnlyUserGroup> _groups;
 
         // Custom comparer for enumerables

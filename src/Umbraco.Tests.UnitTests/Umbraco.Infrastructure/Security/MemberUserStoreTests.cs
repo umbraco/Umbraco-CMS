@@ -152,9 +152,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 PasswordHash = "abcde",
                 SecurityStamp = "abc"
             };
+            fakeUser.Roles.Add(new IdentityUserRole<string> { RoleId = "role1", UserId = "123" });
+            fakeUser.Roles.Add(new IdentityUserRole<string> { RoleId = "role2", UserId = "123" });
+
 
             IMemberType fakeMemberType = new MemberType(new MockShortStringHelper(), 77);
             IMember mockMember = Mock.Of<IMember>(m =>
+                m.Id == 123 &&
                 m.Name == "a" &&
                 m.Email == "a@b.com" &&
                 m.Username == "c" &&
@@ -196,6 +200,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
             _mockMemberService.Verify(x => x.Save(mockMember, It.IsAny<bool>()));
             _mockMemberService.Verify(x => x.GetById(123));
+            _mockMemberService.Verify(x => x.ReplaceRoles(new[] { 123 }, new[] { "role1", "role2" }));
         }
 
         [Test]

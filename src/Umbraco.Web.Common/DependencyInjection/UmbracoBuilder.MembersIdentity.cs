@@ -49,6 +49,8 @@ namespace Umbraco.Extensions
 
             services.AddScoped<IPasswordHasher<MemberIdentityUser>, MemberPasswordHasher>();
 
+            services.ConfigureOptions<ConfigureSecurityStampOptions>();
+
             services.ConfigureApplicationCookie(x =>
             {
                 // TODO: We may want/need to configure these further

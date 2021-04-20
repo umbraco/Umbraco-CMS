@@ -100,6 +100,7 @@ namespace Umbraco.Cms.Core.Security
             //target.Roles =;
         }
 
+        // TODO: We need to validate this mapping is OK, we need to get Umbraco.Code working
         private void Map(IMember source, MemberIdentityUser target)
         {
             target.Email = source.Email;

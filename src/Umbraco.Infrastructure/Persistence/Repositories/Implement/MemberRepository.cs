@@ -252,6 +252,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             entity.AddingEntity();
 
+            // ensure security stamp if missing
+            if (entity.SecurityStamp.IsNullOrWhiteSpace())
+            {
+                entity.SecurityStamp = Guid.NewGuid().ToString();
+            }
+
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
@@ -342,6 +348,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // update
             entity.UpdatingEntity();
 
+            // ensure security stamp if missing
+            if (entity.SecurityStamp.IsNullOrWhiteSpace())
+            {
+                entity.SecurityStamp = Guid.NewGuid().ToString();
+            }
+
             // ensure that strings don't contain characters that are invalid in xml
             // TODO: do we really want to keep doing this here?
             entity.SanitizeEntityPropertiesForXmlStorage();
@@ -373,18 +385,52 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             // but only the changed columns, 'cos we cannot update password if empty
             var changedCols = new List<string>();
 
+            if (entity.IsPropertyDirty("SecurityStamp"))
+            {
+                changedCols.Add("securityStampToken");
+            }
+
             if (entity.IsPropertyDirty("Email"))
+            {
                 changedCols.Add("Email");
+            }
 
             if (entity.IsPropertyDirty("Username"))
+            {
                 changedCols.Add("LoginName");
+            }
 
             // do NOT update the password if it has not changed or if it is null or empty
             if (entity.IsPropertyDirty("RawPasswordValue") && !string.IsNullOrWhiteSpace(entity.RawPasswordValue))
+            {
                 changedCols.Add("Password");
 
+                // If the security stamp hasn't already updated we need to force it
+                if (entity.IsPropertyDirty("SecurityStamp") == false)
+                {
+                    dto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
+                    changedCols.Add("securityStampToken");
+                }
+            }
+
+            // If userlogin or the email has changed then need to reset security stamp
+            if (changedCols.Contains("Email") || changedCols.Contains("LoginName"))
+            {
+                dto.EmailConfirmedDate = null;
+                changedCols.Add("emailConfirmedDate");
+
+                // If the security stamp hasn't already updated we need to force it
+                if (entity.IsPropertyDirty("SecurityStamp") == false)
+                {
+                    dto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
+                    changedCols.Add("securityStampToken");
+                }
+            }
+
             if (changedCols.Count > 0)
+            {
                 Database.Update(dto, changedCols);
+            }
 
             ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
@@ -655,8 +701,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private IMember MapDtoToContent(MemberDto dto)
         {
-            var memberType = _memberTypeRepository.Get(dto.ContentDto.ContentTypeId);
-            var member = ContentBaseFactory.BuildEntity(dto, memberType);
+            IMemberType memberType = _memberTypeRepository.Get(dto.ContentDto.ContentTypeId);
+            Member member = ContentBaseFactory.BuildEntity(dto, memberType);
 
             // get properties - indexed by version id
             var versionId = dto.ContentVersionDto.Id;
@@ -672,6 +718,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public IMember GetByUsername(string username)
         {
             return _memberByUsernameCachePolicy.Get(username, PerformGetByUsername, PerformGetAllByUsername);
+        }
+
+        public int[] GetMemberIds(string[] usernames)
+        {
+            var memberObjectType = Cms.Core.Constants.ObjectTypes.Member;
+
+            var memberSql = Sql()
+                .Select("umbracoNode.id")
+                .From<NodeDto>()
+                .InnerJoin<MemberDto>()
+                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
+                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
+                .Where("cmsMember.LoginName in (@usernames)", new { /*usernames =*/ usernames });
+            return Database.Fetch<int>(memberSql).ToArray();
         }
 
         private IMember PerformGetByUsername(string username)
