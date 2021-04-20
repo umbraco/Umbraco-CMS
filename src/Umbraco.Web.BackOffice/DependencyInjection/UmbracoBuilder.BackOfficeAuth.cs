@@ -47,9 +47,7 @@ namespace Umbraco.Extensions
 
             builder.Services.ConfigureOptions<ConfigureBackOfficeCookieOptions>();
 
-            builder.Services
-                .AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>()
-                .ConfigureOptions<BackOfficeExternalLoginProviderErrorMiddleware>();
+            builder.Services.AddSingleton<BackOfficeExternalLoginProviderErrorMiddleware>();
 
             builder.Services.AddUnique<IBackOfficeAntiforgery, BackOfficeAntiforgery>();
             builder.Services.AddUnique<IPasswordChanger<BackOfficeIdentityUser>, PasswordChanger<BackOfficeIdentityUser>>();

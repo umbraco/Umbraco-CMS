@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Core.Security
                 services => new BackOfficePasswordHasher(
                     new LegacyPasswordSecurity(),
                     services.GetRequiredService<IJsonSerializer>()));
-            services.AddScoped<IUserConfirmation<BackOfficeIdentityUser>, DefaultUserConfirmation<BackOfficeIdentityUser>>();
+            services.AddScoped<IUserConfirmation<BackOfficeIdentityUser>, UmbracoUserConfirmation<BackOfficeIdentityUser>>();
         }
 
         // override to add itself, by default identity only wants a single IdentityErrorDescriber

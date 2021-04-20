@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Core.Cache
             var userGroupCache = AppCaches.IsolatedCaches.Get<IUserGroup>();
             if (userGroupCache)
             {
-                userGroupCache.Result.Clear(RepositoryCacheKeys.GetKey<IUserGroup>(id));
+                userGroupCache.Result.Clear(RepositoryCacheKeys.GetKey<IUserGroup, int>(id));
                 userGroupCache.Result.ClearByKey(CacheKeys.UserGroupGetByAliasCacheKeyPrefix);
             }
 

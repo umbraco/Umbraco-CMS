@@ -1,12 +1,7 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -14,13 +9,12 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Routing;
 
 namespace Umbraco.Cms.Web.Website.Middleware
 {
-    public class PublicAccessMiddleware : IMiddleware, IConfigureOptions<UmbracoPipelineOptions>
+    public class PublicAccessMiddleware : IMiddleware
     {
         private readonly ILogger<PublicAccessMiddleware> _logger;
         private readonly IPublicAccessService _publicAccessService;
@@ -44,17 +38,6 @@ namespace Umbraco.Cms.Web.Website.Middleware
             _umbracoRouteValuesFactory = umbracoRouteValuesFactory;
             _publishedRouter = publishedRouter;
         }
-
-        /// <summary>
-        /// Adds ourselves to the Umbraco middleware pipeline before any endpoint routes are declared
-        /// </summary>
-        /// <param name="options"></param>
-        public void Configure(UmbracoPipelineOptions options)
-            => options.AddFilter(new UmbracoPipelineFilter(
-                nameof(PublicAccessMiddleware),
-                null,
-                app => app.UseMiddleware<PublicAccessMiddleware>(),
-                null));
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
@@ -86,7 +69,7 @@ namespace Umbraco.Cms.Web.Website.Middleware
                 IPublishedContent publishedContent = routeValues.PublishedRequest?.PublishedContent;
                 if (publishedContent == null)
                 {
-                    throw new InvalidOperationException("There is no PublishedContent.");
+                    return;
                 }
 
                 var path = publishedContent.Path;

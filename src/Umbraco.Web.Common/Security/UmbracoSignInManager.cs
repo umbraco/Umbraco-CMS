@@ -25,7 +25,15 @@ namespace Umbraco.Cms.Web.Common.Security
         // borrowed from https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Core/src/SignInManager.cs
         protected const string UmbracoSignInMgrXsrfKey = "XsrfId";
 
-        public UmbracoSignInManager(UserManager<TUser> userManager, IHttpContextAccessor contextAccessor, IUserClaimsPrincipalFactory<TUser> claimsFactory, IOptions<IdentityOptions> optionsAccessor, ILogger<SignInManager<TUser>> logger, IAuthenticationSchemeProvider schemes, IUserConfirmation<TUser> confirmation) : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
+        public UmbracoSignInManager(
+            UserManager<TUser> userManager,
+            IHttpContextAccessor contextAccessor,
+            IUserClaimsPrincipalFactory<TUser> claimsFactory,
+            IOptions<IdentityOptions> optionsAccessor,
+            ILogger<SignInManager<TUser>> logger,
+            IAuthenticationSchemeProvider schemes,
+            IUserConfirmation<TUser> confirmation)
+            : base(userManager, contextAccessor, claimsFactory, optionsAccessor, logger, schemes, confirmation)
         {
         }
 
@@ -38,7 +46,7 @@ namespace Umbraco.Cms.Web.Common.Security
         public override async Task<SignInResult> PasswordSignInAsync(TUser user, string password, bool isPersistent, bool lockoutOnFailure)
         {
             // override to handle logging/events
-            var result = await base.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
+            SignInResult result = await base.PasswordSignInAsync(user, password, isPersistent, lockoutOnFailure);
             return await HandleSignIn(user, user.UserName, result);
         }
 
