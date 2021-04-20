@@ -386,11 +386,11 @@ angular.module("umbraco.directives")
                         });
                     });
 
-                    $window.addEventListener("resize", onViewportSizeChanged)
+                    windowResizeListener.register(onViewportSizeChanged);
 
                     scope.$on('$destroy', function () {
                         $image.prop("src", "");
-                        $window.removeEventListener("resize", onViewportSizeChanged)
+                        windowResizeListener.unregister(onViewportSizeChanged);
                         unsubscribe.forEach(u => u());
                     })
                 }
