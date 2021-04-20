@@ -25,6 +25,14 @@ namespace Umbraco.Extensions
                 return builder;
             }
 
+            // NOTE: We are using AddIdentity which is going to add all of the default AuthN/AuthZ configurations = OK!
+            // This will also add all of the default identity services for our user/role types that we aren't overriding = OK!
+            // If a developer wishes to use Umbraco Members with different AuthN/AuthZ values, like different cookie values
+            // or authentication scheme's then they can call the default identity configuration methods like ConfigureApplicationCookie.
+            // BUT ... if a developer wishes to use the default auth schemes for entirely separate purposes alongside Umbraco members,
+            // then we'll probably have to change this and make it more flexible like how we do for Users. Which means booting up
+            // identity here with the basics and registering all of our own custom services.
+            // Since we are using the defaults in v8 (and below) for members, I think using the default for members now is OK!
             // TODO: We may need to use services.AddIdentityCore instead if this is doing too much
 
             services.AddIdentity<MemberIdentityUser, UmbracoIdentityRole>()
@@ -38,6 +46,8 @@ namespace Umbraco.Extensions
                 .AddUserConfirmation<UmbracoUserConfirmation<MemberIdentityUser>>();
 
             services.ConfigureOptions<ConfigureMemberIdentityOptions>();
+
+            services.AddScoped<IPasswordHasher<MemberIdentityUser>, MemberPasswordHasher>();
 
             services.ConfigureApplicationCookie(x =>
             {

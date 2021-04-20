@@ -33,6 +33,8 @@ namespace Umbraco.Extensions
                 .AddClaimsPrincipalFactory<BackOfficeClaimsPrincipalFactory>()
                 .AddErrorDescriber<BackOfficeErrorDescriber>();
 
+            services.TryAddSingleton<IBackOfficeUserPasswordChecker, NoopBackOfficeUserPasswordChecker>();
+
             // Configure the options specifically for the UmbracoBackOfficeIdentityOptions instance
             services.ConfigureOptions<ConfigureBackOfficeIdentityOptions>();
             services.ConfigureOptions<ConfigureBackOfficeSecurityStampValidatorOptions>();
