@@ -20,7 +20,7 @@ TODO
 
 angular.module("umbraco.directives")
     .directive('umbFileDropzone',
-        function ($timeout, Upload, localizationService, umbRequestHelper, overlayService, mediaHelper) {
+        function ($timeout, Upload, localizationService, umbRequestHelper, overlayService, mediaHelper, mediaTypeHelper) {
             return {
                 restrict: 'E',
                 replace: true,
@@ -188,8 +188,6 @@ angular.module("umbraco.directives")
 
                     function _requestChooseMediaTypeDialog() {
 
-                        console.log("scope.acceptedMediatypes", scope.acceptedMediatypes);
-
                         if (scope.acceptedMediatypes.length === 1) {
                             // if only one accepted type, then we wont ask to choose.
                             return false;
@@ -197,31 +195,7 @@ angular.module("umbraco.directives")
 
                         var uploadFileExtensions = scope.queue.map(file => mediaHelper.getFileExtension(file.name));
 
-                        var filteredMediaTypes = scope.acceptedMediatypes.filter(mediaType => {
-                            var uploadProperty;
-                            mediaType.groups.forEach(group => {
-                                var foundProperty = group.properties.find(property => property.alias === "umbracoFile");
-                                if(foundProperty) {
-                                    uploadProperty = foundProperty;
-                                }
-                            });
-                            if(uploadProperty) {
-                                var acceptedFileExtensions;
-                                if(uploadProperty.editor === "Umbraco.ImageCropper") {
-                                    acceptedFileExtensions = Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes;
-                                } else if(uploadProperty.editor === "Umbraco.UploadField") {
-                                    acceptedFileExtensions = (uploadProperty.config.fileExtensions && uploadProperty.config.fileExtensions.length > 0) ? uploadProperty.config.fileExtensions.map(x => x.value) : null;
-                                    console.log(uploadProperty.config.fileExtensions, acceptedFileExtensions)
-                                }
-                                if(acceptedFileExtensions && acceptedFileExtensions.length > 0) {
-                                    console.log(uploadFileExtensions, uploadFileExtensions.length === uploadFileExtensions.filter(fileExt => acceptedFileExtensions.includes(fileExt)).length)
-                                    return uploadFileExtensions.length === uploadFileExtensions.filter(fileExt => acceptedFileExtensions.includes(fileExt)).length;
-                                }
-                                return true;
-                            }
-                            return false;
-                        })
-                        console.log("filteredMediaTypes", filteredMediaTypes);
+                        var filteredMediaTypes = mediaTypeHelper.getTypeAcceptingFileExtensions(scope.acceptedMediatypes, uploadFileExtensions);
 
                         var mediaTypesNotFile = filteredMediaTypes.filter(mediaType => mediaType.alias !== "File");
 
