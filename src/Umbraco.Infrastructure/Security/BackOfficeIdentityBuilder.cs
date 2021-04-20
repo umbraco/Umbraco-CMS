@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Core.Security
         {
             // We need to manually register some identity services here because we cannot rely on normal
             // AddIdentity calls for back office users
-            // For example: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/IdentityServiceCollectionExtensions.cs#L33            
+            // For example: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/IdentityServiceCollectionExtensions.cs#L33
             // The reason we need our own is because the Identity system doesn't cater easily for multiple identity systems and particularly being
             // able to configure IdentityOptions to a specific provider since there is no named options. So we have strongly typed options
             // and strongly typed ILookupNormalizer and IdentityErrorDescriber since those are 'global' and we need to be unintrusive.
