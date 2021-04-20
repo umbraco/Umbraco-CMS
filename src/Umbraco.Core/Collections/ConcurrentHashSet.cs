@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 
 namespace Umbraco.Core.Collections
 {
@@ -14,9 +14,10 @@ namespace Umbraco.Core.Collections
     [Serializable]
     public class ConcurrentHashSet<T> : ICollection<T>
     {
-        private readonly HashSet<T> _innerSet = new HashSet<T>();
-        private readonly ReaderWriterLockSlim _instanceLocker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-
+        // Internally we just use a ConcurrentDictionary with the same value for the Value (since we don't actually care about the value)
+        private static readonly byte _emptyValue = 0x0;
+        private readonly ConcurrentDictionary<T, byte> _innerSet = new ConcurrentDictionary<T, byte>();
+        
         /// <summary>
         /// Returns an enumerator that iterates through the collection.
         /// </summary>
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Collections
         /// <filterpriority>1</filterpriority>
         public IEnumerator<T> GetEnumerator()
         {
-            return GetThreadSafeClone().GetEnumerator();
+            return _innerSet.Keys.GetEnumerator();
         }
 
         /// <summary>
@@ -50,16 +51,7 @@ namespace Umbraco.Core.Collections
         /// <param name="item">The object to remove from the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
         public bool Remove(T item)
         {
-            try
-            {
-                _instanceLocker.EnterWriteLock();
-                return _innerSet.Remove(item);
-            }
-            finally
-            {
-                if (_instanceLocker.IsWriteLockHeld)
-                    _instanceLocker.ExitWriteLock();
-            }
+            return _innerSet.TryRemove(item, out _);
         }
 
 
@@ -74,17 +66,7 @@ namespace Umbraco.Core.Collections
         {
             get
             {
-                try
-                {
-                    _instanceLocker.EnterReadLock();
-                    return _innerSet.Count;
-                }
-                finally
-                {
-                    if (_instanceLocker.IsReadLockHeld)
-                        _instanceLocker.ExitReadLock();
-                }
-
+                return _innerSet.Count;
             }
         }
 
@@ -99,19 +81,10 @@ namespace Umbraco.Core.Collections
         /// <summary>
         /// Adds an item to the <see cref="T:System.Collections.Generic.ICollection`1"/>.
         /// </summary>
-        /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param><exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only.</exception>
+        /// <param name="item">The object to add to the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
         public void Add(T item)
         {
-            try
-            {
-                _instanceLocker.EnterWriteLock();
-                _innerSet.Add(item);
-            }
-            finally
-            {
-                if (_instanceLocker.IsWriteLockHeld)
-                    _instanceLocker.ExitWriteLock();
-            }
+            _innerSet.TryAdd(item, _emptyValue);
         }
 
         /// <summary>
@@ -121,21 +94,7 @@ namespace Umbraco.Core.Collections
         /// <returns></returns>
         public bool TryAdd(T item)
         {
-            if (Contains(item)) return false;
-            try
-            {
-                _instanceLocker.EnterWriteLock();
-
-                //double check
-                if (_innerSet.Contains(item)) return false;
-                _innerSet.Add(item);
-                return true;
-            }
-            finally
-            {
-                if (_instanceLocker.IsWriteLockHeld)
-                    _instanceLocker.ExitWriteLock();
-            }
+            return _innerSet.TryAdd(item, _emptyValue);
         }
 
         /// <summary>
@@ -144,16 +103,7 @@ namespace Umbraco.Core.Collections
         /// <exception cref="T:System.NotSupportedException">The <see cref="T:System.Collections.Generic.ICollection`1"/> is read-only. </exception>
         public void Clear()
         {
-            try
-            {
-                _instanceLocker.EnterWriteLock();
-                _innerSet.Clear();
-            }
-            finally
-            {
-                if (_instanceLocker.IsWriteLockHeld)
-                    _instanceLocker.ExitWriteLock();
-            }
+            _innerSet.Clear();
         }
 
         /// <summary>
@@ -165,16 +115,7 @@ namespace Umbraco.Core.Collections
         /// <param name="item">The object to locate in the <see cref="T:System.Collections.Generic.ICollection`1"/>.</param>
         public bool Contains(T item)
         {
-            try
-            {
-                _instanceLocker.EnterReadLock();
-                return _innerSet.Contains(item);
-            }
-            finally
-            {
-                if (_instanceLocker.IsReadLockHeld)
-                    _instanceLocker.ExitReadLock();
-            }
+            return _innerSet.ContainsKey(item);
         }
 
         /// <summary>
@@ -183,24 +124,8 @@ namespace Umbraco.Core.Collections
         /// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from the <see cref="T:System.Collections.Concurrent.IProducerConsumerCollection`1"/>. The array must have zero-based indexing.</param><param name="index">The zero-based index in <paramref name="array"/> at which copying begins.</param><exception cref="T:System.ArgumentNullException"><paramref name="array"/> is a null reference (Nothing in Visual Basic).</exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="index"/> is less than zero.</exception><exception cref="T:System.ArgumentException"><paramref name="index"/> is equal to or greater than the length of the <paramref name="array"/> -or- The number of elements in the source <see cref="T:System.Collections.Concurrent.ConcurrentQueue`1"/> is greater than the available space from <paramref name="index"/> to the end of the destination <paramref name="array"/>.</exception>
         public void CopyTo(T[] array, int index)
         {
-            var clone = GetThreadSafeClone();
-            clone.CopyTo(array, index);
-        }
-
-        private HashSet<T> GetThreadSafeClone()
-        {
-            HashSet<T> clone = null;
-            try
-            {
-                _instanceLocker.EnterReadLock();
-                clone = new HashSet<T>(_innerSet, _innerSet.Comparer);
-            }
-            finally
-            {
-                if (_instanceLocker.IsReadLockHeld)
-                    _instanceLocker.ExitReadLock();
-            }
-            return clone;
+            var keys = _innerSet.Keys;
+            keys.CopyTo(array, index);
         }
 
         /// <summary>
@@ -209,8 +134,8 @@ namespace Umbraco.Core.Collections
         /// <param name="array">The one-dimensional <see cref="T:System.Array"/> that is the destination of the elements copied from <see cref="T:System.Collections.ICollection"/>. The <see cref="T:System.Array"/> must have zero-based indexing. </param><param name="index">The zero-based index in <paramref name="array"/> at which copying begins. </param><exception cref="T:System.ArgumentNullException"><paramref name="array"/> is null. </exception><exception cref="T:System.ArgumentOutOfRangeException"><paramref name="index"/> is less than zero. </exception><exception cref="T:System.ArgumentException"><paramref name="array"/> is multidimensional.-or- The number of elements in the source <see cref="T:System.Collections.ICollection"/> is greater than the available space from <paramref name="index"/> to the end of the destination <paramref name="array"/>. </exception><exception cref="T:System.ArgumentException">The type of the source <see cref="T:System.Collections.ICollection"/> cannot be cast automatically to the type of the destination <paramref name="array"/>. </exception><filterpriority>2</filterpriority>
         public void CopyTo(Array array, int index)
         {
-            var clone = GetThreadSafeClone();
-            Array.Copy(clone.ToArray(), 0, array, index, clone.Count);
+            var keys = _innerSet.Keys;
+            Array.Copy(keys.ToArray(), 0, array, index, keys.Count);
         }
     }
 }
