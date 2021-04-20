@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Filters
@@ -15,20 +16,17 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
     ///     Checks if the parameter is IHaveUploadedFiles and then deletes any temporary saved files from file uploads
     ///     associated with the request
     /// </summary>
-    internal sealed class FileUploadCleanupFilterAttribute : TypeFilterAttribute
+    public sealed class FileUploadCleanupFilterAttribute : TypeFilterAttribute
     {
         /// <summary>
         ///     Constructor specifies if the filter should analyze the incoming or outgoing model
         /// </summary>
         /// <param name="incomingModel"></param>
-        public FileUploadCleanupFilterAttribute( bool incomingModel = true) : base(typeof(FileUploadCleanupFilter))
-        {
-
+        public FileUploadCleanupFilterAttribute(bool incomingModel = true) : base(typeof(FileUploadCleanupFilter)) =>
             Arguments = new object[]
             {
                 incomingModel
             };
-        }
 
         // We need to use IAsyncActionFilter even that we dont have any async because we need access to
         // context.ActionArguments, and this is only available on ActionExecutingContext and not on
@@ -45,7 +43,6 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 _incomingModel = incomingModel;
             }
 
-
             public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
                 next(); // We only to do stuff after the action is executed
@@ -60,7 +57,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         if (context.ActionArguments.First().Value is IHaveUploadedFiles contentItem)
                         {
                             //cleanup any files associated
-                            foreach (var f in contentItem.UploadedFiles)
+                            foreach (ContentPropertyFile f in contentItem.UploadedFiles)
                             {
                                 //track all temp folders so we can remove old files afterwards
                                 var dir = Path.GetDirectoryName(f.TempFilePath);
@@ -109,7 +106,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         if (uploadedFiles.UploadedFiles != null)
                         {
                             //cleanup any files associated
-                            foreach (var f in uploadedFiles.UploadedFiles)
+                            foreach (ContentPropertyFile f in uploadedFiles.UploadedFiles)
                             {
                                 if (f.TempFilePath.IsNullOrWhiteSpace() == false)
                                 {

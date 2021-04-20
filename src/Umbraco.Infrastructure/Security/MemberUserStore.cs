@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
@@ -50,10 +49,12 @@ namespace Umbraco.Cms.Core.Security
         public override IQueryable<MemberIdentityUser> Users => throw new NotImplementedException();
 
         /// <inheritdoc />
-        public override Task<string> GetNormalizedUserNameAsync(MemberIdentityUser user, CancellationToken cancellationToken = default) => GetUserNameAsync(user, cancellationToken);
+        public override Task<string> GetNormalizedUserNameAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
+            => GetUserNameAsync(user, cancellationToken);
 
         /// <inheritdoc />
-        public override Task SetNormalizedUserNameAsync(MemberIdentityUser user, string normalizedName, CancellationToken cancellationToken = default) => SetUserNameAsync(user, normalizedName, cancellationToken);
+        public override Task SetNormalizedUserNameAsync(MemberIdentityUser user, string normalizedName, CancellationToken cancellationToken = default)
+            => SetUserNameAsync(user, normalizedName, cancellationToken);
 
         /// <inheritdoc />
         public override Task<IdentityResult> CreateAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
@@ -86,6 +87,7 @@ namespace Umbraco.Cms.Core.Security
 
                 // re-assign id
                 user.Id = UserIdToString(memberEntity.Id);
+                user.Key = memberEntity.Key;
 
                 // [from backofficeuser] we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
                 // var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MembersIdentityUser.Logins));
@@ -644,6 +646,13 @@ namespace Umbraco.Cms.Core.Security
             {
                 anythingChanged = true;
                 member.LastPasswordChangeDate = identityUserMember.LastPasswordChangeDateUtc.Value.ToLocalTime();
+            }
+
+            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.Comments))
+                && member.Comments != identityUserMember.Comments && identityUserMember.Comments.IsNullOrWhiteSpace() == false)
+            {
+                anythingChanged = true;
+                member.Comments = identityUserMember.Comments;
             }
 
             if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.EmailConfirmed))

@@ -88,10 +88,9 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             private async Task UpdateTokensAndAppendCustomHeaders(ActionExecutingContext actionContext)
             {
-                var tokenFilter =
-                    new SetAngularAntiForgeryTokensAttribute.SetAngularAntiForgeryTokensFilter(_backOfficeAntiforgery,
-                        _globalSettings);
-                await tokenFilter.OnActionExecutionAsync(actionContext,
+                var tokenFilter = new SetAngularAntiForgeryTokensAttribute.SetAngularAntiForgeryTokensFilter(_backOfficeAntiforgery);
+                await tokenFilter.OnActionExecutionAsync(
+                    actionContext,
                     () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null)));
 
                 // add the header

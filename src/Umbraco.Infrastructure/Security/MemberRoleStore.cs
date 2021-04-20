@@ -1,9 +1,10 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Security
@@ -11,7 +12,7 @@ namespace Umbraco.Cms.Core.Security
     /// <summary>
     /// A custom user store that uses Umbraco member data
     /// </summary>
-    public class MemberRoleStore : IRoleStore<UmbracoIdentityRole>
+    public class MemberRoleStore : IRoleStore<UmbracoIdentityRole>, IQueryableRoleStore<UmbracoIdentityRole>
     {
         private readonly IMemberGroupService _memberGroupService;
         private bool _disposed;
@@ -20,7 +21,7 @@ namespace Umbraco.Cms.Core.Security
         //TODO: How revealing can the error messages be?
         private readonly IdentityError _intParseError = new IdentityError { Code = "IdentityIdParseError", Description = "Cannot parse ID to int" };
         private readonly IdentityError _memberGroupNotFoundError = new IdentityError { Code = "IdentityMemberGroupNotFound", Description = "Member group not found" };
-        private const string genericIdentityErrorCode = "IdentityErrorUserStore";
+        //private const string genericIdentityErrorCode = "IdentityErrorUserStore";
 
         public MemberRoleStore(IMemberGroupService memberGroupService, IdentityErrorDescriber errorDescriber)
         {
@@ -32,6 +33,8 @@ namespace Umbraco.Cms.Core.Security
         /// Gets or sets the <see cref="IdentityErrorDescriber"/> for any error that occurred with the current operation.
         /// </summary>
         public IdentityErrorDescriber ErrorDescriber { get; set; }
+
+        public IQueryable<UmbracoIdentityRole> Roles => _memberGroupService.GetAll().Select(MapFromMemberGroup).AsQueryable();
 
         /// <inheritdoc />
         public Task<IdentityResult> CreateAsync(UmbracoIdentityRole role, CancellationToken cancellationToken = default)
@@ -268,5 +271,6 @@ namespace Umbraco.Cms.Core.Security
                 throw new ObjectDisposedException(GetType().Name);
             }
         }
+
     }
 }

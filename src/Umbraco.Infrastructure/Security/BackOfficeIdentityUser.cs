@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Extensions;
 
@@ -14,8 +13,6 @@ namespace Umbraco.Cms.Core.Security
     /// </summary>
     public class BackOfficeIdentityUser : UmbracoIdentityUser
     {
-        private string _name;
-        private string _passwordConfig;
         private string _culture;
         private IReadOnlyCollection<IReadOnlyUserGroup> _groups;
         private string[] _allowedSections;
@@ -55,7 +52,7 @@ namespace Umbraco.Cms.Core.Security
             user.Id = null;
             user.HasIdentity = false;
             user._culture = culture;
-            user._name = name;
+            user.Name = name;
             user.EnableChangeTracking();
             return user;
         }
@@ -83,25 +80,6 @@ namespace Umbraco.Cms.Core.Security
 
         public int[] CalculatedMediaStartNodeIds { get; set; }
         public int[] CalculatedContentStartNodeIds { get; set; }
-
-        /// <summary>
-        /// Gets or sets the user's real name
-        /// </summary>
-        public string Name
-        {
-            get => _name;
-            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
-        }
-
-        /// <summary>
-        /// Gets or sets the password config
-        /// </summary>
-        public string PasswordConfig
-        {
-            get => _passwordConfig;
-            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfig));
-        }
-
 
         /// <summary>
         /// Gets or sets content start nodes assigned to the User (not ones assigned to the user's groups)
@@ -180,23 +158,6 @@ namespace Umbraco.Cms.Core.Security
                 BeingDirty.SetPropertyValueAndDetectChanges(value, ref _groups, nameof(Groups), s_groupsComparer);
             }
         }
-
-        /// <summary>
-        /// Gets a value indicating whether the user is locked out based on the user's lockout end date
-        /// </summary>
-        public bool IsLockedOut
-        {
-            get
-            {
-                bool isLocked = LockoutEnd.HasValue && LockoutEnd.Value.ToLocalTime() >= DateTime.Now;
-                return isLocked;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether the IUser IsApproved
-        /// </summary>
-        public bool IsApproved { get; set; }
 
         private static string UserIdToString(int userId) => string.Intern(userId.ToString());
     }

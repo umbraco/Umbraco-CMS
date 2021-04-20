@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
@@ -116,8 +116,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public DateTime CreationDate => _member.CreateDate;
 
         public DateTime LastLoginDate => _member.LastLoginDate;
-
-        public DateTime LastActivityDate => _member.LastLoginDate;
 
         public DateTime LastPasswordChangedDate => _member.LastPasswordChangeDate;
 

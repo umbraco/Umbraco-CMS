@@ -34,11 +34,6 @@
         <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
             <_Parameter1>Umbraco.Tests.Integration</_Parameter1>
         </AssemblyAttribute>
-
-      <!-- Making internals visible to Umbraco Forms -->
-      <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
-        <_Parameter1>Umbraco.Forms.Web</_Parameter1>
-      </AssemblyAttribute>
     </ItemGroup>
 
     <ItemGroup>

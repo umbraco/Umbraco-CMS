@@ -86,6 +86,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IUser PerformGet(int id)
         {
+            // This will never resolve to a user, yet this is asked
+            // for all of the time (especially in cases of members).
+            // Don't issue a SQL call for this, we know it will not exist.
+            if (id == default || id < -1)
+            {
+                return null;
+            }
+
             var sql = SqlContext.Sql()
                 .Select<UserDto>()
                 .From<UserDto>()

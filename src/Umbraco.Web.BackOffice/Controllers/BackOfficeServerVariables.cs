@@ -189,6 +189,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                                 controller => controller.PostSave(null))
                         },
                         {
+                            "publicAccessApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PublicAccessController>(
+                                controller => controller.GetPublicAccess(0))
+                        },
+                        {
                             "mediaApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaController>(
                                 controller => controller.GetRootMedia())
                         },

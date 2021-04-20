@@ -8,12 +8,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -46,7 +44,7 @@ namespace Umbraco.Cms.Core.Security
             IExternalLoginService externalLoginService,
             IOptions<GlobalSettings> globalSettings,
             UmbracoMapper mapper,
-            IdentityErrorDescriber describer,
+            BackOfficeErrorDescriber describer,
             AppCaches appCaches)
             : base(describer)
         {

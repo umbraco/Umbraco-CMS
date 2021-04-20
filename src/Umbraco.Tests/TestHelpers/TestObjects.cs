@@ -81,7 +81,7 @@ namespace Umbraco.Tests.TestHelpers
                     connectionStrings,
                     new Lazy<IMapperCollection>(() => mappers),
                     TestHelper.DbProviderFactoryCreator,
-                    new DatabaseSchemaCreatorFactory(Mock.Of<ILogger<DatabaseSchemaCreator>>(),loggerFactory, new UmbracoVersion()));
+                    new DatabaseSchemaCreatorFactory(Mock.Of<ILogger<DatabaseSchemaCreator>>(),loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>()));
             }
 
             fileSystems ??= new FileSystems(Current.Factory, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, TestHelper.IOHelper, globalSettings, TestHelper.GetHostingEnvironment());

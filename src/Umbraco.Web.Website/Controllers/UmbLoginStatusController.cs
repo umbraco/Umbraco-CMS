@@ -1,14 +1,14 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Cms.Core.Models.Security;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Cms.Web.Common.Models;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Website.Controllers
@@ -16,15 +16,18 @@ namespace Umbraco.Cms.Web.Website.Controllers
     [UmbracoMemberAuthorize]
     public class UmbLoginStatusController : SurfaceController
     {
-        private readonly IUmbracoWebsiteSecurityAccessor _websiteSecurityAccessor;
+        private readonly IMemberSignInManager _signInManager;
 
-        public UmbLoginStatusController(IUmbracoContextAccessor umbracoContextAccessor,
-            IUmbracoDatabaseFactory databaseFactory, ServiceContext services, AppCaches appCaches,
-            IProfilingLogger profilingLogger, IPublishedUrlProvider publishedUrlProvider, IUmbracoWebsiteSecurityAccessor websiteSecurityAccessor)
+        public UmbLoginStatusController(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            IUmbracoDatabaseFactory databaseFactory,
+            ServiceContext services,
+            AppCaches appCaches,
+            IProfilingLogger profilingLogger,
+            IPublishedUrlProvider publishedUrlProvider,
+            IMemberSignInManager signInManager)
             : base(umbracoContextAccessor, databaseFactory, services, appCaches, profilingLogger, publishedUrlProvider)
-        {
-            _websiteSecurityAccessor = websiteSecurityAccessor;
-        }
+            => _signInManager = signInManager;
 
         [HttpPost]
         [ValidateAntiForgeryToken]
@@ -36,9 +39,11 @@ namespace Umbraco.Cms.Web.Website.Controllers
                 return CurrentUmbracoPage();
             }
 
-            if (_websiteSecurityAccessor.WebsiteSecurity.IsLoggedIn())
+            var isLoggedIn = HttpContext.User?.Identity?.IsAuthenticated ?? false;
+
+            if (isLoggedIn)
             {
-                await _websiteSecurityAccessor.WebsiteSecurity.LogOutAsync();
+                await _signInManager.SignOutAsync();
             }
 
             TempData["LogoutSuccess"] = true;

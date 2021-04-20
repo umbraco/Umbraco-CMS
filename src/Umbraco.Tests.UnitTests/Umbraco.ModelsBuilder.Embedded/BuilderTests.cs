@@ -203,7 +203,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		[ImplementPropertyType(""foo"")]
-		public global::System.Collections.Generic.IEnumerable<global::Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::Foo>>(_publishedValueFallback, ""foo"");
+		public global::System.Collections.Generic.IEnumerable<global::" + modelsBuilderConfig.ModelsNamespace + @".Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::" + modelsBuilderConfig.ModelsNamespace + @".Foo>>(_publishedValueFallback, ""foo"");
 	}
 }
 ";

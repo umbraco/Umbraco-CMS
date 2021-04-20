@@ -23,14 +23,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             where TNotificationHandler : INotificationHandler<TNotification>
             where TNotification : INotification
         {
-            // Register the handler as transient. This ensures that anything can be injected into it.
-            var descriptor = new UniqueServiceDescriptor(typeof(INotificationHandler<TNotification>), typeof(TNotificationHandler), ServiceLifetime.Transient);
-
-            if (!builder.Services.Contains(descriptor))
-            {
-                builder.Services.Add(descriptor);
-            }
-
+            builder.Services.AddNotificationHandler<TNotification, TNotificationHandler>();
             return builder;
         }
 
@@ -45,15 +38,38 @@ namespace Umbraco.Cms.Core.DependencyInjection
             where TNotificationAsyncHandler : INotificationAsyncHandler<TNotification>
             where TNotification : INotification
         {
+            builder.Services.AddNotificationAsyncHandler<TNotification, TNotificationAsyncHandler>();
+            return builder;
+        }
+
+        internal static IServiceCollection AddNotificationHandler<TNotification, TNotificationHandler>(this IServiceCollection services)
+            where TNotificationHandler : INotificationHandler<TNotification>
+            where TNotification : INotification
+        {
+            // Register the handler as transient. This ensures that anything can be injected into it.
+            var descriptor = new UniqueServiceDescriptor(typeof(INotificationHandler<TNotification>), typeof(TNotificationHandler), ServiceLifetime.Transient);
+
+            if (!services.Contains(descriptor))
+            {
+                services.Add(descriptor);
+            }
+
+            return services;
+        }
+
+        internal static IServiceCollection AddNotificationAsyncHandler<TNotification, TNotificationAsyncHandler>(this IServiceCollection services)
+            where TNotificationAsyncHandler : INotificationAsyncHandler<TNotification>
+            where TNotification : INotification
+        {
             // Register the handler as transient. This ensures that anything can be injected into it.
             var descriptor = new ServiceDescriptor(typeof(INotificationAsyncHandler<TNotification>), typeof(TNotificationAsyncHandler), ServiceLifetime.Transient);
 
-            if (!builder.Services.Contains(descriptor))
+            if (!services.Contains(descriptor))
             {
-                builder.Services.Add(descriptor);
+                services.Add(descriptor);
             }
 
-            return builder;
+            return services;
         }
     }
 }

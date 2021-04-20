@@ -5,11 +5,10 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Compose
@@ -92,6 +91,7 @@ namespace Umbraco.Cms.Core.Compose
                 .AddNotificationHandler<MacroSavedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<MacroDeletedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<MediaTreeChangeNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<ContentTreeChangeNotification, DistributedCacheBinder>()
                 ;
             // add notification handlers for auditing
             builder
