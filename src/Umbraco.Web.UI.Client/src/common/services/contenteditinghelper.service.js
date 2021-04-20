@@ -32,7 +32,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
         return true;
     }
 
-    function showNotificationsForModelsState(ms) {
+    function showNotificationsForModelsState(ms, messageType) {
+        messageType = messageType || 2;
         for (const [key, value] of Object.entries(ms)) {
 
             var errorMsg = value[0];
@@ -42,12 +43,14 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 var idsToErrors = serverValidationManager.parseComplexEditorError(errorMsg, "");
                 idsToErrors.forEach(x => {
                     if (x.modelState) {
-                        showNotificationsForModelsState(x.modelState);
+                        showNotificationsForModelsState(x.modelState, messageType);
                     }
                 });
             }
             else if (value[0]) {
-                notificationsService.error("Validation", value[0]);
+                //notificationsService.error("Validation", value[0]);
+                console.log({type:messageType, header:"Validation", message:value[0]})
+                notificationsService.showNotification({type:messageType, header:"Validation", message:value[0]})
             }
         }
     }
@@ -129,6 +132,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                             showNotifications: args.showNotifications,
                             softRedirect: args.softRedirect,
                             err: err,
+                            action: args.action,
                             rebindCallback: function () {
                                 // if the error contains data, we want to map that back as we want to continue editing this save. Especially important when the content is new as the returned data will contain ID etc.
                                 if(err.data) {
@@ -600,7 +604,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         //instead of having a property editor $watch their expression to check if it has
                         // been updated, instead we'll check for the existence of a special method on their model
                         // and just call it.
-                        if (angular.isFunction(origProp.onValueChanged)) {
+                        if (Utilities.isFunction(origProp.onValueChanged)) {
                             //send the newVal + oldVal
                             origProp.onValueChanged(origProp.value, origVal);
                         }
@@ -644,9 +648,15 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     //wire up the server validation errs
                     formHelper.handleServerValidation(args.err.data.ModelState);
 
+                    var messageType = 2;//error
+                    console.log(args)
+                    if (args.action === "save") {
+                        messageType = 4;//warning
+                    }
+
                     //add model state errors to notifications
                     if (args.showNotifications) {
-                        showNotificationsForModelsState(args.err.data.ModelState);
+                        showNotificationsForModelsState(args.err.data.ModelState, messageType);
                     }
 
                     if (!this.redirectToCreatedContent(args.err.data.id, args.softRedirect) || args.softRedirect) {
@@ -654,7 +664,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                         // soft-redirecting which means the URL will change but the route wont (i.e. creating content).
 
                         // In this case we need to detect what properties have changed and re-bind them with the server data.
-                        if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
+                        if (args.rebindCallback && Utilities.isFunction(args.rebindCallback)) {
                             args.rebindCallback();
                         }
 
@@ -701,7 +711,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 // soft-redirecting which means the URL will change but the route wont (i.e. creating content).
 
                 // In this case we need to detect what properties have changed and re-bind them with the server data.
-                if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
+                if (args.rebindCallback && Utilities.isFunction(args.rebindCallback)) {
                     args.rebindCallback();
                 }
             }
@@ -764,6 +774,59 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             //don't add a browser history for this
             $location.replace();
             return true;
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.contentEditingHelper#sortVariants
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Sorts the variants so default language is shown first. Mandatory languages are shown next and all other underneath. Both Mandatory and non mandatory languages are
+         * sorted in the following groups 'Published', 'Draft', 'Not Created'. Within each of those groups the variants are
+         * sorted by the language display name.
+         *
+         */
+        sortVariants: function (a, b) {
+            const statesOrder = {'PublishedPendingChanges':1, 'Published': 1, 'Draft': 2, 'NotCreated': 3};
+            const compareDefault = (a,b) => (!a.language.isDefault ? 1 : -1) - (!b.language.isDefault ? 1 : -1);
+
+            // Make sure mandatory variants goes on top, unless they are published, cause then they already goes to the top and then we want to mix them with other published variants.
+            const compareMandatory = (a,b) => (a.state === 'PublishedPendingChanges' || a.state === 'Published') ? 0 : (!a.language.isMandatory ? 1 : -1) - (!b.language.isMandatory ? 1 : -1);
+            const compareState = (a, b) => (statesOrder[a.state] || 99) - (statesOrder[b.state] || 99);
+            const compareName = (a, b) => a.displayName.localeCompare(b.displayName);
+
+            return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.contentEditingHelper#getSortedVariantsAndSegments
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Returns an array of variants and segments sorted by the rules in the sortVariants method.
+         * A variant language is followed by its segments in the array. If a segment doesn't have a parent variant it is
+         * added to the end of the array.
+         *
+         */
+        getSortedVariantsAndSegments: function (variantsAndSegments) {
+            const sortedVariants = variantsAndSegments.filter(variant => !variant.segment).sort(this.sortVariants);
+            let segments = variantsAndSegments.filter(variant => variant.segment);
+            let sortedAvailableVariants = [];
+
+            sortedVariants.forEach((variant) => {
+                const sortedMatchedSegments = segments.filter(segment => segment.language.culture === variant.language.culture).sort(this.sortVariants);
+                segments = segments.filter(segment => segment.language.culture !== variant.language.culture);
+                sortedAvailableVariants = [...sortedAvailableVariants, ...[variant], ...sortedMatchedSegments];
+            })
+
+            // if we have segments without a parent language variant we need to add the remaining segments to the array
+            sortedAvailableVariants = [...sortedAvailableVariants, ...segments.sort(this.sortVariants)];
+
+            return sortedAvailableVariants;
         }
     };
 }

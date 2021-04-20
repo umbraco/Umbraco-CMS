@@ -42,7 +42,7 @@ namespace Umbraco.Core.Services
             var matches = AnchorRegex.Matches(rteContent);
             foreach (Match match in matches)
             {
-                result.Add(match.Value.Split('\"')[1]);
+                result.Add(match.Value.Split(Constants.CharArrays.DoubleQuote)[1]);
             }
             return result;
         }
@@ -88,26 +88,6 @@ namespace Umbraco.Core.Services
         public static void RemoveContentPermissions(this IContentService contentService, int contentId)
         {
             contentService.SetPermissions(new EntityPermissionSet(contentId, new EntityPermissionCollection()));
-        }
-
-        /// <summary>
-        /// Returns true if there is any content in the recycle bin
-        /// </summary>
-        /// <param name="contentService"></param>
-        /// <returns></returns>
-        public static bool RecycleBinSmells(this IContentService contentService)
-        {
-            return contentService.CountChildren(Constants.System.RecycleBinContent) > 0;
-        }
-
-        /// <summary>
-        /// Returns true if there is any media in the recycle bin
-        /// </summary>
-        /// <param name="mediaService"></param>
-        /// <returns></returns>
-        public static bool RecycleBinSmells(this IMediaService mediaService)
-        {
-            return mediaService.CountChildren(Constants.System.RecycleBinMedia) > 0;
         }
     }
 }

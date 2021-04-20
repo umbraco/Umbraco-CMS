@@ -894,7 +894,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.ParentId == -1)
                 return content.Published;
 
-            var ids = content.Path.Split(',').Skip(1).Select(int.Parse);
+            var ids = content.Path.Split(Constants.CharArrays.Comma).Skip(1).Select(int.Parse);
 
             var sql = SqlContext.Sql()
                 .SelectCount<NodeDto>(x => x.NodeId)
@@ -911,6 +911,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Recycle Bin
 
         public override int RecycleBinId => Constants.System.RecycleBinContent;
+
+        public bool RecycleBinSmells()
+        {
+            var cache = _appCaches.RuntimeCache;
+            var cacheKey = CacheKeys.ContentRecycleBinCacheKey;
+
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(RecycleBinId) > 0);
+        }
 
         #endregion
 

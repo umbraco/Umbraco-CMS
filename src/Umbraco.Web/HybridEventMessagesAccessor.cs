@@ -12,8 +12,8 @@ namespace Umbraco.Web
 
         public EventMessages EventMessages
         {
-            get { return Value; }
-            set { Value = value; }
+            get => Value;
+            set => Value = value;
         }
     }
 }

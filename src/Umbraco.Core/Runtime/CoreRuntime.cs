@@ -13,6 +13,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Logging.Serilog;
 using Umbraco.Core.Migrations.Install;
+using Umbraco.Core.Migrations.Upgrade;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Mappers;
 using Umbraco.Core.Sync;
@@ -97,7 +98,7 @@ namespace Umbraco.Core.Runtime
                     HostingEnvironment.ApplicationID,
                     HostingEnvironment.ApplicationPhysicalPath,
                     NetworkHelper.MachineName);
-                logger.Debug<CoreRuntime>("Runtime: {Runtime}", GetType().FullName);
+                logger.Debug<CoreRuntime, string>("Runtime: {Runtime}", GetType().FullName);
 
                 // application environment
                 ConfigureUnhandledException();
@@ -188,6 +189,16 @@ namespace Umbraco.Core.Runtime
 
                 // create the factory
                 _factory = Current.Factory = composition.CreateFactory();
+
+                // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
+                if (_state.Reason == RuntimeLevelReason.UpgradeMigrations && _state.Level == RuntimeLevel.Run)
+                {
+                    // do the upgrade
+                    DoUnattendedUpgrade(_factory.GetInstance<DatabaseBuilder>());
+
+                    // upgrade is done, set reason to Run
+                    _state.Reason = RuntimeLevelReason.Run;
+                }
 
                 // create & initialize the components
                 _components = _factory.GetInstance<ComponentCollection>();
@@ -288,6 +299,17 @@ namespace Umbraco.Core.Runtime
             }
         }
 
+        private void DoUnattendedUpgrade(DatabaseBuilder databaseBuilder)
+        {
+            var plan = new UmbracoPlan();
+            using (ProfilingLogger.TraceDuration<CoreRuntime>("Starting unattended upgrade.", "Unattended upgrade completed."))
+            {
+                var result = databaseBuilder.UpgradeSchemaAndData(plan);
+                if (result.Success == false)
+                    throw new UnattendedInstallException("An error occurred while running the unattended upgrade.\n" + result.Message);
+            }
+        }
+
         protected virtual void ConfigureUnhandledException()
         {
             //take care of unhandled exceptions - there is nothing we can do to
@@ -337,7 +359,7 @@ namespace Umbraco.Core.Runtime
                 {
                     _state.DetermineRuntimeLevel(databaseFactory);
 
-                    profilingLogger.Debug<CoreRuntime>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
+                    profilingLogger.Debug<CoreRuntime,RuntimeLevel,RuntimeLevelReason>("Runtime level: {RuntimeLevel} - {RuntimeLevelReason}", _state.Level, _state.Reason);
 
                     if (_state.Level == RuntimeLevel.Upgrade)
                     {

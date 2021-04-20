@@ -109,7 +109,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 else
                 {
                     // this is a property that does not correspond to anything, ignore and log
-                    Current.Logger.Warn<PublishedMediaCache>("Dropping property '{PropertyKey}' because it does not belong to the content type.", i.Key);
+                    Current.Logger.Warn<PublishedMediaCache,string>("Dropping property '{PropertyKey}' because it does not belong to the content type.", i.Key);
                 }
             }
         }

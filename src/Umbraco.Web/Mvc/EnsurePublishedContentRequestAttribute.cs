@@ -103,7 +103,7 @@ namespace Umbraco.Web.Mvc
         {
             if (_contentId.HasValue)
             {
-                var content = Umbraco.Content(_contentId);
+                var content = Umbraco.Content(_contentId.Value);
                 if (content == null)
                 {
                     throw new InvalidOperationException("Could not resolve content with id " + _contentId);
