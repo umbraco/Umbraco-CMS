@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IAuditService _auditService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IUserService _userService;
         private readonly AppCaches _appCaches;
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IMediaFileSystem mediaFileSystem,
             IImageUrlGenerator imageUrlGenerator,
             IAuditService auditService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IUserService userService,
             AppCaches appCaches,

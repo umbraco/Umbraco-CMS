@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             Constants.DataTypes.DefaultMembersListView
         };
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IDataEditor, PropertyEditorBasic>((source, context) => new PropertyEditorBasic(), Map);
             mapper.Define<ConfigurationField, DataTypeConfigurationFieldDisplay>((source, context) => new DataTypeConfigurationFieldDisplay(), Map);

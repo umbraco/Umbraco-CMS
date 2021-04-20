@@ -3,6 +3,7 @@
 
 namespace Umbraco.Cms.Core.Configuration
 {
+
     /// <summary>
     /// Password configuration
     /// </summary>

@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Security
     {
         private const string genericIdentityErrorCode = "IdentityErrorUserStore";
         private readonly IMemberService _memberService;
-        private readonly UmbracoMapper _mapper;
+        private readonly IUmbracoMapper _mapper;
         private readonly IScopeProvider _scopeProvider;
 
         /// <summary>
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="describer">The error describer</param>
         public MemberUserStore(
             IMemberService memberService,
-            UmbracoMapper mapper,
+            IUmbracoMapper mapper,
             IScopeProvider scopeProvider,
             IdentityErrorDescriber describer)
         : base(describer)

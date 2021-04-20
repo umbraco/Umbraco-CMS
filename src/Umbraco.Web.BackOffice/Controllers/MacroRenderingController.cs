@@ -30,13 +30,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly ISiteDomainHelper _siteDomainHelper;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IUmbracoComponentRenderer _componentRenderer;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
 
         public MacroRenderingController(
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IUmbracoComponentRenderer componentRenderer,
             IVariationContextAccessor variationContextAccessor,
             IMacroService macroService,

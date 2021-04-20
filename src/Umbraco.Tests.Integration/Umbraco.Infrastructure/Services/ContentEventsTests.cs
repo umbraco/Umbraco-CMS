@@ -1010,8 +1010,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
-            int i = 0;
-            int m = 0;
+            var i = 0;
+            var m = 0;
             Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content.Id}", _events[i++].ToString());
             m++;
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content.Id}", _events[i].ToString());
@@ -1035,15 +1035,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.AreEqual(3, _msgCount);
             Assert.AreEqual(4, _events.Count);
-            int i = 0;
-            int m = 0;
-#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
+            var i = 0;
+            var m = 0;
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1.Id}", _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content2.Id}", _events[i++].ToString());
             m++;
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}", _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content2.Id}", _events[i].ToString());
-#pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
         [Test]
@@ -1068,10 +1066,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);
-            int i = 0;
-            int m = 0;
+            var i = 0;
+            var m = 0;
 
-#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[1].Id}", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[0].Id}", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[3].Id}", _events[i++].ToString());
@@ -1087,7 +1084,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content1.Id}", _events[i++].ToString());
             m++;
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}", _events[i].ToString());
-#pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
         #endregion

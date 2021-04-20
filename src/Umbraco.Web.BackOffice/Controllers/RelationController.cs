@@ -17,10 +17,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [Authorize(Policy = AuthorizationPolicies.SectionAccessContent)]
     public class RelationController : UmbracoAuthorizedJsonController
     {
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IRelationService _relationService;
 
-        public RelationController(UmbracoMapper umbracoMapper,
+        public RelationController(IUmbracoMapper umbracoMapper,
             IRelationService relationService)
         {
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));

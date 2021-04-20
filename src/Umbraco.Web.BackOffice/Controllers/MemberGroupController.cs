@@ -24,12 +24,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class MemberGroupController : UmbracoAuthorizedJsonController
     {
         private readonly IMemberGroupService _memberGroupService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
 
         public MemberGroupController(
             IMemberGroupService memberGroupService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService)
         {
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));

@@ -176,9 +176,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 while (compositionIx < compositionDtos.Count && compositionDtos[compositionIx].ChildId == contentType.Id)
                 {
                     var parentDto = compositionDtos[compositionIx];
-                    if (!contentTypes.TryGetValue(parentDto.ParentId, out var parentContentType)) continue;
-                    contentType.AddContentType(parentContentType);
                     compositionIx++;
+
+                    if (!contentTypes.TryGetValue(parentDto.ParentId, out var parentContentType))
+                        continue;
+                    contentType.AddContentType(parentContentType);
                 }
             }
         }

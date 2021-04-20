@@ -1074,6 +1074,15 @@ namespace Umbraco.Cms.Core.Services.Implement
             return OperationResult.Succeed(messages);
         }
 
+        public bool RecycleBinSmells()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+                return _mediaRepository.RecycleBinSmells();
+            }
+        }
+
         #endregion
 
         #region Others

@@ -50,6 +50,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly PreviewRoutes _previewRoutes;
         private readonly IEmailSender _emailSender;
+        private readonly MemberPasswordConfigurationSettings _memberPasswordConfigurationSettings;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
@@ -67,7 +68,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeExternalLoginProviders externalLogins,
             IImageUrlGenerator imageUrlGenerator,
             PreviewRoutes previewRoutes,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IOptions<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -85,6 +87,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _imageUrlGenerator = imageUrlGenerator;
             _previewRoutes = previewRoutes;
             _emailSender = emailSender;
+            _memberPasswordConfigurationSettings = memberPasswordConfigurationSettings.Value;
         }
 
         /// <summary>
@@ -97,7 +100,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
                 {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl", "iconApiBaseUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -408,6 +411,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"showUserInvite", _emailSender.CanSendRequiredEmail()},
                         {"canSendRequiredEmail", _emailSender.CanSendRequiredEmail()},
                         {"showAllowSegmentationForDocumentTypes", false},
+                        {"minimumPasswordLength", _memberPasswordConfigurationSettings.RequiredLength},
+                        {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
                     }
                 },
                 {

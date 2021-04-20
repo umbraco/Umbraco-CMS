@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Testing
 
         protected IMapperCollection Mappers => Factory.GetRequiredService<IMapperCollection>();
 
-        protected UmbracoMapper Mapper => Factory.GetRequiredService<UmbracoMapper>();
+        protected IUmbracoMapper Mapper => Factory.GetRequiredService<IUmbracoMapper>();
         protected IHttpContextAccessor HttpContextAccessor => Factory.GetRequiredService<IHttpContextAccessor>();
         protected IContentService ContentService => Factory.GetRequiredService<IContentService>();
         protected IRuntimeState RuntimeState => MockRuntimeState(RuntimeLevel.Run);

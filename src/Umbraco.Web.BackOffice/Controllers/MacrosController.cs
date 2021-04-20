@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly ILogger<MacrosController> _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
 
         public MacrosController(
             ParameterEditorCollection parameterEditorCollection,
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILogger<MacrosController> logger,
             IHostingEnvironment hostingEnvironment,
-            UmbracoMapper umbracoMapper
+            IUmbracoMapper umbracoMapper
             )
         {
             _parameterEditorCollection = parameterEditorCollection ?? throw new ArgumentNullException(nameof(parameterEditorCollection));

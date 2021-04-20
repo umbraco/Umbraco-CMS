@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Security
             _appCaches = appCaches;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IUser, BackOfficeIdentityUser>(
                 (source, context) =>

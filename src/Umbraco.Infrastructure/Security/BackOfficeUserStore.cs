@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Security
         private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
         private readonly GlobalSettings _globalSettings;
-        private readonly UmbracoMapper _mapper;
+        private readonly IUmbracoMapper _mapper;
         private readonly AppCaches _appCaches;
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Core.Security
             IEntityService entityService,
             IExternalLoginService externalLoginService,
             IOptions<GlobalSettings> globalSettings,
-            UmbracoMapper mapper,
+            IUmbracoMapper mapper,
             BackOfficeErrorDescriber describer,
             AppCaches appCaches)
             : base(describer)

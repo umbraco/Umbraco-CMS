@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             ISystemClock clock,
             IBackOfficeSignInManager backOfficeSignInManager,
             IUserService userService,
-            UmbracoMapper umbracoMapper)
+            IUmbracoMapper umbracoMapper)
             : base(options, logger, encoder, clock)
         {
             _backOfficeSignInManager = backOfficeSignInManager;

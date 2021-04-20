@@ -27,6 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// </summary>
     public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepository>, IMediaRepository
     {
+        private readonly AppCaches _cache;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
@@ -51,6 +52,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             IEventAggregator eventAggregator)
             : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService, eventAggregator)
         {
+            _cache = cache;
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _mediaUrlGenerators = mediaUrlGenerators;
@@ -387,6 +389,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public override int RecycleBinId => Cms.Core.Constants.System.RecycleBinMedia;
 
+        public bool RecycleBinSmells()
+        {
+            var cache = _cache.RuntimeCache;
+            var cacheKey = CacheKeys.MediaRecycleBinCacheKey;
+
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(RecycleBinId) > 0);
+        }
+
         #endregion
 
         #region Read Repository implementation for Guid keys
@@ -513,7 +524,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia, int>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
-                        content[i] = (Core.Models.Media) cached;
+                        content[i] = (Core.Models.Media)cached;
                         continue;
                     }
                 }

@@ -327,10 +327,10 @@ angular.module("umbraco")
                 gotoFolder($scope.currentFolder).then(function () {
                     $timeout(function () {
                         if ($scope.multiPicker) {
-                            var images = _.rest($scope.images, $scope.images.length - files.length);
+                            var images = _.rest(_.sortBy($scope.images, 'id'), $scope.images.length - files.length);
                             images.forEach(image => selectMedia(image));
                         } else {
-                            var image = $scope.images[$scope.images.length - 1];
+                            var image = _.sortBy($scope.images, 'id')[$scope.images.length - 1];
                             clickHandler(image);
                         }
                     });

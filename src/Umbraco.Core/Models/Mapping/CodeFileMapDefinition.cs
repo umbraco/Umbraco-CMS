@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class CodeFileMapDefinition : IMapDefinition
     {
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IStylesheet, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IPartialView, CodeFileDisplay>((source, context) => new CodeFileDisplay(), Map);
