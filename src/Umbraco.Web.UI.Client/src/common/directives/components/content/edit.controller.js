@@ -765,7 +765,13 @@
                             },
                                 function (err) {
                                     clearDirtyState($scope.content.variants);
-                                    model.submitButtonState = "error";
+                                    //model.submitButtonState = "error";
+                                    // Because this is the "save"-action, then we actually save though there was a validation error, therefor we will show success and display the validation errors politely.
+                                    if(err && err.data && err.data.ModelState && Object.keys(err.data.ModelState).length > 0) {
+                                         model.submitButtonState = "success";
+                                    } else {
+                                         model.submitButtonState = "error";
+                                    }
                                     //re-map the dialog model since we've re-bound the properties
                                     dialog.variants = $scope.content.variants;
                                     handleHttpException(err);

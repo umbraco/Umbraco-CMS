@@ -16,7 +16,7 @@
             <div class="umb-list-item"
                  ng-repeat="variant in vm.availableVariants track by variant.compositeId">
                 <ng-form name="saveVariantSelectorForm">
-                    <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--error': saveVariantSelectorForm.saveVariantSelector.$invalid}">
+                    <div class="umb-variant-selector-entry" ng-class="{'umb-list-item--warning': saveVariantSelectorForm.saveVariantSelector.$invalid}">
 
                         <umb-checkbox input-id="{{variant.htmlId}}"
                                       name="saveVariantSelector"
@@ -39,7 +39,7 @@
                                 <span ng-if="variant.isMandatory" ng-class="{'text-error': (variant.publish === false) }"><localize key="general_mandatory"></localize></span>
                             </span>
                             <span class="umb-variant-selector-entry__description" ng-messages="saveVariantSelectorForm.saveVariantSelector.$error" show-validation-on-submit>
-                                <span class="text-error" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
+                                <span class="text-warning" ng-message="valServerField">{{saveVariantSelectorForm.saveVariantSelector.errorMsg}}</span>
                             </span>
 
                         </umb-checkbox>
