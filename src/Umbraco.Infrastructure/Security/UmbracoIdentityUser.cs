@@ -29,6 +29,8 @@ namespace Umbraco.Cms.Core.Security
     /// </remarks>
     public abstract class UmbracoIdentityUser : IdentityUser, IRememberBeingDirty
     {
+        private string _name;
+        private string _passwordConfig;
         private string _id;
         private string _email;
         private string _userName;
@@ -246,6 +248,42 @@ namespace Umbraco.Cms.Core.Security
         /// Gets the <see cref="BeingDirty"/> for change tracking
         /// </summary>
         protected BeingDirty BeingDirty { get; } = new BeingDirty();
+
+        /// <summary>
+        /// Gets a value indicating whether the user is locked out based on the user's lockout end date
+        /// </summary>
+        public bool IsLockedOut
+        {
+            get
+            {
+                bool isLocked = LockoutEnabled && LockoutEnd.HasValue && LockoutEnd.Value.ToLocalTime() >= DateTime.Now;
+                return isLocked;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the IUser IsApproved
+        /// </summary>
+        public bool IsApproved { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user's real name
+        /// </summary>
+        public string Name
+        {
+            get => _name;
+            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+        }
+
+        /// <summary>
+        /// Gets or sets the password config
+        /// </summary>
+        public string PasswordConfig
+        {
+            // TODO: Implement this for members: AB#11550
+            get => _passwordConfig;
+            set => BeingDirty.SetPropertyValueAndDetectChanges(value, ref _passwordConfig, nameof(PasswordConfig));
+        }
 
         /// <inheritdoc />
         public bool IsDirty() => BeingDirty.IsDirty();

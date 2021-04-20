@@ -62,8 +62,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return Ok();
             }
 
-            IEntitySlim loginPageEntity = _entityService.Get(entry.LoginNodeId, UmbracoObjectTypes.Document);
-            IEntitySlim errorPageEntity = _entityService.Get(entry.NoAccessNodeId, UmbracoObjectTypes.Document);
+            var nodes = _entityService
+                .GetAll(UmbracoObjectTypes.Document, entry.LoginNodeId, entry.NoAccessNodeId)
+                .ToDictionary(x => x.Id);
+
+            if (!nodes.TryGetValue(entry.LoginNodeId, out IEntitySlim loginPageEntity))
+            {
+                throw new InvalidOperationException($"Login node with id ${entry.LoginNodeId} was not found");
+            }
+
+            if (!nodes.TryGetValue(entry.NoAccessNodeId, out IEntitySlim errorPageEntity))
+            {
+                throw new InvalidOperationException($"Error node with id ${entry.LoginNodeId} was not found");
+            }
 
             // unwrap the current public access setup for the client
             // - this API method is the single point of entry for both "modes" of public access (single user and role based)

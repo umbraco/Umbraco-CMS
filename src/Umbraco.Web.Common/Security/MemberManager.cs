@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.Common.Security
         public MemberManager(
             IIpResolver ipResolver,
             IMemberUserStore store,
-            IOptions<MemberIdentityOptions> optionsAccessor,
+            IOptions<IdentityOptions> optionsAccessor,
             IPasswordHasher<MemberIdentityUser> passwordHasher,
             IEnumerable<IUserValidator<MemberIdentityUser>> userValidators,
             IEnumerable<IPasswordValidator<MemberIdentityUser>> passwordValidators,

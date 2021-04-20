@@ -47,9 +47,7 @@ namespace Umbraco.Extensions
 
             builder.Services.AddSingleton<MemberModelBuilderFactory>();
 
-            builder.Services
-                .AddSingleton<PublicAccessMiddleware>()
-                .ConfigureOptions<PublicAccessMiddleware>();
+            builder.Services.AddSingleton<PublicAccessMiddleware>();
 
             builder
                 .AddDistributedCache()
