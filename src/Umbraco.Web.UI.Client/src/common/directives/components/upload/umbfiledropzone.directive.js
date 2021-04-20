@@ -20,7 +20,7 @@ TODO
 
 angular.module("umbraco.directives")
     .directive('umbFileDropzone',
-        function ($timeout, Upload, localizationService, umbRequestHelper, overlayService) {
+        function ($timeout, Upload, localizationService, umbRequestHelper, overlayService, mediaHelper) {
             return {
                 restrict: 'E',
                 replace: true,
@@ -88,20 +88,11 @@ angular.module("umbraco.directives")
                                 });
                                 scope.queue = [];
                             }
-                            // One allowed type
-                            if (scope.acceptedMediatypes && scope.acceptedMediatypes.length === 1) {
-                                // Standard setup - set alias to auto select to let the server best decide which media type to use
-                                if (scope.acceptedMediatypes[0].alias === 'Image') {
-                                    scope.contentTypeAlias = "umbracoAutoSelect";
-                                } else {
-                                    scope.contentTypeAlias = scope.acceptedMediatypes[0].alias;
-                                }
+                            // If we have Accepted Media Types, we will ask to choose Media Type, if Choose Media Type returns false, it only had one choice and therefor no reason to
+                            if (scope.acceptedMediatypes && _requestChooseMediaTypeDialog() === false) {
+                                scope.contentTypeAlias = "umbracoAutoSelect";
 
                                 _processQueueItem();
-                            }
-                            // More than one, open dialog
-                            if (scope.acceptedMediatypes && scope.acceptedMediatypes.length > 1) {
-                                _chooseMediaType();
                             }
                         }
                     }
@@ -146,8 +137,8 @@ angular.module("umbraco.directives")
                                   // set percentage property on file
                                   file.uploadProgress = progressPercentage;
                                   // set uploading status on file
-                                  file.uploadStatus = "uploading"; 
-                                }                                
+                                  file.uploadStatus = "uploading";
+                                }
                             })
                             .success(function(data, status, headers, config) {
                                 if (data.notifications && data.notifications.length > 0) {
@@ -195,12 +186,54 @@ angular.module("umbraco.directives")
                             });
                     }
 
-                    function _chooseMediaType() {
+                    function _requestChooseMediaTypeDialog() {
+
+                        console.log("scope.acceptedMediatypes", scope.acceptedMediatypes);
+
+                        if (scope.acceptedMediatypes.length === 1) {
+                            // if only one accepted type, then we wont ask to choose.
+                            return false;
+                        }
+
+                        var uploadFileExtensions = scope.queue.map(file => mediaHelper.getFileExtension(file.name));
+
+                        var filteredMediaTypes = scope.acceptedMediatypes.filter(mediaType => {
+                            var uploadProperty;
+                            mediaType.groups.forEach(group => {
+                                var foundProperty = group.properties.find(property => property.alias === "umbracoFile");
+                                if(foundProperty) {
+                                    uploadProperty = foundProperty;
+                                }
+                            });
+                            if(uploadProperty) {
+                                var acceptedFileExtensions;
+                                if(uploadProperty.editor === "Umbraco.ImageCropper") {
+                                    acceptedFileExtensions = Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes;
+                                } else if(uploadProperty.editor === "Umbraco.UploadField") {
+                                    acceptedFileExtensions = (uploadProperty.config.fileExtensions && uploadProperty.config.fileExtensions.length > 0) ? uploadProperty.config.fileExtensions.map(x => x.value) : null;
+                                    console.log(uploadProperty.config.fileExtensions, acceptedFileExtensions)
+                                }
+                                if(acceptedFileExtensions && acceptedFileExtensions.length > 0) {
+                                    console.log(uploadFileExtensions, uploadFileExtensions.length === uploadFileExtensions.filter(fileExt => acceptedFileExtensions.includes(fileExt)).length)
+                                    return uploadFileExtensions.length === uploadFileExtensions.filter(fileExt => acceptedFileExtensions.includes(fileExt)).length;
+                                }
+                                return true;
+                            }
+                            return false;
+                        })
+                        console.log("filteredMediaTypes", filteredMediaTypes);
+
+                        var mediaTypesNotFile = filteredMediaTypes.filter(mediaType => mediaType.alias !== "File");
+
+                        if (mediaTypesNotFile.length <= 1) {
+                            // if only one  or less accepted types when we have filtered type 'file' out, then we wont ask to choose.
+                            return false;
+                        }
 
                         const dialog = {
                             view: "itempicker",
-                            filter: scope.acceptedMediatypes.length > 15,
-                            availableItems: scope.acceptedMediatypes,
+                            filter: filteredMediaTypes.length > 8,
+                            availableItems: filteredMediaTypes,
                             submit: function (model) {
                                 scope.contentTypeAlias = model.selectedItem.alias;
                                 _processQueueItem();
@@ -211,7 +244,7 @@ angular.module("umbraco.directives")
 
                                 scope.queue.map(function (file) {
                                     file.uploadStatus = "error";
-                                    file.serverErrorMessage = "Cannot upload this file, no mediatype selected";
+                                    file.serverErrorMessage = "No files uploaded, no mediatype selected";
                                     scope.rejected.push(file);
                                 });
                                 scope.queue = [];
@@ -224,6 +257,8 @@ angular.module("umbraco.directives")
                             dialog.title = value;
                             overlayService.open(dialog);
                         });
+
+                        return true;// yes, we did open the choose-media dialog, therefor we return true.
                     }
 
                     scope.handleFiles = function(files, event) {
