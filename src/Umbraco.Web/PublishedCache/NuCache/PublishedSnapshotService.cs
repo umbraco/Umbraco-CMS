@@ -84,7 +84,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
             UrlSegmentProviderCollection urlSegmentProviders,
-            ISyncBootStateAccessor syncBootStateAccessor),
+            ISyncBootStateAccessor syncBootStateAccessor,
             IContentCacheDataSerializerFactory contentCacheDataSerializerFactory, 
             ContentDataSerializer contentDataSerializer = null)
             : base(publishedSnapshotAccessor, variationContextAccessor)
