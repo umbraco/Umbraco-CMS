@@ -11,7 +11,7 @@ namespace Umbraco.Core.Cache
     /// Implements <see cref="IAppPolicyCache"/> on top of a <see cref="System.Web.Caching.Cache"/>.
     /// </summary>
     /// <remarks>The underlying cache is expected to be HttpRuntime.Cache.</remarks>
-    internal class WebCachingAppCache : FastDictionaryAppCacheBase, IAppPolicyCache
+    internal class WebCachingAppCache : FastDictionaryAppCacheBase, IAppPolicyCache, IDisposable
     {
         // locker object that supports upgradeable read locking
         // does not need to support recursion if we implement the cache correctly and ensure
@@ -19,6 +19,7 @@ namespace Umbraco.Core.Cache
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
 
         private readonly System.Web.Caching.Cache _cache;
+        private bool _disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebCachingAppCache"/> class.
@@ -203,6 +204,25 @@ namespace Umbraco.Core.Cache
                 if (_locker.IsWriteLockHeld)
                     _locker.ExitWriteLock();
             }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _locker.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }

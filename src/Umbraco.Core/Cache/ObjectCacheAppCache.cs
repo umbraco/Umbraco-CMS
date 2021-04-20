@@ -13,9 +13,10 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Implements <see cref="IAppPolicyCache"/> on top of a <see cref="ObjectCache"/>.
     /// </summary>
-    public class ObjectCacheAppCache : IAppPolicyCache
+    public class ObjectCacheAppCache : IAppPolicyCache, IDisposable
     {
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+        private bool _disposedValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ObjectCacheAppCache"/>.
@@ -359,6 +360,24 @@ namespace Umbraco.Core.Cache
                 };
             }
             return policy;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _locker.Dispose();
+                }
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }

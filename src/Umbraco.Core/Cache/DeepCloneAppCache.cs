@@ -12,8 +12,10 @@ namespace Umbraco.Core.Cache
     /// instance, and ensuring that all inserts and returns are deep cloned copies of the cache item,
     /// when the item is deep-cloneable.
     /// </summary>
-    internal class DeepCloneAppCache : IAppPolicyCache
+    internal class DeepCloneAppCache : IAppPolicyCache, IDisposable
     {
+        private bool _disposedValue;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="DeepCloneAppCache"/> class.
         /// </summary>
@@ -152,6 +154,25 @@ namespace Umbraco.Core.Cache
             }
 
             return input;
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    InnerCache.DisposeIfDisposable();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
         }
     }
 }

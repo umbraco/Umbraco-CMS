@@ -6,8 +6,10 @@ namespace Umbraco.Core.Cache
     /// <summary>
     /// Represents the application caches.
     /// </summary>
-    public class AppCaches
+    public class AppCaches : IDisposable
     {
+        private bool _disposedValue;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="AppCaches"/> for use in a web application.
         /// </summary>
@@ -82,5 +84,26 @@ namespace Umbraco.Core.Cache
         /// search through all keys on a global scale.</para>
         /// </remarks>
         public IsolatedCaches IsolatedCaches { get; }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    RuntimeCache.DisposeIfDisposable();
+                    RequestCache.DisposeIfDisposable();
+                    IsolatedCaches.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+        }
     }
 }
