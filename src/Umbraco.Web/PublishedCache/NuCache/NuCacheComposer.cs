@@ -1,6 +1,7 @@
 ﻿using System.Configuration;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Sync;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
@@ -26,6 +27,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
             composition.RegisterUnique<IPropertyCacheCompressionOptions, NoopPropertyCacheCompressionOptions>();
 
             composition.RegisterUnique(factory => new ContentDataSerializer(new DictionaryOfPropertyDataSerializer()));
+
+            //Overriden on Run state in DatabaseServerRegistrarAndMessengerComposer
+            composition.Register<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>(Lifetime.Singleton);
 
             // register the NuCache database data source
             composition.RegisterUnique<IDataSource, DatabaseDataSource>();
