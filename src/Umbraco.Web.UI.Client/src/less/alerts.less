@@ -54,6 +54,15 @@
   border-color: @errorBorder;
   color: @errorText;
 }
+
+.alert-warning() {
+    background-color: @warningBackground;
+    border-color: @warningBorder;
+    color: @warningText;
+}
+.alert-warning {
+    .alert-warning()
+}
 .alert-danger h4,
 .alert-error h4 {
   color: @errorText;
@@ -109,6 +118,13 @@
     font-size: 14px;
     padding: 6px 16px 6px 12px;
     margin-bottom: 6px;
+
+    .show-validation-type-warning & {
+        .alert-warning();
+        &.alert-error::after {
+            border-top-color: @warningBackground;
+        }
+    }
 
     &::after {
         content:'';

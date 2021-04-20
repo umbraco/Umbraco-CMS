@@ -788,7 +788,12 @@
                 }).then(function () {
                     $scope.page.saveButtonState = "success";
                 }, function (err) {
-                    $scope.page.saveButtonState = "error";
+                    // Because this is the "save"-action, then we actually save though there was a validation error, therefor we will show success and display the validation errors politely.
+                    if(err && err.data && err.data.ModelState && Object.keys(err.data.ModelState).length > 0) {
+                        $scope.page.saveButtonState = "success";
+                    } else {
+                        $scope.page.saveButtonState = "error";
+                    }
                     handleHttpException(err);
                 });
             }

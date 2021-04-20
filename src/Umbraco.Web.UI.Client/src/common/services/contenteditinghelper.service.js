@@ -32,7 +32,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
         return true;
     }
 
-    function showNotificationsForModelsState(ms) {
+    function showNotificationsForModelsState(ms, messageType) {
+        messageType = messageType || 2;
         for (const [key, value] of Object.entries(ms)) {
 
             var errorMsg = value[0];
@@ -42,12 +43,14 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 var idsToErrors = serverValidationManager.parseComplexEditorError(errorMsg, "");
                 idsToErrors.forEach(x => {
                     if (x.modelState) {
-                        showNotificationsForModelsState(x.modelState);
+                        showNotificationsForModelsState(x.modelState, messageType);
                     }
                 });
             }
             else if (value[0]) {
-                notificationsService.error("Validation", value[0]);
+                //notificationsService.error("Validation", value[0]);
+                console.log({type:messageType, header:"Validation", message:value[0]})
+                notificationsService.showNotification({type:messageType, header:"Validation", message:value[0]})
             }
         }
     }
@@ -124,6 +127,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                             showNotifications: args.showNotifications,
                             softRedirect: args.softRedirect,
                             err: err,
+                            action: args.action,
                             rebindCallback: function () {
                                 // if the error contains data, we want to map that back as we want to continue editing this save. Especially important when the content is new as the returned data will contain ID etc.
                                 if(err.data) {
@@ -639,9 +643,15 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     //wire up the server validation errs
                     formHelper.handleServerValidation(args.err.data.ModelState);
 
+                    var messageType = 2;//error
+                    console.log(args)
+                    if (args.action === "save") {
+                        messageType = 4;//warning
+                    }
+
                     //add model state errors to notifications
                     if (args.showNotifications) {
-                        showNotificationsForModelsState(args.err.data.ModelState);
+                        showNotificationsForModelsState(args.err.data.ModelState, messageType);
                     }
 
                     if (!this.redirectToCreatedContent(args.err.data.id, args.softRedirect) || args.softRedirect) {
