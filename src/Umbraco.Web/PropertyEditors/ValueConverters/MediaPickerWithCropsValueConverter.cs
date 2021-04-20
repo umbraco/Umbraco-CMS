@@ -14,30 +14,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     [DefaultPropertyValueConverter]
     public class MediaPickerWithCropsValueConverter : PropertyValueConverterBase
     {
-        // JSON is an array of the following JSON
-        /*
-        "key": "d1e9c080-5aef-48f6-9b37-47e84de7ad8b",
-        "mediaKey": "80e2507b-c5f9-4c8a-ab14-5dae717a49b3",
-        "crops": [
-            {
-                "alias": "square",
-                "label": "Square",
-                "width": 200,
-                "height": 200,
-                "coordinates": {
-                    "x1": 0.4489663034789123,
-                    "y1": 0.7192332259400422,
-                    "x2": 0.39324276949939146,
-                    "y2": 0
-                }
-            },
-            ...
-        ]
-        "focalPoint": {
-            "left": 0.846,
-            "top": 0.7964285714285714
-        }
-        */
 
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
