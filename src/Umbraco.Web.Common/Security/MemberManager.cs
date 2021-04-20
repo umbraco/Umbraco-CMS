@@ -232,7 +232,7 @@ namespace Umbraco.Cms.Web.Common.Security
                     async () => await getUserRolesAsync());
             }
             return result;
-        }
+        }        
 
         public IPublishedMember AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
     }

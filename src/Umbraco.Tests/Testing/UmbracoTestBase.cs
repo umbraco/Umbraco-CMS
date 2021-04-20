@@ -486,7 +486,7 @@ namespace Umbraco.Tests.Testing
                 connectionStrings,
                 new Lazy<IMapperCollection>(f.GetRequiredService<IMapperCollection>),
                 TestHelper.DbProviderFactoryCreator,
-                new DatabaseSchemaCreatorFactory(LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion)));
+                new DatabaseSchemaCreatorFactory(LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, Mock.Of<IEventAggregator>())));
 
             Builder.Services.AddUnique(f => f.GetService<IUmbracoDatabaseFactory>().SqlContext);
 

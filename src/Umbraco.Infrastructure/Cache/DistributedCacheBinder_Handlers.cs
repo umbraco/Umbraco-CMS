@@ -44,7 +44,8 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<DomainSavedNotification>,
         INotificationHandler<MacroSavedNotification>,
         INotificationHandler<MacroDeletedNotification>,
-        INotificationHandler<MediaTreeChangeNotification>
+        INotificationHandler<MediaTreeChangeNotification>,
+        INotificationHandler<ContentTreeChangeNotification>
     {
         private List<Action> _unbinders;
 
@@ -83,10 +84,6 @@ namespace Umbraco.Cms.Core.Cache
             Bind(() => MemberTypeService.Changed += MemberTypeService_Changed,
                 () => MemberTypeService.Changed -= MemberTypeService_Changed);
 
-            // bind to content events
-            Bind(() => ContentService.TreeChanged += ContentService_TreeChanged,// handles all content changes
-                () => ContentService.TreeChanged -= ContentService_TreeChanged);
-
             // TreeChanged should also deal with this
             //Bind(() => ContentService.SavedBlueprint += ContentService_SavedBlueprint,
             //    () => ContentService.SavedBlueprint -= ContentService_SavedBlueprint);
@@ -124,9 +121,10 @@ namespace Umbraco.Cms.Core.Cache
         {
         }
 
-        private void ContentService_TreeChanged(IContentService sender, TreeChange<IContent>.EventArgs args)
+
+        public void Handle(ContentTreeChangeNotification notification)
         {
-            _distributedCache.RefreshContentCache(args.Changes.ToArray());
+            _distributedCache.RefreshContentCache(notification.Changes.ToArray());
         }
 
         //private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
