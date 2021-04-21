@@ -76,7 +76,7 @@
 
                 // get pre values
                 dataTypeResource.getPreValues(newDataType.selectedEditor).then(function(preValues) {
-                    newDataType.preValues = preValues;
+                    newDataType.preValues = dataTypeHelper.createPreValueProps(preValues);
                     vm.dataType = newDataType;
                     vm.loadingDataType = false;
                 });
@@ -88,6 +88,7 @@
         function getDataType() {
             vm.loadingDataType = true;
             dataTypeResource.getById($scope.model.id).then(function (dataType) {
+                dataType.preValues = dataTypeHelper.createPreValueProps(dataType.preValues);
                 vm.dataType = dataType;
                 vm.loadingDataType = false;
             });
