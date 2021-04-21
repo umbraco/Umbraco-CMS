@@ -60,7 +60,6 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
                 vm.preValuesLoaded = true;
                 vm.content = data;
 
-                console.log(vm.content.preValues);
                 createPreValueProps(vm.content.preValues);
 
                 setHeaderNameState(vm.content);
