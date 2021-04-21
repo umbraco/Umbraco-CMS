@@ -136,7 +136,8 @@
             scope: {
                 navigation: "=",
                 onSelect: "&",
-                onAnchorSelect: "&"
+                onAnchorSelect: "&",
+                test: "<"
             },
             link: link
         };

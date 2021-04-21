@@ -14,6 +14,8 @@
             var scrollableNode = appRootNode.closest(".umb-scrollable");
             scrollableNode.addEventListener("scroll", onScroll);
             scrollableNode.addEventListener("mousewheel", cancelScrollTween);
+
+            $scope.activeAppId = '1';
             
             function onScroll(event) {
                 
@@ -97,6 +99,9 @@
                     var activeAnchor = getActiveAnchor();
                     $timeout(jumpTo.bind(null, [activeAnchor.id]));
                 }
+
+                $scope.activeAppId = $args.app.id;
+                $scope.$evalAsync();
             });
             
             $scope.$on("editors.apps.appAnchorChanged", function($event, $args) {

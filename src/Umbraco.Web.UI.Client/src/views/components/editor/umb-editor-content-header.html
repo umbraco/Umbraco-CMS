@@ -100,12 +100,13 @@
             </button>
         </div>
 
-        <div ng-if="editor.variantApps && splitViewOpen !== true">
+        <div ng-if="editor.variantApps">
             <umb-editor-navigation
                 data-element="editor-sub-views"
                 navigation="editor.variantApps"
                 on-select="selectNavigationItem(item)"
-                on-anchor-select="selectAnchorItem(item, anchor)">
+                on-anchor-select="selectAnchorItem(item, anchor)"
+                test="splitViewOpen === true"> <!-- TODO: clean up -->
             </umb-editor-navigation>
         </div>
 

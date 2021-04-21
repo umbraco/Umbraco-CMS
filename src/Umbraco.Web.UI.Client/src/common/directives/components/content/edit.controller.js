@@ -222,9 +222,73 @@
 
             //we are editing so get the content item from the server
             return $scope.getMethod()($scope.contentId)
-                .then(function (data) {
+                .then(function (data) {                    
+
                     $scope.content = data;
 
+                    console.log($scope.content);
+
+                    // TODO: remove all of this - hacking for testing with starter kit
+                    if ($scope.content.contentTypeAlias === 'home') {
+                        $scope.content.apps = $scope.content.apps.filter(app => app.alias !== 'umbContent');
+                    
+                        $scope.content.test = [
+                            {
+                                id: '1',
+                                name: 'Content',
+                                alias: 'contentTest',
+                                icon: 'icon-document',
+                                view: 'views/content/apps/content/content.html'
+                            },
+                            {
+                                id: '2',
+                                name: 'Design',
+                                alias: 'designTest',
+                                icon: 'icon-brush',
+                                view: 'views/content/apps/content/content.html'
+                            },
+                            {
+                                id: '3',
+                                name: 'SEO',
+                                alias: 'seoTest',
+                                icon: 'icon-search',
+                                view: 'views/content/apps/content/content.html'
+                            }
+                        ];
+    
+                        $scope.content.variants.forEach(variant => {
+                            variant.tabs.forEach(tab => {
+                                console.log(tab.alias);
+
+                                if (tab.alias === 'Hero') {
+                                    tab.testId = '1';
+                                }
+    
+                                if (tab.alias === 'Content') {
+                                    tab.testId = '1';
+                                }
+    
+                                if (tab.alias === 'Footer') {
+                                    tab.testId = '1';
+                                }
+    
+                                if (tab.alias === 'Design') {
+                                    tab.testId = '2';
+                                }
+    
+                                if (tab.seo === 'Media') {
+                                    tab.testId = '3';
+                                }
+                            });
+                        });
+
+                        $scope.content.apps = [...$scope.content.test, ...$scope.content.apps];
+                    }
+
+                    if ($scope.content.contentTypeAlias === 'products') {
+
+                    }
+                    
                     appendRuntimeData();
                     init();
 
@@ -281,6 +345,9 @@
             $scope.page.saveButtonStyle = content.trashed || content.isElement || isBlueprint ? "primary" : "info";
             // only create the save/publish/preview buttons if the
             // content app is "Conent"
+
+            // TODO: Add this back - only for testing purposes
+            /*
             if ($scope.activeApp && !contentAppHelper.isContentBasedApp($scope.activeApp)) {
                 $scope.defaultButton = null;
                 $scope.subButtons = null;
@@ -288,6 +355,7 @@
                 $scope.page.showPreviewButton = false;
                 return;
             }
+            */
 
             // create the save button
             if (_.contains($scope.content.allowedActions, "A")) {

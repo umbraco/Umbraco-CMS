@@ -110,7 +110,8 @@
         function onAppChanged(activeApp) {
 
             // disable the name field if the active content app is not "Content" or "Info"
-            vm.nameDisabled = (activeApp && !contentAppHelper.isContentBasedApp(activeApp));
+            vm.nameDisabled = (activeApp && !contentAppHelper.isContentBasedApp(activeApp)); 
+            vm.nameDisabled = false; // TODO - remove this. Only for testing purposes
         }
 
         /**

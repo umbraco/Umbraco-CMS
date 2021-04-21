@@ -1,7 +1,6 @@
 ﻿<div>
     <ng-form name="tabbedContentForm">
-        <div class="umb-group-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.id">
-
+        <div class="umb-group-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.id" ng-if="group.testId === activeAppId">
             <div class="umb-group-panel__header">
                 <div id="group-{{group.id}}">{{ group.label }}</div>
             </div>
@@ -23,7 +22,16 @@
 
                 </umb-property>
             </div>
+        </div>
 
+        <div ng-if="activeAppId === '3'" class="umb-group-panel">
+            <div class="umb-group-panel__header">
+                <div>Meta stuff</div>
+            </div>
+
+            <div class="umb-group-panel__content">
+                Some properties for SEO input
+            </div>
         </div>
 
         <umb-empty-state
