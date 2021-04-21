@@ -35,11 +35,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
         public MemberManager CreateSut()
         {
+            var scopeProvider = new Mock<IScopeProvider>().Object;
             _mockMemberService = new Mock<IMemberService>();
             _fakeMemberStore = new MemberUserStore(
                 _mockMemberService.Object,
-                new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>())),
-                new Mock<IScopeProvider>().Object,
+                new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>()), scopeProvider),
+                scopeProvider,
                 new IdentityErrorDescriber(),
                 Mock.Of<IPublishedMemberCache>());
 
@@ -96,7 +97,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             {
                 PasswordConfig = "testConfig"
             };
-            
+
             //act
             IdentityResult identityResult = await sut.CreateAsync(fakeUser);
 

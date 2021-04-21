@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence;
@@ -65,8 +66,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
-            IJsonSerializer serializer)
-            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService)
+            IJsonSerializer serializer,
+            IEventAggregator eventAggregator)
+            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
@@ -352,9 +354,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PerformDeleteVersion(int id, int versionId)
         {
-            // raise event first else potential FK issues
-            OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
-
             Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
             Database.Delete<ContentVersionCultureVariationDto>("WHERE versionId = @versionId", new { versionId });
             Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new { versionId });
@@ -497,7 +496,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.SetCultureEdited(editedCultures);
 
             // trigger here, before we reset Published etc
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
 
             // flip the entity's published property
             // this also flips its published state
@@ -711,7 +710,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             // trigger here, before we reset Published etc
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
 
             if (!isMoving)
             {
@@ -789,8 +788,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PersistDeletedItem(IContent entity)
         {
-            // raise event first else potential FK issues
-            OnUowRemovingEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            // Raise event first else potential FK issues
+            OnUowRemovingEntity(entity);
 
             //We need to clear out all access rules but we need to do this in a manual way since
             // nothing in that table is joined to a content id
@@ -934,6 +933,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         #region Recycle Bin
 
         public override int RecycleBinId => Cms.Core.Constants.System.RecycleBinContent;
+
+        public bool RecycleBinSmells()
+        {
+            var cache = _appCaches.RuntimeCache;
+            var cacheKey = CacheKeys.ContentRecycleBinCacheKey;
+
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(RecycleBinId) > 0);
+        }
 
         #endregion
 

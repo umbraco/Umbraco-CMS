@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             Layouts = new[]
             {
                 new Layout { Name = "List", Icon = "icon-list", IsSystem = 1, Selected = true, Path = "views/propertyeditors/listview/layouts/list/list.html" },
-                new Layout { Name = "grid", Icon = "icon-thumbnails-small", IsSystem = 1, Selected = true, Path = "views/propertyeditors/listview/layouts/grid/grid.html" }
+                new Layout { Name = "Grid", Icon = "icon-thumbnails-small", IsSystem = 1, Selected = true, Path = "views/propertyeditors/listview/layouts/grid/grid.html" }
             };
 
             IncludeProperties = new[]

@@ -4,6 +4,7 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Mapping
@@ -30,7 +31,7 @@ namespace Umbraco.Cms.Core.Mapping
     /// using the Map{TTarget}(object source, ...) TSource is defined as source.GetType().</para>
     /// <para>In both cases, TTarget is explicit and not typeof(target).</para>
     /// </remarks>
-    public class UmbracoMapper
+    public class UmbracoMapper : IUmbracoMapper
     {
         // note
         //
@@ -43,12 +44,17 @@ namespace Umbraco.Cms.Core.Mapping
         private readonly ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>> _maps
             = new ConcurrentDictionary<Type, Dictionary<Type, Action<object, object, MapperContext>>>();
 
+        private readonly IScopeProvider _scopeProvider;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoMapper"/> class.
         /// </summary>
         /// <param name="profiles"></param>
-        public UmbracoMapper(MapDefinitionCollection profiles)
+        /// <param name="scopeProvider"></param>
+        public UmbracoMapper(MapDefinitionCollection profiles, IScopeProvider scopeProvider)
         {
+            _scopeProvider = scopeProvider;
+
             foreach (var profile in profiles)
                 profile.DefineMaps(this);
         }
@@ -204,7 +210,10 @@ namespace Umbraco.Cms.Core.Mapping
             if (ctor != null && map != null)
             {
                 var target = ctor(source, context);
-                map(source, target, context);
+                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+                {
+                    map(source, target, context);
+                }
                 return (TTarget)target;
             }
 
@@ -249,11 +258,14 @@ namespace Umbraco.Cms.Core.Mapping
         {
             var targetList = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(targetGenericArg));
 
-            foreach (var sourceItem in source)
+            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {
-                var targetItem = ctor(sourceItem, context);
-                map(sourceItem, targetItem, context);
-                targetList.Add(targetItem);
+                foreach (var sourceItem in source)
+                {
+                    var targetItem = ctor(sourceItem, context);
+                    map(sourceItem, targetItem, context);
+                    targetList.Add(targetItem);
+                }
             }
 
             object target = targetList;
@@ -316,7 +328,10 @@ namespace Umbraco.Cms.Core.Mapping
             // if there is a direct map, map
             if (map != null)
             {
-                map(source, target, context);
+                using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+                {
+                    map(source, target, context);
+                }
                 return target;
             }
 

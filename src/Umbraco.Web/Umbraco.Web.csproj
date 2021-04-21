@@ -71,6 +71,8 @@
     <PackageReference Include="HtmlSanitizer">
       <Version>5.0.376</Version>
     </PackageReference>
+    <PackageReference Include="Examine" Version="1.1.0" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
       <Version>2.9.1</Version>
     </PackageReference>
@@ -136,7 +138,6 @@
     <Compile Include="AspNet\FrameworkMarchal.cs" />
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
     <Compile Include="HttpContextExtensions.cs" />
-    <Compile Include="Macros\MemberUserKeyProvider.cs" />
     <Compile Include="Security\BackOfficeSecurity.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
     <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />

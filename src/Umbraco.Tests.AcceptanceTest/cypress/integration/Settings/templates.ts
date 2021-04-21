@@ -139,7 +139,7 @@ context('Templates', () => {
         cy.get('.umb-card-grid-item').contains(name).click();
 
         // Assert
-        cy.get('.ace_content').contains('@Umbraco.RenderMacro("' + name + '")').should('exist');
+        cy.get('.ace_content').contains('@await Umbraco.RenderMacroAsync("' + name + '")').should('exist');
 
         // Clean
         cy.umbracoEnsureTemplateNameNotExists(name);

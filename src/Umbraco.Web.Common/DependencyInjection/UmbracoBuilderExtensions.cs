@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -287,7 +286,6 @@ namespace Umbraco.Extensions
 
             builder.Services.AddUnique<IMacroRenderer, MacroRenderer>();
             builder.Services.AddUnique<PartialViewMacroEngine>();
-            builder.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
 
             // register the umbraco context factory
 

@@ -14,9 +14,8 @@ namespace Umbraco.Cms.Core.Cache
     /// </summary>
     public sealed class DatabaseServerMessengerNotificationHandler : INotificationHandler<UmbracoApplicationStarting>, INotificationHandler<UmbracoRequestEnd>
     {
-        private readonly IServerMessenger _messenger; 
+        private readonly IServerMessenger _messenger;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
-        private readonly IDistributedCacheBinder _distributedCacheBinder;
         private readonly ILogger<DatabaseServerMessengerNotificationHandler> _logger;
         private readonly IRuntimeState _runtimeState;
 
@@ -24,14 +23,12 @@ namespace Umbraco.Cms.Core.Cache
         /// Initializes a new instance of the <see cref="DatabaseServerMessengerNotificationHandler"/> class.
         /// </summary>
         public DatabaseServerMessengerNotificationHandler(
-            IServerMessenger serverMessenger, 
+            IServerMessenger serverMessenger,
             IUmbracoDatabaseFactory databaseFactory,
-            IDistributedCacheBinder distributedCacheBinder,
             ILogger<DatabaseServerMessengerNotificationHandler> logger,
             IRuntimeState runtimeState)
-        { 
+        {
             _databaseFactory = databaseFactory;
-            _distributedCacheBinder = distributedCacheBinder;
             _logger = logger;
             _messenger = serverMessenger;
             _runtimeState = runtimeState;
@@ -50,8 +47,6 @@ namespace Umbraco.Cms.Core.Cache
             }
 			else
             {
-                _distributedCacheBinder.BindEvents();
-
                 // Sync on startup, this will run through the messenger's initialization sequence
                 _messenger?.Sync();
             }

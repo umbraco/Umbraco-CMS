@@ -54,13 +54,13 @@ namespace Umbraco.Cms.Core.Templates
         }
 
         /// <inheritdoc/>
-        public IHtmlEncodedString RenderMacro(int contentId, string alias) => RenderMacro(contentId, alias, new { });
+        public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias) => await RenderMacroAsync(contentId, alias, new { });
 
         /// <inheritdoc/>
-        public IHtmlEncodedString RenderMacro(int contentId, string alias, object parameters) => RenderMacro(contentId, alias, parameters?.ToDictionary<object>());
+        public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, object parameters) => await RenderMacroAsync(contentId, alias, parameters?.ToDictionary<object>());
 
         /// <inheritdoc/>
-        public IHtmlEncodedString RenderMacro(int contentId, string alias, IDictionary<string, object> parameters)
+        public async Task<IHtmlEncodedString> RenderMacroAsync(int contentId, string alias, IDictionary<string, object> parameters)
         {
             if (contentId == default)
             {
@@ -74,24 +74,24 @@ namespace Umbraco.Cms.Core.Templates
                 throw new InvalidOperationException("Cannot render a macro, no content found by id " + contentId);
             }
 
-            return RenderMacro(content, alias, parameters);
+            return await RenderMacroAsync(content, alias, parameters);
         }
 
         /// <inheritdoc/>
-        public IHtmlEncodedString RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object> parameters)
+        public async Task<IHtmlEncodedString> RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object> parameters)
         {
             if(content == null)
             {
                 throw new InvalidOperationException("Cannot render a macro, IPublishedContent is null");
             }
 
-            return RenderMacro(content, alias, parameters);
+            return await RenderMacroAsync(content, alias, parameters);
         }
 
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
         /// </summary>
-        private IHtmlEncodedString RenderMacro(IPublishedContent content, string alias, IDictionary<string, object> parameters)
+        private async Task<IHtmlEncodedString> RenderMacroAsync(IPublishedContent content, string alias, IDictionary<string, object> parameters)
         {
             if (content == null)
             {
@@ -104,7 +104,7 @@ namespace Umbraco.Cms.Core.Templates
                 x => x.Key.ToLowerInvariant(),
                 i => (i.Value is string) ? WebUtility.HtmlDecode(i.Value.ToString()) : i.Value);
 
-            var html = _macroRenderer.Render(alias, content, macroProps).Text;
+            var html = (await _macroRenderer.RenderAsync(alias, content, macroProps)).Text;
 
             return new HtmlEncodedString(html);
         }

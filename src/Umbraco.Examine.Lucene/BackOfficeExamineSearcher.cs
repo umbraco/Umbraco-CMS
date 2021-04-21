@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         private readonly IEntityService _entityService;
         private readonly IUmbracoTreeSearcherFields _treeSearcherFields;
         private readonly AppCaches _appCaches;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
 
         public BackOfficeExamineSearcher(IExamineManager examineManager,
@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             IEntityService entityService,
             IUmbracoTreeSearcherFields treeSearcherFields,
             AppCaches appCaches,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IPublishedUrlProvider publishedUrlProvider)
         {
             _examineManager = examineManager;

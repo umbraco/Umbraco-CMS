@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             _tabsAndPropertiesMapper = tabsAndPropertiesMapper;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IMember, MemberDisplay>((source, context) => new MemberDisplay(), Map);
             mapper.Define<IMember, MemberBasic>((source, context) => new MemberBasic(), Map);

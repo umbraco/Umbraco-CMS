@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             _contentVariantMapper = new ContentVariantMapper(_localizationService, localizedTextService);
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IContent, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
             mapper.Define<IContent, ContentItemDisplay>((source, context) => new ContentItemDisplay(), Map);

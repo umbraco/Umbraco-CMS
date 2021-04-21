@@ -139,7 +139,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters
         {
             ILogger<ContentSaveModelValidator> logger = Services.GetRequiredService<ILogger<ContentSaveModelValidator>>();
             IPropertyValidationService propertyValidationService = Services.GetRequiredService<IPropertyValidationService>();
-            UmbracoMapper umbracoMapper = Services.GetRequiredService<UmbracoMapper>();
+            IUmbracoMapper umbracoMapper = Services.GetRequiredService<IUmbracoMapper>();
 
             var validator = new ContentSaveModelValidator(logger, propertyValidationService);
 

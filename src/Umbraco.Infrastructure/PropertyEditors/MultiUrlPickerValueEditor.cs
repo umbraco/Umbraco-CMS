@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error getting links", ex);
+                _logger.LogError(ex, "Error getting links");
             }
 
             return base.ToEditor(property, culture, segment);
@@ -173,7 +173,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error saving links", ex);
+                _logger.LogError(ex, "Error saving links");
             }
 
             return base.FromEditor(editorValue, currentValue);

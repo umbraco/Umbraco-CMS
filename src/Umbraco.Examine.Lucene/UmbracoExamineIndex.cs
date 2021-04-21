@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 using (ExecutionContext.SuppressFlow())
                 {
                     base.PerformIndexItems(values, onComplete);
-                }                
+                }
             }
         }
 

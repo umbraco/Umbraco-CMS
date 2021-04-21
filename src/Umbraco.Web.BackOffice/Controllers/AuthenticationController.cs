@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeSignInManager _signInManager;
         private readonly IUserService _userService;
         private readonly ILocalizedTextService _textService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly GlobalSettings _globalSettings;
         private readonly SecuritySettings _securitySettings;
         private readonly ILogger<AuthenticationController> _logger;
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeSignInManager signInManager,
             IUserService userService,
             ILocalizedTextService textService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IOptions<GlobalSettings> globalSettings,
             IOptions<SecuritySettings> securitySettings,
             ILogger<AuthenticationController> logger,

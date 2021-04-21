@@ -117,7 +117,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlEncodedString RenderMacro(string alias)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, null);
+            return _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, null).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -128,7 +128,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlEncodedString RenderMacro(string alias, object parameters)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
+            return _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>()).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -139,7 +139,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlEncodedString RenderMacro(string alias, IDictionary<string, object> parameters)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters);
+            return _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, parameters).GetAwaiter().GetResult();
         }
 
         #endregion

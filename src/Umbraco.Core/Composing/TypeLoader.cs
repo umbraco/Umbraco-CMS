@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Text;
 using System.Threading;
@@ -74,6 +75,8 @@ namespace Umbraco.Cms.Core.Composing
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
             _assemblies = assembliesToScan;
+
+            _fileBasePath = new Lazy<string>(GetFileBasePath);
 
             _fileBasePath = new Lazy<string>(GetFileBasePath);
 

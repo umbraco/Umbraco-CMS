@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
             return new MemberUserStore(
                 _mockMemberService.Object,
-                new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>())),
+                new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>()), mockScopeProvider.Object),
                 mockScopeProvider.Object,
                 new IdentityErrorDescriber(),
                 Mock.Of<IPublishedMemberCache>());

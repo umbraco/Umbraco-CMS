@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class EntityMapDefinition : IMapDefinition
     {
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IEntitySlim, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<PropertyType, EntityBasic>((source, context) => new EntityBasic(), Map);
