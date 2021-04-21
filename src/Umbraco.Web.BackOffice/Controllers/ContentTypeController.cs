@@ -44,7 +44,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IEntityXmlSerializer _serializer;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IContentTypeService _contentTypeService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IDataTypeService _dataTypeService;
         private readonly IShortStringHelper _shortStringHelper;
@@ -61,7 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IContentTypeService contentTypeService,
             IMediaTypeService mediaTypeService,
             IMemberTypeService memberTypeService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
             IEntityXmlSerializer serializer,
             PropertyEditorCollection propertyEditors,

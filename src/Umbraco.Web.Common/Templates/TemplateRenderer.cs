@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Web.Common.Templates
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ICompositeViewEngine _viewEngine;
         private readonly IModelMetadataProvider _modelMetadataProvider;
-        private readonly ITempDataProvider _tempDataProvider;
+        private readonly ITempDataDictionaryFactory _tempDataDictionaryFactory;
 
         public TemplateRenderer(
             IUmbracoContextAccessor umbracoContextAccessor,
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Web.Common.Templates
             IHttpContextAccessor httpContextAccessor,
             ICompositeViewEngine viewEngine,
             IModelMetadataProvider modelMetadataProvider,
-            ITempDataProvider tempDataProvider)
+            ITempDataDictionaryFactory tempDataDictionaryFactory)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedRouter = publishedRouter ?? throw new ArgumentNullException(nameof(publishedRouter));
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Web.Common.Templates
             _httpContextAccessor = httpContextAccessor ?? throw new ArgumentNullException(nameof(httpContextAccessor));
             _viewEngine = viewEngine ?? throw new ArgumentNullException(nameof(viewEngine));
             _modelMetadataProvider = modelMetadataProvider;
-            _tempDataProvider = tempDataProvider;
+            _tempDataDictionaryFactory = tempDataDictionaryFactory;
         }
 
         public async Task RenderAsync(int pageId, int? altTemplateId, StringWriter writer)
@@ -169,7 +169,7 @@ namespace Umbraco.Cms.Web.Common.Templates
                 new ActionContext(httpContext, httpContext.GetRouteData(), new ControllerActionDescriptor()),
                 viewResult.View,
                 viewData,
-                new TempDataDictionary(httpContext, _tempDataProvider),
+                _tempDataDictionaryFactory.GetTempData(httpContext),
                 writer,
                 new HtmlHelperOptions()
             );

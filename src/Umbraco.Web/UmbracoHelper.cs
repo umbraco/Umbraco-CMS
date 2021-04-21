@@ -120,7 +120,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlEncodedString RenderMacro(string alias)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, null);
+            return _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, null).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -131,7 +131,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlEncodedString RenderMacro(string alias, object parameters)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
+            return _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>()).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -142,7 +142,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlEncodedString RenderMacro(string alias, IDictionary<string, object> parameters)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters);
+            return _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, parameters).GetAwaiter().GetResult();
         }
 
         #endregion
@@ -189,19 +189,13 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="path">The full path of the document object to check</param>
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
-        public bool MemberHasAccess(string path)
-        {
-            return _membershipHelper.MemberHasAccess(path);
-        }
+        public bool MemberHasAccess(string path) => throw new NotImplementedException("Migrated to netcore");
 
         /// <summary>
         /// Whether or not the current member is logged in (based on the membership provider)
         /// </summary>
         /// <returns>True is the current user is logged in</returns>
-        public bool MemberIsLoggedOn()
-        {
-            return _membershipHelper.IsLoggedIn();
-        }
+        public bool MemberIsLoggedOn() => throw new NotImplementedException("Migrated to netcore");
 
         #endregion
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -8,8 +8,8 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Infrastructure.Persistence.Querying;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
@@ -1015,7 +1015,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
-                int[] ids = _memberGroupRepository.GetMemberIds(usernames);
+                int[] ids = _memberRepository.GetMemberIds(usernames);
                 _memberGroupRepository.AssignRoles(ids, roleNames);
                 scope.Notifications.Publish(new AssignedMemberRolesNotification(ids, roleNames));
                 scope.Complete();
@@ -1029,7 +1029,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (IScope scope = ScopeProvider.CreateScope())
             {
                 scope.WriteLock(Constants.Locks.MemberTree);
-                int[] ids = _memberGroupRepository.GetMemberIds(usernames);
+                int[] ids = _memberRepository.GetMemberIds(usernames);
                 _memberGroupRepository.DissociateRoles(ids, roleNames);
                 scope.Notifications.Publish(new RemovedMemberRolesNotification(ids, roleNames));
                 scope.Complete();
@@ -1058,6 +1058,29 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.DissociateRoles(memberIds, roleNames);
                 scope.Notifications.Publish(new RemovedMemberRolesNotification(memberIds, roleNames));
+                scope.Complete();
+            }
+        }
+
+        public void ReplaceRoles(string[] usernames, string[] roleNames)
+        {
+            using (IScope scope = ScopeProvider.CreateScope())
+            {
+                scope.WriteLock(Constants.Locks.MemberTree);
+                int[] ids = _memberRepository.GetMemberIds(usernames);
+                _memberGroupRepository.ReplaceRoles(ids, roleNames);
+                scope.Notifications.Publish(new AssignedMemberRolesNotification(ids, roleNames));
+                scope.Complete();
+            }
+        }
+
+        public void ReplaceRoles(int[] memberIds, string[] roleNames)
+        {
+            using (IScope scope = ScopeProvider.CreateScope())
+            {
+                scope.WriteLock(Constants.Locks.MemberTree);
+                _memberGroupRepository.ReplaceRoles(memberIds, roleNames);
+                scope.Notifications.Publish(new AssignedMemberRolesNotification(memberIds, roleNames));
                 scope.Complete();
             }
         }

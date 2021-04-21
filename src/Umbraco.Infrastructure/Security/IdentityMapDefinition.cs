@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Security
             _appCaches = appCaches;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IUser, BackOfficeIdentityUser>(
                 (source, context) =>
@@ -100,6 +100,7 @@ namespace Umbraco.Cms.Core.Security
             //target.Roles =;
         }
 
+        // TODO: We need to validate this mapping is OK, we need to get Umbraco.Code working
         private void Map(IMember source, MemberIdentityUser target)
         {
             target.Email = source.Email;
@@ -114,6 +115,11 @@ namespace Umbraco.Cms.Core.Security
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
+            target.Comments = source.Comments;
+            target.LastLockoutDateUtc = source.LastLockoutDate == DateTime.MinValue ? null : source.LastLockoutDate.ToUniversalTime();
+            target.CreatedDateUtc = source.CreateDate.ToUniversalTime();
+            target.Key = source.Key;
+            target.MemberTypeAlias = source.ContentTypeAlias;
 
             // NB: same comments re AutoMapper as per BackOfficeUser
         }

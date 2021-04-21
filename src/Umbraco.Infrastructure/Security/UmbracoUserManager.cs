@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Net;
 
 namespace Umbraco.Cms.Core.Security

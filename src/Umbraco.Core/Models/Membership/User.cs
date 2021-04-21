@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -135,18 +135,21 @@ namespace Umbraco.Cms.Core.Models.Membership
             get => _emailConfirmedDate;
             set => SetPropertyValueAndDetectChanges(value, ref _emailConfirmedDate, nameof(EmailConfirmedDate));
         }
+
         [DataMember]
         public DateTime? InvitedDate
         {
             get => _invitedDate;
             set => SetPropertyValueAndDetectChanges(value, ref _invitedDate, nameof(InvitedDate));
         }
+
         [DataMember]
         public string Username
         {
             get => _username;
             set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
         }
+
         [DataMember]
         public string Email
         {

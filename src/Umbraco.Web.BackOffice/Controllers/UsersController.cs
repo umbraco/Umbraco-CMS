@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUserService _userService;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly GlobalSettings _globalSettings;
         private readonly IBackOfficeUserManager _userManager;
         private readonly ILoggerFactory _loggerFactory;
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IUserService userService,
             ILocalizedTextService localizedTextService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IOptions<GlobalSettings> globalSettings,
             IBackOfficeUserManager backOfficeUserManager,
             ILoggerFactory loggerFactory,

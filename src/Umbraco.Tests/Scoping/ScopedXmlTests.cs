@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -11,9 +10,8 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
@@ -66,9 +64,6 @@ namespace Umbraco.Tests.Scoping
         [TearDown]
         public void Teardown()
         {
-            _distributedCacheBinder?.UnbindEvents();
-            _distributedCacheBinder = null;
-
             NotificationHandler.PublishedContent = null;
             SafeXmlReaderWriter.Cloning = null;
         }
@@ -100,8 +95,7 @@ namespace Umbraco.Tests.Scoping
             var item = new Content("name", -1, contentType);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger<DistributedCacheBinder>>());
-            _distributedCacheBinder.BindEvents(true);
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers));
 
             // check xml in context = "before"
             var xml = XmlInContext;
@@ -211,8 +205,7 @@ namespace Umbraco.Tests.Scoping
             ServiceContext.ContentTypeService.Save(contentType);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger<DistributedCacheBinder>>());
-            _distributedCacheBinder.BindEvents(true);
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers));
 
             // check xml in context = "before"
             var xml = XmlInContext;

@@ -18,9 +18,9 @@
         </div>
 
         <button ng-show="!model.config.maxNumber || renderModel.length < model.config.maxNumber"
-            type="button"
-            class="umb-node-preview-add"
-            ng-click="openLinkPicker()">
+                type="button"
+                class="umb-node-preview-add"
+                ng-click="openLinkPicker()">
             <span class="sr-only">{{ model.label }}:</span>
             <localize key="general_add">Add</localize>
             <span class="sr-only">url</span>
@@ -59,6 +59,8 @@
             </span>
 
         </div>
+
+        <input type="hidden" name="modelValue" ng-model="renderModel.length" />
 
         <!--These are here because we need ng-form fields to validate against-->
         <input type="hidden" name="minCount" ng-model="renderModel" />

@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
 
@@ -23,6 +23,6 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <param name="httpContext"></param>
         /// <param name="cookieToken"></param>
         /// <param name="headerToken"></param>
-        void GetTokens(HttpContext httpContext, out string cookieToken, out string headerToken);
+        void GetAndStoreTokens(HttpContext httpContext);
     }
 }

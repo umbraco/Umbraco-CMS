@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Testing
 
         protected IMapperCollection Mappers => Factory.GetRequiredService<IMapperCollection>();
 
-        protected UmbracoMapper Mapper => Factory.GetRequiredService<UmbracoMapper>();
+        protected IUmbracoMapper Mapper => Factory.GetRequiredService<IUmbracoMapper>();
         protected IHttpContextAccessor HttpContextAccessor => Factory.GetRequiredService<IHttpContextAccessor>();
         protected IContentService ContentService => Factory.GetRequiredService<IContentService>();
         protected IRuntimeState RuntimeState => MockRuntimeState(RuntimeLevel.Run);
@@ -228,7 +228,7 @@ namespace Umbraco.Tests.Testing
             services.AddUnique(ipResolver);
             services.AddUnique<IPasswordHasher, AspNetPasswordHasher>();
             services.AddUnique(TestHelper.ShortStringHelper);
-            services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
+            //services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
 
             var memberService = Mock.Of<IMemberService>();
@@ -490,7 +490,7 @@ namespace Umbraco.Tests.Testing
                 connectionStrings,
                 new Lazy<IMapperCollection>(f.GetRequiredService<IMapperCollection>),
                 TestHelper.DbProviderFactoryCreator,
-                new DatabaseSchemaCreatorFactory(LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion)));
+                new DatabaseSchemaCreatorFactory(LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, Mock.Of<IEventAggregator>())));
 
             Builder.Services.AddUnique(f => f.GetService<IUmbracoDatabaseFactory>().SqlContext);
 
@@ -584,14 +584,6 @@ namespace Umbraco.Tests.Testing
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath(HostingEnvironment);
-
-            // clear static events
-            DocumentRepository.ClearScopeEvents();
-            MediaRepository.ClearScopeEvents();
-            MemberRepository.ClearScopeEvents();
-            ContentTypeService.ClearScopeEvents();
-            MediaTypeService.ClearScopeEvents();
-            MemberTypeService.ClearScopeEvents();
         }
 
         #endregion

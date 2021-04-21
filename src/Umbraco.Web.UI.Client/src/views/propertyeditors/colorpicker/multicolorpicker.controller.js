@@ -104,7 +104,7 @@
                 return x.value === item.value && x.label === item.label;
             });
 
-            angularHelper.getCurrentForm($scope).$setDirty();
+            setDirty();
         }
 
         function add(evt) {
@@ -130,7 +130,7 @@
                     $scope.newLabel = "";
                     $scope.hasError = false;
                     $scope.focusOnNew = true;
-                    angularHelper.getCurrentForm($scope).$setDirty();
+                    setDirty();
                     return;
                 }
 
@@ -156,6 +156,12 @@
             $scope.newLabel = defaultLabel;
         }
 
+        function setDirty() {
+            if (vm.modelValueForm) {
+                vm.modelValueForm.selectedColor.$setDirty();
+            }
+        }
+
         $scope.sortableOptions = {
             axis: 'y',
             containment: 'parent',
@@ -164,7 +170,7 @@
             items: '> div.control-group',
             tolerance: 'pointer',
             update: function (e, ui) {
-                angularHelper.getCurrentForm($scope).$setDirty();
+                setDirty();
             }
         };
 

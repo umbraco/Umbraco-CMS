@@ -1,17 +1,12 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Changes;
-using Umbraco.Cms.Core.Services.Implement;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
@@ -19,7 +14,7 @@ namespace Umbraco.Cms.Core.Cache
     /// <summary>
     /// Default <see cref="IDistributedCacheBinder"/> implementation.
     /// </summary>
-    public partial class DistributedCacheBinder :
+    public class DistributedCacheBinder :
         INotificationHandler<DictionaryItemDeletedNotification>,
         INotificationHandler<DictionaryItemSavedNotification>,
         INotificationHandler<LanguageSavedNotification>,
@@ -34,6 +29,8 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<UserGroupDeletedNotification>,
         INotificationHandler<MemberGroupDeletedNotification>,
         INotificationHandler<MemberGroupSavedNotification>,
+        INotificationHandler<TemplateDeletedNotification>,
+        INotificationHandler<TemplateSavedNotification>,
         INotificationHandler<DataTypeDeletedNotification>,
         INotificationHandler<DataTypeSavedNotification>,
         INotificationHandler<RelationTypeDeletedNotification>,
@@ -41,70 +38,21 @@ namespace Umbraco.Cms.Core.Cache
         INotificationHandler<DomainDeletedNotification>,
         INotificationHandler<DomainSavedNotification>,
         INotificationHandler<MacroSavedNotification>,
-        INotificationHandler<MacroDeletedNotification>
+        INotificationHandler<MacroDeletedNotification>,
+        INotificationHandler<MediaTreeChangeNotification>,
+        INotificationHandler<ContentTypeChangedNotification>,
+        INotificationHandler<MediaTypeChangedNotification>,
+        INotificationHandler<MemberTypeChangedNotification>,
+        INotificationHandler<ContentTreeChangeNotification>
     {
-        private List<Action> _unbinders;
+        private readonly DistributedCache _distributedCache;
 
-        private void Bind(Action binder, Action unbinder)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="DistributedCacheBinder"/> class.
+        /// </summary>
+        public DistributedCacheBinder(DistributedCache distributedCache)
         {
-            // bind now
-            binder();
-
-            // and register unbinder for later, if needed
-            _unbinders?.Add(unbinder);
-        }
-
-        /// <inheritdoc />
-        public void UnbindEvents()
-        {
-            if (_unbinders == null)
-                throw new NotSupportedException();
-            foreach (var unbinder in _unbinders)
-                unbinder();
-            _unbinders = null;
-        }
-
-        /// <inheritdoc />
-        public void BindEvents(bool supportUnbinding = false)
-        {
-            if (supportUnbinding)
-                _unbinders = new List<Action>();
-
-            _logger.LogInformation("Initializing Umbraco internal event handlers for cache refreshing.");
-
-            // bind to stylesheet events
-            Bind(() => FileService.SavedStylesheet += FileService_SavedStylesheet,
-                () => FileService.SavedStylesheet -= FileService_SavedStylesheet);
-            Bind(() => FileService.DeletedStylesheet += FileService_DeletedStylesheet,
-                () => FileService.DeletedStylesheet -= FileService_DeletedStylesheet);
-
-            // bind to content type events
-            Bind(() => ContentTypeService.Changed += ContentTypeService_Changed,
-                () => ContentTypeService.Changed -= ContentTypeService_Changed);
-            Bind(() => MediaTypeService.Changed += MediaTypeService_Changed,
-                () => MediaTypeService.Changed -= MediaTypeService_Changed);
-            Bind(() => MemberTypeService.Changed += MemberTypeService_Changed,
-                () => MemberTypeService.Changed -= MemberTypeService_Changed);
-
-            // bind to template events
-            Bind(() => FileService.SavedTemplate += FileService_SavedTemplate,
-                () => FileService.SavedTemplate -= FileService_SavedTemplate);
-            Bind(() => FileService.DeletedTemplate += FileService_DeletedTemplate,
-                () => FileService.DeletedTemplate -= FileService_DeletedTemplate);
-
-            // bind to media events - handles all media changes
-            Bind(() => MediaService.TreeChanged += MediaService_TreeChanged,
-                () => MediaService.TreeChanged -= MediaService_TreeChanged);
-
-            // bind to content events
-            Bind(() => ContentService.TreeChanged += ContentService_TreeChanged,// handles all content changes
-                () => ContentService.TreeChanged -= ContentService_TreeChanged);
-
-            // TreeChanged should also deal with this
-            //Bind(() => ContentService.SavedBlueprint += ContentService_SavedBlueprint,
-            //    () => ContentService.SavedBlueprint -= ContentService_SavedBlueprint);
-            //Bind(() => ContentService.DeletedBlueprint += ContentService_DeletedBlueprint,
-            //    () => ContentService.DeletedBlueprint -= ContentService_DeletedBlueprint);
+            _distributedCache = distributedCache;
         }
 
         #region PublicAccessService
@@ -137,9 +85,10 @@ namespace Umbraco.Cms.Core.Cache
         {
         }
 
-        private void ContentService_TreeChanged(IContentService sender, TreeChange<IContent>.EventArgs args)
+
+        public void Handle(ContentTreeChangeNotification notification)
         {
-            _distributedCache.RefreshContentCache(args.Changes.ToArray());
+            _distributedCache.RefreshContentCache(notification.Changes.ToArray());
         }
 
         //private void ContentService_SavedBlueprint(IContentService sender, SaveEventArgs<IContent> e)
@@ -243,28 +192,14 @@ namespace Umbraco.Cms.Core.Cache
 
         #region Content|Media|MemberTypeService
 
-        private void ContentTypeService_Changed(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
-        {
-            _distributedCache.RefreshContentTypeCache(args.Changes.ToArray());
-        }
+        public void Handle(ContentTypeChangedNotification notification) =>
+            _distributedCache.RefreshContentTypeCache(notification.Changes.ToArray());
 
-        private void MediaTypeService_Changed(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
-        {
-            _distributedCache.RefreshContentTypeCache(args.Changes.ToArray());
-        }
+        public void Handle(MediaTypeChangedNotification notification) =>
+            _distributedCache.RefreshContentTypeCache(notification.Changes.ToArray());
 
-        private void MemberTypeService_Changed(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
-        {
-            _distributedCache.RefreshContentTypeCache(args.Changes.ToArray());
-        }
-
-        // TODO: our weird events handling wants this for now
-        private void ContentTypeService_Saved(IContentTypeService sender, SaveEventArgs<IContentType> args) { }
-        private void MediaTypeService_Saved(IMediaTypeService sender, SaveEventArgs<IMediaType> args) { }
-        private void MemberTypeService_Saved(IMemberTypeService sender, SaveEventArgs<IMemberType> args) { }
-        private void ContentTypeService_Deleted(IContentTypeService sender, DeleteEventArgs<IContentType> args) { }
-        private void MediaTypeService_Deleted(IMediaTypeService sender, DeleteEventArgs<IMediaType> args) { }
-        private void MemberTypeService_Deleted(IMemberTypeService sender, DeleteEventArgs<IMemberType> args) { }
+        public void Handle(MemberTypeChangedNotification notification) =>
+            _distributedCache.RefreshContentTypeCache(notification.Changes.ToArray());
 
         #endregion
 
@@ -309,28 +244,26 @@ namespace Umbraco.Cms.Core.Cache
         /// <summary>
         /// Removes cache for template
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void FileService_DeletedTemplate(IFileService sender, DeleteEventArgs<ITemplate> e)
+        /// <param name="notification"></param>
+        public void Handle(TemplateDeletedNotification notification)
         {
-            foreach (var entity in e.DeletedEntities)
+            foreach (ITemplate entity in notification.DeletedEntities)
+            {
                 _distributedCache.RemoveTemplateCache(entity.Id);
+            }
         }
 
         /// <summary>
         /// Refresh cache for template
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void FileService_SavedTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
+        /// <param name="notification"></param>
+        public void Handle(TemplateSavedNotification notification)
         {
-            foreach (var entity in e.SavedEntities)
+            foreach (ITemplate entity in notification.SavedEntities)
+            {
                 _distributedCache.RefreshTemplateCache(entity.Id);
+            }
         }
-
-        // TODO: our weird events handling wants this for now
-        private void FileService_DeletedStylesheet(IFileService sender, DeleteEventArgs<IStylesheet> e) { }
-        private void FileService_SavedStylesheet(IFileService sender, SaveEventArgs<IStylesheet> e) { }
 
         #endregion
 
@@ -356,9 +289,9 @@ namespace Umbraco.Cms.Core.Cache
 
         #region MediaService
 
-        private void MediaService_TreeChanged(IMediaService sender, TreeChange<IMedia>.EventArgs args)
+        public void Handle(MediaTreeChangeNotification notification)
         {
-            _distributedCache.RefreshMediaCache(args.Changes.ToArray());
+            _distributedCache.RefreshMediaCache(notification.Changes.ToArray());
         }
 
         #endregion

@@ -12,9 +12,9 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.PublishedCache;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -59,13 +59,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                 .AddNotificationHandler<MemberGroupDeletedNotification, DistributedCacheBinder>()
                 .AddNotificationHandler<MemberGroupSavedNotification, DistributedCacheBinder>();
             builder.AddNotificationHandler<LanguageSavedNotification, PublishedSnapshotServiceEventHandler>();
-        }
-
-        [TearDown]
-        public void Teardown()
-        {
-            _distributedCacheBinder?.UnbindEvents();
-            _distributedCacheBinder = null;
         }
 
         [TestCase(true)]

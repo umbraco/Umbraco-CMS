@@ -18,7 +18,6 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Cms.Core.Models.Security;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -30,6 +29,7 @@ using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Cms.Web.Common.Models;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 using SignInResult = Microsoft.AspNetCore.Identity.SignInResult;
@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeSignInManager _signInManager;
         private readonly IUserService _userService;
         private readonly ILocalizedTextService _textService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly GlobalSettings _globalSettings;
         private readonly SecuritySettings _securitySettings;
         private readonly ILogger<AuthenticationController> _logger;
@@ -78,7 +78,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeSignInManager signInManager,
             IUserService userService,
             ILocalizedTextService textService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IOptions<GlobalSettings> globalSettings,
             IOptions<SecuritySettings> securitySettings,
             ILogger<AuthenticationController> logger,
@@ -346,6 +346,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 return verifyResponse;
             }
+
+            // TODO: We can check for these and respond differently if we think it's important
+            //  result.IsLockedOut
+            //  result.IsNotAllowed
 
             // return BadRequest (400), we don't want to return a 401 because that get's intercepted
             // by our angular helper because it thinks that we need to re-perform the request once we are

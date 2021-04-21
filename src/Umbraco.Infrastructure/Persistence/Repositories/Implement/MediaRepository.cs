@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -26,6 +27,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// </summary>
     public class MediaRepository : ContentRepositoryBase<int, IMedia, MediaRepository>, IMediaRepository
     {
+        private readonly AppCaches _cache;
         private readonly IMediaTypeRepository _mediaTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly MediaUrlGeneratorCollection _mediaUrlGenerators;
@@ -46,9 +48,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             MediaUrlGeneratorCollection mediaUrlGenerators,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
-            IJsonSerializer serializer)
-            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService)
+            IJsonSerializer serializer,
+            IEventAggregator eventAggregator)
+            : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection, dataValueReferenceFactories, dataTypeService, eventAggregator)
         {
+            _cache = cache;
             _mediaTypeRepository = mediaTypeRepository ?? throw new ArgumentNullException(nameof(mediaTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _mediaUrlGenerators = mediaUrlGenerators;
@@ -225,9 +229,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PerformDeleteVersion(int id, int versionId)
         {
-            // raise event first else potential FK issues
-            OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
-
             Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
             Database.Delete<ContentVersionDto>("WHERE versionId = @versionId", new { versionId });
         }
@@ -307,7 +308,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             PersistRelations(entity);
 
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new MediaRefreshNotification(entity, new EventMessages()));
 
             entity.ResetDirtyProperties();
         }
@@ -370,15 +371,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 PersistRelations(entity);
             }
 
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new MediaRefreshNotification(entity, new EventMessages()));
 
             entity.ResetDirtyProperties();
         }
 
         protected override void PersistDeletedItem(IMedia entity)
         {
-            // raise event first else potential FK issues
-            OnUowRemovingEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            // Raise event first else potential FK issues
+            OnUowRemovingEntity(entity);
             base.PersistDeletedItem(entity);
         }
 
@@ -387,6 +388,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         #region Recycle Bin
 
         public override int RecycleBinId => Cms.Core.Constants.System.RecycleBinMedia;
+
+        public bool RecycleBinSmells()
+        {
+            var cache = _cache.RuntimeCache;
+            var cacheKey = CacheKeys.MediaRecycleBinCacheKey;
+
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(RecycleBinId) > 0);
+        }
 
         #endregion
 
@@ -407,10 +417,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return _mediaByGuidReadRepository.Exists(id);
         }
 
-        
+
         // A reading repository purely for looking up by GUID
         // TODO: This is ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
-        // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this        
+        // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
         private class MediaByGuidReadRepository : EntityRepositoryBase<Guid, IMedia>
         {
             private readonly MediaRepository _outerRepo;
@@ -511,10 +521,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
-                    var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IMedia>(RepositoryCacheKeys.GetKey<IMedia, int>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
-                        content[i] = (Core.Models.Media) cached;
+                        content[i] = (Core.Models.Media)cached;
                         continue;
                     }
                 }

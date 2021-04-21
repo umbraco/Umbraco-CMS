@@ -28,13 +28,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class RelationTypeController : BackOfficeNotificationsController
     {
         private readonly ILogger<RelationTypeController> _logger;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IRelationService _relationService;
         private readonly IShortStringHelper _shortStringHelper;
 
         public RelationTypeController(
             ILogger<RelationTypeController> logger,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IRelationService relationService,
             IShortStringHelper shortStringHelper)
         {

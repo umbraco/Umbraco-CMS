@@ -78,7 +78,7 @@
                 model.block.index = index;
                 model.block.updateLabel();
             }
-        }
+        };
     }
 
 

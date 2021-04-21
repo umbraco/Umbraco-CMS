@@ -4,7 +4,9 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -16,7 +18,6 @@ using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -30,13 +31,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly ISiteDomainHelper _siteDomainHelper;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IUmbracoComponentRenderer _componentRenderer;
         private readonly IVariationContextAccessor _variationContextAccessor;
 
 
         public MacroRenderingController(
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IUmbracoComponentRenderer componentRenderer,
             IVariationContextAccessor variationContextAccessor,
             IMacroService macroService,
@@ -86,9 +87,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </param>
         /// <returns></returns>
         [HttpGet]
-        public IActionResult GetMacroResultAsHtmlForEditor(string macroAlias, int pageId, [FromQuery] IDictionary<string, object> macroParams)
+        public async Task<IActionResult> GetMacroResultAsHtmlForEditor(string macroAlias, int pageId, [FromQuery] IDictionary<string, object> macroParams)
         {
-            return GetMacroResultAsHtml(macroAlias, pageId, macroParams);
+            return await GetMacroResultAsHtml(macroAlias, pageId, macroParams);
         }
 
         /// <summary>
@@ -99,9 +100,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult GetMacroResultAsHtmlForEditor(MacroParameterModel model)
+        public async Task<IActionResult>  GetMacroResultAsHtmlForEditor(MacroParameterModel model)
         {
-            return GetMacroResultAsHtml(model.MacroAlias, model.PageId, model.MacroParams);
+            return await GetMacroResultAsHtml(model.MacroAlias, model.PageId, model.MacroParams);
         }
 
         public class MacroParameterModel
@@ -111,7 +112,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             public IDictionary<string, object> MacroParams { get; set; }
         }
 
-        private IActionResult GetMacroResultAsHtml(string macroAlias, int pageId, IDictionary<string, object> macroParams)
+        private async Task<IActionResult> GetMacroResultAsHtml(string macroAlias, int pageId, IDictionary<string, object> macroParams)
         {
             var m = _macroService.GetByAlias(macroAlias);
             if (m == null)
@@ -150,7 +151,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             {
                 //need to create a specific content result formatted as HTML since this controller has been configured
                 //with only json formatters.
-                return Content(_componentRenderer.RenderMacroForContent(publishedContent, m.Alias, macroParams).ToString(), "text/html",
+                return Content((await _componentRenderer.RenderMacroForContent(publishedContent, m.Alias, macroParams)).ToString(), "text/html",
                     Encoding.UTF8);
             }
         }
