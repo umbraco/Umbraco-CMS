@@ -171,7 +171,8 @@
             link: link,
             scope: {
                 content: "=", // in this context the content is the variant model.
-                contentNodeModel: "=?" //contentNodeModel is the content model for the node, 
+                contentNodeModel: "=?", //contentNodeModel is the content model for the node,
+                contentApp: "=?" // contentApp is the origin app model for this view
             }
         };
 

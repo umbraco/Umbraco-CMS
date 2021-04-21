@@ -1,6 +1,6 @@
 ﻿<div>
     <ng-form name="tabbedContentForm">
-        <div class="umb-group-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.id" ng-if="group.testId === activeAppId">
+        <div class="umb-group-panel" retrive-dom-element="registerPropertyGroup(element[0], attributes.appAnchor)" data-app-anchor="{{group.id}}" data-element="group-{{group.alias}}" ng-repeat="group in content.tabs track by group.id" ng-if="group.testId === contentApp.id">
             <div class="umb-group-panel__header">
                 <div id="group-{{group.id}}">{{ group.label }}</div>
             </div>
