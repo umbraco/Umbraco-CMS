@@ -7,11 +7,11 @@ namespace Umbraco.Cms.Core.PublishedCache
     public interface IPublishedMemberCache
     {
         /// <summary>
-        /// Get an <see cref="IPublishedMember"/> from an <see cref="IMember"/>
+        /// Get an <see cref="IPublishedContent"/> from an <see cref="IMember"/>
         /// </summary>
         /// <param name="member"></param>
         /// <returns></returns>
-        IPublishedMember Get(IMember member);
+        IPublishedContent Get(IMember member);
 
         /// <summary>
         /// Gets a content type identified by its unique identifier.

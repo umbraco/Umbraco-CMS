@@ -234,6 +234,6 @@ namespace Umbraco.Cms.Web.Common.Security
             return result;
         }        
 
-        public IPublishedMember AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
+        public IPublishedContent AsPublishedMember(MemberIdentityUser user) => _store.GetPublishedMember(user);
     }
 }

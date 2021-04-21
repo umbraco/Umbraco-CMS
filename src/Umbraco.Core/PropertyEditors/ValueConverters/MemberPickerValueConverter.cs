@@ -12,16 +12,16 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
     public class MemberPickerValueConverter : PropertyValueConverterBase
     {
         private readonly IMemberService _memberService;
-        private readonly IPublishedMemberCache _publishedMemberCache;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
 
         public MemberPickerValueConverter(
             IMemberService memberService,
-            IPublishedMemberCache publishedMemberCache,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IUmbracoContextAccessor umbracoContextAccessor)
         {
             _memberService = memberService;
-            _publishedMemberCache = publishedMemberCache;
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
 
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     {
                         return null;
                     }
-                    member = _publishedMemberCache.Get(m);
+                    member = _publishedSnapshotAccessor.PublishedSnapshot?.Members.Get(m);
                     if (member != null)
                     {
                         return member;
@@ -81,7 +81,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                         return null;
                     }
 
-                    member = _publishedMemberCache.Get(m);
+                    member = _publishedSnapshotAccessor.PublishedSnapshot?.Members.Get(m);
 
                     if (member != null)
                     {

@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Umbraco.Cms.Core.Cache;
 
 namespace Umbraco.Cms.Core.PublishedCache
@@ -19,6 +19,11 @@ namespace Umbraco.Cms.Core.PublishedCache
         /// Gets the <see cref="IPublishedMediaCache"/>.
         /// </summary>
         IPublishedMediaCache Media { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IPublishedMemberCache"/>.
+        /// </summary>
+        IPublishedMemberCache Members { get; }
 
         /// <summary>
         /// Gets the <see cref="IDomainCache"/>.

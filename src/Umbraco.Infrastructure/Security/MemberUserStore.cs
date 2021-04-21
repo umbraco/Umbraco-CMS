@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Core.Security
 {
     public interface IMemberUserStore : IUserStore<MemberIdentityUser>
     {
-        IPublishedMember GetPublishedMember(MemberIdentityUser user);
+        IPublishedContent GetPublishedMember(MemberIdentityUser user);
     }
 
     /// <summary>
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Security
         private readonly IMemberService _memberService;
         private readonly UmbracoMapper _mapper;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IPublishedMemberCache _publishedMemberCache;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberUserStore"/> class for the members identity store
@@ -45,13 +45,13 @@ namespace Umbraco.Cms.Core.Security
             UmbracoMapper mapper,
             IScopeProvider scopeProvider,
             IdentityErrorDescriber describer,
-            IPublishedMemberCache publishedMemberCache)
+            IPublishedSnapshotAccessor publishedSnapshotAccessor)
             : base(describer)
         {
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
-            _publishedMemberCache = publishedMemberCache;
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
         }
 
         /// <inheritdoc />
@@ -613,14 +613,14 @@ namespace Umbraco.Cms.Core.Security
             return anythingChanged;
         }
 
-        public IPublishedMember GetPublishedMember(MemberIdentityUser user)
+        public IPublishedContent GetPublishedMember(MemberIdentityUser user)
         {
             IMember member = _memberService.GetByKey(user.Key);
             if (member == null)
             {
                 return null;
             }
-            return _publishedMemberCache.Get(member);
+            return _publishedSnapshotAccessor.PublishedSnapshot?.Members.Get(member);
         }
     }
 }

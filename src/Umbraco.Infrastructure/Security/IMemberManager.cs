@@ -10,11 +10,11 @@ namespace Umbraco.Cms.Core.Security
     public interface IMemberManager : IUmbracoUserManager<MemberIdentityUser>
     {
         /// <summary>
-        /// Returns the <see cref="IPublishedMember"/> instance for the specified <see cref="MemberIdentityUser"/>
+        /// Returns the <see cref="IPublishedContent"/> instance for the specified <see cref="MemberIdentityUser"/>
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        IPublishedMember AsPublishedMember(MemberIdentityUser user);
+        IPublishedContent AsPublishedMember(MemberIdentityUser user);
 
         /// <summary>
         /// Returns the currently logged in member if there is one, else returns null

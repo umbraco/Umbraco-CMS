@@ -20,8 +20,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
     {
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IPublishedMemberCache _publishedMemberCache;
         private readonly IMemberService _memberService;
+
         private static readonly List<string> PropertiesToExclude = new List<string>
         {
             Constants.Conventions.Content.InternalRedirectId.ToLower(CultureInfo.InvariantCulture),
@@ -31,12 +31,10 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
         public MultiNodeTreePickerValueConverter(
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IPublishedMemberCache publishedMemberCache,
             IMemberService memberService)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
             _umbracoContextAccessor = umbracoContextAccessor;
-            _publishedMemberCache = publishedMemberCache;
             _memberService = memberService;
         }
 
@@ -111,7 +109,7 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                                         {
                                             return null;
                                         }
-                                        IPublishedMember member = _publishedMemberCache.Get(m);
+                                        IPublishedContent member = _publishedSnapshotAccessor.PublishedSnapshot.Members.Get(m);
                                         return member;
                                     });
                                     break;

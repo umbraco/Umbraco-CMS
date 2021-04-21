@@ -13,8 +13,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="content">The internal published content.</param>
         /// <returns>The strongly typed published content model.</returns>
-        public static TPublishedContent CreateModel<TPublishedContent>(this TPublishedContent content, IPublishedModelFactory publishedModelFactory)
-            where TPublishedContent : class, IPublishedContent
+        public static IPublishedContent CreateModel(this IPublishedContent content, IPublishedModelFactory publishedModelFactory)
         {
             if (publishedModelFactory == null) throw new ArgumentNullException(nameof(publishedModelFactory));
             if (content == null)
@@ -27,7 +26,7 @@ namespace Umbraco.Extensions
                 throw new InvalidOperationException("Factory returned null.");
 
             // if factory returns a different type, throw
-            if (!(model is TPublishedContent publishedContent))
+            if (!(model is IPublishedContent publishedContent))
                 throw new InvalidOperationException($"Factory returned model of type {model.GetType().FullName} which does not implement IPublishedContent.");
 
             return publishedContent;
