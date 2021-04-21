@@ -1619,6 +1619,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contentAllowed">This content is allowed here</key>
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
+      <key alias="clickToInsertMacro">Click to insert a macro</key>
     <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
     <key alias="gridLayouts">Grid Layouts</key>
