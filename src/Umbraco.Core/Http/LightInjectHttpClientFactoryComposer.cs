@@ -1,13 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Http;
-using System.Text;
-using System.Threading.Tasks;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Composing.LightInject;
-using Umbraco.Core.Http.Clients;
 
 namespace Umbraco.Core.Http
 {
