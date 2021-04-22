@@ -850,7 +850,10 @@ namespace Umbraco.Core.Security
         protected internal static string GenerateSalt()
         {
             var numArray = new byte[16];
-            new RNGCryptoServiceProvider().GetBytes(numArray);
+            using (var rng = new RNGCryptoServiceProvider())
+            {
+                rng.GetBytes(numArray);
+            }
             return Convert.ToBase64String(numArray);
         }
 
