@@ -167,7 +167,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IGridConfig, GridConfig>();
 
             Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
-            Services.AddUnique<ISiteDomainHelper, SiteDomainHelper>();
+            Services.AddUnique<ISiteDomainMapper, SiteDomainMapper>();
 
             Services.AddUnique<HtmlLocalLinkParser>();
             Services.AddUnique<HtmlImageSourceParser>();
