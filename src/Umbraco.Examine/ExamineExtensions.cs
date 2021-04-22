@@ -107,8 +107,11 @@ namespace Umbraco.Examine
             try
             {
                 //This will pass with a plain old string without any fields, need to figure out a way to have it properly parse
-                var parsed = new QueryParser(Version.LUCENE_30, "nodeName", new KeywordAnalyzer()).Parse(query);
-                return true;
+                using (var keywordAnalyzer = new KeywordAnalyzer())
+                {
+                    var parsed = new QueryParser(Version.LUCENE_30, "nodeName", keywordAnalyzer).Parse(query);
+                    return true;
+                }
             }
             catch (ParseException)
             {
