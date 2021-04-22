@@ -12,7 +12,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     /// <summary>
     /// Exposes a member object as IPublishedContent
     /// </summary>
-    public sealed class PublishedMember : PublishedContentBase, IPublishedMember
+    public sealed class PublishedMember : PublishedContentBase
     {
         private readonly IMember _member;
         private readonly IMembershipUser _membershipUser;

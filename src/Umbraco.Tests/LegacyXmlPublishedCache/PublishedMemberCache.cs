@@ -17,7 +17,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _variationContextAccessor = variationContextAccessor;
         }
 
-        public IPublishedMember Get(IMember member)
+        public IPublishedContent Get(IMember member)
         {
             var type = _contentTypeCache.Get(PublishedItemType.Member, member.ContentTypeId);
             return new PublishedMember(member, type, _variationContextAccessor)
