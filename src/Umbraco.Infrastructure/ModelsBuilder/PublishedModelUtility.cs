@@ -40,8 +40,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
                 case PublishedItemType.Media:
                     return facade.Media.GetContentType(alias);
                 case PublishedItemType.Member:
-                    throw new NotImplementedException();
-                    //return facade.Members.GetContentType(alias);
+                    return facade.Members.GetContentType(alias);
                 default:
                     throw new ArgumentOutOfRangeException(nameof(itemType));
             }

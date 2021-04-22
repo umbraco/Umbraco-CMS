@@ -17,10 +17,6 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
 {
-    public interface IMemberUserStore : IUserStore<MemberIdentityUser>
-    {
-        IPublishedContent GetPublishedMember(MemberIdentityUser user);
-    }
 
     /// <summary>
     /// A custom user store that uses Umbraco member data
