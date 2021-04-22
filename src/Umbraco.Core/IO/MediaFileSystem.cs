@@ -4,6 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
@@ -13,8 +16,9 @@ namespace Umbraco.Cms.Core.IO
     /// <summary>
     /// A custom file system provider for media
     /// </summary>
-    public class MediaFileSystem : FileSystemWrapper, IMediaFileSystem
+    public class MediaFileSystem : PhysicalFileSystem, IMediaFileSystem
     {
+        private readonly IFileSystem _innerFileSystem;
         private readonly IMediaPathScheme _mediaPathScheme;
         private readonly ILogger<MediaFileSystem> _logger;
         private readonly IShortStringHelper _shortStringHelper;
@@ -22,11 +26,19 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Initializes a new instance of the <see cref="MediaFileSystem"/> class.
         /// </summary>
-        public MediaFileSystem(IFileSystem innerFileSystem, IMediaPathScheme mediaPathScheme, ILogger<MediaFileSystem> logger, IShortStringHelper shortStringHelper)
-            : base(innerFileSystem)
+        public MediaFileSystem(
+            IMediaPathScheme mediaPathScheme,
+            ILoggerFactory loggerFactory,
+            IShortStringHelper shortStringHelper,
+            IIOHelper ioHelper,
+            IHostingEnvironment hostingEnvironment,
+            IOptions<GlobalSettings> globalSettings)
+            : base(ioHelper, hostingEnvironment, loggerFactory.CreateLogger<PhysicalFileSystem>(),
+                hostingEnvironment.MapPathWebRoot(globalSettings.Value.UmbracoMediaPath),
+                hostingEnvironment.ToAbsolute(globalSettings.Value.UmbracoMediaPath))
         {
             _mediaPathScheme = mediaPathScheme;
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<MediaFileSystem>();
             _shortStringHelper = shortStringHelper;
         }
 

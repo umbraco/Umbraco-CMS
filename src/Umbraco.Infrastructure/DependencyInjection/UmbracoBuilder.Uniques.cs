@@ -110,29 +110,14 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         }
 
         /// <summary>
-        /// Register MediaFileSystem with a specific inner filesystem.
-        /// </summary>
-        /// <param name="builder">A builder.</param>
-        /// <param name="filesystemFactory">A filesystem factory.</param>
-        public static void SetMediaFileSystemWithInnerFileSystem(this IUmbracoBuilder builder, Func<IServiceProvider, IFileSystem> filesystemFactory)
-            => builder.Services.AddUnique<IMediaFileSystem>(factory =>
-            {
-                return new MediaFileSystem(filesystemFactory(factory), factory.GetRequiredService<IMediaPathScheme>(),
-                    factory.GetRequiredService<ILogger<MediaFileSystem>>(),
-                    factory.GetRequiredService<IShortStringHelper>());
-            });
-
-        /// <summary>
         /// Register an implementation of IMediaFileSystem
         /// </summary>
         /// <param name="builder">A builder.</param>
         /// <param name="mediaFileSystem">Instance of IMediaFileSystem to register</param>
-        public static void SetCustomMediaFileSystem(this IUmbracoBuilder builder, IMediaFileSystem mediaFileSystem) =>
-            builder.Services.AddUnique<IMediaFileSystem>(
-                _ =>
-                {
-                    return mediaFileSystem;
-                });
+        public static void SetMediaFileSystem<TMediaFileSystem>(this IUmbracoBuilder builder) where TMediaFileSystem : class, IMediaFileSystem
+        {
+            builder.Services.AddSingleton<IMediaFileSystem, TMediaFileSystem>();
+        }
 
         /// <summary>
         /// Sets the log viewer.

@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
         private ScopeProvider GetScopeProvider(out Mock<ISqlSyntaxProvider> syntaxProviderMock)
         {
             var loggerFactory = NullLoggerFactory.Instance;
-            var fileSystem = new FileSystems(Mock.Of<IServiceProvider>(), loggerFactory.CreateLogger<FileSystems>(), loggerFactory, Mock.Of<IIOHelper>(), Mock.Of<IOptions<GlobalSettings>>(), Mock.Of<IHostingEnvironment>());
+            var fileSystem = new FileSystems(loggerFactory.CreateLogger<FileSystems>(), loggerFactory, Mock.Of<IIOHelper>(), Mock.Of<IOptions<GlobalSettings>>(), Mock.Of<IHostingEnvironment>(), Mock.Of<IMediaFileSystem>());
             var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
             var database = new Mock<IUmbracoDatabase>();
             var sqlContext = new Mock<ISqlContext>();

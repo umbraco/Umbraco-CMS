@@ -12,14 +12,12 @@ namespace Umbraco.Cms.Core.IO
 {
     public class FileSystems : IFileSystems
     {
-        private readonly IServiceProvider _container;
         private readonly ILogger<FileSystems> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IIOHelper _ioHelper;
         private GlobalSettings _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        private readonly ConcurrentDictionary<Type, Lazy<IFileSystem>> _filesystems = new ConcurrentDictionary<Type, Lazy<IFileSystem>>();
 
         // wrappers for shadow support
         private ShadowWrapper _macroPartialFileSystem;
@@ -40,22 +38,20 @@ namespace Umbraco.Cms.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IServiceProvider container, ILogger<FileSystems> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IMediaFileSystem mediaFileSystem)
+        public FileSystems(ILogger<FileSystems> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IMediaFileSystem mediaFileSystem)
         {
-            _container = container;
             _logger = logger;
             _loggerFactory = loggerFactory;
             _ioHelper = ioHelper;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
-            AddMediaWrapper(mediaFileSystem);
+            CreateShadowWrapper(mediaFileSystem, "media");
         }
 
         // for tests only, totally unsafe
         internal void Reset()
         {
             _shadowWrappers.Clear();
-            _filesystems.Clear();
             Volatile.Write(ref _wkfsInitialized, false);
             _shadowCurrentId = null;
         }
@@ -155,13 +151,6 @@ namespace Umbraco.Cms.Core.IO
             _shadowWrappers.Add(_mvcViewsFileSystem);
 
             return null;
-        }
-
-        private void AddMediaWrapper(IMediaFileSystem fileSystem)
-        {
-            var mediaFileSystem = new ShadowWrapper(fileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "media",
-                IsScoped);
-            _shadowWrappers.Add(mediaFileSystem);
         }
 
         #endregion

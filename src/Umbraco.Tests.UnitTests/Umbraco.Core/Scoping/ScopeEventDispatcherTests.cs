@@ -73,12 +73,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
         private ScopeProvider GetScopeProvider(NullLoggerFactory instance)
         {
             var fileSystems = new FileSystems(
-                Mock.Of<IServiceProvider>(),
                 Mock.Of<ILogger<FileSystems>>(),
                 instance,
                 Mock.Of<IIOHelper>(),
                 Options.Create(new GlobalSettings()),
-                Mock.Of<IHostingEnvironment>());
+                Mock.Of<IHostingEnvironment>(),
+                Mock.Of<IMediaFileSystem>());
 
             return new ScopeProvider(
                 Mock.Of<IUmbracoDatabaseFactory>(),

@@ -3,6 +3,7 @@ using System.Xml.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -35,7 +36,7 @@ namespace Umbraco.Tests.Models
             var scheme = Mock.Of<IMediaPathScheme>();
             var contentSettings = new ContentSettings();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, loggerFactory.CreateLogger<MediaFileSystem>(), ShortStringHelper);
+            var mediaFileSystem = new MediaFileSystem(scheme, loggerFactory, ShortStringHelper, IOHelper, HostingEnvironment, Mock.Of<IOptions<GlobalSettings>>());
             var ignored = new FileUploadPropertyEditor(loggerFactory, mediaFileSystem, Microsoft.Extensions.Options.Options.Create(contentSettings), DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, UploadAutoFillProperties, JsonNetSerializer, ContentService);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);

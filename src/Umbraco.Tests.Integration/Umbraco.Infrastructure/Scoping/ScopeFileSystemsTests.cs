@@ -170,7 +170,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                     // not ok to create a 'scoped filesystems' other scope
                     // we will get a "Already shadowing." exception.
                     Assert.Throws<InvalidOperationException>(() =>
-                    {                       
+                    {
                         using IScope other = scopeProvider.CreateScope(scopeFileSystems: true);
                     });
 
