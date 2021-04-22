@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(IServiceProvider container, ILogger<FileSystems> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+        public FileSystems(IServiceProvider container, ILogger<FileSystems> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IMediaFileSystem mediaFileSystem)
         {
             _container = container;
             _logger = logger;
@@ -46,6 +46,7 @@ namespace Umbraco.Cms.Core.IO
             _ioHelper = ioHelper;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
+            AddMediaWrapper(mediaFileSystem);
         }
 
         // for tests only, totally unsafe
@@ -152,6 +153,13 @@ namespace Umbraco.Cms.Core.IO
             _shadowWrappers.Add(_mvcViewsFileSystem);
 
             return null;
+        }
+
+        private void AddMediaWrapper(IMediaFileSystem fileSystem)
+        {
+            var mediaFileSystem = new ShadowWrapper(fileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "media",
+                IsScoped);
+            _shadowWrappers.Add(mediaFileSystem);
         }
 
         #endregion
@@ -279,7 +287,7 @@ namespace Umbraco.Cms.Core.IO
             }
         }
 
-        private ShadowWrapper CreateShadowWrapper(IFileSystem filesystem, string shadowPath)
+        internal ShadowWrapper CreateShadowWrapper(IFileSystem filesystem, string shadowPath)
         {
             lock (_shadowLocker)
             {

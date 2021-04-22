@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
@@ -109,19 +110,29 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         }
 
         /// <summary>
-        /// Sets the underlying media filesystem.
+        /// Register MediaFileSystem with a specific inner filesystem.
         /// </summary>
         /// <param name="builder">A builder.</param>
         /// <param name="filesystemFactory">A filesystem factory.</param>
-        /// <remarks>
-        /// Using this helper will ensure that your IFileSystem implementation is wrapped by the ShadowWrapper
-        /// </remarks>
-        public static void SetMediaFileSystem(this IUmbracoBuilder builder, Func<IServiceProvider, IFileSystem> filesystemFactory)
+        public static void SetMediaFileSystemWithInnerFileSystem(this IUmbracoBuilder builder, Func<IServiceProvider, IFileSystem> filesystemFactory)
             => builder.Services.AddUnique<IMediaFileSystem>(factory =>
             {
-                var fileSystems = factory.GetRequiredService<FileSystems>();
-                return fileSystems.GetFileSystem<MediaFileSystem>(filesystemFactory(factory));
+                return new MediaFileSystem(filesystemFactory(factory), factory.GetRequiredService<IMediaPathScheme>(),
+                    factory.GetRequiredService<ILogger<MediaFileSystem>>(),
+                    factory.GetRequiredService<IShortStringHelper>());
             });
+
+        /// <summary>
+        /// Register an implementation of IMediaFileSystem
+        /// </summary>
+        /// <param name="builder">A builder.</param>
+        /// <param name="mediaFileSystem">Instance of IMediaFileSystem to register</param>
+        public static void SetCustomMediaFileSystem(this IUmbracoBuilder builder, IMediaFileSystem mediaFileSystem) =>
+            builder.Services.AddUnique<IMediaFileSystem>(
+                _ =>
+                {
+                    return mediaFileSystem;
+                });
 
         /// <summary>
         /// Sets the log viewer.
