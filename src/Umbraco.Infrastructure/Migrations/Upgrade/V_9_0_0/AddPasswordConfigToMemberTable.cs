@@ -3,9 +3,9 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
 {
-    public class MemberTableColumns2 : MigrationBase
+    public class AddPasswordConfigToMemberTable : MigrationBase
     {
-        public MemberTableColumns2(IMigrationContext context)
+        public AddPasswordConfigToMemberTable(IMigrationContext context)
             : base(context)
         {
         }
