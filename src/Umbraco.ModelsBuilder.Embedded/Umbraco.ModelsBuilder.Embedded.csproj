@@ -89,6 +89,11 @@
     <Compile Include="BackOffice\ContentTypeModelValidator.cs" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="IDisposableAnalyzers">
+      <Version>3.4.13</Version>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp">
       <Version>2.10.0</Version>
     </PackageReference>
