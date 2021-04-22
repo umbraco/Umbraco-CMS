@@ -17,14 +17,14 @@
         {
             "id": "SkipRestore",
             "name": {
-                "text": "Skips the automatic nuget restore of the project on create."
+                "text": "Skips the automatic NuGet restore of the project on create"
             },
             "isVisible": "true"
         },
         {
             "id": "PackageTestSiteName",
             "name": {
-                "text": "Optional: Specify the name of a package that this should be a test site for."
+                "text": "Optional: Specify the name of a package that this should be a test site for"
             },
             "isVisible": "true"
         },

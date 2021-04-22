@@ -34,6 +34,6 @@
         "dotnet new umbraco -n MyNewProject",
         "dotnet new umbraco -n MyNewProjectWithCE -ce",
         "dotnet new umbraco -n MyNewProject --no-restore",
-        "dotnet new umbraco -n MyNewProject --friendly-name Friendly User --email user@email.com --password password1234 --connection-string"
+        "dotnet new umbraco -n MyNewProject --friendly-name "Friendly User" --email user@email.com --password password1234 --connection-string "Server=ConnectionStringHere""
     ]
 }
