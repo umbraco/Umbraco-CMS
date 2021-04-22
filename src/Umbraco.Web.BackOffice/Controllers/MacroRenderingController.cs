@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IMacroService _macroService;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly ISiteDomainMapper _siteDomainHelper;
         private readonly IUmbracoMapper _umbracoMapper;
         private readonly IUmbracoComponentRenderer _componentRenderer;
         private readonly IVariationContextAccessor _variationContextAccessor;
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IMacroService macroService,
             IUmbracoContextAccessor umbracoContextAccessor,
             IShortStringHelper shortStringHelper,
-            ISiteDomainHelper siteDomainHelper)
+            ISiteDomainMapper siteDomainHelper)
 
         {
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));

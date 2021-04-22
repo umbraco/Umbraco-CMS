@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Routing
@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Routing
     /// <summary>
     /// Provides utilities to handle site domains.
     /// </summary>
-    public interface ISiteDomainHelper
+    public interface ISiteDomainMapper
     {
         /// <summary>
         /// Filters a list of <c>DomainAndUri</c> to pick one that best matches the current request.
