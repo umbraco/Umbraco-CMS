@@ -93,20 +93,12 @@
 
         </div>
 
-        <div ng-if="splitViewOpen">
-            <button type="button" class="btn-reset umb-editor-header__close-split-view" ng-click="closeSplitView()">
-                <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
-                <span class="sr-only"><localize key="general_closepane">Close Pane</localize></span>
-            </button>
-        </div>
-
         <div ng-if="editor.variantApps">
             <umb-editor-navigation
                 data-element="editor-sub-views"
                 navigation="editor.variantApps"
                 on-select="selectNavigationItem(item)"
-                on-anchor-select="selectAnchorItem(item, anchor)"
-                test="splitViewOpen === true"> <!-- TODO: clean up -->
+                on-anchor-select="selectAnchorItem(item, anchor)">
             </umb-editor-navigation>
         </div>
 
@@ -117,6 +109,13 @@
                 current-section="{{menu.currentSection}}"
                 is-disabled="disableActionsMenu">
             </umb-editor-menu>
+        </div>
+
+        <div ng-if="splitViewOpen">
+            <button type="button" class="btn-reset umb-editor-header__close-split-view" ng-click="closeSplitView()">
+                <umb-icon icon="icon-delete" class="icon-delete"></umb-icon>
+                <span class="sr-only"><localize key="general_closepane">Close Pane</localize></span>
+            </button>
         </div>
 
     </div>

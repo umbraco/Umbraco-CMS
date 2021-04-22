@@ -226,8 +226,6 @@
 
                     $scope.content = data;
 
-                    console.log($scope.content);
-
                     // TODO: remove all of this - hacking for testing with starter kit
                     if ($scope.content.contentTypeAlias === 'home') {
                         $scope.content.apps = $scope.content.apps.filter(app => app.alias !== 'umbContent');
@@ -258,8 +256,6 @@
     
                         $scope.content.variants.forEach(variant => {
                             variant.tabs.forEach(tab => {
-                                console.log(tab.alias);
-
                                 if (tab.alias === 'Hero') {
                                     tab.testId = '1';
                                 }
@@ -283,10 +279,6 @@
                         });
 
                         $scope.content.apps = [...$scope.content.test, ...$scope.content.apps];
-                    }
-
-                    if ($scope.content.contentTypeAlias === 'products') {
-
                     }
                     
                     appendRuntimeData();
