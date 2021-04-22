@@ -5,11 +5,13 @@
 
         function link(scope) {
 
+            const unsubscribe = [];
+
             scope.showNavigation = true;
             scope.showMoreButton = false;
             scope.showDropdown = false;
             scope.overflowingItems = 0;
-            scope.itemsLimit = 6;
+            scope.itemsLimit = Number.isInteger(scope.limit) ? scope.limit : 6;
 
             scope.moreButton = {
                 alias: "more",
@@ -49,7 +51,7 @@
                 var firstRun = true;
                 calculateVisibleItems($window.innerWidth);
 ;
-                scope.$watch("navigation", (newVal, oldVal) => {
+                unsubscribe.push(scope.$watch("navigation", (newVal, oldVal) => {
                     const newLength = newVal.length;
                     const oldLength = oldVal.length;
 
@@ -60,7 +62,7 @@
                     }
 
                     setMoreButtonErrorState();
-                }, true);
+                }, true));
             }
 
             function calculateVisibleItems(windowWidth) {
@@ -69,14 +71,17 @@
                     return;
                 }
 
-                scope.itemsLimit = 0;
+                // if we haven't set a specific limit prop we base the amount of visible items on the window width
+                if (scope.limit === undefined) {
+                    scope.itemsLimit = 0;
 
-                // set visible items based on browser width
-                if (windowWidth > 1500) {
-                    scope.itemsLimit = 6;
-                } 
-                else if (windowWidth > 700) {
-                    scope.itemsLimit = 4;
+                    // set visible items based on browser width
+                    if (windowWidth > 1500) {
+                        scope.itemsLimit = 6;
+                    } 
+                    else if (windowWidth > 700) {
+                        scope.itemsLimit = 4;
+                    }
                 }
 
                 // toggle more button
@@ -141,13 +146,20 @@
 
             windowResizeListener.register(resizeCallback);
 
-            //ensure to unregister from all events and kill jquery plugins
+            unsubscribe.push(scope.$watch('limit', (newVal) => {
+                scope.itemsLimit = newVal;
+                calculateVisibleItems($window.innerWidth);
+            }));
+
             scope.$on('$destroy', function () {
                 windowResizeListener.unregister(resizeCallback);
+
+                for (var u in unsubscribe) {
+                    unsubscribe[u]();
+                }
             });
 
             onInit();
-
         }
 
         var directive = {
@@ -157,7 +169,8 @@
             scope: {
                 navigation: "=",
                 onSelect: "&",
-                onAnchorSelect: "&"
+                onAnchorSelect: "&",
+                limit: "<"
             },
             link: link
         };

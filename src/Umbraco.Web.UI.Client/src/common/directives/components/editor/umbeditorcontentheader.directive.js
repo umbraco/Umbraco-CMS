@@ -214,6 +214,10 @@
                 }
             };
 
+            unsubscribe.push(scope.$watch('splitViewOpen', (newVal) => {
+                scope.vm.navigationItemLimit = newVal === true ? 0 : undefined;
+            }));
+
             onInit();
 
             scope.$on('$destroy', function () {
