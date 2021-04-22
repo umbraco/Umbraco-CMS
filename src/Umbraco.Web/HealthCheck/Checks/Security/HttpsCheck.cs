@@ -92,24 +92,26 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                     // Hat-tip: https://stackoverflow.com/a/15343898/489433
                     const int NumberOfDaysForExpiryWarning = 14;
                     var cert = request.ServicePoint.Certificate;
-                    var cert2 = new X509Certificate2(cert);
-                    var expirationDate = cert2.NotAfter;
+                    using (var cert2 = new X509Certificate2(cert))
+                    {
+                        var expirationDate = cert2.NotAfter;
 
-                    var daysToExpiry = (int)Math.Floor((cert2.NotAfter - DateTime.Now).TotalDays);
-                    if (daysToExpiry <= 0)
-                    {
-                        result = StatusResultType.Error;
-                        message = _textService.Localize("healthcheck/httpsCheckExpiredCertificate");
-                    }
-                    else if (daysToExpiry < NumberOfDaysForExpiryWarning)
-                    {
-                        result = StatusResultType.Warning;
-                        message = _textService.Localize("healthcheck/httpsCheckExpiringCertificate", new[] { daysToExpiry.ToString() });
-                    }
-                    else
-                    {
-                        result = StatusResultType.Success;
-                        message = _textService.Localize("healthcheck/httpsCheckValidCertificate");
+                        var daysToExpiry = (int)Math.Floor((cert2.NotAfter - DateTime.Now).TotalDays);
+                        if (daysToExpiry <= 0)
+                        {
+                            result = StatusResultType.Error;
+                            message = _textService.Localize("healthcheck/httpsCheckExpiredCertificate");
+                        }
+                        else if (daysToExpiry < NumberOfDaysForExpiryWarning)
+                        {
+                            result = StatusResultType.Warning;
+                            message = _textService.Localize("healthcheck/httpsCheckExpiringCertificate", new[] { daysToExpiry.ToString() });
+                        }
+                        else
+                        {
+                            result = StatusResultType.Success;
+                            message = _textService.Localize("healthcheck/httpsCheckValidCertificate");
+                        }
                     }
                 }
                 else
