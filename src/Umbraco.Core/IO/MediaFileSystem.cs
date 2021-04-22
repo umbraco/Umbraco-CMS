@@ -18,7 +18,6 @@ namespace Umbraco.Cms.Core.IO
     /// </summary>
     public class MediaFileSystem : PhysicalFileSystem, IMediaFileSystem
     {
-        private readonly IFileSystem _innerFileSystem;
         private readonly IMediaPathScheme _mediaPathScheme;
         private readonly ILogger<MediaFileSystem> _logger;
         private readonly IShortStringHelper _shortStringHelper;
