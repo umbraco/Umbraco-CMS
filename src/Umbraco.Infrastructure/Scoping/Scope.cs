@@ -42,11 +42,14 @@ namespace Umbraco.Cms.Core.Scoping
         // eventually this may need to be injectable - for now we'll create it explicitly and let future needs determine if it should be injectable
         private IScopedNotificationPublisher _notificationPublisher;
 
-        private object _dictionaryLocker;
+        private readonly object _dictionaryLocker;
         private HashSet<int> _readLocks;
         private HashSet<int> _writeLocks;
-        internal Dictionary<Guid, Dictionary<int, int>> ReadLocks;
-        internal Dictionary<Guid, Dictionary<int, int>> WriteLocks;
+        private Dictionary<Guid, Dictionary<int, int>> _readLockDictionary;
+        private Dictionary<Guid, Dictionary<int, int>> _writeLockDictionary;
+
+        internal Dictionary<Guid, Dictionary<int, int>> ReadLocks => _readLockDictionary;
+        internal Dictionary<Guid, Dictionary<int, int>> WriteLocks => _writeLockDictionary;
 
         // initializes a new scope
         private Scope(
@@ -770,7 +773,7 @@ namespace Umbraco.Cms.Core.Scoping
             else
             {
                 // We are the outermost scope, handle the lock request.
-                LockInner(instanceId, ref ReadLocks, ref _readLocks, ObtainReadLock, ObtainTimeoutReadLock, timeout, lockIds);
+                LockInner(instanceId, ref _readLockDictionary, ref _readLocks, ObtainReadLock, ObtainTimeoutReadLock, timeout, lockIds);
             }
         }
 
@@ -790,7 +793,7 @@ namespace Umbraco.Cms.Core.Scoping
             else
             {
                 // We are the outermost scope, handle the lock request.
-                LockInner(instanceId, ref WriteLocks, ref _writeLocks, ObtainWriteLock, ObtainTimeoutWriteLock, timeout, lockIds);
+                LockInner(instanceId, ref _writeLockDictionary, ref _writeLocks, ObtainWriteLock, ObtainTimeoutWriteLock, timeout, lockIds);
             }
         }
 

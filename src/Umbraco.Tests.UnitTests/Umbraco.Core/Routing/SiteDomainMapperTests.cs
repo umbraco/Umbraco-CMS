@@ -10,13 +10,10 @@ using Umbraco.Cms.Core.Routing;
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 {
     [TestFixture]
-    public class SiteDomainHelperTests
+    public class SiteDomainMapperTests
     {
-        [SetUp]
-        public void SetUp() => SiteDomainHelper.Clear(); // assuming this works!
 
-        [TearDown]
-        public void TearDown() => SiteDomainHelper.Clear(); // assuming this works!
+        private SiteDomainMapper CreateSut() => new SiteDomainMapper();
 
         private static readonly string s_cultureFr = "fr-fr";
         private static readonly string s_cultureGb = "en-gb";
@@ -24,10 +21,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
         [Test]
         public void AddSites()
         {
-            SiteDomainHelper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
-            SiteDomainHelper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
+            SiteDomainMapper siteDomainMapper = CreateSut();
 
-            Dictionary<string, string[]> sites = SiteDomainHelper.Sites;
+            siteDomainMapper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
+            siteDomainMapper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
+
+            Dictionary<string, string[]> sites = siteDomainMapper.Sites;
 
             Assert.AreEqual(2, sites.Count);
 
@@ -57,23 +56,35 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
         [TestCase("http://www.domain.com:12/")]
         [TestCase("https://foo.www.domain.com")]
         [TestCase("https://foo.www.domain.com:5478/")]
-        public void AddValidSite(string domain) => SiteDomainHelper.AddSite("site1", domain);
+        public void AddValidSite(string domain)
+        {
+            SiteDomainMapper siteDomainMapper = CreateSut();
+
+            siteDomainMapper.AddSite("site1", domain);
+        }
 
         [TestCase("domain.com/foo")]
         [TestCase("http:/domain.com")]
         [TestCase("*")]
-        public void AddInvalidSite(string domain) => Assert.Throws<ArgumentOutOfRangeException>(() => SiteDomainHelper.AddSite("site1", domain));
+        public void AddInvalidSite(string domain)
+        {
+            SiteDomainMapper siteDomainMapper = CreateSut();
+
+            Assert.Throws<ArgumentOutOfRangeException>(() => siteDomainMapper.AddSite("site1", domain));
+        }
 
         [Test]
         public void AddRemoveSites()
         {
-            SiteDomainHelper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
-            SiteDomainHelper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
+            SiteDomainMapper siteDomainMapper = CreateSut();
 
-            Dictionary<string, string[]> sites = SiteDomainHelper.Sites;
+            siteDomainMapper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
+            siteDomainMapper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
 
-            SiteDomainHelper.RemoveSite("site1");
-            SiteDomainHelper.RemoveSite("site3");
+            Dictionary<string, string[]> sites = siteDomainMapper.Sites;
+
+            siteDomainMapper.RemoveSite("site1");
+            siteDomainMapper.RemoveSite("site3");
 
             Assert.AreEqual(1, sites.Count);
 
@@ -83,10 +94,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
         [Test]
         public void AddSiteAgain()
         {
-            SiteDomainHelper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
-            SiteDomainHelper.AddSite("site1", "domain2.com", "domain1.net");
+            SiteDomainMapper siteDomainMapper = CreateSut();
 
-            Dictionary<string, string[]> sites = SiteDomainHelper.Sites;
+            siteDomainMapper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
+            siteDomainMapper.AddSite("site1", "domain2.com", "domain1.net");
+
+            Dictionary<string, string[]> sites = siteDomainMapper.Sites;
 
             Assert.AreEqual(1, sites.Count);
 
@@ -101,14 +114,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
         [Test]
         public void BindSitesOnce()
         {
-            SiteDomainHelper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
-            SiteDomainHelper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
-            SiteDomainHelper.AddSite("site3", "domain3.com", "domain3.net", "domain3.org");
-            SiteDomainHelper.AddSite("site4", "domain4.com", "domain4.net", "domain4.org");
+            SiteDomainMapper siteDomainMapper = CreateSut();
 
-            SiteDomainHelper.BindSites("site1", "site2");
+            siteDomainMapper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
+            siteDomainMapper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
+            siteDomainMapper.AddSite("site3", "domain3.com", "domain3.net", "domain3.org");
+            siteDomainMapper.AddSite("site4", "domain4.com", "domain4.net", "domain4.org");
 
-            Dictionary<string, List<string>> bindings = SiteDomainHelper.Bindings;
+            siteDomainMapper.BindSites("site1", "site2");
+
+            Dictionary<string, List<string>> bindings = siteDomainMapper.Bindings;
 
             Assert.AreEqual(2, bindings.Count);
             Assert.Contains("site1", bindings.Keys);
@@ -126,15 +141,17 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
         [Test]
         public void BindMoreSites()
         {
-            SiteDomainHelper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
-            SiteDomainHelper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
-            SiteDomainHelper.AddSite("site3", "domain3.com", "domain3.net", "domain3.org");
-            SiteDomainHelper.AddSite("site4", "domain4.com", "domain4.net", "domain4.org");
+            SiteDomainMapper siteDomainMapper = CreateSut();
 
-            SiteDomainHelper.BindSites("site1", "site2");
-            SiteDomainHelper.BindSites("site1", "site3");
+            siteDomainMapper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
+            siteDomainMapper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
+            siteDomainMapper.AddSite("site3", "domain3.com", "domain3.net", "domain3.org");
+            siteDomainMapper.AddSite("site4", "domain4.com", "domain4.net", "domain4.org");
 
-            Dictionary<string, List<string>> bindings = SiteDomainHelper.Bindings;
+            siteDomainMapper.BindSites("site1", "site2");
+            siteDomainMapper.BindSites("site1", "site3");
+
+            Dictionary<string, List<string>> bindings = siteDomainMapper.Bindings;
 
             Assert.AreEqual(3, bindings.Count);
             Assert.Contains("site1", bindings.Keys);
@@ -167,13 +184,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
         [Test]
         public void MapDomainWithScheme()
         {
-            SiteDomainHelper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
-            SiteDomainHelper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
-            SiteDomainHelper.AddSite("site3", "domain3.com", "domain3.net", "domain3.org");
-            SiteDomainHelper.AddSite("site4", "https://domain4.com", "https://domain4.net", "https://domain4.org");
+            SiteDomainMapper siteDomainMapper = CreateSut();
 
-            // map methods are not static because we can override them
-            var helper = new SiteDomainHelper();
+            siteDomainMapper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
+            siteDomainMapper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
+            siteDomainMapper.AddSite("site3", "domain3.com", "domain3.net", "domain3.org");
+            siteDomainMapper.AddSite("site4", "https://domain4.com", "https://domain4.net", "https://domain4.org");
 
             // this works, but it's purely by chance / arbitrary
             // don't use the www in tests here!
@@ -184,7 +200,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
                     new Domain(1, "domain1.com", -1, s_cultureGb, false),
                 };
             DomainAndUri[] domainAndUris = DomainAndUris(current, domains);
-            string output = helper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
+            string output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
             Assert.AreEqual("https://domain1.com/", output);
 
             // will pick it all right
@@ -195,7 +211,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
                     new Domain(1, "https://domain2.com", -1, s_cultureGb, false)
                 };
             domainAndUris = DomainAndUris(current, domains);
-            output = helper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
+            output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
             Assert.AreEqual("https://domain1.com/", output);
 
             current = new Uri("https://domain1.com/foo/bar");
@@ -205,7 +221,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
                     new Domain(1, "https://domain4.com", -1, s_cultureGb, false)
                 };
             domainAndUris = DomainAndUris(current, domains);
-            output = helper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
+            output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
             Assert.AreEqual("https://domain1.com/", output);
 
             current = new Uri("https://domain4.com/foo/bar");
@@ -215,25 +231,24 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
                 new Domain(1, "https://domain4.com", -1, s_cultureGb, false)
             };
             domainAndUris = DomainAndUris(current, domains);
-            output = helper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
+            output = siteDomainMapper.MapDomain(domainAndUris, current, s_cultureFr, s_cultureFr).Uri.ToString();
             Assert.AreEqual("https://domain4.com/", output);
         }
 
         [Test]
         public void MapDomain()
         {
-            SiteDomainHelper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
-            SiteDomainHelper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
-            SiteDomainHelper.AddSite("site3", "domain3.com", "domain3.net", "domain3.org");
-            SiteDomainHelper.AddSite("site4", "domain4.com", "domain4.net", "domain4.org");
+            SiteDomainMapper siteDomainMapper = CreateSut();
 
-            // map methods are not static because we can override them
-            var helper = new SiteDomainHelper();
+            siteDomainMapper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
+            siteDomainMapper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
+            siteDomainMapper.AddSite("site3", "domain3.com", "domain3.net", "domain3.org");
+            siteDomainMapper.AddSite("site4", "domain4.com", "domain4.net", "domain4.org");
 
             // current is a site1 uri, domains contain current
             // so we'll get current
             var current = new Uri("http://domain1.com/foo/bar");
-            string output = helper.MapDomain(
+            string output = siteDomainMapper.MapDomain(
                 new[]
                 {
                     new DomainAndUri(new Domain(1, "domain1.com", -1, s_cultureFr, false), current),
@@ -246,7 +261,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             // current is a site1 uri, domains do not contain current
             // so we'll get the corresponding site1 domain
             current = new Uri("http://domain1.com/foo/bar");
-            output = helper.MapDomain(
+            output = siteDomainMapper.MapDomain(
                 new[]
                 {
                     new DomainAndUri(new Domain(1, "domain1.net", -1, s_cultureFr, false), current),
@@ -260,7 +275,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             // so we'll get the corresponding site1 domain
             // order does not matter
             current = new Uri("http://domain1.com/foo/bar");
-            output = helper.MapDomain(
+            output = siteDomainMapper.MapDomain(
                 new[]
                 {
                     new DomainAndUri(new Domain(1, "domain2.net", -1, s_cultureFr, false), current),
@@ -274,13 +289,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
         [Test]
         public void MapDomains()
         {
-            SiteDomainHelper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
-            SiteDomainHelper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
-            SiteDomainHelper.AddSite("site3", "domain3.com", "domain3.net", "domain3.org");
-            SiteDomainHelper.AddSite("site4", "domain4.com", "domain4.net", "domain4.org");
+            SiteDomainMapper siteDomainMapper = CreateSut();
 
-            // map methods are not static because we can override them
-            var helper = new SiteDomainHelper();
+            siteDomainMapper.AddSite("site1", "domain1.com", "domain1.net", "domain1.org");
+            siteDomainMapper.AddSite("site2", "domain2.com", "domain2.net", "domain2.org");
+            siteDomainMapper.AddSite("site3", "domain3.com", "domain3.net", "domain3.org");
+            siteDomainMapper.AddSite("site4", "domain4.com", "domain4.net", "domain4.org");
 
             // the rule is:
             // - exclude the current domain
@@ -289,7 +303,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 
             // current is a site1 uri, domains contains current
             var current = new Uri("http://domain1.com/foo/bar");
-            DomainAndUri[] output = helper.MapDomains(
+            DomainAndUri[] output = siteDomainMapper.MapDomains(
                 new[]
                 {
                     new DomainAndUri(new Domain(1, "domain1.com", -1, s_cultureFr, false), current), // no: current + what MapDomain would pick
@@ -308,7 +322,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 
             // current is a site1 uri, domains does not contain current
             current = new Uri("http://domain1.com/foo/bar");
-            output = helper.MapDomains(
+            output = siteDomainMapper.MapDomains(
                 new[]
                 {
                     new DomainAndUri(new Domain(1, "domain1.net", -1, s_cultureFr, false), current), // no: what MapDomain would pick
@@ -325,12 +339,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             Assert.AreEqual(1, output.Count());
             Assert.Contains("http://domain1.org/", output.Select(d => d.Uri.ToString()).ToArray());
 
-            SiteDomainHelper.BindSites("site1", "site3");
-            SiteDomainHelper.BindSites("site2", "site4");
+            siteDomainMapper.BindSites("site1", "site3");
+            siteDomainMapper.BindSites("site2", "site4");
 
             // current is a site1 uri, domains contains current
             current = new Uri("http://domain1.com/foo/bar");
-            output = helper.MapDomains(
+            output = siteDomainMapper.MapDomains(
                 new[]
                 {
                     new DomainAndUri(new Domain(1, "domain1.com", -1, s_cultureFr, false), current), // no: current + what MapDomain would pick
@@ -352,7 +366,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
 
             // current is a site1 uri, domains does not contain current
             current = new Uri("http://domain1.com/foo/bar");
-            output = helper.MapDomains(
+            output = siteDomainMapper.MapDomains(
                 new[]
                 {
                     new DomainAndUri(new Domain(1, "domain1.net", -1, s_cultureFr, false), current), // no: what MapDomain would pick

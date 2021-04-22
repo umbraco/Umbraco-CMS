@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Caching;
@@ -107,18 +107,33 @@ namespace Umbraco.Cms.Core.Cache
 
             Lazy<object> result;
 
-            using (var lck = new UpgradeableReadLock(_locker))
+            try
             {
+                _locker.EnterUpgradeableReadLock();
+
                 result = MemoryCache.Get(key) as Lazy<object>;
                 if (result == null || SafeLazy.GetSafeLazyValue(result, true) == null) // get non-created as NonCreatedValue & exceptions as null
                 {
                     result = SafeLazy.GetSafeLazy(factory);
                     var policy = GetPolicy(timeout, isSliding, dependentFiles);
 
-                    lck.UpgradeToWriteLock();
-                    //NOTE: This does an add or update
-                    MemoryCache.Set(key, result, policy);
+                    try
+                    {
+                        _locker.EnterWriteLock();
+                        //NOTE: This does an add or update
+                        MemoryCache.Set(key, result, policy);
+                    }
+                    finally
+                    {
+                        if (_locker.IsWriteLockHeld)
+                            _locker.ExitWriteLock();
+                    }
                 }
+            }
+            finally
+            {
+                if (_locker.IsUpgradeableReadLockHeld)
+                    _locker.ExitUpgradeableReadLock();
             }
 
             //return result.Value;

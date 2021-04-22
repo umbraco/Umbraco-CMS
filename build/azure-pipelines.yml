@@ -349,7 +349,7 @@ stages:
                         #Update the version in templates also
 
                         $templatePath =
-                        'build/templates/UmbracoSolution/.template.config/template.json'
+                        'build/templates/UmbracoProject/.template.config/template.json'
 
                         $a = Get-Content $templatePath -raw | ConvertFrom-Json
 

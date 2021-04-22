@@ -7,61 +7,54 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Routing
 {
-     /// <summary>
+    /// <summary>
     /// Provides utilities to handle site domains.
-     /// </summary>
-    public class SiteDomainHelper : ISiteDomainHelper
+    /// </summary>
+    public class SiteDomainMapper : ISiteDomainMapper, IDisposable
     {
         #region Configure
 
-        private static readonly ReaderWriterLockSlim ConfigLock = new ReaderWriterLockSlim();
-        private static Dictionary<string, string[]> _sites;
-        private static Dictionary<string, List<string>> _bindings;
-        private static Dictionary<string, Dictionary<string, string[]>> _qualifiedSites;
+        private readonly ReaderWriterLockSlim _configLock = new ReaderWriterLockSlim();
+        private Dictionary<string, Dictionary<string, string[]>> _qualifiedSites;
+        private bool _disposedValue;
 
-        // these are for unit tests *only*
-        // ReSharper disable ConvertToAutoPropertyWithPrivateSetter
-        internal static Dictionary<string, string[]> Sites => _sites;
-        internal static Dictionary<string, List<string>> Bindings => _bindings;
-        // ReSharper restore ConvertToAutoPropertyWithPrivateSetter
+        internal Dictionary<string, string[]> Sites { get; private set; }
+        internal Dictionary<string, List<string>> Bindings { get; private set; }
 
         // these are for validation
         //private const string DomainValidationSource = @"^(\*|((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/[-\w]*)?))$";
         private const string DomainValidationSource = @"^(((?i:http[s]?://)?([-\w]+(\.[-\w]+)*)(:\d+)?(/)?))$";
-        private static readonly Regex DomainValidation = new Regex(DomainValidationSource, RegexOptions.IgnoreCase | RegexOptions.Compiled);
-
-        /// <summary>
-        /// Returns a disposable object that represents safe write access to config.
-        /// </summary>
-        /// <remarks>Should be used in a <c>using(SiteDomainHelper.ConfigWriteLock) { ... }</c>  mode.</remarks>
-        protected static IDisposable ConfigWriteLock => new WriteLock(ConfigLock);
-
-        /// <summary>
-        /// Returns a disposable object that represents safe read access to config.
-        /// </summary>
-        /// <remarks>Should be used in a <c>using(SiteDomainHelper.ConfigWriteLock) { ... }</c>  mode.</remarks>
-        protected static IDisposable ConfigReadLock => new ReadLock(ConfigLock);
+        private static readonly Regex s_domainValidation = new Regex(DomainValidationSource, RegexOptions.IgnoreCase | RegexOptions.Compiled);
 
         /// <summary>
         /// Clears the entire configuration.
         /// </summary>
-        public static void Clear()
+        public void Clear()
         {
-            using (ConfigWriteLock)
+            try
             {
-                _sites = null;
-                _bindings = null;
+                _configLock.EnterWriteLock();
+
+                Sites = null;
+                Bindings = null;
                 _qualifiedSites = null;
+            }
+            finally
+            {
+                if (_configLock.IsWriteLockHeld)
+                {
+                    _configLock.ExitWriteLock();
+                }
             }
         }
 
-        private static IEnumerable<string> ValidateDomains(IEnumerable<string> domains)
+        private IEnumerable<string> ValidateDomains(IEnumerable<string> domains)
         {
             // must use authority format w/optional scheme and port, but no path
             // any domain should appear only once
             return domains.Select(domain =>
                 {
-                    if (!DomainValidation.IsMatch(domain))
+                    if (!s_domainValidation.IsMatch(domain))
                         throw new ArgumentOutOfRangeException(nameof(domains), $"Invalid domain: \"{domain}\".");
                     return domain;
                 });
@@ -73,13 +66,22 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="key">A key uniquely identifying the site.</param>
         /// <param name="domains">The site domains.</param>
         /// <remarks>At the moment there is no public way to remove a site. Clear and reconfigure.</remarks>
-        public static void AddSite(string key, IEnumerable<string> domains)
+        public void AddSite(string key, IEnumerable<string> domains)
         {
-            using (ConfigWriteLock)
+            try
             {
-                _sites = _sites ?? new Dictionary<string, string[]>();
-                _sites[key] = ValidateDomains(domains).ToArray();
+                _configLock.EnterWriteLock();
+
+                Sites = Sites ?? new Dictionary<string, string[]>();
+                Sites[key] = ValidateDomains(domains).ToArray();
                 _qualifiedSites = null;
+            }
+            finally
+            {
+                if (_configLock.IsWriteLockHeld)
+                {
+                    _configLock.ExitWriteLock();
+                }
             }
         }
 
@@ -89,13 +91,22 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="key">A key uniquely identifying the site.</param>
         /// <param name="domains">The site domains.</param>
         /// <remarks>At the moment there is no public way to remove a site. Clear and reconfigure.</remarks>
-        public static void AddSite(string key, params string[] domains)
+        public void AddSite(string key, params string[] domains)
         {
-            using (ConfigWriteLock)
+            try
             {
-                _sites = _sites ?? new Dictionary<string, string[]>();
-                _sites[key] = ValidateDomains(domains).ToArray();
+                _configLock.EnterWriteLock();
+
+                Sites = Sites ?? new Dictionary<string, string[]>();
+                Sites[key] = ValidateDomains(domains).ToArray();
                 _qualifiedSites = null;
+            }
+            finally
+            {
+                if (_configLock.IsWriteLockHeld)
+                {
+                    _configLock.ExitWriteLock();
+                }
             }
         }
 
@@ -103,31 +114,40 @@ namespace Umbraco.Cms.Core.Routing
         /// Removes a site.
         /// </summary>
         /// <param name="key">A key uniquely identifying the site.</param>
-        internal static void RemoveSite(string key)
+        internal void RemoveSite(string key)
         {
-            using (ConfigWriteLock)
+            try
             {
-                if (_sites == null || !_sites.ContainsKey(key))
+                _configLock.EnterWriteLock();
+
+                if (Sites == null || !Sites.ContainsKey(key))
                     return;
 
-                _sites.Remove(key);
-                if (_sites.Count == 0)
-                    _sites = null;
+                Sites.Remove(key);
+                if (Sites.Count == 0)
+                    Sites = null;
 
-                if (_bindings != null && _bindings.ContainsKey(key))
+                if (Bindings != null && Bindings.ContainsKey(key))
                 {
-                    foreach (var b in _bindings[key])
+                    foreach (var b in Bindings[key])
                     {
-                        _bindings[b].Remove(key);
-                        if (_bindings[b].Count == 0)
-                            _bindings.Remove(b);
+                        Bindings[b].Remove(key);
+                        if (Bindings[b].Count == 0)
+                            Bindings.Remove(b);
                     }
-                    _bindings.Remove(key);
-                    if (_bindings.Count > 0)
-                        _bindings = null;
+                    Bindings.Remove(key);
+                    if (Bindings.Count > 0)
+                        Bindings = null;
                 }
 
                 _qualifiedSites = null;
+            }
+            finally
+            {
+                if (_configLock.IsWriteLockHeld)
+                {
+                    _configLock.ExitWriteLock();
+                }
             }
         }
 
@@ -135,20 +155,22 @@ namespace Umbraco.Cms.Core.Routing
         /// Binds some sites.
         /// </summary>
         /// <param name="keys">The keys uniquely identifying the sites to bind.</param>
-         /// <remarks>
+        /// <remarks>
         /// <para>At the moment there is no public way to unbind sites. Clear and reconfigure.</para>
         /// <para>If site1 is bound to site2 and site2 is bound to site3 then site1 is bound to site3.</para>
-         /// </remarks>
-        public static void BindSites(params string[] keys)
-         {
-            using (ConfigWriteLock)
+        /// </remarks>
+        public void BindSites(params string[] keys)
+        {
+            try
             {
-                foreach (var key in keys.Where(key => !_sites.ContainsKey(key)))
+                _configLock.EnterWriteLock();
+
+                foreach (var key in keys.Where(key => !Sites.ContainsKey(key)))
                     throw new ArgumentException($"Not an existing site key: {key}.", nameof(keys));
 
-                _bindings = _bindings ?? new Dictionary<string, List<string>>();
+                Bindings = Bindings ?? new Dictionary<string, List<string>>();
 
-                var allkeys = _bindings
+                var allkeys = Bindings
                     .Where(kvp => keys.Contains(kvp.Key))
                     .SelectMany(kvp => kvp.Value)
                     .Union(keys)
@@ -156,11 +178,18 @@ namespace Umbraco.Cms.Core.Routing
 
                 foreach (var key in allkeys)
                 {
-                    if (!_bindings.ContainsKey(key))
-                        _bindings[key] = new List<string>();
+                    if (!Bindings.ContainsKey(key))
+                        Bindings[key] = new List<string>();
                     var xkey = key;
-                    var addKeys = allkeys.Where(k => k != xkey).Except(_bindings[key]);
-                    _bindings[key].AddRange(addKeys);
+                    var addKeys = allkeys.Where(k => k != xkey).Except(Bindings[key]);
+                    Bindings[key].AddRange(addKeys);
+                }
+            }
+            finally
+            {
+                if (_configLock.IsWriteLockHeld)
+                {
+                    _configLock.ExitWriteLock();
                 }
             }
         }
@@ -185,10 +214,12 @@ namespace Umbraco.Cms.Core.Routing
 
             var currentAuthority = current.GetLeftPart(UriPartial.Authority);
             KeyValuePair<string, string[]>[] candidateSites = null;
-             IEnumerable<DomainAndUri> ret = domainAndUris;
+            IEnumerable<DomainAndUri> ret = domainAndUris;
 
-            using (ConfigReadLock) // so nothing changes between GetQualifiedSites and access to bindings
+            try
             {
+                _configLock.EnterReadLock();
+
                 var qualifiedSites = GetQualifiedSitesInsideLock(current);
 
                 if (excludeDefault)
@@ -223,13 +254,20 @@ namespace Umbraco.Cms.Core.Routing
                 if (!currentSite.Equals(default(KeyValuePair<string, string[]>)))
                 {
                     candidateSites = new[] { currentSite };
-                    if (_bindings != null && _bindings.ContainsKey(currentSite.Key))
+                    if (Bindings != null && Bindings.ContainsKey(currentSite.Key))
                     {
-                        var boundSites = qualifiedSites.Where(site => _bindings[currentSite.Key].Contains(site.Key));
+                        var boundSites = qualifiedSites.Where(site => Bindings[currentSite.Key].Contains(site.Key));
                         candidateSites = candidateSites.Union(boundSites).ToArray();
 
                         // .ToArray ensures it is evaluated before the configuration lock is exited
                     }
+                }
+            }
+            finally
+            {
+                if (_configLock.IsReadLockHeld)
+                {
+                    _configLock.ExitReadLock();
                 }
             }
 
@@ -241,18 +279,27 @@ namespace Umbraco.Cms.Core.Routing
                 });
         }
 
-        private static Dictionary<string, string[]> GetQualifiedSites(Uri current)
+        private Dictionary<string, string[]> GetQualifiedSites(Uri current)
         {
-            using (ConfigReadLock)
+            try
             {
+                _configLock.EnterReadLock();
+
                 return GetQualifiedSitesInsideLock(current);
+            }
+            finally
+            {
+                if (_configLock.IsReadLockHeld)
+                {
+                    _configLock.ExitReadLock();
+                }
             }
         }
 
-        private static Dictionary<string, string[]> GetQualifiedSitesInsideLock(Uri current)
+        private Dictionary<string, string[]> GetQualifiedSitesInsideLock(Uri current)
         {
             // we do our best, but can't do the impossible
-            if (_sites == null)
+            if (Sites == null)
                 return null;
 
             // cached?
@@ -263,7 +310,7 @@ namespace Umbraco.Cms.Core.Routing
 
             // convert sites into authority sites based upon current scheme
             // because some domains in the sites might not have a scheme -- and cache
-            return _qualifiedSites[current.Scheme] = _sites
+            return _qualifiedSites[current.Scheme] = Sites
                 .ToDictionary(
                     kvp => kvp.Key,
                     kvp => kvp.Value.Select(d => new Uri(UriUtilityCore.StartWithScheme(d, current.Scheme)).GetLeftPart(UriPartial.Authority)).ToArray()
@@ -274,10 +321,12 @@ namespace Umbraco.Cms.Core.Routing
             // therefore it is safe to return and exit the configuration lock
         }
 
-        private static DomainAndUri MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Dictionary<string, string[]> qualifiedSites, string currentAuthority, string culture, string defaultCulture)
+        private DomainAndUri MapDomain(IReadOnlyCollection<DomainAndUri> domainAndUris, Dictionary<string, string[]> qualifiedSites, string currentAuthority, string culture, string defaultCulture)
         {
-            if (domainAndUris == null) throw new ArgumentNullException(nameof(domainAndUris));
-            if (domainAndUris.Count == 0) throw new ArgumentException("Cannot be empty.", nameof(domainAndUris));
+            if (domainAndUris == null)
+                throw new ArgumentNullException(nameof(domainAndUris));
+            if (domainAndUris.Count == 0)
+                throw new ArgumentException("Cannot be empty.", nameof(domainAndUris));
 
             // TODO: how shall we deal with cultures?
 
@@ -316,5 +365,26 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         #endregion
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    // This is pretty nasty disposing a static on an instance but it's because this whole class
+                    // is pretty fubar. I'm sure we've fixed this all up in netcore now? We need to remove all statics.
+                    _configLock.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+        }
     }
 }

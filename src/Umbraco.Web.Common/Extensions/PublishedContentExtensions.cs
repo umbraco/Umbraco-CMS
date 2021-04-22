@@ -47,7 +47,7 @@ namespace Umbraco.Extensions
         /// one document per culture), and domains, withing the context of a current Uri, assign
         /// a culture to that document.</para>
         /// </remarks>
-        public static string GetCultureFromDomains(this IPublishedContent content, IUmbracoContextAccessor umbracoContextAccessor, ISiteDomainHelper siteDomainHelper, Uri current = null)
+        public static string GetCultureFromDomains(this IPublishedContent content, IUmbracoContextAccessor umbracoContextAccessor, ISiteDomainMapper siteDomainHelper, Uri current = null)
             => DomainUtilities.GetCultureFromDomains(content.Id, content.Path, current, umbracoContextAccessor.UmbracoContext, siteDomainHelper);
 
         #endregion
