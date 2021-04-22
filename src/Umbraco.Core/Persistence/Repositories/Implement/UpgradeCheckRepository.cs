@@ -1,4 +1,5 @@
-﻿using System.Net.Http;
+﻿using System;
+using System.Net.Http;
 using System.Net.Http.Formatting;
 using System.Threading.Tasks;
 using Semver;
@@ -6,9 +7,10 @@ using Umbraco.Core.Models;
 
 namespace Umbraco.Core.Persistence.Repositories.Implement
 {
-    internal class UpgradeCheckRepository : IUpgradeCheckRepository
+    internal class UpgradeCheckRepository : IUpgradeCheckRepository, IDisposable
     {
         private static HttpClient _httpClient;
+        private bool _disposedValue;
         private const string RestApiUpgradeChecklUrl = "https://our.umbraco.com/umbraco/api/UpgradeCheck/CheckUpgrade";
 
 
@@ -49,6 +51,28 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             public int VersionMinor { get; }
             public int VersionPatch { get; }
             public string VersionComment { get;  }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _httpClient?.Dispose();
+                }
+
+                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
+                // TODO: set large fields to null
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
     }
 }
