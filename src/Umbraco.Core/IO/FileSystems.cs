@@ -16,6 +16,8 @@ namespace Umbraco.Cms.Core.IO
         private readonly ILogger<FileSystems> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly IIOHelper _ioHelper;
+        private GlobalSettings _globalSettings;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         private readonly ConcurrentDictionary<Type, Lazy<IFileSystem>> _filesystems = new ConcurrentDictionary<Type, Lazy<IFileSystem>>();
 
@@ -160,64 +162,6 @@ namespace Umbraco.Cms.Core.IO
             var mediaFileSystem = new ShadowWrapper(fileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "media",
                 IsScoped);
             _shadowWrappers.Add(mediaFileSystem);
-        }
-
-        #endregion
-
-        #region Providers
-
-        private readonly Dictionary<Type, string> _paths = new Dictionary<Type, string>();
-
-        // internal for tests
-        internal IReadOnlyDictionary<Type, string> Paths => _paths;
-        private GlobalSettings _globalSettings;
-        private readonly IHostingEnvironment _hostingEnvironment;
-
-        /// <summary>
-        /// Gets a strongly-typed filesystem.
-        /// </summary>
-        /// <typeparam name="TFileSystem">The type of the filesystem.</typeparam>
-        /// <returns>A strongly-typed filesystem of the specified type.</returns>
-        /// <remarks>
-        /// <para>Note that any filesystem created by this method *after* shadowing begins, will *not* be
-        /// shadowing (and an exception will be thrown by the ShadowWrapper).</para>
-        /// </remarks>
-        public TFileSystem GetFileSystem<TFileSystem>(IFileSystem supporting)
-            where TFileSystem : FileSystemWrapper
-        {
-            if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
-
-            return (TFileSystem) _filesystems.GetOrAdd(typeof(TFileSystem), _ => new Lazy<IFileSystem>(() =>
-            {
-                var typeofTFileSystem = typeof(TFileSystem);
-
-                // path must be unique and not collide with paths used in CreateWellKnownFileSystems
-                // for our well-known 'media' filesystem we can use the short 'media' path
-                // for others, put them under 'x/' and use ... something
-                string path;
-                if (typeofTFileSystem == typeof(MediaFileSystem))
-                {
-                    path = "media";
-                }
-                else
-                {
-                    lock (_paths)
-                    {
-                        if (!_paths.TryGetValue(typeofTFileSystem, out path))
-                        {
-                            path = Guid.NewGuid().ToString("N").Substring(0, 6);
-                            while (_paths.ContainsValue(path)) // this can't loop forever, right?
-                                path = Guid.NewGuid().ToString("N").Substring(0, 6);
-                            _paths[typeofTFileSystem] = path;
-                        }
-                    }
-
-                    path = "x/" + path;
-                }
-
-                var shadowWrapper = CreateShadowWrapper(supporting, path);
-                return _container.CreateInstance<TFileSystem>(shadowWrapper);
-            })).Value;
         }
 
         #endregion
