@@ -31,6 +31,7 @@ namespace Umbraco.Core.Compose
             var appPlugins = IOHelper.MapPath("~/App_Plugins/");
             if (Directory.Exists(appPlugins) == false) return;
 
+            _mw?.Dispose();
             _mw = new ManifestWatcher(_logger);
             _mw.Start(Directory.GetDirectories(appPlugins));
         }

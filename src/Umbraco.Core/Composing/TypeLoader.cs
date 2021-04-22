@@ -459,7 +459,10 @@ namespace Umbraco.Core.Composing
                     }
                     catch { /* bah - just don't die */ }
                     if (!_timing)
+                    {
+                        _timer?.Dispose();
                         _timer = null;
+                    }
                 }
             }
 
