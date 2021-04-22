@@ -85,32 +85,34 @@ namespace Umbraco.Core.Logging.Viewer
                     {
                         using (var stream = new StreamReader(fs))
                         {
-                            var reader = new LogEventReader(stream);
-                            while (TryRead(reader, out var evt))
+                            using (var reader = new LogEventReader(stream))
                             {
-                                //We may get a null if log line is malformed
-                                if (evt == null)
+                                while (TryRead(reader, out var evt))
                                 {
-                                    continue;
-                                }
+                                    //We may get a null if log line is malformed
+                                    if (evt == null)
+                                    {
+                                        continue;
+                                    }
 
-                                if (count > skip + take)
-                                {
-                                    break;
-                                }
+                                    if (count > skip + take)
+                                    {
+                                        break;
+                                    }
 
-                                if (count < skip)
-                                {
+                                    if (count < skip)
+                                    {
+                                        count++;
+                                        continue;
+                                    }
+
+                                    if (filter.TakeLogEvent(evt))
+                                    {
+                                        logs.Add(evt);
+                                    }
+
                                     count++;
-                                    continue;
                                 }
-
-                                if (filter.TakeLogEvent(evt))
-                                {
-                                    logs.Add(evt);
-                                }
-
-                                count++;
                             }
                         }
                     }
