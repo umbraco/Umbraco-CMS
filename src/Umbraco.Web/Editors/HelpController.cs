@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Threading.Tasks;
-
+using HttpClientConstants = Umbraco.Core.Constants.HttpClientConstants;
 namespace Umbraco.Web.Editors
 {
     public class HelpController : UmbracoAuthorizedJsonController
     {
-        private static HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public HelpController(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
         public async Task<List<HelpPage>> GetContextHelpForPage(string section, string tree, string baseUrl = "https://our.umbraco.com")
         {
             var url = string.Format(baseUrl + "/Umbraco/Documentation/Lessons/GetContextHelpDocs?sectionAlias={0}&treeAlias={1}", section, tree);
@@ -16,11 +21,10 @@ namespace Umbraco.Web.Editors
             try
             {
 
-                if (_httpClient == null)
-                    _httpClient = new HttpClient();
+                var httpClient = _httpClientFactory.CreateClient(HttpClientConstants.OurUmbracoHelpPage);
 
                 //fetch dashboard json and parse to JObject
-                var json = await _httpClient.GetStringAsync(url);
+                var json = await httpClient.GetStringAsync(url);
                 var result = JsonConvert.DeserializeObject<List<HelpPage>>(json);
                 if (result != null)
                     return result;

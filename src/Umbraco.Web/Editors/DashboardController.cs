@@ -19,7 +19,7 @@ using Umbraco.Core.Services;
 using Umbraco.Core.Dashboards;
 using Umbraco.Core.Models;
 using Umbraco.Web.Services;
-
+using HttpClientConstants = Umbraco.Core.Constants.HttpClientConstants;
 namespace Umbraco.Web.Editors
 {
     //we need to fire up the controller like this to enable loading of remote css directly from this controller
@@ -32,18 +32,22 @@ namespace Umbraco.Web.Editors
     public class DashboardController : UmbracoApiController
     {
         private readonly IDashboardService _dashboardService;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService, UmbracoHelper umbracoHelper)
+        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext,
+            ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState,
+            IDashboardService dashboardService,
+            UmbracoHelper umbracoHelper,
+            IHttpClientFactory httpClientFactory
+            )
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _dashboardService = dashboardService;
+            _httpClientFactory = httpClientFactory;
         }
-
-        //we have just one instance of HttpClient shared for the entire application
-        private static readonly HttpClient HttpClient = new HttpClient();
 
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
@@ -70,7 +74,8 @@ namespace Umbraco.Web.Editors
                 try
                 {
                     //fetch dashboard json and parse to JObject
-                    var json = await HttpClient.GetStringAsync(url);
+                    var httpClient = _httpClientFactory.CreateClient(HttpClientConstants.RemoteDashboardUrl);
+                    var json = await httpClient.GetStringAsync(url);
                     content = JObject.Parse(json);
                     result = content;
 
@@ -106,7 +111,8 @@ namespace Umbraco.Web.Editors
                 try
                 {
                     //fetch remote css
-                    content = await HttpClient.GetStringAsync(url);
+                    var httpClient = _httpClientFactory.CreateClient(HttpClientConstants.RemoteDashboardUrl);
+                    content = await httpClient.GetStringAsync(url);
 
                     //can't use content directly, modified closure problem
                     result = content;
@@ -170,7 +176,8 @@ namespace Umbraco.Web.Editors
                 try
                 {
                     //fetch remote css
-                    content = await HttpClient.GetStringAsync($"{urlPrefix}{url}");
+                    var httpClient = _httpClientFactory.CreateClient(HttpClientConstants.RemoteXmlUrl);
+                    content = await httpClient.GetStringAsync($"{urlPrefix}{url}");
 
                     //can't use content directly, modified closure problem
                     result = content;

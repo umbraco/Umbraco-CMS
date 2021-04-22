@@ -17,17 +17,18 @@ using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Install.Models;
+using static Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Install
 {
     public sealed class InstallHelper
     {
-        private static HttpClient _httpClient;
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly HttpContextBase _httpContext;
         private readonly ILogger _logger;
         private readonly IGlobalSettings _globalSettings;
         private readonly IInstallationService _installationService;
+        private readonly Core.Composing.IHttpClientFactory _httpClientFactory;
         private InstallationType? _installationType;
 
 
@@ -36,10 +37,11 @@ namespace Umbraco.Web.Install
         IUmbracoContextAccessor umbracoContextAccessor,
             DatabaseBuilder databaseBuilder,
             ILogger logger,
-            IGlobalSettings globalSettings)
+            IGlobalSettings globalSettings,
+            Core.Composing.IHttpClientFactory httpClientFactory)
             : this(umbracoContextAccessor, databaseBuilder, logger, globalSettings, Current.Factory.GetInstance<IInstallationService>())
         {
-
+            _httpClientFactory = httpClientFactory;
         }
 
         public InstallHelper(IUmbracoContextAccessor umbracoContextAccessor,
@@ -151,9 +153,6 @@ namespace Umbraco.Web.Install
 
         internal IEnumerable<Package> GetStarterKits()
         {
-            if (_httpClient == null)
-                _httpClient = new HttpClient();
-
             var packages = new List<Package>();
             try
             {
@@ -161,7 +160,8 @@ namespace Umbraco.Web.Install
 
                 using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
                 {
-                    var response = _httpClient.SendAsync(request).Result;
+                    var httpClient = _httpClientFactory.CreateClient(HttpClientConstants.OurUmbracoWebApi);
+                    var response = httpClient.SendAsync(request).Result;
                     packages = response.Content.ReadAsAsync<IEnumerable<Package>>().Result.ToList();
                 }
             }

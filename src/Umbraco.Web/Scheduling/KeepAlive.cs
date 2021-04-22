@@ -7,6 +7,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Sync;
+using static Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Scheduling
 {
@@ -15,17 +16,17 @@ namespace Umbraco.Web.Scheduling
         private readonly IRuntimeState _runtime;
         private readonly IKeepAliveSection _keepAliveSection;
         private readonly IProfilingLogger _logger;
-        private static HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
 
         public KeepAlive(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayMilliseconds, int periodMilliseconds,
-            IRuntimeState runtime, IKeepAliveSection keepAliveSection, IProfilingLogger logger)
+            IRuntimeState runtime, IKeepAliveSection keepAliveSection, IProfilingLogger logger,
+            IHttpClientFactory httpClientFactory)
             : base(runner, delayMilliseconds, periodMilliseconds)
         {
             _runtime = runtime;
             _keepAliveSection = keepAliveSection;
             _logger = logger;
-            if (_httpClient == null)
-                _httpClient = new HttpClient();
+            _httpClientFactory = httpClientFactory;
         }
 
         public override async Task<bool> PerformRunAsync(CancellationToken token)
@@ -66,7 +67,8 @@ namespace Umbraco.Web.Scheduling
                     }
 
                     var request = new HttpRequestMessage(HttpMethod.Get, keepAlivePingUrl);
-                    var result = await _httpClient.SendAsync(request, token);
+                    var httpClient = _httpClientFactory.CreateClient(HttpClientConstants.KeepAlivePing);
+                    var result = await httpClient.SendAsync(request, token);
                 }
                 catch (Exception ex)
                 {

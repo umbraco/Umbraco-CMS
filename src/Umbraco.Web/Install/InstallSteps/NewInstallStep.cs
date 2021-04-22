@@ -15,6 +15,7 @@ using Umbraco.Core.Migrations.Install;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Web.Install.Models;
+using static Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Install.InstallSteps
 {
@@ -32,15 +33,17 @@ namespace Umbraco.Web.Install.InstallSteps
         private readonly HttpContextBase _http;
         private readonly IUserService _userService;
         private readonly DatabaseBuilder _databaseBuilder;
-        private static HttpClient _httpClient;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings)
+        public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder,
+            IGlobalSettings globalSettings, IHttpClientFactory httpClientFactory)
         {
             _http = http;
             _userService = userService;
             _databaseBuilder = databaseBuilder;
             _globalSettings = globalSettings;
+            _httpClientFactory = httpClientFactory;
         }
 
         // TODO: Change all logic in this step to use ASP.NET Identity NOT MembershipProviders
@@ -88,15 +91,14 @@ namespace Umbraco.Web.Install.InstallSteps
 
             if (user.SubscribeToNewsLetter)
             {
-                if (_httpClient == null)
-                    _httpClient = new HttpClient();
 
                 var values = new NameValueCollection { { "name", admin.Name }, { "email", admin.Email } };
                 var content = new StringContent(JsonConvert.SerializeObject(values), Encoding.UTF8, "application/json");
 
                 try
                 {
-                    var response = _httpClient.PostAsync("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", content).Result;
+                    var httpClient = _httpClientFactory.CreateClient(HttpClientConstants.ShopUmbracoBase);
+                    var response = httpClient.PostAsync("https://shop.umbraco.com/base/Ecom/SubmitEmail/installer.aspx", content).Result;
                 }
                 catch { /* fail in silence */ }
             }

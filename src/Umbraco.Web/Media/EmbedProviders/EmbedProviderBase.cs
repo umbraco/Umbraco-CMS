@@ -7,19 +7,30 @@ using System.Text;
 using System.Web;
 using System.Xml;
 using Umbraco.Core.Media;
+using static Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Media.EmbedProviders
 {
     public abstract class EmbedProviderBase : IEmbedProvider
     {
         private static HttpClient _httpClient;
+        private readonly IHttpClientFactory _httpClientFactory;
+
+        public EmbedProviderBase()
+        {
+
+        }
+        public EmbedProviderBase(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
 
         public abstract string ApiEndpoint { get; }
 
         public abstract string[] UrlSchemeRegex { get; }
 
         public abstract Dictionary<string, string> RequestParams { get; }
-        
+
         public abstract string GetMarkup(string url, int maxWidth = 0, int maxHeight = 0);
 
         public virtual string GetEmbedProviderUrl(string url, int maxWidth, int maxHeight)
@@ -43,15 +54,27 @@ namespace Umbraco.Web.Media.EmbedProviders
 
             return fullUrl.ToString();
         }
-        
+
         public virtual string DownloadResponse(string url)
         {
-            if (_httpClient == null)
-                _httpClient = new HttpClient();
+            HttpClient httpClient;
+            if (_httpClientFactory == null)
+            {
+                if (_httpClient == null)
+                {
+                    _httpClient = new HttpClient();
+                }
+                httpClient = _httpClient;
+            }
+            else
+            {
+                httpClient = _httpClientFactory.CreateClient(HttpClientConstants.EmbedProviderBase);
+            }
+
 
             using (var request = new HttpRequestMessage(HttpMethod.Get, url))
             {
-                var response = _httpClient.SendAsync(request).Result;
+                var response = httpClient.SendAsync(request).Result;
                 return response.Content.ReadAsStringAsync().Result;
             }
         }

@@ -22,21 +22,23 @@ namespace Umbraco.Core.Services.Implement
     {
 
         private readonly IPackageInstallation _packageInstallation;
+        private readonly IHttpClientFactory _httpClientFactory;
         private readonly IAuditService _auditService;
         private readonly ICreatedPackagesRepository _createdPackages;
         private readonly IInstalledPackagesRepository _installedPackages;
-        private static HttpClient _httpClient;
 
         public PackagingService(
             IAuditService auditService,
             ICreatedPackagesRepository createdPackages,
             IInstalledPackagesRepository installedPackages,
-            IPackageInstallation packageInstallation)
+            IPackageInstallation packageInstallation,
+            IHttpClientFactory httpClientFactory)
         {
             _auditService = auditService;
             _createdPackages = createdPackages;
             _installedPackages = installedPackages;
             _packageInstallation = packageInstallation;
+            _httpClientFactory = httpClientFactory;
         }
 
         #region Package Files
@@ -49,11 +51,8 @@ namespace Umbraco.Core.Services.Implement
             byte[] bytes;
             try
             {
-                if (_httpClient == null)
-                {
-                    _httpClient = new HttpClient();
-                }
-                bytes = await _httpClient.GetByteArrayAsync(url);
+                var httpClient = _httpClientFactory.CreateClient(Constants.HttpClientConstants.RestApiBaseUrl);
+                bytes = await httpClient.GetByteArrayAsync(url);
             }
             catch (HttpRequestException ex)
             {

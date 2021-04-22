@@ -8,18 +8,21 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 {
     internal class UpgradeCheckRepository : IUpgradeCheckRepository
     {
-        private static HttpClient _httpClient;
         private const string RestApiUpgradeChecklUrl = "https://our.umbraco.com/umbraco/api/UpgradeCheck/CheckUpgrade";
+        private readonly IHttpClientFactory _httpClientFactory;
 
+        public UpgradeCheckRepository(IHttpClientFactory httpClientFactory)
+        {
+            _httpClientFactory = httpClientFactory;
+        }
 
         public async Task<UpgradeResult> CheckUpgradeAsync(SemVersion version)
         {
             try
             {
-                if (_httpClient == null)
-                    _httpClient = new HttpClient();
+                var httpClient = _httpClientFactory.CreateClient(Constants.HttpClientConstants.RestApiUpgradeChecklUrl);
 
-                var task = await _httpClient.PostAsync(RestApiUpgradeChecklUrl, new CheckUpgradeDto(version), new JsonMediaTypeFormatter());
+                var task = await httpClient.PostAsync(RestApiUpgradeChecklUrl, new CheckUpgradeDto(version), new JsonMediaTypeFormatter());
                 var result = await task.Content.ReadAsAsync<UpgradeResult>();
 
                 return result ?? new UpgradeResult("None", "", "");
@@ -45,7 +48,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 VersionComment = version.Prerelease;
             }
 
-            public int VersionMajor { get;  }
+            public int VersionMajor { get; }
             public int VersionMinor { get; }
             public int VersionPatch { get; }
             public string VersionComment { get;  }

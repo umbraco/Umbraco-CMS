@@ -18,13 +18,17 @@ namespace Umbraco.Web.Telemetry
         private readonly IProfilingLogger _logger;
         private static HttpClient _httpClient;
         private readonly IUmbracoSettingsSection _settings;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public ReportSiteTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayBeforeWeStart, int howOftenWeRepeat, IProfilingLogger logger, IUmbracoSettingsSection settings)
+        public ReportSiteTask(IBackgroundTaskRunner<RecurringTaskBase> runner, int delayBeforeWeStart,
+            int howOftenWeRepeat, IProfilingLogger logger, IUmbracoSettingsSection settings,
+            IHttpClientFactory httpClientFactory
+            )
             : base(runner, delayBeforeWeStart, howOftenWeRepeat)
         {
             _logger = logger;
-            _httpClient = new HttpClient();
             _settings = settings;
+            _httpClientFactory = httpClientFactory;
         }
 
         /// <summary>
@@ -49,15 +53,16 @@ namespace Umbraco.Web.Telemetry
 
             try
             {
+                var httpClient = _httpClientFactory.CreateClient(Constants.HttpClientConstants.ReportSiteTask);
                 // Send data to LIVE telemetry
-                _httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
+                httpClient.BaseAddress = new Uri("https://telemetry.umbraco.com/");
 
 #if DEBUG
                 // Send data to DEBUG telemetry service
-                _httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
+                httpClient.BaseAddress = new Uri("https://telemetry.rainbowsrock.net/");
 #endif
 
-                _httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
+                httpClient.DefaultRequestHeaders.TryAddWithoutValidation("Content-Type", "application/json");
 
                 using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
                 {
