@@ -476,7 +476,7 @@ namespace Umbraco.Core.Scoping
 
             lock(_queuedLocks)
             {
-                _queuedLocks?.Clear()
+                _queuedLocks?.Clear();
             }
 
             _disposed = true;
