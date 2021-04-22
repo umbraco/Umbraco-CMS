@@ -27,13 +27,12 @@ namespace Umbraco.Web.Install.InstallSteps
     /// display a simple continue installation view.
     /// </remarks>
     [InstallSetupStep(InstallationType.NewInstall, "User", 20, "")]
-    internal class NewInstallStep : InstallSetupStep<UserModel>, IDisposable
+    internal class NewInstallStep : InstallSetupStep<UserModel>
     {
         private readonly HttpContextBase _http;
         private readonly IUserService _userService;
         private readonly DatabaseBuilder _databaseBuilder;
         private static HttpClient _httpClient;
-        private bool _disposedValue;
         private readonly IGlobalSettings _globalSettings;
 
         public NewInstallStep(HttpContextBase http, IUserService userService, DatabaseBuilder databaseBuilder, IGlobalSettings globalSettings)
@@ -214,28 +213,6 @@ namespace Umbraco.Web.Install.InstallSteps
             CanConnect = 1 << 4,
             UmbracoInstalled = 1 << 5,
             HasNonDefaultUser = 1 << 6
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    _httpClient?.Dispose();
-                }
-
-                // TODO: free unmanaged resources (unmanaged objects) and override finalizer
-                // TODO: set large fields to null
-                _disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }
