@@ -474,7 +474,7 @@ namespace Umbraco.Core.Scoping
             else
                 DisposeLastScope();
 
-            lock(_queuedLocks)
+            lock(_lockQueueLocker)
             {
                 _queuedLocks?.Clear();
             }
