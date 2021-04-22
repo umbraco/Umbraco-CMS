@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Web.Routing;
-using System.Web.Security;
 using System.Xml.Linq;
 using Examine;
 using Microsoft.Extensions.Configuration;
@@ -55,7 +54,6 @@ using Umbraco.Cms.Infrastructure.Media;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common;
@@ -67,7 +65,6 @@ using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Hosting;
 using Umbraco.Web.Security;
-using Umbraco.Web.Security.Providers;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Testing

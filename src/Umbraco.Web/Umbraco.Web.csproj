@@ -146,9 +146,6 @@
     <Compile Include="AspNet\AspNetIpResolver.cs" />
     <Compile Include="AspNet\AspNetPasswordHasher.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
-    <Compile Include="Security\MembershipProviderBase.cs" />
-    <Compile Include="Security\MembershipProviderExtensions.cs" />
-    <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
@@ -173,8 +170,6 @@
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
-    <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
-    <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />

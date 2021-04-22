@@ -130,10 +130,6 @@ namespace Umbraco.Cms.Core
                 /// </summary>
                 public static readonly string InternalRolePrefix = "__umbracoRole";
 
-                public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
-
-                public static readonly string UmbracoRoleProviderName = "UmbracoRoleProvider";
-
                 /// <summary>
                 /// Property alias for the Comments on a Member
                 /// </summary>
