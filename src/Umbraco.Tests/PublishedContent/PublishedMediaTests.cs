@@ -1,29 +1,27 @@
-﻿using System.Web;
-using System.Xml.Linq;
-using System.Xml.XPath;
+﻿using Examine;
 using NUnit.Framework;
-using Umbraco.Core;
-using Umbraco.Core.Models;
-using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.UmbracoExamine;
-using Umbraco.Web;
 using System.Linq;
 using System.Threading;
+using System.Web;
 using System.Xml;
-using Examine;
+using System.Xml.Linq;
+using System.Xml.XPath;
+using Umbraco.Core;
 using Umbraco.Core.Cache;
-using Umbraco.Core.Models.PublishedContent;
-using Umbraco.Core.Strings;
-using Umbraco.Examine;
-using Current = Umbraco.Web.Composing.Current;
-using Umbraco.Tests.Testing;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
+using Umbraco.Core.Strings;
+using Umbraco.Examine;
 using Umbraco.Tests.LegacyXmlPublishedCache;
+using Umbraco.Tests.TestHelpers.Entities;
+using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Tests.UmbracoExamine;
+using Umbraco.Web;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -94,6 +92,7 @@ namespace Umbraco.Tests.PublishedContent
                         Name = "Rich Text",
                         DataTypeId = -87 //tiny mce
                     });
+            var existing = ServiceContext.MediaTypeService.GetAll();
             ServiceContext.MediaTypeService.Save(mType);
             var media = MockedMedia.CreateMediaImage(mType, -1);
             media.Properties["content"].SetValue("<div>This is some content</div>");

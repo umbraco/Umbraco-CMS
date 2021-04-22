@@ -13,11 +13,12 @@
                                   on-files-selected="filesSelected(value, files)"
                                   on-files-changed="filesChanged(files)"
                                   on-init="fileUploaderInit(value, files)"
-                                  hide-selection="true">
+                                  hide-selection="true"
+                                  accept-file-ext="acceptFileExt">
 
             <div class="imagecropper clearfix">
 
-                <div ng-if="currentCrop || pendingCrop" style="float:left; max-width: 100%;" class="clearfix">
+                <div ng-if="currentCrop || pendingCrop" style="float:left; width: 100%;" class="clearfix">
                     <div class="umb-cropper__container">
 
                         <div ng-if="currentCrop">
@@ -25,7 +26,6 @@
                                             width="{{currentCrop.width}}"
                                             crop="currentCrop.coordinates"
                                             center="model.value.focalPoint"
-                                            max-size="450"
                                             src="imageSrc">
                             </umb-image-crop>
                         </div>
@@ -49,7 +49,7 @@
                     <button type="button" class="sr-only" ng-click="vm.clear()"><localize key="content_uploadClearImageContext">Click here to remove the image from the media item</localize></button>
                 </div>
 
-                
+
                 <ul ng-if="isCroppable" class="umb-sortable-thumbnails cropList clearfix">
                     <li ng-repeat=" (key,value) in model.value.crops" ng-class="{'current':currentCrop.alias === value.alias}" ng-click="crop(value)">
 

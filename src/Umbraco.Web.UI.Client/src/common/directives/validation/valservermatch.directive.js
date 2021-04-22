@@ -2,8 +2,8 @@
  * @ngdoc directive
  * @name umbraco.directives.directive:valServerMatch
  * @restrict A
- * @description A custom validator applied to a form/ng-form within an umbProperty that validates server side validation data 
- * contained within the serverValidationManager. The data can be matched on "exact", "prefix", "suffix" or "contains" matches against 
+ * @description A custom validator applied to a form/ng-form within an umbProperty that validates server side validation data
+ * contained within the serverValidationManager. The data can be matched on "exact", "prefix", "suffix" or "contains" matches against
  * a property validation key. The attribute value can be in multiple value types:
  * - STRING = The property validation key to have an exact match on. If matched, then the form will have a valServerMatch validator applied.
  * - OBJECT = A dictionary where the key is the match type: "contains", "prefix", "suffix" and the value is either:
