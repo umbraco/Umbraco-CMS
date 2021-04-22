@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
@@ -50,15 +48,7 @@ namespace Umbraco.Extensions
             services.AddScoped<IPasswordHasher<MemberIdentityUser>, MemberPasswordHasher>();
 
             services.ConfigureOptions<ConfigureSecurityStampOptions>();
-
-            services.ConfigureApplicationCookie(x =>
-            {
-                // TODO: We may want/need to configure these further
-
-                x.LoginPath = null;
-                x.AccessDeniedPath = null;
-                x.LogoutPath = null;
-            });
+            services.ConfigureOptions<ConfigureMemberCookieOptions>();
 
             return builder;
         }

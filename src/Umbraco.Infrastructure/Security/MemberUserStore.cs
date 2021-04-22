@@ -611,6 +611,10 @@ namespace Umbraco.Cms.Core.Security
 
         public IPublishedContent GetPublishedMember(MemberIdentityUser user)
         {
+            if (user == null)
+            {
+                return null;
+            }
             IMember member = _memberService.GetByKey(user.Key);
             if (member == null)
             {

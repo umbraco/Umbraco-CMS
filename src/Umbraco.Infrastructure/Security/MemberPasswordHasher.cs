@@ -1,7 +1,10 @@
 using System;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Serialization;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
 {
@@ -11,11 +14,12 @@ namespace Umbraco.Cms.Core.Security
     /// <remarks>
     /// This will check for the ASP.NET Identity password hash flag before falling back to the legacy password hashing format ("HMACSHA256")
     /// </remarks>
-    public class MemberPasswordHasher : PasswordHasher<MemberIdentityUser>
+    public class MemberPasswordHasher : UmbracoPasswordHasher<MemberIdentityUser>
     {
-        private readonly LegacyPasswordSecurity _legacyPasswordHasher;
-
-        public MemberPasswordHasher(LegacyPasswordSecurity legacyPasswordHasher) => _legacyPasswordHasher = legacyPasswordHasher ?? throw new ArgumentNullException(nameof(legacyPasswordHasher));
+        public MemberPasswordHasher(LegacyPasswordSecurity legacyPasswordHasher, IJsonSerializer jsonSerializer)
+            : base(legacyPasswordHasher, jsonSerializer)
+        {
+        }
 
         /// <summary>
         /// Verifies a user's hashed password
@@ -27,6 +31,20 @@ namespace Umbraco.Cms.Core.Security
         /// <exception cref="InvalidOperationException">Thrown when the correct hashing algorith cannot be determined</exception>
         public override PasswordVerificationResult VerifyHashedPassword(MemberIdentityUser user, string hashedPassword, string providedPassword)
         {
+            if (user is null)
+            {
+                throw new ArgumentNullException(nameof(user));
+            }
+
+            // if there's password config use the base implementation
+            if (!user.PasswordConfig.IsNullOrWhiteSpace())
+            {
+                return base.VerifyHashedPassword(user, hashedPassword, providedPassword);
+            }
+
+            // Else we need to detect what the password is. This will be the case
+            // for upgrades since no password config will exist.
+
             byte[] decodedHashedPassword = null;
             bool isAspNetIdentityHash = false;
 
@@ -51,7 +69,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new InvalidOperationException("unable to determine member password hashing algorith");
             }
 
-            var isValid = _legacyPasswordHasher.VerifyPassword(
+            var isValid = LegacyPasswordSecurity.VerifyPassword(
                 Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName,
                 providedPassword,
                 hashedPassword);
