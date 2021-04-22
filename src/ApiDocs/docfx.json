@@ -50,7 +50,6 @@
     ],
     "globalMetadata": {
       "_appTitle": "Umbraco c# Api docs",
-      "branch": "v8/contrib",
       "_enableSearch": true,
       "_disableContribution": false
     },
