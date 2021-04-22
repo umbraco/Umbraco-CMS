@@ -9,21 +9,25 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
 {
+
     /// <summary>
     /// A custom user store that uses Umbraco member data
     /// </summary>
-    public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdentityRole>
+    public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdentityRole>, IMemberUserStore
     {
         private const string genericIdentityErrorCode = "IdentityErrorUserStore";
         private readonly IMemberService _memberService;
         private readonly IUmbracoMapper _mapper;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberUserStore"/> class for the members identity store
@@ -36,12 +40,14 @@ namespace Umbraco.Cms.Core.Security
             IMemberService memberService,
             IUmbracoMapper mapper,
             IScopeProvider scopeProvider,
-            IdentityErrorDescriber describer)
-        : base(describer)
+            IdentityErrorDescriber describer,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor)
+            : base(describer)
         {
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
         }
 
         /// <inheritdoc />
@@ -603,5 +609,14 @@ namespace Umbraco.Cms.Core.Security
             return anythingChanged;
         }
 
+        public IPublishedContent GetPublishedMember(MemberIdentityUser user)
+        {
+            IMember member = _memberService.GetByKey(user.Key);
+            if (member == null)
+            {
+                return null;
+            }
+            return _publishedSnapshotAccessor.PublishedSnapshot?.Members.Get(member);
+        }
     }
 }

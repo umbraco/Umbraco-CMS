@@ -27,7 +27,6 @@ namespace Umbraco.Web
     {
         private readonly IPublishedContentQuery _publishedContentQuery;
         private readonly IUmbracoComponentRenderer _componentRenderer;
-        private readonly MembershipHelper _membershipHelper;
         private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
 
         private IPublishedContent _currentPage;
@@ -47,12 +46,10 @@ namespace Umbraco.Web
         public UmbracoHelper(IPublishedContent currentPage,
             ICultureDictionaryFactory cultureDictionary,
             IUmbracoComponentRenderer componentRenderer,
-            IPublishedContentQuery publishedContentQuery,
-            MembershipHelper membershipHelper)
+            IPublishedContentQuery publishedContentQuery)
         {
             _cultureDictionaryFactory = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
             _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
-            _membershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
             _publishedContentQuery = publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
             _currentPage = currentPage;
         }
@@ -202,71 +199,6 @@ namespace Umbraco.Web
 
 
         #region Member/Content/Media from Udi
-
-        #endregion
-
-        #region Members
-
-        public IPublishedContent Member(Udi id)
-        {
-            var guidUdi = id as GuidUdi;
-            return guidUdi == null ? null : Member(guidUdi.Guid);
-        }
-
-        public IPublishedContent Member(Guid id)
-        {
-            return _membershipHelper.GetById(id);
-        }
-
-        public IPublishedContent Member(int id)
-        {
-            return _membershipHelper.GetById(id);
-        }
-
-        public IPublishedContent Member(string id)
-        {
-            var asInt = id.TryConvertTo<int>();
-            return asInt ? _membershipHelper.GetById(asInt.Result) : _membershipHelper.GetByProviderKey(id);
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<int> ids)
-        {
-            return _membershipHelper.GetByIds(ids);
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<string> ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<Guid> ids)
-        {
-            return _membershipHelper.GetByIds(ids);
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<Udi> ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-        public IEnumerable<IPublishedContent> Members(params int[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(params string[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(params Guid[] ids)
-        {
-            return _membershipHelper.GetByIds(ids);
-        }
-
-        public IEnumerable<IPublishedContent> Members(params Udi[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
 
         #endregion
 

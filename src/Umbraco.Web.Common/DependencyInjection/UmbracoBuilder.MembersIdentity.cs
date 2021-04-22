@@ -33,7 +33,6 @@ namespace Umbraco.Extensions
             // then we'll probably have to change this and make it more flexible like how we do for Users. Which means booting up
             // identity here with the basics and registering all of our own custom services.
             // Since we are using the defaults in v8 (and below) for members, I think using the default for members now is OK!
-            // TODO: We may need to use services.AddIdentityCore instead if this is doing too much
 
             services.AddIdentity<MemberIdentityUser, UmbracoIdentityRole>()
                 .AddDefaultTokenProviders()
@@ -47,6 +46,7 @@ namespace Umbraco.Extensions
 
             services.ConfigureOptions<ConfigureMemberIdentityOptions>();
 
+            services.AddScoped<IMemberUserStore>(x => (IMemberUserStore)x.GetRequiredService<IUserStore<MemberIdentityUser>>());
             services.AddScoped<IPasswordHasher<MemberIdentityUser>, MemberPasswordHasher>();
 
             services.ConfigureOptions<ConfigureSecurityStampOptions>();
