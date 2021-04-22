@@ -134,9 +134,16 @@ namespace Umbraco.Cms.Core.Security
                     // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
                     var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
 
-                    if (UpdateMemberProperties(found, user))
+                    var memberChangeType = UpdateMemberProperties(found, user);
+                    if (memberChangeType == MemberDataChangeType.FullSave)
                     {
                         _memberService.Save(found);
+                    }
+                    else if (memberChangeType == MemberDataChangeType.LoginOnly)
+                    {
+                        // If the member is only logging in, just issue that command without
+                        // any write locks so we are creating a bottleneck.
+                        _memberService.SetLastLogin(found.Username, DateTime.Now);
                     }
 
                     // TODO: when to implement external login service?
@@ -496,16 +503,16 @@ namespace Umbraco.Cms.Core.Security
             return user;
         }
 
-        private bool UpdateMemberProperties(IMember member, MemberIdentityUser identityUser)
+        private MemberDataChangeType UpdateMemberProperties(IMember member, MemberIdentityUser identityUser)
         {
-            var anythingChanged = false;
+            var changeType = MemberDataChangeType.None;
 
             // don't assign anything if nothing has changed as this will trigger the track changes of the model
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDateUtc))
                 || (member.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
                 || (identityUser.LastLoginDateUtc.HasValue && member.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.LoginOnly;
 
                 // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
                 DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc.Value.ToLocalTime();
@@ -516,14 +523,14 @@ namespace Umbraco.Cms.Core.Security
                 || (member.LastPasswordChangeDate != default && identityUser.LastPasswordChangeDateUtc.HasValue == false)
                 || (identityUser.LastPasswordChangeDateUtc.HasValue && member.LastPasswordChangeDate.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value))
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
                 member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc.Value.ToLocalTime();
             }
 
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Comments))
                 && member.Comments != identityUser.Comments && identityUser.Comments.IsNullOrWhiteSpace() == false)
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
                 member.Comments = identityUser.Comments;
             }
 
@@ -531,34 +538,34 @@ namespace Umbraco.Cms.Core.Security
                 || (member.EmailConfirmedDate.HasValue && member.EmailConfirmedDate.Value != default && identityUser.EmailConfirmed == false)
                 || ((member.EmailConfirmedDate.HasValue == false || member.EmailConfirmedDate.Value == default) && identityUser.EmailConfirmed))
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
                 member.EmailConfirmedDate = identityUser.EmailConfirmed ? (DateTime?)DateTime.Now : null;
             }
 
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Name))
                 && member.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
                 member.Name = identityUser.Name;
             }
 
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Email))
                 && member.Email != identityUser.Email && identityUser.Email.IsNullOrWhiteSpace() == false)
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
                 member.Email = identityUser.Email;
             }
 
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.AccessFailedCount))
                 && member.FailedPasswordAttempts != identityUser.AccessFailedCount)
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
                 member.FailedPasswordAttempts = identityUser.AccessFailedCount;
             }
 
             if (member.IsLockedOut != identityUser.IsLockedOut)
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
                 member.IsLockedOut = identityUser.IsLockedOut;
 
                 if (member.IsLockedOut)
@@ -570,34 +577,34 @@ namespace Umbraco.Cms.Core.Security
 
             if (member.IsApproved != identityUser.IsApproved)
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
                 member.IsApproved = identityUser.IsApproved;
             }
 
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.UserName))
                 && member.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
                 member.Username = identityUser.UserName;
             }
 
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.PasswordHash))
                 && member.RawPasswordValue != identityUser.PasswordHash && identityUser.PasswordHash.IsNullOrWhiteSpace() == false)
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
                 member.RawPasswordValue = identityUser.PasswordHash;
                 member.PasswordConfiguration = identityUser.PasswordConfig;
             }
 
             if (member.SecurityStamp != identityUser.SecurityStamp)
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
                 member.SecurityStamp = identityUser.SecurityStamp;
             }
 
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Roles)))
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.FullSave;
 
                 var identityUserRoles = identityUser.Roles.Select(x => x.RoleId).ToArray();
                 _memberService.ReplaceRoles(new[] { member.Id }, identityUserRoles);
@@ -606,7 +613,7 @@ namespace Umbraco.Cms.Core.Security
             // reset all changes
             identityUser.ResetDirtyProperties(false);
 
-            return anythingChanged;
+            return changeType;
         }
 
         public IPublishedContent GetPublishedMember(MemberIdentityUser user)
@@ -621,6 +628,13 @@ namespace Umbraco.Cms.Core.Security
                 return null;
             }
             return _publishedSnapshotAccessor.PublishedSnapshot?.Members.Get(member);
+        }
+
+        private enum MemberDataChangeType
+        {
+            None,
+            LoginOnly,
+            FullSave
         }
     }
 }
