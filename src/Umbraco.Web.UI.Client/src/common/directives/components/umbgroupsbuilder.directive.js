@@ -389,7 +389,8 @@
                 const tab = {
                     id: newTabIndex + 1, // temp id
                     name: "",
-                    sortOrder
+                    sortOrder,
+                    icon: 'icon-document color-black'
                 };
 
                 if (newTabIndex === 0) {
@@ -419,6 +420,10 @@
 
             scope.onChangeTabSortOrderValue = function (tab) {
                 scope.model.tabs = $filter('orderBy')(scope.model.tabs, 'sortOrder');
+            };
+
+            scope.onChangeTabIcon = function (icon, color, tab) {
+                tab.icon = color ? icon + ' ' + color : icon;
             };
 
             scope.addNewProperty = function (group) {

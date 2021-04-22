@@ -9,29 +9,44 @@
       </div>
       <div class="umb-group-builder__tab-title-wrapper">
           <i class="umb-group-builder__tab-title-icon icon-navigation" ng-if="vm.sorting && !vm.tab.inherited"></i>
-          <ng-form name="tabNameForm" data-element="tab-name">
-              <div class="umb-group-builder__tab-name" ng-if="vm.tab.inherited || vm.sorting">{{ vm.tab.name }}</div>
-              <input
-                  ng-if="!vm.tab.inherited && !vm.sorting"
-                  class="umb-group-builder__group-title-input"
-                  data-element="tab-name-field"
-                  type="text"
-                  localize="placeholder"
-                  placeholder="@placeholders_entername"
-                  name="tabName"
-                  ng-model="vm.tab.name"
-                  ng-class="{'-placeholder': vm.tab.name == ''}"
-                  ng-disabled="!vm.isOpen"
-                  umb-auto-focus
-                  umb-auto-resize
-                  val-server-field="{{ vm.valServerFieldName }}"
-                  data-lpignore="true" />
-              
-              <div class="umb-group-builder__tab-val-message" ng-messages="tabNameForm.tabName.$error" show-validation-on-submit>
-                  <div class="umb-validation-label -arrow-bottom" ng-message="valServerField">{{tabNameForm.tabName.errorMsg}}</div>
-                  <div class="umb-validation-label -arrow-bottom" ng-message="required"><localize key="required"></localize></div>
-              </div>
-          </ng-form>
+
+            <ng-form data-element="tab-icon" name="vm.tabIconForm">
+                <button
+                    type="button" 
+                    class="btn-reset umb-group-builder__tab-icon"
+                    ng-click="vm.openIconPicker()"
+                    ng-class="{'-placeholder': !vm.tab.icon }"
+                    title="{{vm.tab.icon}}">
+                        <umb-icon class="icon {{vm.tab.icon}}" icon="{{vm.tab.icon}}" ng-if="vm.tab.icon"></umb-icon>
+                        <span class="umb-group-builder__tab-icon-text" ng-if="!vm.tab.icon">
+                            <localize key="settings_addIcon">Add icon</localize>
+                        </span>
+                </button>
+            </ng-form>
+
+            <ng-form name="tabNameForm" data-element="tab-name">
+                <div class="umb-group-builder__tab-name" ng-if="vm.tab.inherited || vm.sorting">{{ vm.tab.name }}</div>
+                <input
+                    ng-if="!vm.tab.inherited && !vm.sorting"
+                    class="umb-group-builder__group-title-input"
+                    data-element="tab-name-field"
+                    type="text"
+                    localize="placeholder"
+                    placeholder="@placeholders_entername"
+                    name="tabName"
+                    ng-model="vm.tab.name"
+                    ng-class="{'-placeholder': vm.tab.name == ''}"
+                    ng-disabled="!vm.isOpen"
+                    umb-auto-focus
+                    umb-auto-resize
+                    val-server-field="{{ vm.valServerFieldName }}"
+                    data-lpignore="true" />
+                
+                <div class="umb-group-builder__tab-val-message" ng-messages="tabNameForm.tabName.$error" show-validation-on-submit>
+                    <div class="umb-validation-label -arrow-bottom" ng-message="valServerField">{{tabNameForm.tabName.errorMsg}}</div>
+                    <div class="umb-validation-label -arrow-bottom" ng-message="required"><localize key="required"></localize></div>
+                </div>
+            </ng-form>
 
           <div ng-show="vm.tab.hasError && !vm.isOpen" class="badge">!</div>
 

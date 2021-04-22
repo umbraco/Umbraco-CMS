@@ -49,7 +49,8 @@
                     allow-remove="canRemoveTab(tab) && !sortingMode"
                     on-remove="removeTab(tabIndex)"
                     val-server-field-name="{{'Tabs[' + $index + '].Name'}}"
-                    on-change-sort-order-value="onChangeTabSortOrderValue(tab)">
+                    on-change-sort-order-value="onChangeTabSortOrderValue(tab)"
+                    on-change-icon="onChangeTabIcon(icon, color, tab)">
                 </umb-content-type-tab>
             </li>
             <li>

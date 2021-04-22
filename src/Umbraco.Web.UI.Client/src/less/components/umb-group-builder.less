@@ -58,7 +58,7 @@
 
 .umb-group-builder__tab {
   position: relative;
-  padding: 0 40px 0 20px;
+  padding: 0 40px 0 10px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -93,8 +93,8 @@
     content: "";
     position: absolute;
     height: 0px;
-    left: 10px;
-    right: 10px;
+    left: 15px;
+    right: 15px;
     background-color: @ui-light-active-border;
     bottom: 0;
     border-radius: @baseBorderRadius @baseBorderRadius 0 0;
@@ -125,6 +125,19 @@
     &:disabled {
       cursor: pointer;
     }
+  }
+}
+
+.umb-group-builder__tab-icon {
+  font-size: 24px;
+  margin-right: 7px;
+  border: 1px solid transparent;
+  width: 35px;
+  height: 35px;
+  line-height: 1em;
+
+  &:hover {
+    border-color: @gray-8;
   }
 }
 
@@ -170,7 +183,7 @@
   border: 1px dashed @gray-7;
   border-bottom: none;
   border-top: none;
-  padding-right: 20px;
+  padding-right: 10px;
   min-width: 100px;
 }
 
