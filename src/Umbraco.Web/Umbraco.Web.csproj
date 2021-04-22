@@ -139,7 +139,6 @@
     <Compile Include="HttpContextExtensions.cs" />
     <Compile Include="Security\BackOfficeSecurity.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
-    <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
     <Compile Include="AspNet\AspNetBackOfficeInfo.cs" />
     <Compile Include="AspNet\AspNetCookieManager.cs" />
     <Compile Include="AspNet\AspNetHttpContextAccessor.cs" />
