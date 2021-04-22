@@ -746,13 +746,13 @@ namespace Umbraco.Cms.Core.Scoping
         }
 
         /// <inheritdoc />
-        public void ReadLock(params int[] lockIds) => ReadLockInner(InstanceId, null, lockIds);
+        public void ReadLock(int lockId) => ReadLockInner(InstanceId, null, lockId);
 
         /// <inheritdoc />
         public void ReadLock(TimeSpan timeout, int lockId) => ReadLockInner(InstanceId, timeout, lockId);
 
         /// <inheritdoc />
-        public void WriteLock(params int[] lockIds) => WriteLockInner(InstanceId, null, lockIds);
+        public void WriteLock(int lockId) => WriteLockInner(InstanceId, null, lockId);
 
         /// <inheritdoc />
         public void WriteLock(TimeSpan timeout, int lockId) => WriteLockInner(InstanceId, timeout, lockId);
@@ -762,18 +762,18 @@ namespace Umbraco.Cms.Core.Scoping
         /// </summary>
         /// <param name="instanceId">Instance ID of the requesting scope.</param>
         /// <param name="timeout">Optional database timeout in milliseconds.</param>
-        /// <param name="lockIds">Array of lock object identifiers.</param>
-        private void ReadLockInner(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
+        /// <param name="lockId">Array of lock object identifiers.</param>
+        private void ReadLockInner(Guid instanceId, TimeSpan? timeout, int lockId)
         {
             if (ParentScope is not null)
             {
                 // If we have a parent we delegate lock creation to parent.
-                ParentScope.ReadLockInner(instanceId, timeout, lockIds);
+                ParentScope.ReadLockInner(instanceId, timeout, lockId);
             }
             else
             {
                 // We are the outermost scope, handle the lock request.
-                LockInner(instanceId, ref _readLockDictionary, ref _readLocks, ObtainReadLock, ObtainTimeoutReadLock, timeout, lockIds);
+                LockInner(instanceId, ref _readLockDictionary, ref _readLocks, ObtainReadLock, ObtainTimeoutReadLock, timeout, lockId);
             }
         }
 
@@ -782,18 +782,18 @@ namespace Umbraco.Cms.Core.Scoping
         /// </summary>
         /// <param name="instanceId">Instance ID of the requesting scope.</param>
         /// <param name="timeout">Optional database timeout in milliseconds.</param>
-        /// <param name="lockIds">Array of lock object identifiers.</param>
-        private void WriteLockInner(Guid instanceId, TimeSpan? timeout = null, params int[] lockIds)
+        /// <param name="lockId">Array of lock object identifiers.</param>
+        private void WriteLockInner(Guid instanceId, TimeSpan? timeout, int lockId)
         {
             if (ParentScope is not null)
             {
                 // If we have a parent we delegate lock creation to parent.
-                ParentScope.WriteLockInner(instanceId, timeout, lockIds);
+                ParentScope.WriteLockInner(instanceId, timeout, lockId);
             }
             else
             {
                 // We are the outermost scope, handle the lock request.
-                LockInner(instanceId, ref _writeLockDictionary, ref _writeLocks, ObtainWriteLock, ObtainTimeoutWriteLock, timeout, lockIds);
+                LockInner(instanceId, ref _writeLockDictionary, ref _writeLocks, ObtainWriteLock, ObtainTimeoutWriteLock, timeout, lockId);
             }
         }
 
@@ -808,47 +808,44 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="timeout">Optional timeout parameter to specify a timeout.</param>
         /// <param name="lockIds">Lock identifiers to lock on.</param>
         private void LockInner(Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>> locks, ref HashSet<int> locksSet,
-            Action<int> obtainLock, Action<int, TimeSpan> obtainLockTimeout, TimeSpan? timeout = null,
-            params int[] lockIds)
+            Action<int> obtainLock, Action<int, TimeSpan> obtainLockTimeout, TimeSpan? timeout,
+            int lockId)
         {
             lock (_dictionaryLocker)
             {
                 locksSet ??= new HashSet<int>();
-                foreach (var lockId in lockIds)
+                // Only acquire the lock if we haven't done so yet.
+                if (!locksSet.Contains(lockId))
                 {
-                    // Only acquire the lock if we haven't done so yet.
-                    if (!locksSet.Contains(lockId))
+                    IncrementLock(lockId, instanceId, ref locks);
+                    locksSet.Add(lockId);
+                    try
                     {
-                        IncrementLock(lockId, instanceId, ref locks);
-                        locksSet.Add(lockId);
-                        try
+                        if (timeout is null)
                         {
-                            if (timeout is null)
-                            {
-                                // We just want an ordinary lock.
-                                obtainLock(lockId);
-                            }
-                            else
-                            {
-                                // We want a lock with a custom timeout
-                                obtainLockTimeout(lockId, timeout.Value);
-                            }
+                            // We just want an ordinary lock.
+                            obtainLock(lockId);
                         }
-                        catch
+                        else
                         {
-                            // Something went wrong and we didn't get the lock
-                            // Since we at this point have determined that we haven't got any lock with an ID of LockID, it's safe to completely remove it instead of decrementing.
-                            locks[instanceId].Remove(lockId);
-                            // It needs to be removed from the HashSet as well, because that's how we determine to acquire a lock.
-                            locksSet.Remove(lockId);
-                            throw;
+                            // We want a lock with a custom timeout
+                            obtainLockTimeout(lockId, timeout.Value);
                         }
                     }
-                    else
+                    catch
                     {
-                        // We already have a lock, but need to update the dictionary for debugging purposes.
-                        IncrementLock(lockId, instanceId, ref locks);
+                        // Something went wrong and we didn't get the lock
+                        // Since we at this point have determined that we haven't got any lock with an ID of LockID, it's safe to completely remove it instead of decrementing.
+                        locks[instanceId].Remove(lockId);
+                        // It needs to be removed from the HashSet as well, because that's how we determine to acquire a lock.
+                        locksSet.Remove(lockId);
+                        throw;
                     }
+                }
+                else
+                {
+                    // We already have a lock, but need to update the dictionary for debugging purposes.
+                    IncrementLock(lockId, instanceId, ref locks);
                 }
             }
         }

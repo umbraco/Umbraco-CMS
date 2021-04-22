@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -7,6 +7,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -92,7 +93,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // that one is special because it works across content, media and member types
-                scope.ReadLock(Cms.Core.Constants.Locks.ContentTypes, Cms.Core.Constants.Locks.MediaTypes, Cms.Core.Constants.Locks.MemberTypes);
+                scope.ReadLock(new[] { Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes });
                 return Repository.GetAllPropertyTypeAliases();
             }
         }
@@ -108,7 +109,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // that one is special because it works across content, media and member types
-                scope.ReadLock(Cms.Core.Constants.Locks.ContentTypes, Cms.Core.Constants.Locks.MediaTypes, Cms.Core.Constants.Locks.MemberTypes);
+                scope.ReadLock(new[] { Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes });
                 return Repository.GetAllContentTypeAliases(guids);
             }
         }
@@ -124,7 +125,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 // that one is special because it works across content, media and member types
-                scope.ReadLock(Cms.Core.Constants.Locks.ContentTypes, Cms.Core.Constants.Locks.MediaTypes, Cms.Core.Constants.Locks.MemberTypes);
+                scope.ReadLock(new[] { Constants.Locks.ContentTypes, Constants.Locks.MediaTypes, Constants.Locks.MemberTypes });
                 return Repository.GetAllContentTypeIds(aliases);
             }
         }
