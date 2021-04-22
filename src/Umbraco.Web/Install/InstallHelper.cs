@@ -20,7 +20,7 @@ using Umbraco.Web.Install.Models;
 
 namespace Umbraco.Web.Install
 {
-    public sealed class InstallHelper : IDisposable
+    public sealed class InstallHelper
     {
         private static HttpClient _httpClient;
         private readonly DatabaseBuilder _databaseBuilder;
@@ -29,7 +29,7 @@ namespace Umbraco.Web.Install
         private readonly IGlobalSettings _globalSettings;
         private readonly IInstallationService _installationService;
         private InstallationType? _installationType;
-        private bool _disposedValue;
+
 
         [Obsolete("Use the constructor with IInstallationService injected.")]
         public InstallHelper(
@@ -171,27 +171,6 @@ namespace Umbraco.Web.Install
             }
 
             return packages;
-        }
-
-        private void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    _httpClient?.Dispose();
-                }
-
-                _disposedValue = true;
-            }
-        }
-
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
-            GC.SuppressFinalize(this);
         }
     }
 }
