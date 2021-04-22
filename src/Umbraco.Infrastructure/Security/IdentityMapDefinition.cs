@@ -63,15 +63,10 @@ namespace Umbraco.Cms.Core.Security
                 });
         }
 
-        // Umbraco.Code.MapAll -Id -Groups -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled
+        // Umbraco.Code.MapAll -Id -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled -ConcurrencyStamp -NormalizedEmail -NormalizedUserName -Roles
         private void Map(IUser source, BackOfficeIdentityUser target)
         {
-            // well, the ctor has been fixed
-            /*
-            // these two are already set in ctor but BackOfficeIdentityUser ctor is CompletelyBroken
-            target.Id = source.Id;
-            target.Groups = source.Groups.ToArray();
-            */
+            // NOTE: Groups/Roles are set in the BackOfficeIdentityUser ctor
 
             target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
             target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
@@ -90,14 +85,6 @@ namespace Umbraco.Cms.Core.Security
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
-
-            // this was in AutoMapper but does not have a setter anyways
-            //target.AllowedSections = source.AllowedSections.ToArray(),
-
-            // these were marked as ignored for AutoMapper but don't have a setter anyways
-            //target.Logins =;
-            //target.Claims =;
-            //target.Roles =;
         }
 
         // TODO: We need to validate this mapping is OK, we need to get Umbraco.Code working
