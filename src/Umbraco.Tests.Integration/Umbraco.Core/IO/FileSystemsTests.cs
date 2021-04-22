@@ -41,16 +41,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
         }
 
         [Test]
-        public void Can_Unwrap_MediaFileSystem()
-        {
-            IMediaFileSystem fileSystem = GetRequiredService<IMediaFileSystem>();
-            IFileSystem unwrapped = fileSystem.Unwrap();
-            Assert.IsNotNull(unwrapped);
-            var physical = unwrapped as PhysicalFileSystem;
-            Assert.IsNotNull(physical);
-        }
-
-        [Test]
         public void Can_Delete_MediaFiles()
         {
             IMediaFileSystem fs = GetRequiredService<IMediaFileSystem>();

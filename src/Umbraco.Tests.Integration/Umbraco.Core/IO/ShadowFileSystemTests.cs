@@ -381,13 +381,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
             Assert.IsFalse(File.Exists(path + "/ShadowTests/sub/sub/f2.txt"));
         }
 
-        class FS : FileSystemWrapper
-        {
-            public FS(IFileSystem innerFileSystem)
-                : base(innerFileSystem)
-            { }
-        }
-
         [Test]
         public void ShadowScopeComplete()
         {
