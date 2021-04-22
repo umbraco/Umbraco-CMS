@@ -24,6 +24,11 @@
                 for(var i in $scope.content.tabs) {
                     var group = $scope.content.tabs[i];
                     var node = propertyGroupNodesDictionary[group.id];
+
+                    if (!node) {
+                        return;
+                    }
+
                     if (viewFocusY >= node.offsetTop && viewFocusY <= node.offsetTop + node.clientHeight) {
                         setActiveAnchor(group);
                         return;
