@@ -224,12 +224,17 @@ namespace Umbraco.Cms.Core.Security
         /// <returns></returns>
         private UmbracoIdentityRole MapFromMemberGroup(IMemberGroup memberGroup)
         {
+            // NOTE: there is a ConcurrencyStamp property but we don't use it. The purpose
+            // of this value is to try to prevent concurrent writes in the DB but this is
+            // an implementation detail at the data source level that has leaked into the
+            // model. A good writeup of that is here:
+            // https://stackoverflow.com/a/37362173
+            // For our purposes currently we won't worry about this.
+
             var result = new UmbracoIdentityRole
             {
                 Id = memberGroup.Id.ToString(),
                 Name = memberGroup.Name
-                // TODO: Implement this functionality, requires DB and logic updates
-                //ConcurrencyStamp
             };
             return result;
         }
@@ -247,8 +252,6 @@ namespace Umbraco.Cms.Core.Security
             if (role.IsPropertyDirty(nameof(UmbracoIdentityRole.Name))
                 && !string.IsNullOrEmpty(role.Name) && memberGroup.Name != role.Name)
             {
-                // TODO: Need to support ConcurrencyStamp and logic
-
                 memberGroup.Name = role.Name;
                 anythingChanged = true;
             }

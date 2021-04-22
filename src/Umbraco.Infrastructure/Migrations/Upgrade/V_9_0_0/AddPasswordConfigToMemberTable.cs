@@ -1,11 +1,11 @@
-using System.Linq;
+﻿using System.Linq;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
 {
-    public class MemberTableColumns : MigrationBase
+    public class AddPasswordConfigToMemberTable : MigrationBase
     {
-        public MemberTableColumns(IMigrationContext context)
+        public AddPasswordConfigToMemberTable(IMigrationContext context)
             : base(context)
         {
         }
@@ -17,8 +17,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0
         {
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
 
-            AddColumnIfNotExists<MemberDto>(columns, "securityStampToken");
-            AddColumnIfNotExists<MemberDto>(columns, "emailConfirmedDate");
+            AddColumnIfNotExists<MemberDto>(columns, "passwordConfig");
         }
     }
 }
