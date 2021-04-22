@@ -28,7 +28,7 @@ namespace Umbraco.Core.Sync
     // but only processes instructions coming from remote servers,
     // thus ensuring that instructions run only once
     //
-    public class DatabaseServerMessenger : ServerMessengerBase
+    public class DatabaseServerMessenger : ServerMessengerBase, IDisposable
     {
         private readonly IRuntimeState _runtime;
         private readonly ManualResetEvent _syncIdle;
@@ -42,6 +42,7 @@ namespace Umbraco.Core.Sync
         private bool _initialized;
         private bool _syncing;
         private bool _released;
+        private bool _disposedValue;
 
         public DatabaseServerMessengerOptions Options { get; }
 
@@ -685,5 +686,25 @@ namespace Umbraco.Core.Sync
         }
 
         #endregion
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _syncIdle?.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
+        }
     }
 }
