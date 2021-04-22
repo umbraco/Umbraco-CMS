@@ -239,7 +239,9 @@ namespace Umbraco.Web.Install
             try
             {
                 var path = IOHelper.MapPath(file);
-                File.AppendText(path).Close();
+                using (var sw = File.AppendText(path)) {
+                    sw.Close();
+                }
                 return true;
             }
             catch
