@@ -395,9 +395,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
             var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
 
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(Mock.Of<ILogger<FileSystems>>(), loggerFactory, IOHelper, globalSettings, HostingEnvironment, Mock.Of<IMediaFileSystem>()) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(Mock.Of<ILogger<FileSystems>>(), loggerFactory, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
             var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
-            var sw = fileSystems.CreateShadowWrapper(phy, shadowPath);
+            var sw = (ShadowWrapper)fileSystems.CreateShadowWrapper(phy, shadowPath);
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f1.txt", ms);
@@ -486,7 +486,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
             var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
 
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(Mock.Of<ILogger<FileSystems>>(), NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment, Mock.Of<IMediaFileSystem>()) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(Mock.Of<ILogger<FileSystems>>(), NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
             var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
             var sw = fileSystems.CreateShadowWrapper(phy, shadowPath);
 
@@ -537,7 +537,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
             var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
 
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(Mock.Of<ILogger<FileSystems>>(), NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment, Mock.Of<IMediaFileSystem>()) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(Mock.Of<ILogger<FileSystems>>(), NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
             var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
             var sw = fileSystems.CreateShadowWrapper(phy, shadowPath);
 

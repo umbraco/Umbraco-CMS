@@ -1,12 +1,10 @@
 ﻿using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.IO
 {
@@ -38,14 +36,13 @@ namespace Umbraco.Cms.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(ILogger<FileSystems> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment, IMediaFileSystem mediaFileSystem)
+        public FileSystems(ILogger<FileSystems> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
         {
             _logger = logger;
             _loggerFactory = loggerFactory;
             _ioHelper = ioHelper;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
-            CreateShadowWrapper(mediaFileSystem, "media");
         }
 
         // for tests only, totally unsafe
@@ -220,7 +217,7 @@ namespace Umbraco.Cms.Core.IO
             }
         }
 
-        internal ShadowWrapper CreateShadowWrapper(IFileSystem filesystem, string shadowPath)
+        public IFileSystem CreateShadowWrapper(IFileSystem filesystem, string shadowPath)
         {
             lock (_shadowLocker)
             {

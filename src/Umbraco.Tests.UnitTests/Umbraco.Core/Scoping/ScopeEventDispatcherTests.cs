@@ -77,14 +77,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
                 instance,
                 Mock.Of<IIOHelper>(),
                 Options.Create(new GlobalSettings()),
-                Mock.Of<IHostingEnvironment>(),
-                Mock.Of<IMediaFileSystem>());
+                Mock.Of<IHostingEnvironment>());
 
             return new ScopeProvider(
                 Mock.Of<IUmbracoDatabaseFactory>(),
                 fileSystems,
                 Options.Create(new CoreDebugSettings()),
-                Mock.Of<IMediaFileSystem>(),
+                Mock.Of<MediaFileManager>(),
                 Mock.Of<ILogger<ScopeProvider>>(),
                 instance,
                 Mock.Of<IRequestCache>(),

@@ -1,6 +1,5 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
@@ -114,10 +113,19 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         /// </summary>
         /// <param name="builder">A builder.</param>
         /// <param name="mediaFileSystem">Instance of IMediaFileSystem to register</param>
-        public static void SetMediaFileSystem<TMediaFileSystem>(this IUmbracoBuilder builder) where TMediaFileSystem : class, IMediaFileSystem
-        {
-            builder.Services.AddSingleton<IMediaFileSystem, TMediaFileSystem>();
-        }
+        public static void SetMediaFileSystem(this IUmbracoBuilder builder,
+            Func<IServiceProvider, IFileSystem> filesystemFactory) => builder.Services.AddSingleton(
+            provider =>
+            {
+                IFileSystem filesystem = filesystemFactory(provider);
+                // We need to use the Filesystems to create a shadow wrapper,
+                // because shadow wrapper requires the IsScoped delegate from the FileSystems.
+                // This is used by the scope provider when taking control of the filesystems.
+                FileSystems fileSystems = provider.GetRequiredService<FileSystems>();
+                IFileSystem shadow = fileSystems.CreateShadowWrapper(filesystem, "media");
+
+                return provider.CreateInstance<MediaFileManager>(shadow);
+            });
 
         /// <summary>
         /// Sets the log viewer.

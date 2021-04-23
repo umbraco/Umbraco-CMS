@@ -47,7 +47,17 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // register the scheme for media paths
             builder.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
 
-            builder.SetMediaFileSystem<MediaFileSystem>();
+            builder.SetMediaFileSystem(factory =>
+            {
+                IIOHelper ioHelper = factory.GetRequiredService<IIOHelper>();
+                IHostingEnvironment hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+                ILogger<PhysicalFileSystem> logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
+                GlobalSettings globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
+
+                var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
+                var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);
+                return new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
+            });
 
             return builder;
         }

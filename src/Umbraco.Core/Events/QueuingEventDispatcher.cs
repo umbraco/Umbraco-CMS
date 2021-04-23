@@ -11,11 +11,11 @@ namespace Umbraco.Cms.Core.Events
     /// </summary>
     public class QueuingEventDispatcher : QueuingEventDispatcherBase
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
-        public QueuingEventDispatcher(IMediaFileSystem mediaFileSystem)
+        private readonly MediaFileManager _mediaFileManager;
+        public QueuingEventDispatcher(MediaFileManager mediaFileManager)
             : base(true)
         {
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
         }
 
         protected override void ScopeExitCompleted()
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.Events
                 // but then where should it be (without making things too complicated)?
                 var delete = e.Args as IDeletingMediaFilesEventArgs;
                 if (delete != null && delete.MediaFilesToDelete.Count > 0)
-                    _mediaFileSystem.DeleteMediaFiles(delete.MediaFilesToDelete);
+                    _mediaFileManager.DeleteMediaFiles(delete.MediaFilesToDelete);
             }
         }
 

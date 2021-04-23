@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Core.IO
                     if (FileExists(file) == false) return;
                     DeleteFile(file);
 
-                    var directory = _mediaPathScheme.GetDeleteDirectory(this, file);
+                    var directory = "blah"; // _mediaPathScheme.GetDeleteDirectory(this, file);
                     if (!directory.IsNullOrWhiteSpace())
                         DeleteDirectory(directory, true);
                 }
@@ -77,7 +77,7 @@ namespace Umbraco.Cms.Core.IO
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
             filename = _shortStringHelper.CleanStringForSafeFileName(filename.ToLowerInvariant());
 
-            return _mediaPathScheme.GetFilePath(this, cuid, puid, filename);
+            return "blah"; // _mediaPathScheme.GetFilePath(this, cuid, puid, filename);
         }
 
         /// <inheritoc />
@@ -87,7 +87,7 @@ namespace Umbraco.Cms.Core.IO
             if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
             filename = _shortStringHelper.CleanStringForSafeFileName(filename.ToLowerInvariant());
 
-            return _mediaPathScheme.GetFilePath(this, cuid, puid, filename, prevpath);
+            return "Blah"; // _mediaPathScheme.GetFilePath(this, cuid, puid, filename, prevpath);
         }
 
         #endregion
