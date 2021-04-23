@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
         private static Mock<MemberManager> MockMemberManager()
             => new Mock<MemberManager>(
                     Mock.Of<IIpResolver>(),
-                    Mock.Of<IUserStore<MemberIdentityUser>>(),
+                    Mock.Of<IMemberUserStore>(),
                     Options.Create(new IdentityOptions()),
                     Mock.Of<IPasswordHasher<MemberIdentityUser>>(),
                     Enumerable.Empty<IUserValidator<MemberIdentityUser>>(),

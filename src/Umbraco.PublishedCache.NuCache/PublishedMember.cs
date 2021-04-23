@@ -12,10 +12,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
     // note
     // the whole PublishedMember thing should be refactored because as soon as a member
     // is wrapped on in a model, the inner IMember and all associated properties are lost
-    internal class PublishedMember : PublishedContent //, IPublishedMember
+    internal class PublishedMember : PublishedContent
     {
-        private readonly IMember _member;
-
         private PublishedMember(
             IMember member,
             ContentNode contentNode,
@@ -25,7 +23,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             IPublishedModelFactory publishedModelFactory)
             : base(contentNode, contentData, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory)
         {
-            _member = member;
+            Member = member;
         }
 
         public static IPublishedContent Create(
@@ -45,12 +43,19 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 WriterId = member.CreatorId, // what else?
                 Properties = GetPropertyValues(contentType, member)
             };
-            var n = new ContentNode(member.Id, member.Key,
+            var n = new ContentNode(
+                member.Id,
+                member.Key,
                 contentType,
-                member.Level, member.Path, member.SortOrder,
+                member.Level,
+                member.Path,
+                member.SortOrder,
                 member.ParentId,
-                member.CreateDate, member.CreatorId);
-            return new PublishedMember(member, n, d, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory).CreateModel(publishedModelFactory);
+                member.CreateDate,
+                member.CreatorId);
+
+            return new PublishedMember(member, n, d, publishedSnapshotAccessor, variationContextAccessor, publishedModelFactory)
+                .CreateModel(publishedModelFactory);
         }
 
         private static Dictionary<string, PropertyData[]> GetPropertyValues(IPublishedContentType contentType, IMember member)
@@ -99,25 +104,25 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region IPublishedMember
 
-        public IMember Member => _member;
+        public IMember Member { get; }
 
-        public string Email => _member.Email;
+        public string Email => Member.Email;
 
-        public string UserName => _member.Username;
+        public string UserName => Member.Username;
 
-        public string Comments => _member.Comments;
+        public string Comments => Member.Comments;
 
-        public bool IsApproved => _member.IsApproved;
+        public bool IsApproved => Member.IsApproved;
 
-        public bool IsLockedOut => _member.IsLockedOut;
+        public bool IsLockedOut => Member.IsLockedOut;
 
-        public DateTime LastLockoutDate => _member.LastLockoutDate;
+        public DateTime LastLockoutDate => Member.LastLockoutDate;
 
-        public DateTime CreationDate => _member.CreateDate;
+        public DateTime CreationDate => Member.CreateDate;
 
-        public DateTime LastLoginDate => _member.LastLoginDate;
+        public DateTime LastLoginDate => Member.LastLoginDate;
 
-        public DateTime LastPasswordChangedDate => _member.LastPasswordChangeDate;
+        public DateTime LastPasswordChangedDate => Member.LastPasswordChangeDate;
 
         #endregion
     }

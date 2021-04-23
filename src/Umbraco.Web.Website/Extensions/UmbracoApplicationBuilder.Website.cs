@@ -17,7 +17,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IUmbracoApplicationBuilder WithWebsite(this IUmbracoApplicationBuilder builder)
+        public static IUmbracoMiddlewareBuilder WithWebsite(this IUmbracoMiddlewareBuilder builder)
         {
             builder.AppBuilder.UseMiddleware<PublicAccessMiddleware>();
             return builder;

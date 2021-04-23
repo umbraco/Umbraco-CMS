@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 content.Id = dto.NodeId;
                 content.SecurityStamp = dto.SecurityStampToken;
                 content.EmailConfirmedDate = dto.EmailConfirmedDate;
-
+                content.PasswordConfiguration = dto.PasswordConfig;
                 content.Key = nodeDto.UniqueId;
                 content.VersionId = contentVersionDto.Id;
                 
@@ -218,7 +218,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 SecurityStampToken = entity.SecurityStamp,
                 EmailConfirmedDate = entity.EmailConfirmedDate,
                 ContentDto = contentDto,
-                ContentVersionDto = BuildContentVersionDto(entity, contentDto)
+                ContentVersionDto = BuildContentVersionDto(entity, contentDto),
+                PasswordConfig = entity.PasswordConfiguration
             };
             return dto;
         }

@@ -2,10 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -26,30 +29,65 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// </summary>
     public class MemberRepository : ContentRepositoryBase<int, IMember, MemberRepository>, IMemberRepository
     {
+        private readonly MemberPasswordConfigurationSettings _passwordConfiguration;
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly ITagRepository _tagRepository;
         private readonly IPasswordHasher _passwordHasher;
-        private readonly IJsonSerializer _serializer;
+        private readonly IJsonSerializer _jsonSerializer;
         private readonly IMemberGroupRepository _memberGroupRepository;
         private readonly IRepositoryCachePolicy<IMember, string> _memberByUsernameCachePolicy;
+        private bool _passwordConfigInitialized;
+        private string _passwordConfigJson;
 
-        public MemberRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberRepository> logger,
-            IMemberTypeRepository memberTypeRepository, IMemberGroupRepository memberGroupRepository, ITagRepository tagRepository, ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
+        public MemberRepository(
+            IScopeAccessor scopeAccessor,
+            AppCaches cache,
+            ILogger<MemberRepository> logger,
+            IMemberTypeRepository memberTypeRepository,
+            IMemberGroupRepository memberGroupRepository,
+            ITagRepository tagRepository,
+            ILanguageRepository languageRepository,
+            IRelationRepository relationRepository,
+            IRelationTypeRepository relationTypeRepository,
             IPasswordHasher passwordHasher,
             Lazy<PropertyEditorCollection> propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
             IJsonSerializer serializer,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IOptions<MemberPasswordConfigurationSettings> passwordConfiguration)
             : base(scopeAccessor, cache, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
         {
             _memberTypeRepository = memberTypeRepository ?? throw new ArgumentNullException(nameof(memberTypeRepository));
             _tagRepository = tagRepository ?? throw new ArgumentNullException(nameof(tagRepository));
             _passwordHasher = passwordHasher;
-            _serializer = serializer;
+            _jsonSerializer = serializer;
             _memberGroupRepository = memberGroupRepository;
-
+            _passwordConfiguration = passwordConfiguration.Value;
             _memberByUsernameCachePolicy = new DefaultRepositoryCachePolicy<IMember, string>(GlobalIsolatedCache, ScopeAccessor, DefaultOptions);
+        }
+
+        /// <summary>
+        /// Returns a serialized dictionary of the password configuration that is stored against the member in the database
+        /// </summary>
+        private string DefaultPasswordConfigJson
+        {
+            get
+            {
+                if (_passwordConfigInitialized)
+                {
+                    return _passwordConfigJson;
+                }
+
+                var passwordConfig = new PersistedPasswordSettings
+                {
+                    HashAlgorithm = _passwordConfiguration.HashAlgorithmType
+                };
+
+                _passwordConfigJson = passwordConfig == null ? null : _jsonSerializer.Serialize(passwordConfig);
+                _passwordConfigInitialized = true;
+                return _passwordConfigJson;
+            }
         }
 
         protected override MemberRepository This => this;
@@ -262,17 +300,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.SanitizeEntityPropertiesForXmlStorage();
 
             // create the dto
-            var dto = ContentBaseFactory.BuildDto(entity);
+            MemberDto memberDto = ContentBaseFactory.BuildDto(entity);
+
+            // check if we have a user config else use the default
+            memberDto.PasswordConfig = entity.PasswordConfiguration ?? DefaultPasswordConfigJson;
 
             // derive path and level from parent
-            var parent = GetParentNodeDto(entity.ParentId);
+            NodeDto parent = GetParentNodeDto(entity.ParentId);
             var level = parent.Level + 1;
 
             // get sort order
             var sortOrder = GetNewChildSortOrder(entity.ParentId, 0);
 
             // persist the node dto
-            var nodeDto = dto.ContentDto.NodeDto;
+            NodeDto nodeDto = memberDto.ContentDto.NodeDto;
             nodeDto.Path = parent.Path;
             nodeDto.Level = Convert.ToInt16(level);
             nodeDto.SortOrder = sortOrder;
@@ -304,36 +345,36 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.Level = level;
 
             // persist the content dto
-            var contentDto = dto.ContentDto;
+            var contentDto = memberDto.ContentDto;
             contentDto.NodeId = nodeDto.NodeId;
             Database.Insert(contentDto);
 
             // persist the content version dto
             // assumes a new version id and version date (modified date) has been set
-            var contentVersionDto = dto.ContentVersionDto;
+            var contentVersionDto = memberDto.ContentVersionDto;
             contentVersionDto.NodeId = nodeDto.NodeId;
             contentVersionDto.Current = true;
             Database.Insert(contentVersionDto);
             entity.VersionId = contentVersionDto.Id;
 
             // persist the member dto
-            dto.NodeId = nodeDto.NodeId;
+            memberDto.NodeId = nodeDto.NodeId;
 
             // if the password is empty, generate one with the special prefix
             // this will hash the guid with a salt so should be nicely random
             if (entity.RawPasswordValue.IsNullOrWhiteSpace())
             {
 
-                dto.Password = Cms.Core.Constants.Security.EmptyPasswordPrefix + _passwordHasher.HashPassword(Guid.NewGuid().ToString("N"));
-                entity.RawPasswordValue = dto.Password;
+                memberDto.Password = Cms.Core.Constants.Security.EmptyPasswordPrefix + _passwordHasher.HashPassword(Guid.NewGuid().ToString("N"));
+                entity.RawPasswordValue = memberDto.Password;
             }
 
-            Database.Insert(dto);
+            Database.Insert(memberDto);
 
             // persist the property data
             InsertPropertyValues(entity, 0, out _, out _);
 
-            SetEntityTags(entity, _tagRepository, _serializer);
+            SetEntityTags(entity, _tagRepository, _jsonSerializer);
 
             PersistRelations(entity);
 
@@ -368,17 +409,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             // create the dto
-            MemberDto dto = ContentBaseFactory.BuildDto(entity);
+            MemberDto memberDto = ContentBaseFactory.BuildDto(entity);
 
             // update the node dto
-            NodeDto nodeDto = dto.ContentDto.NodeDto;
+            NodeDto nodeDto = memberDto.ContentDto.NodeDto;
             Database.Update(nodeDto);
 
             // update the content dto
-            Database.Update(dto.ContentDto);
+            Database.Update(memberDto.ContentDto);
 
             // update the content version dto
-            Database.Update(dto.ContentVersionDto);
+            Database.Update(memberDto.ContentVersionDto);
 
             // update the member dto
             // but only the changed columns, 'cos we cannot update password if empty
@@ -399,6 +440,13 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 changedCols.Add("LoginName");
             }
 
+            // this can occur from an upgrade
+            if (memberDto.PasswordConfig.IsNullOrWhiteSpace())
+            {
+                memberDto.PasswordConfig = DefaultPasswordConfigJson;
+                changedCols.Add("passwordConfig");
+            }
+
             // do NOT update the password if it has not changed or if it is null or empty
             if (entity.IsPropertyDirty("RawPasswordValue") && !string.IsNullOrWhiteSpace(entity.RawPasswordValue))
             {
@@ -407,33 +455,37 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 // If the security stamp hasn't already updated we need to force it
                 if (entity.IsPropertyDirty("SecurityStamp") == false)
                 {
-                    dto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
+                    memberDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
                     changedCols.Add("securityStampToken");
                 }
+
+                // check if we have a user config else use the default
+                memberDto.PasswordConfig = entity.PasswordConfiguration ?? DefaultPasswordConfigJson;
+                changedCols.Add("passwordConfig");
             }
 
             // If userlogin or the email has changed then need to reset security stamp
             if (changedCols.Contains("Email") || changedCols.Contains("LoginName"))
             {
-                dto.EmailConfirmedDate = null;
+                memberDto.EmailConfirmedDate = null;
                 changedCols.Add("emailConfirmedDate");
 
                 // If the security stamp hasn't already updated we need to force it
                 if (entity.IsPropertyDirty("SecurityStamp") == false)
                 {
-                    dto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
+                    memberDto.SecurityStampToken = entity.SecurityStamp = Guid.NewGuid().ToString();
                     changedCols.Add("securityStampToken");
                 }
             }
 
             if (changedCols.Count > 0)
             {
-                Database.Update(dto, changedCols);
+                Database.Update(memberDto, changedCols);
             }
 
             ReplacePropertyValues(entity, entity.VersionId, 0, out _, out _);
 
-            SetEntityTags(entity, _tagRepository, _serializer);
+            SetEntityTags(entity, _tagRepository, _jsonSerializer);
 
             PersistRelations(entity);
 

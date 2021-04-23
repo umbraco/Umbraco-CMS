@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models.Membership
 {
@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Core.Models.Membership
     /// The data stored against the user for their password configuration
     /// </summary>
     [DataContract(Name = "userPasswordSettings", Namespace = "")]
-    public class UserPasswordSettings
+    public class PersistedPasswordSettings
     {
         /// <summary>
         /// The algorithm name

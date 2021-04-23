@@ -21,7 +21,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="builder"></param>
         /// <returns></returns>
-        public static IUmbracoApplicationBuilder WithBackOffice(this IUmbracoApplicationBuilder builder)
+        public static IUmbracoMiddlewareBuilder WithBackOffice(this IUmbracoMiddlewareBuilder builder)
         {
             KeepAliveSettings keepAliveSettings = builder.ApplicationServices.GetRequiredService<IOptions<KeepAliveSettings>>().Value;
             IHostingEnvironment hostingEnvironment = builder.ApplicationServices.GetRequiredService<IHostingEnvironment>();

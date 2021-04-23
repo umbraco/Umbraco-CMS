@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.PublishedCache
+namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
     /// <summary>
     /// Exposes a member object as IPublishedContent
@@ -18,18 +18,15 @@ namespace Umbraco.Cms.Core.PublishedCache
         private readonly IMembershipUser _membershipUser;
         private readonly IPublishedProperty[] _properties;
         private readonly IPublishedContentType _publishedMemberType;
-        private readonly IUserService _userService;
 
         public PublishedMember(
             IMember member,
             IPublishedContentType publishedMemberType,
-            IUserService userService,
             IVariationContextAccessor variationContextAccessor) : base(variationContextAccessor)
         {
             _member = member ?? throw new ArgumentNullException(nameof(member));
             _membershipUser = member;
             _publishedMemberType = publishedMemberType ?? throw new ArgumentNullException(nameof(publishedMemberType));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
 
             // RawValueProperty is used for two things here
             // - for the 'map properties' thing that we should really get rid of
@@ -149,6 +146,8 @@ namespace Umbraco.Cms.Core.PublishedCache
         public override DateTime UpdateDate => _member.UpdateDate;
 
         public override int Level => _member.Level;
+
+        public DateTime LastPasswordChangedDate => throw new NotImplementedException();
 
         #endregion
     }

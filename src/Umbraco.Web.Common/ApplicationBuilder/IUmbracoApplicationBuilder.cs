@@ -1,14 +1,17 @@
-﻿using System;
+using System;
 using Microsoft.AspNetCore.Builder;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 {
-    public interface IUmbracoApplicationBuilder
+    public interface IUmbracoApplicationBuilder : IUmbracoMiddlewareBuilder
     {
-        IRuntimeState RuntimeState { get; }
-        IServiceProvider ApplicationServices { get; }
-        IApplicationBuilder AppBuilder { get; }
+        /// <summary>
+        /// Called to include umbraco middleware
+        /// </summary>
+        /// <param name="configureUmbraco"></param>
+        /// <returns></returns>
+        IUmbracoApplicationBuilder WithMiddleware(Action<IUmbracoMiddlewareBuilder> configureUmbraco);
 
         /// <summary>
         /// Final call during app building to configure endpoints

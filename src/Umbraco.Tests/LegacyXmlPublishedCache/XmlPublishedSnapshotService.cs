@@ -27,7 +27,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly IDomainService _domainService;
-        private readonly IMemberService _memberService;
         private readonly IMediaService _mediaService;
         private readonly IUserService _userService;
         private readonly IAppCache _requestCache;
@@ -104,7 +103,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 documentRepository, mediaRepository, memberRepository, entitySerializer, hostingEnvironment, hostingLifetime, shortStringHelper);
 
             _domainService = serviceContext.DomainService;
-            _memberService = serviceContext.MemberService;
             _mediaService = serviceContext.MediaService;
             _userService = serviceContext.UserService;
             _defaultCultureAccessor = defaultCultureAccessor;
@@ -134,7 +132,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return new PublishedSnapshot(
                 new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache, _variationContextAccessor, previewToken),
                 new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache, _entitySerializer, _umbracoContextAccessor, _variationContextAccessor),
-                new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache, _userService, _variationContextAccessor),
+                new PublishedMemberCache(_contentTypeCache, _variationContextAccessor),
                 domainCache);
         }
 

@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     return _passwordConfigJson;
                 }
 
-                var passwordConfig = new UserPasswordSettings
+                var passwordConfig = new PersistedPasswordSettings
                 {
                     HashAlgorithm = _passwordConfiguration.HashAlgorithmType
                 };
@@ -462,7 +462,7 @@ ORDER BY colName";
                 entity.SecurityStamp = Guid.NewGuid().ToString();
             }
 
-            var userDto = UserFactory.BuildDto(entity);
+            UserDto userDto = UserFactory.BuildDto(entity);
 
             // check if we have a user config else use the default
             userDto.PasswordConfig = entity.PasswordConfiguration ?? DefaultPasswordConfigJson;

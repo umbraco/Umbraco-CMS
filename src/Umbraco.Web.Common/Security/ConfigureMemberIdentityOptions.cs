@@ -6,14 +6,13 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Security
 {
+
     public sealed class ConfigureMemberIdentityOptions : IConfigureOptions<IdentityOptions>
     {
         private readonly MemberPasswordConfigurationSettings _memberPasswordConfiguration;
 
         public ConfigureMemberIdentityOptions(IOptions<MemberPasswordConfigurationSettings> memberPasswordConfiguration)
-        {
-            _memberPasswordConfiguration = memberPasswordConfiguration.Value;
-        }
+            => _memberPasswordConfiguration = memberPasswordConfiguration.Value;
 
         public void Configure(IdentityOptions options)
         {

@@ -32,6 +32,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [Constraint(Default = "''")]
         public string Password { get; set; }
 
+        /// <summary>
+        /// This will represent a JSON structure of how the password has been created (i.e hash algorithm, iterations)
+        /// </summary>
+        [Column("passwordConfig")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
+        public string PasswordConfig { get; set; }
+
         [Column("securityStampToken")]
         [NullSetting(NullSetting = NullSettings.Null)]
         [Length(255)]

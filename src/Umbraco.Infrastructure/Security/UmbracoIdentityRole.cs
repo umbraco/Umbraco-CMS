@@ -57,7 +57,12 @@ namespace Umbraco.Cms.Core.Security
         /// </summary>
         public bool HasIdentity { get; protected set; }
 
-        // TODO: We should support this and it's logic
+        // NOTE: The purpose
+        // of this value is to try to prevent concurrent writes in the DB but this is
+        // an implementation detail at the data source level that has leaked into the
+        // model. A good writeup of that is here:
+        // https://stackoverflow.com/a/37362173
+        // For our purposes currently we won't worry about this.
         public override string ConcurrencyStamp { get => base.ConcurrencyStamp; set => base.ConcurrencyStamp = value; }
 
         /// <summary>
