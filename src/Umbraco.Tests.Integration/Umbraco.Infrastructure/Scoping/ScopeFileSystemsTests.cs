@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void MediaFileSystem_does_not_write_to_physical_file_system_when_scoped_if_scope_does_not_complete()
+        public void MediaFileManager_does_not_write_to_physical_file_system_when_scoped_if_scope_does_not_complete()
         {
             string rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
             string rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void MediaFileSystem_writes_to_physical_file_system_when_scoped_and_scope_is_completed()
+        public void MediaFileManager_writes_to_physical_file_system_when_scoped_and_scope_is_completed()
         {
             string rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
             string rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);

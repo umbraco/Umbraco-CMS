@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Builders;
 
@@ -79,11 +80,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
                 Options.Create(new GlobalSettings()),
                 Mock.Of<IHostingEnvironment>());
 
+            var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), Mock.Of<IMediaPathScheme>(),
+                instance.CreateLogger<MediaFileManager>(), Mock.Of<IShortStringHelper>());
+
             return new ScopeProvider(
                 Mock.Of<IUmbracoDatabaseFactory>(),
                 fileSystems,
                 Options.Create(new CoreDebugSettings()),
-                Mock.Of<MediaFileManager>(),
+                mediaFileManager,
                 Mock.Of<ILogger<ScopeProvider>>(),
                 instance,
                 Mock.Of<IRequestCache>(),

@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private readonly MediaFileManager _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IJsonSerializer _serializer;
@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IHostingEnvironment hostingEnvironment,
             IMediaService mediaService,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
-            MediaFileManager mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IShortStringHelper shortStringHelper,
             IPublishedUrlProvider publishedUrlProvider,
             IJsonSerializer serializer)
@@ -50,7 +50,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _hostingEnvironment = hostingEnvironment;
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider ?? throw new ArgumentNullException(nameof(contentTypeBaseServiceProvider));
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
             _shortStringHelper = shortStringHelper;
             _publishedUrlProvider = publishedUrlProvider;
             _serializer = serializer;
@@ -107,7 +107,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     if (fileStream == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fileStream)
                     {
-                        mediaFile.SetValue(_mediaFileSystem, _shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File, safeFileName, fileStream);
+                        mediaFile.SetValue(_mediaFileManager, _shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File, safeFileName, fileStream);
                     }
 
                     _mediaService.Save(mediaFile, userId);
