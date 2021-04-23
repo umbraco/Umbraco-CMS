@@ -36,9 +36,9 @@ namespace Umbraco.Tests.Persistence
         [Test]
         public void SingleReadLockTest()
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = (Scope)ScopeProvider.CreateScope())
             {
-                scope.ReadLock(Constants.Locks.Servers);
+                scope.EagerReadLock(Constants.Locks.Servers);
                 scope.Complete();
             }
         }
@@ -59,11 +59,11 @@ namespace Umbraco.Tests.Persistence
                 var ic = i; // capture
                 threads[i] = new Thread(() =>
                 {
-                    using (var scope = ScopeProvider.CreateScope())
+                    using (var scope = (Scope)ScopeProvider.CreateScope())
                     {
                         try
                         {
-                            scope.ReadLock(Constants.Locks.Servers);
+                            scope.EagerReadLock(Constants.Locks.Servers);
                             lock (locker)
                             {
                                 acquired++;
@@ -122,7 +122,7 @@ namespace Umbraco.Tests.Persistence
                 var ic = i; // capture
                 threads[i] = new Thread(() =>
                 {
-                    using (var scope = ScopeProvider.CreateScope())
+                    using (var scope = (Scope)ScopeProvider.CreateScope())
                     {
                         try
                         {
@@ -132,7 +132,7 @@ namespace Umbraco.Tests.Persistence
                                 if (entered == threadCount) m1.Set();
                             }
                             ms[ic].WaitOne();
-                            scope.WriteLock(Constants.Locks.Servers);
+                            scope.EagerWriteLock(Constants.Locks.Servers);
                             lock (locker)
                             {
                                 acquired++;
@@ -161,8 +161,10 @@ namespace Umbraco.Tests.Persistence
             m1.Wait();
             // all threads have entered
             ms[0].Set(); // let 0 go
+            // TODO: This timing is flaky
             Thread.Sleep(100);
             for (var i = 1; i < threadCount; i++) ms[i].Set(); // let others go
+            // TODO: This timing is flaky
             Thread.Sleep(500);
             // only 1 thread has locked
             Assert.AreEqual(1, acquired);
@@ -216,13 +218,13 @@ namespace Umbraco.Tests.Persistence
 
         private void DeadLockTestThread(int id1, int id2, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = (Scope)ScopeProvider.CreateScope())
             {
                 try
                 {
                     otherEv.WaitOne();
                     Console.WriteLine($"[{id1}] WAIT {id1}");
-                    scope.WriteLock(id1);
+                    scope.EagerWriteLock(id1);
                     Console.WriteLine($"[{id1}] GRANT {id1}");
                     WriteLocks(scope.Database);
                     myEv.Set();
@@ -233,7 +235,7 @@ namespace Umbraco.Tests.Persistence
                         Thread.Sleep(200); // cannot wait due to deadlock... just give it a bit of time
 
                     Console.WriteLine($"[{id1}] WAIT {id2}");
-                    scope.WriteLock(id2);
+                    scope.EagerWriteLock(id2);
                     Console.WriteLine($"[{id1}] GRANT {id2}");
                     WriteLocks(scope.Database);
                 }
@@ -288,7 +290,7 @@ namespace Umbraco.Tests.Persistence
 
                     Console.WriteLine("Write lock A");
                     // This will acquire right away
-                    realScope.WriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
+                    realScope.EagerWriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
                     Thread.Sleep(6000); // Wait longer than the Read Lock B timeout
                     scope.Complete();
                     Console.WriteLine("Finished Write lock A");
@@ -308,7 +310,7 @@ namespace Umbraco.Tests.Persistence
                     // This will wait for the write lock to release but it isn't going to wait long
                     // enough so an exception will be thrown.
                     Assert.Throws<SqlCeLockTimeoutException>(() =>
-                        realScope.ReadLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
+                        realScope.EagerReadLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
 
                     scope.Complete();
                     Console.WriteLine("Finished Read lock B");
@@ -326,7 +328,7 @@ namespace Umbraco.Tests.Persistence
                     // This will wait for the write lock to release but it isn't going to wait long
                     // enough so an exception will be thrown.
                     Assert.Throws<SqlCeLockTimeoutException>(() =>
-                        realScope.WriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
+                        realScope.EagerWriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree));
 
                     scope.Complete();
                     Console.WriteLine("Finished Write lock C");
@@ -349,7 +351,7 @@ namespace Umbraco.Tests.Persistence
 
                     Console.WriteLine("Write lock A");
                     // This will acquire right away
-                    realScope.WriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
+                    realScope.EagerWriteLock(TimeSpan.FromMilliseconds(2000), Constants.Locks.ContentTree);
                     Thread.Sleep(4000); // Wait less than the Read Lock B timeout
                     scope.Complete();
                     Interlocked.Increment(ref locksCompleted);
@@ -369,7 +371,7 @@ namespace Umbraco.Tests.Persistence
 
                     // This will wait for the write lock to release
                     Assert.DoesNotThrow(() =>
-                        realScope.ReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
+                        realScope.EagerReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
 
                     Assert.GreaterOrEqual(locksCompleted, 1);
 
@@ -389,7 +391,7 @@ namespace Umbraco.Tests.Persistence
 
                     // This will wait for the write lock to release
                     Assert.DoesNotThrow(() =>
-                        realScope.ReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
+                        realScope.EagerReadLock(TimeSpan.FromMilliseconds(6000), Constants.Locks.ContentTree));
 
                     Assert.GreaterOrEqual(locksCompleted, 1);
 
@@ -417,7 +419,7 @@ namespace Umbraco.Tests.Persistence
 
                 Console.WriteLine("Write lock A");
                 // TODO: In theory this would throw
-                realScope.WriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree);
+                realScope.EagerWriteLock(TimeSpan.FromMilliseconds(3000), Constants.Locks.ContentTree);
                 scope.Complete();
                 Console.WriteLine("Finished Write lock A");
             }
@@ -425,13 +427,13 @@ namespace Umbraco.Tests.Persistence
 
         private void NoDeadLockTestThread(int id, EventWaitHandle myEv, WaitHandle otherEv, ref Exception exception)
         {
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = (Scope)ScopeProvider.CreateScope())
             {
                 try
                 {
                     otherEv.WaitOne();
                     Console.WriteLine($"[{id}] WAIT {id}");
-                    scope.WriteLock(id);
+                    scope.EagerWriteLock(id);
                     Console.WriteLine($"[{id}] GRANT {id}");
                     WriteLocks(scope.Database);
                     myEv.Set();
