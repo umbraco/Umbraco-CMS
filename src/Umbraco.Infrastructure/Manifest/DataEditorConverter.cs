@@ -113,29 +113,36 @@ namespace Umbraco.Cms.Core.Manifest
             if(jobject["editor"]["view"] is JValue view)
                 jobject["editor"]["view"] = RewriteVirtualUrl(view);
 
-            if (jobject["prevalues"] is JObject config)
+            var prevalues = jobject["prevalues"] as JObject;
+            var defaultConfig = jobject["defaultConfig"] as JObject;
+            if (prevalues != null || defaultConfig != null)
             {
                 // explicitly assign a configuration editor of type ConfigurationEditor
                 // (else the deserializer will try to read it before setting it)
                 // (and besides it's an interface)
                 target.ExplicitConfigurationEditor = new ConfigurationEditor();
 
-                // see note about validators, above - same applies to field validators
-                if (config["fields"] is JArray jarray)
+                var config = new JObject();
+                if (prevalues != null)
                 {
-                    foreach (var field in jarray)
+                    config = prevalues;
+                    // see note about validators, above - same applies to field validators
+                    if (config["fields"] is JArray jarray)
                     {
-                        if (field["validation"] is JObject fvalidation)
-                            field["validation"] = RewriteValidators(fvalidation);
+                        foreach (var field in jarray)
+                        {
+                            if (field["validation"] is JObject fvalidation)
+                                field["validation"] = RewriteValidators(fvalidation);
 
-                        if(field["view"] is JValue fview)
-                            field["view"] = RewriteVirtualUrl(fview);
+                            if(field["view"] is JValue fview)
+                                field["view"] = RewriteVirtualUrl(fview);
+                        }
                     }
                 }
 
                 // in the manifest, default configuration is at editor level
                 // move it down to configuration editor level so it can be deserialized properly
-                if (jobject["defaultConfig"] is JObject defaultConfig)
+                if (defaultConfig != null)
                 {
                     config["defaultConfig"] = defaultConfig;
                     jobject.Remove("defaultConfig");

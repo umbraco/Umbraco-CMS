@@ -38,12 +38,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         private IMemberService MemberService => GetRequiredService<IMemberService>();
 
-        [SetUp]
-        public void SetupTest() =>
-
-            // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            global::Umbraco.Cms.Core.Services.Implement.MemberTypeService.ClearScopeEvents();
-
         [Test]
         public void Can_Update_Member_Property_Values()
         {
@@ -225,6 +219,25 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IEnumerable<int> found = MemberService.GetAllRolesIds();
 
             Assert.AreEqual(3, found.Count());
+        }
+
+        [Test]
+        public void Can_Replace_Roles()
+        {
+            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+            MemberTypeService.Save(memberType);
+            IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            MemberService.Save(member);
+
+            string[] roleNames1 = new[] { "TR1", "TR2" };
+            MemberService.AssignRoles(new[] { member.Id }, roleNames1);
+            IEnumerable<string> memberRoles = MemberService.GetAllRoles(member.Id);
+            CollectionAssert.AreEquivalent(roleNames1, memberRoles);
+
+            string[] roleNames2 = new[] { "TR3", "TR4" };
+            MemberService.ReplaceRoles(new[] { member.Id }, roleNames2);
+            memberRoles = MemberService.GetAllRoles(member.Id);
+            CollectionAssert.AreEquivalent(roleNames2, memberRoles);
         }
 
         [Test]

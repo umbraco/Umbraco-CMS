@@ -286,7 +286,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
 
             try
             {
-                CacheInstructionServiceProcessInstructionsResult result = CacheInstructionService.ProcessInstructions(_released, LocalIdentity, _lastPruned);
+                CacheInstructionServiceProcessInstructionsResult result = CacheInstructionService.ProcessInstructions(_released, LocalIdentity, _lastPruned, _lastId);
                 if (result.InstructionsWerePruned)
                 {
                     _lastPruned = _lastSync;
@@ -307,8 +307,8 @@ namespace Umbraco.Cms.Infrastructure.Sync
 
                 _syncIdle.Set();
             }
-        }        
-        
+        }
+
         /// <summary>
         /// Reads the last-synced id from file into memory.
         /// </summary>

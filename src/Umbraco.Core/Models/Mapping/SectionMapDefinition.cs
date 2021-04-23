@@ -15,7 +15,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _textService = textService;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<ISection, Section>((source, context) => new Section(), Map);
 

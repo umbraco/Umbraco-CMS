@@ -17,12 +17,12 @@ using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
@@ -63,9 +63,6 @@ namespace Umbraco.Tests.Scoping
         public override void TearDown()
         {
             base.TearDown();
-
-            _distributedCacheBinder?.UnbindEvents();
-            _distributedCacheBinder = null;
 
             NotificationHandler.PublishedContent = null;
         }
@@ -140,8 +137,7 @@ namespace Umbraco.Tests.Scoping
             var umbracoContext = GetUmbracoContextNu("http://example.com/", setSingleton: true);
 
             // wire cache refresher
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers), Mock.Of<IUmbracoContextFactory>(), Mock.Of<ILogger<DistributedCacheBinder>>());
-            _distributedCacheBinder.BindEvents(true);
+            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(Current.ServerMessenger, Current.CacheRefreshers));
 
             // create document type, document
             var contentType = new ContentType(ShortStringHelper, -1) { Alias = "CustomDocument", Name = "Custom Document" };

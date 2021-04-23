@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 

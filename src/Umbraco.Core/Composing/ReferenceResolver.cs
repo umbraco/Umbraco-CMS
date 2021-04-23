@@ -82,9 +82,8 @@ namespace Umbraco.Cms.Core.Composing
                             assemblyName.FullName.StartsWith(f, StringComparison.InvariantCultureIgnoreCase)))
                             continue;
 
-                        // don't include this item if it's Umbraco
-                        // TODO: We should maybe pass an explicit list of these names in?
-                        if (assemblyName.FullName.StartsWith("Umbraco.") || assemblyName.Name.EndsWith(".Views"))
+                        // don't include this item if it's Umbraco Core
+                        if (Constants.Composing.UmbracoCoreAssemblyNames.Any(x=>assemblyName.FullName.StartsWith(x) || assemblyName.Name.EndsWith(".Views")))
                             continue;
 
                         var assembly = Assembly.Load(assemblyName);

@@ -26,14 +26,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
     public class ContentTypeModelMappingTests : UmbracoIntegrationTest
     {
         private IDataTypeService _dataTypeService;
-        private UmbracoMapper _sut;
+        private IUmbracoMapper _sut;
         private IFileService _fileService;
         private IConfigurationEditorJsonSerializer _serializer;
 
         [SetUp]
         public void SetupTest()
         {
-            _sut = Services.GetRequiredService<UmbracoMapper>();
+            _sut = Services.GetRequiredService<IUmbracoMapper>();
             _dataTypeService = Services.GetRequiredService<IDataTypeService>();
             _fileService = Services.GetRequiredService<IFileService>();
             _serializer = Services.GetRequiredService<IConfigurationEditorJsonSerializer>();

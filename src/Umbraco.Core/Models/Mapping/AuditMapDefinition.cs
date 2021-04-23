@@ -5,7 +5,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class AuditMapDefinition : IMapDefinition
     {
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IAuditItem, AuditLog>((source, context) => new AuditLog(), Map);
         }

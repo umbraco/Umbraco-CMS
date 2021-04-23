@@ -133,12 +133,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             new CacheInstruction(0, DateTime.UtcNow, JsonConvert.SerializeObject(instructions, Formatting.None), localIdentity, instructions.Sum(x => x.JsonIdCount));
 
         /// <inheritdoc/>
-        public CacheInstructionServiceProcessInstructionsResult ProcessInstructions(bool released, string localIdentity, DateTime lastPruned)
+        public CacheInstructionServiceProcessInstructionsResult ProcessInstructions(bool released, string localIdentity, DateTime lastPruned, int lastId)
         {
             using (_profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var numberOfInstructionsProcessed = ProcessDatabaseInstructions(released, localIdentity, out int lastId);
+                var numberOfInstructionsProcessed = ProcessDatabaseInstructions(released, localIdentity, ref lastId);
 
                 // Check for pruning throttling.
                 if (released || (DateTime.UtcNow - lastPruned) <= _globalSettings.DatabaseServerMessenger.TimeBetweenPruneOperations)
@@ -172,7 +172,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// </remarks>
         /// <returns>Number of instructions processed.</returns>
-        private int ProcessDatabaseInstructions(bool released, string localIdentity, out int lastId)
+        private int ProcessDatabaseInstructions(bool released, string localIdentity, ref int lastId)
         {
             // NOTE:
             // We 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
@@ -199,8 +199,9 @@ namespace Umbraco.Cms.Core.Services.Implement
             // It would have been nice to do this in a Query instead of Fetch using a data reader to save
             // some memory however we cannot do that because inside of this loop the cache refreshers are also
             // performing some lookups which cannot be done with an active reader open.
+            IEnumerable<CacheInstruction> pendingInstructions = _cacheInstructionRepository.GetPendingInstructions(lastId, MaxInstructionsToRetrieve);
             lastId = 0;
-            foreach (CacheInstruction instruction in _cacheInstructionRepository.GetPendingInstructions(lastId, MaxInstructionsToRetrieve))
+            foreach (CacheInstruction instruction in pendingInstructions)
             {
                 // If this flag gets set it means we're shutting down! In this case, we need to exit asap and cannot
                 // continue processing anything otherwise we'll hold up the app domain shutdown.

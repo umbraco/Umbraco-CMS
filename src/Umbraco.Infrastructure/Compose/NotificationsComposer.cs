@@ -1,25 +1,22 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Compose
 {
-    public sealed class NotificationsComposer : ComponentComposer<NotificationsComponent>, ICoreComposer
+    public sealed class NotificationsComposer : ICoreComposer
     {
-        public override void Compose(IUmbracoBuilder builder)
+        public void Compose(IUmbracoBuilder builder)
         {
-            base.Compose(builder);
-
-            builder.Services.AddUnique<NotificationsComponent.Notifier>();
-
             // add handlers for sending user notifications (i.e. emails)
             builder.Services.AddUnique<UserNotificationsHandler.Notifier>();
             builder
@@ -31,7 +28,9 @@ namespace Umbraco.Cms.Core.Compose
                 .AddNotificationHandler<ContentCopiedNotification, UserNotificationsHandler>()
                 .AddNotificationHandler<ContentRolledBackNotification, UserNotificationsHandler>()
                 .AddNotificationHandler<ContentSentToPublishNotification, UserNotificationsHandler>()
-                .AddNotificationHandler<ContentUnpublishedNotification, UserNotificationsHandler>();
+                .AddNotificationHandler<ContentUnpublishedNotification, UserNotificationsHandler>()
+                .AddNotificationHandler<AssignedUserGroupPermissionsNotification, UserNotificationsHandler>()
+                .AddNotificationHandler<PublicAccessEntrySavedNotification, UserNotificationsHandler>();
 
             // add handlers for building content relations
             builder
@@ -51,10 +50,12 @@ namespace Umbraco.Cms.Core.Compose
                 .AddNotificationHandler<ContentDeletedNotification, FileUploadPropertyEditor>()
                 .AddNotificationHandler<MediaDeletedNotification, FileUploadPropertyEditor>()
                 .AddNotificationHandler<MediaSavingNotification, FileUploadPropertyEditor>()
+                .AddNotificationHandler<MemberDeletedNotification, FileUploadPropertyEditor>()
                 .AddNotificationHandler<ContentCopiedNotification, ImageCropperPropertyEditor>()
                 .AddNotificationHandler<ContentDeletedNotification, ImageCropperPropertyEditor>()
                 .AddNotificationHandler<MediaDeletedNotification, ImageCropperPropertyEditor>()
-                .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>();
+                .AddNotificationHandler<MediaSavingNotification, ImageCropperPropertyEditor>()
+                .AddNotificationHandler<MemberDeletedNotification, ImageCropperPropertyEditor>();
 
             // add notification handlers for redirect tracking
             builder
@@ -62,6 +63,50 @@ namespace Umbraco.Cms.Core.Compose
                 .AddNotificationHandler<ContentPublishedNotification, RedirectTrackingHandler>()
                 .AddNotificationHandler<ContentMovingNotification, RedirectTrackingHandler>()
                 .AddNotificationHandler<ContentMovedNotification, RedirectTrackingHandler>();
+
+            // Add notification handlers for DistributedCache
+            builder
+                .AddNotificationHandler<DictionaryItemDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<DictionaryItemSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<LanguageSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MemberSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MemberDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<PublicAccessEntrySavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<PublicAccessEntryDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<UserSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<UserDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<UserGroupWithUsersSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<UserGroupDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MemberGroupDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MemberGroupSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<DataTypeDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<DataTypeSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<TemplateDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<TemplateSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<RelationTypeDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<RelationTypeSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<DomainDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<DomainSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MacroSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MacroDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MediaTreeChangeNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<ContentTypeChangedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MediaTypeChangedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MemberTypeChangedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<ContentTreeChangeNotification, DistributedCacheBinder>()
+                ;
+            // add notification handlers for auditing
+            builder
+                .AddNotificationHandler<MemberSavedNotification, AuditNotificationsHandler>()
+                .AddNotificationHandler<MemberDeletedNotification, AuditNotificationsHandler>()
+                .AddNotificationHandler<AssignedMemberRolesNotification, AuditNotificationsHandler>()
+                .AddNotificationHandler<RemovedMemberRolesNotification, AuditNotificationsHandler>()
+                .AddNotificationHandler<ExportedMemberNotification, AuditNotificationsHandler>()
+                .AddNotificationHandler<UserSavedNotification, AuditNotificationsHandler>()
+                .AddNotificationHandler<UserDeletedNotification, AuditNotificationsHandler>()
+                .AddNotificationHandler<UserGroupWithUsersSavedNotification, AuditNotificationsHandler>()
+                .AddNotificationHandler<AssignedUserGroupPermissionsNotification, AuditNotificationsHandler>();
         }
     }
 }

@@ -13,9 +13,10 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
@@ -36,8 +37,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         #region Setup
 
-        private class TestNotificationHandler : INotificationHandler<ContentCacheRefresherNotification>
+        private class TestNotificationHandler :
+            INotificationHandler<ContentCacheRefresherNotification>,
+            INotificationHandler<ContentDeletedNotification>,
+            INotificationHandler<ContentDeletingVersionsNotification>,
+            INotificationHandler<ContentRefreshNotification>
         {
+            private readonly IDocumentRepository _documentRepository;
+
+            public TestNotificationHandler(IDocumentRepository documentRepository)
+            {
+                _documentRepository = documentRepository;
+            }
+
             public void Handle(ContentCacheRefresherNotification args)
             {
                 // reports the event as: "ContentCache/<action>,<action>.../X
@@ -47,6 +59,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 if (args.MessageType != MessageType.RefreshByPayload)
                 {
                     throw new NotSupportedException();
+                }
+
+                // We're in between tests, don't do anything.
+                if (_events is null)
+                {
+                    return;
                 }
 
                 foreach (ContentCacheRefresher.JsonPayload payload in (ContentCacheRefresher.JsonPayload[])args.MessageObject)
@@ -64,23 +82,106 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
                 _msgCount++;
             }
+
+            public void Handle(ContentDeletedNotification notification)
+            {
+                // reports the event as : "ContentRepository/Remove/X"
+                // where
+                // X is the event content ID
+                var e = new EventInstance
+                {
+                    Message = _msgCount++,
+                    Sender = "ContentRepository",
+                    EventArgs = null,  // Notification has no event args
+                    Name = "Remove",
+                    Args = string.Join(",", notification.DeletedEntities.Select(x => x.Id))
+                };
+                _events.Add(e);
+            }
+
+            public void Handle(ContentDeletingVersionsNotification notification)
+            {
+                // reports the event as : "ContentRepository/Remove/X:Y"
+                // where
+                // X is the event content ID
+                // Y is the event content version GUID
+                var e = new EventInstance
+                {
+                    Message = _msgCount++,
+                    Sender = "ContentRepository",
+                    EventArgs = null, // Notification has no args
+                    Name = "RemoveVersion",
+                    Args = $"{notification.Id}:{notification.SpecificVersion}"
+                };
+                _events.Add(e);
+            }
+
+            public void Handle(ContentRefreshNotification notification)
+            {
+                // reports the event as : "ContentRepository/Refresh/XY-Z"
+                // where
+                // X can be u (unpublished) or p (published) and is the state of the event content
+                // Y can be u (unchanged), x (unpublishing), p (published) or m (masked) and is the state of the published version
+                // Z is the event content ID
+
+                // reports the event as "ContentRepository/Refresh/id.xyz
+                // where
+                // id is the event content identifier
+                // x is u|p and is the (un)published state of the event content
+                // y is +|-|= and is the action (publish, unpublish, no change)
+                // z is u|p|m and is the (un)published state after the event
+                if (_events is null)
+                {
+                    return;
+                }
+                IContent[] entities = new[] { notification.Entity }; // args.Entities
+
+                var e = new EventInstance
+                {
+                    Message = _msgCount++,
+                    Sender = "ContentRepository",
+                    Name = "Refresh",
+                    Args = string.Join(",", entities.Select(x =>
+                    {
+                        PublishedState publishedState = ((Content)x).PublishedState;
+
+                        string xstate = x.Published ? "p" : "u";
+                        if (publishedState == PublishedState.Publishing)
+                        {
+                            xstate += "+" + (x.ParentId == -1 || _documentRepository.IsPathPublished(_documentRepository.Get(x.ParentId)) ? "p" : "m");
+                        }
+                        else if (publishedState == PublishedState.Unpublishing)
+                        {
+                            xstate += "-u";
+                        }
+                        else
+                        {
+                            xstate += "=" + (x.Published ? (_documentRepository.IsPathPublished(x) ? "p" : "m") : "u");
+                        }
+
+                        return $"{x.Id}.{xstate}";
+                    }))
+                };
+                _events.Add(e);
+            }
         }
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
-            builder.AddNotificationHandler<ContentCacheRefresherNotification, TestNotificationHandler>();
+            builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
+            builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
+            builder
+                .AddNotificationHandler<ContentCacheRefresherNotification, TestNotificationHandler>()
+                .AddNotificationHandler<ContentDeletedNotification, TestNotificationHandler>()
+                .AddNotificationHandler<ContentDeletingVersionsNotification, TestNotificationHandler>()
+                .AddNotificationHandler<ContentRefreshNotification, TestNotificationHandler>()
+                ;
+            builder.AddNotificationHandler<ContentTreeChangeNotification, DistributedCacheBinder>();
         }
 
         [SetUp]
         public void SetUp()
         {
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(new LocalServerMessenger(), CacheRefresherCollection), UmbracoContextFactory, GetRequiredService<ILogger<DistributedCacheBinder>>());
-            _distributedCacheBinder.BindEvents(true);
-
             _events = new List<EventInstance>();
-
-            DocumentRepository.ScopedEntityRefresh += ContentRepositoryRefreshed;
-            DocumentRepository.ScopeEntityRemove += ContentRepositoryRemoved;
-            DocumentRepository.ScopeVersionRemove += ContentRepositoryRemovedVersion;
 
             // prepare content type
             Template template = TemplateBuilder.CreateTextPageTemplate();
@@ -92,18 +193,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentTypeService.Save(_contentType);
         }
 
-        [TearDown]
-        public void TearDownTest()
-        {
-            _distributedCacheBinder?.UnbindEvents();
-
-            // Clear ALL events
-            DocumentRepository.ScopedEntityRefresh -= ContentRepositoryRefreshed;
-            DocumentRepository.ScopeEntityRemove -= ContentRepositoryRemoved;
-            DocumentRepository.ScopeVersionRemove -= ContentRepositoryRemovedVersion;
-        }
-
-        private DistributedCacheBinder _distributedCacheBinder;
         private static IList<EventInstance> _events;
         private static int _msgCount;
         private IContentType _contentType;
@@ -269,96 +358,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // have to be more precise & specify properties
             return s_propertiesImpactingAllVersions.Any(content.IsPropertyDirty);
         }
-
-        private void ContentRepositoryRefreshed(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
-        {
-            // reports the event as : "ContentRepository/Refresh/XY-Z"
-            // where
-            // X can be u (unpublished) or p (published) and is the state of the event content
-            // Y can be u (unchanged), x (unpublishing), p (published) or m (masked) and is the state of the published version
-            // Z is the event content ID
-            //
-            // XmlStore would typically...
-            //   uu: rebuild preview
-            //   ux: rebuild preview, delete published
-            //   up: rebuild preview, rebuild published (using published) - eg because of sort, move...
-            //   um: rebuild preview, rebuild published (using published) or maybe delete published (?)
-            //   pp: rebuild preview, rebuild published (using current)
-            //   pm: rebuild preview, rebuild published (using current) or maybe delete published (?)
-
-            // reports the event as "ContentRepository/Refresh/id.xyz
-            // where
-            // id is the event content identifier
-            // x is u|p and is the (un)published state of the event content
-            // y is +|-|= and is the action (publish, unpublish, no change)
-            // z is u|p|m and is the (un)published state after the event
-            IContent[] entities = new[] { args.Entity }; // args.Entities
-
-            var e = new EventInstance
-            {
-                Message = _msgCount++,
-                Sender = "ContentRepository",
-                Name = "Refresh",
-                Args = string.Join(",", entities.Select(x =>
-                {
-                    PublishedState publishedState = ((Content)x).PublishedState;
-
-                    string xstate = x.Published ? "p" : "u";
-                    if (publishedState == PublishedState.Publishing)
-                    {
-                        xstate += "+" + (x.ParentId == -1 || sender.IsPathPublished(sender.Get(x.ParentId)) ? "p" : "m");
-                    }
-                    else if (publishedState == PublishedState.Unpublishing)
-                    {
-                        xstate += "-u";
-                    }
-                    else
-                    {
-                        xstate += "=" + (x.Published ? (sender.IsPathPublished(x) ? "p" : "m") : "u");
-                    }
-
-                    return $"{x.Id}.{xstate}";
-                }))
-            };
-            _events.Add(e);
-        }
-
-        private void ContentRepositoryRemoved(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
-        {
-            // reports the event as : "ContentRepository/Remove/X"
-            // where
-            // X is the event content ID
-            IContent[] entities = new[] { args.Entity }; // args.Entities
-
-            var e = new EventInstance
-            {
-                Message = _msgCount++,
-                Sender = "ContentRepository",
-                EventArgs = args,
-                Name = "Remove",
-                Args = string.Join(",", entities.Select(x => x.Id))
-            };
-            _events.Add(e);
-        }
-
-        private void ContentRepositoryRemovedVersion(DocumentRepository sender, DocumentRepository.ScopedVersionEventArgs args)
-        {
-            // reports the event as : "ContentRepository/Remove/X:Y"
-            // where
-            // X is the event content ID
-            // Y is the event content version GUID
-            var e = new EventInstance
-            {
-                Message = _msgCount++,
-                Sender = "ContentRepository",
-                EventArgs = args,
-                Name = "RemoveVersion",
-                Args = $"{args.EntityId}:{args.VersionId}"
-            };
-            _events.Add(e);
-        }
-
-
 
         private void WriteEvents()
         {
@@ -1011,8 +1010,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.AreEqual(2, _msgCount);
             Assert.AreEqual(2, _events.Count);
-            int i = 0;
-            int m = 0;
+            var i = 0;
+            var m = 0;
             Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content.Id}", _events[i++].ToString());
             m++;
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content.Id}", _events[i].ToString());
@@ -1036,15 +1035,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.AreEqual(3, _msgCount);
             Assert.AreEqual(4, _events.Count);
-            int i = 0;
-            int m = 0;
-#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
+            var i = 0;
+            var m = 0;
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1.Id}", _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content2.Id}", _events[i++].ToString());
             m++;
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}", _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content2.Id}", _events[i].ToString());
-#pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
         [Test]
@@ -1069,10 +1066,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.AreEqual(14, _msgCount);
             Assert.AreEqual(14, _events.Count);
-            int i = 0;
-            int m = 0;
+            var i = 0;
+            var m = 0;
 
-#pragma warning disable SA1003 // Symbols should be spaced correctly (justification: suppression necessary here as it's used in an interpolated string format.
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[1].Id}", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content5C[0].Id}", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[3].Id}", _events[i++].ToString());
@@ -1088,7 +1084,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content1.Id}", _events[i++].ToString());
             m++;
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}", _events[i].ToString());
-#pragma warning restore SA1003 // Symbols should be spaced correctly
         }
 
         #endregion

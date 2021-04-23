@@ -32,8 +32,8 @@ namespace Umbraco.Extensions
         private static IUmbracoContextAccessor UmbracoContextAccessor { get; } =
             StaticServiceProvider.Instance.GetRequiredService<IUmbracoContextAccessor>();
 
-        private static ISiteDomainHelper SiteDomainHelper { get; } =
-            StaticServiceProvider.Instance.GetRequiredService<ISiteDomainHelper>();
+        private static ISiteDomainMapper SiteDomainHelper { get; } =
+            StaticServiceProvider.Instance.GetRequiredService<ISiteDomainMapper>();
 
         private static IExamineManager ExamineManager { get; } =
             StaticServiceProvider.Instance.GetRequiredService<IExamineManager>();

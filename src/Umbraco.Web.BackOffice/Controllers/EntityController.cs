@@ -58,7 +58,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IContentService _contentService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IDataTypeService _dataTypeService;
         private readonly ISqlContext _sqlContext;
         private readonly ILocalizedTextService _localizedTextService;
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IPublishedUrlProvider publishedUrlProvider,
             IContentService contentService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IDataTypeService dataTypeService,
             ISqlContext sqlContext,
             ILocalizedTextService localizedTextService,

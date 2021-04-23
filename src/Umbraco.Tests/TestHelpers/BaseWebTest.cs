@@ -110,10 +110,8 @@ namespace Umbraco.Tests.TestHelpers
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),
                 container?.GetRequiredService<IPublishedValueFallback>() ?? Current.Factory.GetRequiredService<IPublishedValueFallback>(),
-                container?.GetRequiredService<IPublicAccessChecker>() ?? Current.Factory.GetRequiredService<IPublicAccessChecker>(),
                 container?.GetRequiredService<IFileService>() ?? Current.Factory.GetRequiredService<IFileService>(),
                 container?.GetRequiredService<IContentTypeService>() ?? Current.Factory.GetRequiredService<IContentTypeService>(),
-                container?.GetRequiredService<IPublicAccessService>() ?? Current.Factory.GetRequiredService<IPublicAccessService>(),
                 umbracoContextAccessor,
                 Mock.Of<IEventAggregator>()
             );

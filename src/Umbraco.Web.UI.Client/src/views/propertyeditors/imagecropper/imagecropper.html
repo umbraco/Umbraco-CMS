@@ -2,6 +2,9 @@
      ng-controller="Umbraco.PropertyEditors.ImageCropperController">
 
     <ng-form name="imageCropperForm">
+
+        <input type="hidden" name="modelValue" ng-model="model.value" />
+
         <umb-property-file-upload culture="{{model.culture}}"
                                   segment="{{model.segment}}"
                                   property-alias="{{model.alias}}"
@@ -28,9 +31,9 @@
                         </div>
 
                         <div class="button-drawer" ng-if="currentCrop">
-                            <button class="btn btn-link" ng-click="reset()"><localize key="imagecropper_reset">Reset this crop</localize></button>
-                            <button class="btn" ng-click="close()"><localize key="imagecropper_undoEditCrop">Undo edits</localize></button>
-                            <button class="btn btn-success" ng-click="done()"><localize key="imagecropper_updateEditCrop">Done</localize></button>
+                            <button type="button" class="btn btn-link" ng-click="reset()"><localize key="imagecropper_reset">Reset this crop</localize></button>
+                            <button type="button" class="btn" ng-click="close()"><localize key="imagecropper_undoEditCrop">Undo edits</localize></button>
+                            <button type="button" class="btn btn-success" ng-click="done()"><localize key="imagecropper_updateEditCrop">Done</localize></button>
                         </div>
 
                     </div>

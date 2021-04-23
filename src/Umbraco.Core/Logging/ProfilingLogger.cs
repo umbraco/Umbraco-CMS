@@ -95,6 +95,8 @@ namespace Umbraco.Cms.Core.Logging
         public void LogTrace(string messageTemplate, params object[] propertyValues)
             => Logger.LogTrace(messageTemplate, propertyValues);
 
+
+
         #endregion
     }
 }

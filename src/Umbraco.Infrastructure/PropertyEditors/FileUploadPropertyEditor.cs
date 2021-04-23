@@ -13,8 +13,8 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -27,7 +27,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         Icon = "icon-download-alt")]
     public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
         INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
-        INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>
+        INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
+        INotificationHandler<MemberDeletedNotification>
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly ContentSettings _contentSettings;
@@ -95,10 +96,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// The paths to all file upload property files contained within a collection of content entities
         /// </summary>
         /// <param name="entities"></param>
-        /// <remarks>
-        /// This method must be made private once MemberService events have been replaced by notifications
-        /// </remarks>
-        internal IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
+        private IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
             .SelectMany(x => x.Properties)
             .Where(IsUploadField)
             .SelectMany(GetFilePathsFromPropertyValues)
@@ -161,6 +159,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
         public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+
+        public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
         private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
         {

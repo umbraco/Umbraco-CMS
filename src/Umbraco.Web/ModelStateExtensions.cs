@@ -21,11 +21,11 @@ namespace Umbraco.Web
         {
             if (dictionary == null)
                 return;
-            foreach (var keyValuePair in dictionary
+            foreach (var (key, value) in dictionary
                 //It can either equal the prefix exactly (model level errors) or start with the prefix. (property level errors)
                 .Where(keyValuePair => keyValuePair.Key == prefix || keyValuePair.Key.StartsWith(prefix + ".")))
             {
-                state[keyValuePair.Key] = keyValuePair.Value;
+                state[key] = value;
             }
         }
 

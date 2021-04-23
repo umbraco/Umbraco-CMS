@@ -111,4 +111,8 @@
       <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Services\Notifications" />
+    </ItemGroup>
+
 </Project>

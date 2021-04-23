@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -38,7 +39,6 @@ using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Mapping;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Security;
-using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 using MemberMapDefinition = Umbraco.Cms.Web.BackOffice.Mapping.MemberMapDefinition;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
     [TestFixture]
     public class MemberControllerUnitTests
     {
-        private UmbracoMapper _mapper;
+        private IUmbracoMapper _mapper;
 
         [Test]
         [AutoMoqData]
@@ -70,7 +70,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IMemberGroupService memberGroupService,
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IPasswordChanger<MembersIdentityUser> passwordChanger,
+            IPasswordChanger<MemberIdentityUser> passwordChanger,
             IOptions<GlobalSettings> globalSettings,
             IUser user)
         {
@@ -80,14 +80,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             sut.ModelState.AddModelError("key", "Invalid model state");
 
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<string>()))
+                .Setup(x => x.CreateAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<string>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => IdentityResult.Success);
 
             var value = new MemberDisplay();
-            
+
             // act
             ActionResult<MemberDisplay> result = sut.PostSave(fakeMemberData).Result;
             var validation = result.Result as ValidationErrorResult;
@@ -108,14 +108,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IBackOfficeSecurity backOfficeSecurity,
-            IPasswordChanger<MembersIdentityUser> passwordChanger,
+            IPasswordChanger<MemberIdentityUser> passwordChanger,
              IOptions<GlobalSettings> globalSettings,
             IUser user)
         {
             // arrange
             Member member = SetupMemberTestData(out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<string>()))
+                .Setup(x => x.CreateAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<string>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
@@ -149,14 +149,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
         IDataTypeService dataTypeService,
         IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
         IBackOfficeSecurity backOfficeSecurity,
-        IPasswordChanger<MembersIdentityUser> passwordChanger,
+        IPasswordChanger<MemberIdentityUser> passwordChanger,
         IOptions<GlobalSettings> globalSettings,
         IUser user)
         {
             // arrange
             Member member = SetupMemberTestData(out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<string>()))
+                .Setup(x => x.CreateAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<string>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
@@ -191,13 +191,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IBackOfficeSecurity backOfficeSecurity,
-            IPasswordChanger<MembersIdentityUser> passwordChanger,
+            IPasswordChanger<MemberIdentityUser> passwordChanger,
             IOptions<GlobalSettings> globalSettings,
             IUser user)
         {
             // arrange
             Member member = SetupMemberTestData(out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.Save);
-            var membersIdentityUser = new MembersIdentityUser(123);
+            var membersIdentityUser = new MemberIdentityUser(123);
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => membersIdentityUser);
@@ -206,7 +206,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .ReturnsAsync(() => IdentityResult.Success);
 
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.UpdateAsync(It.IsAny<MembersIdentityUser>()))
+                .Setup(x => x.UpdateAsync(It.IsAny<MemberIdentityUser>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(globalSettings);
@@ -243,13 +243,13 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IBackOfficeSecurity backOfficeSecurity,
-            IPasswordChanger<MembersIdentityUser> passwordChanger,
+            IPasswordChanger<MemberIdentityUser> passwordChanger,
             IOptions<GlobalSettings> globalSettings,
             IUser user)
         {
             // arrange
             Member member = SetupMemberTestData(out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.Save);
-            var membersIdentityUser = new MembersIdentityUser(123);
+            var membersIdentityUser = new MemberIdentityUser(123);
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => membersIdentityUser);
@@ -258,7 +258,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .ReturnsAsync(() => IdentityResult.Success);
 
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.UpdateAsync(It.IsAny<MembersIdentityUser>()))
+                .Setup(x => x.UpdateAsync(It.IsAny<MemberIdentityUser>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(globalSettings);
@@ -290,7 +290,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             Mock.Get(backOfficeSecurity).Setup(x => x.CurrentUser).Returns(user);
         }
 
-        private static void SetupPasswordSuccess(IMemberManager umbracoMembersUserManager, IPasswordChanger<MembersIdentityUser> passwordChanger, bool successful = true)
+        private static void SetupPasswordSuccess(IMemberManager umbracoMembersUserManager, IPasswordChanger<MemberIdentityUser> passwordChanger, bool successful = true)
         {
             var passwordChanged = new PasswordChangedModel()
             {
@@ -323,14 +323,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IBackOfficeSecurity backOfficeSecurity,
-            IPasswordChanger<MembersIdentityUser> passwordChanger,
+            IPasswordChanger<MemberIdentityUser> passwordChanger,
             IOptions<GlobalSettings> globalSettings,
             IUser user)
         {
             // arrange
             Member member = SetupMemberTestData(out MemberSave fakeMemberData, out MemberDisplay memberDisplay, ContentSaveAction.SaveNew);
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.CreateAsync(It.IsAny<MembersIdentityUser>()))
+                .Setup(x => x.CreateAsync(It.IsAny<MemberIdentityUser>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
@@ -338,7 +338,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.AddToRolesAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<IEnumerable<string>>()))
+                .Setup(x => x.AddToRolesAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<IEnumerable<string>>()))
                 .ReturnsAsync(() => IdentityResult.Success);
 
             Mock.Get(memberService).SetupSequence(
@@ -346,7 +346,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Returns(() => member);
 
             MemberController sut = CreateSut(memberService, memberTypeService, memberGroupService, umbracoMembersUserManager, dataTypeService, backOfficeSecurityAccessor, passwordChanger, globalSettings, user);
-            
+
             // act
             ActionResult<MemberDisplay> result = sut.PostSave(fakeMemberData).Result;
             var validation = result.Result as ValidationErrorResult;
@@ -367,7 +367,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IBackOfficeSecurity backOfficeSecurity,
-            IPasswordChanger<MembersIdentityUser> passwordChanger,
+            IPasswordChanger<MemberIdentityUser> passwordChanger,
             IOptions<GlobalSettings> globalSettings,
             IUser user)
         {
@@ -378,7 +378,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             {
                 roleName
             };
-            var membersIdentityUser = new MembersIdentityUser(123);
+            var membersIdentityUser = new MemberIdentityUser(123);
             Mock.Get(umbracoMembersUserManager)
                 .Setup(x => x.FindByIdAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => membersIdentityUser);
@@ -386,10 +386,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 .Setup(x => x.ValidatePasswordAsync(It.IsAny<string>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.UpdateAsync(It.IsAny<MembersIdentityUser>()))
+                .Setup(x => x.UpdateAsync(It.IsAny<MemberIdentityUser>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(umbracoMembersUserManager)
-                .Setup(x => x.AddToRolesAsync(It.IsAny<MembersIdentityUser>(), It.IsAny<IEnumerable<string>>()))
+                .Setup(x => x.AddToRolesAsync(It.IsAny<MemberIdentityUser>(), It.IsAny<IEnumerable<string>>()))
                 .ReturnsAsync(() => IdentityResult.Success);
             Mock.Get(memberTypeService).Setup(x => x.GetDefault()).Returns("fakeAlias");
             Mock.Get(backOfficeSecurityAccessor).Setup(x => x.BackOfficeSecurity).Returns(backOfficeSecurity);
@@ -435,10 +435,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberGroupService memberGroupService,
-            IUmbracoUserManager<MembersIdentityUser> membersUserManager,
+            IUmbracoUserManager<MemberIdentityUser> membersUserManager,
             IDataTypeService dataTypeService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IPasswordChanger<MembersIdentityUser> passwordChanger,
+            IPasswordChanger<MemberIdentityUser> passwordChanger,
             IOptions<GlobalSettings> globalSettings,
             IUser user)
         {
@@ -484,8 +484,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                     memberGroupService,
                     mockPasswordConfig.Object,
                     contentTypeBaseServiceProvider.Object,
-                    propertyEditorCollection),
-                httpContextAccessor);
+                    propertyEditorCollection));
 
             var map = new MapDefinitionCollection(new List<IMapDefinition>()
             {
@@ -504,7 +503,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                     globalSettings,
                     new Mock<IHostingEnvironment>().Object)
             });
-            _mapper = new UmbracoMapper(map);
+            var scopeProvider = Mock.Of<IScopeProvider>(x => x.CreateScope(
+                It.IsAny<IsolationLevel>(),
+                It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher>(),
+                It.IsAny<bool?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()) == Mock.Of<IScope>());
+
+            _mapper = new UmbracoMapper(map, scopeProvider);
 
             return new MemberController(
                 new DefaultCultureDictionary(
@@ -524,13 +531,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 backOfficeSecurityAccessor,
                 new ConfigurationEditorJsonSerializer(),
                 passwordChanger,
-                Mock.Of<IScopeProvider>(x => x.CreateScope(
-                    It.IsAny<IsolationLevel>(),
-                    It.IsAny<RepositoryCacheMode>(),
-                    It.IsAny<IEventDispatcher>(),
-                    It.IsAny<bool?>(),
-                    It.IsAny<bool>(),
-                    It.IsAny<bool>()) == Mock.Of<IScope>()));
+                scopeProvider
+                );
         }
 
         /// <summary>
