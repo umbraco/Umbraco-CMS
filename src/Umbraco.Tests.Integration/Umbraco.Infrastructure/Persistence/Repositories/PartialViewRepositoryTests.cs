@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -43,7 +44,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void PathTests()
         {
             // unless noted otherwise, no changes / 7.2.8
-            FileSystems fileSystems = new FileSystems(LoggerFactory, IOHelper,
+            FileSystems fileSystems = FileSystemsCreator.CreateTestFileSystems(LoggerFactory, IOHelper,
                 GetRequiredService<IOptions<GlobalSettings>>(), HostingEnvironment,
                 null, _fileSystem, null, null, null);
 

@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -36,7 +37,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             string path = GlobalSettings.UmbracoScriptsPath;
             _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathWebRoot(path), HostingEnvironment.ToAbsolute(path));
 
-            _fileSystems = new FileSystems(LoggerFactory, IOHelper, GetRequiredService<IOptions<GlobalSettings>>(),
+            _fileSystems = FileSystemsCreator.CreateTestFileSystems(LoggerFactory, IOHelper, GetRequiredService<IOptions<GlobalSettings>>(),
                 HostingEnvironment,
                 null, null, null, _fileSystem, null);
             using (Stream stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");"))

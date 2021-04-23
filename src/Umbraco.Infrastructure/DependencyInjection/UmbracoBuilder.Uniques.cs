@@ -109,7 +109,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         }
 
         /// <summary>
-        /// Register an implementation of IMediaFileSystem
+        /// Sets the filesystem used by the MediaFileManager
         /// </summary>
         /// <param name="builder">A builder.</param>
         /// <param name="mediaFileSystem">Instance of IMediaFileSystem to register</param>

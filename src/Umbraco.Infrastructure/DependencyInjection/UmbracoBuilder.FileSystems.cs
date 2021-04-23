@@ -19,9 +19,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
          * Create an implementation of IFileSystem and register it as the underlying filesystem for
          * MediaFileSystem with the following extension on composition.
          *
-         * builder.SetMediaFileSystemWithInnerFileSystem(factory => FactoryMethodToReturnYourImplementation())
-         *
-         * Alternatively you can just register an Implementation of IMediaFileSystem
+         * builder.SetMediaFileSystem(factory => FactoryMethodToReturnYourImplementation())
          *
          * WHAT IS SHADOWING
          * -----------------

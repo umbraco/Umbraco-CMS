@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.SqlCe;
 using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Extensions;
 using Umbraco.Web;
 
@@ -145,7 +146,7 @@ namespace Umbraco.Tests.TestHelpers
         }
         public FileSystems GetFileSystemsMock()
         {
-            var fileSystems = new FileSystems(
+            var fileSystems = FileSystemsCreator.CreateTestFileSystems(
                 NullLoggerFactory.Instance,
                 Mock.Of<IIOHelper>(),
                 Mock.Of<IOptions<GlobalSettings>>(),
