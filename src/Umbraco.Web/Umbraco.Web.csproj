@@ -77,7 +77,7 @@
     <PackageReference Include="LightInject.WebApi" Version="2.0.0" />
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="MessagePack">
-      <Version>2.1.152</Version>
+      <Version>2.2.85</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
@@ -1314,8 +1314,7 @@
     </PropertyGroup>
     <ItemGroup>
       <!-- we want to exclude all facade references ?! -->
-      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'Microsoft.Bcl.AsyncInterfaces' and '%(ReferencePath.FileName)' != 'System.Buffers' and '%(ReferencePath.FileName)' != 'System.Numerics.Vectors' and '%(ReferencePath.FileName)' != 'System.Runtime.CompilerServices.Unsafe' and '%(ReferencePath.FileName)' != 'System.Text.Encoding.CodePages'" />
-      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http'" />
+      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'Microsoft.Bcl.AsyncInterfaces' and '%(ReferencePath.FileName)' != 'System.Buffers' and '%(ReferencePath.FileName)' != 'System.Numerics.Vectors' and '%(ReferencePath.FileName)' != 'System.Runtime.CompilerServices.Unsafe'" />
     </ItemGroup>
     <Delete Files="$(TargetDir)$(TargetName).XmlSerializers.dll" ContinueOnError="true" />
     <!--
