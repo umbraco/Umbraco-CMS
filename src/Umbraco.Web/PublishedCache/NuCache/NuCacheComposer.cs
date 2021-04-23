@@ -13,7 +13,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             base.Compose(composition);
 
-            var serializer = ConfigurationManager.AppSettings["Umbraco.Web.PublishedCache.NuCache.Serializer"];
+            var serializer = ConfigurationManager.AppSettings[NuCacheSerializerComponent.Nucache_Serializer_Key];
             if (serializer != "MsgPack")
             {
                 // TODO: This allows people to revert to the legacy serializer, by default it will be MessagePack

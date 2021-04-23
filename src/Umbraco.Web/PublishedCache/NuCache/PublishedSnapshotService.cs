@@ -228,7 +228,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var okMedia = false;
             if (_syncBootStateAccessor.GetSyncBootState() == SyncBootState.ColdBoot)
             {
-                _logger.Warn<PublishedSnapshotService>("Sync Service is in a Cold Boot state. Skip LoadCachesOnStartup as the Sync Service will trigger a full reload");
+                _logger.Info<PublishedSnapshotService>("Sync Service is in a Cold Boot state. Skip LoadCachesOnStartup as the Sync Service will trigger a full reload");
                 _isReady = true;
                 return;
             }
