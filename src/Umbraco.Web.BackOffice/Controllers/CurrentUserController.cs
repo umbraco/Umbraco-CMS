@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class CurrentUserController : UmbracoAuthorizedJsonController
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly ContentSettings _contentSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IImageUrlGenerator _imageUrlGenerator;
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IPasswordChanger<BackOfficeIdentityUser> _passwordChanger;
 
         public CurrentUserController(
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IPasswordChanger<BackOfficeIdentityUser> passwordChanger)
         {
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
             _contentSettings = contentSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _imageUrlGenerator = imageUrlGenerator;
@@ -210,7 +210,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IActionResult PostSetAvatar(IList<IFormFile> file)
         {
             //borrow the logic from the user controller
-            return UsersController.PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache,  _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
+            return UsersController.PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache,  _mediaFileManager, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
         }
 
         /// <summary>

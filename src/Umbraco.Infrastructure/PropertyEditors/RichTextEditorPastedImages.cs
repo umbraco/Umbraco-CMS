@@ -27,14 +27,23 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileSystem;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IJsonSerializer _serializer;
 
         const string TemporaryImageDataAttribute = "data-tmpimg";
 
-        public RichTextEditorPastedImages(IUmbracoContextAccessor umbracoContextAccessor, ILogger<RichTextEditorPastedImages> logger, IHostingEnvironment hostingEnvironment, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IPublishedUrlProvider publishedUrlProvider,  IJsonSerializer serializer)
+        public RichTextEditorPastedImages(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ILogger<RichTextEditorPastedImages> logger,
+            IHostingEnvironment hostingEnvironment,
+            IMediaService mediaService,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+            MediaFileManager mediaFileSystem,
+            IShortStringHelper shortStringHelper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IJsonSerializer serializer)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

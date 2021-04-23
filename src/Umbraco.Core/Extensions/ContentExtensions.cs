@@ -204,7 +204,7 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Sets the posted file value of a property.
         /// </summary>
-        public static void SetValue(this IContentBase content, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IJsonSerializer serializer, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
+        public static void SetValue(this IContentBase content, MediaFileManager mediaFileManager, IShortStringHelper shortStringHelper, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IJsonSerializer serializer, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
         {
             if (filename == null || filestream == null) return;
 
@@ -212,10 +212,10 @@ namespace Umbraco.Extensions
             if (string.IsNullOrWhiteSpace(filename)) return;
             filename = filename.ToLower();
 
-            SetUploadFile(content, mediaFileSystem, contentTypeBaseServiceProvider, serializer, propertyTypeAlias, filename, filestream, culture, segment);
+            SetUploadFile(content, mediaFileManager, contentTypeBaseServiceProvider, serializer, propertyTypeAlias, filename, filestream, culture, segment);
         }
 
-        private static void SetUploadFile(this IContentBase content, IMediaFileSystem mediaFileSystem, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IJsonSerializer serializer, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
+        private static void SetUploadFile(this IContentBase content, MediaFileManager mediaFileManager, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IJsonSerializer serializer, string propertyTypeAlias, string filename, Stream filestream, string culture = null, string segment = null)
         {
             var property = GetProperty(content, contentTypeBaseServiceProvider, propertyTypeAlias);
 
@@ -229,11 +229,11 @@ namespace Umbraco.Extensions
                     // the property value is a JSON serialized image crop data set - grab the "src" property as the file source
                     svalue = serializer.DeserializeSubset<string>(svalue, "src");
                 }
-                oldpath = mediaFileSystem.GetRelativePath(svalue);
+                oldpath = mediaFileManager.FileSystem.GetRelativePath(svalue);
             }
 
-            var filepath = mediaFileSystem.StoreFile(content, property.PropertyType, filename, filestream, oldpath);
-            property.SetValue(mediaFileSystem.GetUrl(filepath), culture, segment);
+            var filepath = mediaFileManager.StoreFile(content, property.PropertyType, filename, filestream, oldpath);
+            property.SetValue(mediaFileManager.FileSystem.GetUrl(filepath), culture, segment);
         }
 
         // gets or creates a property for a content item.
@@ -269,13 +269,13 @@ namespace Umbraco.Extensions
         /// the "folder number" that was assigned to the previous file referenced by the property,
         /// if any.</para>
         /// </remarks>
-        public static string StoreFile(this IContentBase content, IMediaFileSystem mediaFileSystem, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, Stream filestream, string filepath)
+        public static string StoreFile(this IContentBase content, MediaFileManager mediaFileManager, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, string propertyTypeAlias, string filename, Stream filestream, string filepath)
         {
             var contentType = contentTypeBaseServiceProvider.GetContentTypeOf(content);
             var propertyType = contentType
                 .CompositionPropertyTypes.FirstOrDefault(x => x.Alias.InvariantEquals(propertyTypeAlias));
             if (propertyType == null) throw new ArgumentException("Invalid property type alias " + propertyTypeAlias + ".");
-            return mediaFileSystem.StoreFile(content, propertyType, filename, filestream, filepath);
+            return mediaFileManager.StoreFile(content, propertyType, filename, filestream, filepath);
         }
 
         #endregion

@@ -29,16 +29,16 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IEntityRepository _entityRepository;
         private readonly IShortStringHelper _shortStringHelper;
 
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
 
         #region Constructors
 
-        public MediaService(IScopeProvider provider, IMediaFileSystem mediaFileSystem, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+        public MediaService(IScopeProvider provider, MediaFileManager mediaFileManager, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IMediaRepository mediaRepository, IAuditRepository auditRepository, IMediaTypeRepository mediaTypeRepository,
             IEntityRepository entityRepository, IShortStringHelper shortStringHelper)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
             _mediaRepository = mediaRepository;
             _auditRepository = auditRepository;
             _mediaTypeRepository = mediaTypeRepository;
@@ -1183,12 +1183,12 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public Stream GetMediaFileContentStream(string filepath)
         {
-            if (_mediaFileSystem.FileExists(filepath) == false)
+            if (_mediaFileManager.FileSystem.FileExists(filepath) == false)
                 return null;
 
             try
             {
-                return _mediaFileSystem.OpenFile(filepath);
+                return _mediaFileManager.FileSystem.OpenFile(filepath);
             }
             catch
             {
@@ -1198,17 +1198,17 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public void SetMediaFileContent(string filepath, Stream stream)
         {
-            _mediaFileSystem.AddFile(filepath, stream, true);
+            _mediaFileManager.FileSystem.AddFile(filepath, stream, true);
         }
 
         public void DeleteMediaFile(string filepath)
         {
-            _mediaFileSystem.DeleteFile(filepath);
+            _mediaFileManager.FileSystem.DeleteFile(filepath);
         }
 
         public long GetMediaFileSize(string filepath)
         {
-            return _mediaFileSystem.GetSize(filepath);
+            return _mediaFileManager.FileSystem.GetSize(filepath);
         }
 
         #endregion

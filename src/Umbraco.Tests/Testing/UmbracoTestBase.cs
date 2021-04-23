@@ -470,8 +470,8 @@ namespace Umbraco.Tests.Testing
 
             var scheme = Mock.Of<IMediaPathScheme>();
 
-            var mediaFileSystem = new MediaFileSystem(scheme, _loggerFactory, TestHelper.ShortStringHelper, IOHelper, HostingEnvironment, Mock.Of<IOptions<GlobalSettings>>());
-            Builder.Services.AddUnique<IMediaFileSystem>(factory => mediaFileSystem);
+            var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), scheme, Mock.Of<ILogger<MediaFileManager>>(), Mock.Of<IShortStringHelper>());
+            Builder.Services.AddUnique(factory => mediaFileManager);
 
             // no factory (noop)
             Builder.Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();

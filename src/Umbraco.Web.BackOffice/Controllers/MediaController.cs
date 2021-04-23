@@ -89,7 +89,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             IRelationService relationService,
             PropertyEditorCollection propertyEditors,
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IJsonSerializer serializer,
@@ -110,7 +110,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _relationService = relationService;
             _propertyEditors = propertyEditors;
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
             _hostingEnvironment = hostingEnvironment;
             _logger = loggerFactory.CreateLogger<MediaController>();
             _imageUrlGenerator = imageUrlGenerator;
@@ -288,7 +288,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly IHostingEnvironment _hostingEnvironment;
 
 
@@ -806,7 +806,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     await using (var stream = formFile.OpenReadStream())
                     {
-                        f.SetValue(_mediaFileSystem,_shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File,fileName, stream);
+                        f.SetValue(_mediaFileManager,_shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File,fileName, stream);
                     }
 
 

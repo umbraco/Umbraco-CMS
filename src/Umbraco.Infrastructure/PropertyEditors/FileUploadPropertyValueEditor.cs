@@ -19,12 +19,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     internal class FileUploadPropertyValueEditor : DataValueEditor
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly ContentSettings _contentSettings;
 
         public FileUploadPropertyValueEditor(
             DataEditorAttribute attribute,
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IJsonSerializer jsonSerializer)
             : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
         {
-            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
         }
 
@@ -59,7 +59,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         {
             var currentPath = currentValue as string;
             if (!currentPath.IsNullOrWhiteSpace())
-                currentPath = _mediaFileSystem.GetRelativePath(currentPath);
+                currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath);
 
             string editorFile = null;
             if (editorValue.Value != null)
@@ -84,7 +84,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 // value is unchanged.
                 if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
                 {
-                    _mediaFileSystem.DeleteFile(currentPath);
+                    _mediaFileManager.FileSystem.DeleteFile(currentPath);
                     return null; // clear
                 }
 
@@ -100,11 +100,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             // remove current file if replaced
             if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
-                _mediaFileSystem.DeleteFile(currentPath);
+                _mediaFileManager.FileSystem.DeleteFile(currentPath);
 
             // update json and return
             if (editorFile == null) return null;
-            return filepath == null ? string.Empty : _mediaFileSystem.GetUrl(filepath);
+            return filepath == null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
 
 
         }
@@ -118,14 +118,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             // get the filepath
             // in case we are using the old path scheme, try to re-use numbers (bah...)
-            var filepath = _mediaFileSystem.GetMediaPath(file.FileName, currentPath, cuid, puid); // fs-relative path
+            var filepath = _mediaFileManager.GetMediaPath(file.FileName, currentPath, cuid, puid); // fs-relative path
 
             using (var filestream = File.OpenRead(file.TempFilePath))
             {
                 // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
                 // since we'd need to be able to return values for other properties from these methods
 
-                _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
+                _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!
             }
 
             return filepath;

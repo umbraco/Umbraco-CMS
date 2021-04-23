@@ -19,42 +19,35 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
     public class FileSystemsTests : UmbracoIntegrationTest
     {
         [Test]
-        public void Can_Get_MediaFileSystem()
+        public void Can_Get_MediaFileManager()
         {
-            IMediaFileSystem fileSystem = GetRequiredService<IMediaFileSystem>();
+            MediaFileManager fileSystem = GetRequiredService<MediaFileManager>();
             Assert.NotNull(fileSystem);
         }
 
         [Test]
-        public void Can_Get_IMediaFileSystem()
+        public void MediaFileManager_Is_Singleton()
         {
-            IMediaFileSystem fileSystem = GetRequiredService<IMediaFileSystem>();
-            Assert.NotNull(fileSystem);
-        }
-
-        [Test]
-        public void IMediaFileSystem_Is_Singleton()
-        {
-            IMediaFileSystem fileSystem1 = GetRequiredService<IMediaFileSystem>();
-            IMediaFileSystem fileSystem2 = GetRequiredService<IMediaFileSystem>();
-            Assert.AreSame(fileSystem1, fileSystem2);
+            MediaFileManager fileManager1 = GetRequiredService<MediaFileManager>();
+            MediaFileManager fileManager2 = GetRequiredService<MediaFileManager>();
+            Assert.AreSame(fileManager1, fileManager2);
         }
 
         [Test]
         public void Can_Delete_MediaFiles()
         {
-            IMediaFileSystem fs = GetRequiredService<IMediaFileSystem>();
-            var ms = new MemoryStream(Encoding.UTF8.GetBytes("test"));
-            string virtPath = fs.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
-            fs.AddFile(virtPath, ms);
+            MediaFileManager mediaFileManager = GetRequiredService<MediaFileManager>();
+            var memoryStream = new MemoryStream(Encoding.UTF8.GetBytes("test"));
+            string virtualPath = mediaFileManager.GetMediaPath("file.txt", Guid.NewGuid(), Guid.NewGuid());
+            mediaFileManager.FileSystem.AddFile(virtualPath, memoryStream);
 
             // ~/media/1234/file.txt exists
             IHostingEnvironment hostingEnvironment = GetRequiredService<IHostingEnvironment>();
-            string physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtPath));
+            string physPath = hostingEnvironment.MapPathWebRoot(Path.Combine("media", virtualPath));
             Assert.IsTrue(File.Exists(physPath));
 
             // ~/media/1234/file.txt is gone
-            fs.DeleteMediaFiles(new[] { virtPath });
+            mediaFileManager.DeleteMediaFiles(new[] { virtualPath });
             Assert.IsFalse(File.Exists(physPath));
 
             IMediaPathScheme scheme = GetRequiredService<IMediaPathScheme>();
