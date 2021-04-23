@@ -74,7 +74,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
         private ScopeProvider GetScopeProvider(NullLoggerFactory instance)
         {
             var fileSystems = new FileSystems(
-                Mock.Of<ILogger<FileSystems>>(),
                 instance,
                 Mock.Of<IIOHelper>(),
                 Options.Create(new GlobalSettings()),

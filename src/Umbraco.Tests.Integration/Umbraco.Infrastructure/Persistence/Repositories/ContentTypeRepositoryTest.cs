@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         private ContentType _simpleContentType;
         private ContentType _textpageContentType;
 
-        private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
+        private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
         private IUmbracoMapper Mapper => GetRequiredService<IUmbracoMapper>();
 

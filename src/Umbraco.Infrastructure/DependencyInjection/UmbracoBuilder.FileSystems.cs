@@ -41,9 +41,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             // interface is really for end-users to get access to filesystems.
             builder.Services.AddUnique<FileSystems>();
 
-            // register IFileSystems, which gives access too all filesystems
-            builder.Services.AddUnique<IFileSystems>(factory => factory.GetRequiredService<FileSystems>());
-
             // register the scheme for media paths
             builder.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
 

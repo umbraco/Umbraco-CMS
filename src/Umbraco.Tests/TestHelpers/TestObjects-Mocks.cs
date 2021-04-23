@@ -6,6 +6,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using Umbraco.Cms.Core;
@@ -142,23 +143,21 @@ namespace Umbraco.Tests.TestHelpers
         {
             return new GlobalSettings();
         }
-        public IFileSystems GetFileSystemsMock()
+        public FileSystems GetFileSystemsMock()
         {
-            var fileSystems = Mock.Of<IFileSystems>();
-
-            MockFs(fileSystems, x => x.MacroPartialsFileSystem);
-            MockFs(fileSystems, x => x.MvcViewsFileSystem);
-            MockFs(fileSystems, x => x.PartialViewsFileSystem);
-            MockFs(fileSystems, x => x.ScriptsFileSystem);
-            MockFs(fileSystems, x => x.StylesheetsFileSystem);
+            var fileSystems = new FileSystems(
+                NullLoggerFactory.Instance,
+                Mock.Of<IIOHelper>(),
+                Mock.Of<IOptions<GlobalSettings>>(),
+                Mock.Of<Cms.Core.Hosting.IHostingEnvironment>(),
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IFileSystem>()
+            );
 
             return fileSystems;
-        }
-
-        private void MockFs(IFileSystems fileSystems, Expression<Func<IFileSystems, IFileSystem>> fileSystem)
-        {
-            var fs = Mock.Of<IFileSystem>();
-            Mock.Get(fileSystems).Setup(fileSystem).Returns(fs);
         }
 
         #region Inner classes

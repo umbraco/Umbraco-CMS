@@ -8,7 +8,7 @@ using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Core.IO
 {
-    public class FileSystems : IFileSystems
+    public sealed class FileSystems
     {
         private readonly ILogger<FileSystems> _logger;
         private readonly ILoggerFactory _loggerFactory;
@@ -36,13 +36,35 @@ namespace Umbraco.Cms.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(ILogger<FileSystems> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+        public FileSystems(ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
         {
-            _logger = logger;
+            _logger = loggerFactory.CreateLogger<FileSystems>();
             _loggerFactory = loggerFactory;
             _ioHelper = ioHelper;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
+        }
+
+        // Ctor for tests, allows you to set the various filesystems
+        internal FileSystems(
+            ILoggerFactory loggerFactory,
+            IIOHelper ioHelper,
+            IOptions<GlobalSettings> globalSettings,
+            IHostingEnvironment hostingEnvironment,
+            IFileSystem macroPartialFileSystem,
+            IFileSystem partialViewsFileSystem,
+            IFileSystem stylesheetFileSystem,
+            IFileSystem scriptsFileSystem,
+            IFileSystem mvcViewFileSystem) : this(loggerFactory, ioHelper, globalSettings, hostingEnvironment)
+        {
+            _macroPartialFileSystem = (ShadowWrapper)CreateShadowWrapper(macroPartialFileSystem, "macro-partials");
+            _partialViewsFileSystem = (ShadowWrapper)CreateShadowWrapper(partialViewsFileSystem, "partials");
+            _stylesheetsFileSystem = (ShadowWrapper)CreateShadowWrapper(stylesheetFileSystem, "css");
+            _scriptsFileSystem = (ShadowWrapper)CreateShadowWrapper(scriptsFileSystem, "scripts");
+            _mvcViewsFileSystem = (ShadowWrapper)CreateShadowWrapper(mvcViewFileSystem, "view");
+            // Set initialized to true so the filesystems doesn't get overwritten.
+            _wkfsInitialized = true;
+
         }
 
         // for tests only, totally unsafe

@@ -5,8 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using Microsoft.Extensions.Logging;
-using Moq;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -42,8 +43,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void PathTests()
         {
             // unless noted otherwise, no changes / 7.2.8
-            IFileSystems fileSystems = Mock.Of<IFileSystems>();
-            Mock.Get(fileSystems).Setup(x => x.PartialViewsFileSystem).Returns(_fileSystem);
+            FileSystems fileSystems = new FileSystems(LoggerFactory, IOHelper,
+                GetRequiredService<IOptions<GlobalSettings>>(), HostingEnvironment,
+                null, _fileSystem, null, null, null);
 
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())

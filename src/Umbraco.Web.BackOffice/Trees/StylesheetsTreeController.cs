@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
-            IFileSystems fileSystems,
+            FileSystems fileSystems,
             IEventAggregator eventAggregator)
             : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator)
         {

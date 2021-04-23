@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private readonly IIOHelper _ioHelper;
         private readonly GlobalSettings _globalSettings;
 
-        public StylesheetRepository(ILogger<StylesheetRepository> logger, IFileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
+        public StylesheetRepository(ILogger<StylesheetRepository> logger, FileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
             : base(fileSystems.StylesheetsFileSystem)
         {
             _logger = logger;
