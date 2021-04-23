@@ -15,6 +15,10 @@ namespace Umbraco.Cms.Core.IO
         private readonly IMediaPathScheme _mediaPathScheme;
         private readonly ILogger<MediaFileManager> _logger;
         private readonly IShortStringHelper _shortStringHelper;
+
+        /// <summary>
+        /// Gets the media filesystem.
+        /// </summary>
         public IFileSystem FileSystem { get; }
 
         public MediaFileManager(
@@ -44,13 +48,23 @@ namespace Umbraco.Cms.Core.IO
             {
                 try
                 {
-                    if (file.IsNullOrWhiteSpace()) return;
-                    if (FileSystem.FileExists(file) == false) return;
+                    if (file.IsNullOrWhiteSpace())
+                    {
+                        return;
+                    }
+
+                    if (FileSystem.FileExists(file) == false)
+                    {
+                        return;
+                    }
+
                     FileSystem.DeleteFile(file);
 
                     var directory = _mediaPathScheme.GetDeleteDirectory(this, file);
                     if (!directory.IsNullOrWhiteSpace())
+                    {
                         FileSystem.DeleteDirectory(directory, true);
+                    }
                 }
                 catch (Exception e)
                 {
@@ -72,7 +86,11 @@ namespace Umbraco.Cms.Core.IO
         public string GetMediaPath(string filename, Guid cuid, Guid puid)
         {
             filename = Path.GetFileName(filename);
-            if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
+            if (filename == null)
+            {
+                throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
+            }
+
             filename = _shortStringHelper.CleanStringForSafeFileName(filename.ToLowerInvariant());
 
             return _mediaPathScheme.GetFilePath(this, cuid, puid, filename);
@@ -91,7 +109,11 @@ namespace Umbraco.Cms.Core.IO
         public string GetMediaPath(string filename, string prevpath, Guid cuid, Guid puid)
         {
             filename = Path.GetFileName(filename);
-            if (filename == null) throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
+            if (filename == null)
+            {
+                throw new ArgumentException("Cannot become a safe filename.", nameof(filename));
+            }
+
             filename = _shortStringHelper.CleanStringForSafeFileName(filename.ToLowerInvariant());
 
             return _mediaPathScheme.GetFilePath(this, cuid, puid, filename, prevpath);
@@ -117,15 +139,36 @@ namespace Umbraco.Cms.Core.IO
         /// </remarks>
         public string StoreFile(IContentBase content, IPropertyType propertyType, string filename, Stream filestream, string oldpath)
         {
-            if (content == null) throw new ArgumentNullException(nameof(content));
-            if (propertyType == null) throw new ArgumentNullException(nameof(propertyType));
-            if (filename == null) throw new ArgumentNullException(nameof(filename));
-            if (string.IsNullOrWhiteSpace(filename)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(filename));
-            if (filestream == null) throw new ArgumentNullException(nameof(filestream));
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            if (propertyType == null)
+            {
+                throw new ArgumentNullException(nameof(propertyType));
+            }
+
+            if (filename == null)
+            {
+                throw new ArgumentNullException(nameof(filename));
+            }
+
+            if (string.IsNullOrWhiteSpace(filename))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(filename));
+            }
+
+            if (filestream == null)
+            {
+                throw new ArgumentNullException(nameof(filestream));
+            }
 
             // clear the old file, if any
             if (string.IsNullOrWhiteSpace(oldpath) == false)
+            {
                 FileSystem.DeleteFile(oldpath);
+            }
 
             // get the filepath, store the data
             // use oldpath as "prevpath" to try and reuse the folder, in original number-based scheme
@@ -143,13 +186,31 @@ namespace Umbraco.Cms.Core.IO
         /// <returns>The filesystem-relative path to the copy of the media file.</returns>
         public string CopyFile(IContentBase content, IPropertyType propertyType, string sourcepath)
         {
-            if (content == null) throw new ArgumentNullException(nameof(content));
-            if (propertyType == null) throw new ArgumentNullException(nameof(propertyType));
-            if (sourcepath == null) throw new ArgumentNullException(nameof(sourcepath));
-            if (string.IsNullOrWhiteSpace(sourcepath)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(sourcepath));
+            if (content == null)
+            {
+                throw new ArgumentNullException(nameof(content));
+            }
+
+            if (propertyType == null)
+            {
+                throw new ArgumentNullException(nameof(propertyType));
+            }
+
+            if (sourcepath == null)
+            {
+                throw new ArgumentNullException(nameof(sourcepath));
+            }
+
+            if (string.IsNullOrWhiteSpace(sourcepath))
+            {
+                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(sourcepath));
+            }
 
             // ensure we have a file to copy
-            if (FileSystem.FileExists(sourcepath) == false) return null;
+            if (FileSystem.FileExists(sourcepath) == false)
+            {
+                return null;
+            }
 
             // get the filepath
             var filename = Path.GetFileName(sourcepath);
