@@ -66,10 +66,9 @@
       <Version>14.906.1403.1082</Version>
     </PackageReference>
     <PackageReference Include="Examine" Version="1.0.2" />
+    <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
+    <PackageReference Include="Examine" Version="1.1.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
-    <PackageReference Include="HtmlSanitizer">
-      <Version>4.0.217</Version>
-    </PackageReference>
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
     </PackageReference>
@@ -82,7 +81,7 @@
     <PackageReference Include="LightInject.WebApi" Version="2.0.0" />
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="MessagePack">
-      <Version>2.1.152</Version>
+      <Version>2.2.85</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.AspNet.Identity.Owin" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNet.Mvc" Version="5.2.7" />
@@ -265,6 +264,8 @@
     <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\EyeDropperColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
@@ -298,6 +299,8 @@
     <Compile Include="PublishedCache\NuCache\ITransactableDictionarySerializer.cs" />
     <Compile Include="PublishedCache\NuCache\ITransactionScope.cs" />
     <Compile Include="PublishedCache\NuCache\INucacheRepositoryBase.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheSerializerComponent.cs" />
+    <Compile Include="PublishedCache\NuCache\NuCacheSerializerComposer.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
@@ -321,6 +324,7 @@
     <Compile Include="Security\BackOfficeExternalLoginProviderErrorMiddlware.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderErrors.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderOptions.cs" />
+    <Compile Include="Security\ClaimsIdentityExtensions.cs" />
     <Compile Include="Security\SignOutAuditEventArgs.cs" />
     <Compile Include="Security\UserInviteEventArgs.cs" />
     <Compile Include="Services\DashboardService.cs" />

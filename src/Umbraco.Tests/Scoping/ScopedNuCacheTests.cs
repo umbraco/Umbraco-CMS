@@ -93,7 +93,7 @@ namespace Umbraco.Tests.Scoping
             var transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory<int, ContentNodeKit>(globalSettings, valueSerializer, keySerializer);
             INucacheRepositoryFactory nucacheRepositoryFactory = new TransactableDictionaryNucacheRepositoryFactory(transactableDictionaryFactory);
             var nestedContentDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
-
+            var segmentProvider = new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() });
             return new PublishedSnapshotService(
                 options,
                 null,
@@ -107,10 +107,12 @@ namespace Umbraco.Tests.Scoping
                 ScopeProvider,
                 DefaultCultureAccessor,
                 new DatabaseDataSource(nestedContentDataSerializerFactory, documentRepository, mediaRepository, memberRepository,
-                ScopeProvider, new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() })),
+                ScopeProvider, segmentProvider),
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
+                segmentProvider,
+                new TestSyncBootStateAccessor(SyncBootState.HasSyncState),
                 nucacheRepositoryFactory.GetMediaRepository(),
                 nucacheRepositoryFactory.GetContentRepository());
         }

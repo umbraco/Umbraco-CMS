@@ -114,7 +114,7 @@ namespace Umbraco.Core.Composing
 
             // bit verbose but should help for troubleshooting
             //var text = "Ordered Composers: " + Environment.NewLine + string.Join(Environment.NewLine, sortedComposerTypes) + Environment.NewLine;
-            _logger.Debug<Composers>("Ordered Composers: {SortedComposerTypes}", sortedComposerTypes);
+            _logger.Debug<Composers,IEnumerable<Type>>("Ordered Composers: {SortedComposerTypes}", sortedComposerTypes);
 
             return sortedComposerTypes;
         }
@@ -205,7 +205,7 @@ namespace Umbraco.Core.Composing
             catch (Exception e)
             {
                 // in case of an error, force-dump everything to log
-                _logger.Info<Composers>("Composer Report:\r\n{ComposerReport}", GetComposersReport(requirements));
+                _logger.Info<Composers,string>("Composer Report:\r\n{ComposerReport}", GetComposersReport(requirements));
                 _logger.Error<Composers>(e, "Failed to sort composers.");
                 throw;
             }

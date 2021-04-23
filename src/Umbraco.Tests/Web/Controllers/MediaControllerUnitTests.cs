@@ -2,6 +2,7 @@
 using System.Web.Http;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
@@ -31,7 +32,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, 1234);
+            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, AppCaches.Disabled, 1234);
 
             //assert
             Assert.IsTrue(result);
@@ -54,7 +55,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act/assert
-            Assert.Throws<HttpResponseException>(() => MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, 1234));
+            Assert.Throws<HttpResponseException>(() => MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, AppCaches.Disabled, 1234));
         }
 
         [Test]
@@ -77,7 +78,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, 1234);
+            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, AppCaches.Disabled, 1234);
 
             //assert
             Assert.IsFalse(result);
@@ -97,7 +98,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, -1);
+            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, AppCaches.Disabled, -1);
 
             //assert
             Assert.IsTrue(result);
@@ -119,7 +120,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, -1);
+            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, AppCaches.Disabled, -1);
 
             //assert
             Assert.IsFalse(result);
@@ -139,7 +140,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, -21);
+            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, AppCaches.Disabled, -21);
 
             //assert
             Assert.IsTrue(result);
@@ -161,7 +162,7 @@ namespace Umbraco.Tests.Web.Controllers
             var entityService = entityServiceMock.Object;
 
             //act
-            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, -21);
+            var result = MediaController.CheckPermissions(new Dictionary<string, object>(), user, mediaService, entityService, AppCaches.Disabled, -21);
 
             //assert
             Assert.IsFalse(result);

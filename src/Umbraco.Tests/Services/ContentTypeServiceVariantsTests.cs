@@ -18,6 +18,7 @@ using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
 using Umbraco.Core.Sync;
+using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
 using Umbraco.Web.PublishedCache;
@@ -66,6 +67,7 @@ namespace Umbraco.Tests.Services
             var transactableDictionaryFactory = new BPlusTreeTransactableDictionaryFactory<int, ContentNodeKit>(globalSettings, valueSerializer, keySerializer);
             INucacheRepositoryFactory nucacheRepositoryFactory = new TransactableDictionaryNucacheRepositoryFactory(transactableDictionaryFactory);
             var nestedContentDataSerializerFactory = new JsonContentNestedDataSerializerFactory();
+            var segmentProvider = new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() });
             return new PublishedSnapshotService(
                 options,
                 null,
@@ -83,6 +85,8 @@ namespace Umbraco.Tests.Services
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
+                segmentProvider,
+                new TestSyncBootStateAccessor(SyncBootState.HasSyncState),
                 nucacheRepositoryFactory.GetMediaRepository(),
                 nucacheRepositoryFactory.GetContentRepository());
         }

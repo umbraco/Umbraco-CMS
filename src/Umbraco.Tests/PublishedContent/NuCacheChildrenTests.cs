@@ -18,6 +18,7 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Sync;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing.Objects;
 using Umbraco.Tests.Testing.Objects.Accessors;
@@ -163,6 +164,8 @@ namespace Umbraco.Tests.PublishedContent
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
+                new TestSyncBootStateAccessor(SyncBootState.HasSyncState),
                 nucacheRepositoryFactory.GetMediaRepository(),
                 nucacheRepositoryFactory.GetContentRepository());
 

@@ -17,6 +17,8 @@ using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Changes;
 using Umbraco.Core.Services.Implement;
+using Umbraco.Core.Strings;
+using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Web.Install;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
@@ -50,6 +52,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private INucacheContentRepository _documentRepository;
         private INucacheMediaRepository _mediaRepository;
 
+        private readonly ISyncBootStateAccessor _syncBootStateAccessor;
+
         // define constant - determines whether to use cache when previewing
         // to store eg routes, property converted values, anything - caching
         // means faster execution, but uses memory - not sure if we want it
@@ -67,6 +71,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             IDataSource dataSource, IGlobalSettings globalSettings,
             IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
+            UrlSegmentProviderCollection urlSegmentProviders,
+            ISyncBootStateAccessor syncBootStateAccessor,
             INucacheMediaRepository nucacheMediaRepository,
             INucacheContentRepository nucacheContentRepository)
             : base(publishedSnapshotAccessor, variationContextAccessor)
@@ -83,6 +89,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
             _globalSettings = globalSettings;
             _documentRepository = nucacheContentRepository;
             _mediaRepository = nucacheMediaRepository;
+
+            _syncBootStateAccessor = syncBootStateAccessor;
 
             // we need an Xml serializer here so that the member cache can support XPath,
             // for members this is done by navigating the serialized-to-xml member
@@ -116,9 +124,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
                     // figure out whether it can read the databases or it should populate them from sql
 
-                    _logger.Info<PublishedSnapshotService>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _documentRepository.IsPopulated());
+                    _logger.Info<PublishedSnapshotService,bool>("Creating the content store, localContentDbExists? {LocalContentDbExists}", _documentRepository.IsPopulated());
                     _contentStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _documentRepository);
-                    _logger.Info<PublishedSnapshotService>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _documentRepository.IsPopulated());
+                    _logger.Info<PublishedSnapshotService,bool>("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _documentRepository.IsPopulated());
                     _mediaStore = new ContentStore(publishedSnapshotAccessor, variationContextAccessor, logger, _mediaRepository);
                 }
                 else
@@ -159,7 +167,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             // if both local databases exist then Get will open them, else new databases will be created
             _documentRepository.Init();
             _mediaRepository.Init();
-            _logger.Info<PublishedSnapshotService>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _documentRepository.IsPopulated(), _mediaRepository.IsPopulated());
+            _logger.Info<PublishedSnapshotService,bool,bool>("Registered with MainDom, localContentDbExists? {LocalContentDbExists}, localMediaDbExists? {LocalMediaDbExists}", _documentRepository.IsPopulated(), _mediaRepository.IsPopulated());
         }
 
         /// <summary>
@@ -194,7 +202,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             var okContent = false;
             var okMedia = false;
-
+            if (_syncBootStateAccessor.GetSyncBootState() == SyncBootState.ColdBoot)
+            {
+                _logger.Warn<PublishedSnapshotService>("Sync Service is in a Cold Boot state. Skip LoadCachesOnStartup as the Sync Service will trigger a full reload");
+                _isReady = true;
+                return;
+            }
             try
             {
                 if ((_documentRepository != null && _documentRepository.IsPopulated()))
@@ -210,7 +223,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                     if (!okMedia)
                         _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
                 }
-
+                
                 if (!okContent)
                     LockAndLoadContent(scope => LoadContentFromDatabaseLocked(scope, true));
 
@@ -663,7 +676,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var payload in payloads)
             {
-                _logger.Debug<PublishedSnapshotService>("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
+                _logger.Debug<PublishedSnapshotService,TreeChangeTypes,int>("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
 
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                 {
@@ -756,7 +769,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
             foreach (var payload in payloads)
             {
-                _logger.Debug<PublishedSnapshotService>("Notified {ChangeTypes} for media {MediaId}", payload.ChangeTypes, payload.Id);
+                _logger.Debug<PublishedSnapshotService,TreeChangeTypes,int>("Notified {ChangeTypes} for media {MediaId}", payload.ChangeTypes, payload.Id);
 
                 if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                 {
@@ -827,7 +840,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
                 return;
 
             foreach (var payload in payloads)
-                _logger.Debug<PublishedSnapshotService>("Notified {ChangeTypes} for {ItemType} {ItemId}", payload.ChangeTypes, payload.ItemType, payload.Id);
+                _logger.Debug<PublishedSnapshotService, ContentTypeChangeTypes, string,int>("Notified {ChangeTypes} for {ItemType} {ItemId}", payload.ChangeTypes, payload.ItemType, payload.Id);
 
             Notify<IContentType>(_contentStore, payloads, RefreshContentTypesLocked);
             Notify<IMediaType>(_mediaStore, payloads, RefreshMediaTypesLocked);
@@ -911,7 +924,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
             var idsA = payloads.Select(x => x.Id).ToArray();
 
             foreach (var payload in payloads)
-                _logger.Debug<PublishedSnapshotService>("Notified {RemovedStatus} for data type {DataTypeId}",
+                _logger.Debug<PublishedSnapshotService, string,int>("Notified {RemovedStatus} for data type {DataTypeId}",
                     payload.Removed ? "Removed" : "Refreshed",
                     payload.Id);
 
