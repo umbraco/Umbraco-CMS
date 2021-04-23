@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -8,6 +9,9 @@ using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Core.IO
 {
+    /// <summary>
+    /// Provides the system filesystems.
+    /// </summary>
     public sealed class FileSystems
     {
         private readonly ILogger<FileSystems> _logger;
@@ -68,80 +72,99 @@ namespace Umbraco.Cms.Core.IO
         }
 
         // for tests only, totally unsafe
-        internal void Reset()
-        {
-            _shadowWrappers.Clear();
-            Volatile.Write(ref _wkfsInitialized, false);
-            _shadowCurrentId = null;
-        }
+        internal static void ResetShadowId() => _shadowCurrentId = null;
 
-        // for tests only, totally unsafe
-        internal static void ResetShadowId()
-        {
-            _shadowCurrentId = null;
-        }
-
-        // set by the scope provider when taking control of filesystems
+        /// <summary>
+        /// Used be Scope provider to take control over the filesystems, should never be used for anything else.
+        /// </summary>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public Func<bool> IsScoped { get; set; } = () => false;
 
         #endregion
 
         #region Well-Known FileSystems
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the macro partials filesystem.
+        /// </summary>
         public IFileSystem MacroPartialsFileSystem
         {
             get
             {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                if (Volatile.Read(ref _wkfsInitialized) == false)
+                {
+                    EnsureWellKnownFileSystems();
+                }
+
                 return _macroPartialFileSystem;
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the partial views filesystem.
+        /// </summary>
         public IFileSystem PartialViewsFileSystem
         {
             get
             {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                if (Volatile.Read(ref _wkfsInitialized) == false)
+                {
+                    EnsureWellKnownFileSystems();
+                }
+
                 return _partialViewsFileSystem;
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the stylesheets filesystem.
+        /// </summary>
         public IFileSystem StylesheetsFileSystem
         {
             get
             {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                if (Volatile.Read(ref _wkfsInitialized) == false)
+                {
+                    EnsureWellKnownFileSystems();
+                }
+
                 return _stylesheetsFileSystem;
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the scripts filesystem.
+        /// </summary>
         public IFileSystem ScriptsFileSystem
         {
             get
             {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                if (Volatile.Read(ref _wkfsInitialized) == false)
+                {
+                    EnsureWellKnownFileSystems();
+                }
+
                 return _scriptsFileSystem;
             }
         }
 
-        /// <inheritdoc />
+        /// <summary>
+        /// Gets the MVC views filesystem.
+        /// </summary>
         public IFileSystem MvcViewsFileSystem
         {
             get
             {
-                if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+                if (Volatile.Read(ref _wkfsInitialized) == false)
+                {
+                    EnsureWellKnownFileSystems();
+                }
+
                 return _mvcViewsFileSystem;
             }
         }
 
-        private void EnsureWellKnownFileSystems()
-        {
-            LazyInitializer.EnsureInitialized(ref _wkfsObject, ref _wkfsInitialized, ref _wkfsLock, CreateWellKnownFileSystems);
-        }
+        private void EnsureWellKnownFileSystems() => LazyInitializer.EnsureInitialized(ref _wkfsObject, ref _wkfsInitialized, ref _wkfsLock, CreateWellKnownFileSystems);
 
         // need to return something to LazyInitializer.EnsureInitialized
         // but it does not really matter what we return - here, null
@@ -181,9 +204,17 @@ namespace Umbraco.Cms.Core.IO
         // global shadow for the entire application, so great care should be taken to ensure that the
         // application is *not* doing anything else when using a shadow.
 
+        /// <summary>
+        /// Shadows the filesystem, should never be used outside the Scope class.
+        /// </summary>
+        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public ICompletable Shadow()
         {
-            if (Volatile.Read(ref _wkfsInitialized) == false) EnsureWellKnownFileSystems();
+            if (Volatile.Read(ref _wkfsInitialized) == false)
+            {
+                EnsureWellKnownFileSystems();
+            }
 
             var id = ShadowWrapper.CreateShadowId(_hostingEnvironment);
             return new ShadowFileSystems(this, id); // will invoke BeginShadow and EndShadow
@@ -195,14 +226,18 @@ namespace Umbraco.Cms.Core.IO
             {
                 // if we throw here, it means that something very wrong happened.
                 if (_shadowCurrentId != null)
+                {
                     throw new InvalidOperationException("Already shadowing.");
+                }
 
                 _shadowCurrentId = id;
 
                 _logger.LogDebug("Shadow '{ShadowId}'", _shadowCurrentId);
 
-                foreach (var wrapper in _shadowWrappers)
+                foreach (ShadowWrapper wrapper in _shadowWrappers)
+                {
                     wrapper.Shadow(_shadowCurrentId);
+                }
             }
         }
 
@@ -212,14 +247,19 @@ namespace Umbraco.Cms.Core.IO
             {
                 // if we throw here, it means that something very wrong happened.
                 if (_shadowCurrentId == null)
+                {
                     throw new InvalidOperationException("Not shadowing.");
+                }
+
                 if (id != _shadowCurrentId)
+                {
                     throw new InvalidOperationException("Not the current shadow.");
+                }
 
                 _logger.LogDebug("UnShadow '{ShadowId}' {Status}", id, completed ? "complete" : "abort");
 
                 var exceptions = new List<Exception>();
-                foreach (var wrapper in _shadowWrappers)
+                foreach (ShadowWrapper wrapper in _shadowWrappers)
                 {
                     try
                     {
@@ -235,10 +275,19 @@ namespace Umbraco.Cms.Core.IO
                 _shadowCurrentId = null;
 
                 if (exceptions.Count > 0)
+                {
                     throw new AggregateException(completed ? "Failed to apply all changes (see exceptions)." : "Failed to abort (see exceptions).", exceptions);
+                }
             }
         }
 
+        /// <summary>
+        /// Creates a shadow wrapper for a filesystem, should never be used outside UmbracoBuilder or testing
+        /// </summary>
+        /// <param name="filesystem"></param>
+        /// <param name="shadowPath"></param>
+        /// <returns></returns>
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public IFileSystem CreateShadowWrapper(IFileSystem filesystem, string shadowPath)
         {
             lock (_shadowLocker)
