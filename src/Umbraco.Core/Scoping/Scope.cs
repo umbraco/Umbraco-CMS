@@ -235,6 +235,20 @@ namespace Umbraco.Core.Scoping
 
                 if (_database != null)
                 {
+                    // If the database has already been resolved, we are already in a
+                    // transaction, but it's possible that more locks have been requested
+                    // so acquire them.
+
+                    // TODO: This is the issue we face with non-eager locks. If locks are
+                    // requested after the Database property is resolved, those locks may
+                    // not get executed because the developer may be using their local Database variable
+                    // instead of accessing via scope.Database.
+                    // In our case within Umbraco, I don't think this ever occurs, all locks are requested
+                    // up-front, however, that might not be the case for others.
+                    // The other way to deal with this would be to bake this callback somehow into the
+                    // UmbracoDatabase instance directly and ensure it's called when OnExecutingCommand
+                    // (so long as the executing command isn't a lock command itself!)
+                    // If we could do that, that would be the ultimate lazy executed locks.
                     EnsureDbLocks();
                     return _database;
                 }

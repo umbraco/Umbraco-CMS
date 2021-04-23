@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
@@ -102,6 +103,35 @@ namespace Umbraco.Tests.Persistence
 
             for (var i = 0; i < threadCount; i++)
                 Assert.IsNull(exceptions[i]);
+        }
+
+        [Test]
+        public void GivenNonEagerLocking_WhenNoDbIsAccessed_ThenNoSqlIsExecuted()
+        {
+            var sqlCount = 0;
+
+            using (var scope = (Scope)ScopeProvider.CreateScope())
+            {
+                var db = (UmbracoDatabase)scope.Database;                
+                try
+                {
+                    db.EnableSqlCount = true;
+
+                    // Issue a lock request, but we are using non-eager
+                    // locks so this only queues the request.
+                    // The lock will not be issued unless we resolve
+                    // scope.Database
+                    scope.WriteLock(Constants.Locks.Servers);
+
+                    sqlCount = db.SqlCount;
+                }
+                finally
+                {
+                    db.EnableSqlCount = false;
+                }
+            }
+
+            Assert.AreEqual(0, sqlCount);
         }
 
         [Test]
