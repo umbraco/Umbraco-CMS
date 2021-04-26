@@ -1,5 +1,6 @@
 ﻿using Umbraco.Core;
 using Umbraco.Core.Composing;
+using Umbraco.Core.Sync;
 using Umbraco.Web.PublishedCache.NuCache.DataSource;
 
 namespace Umbraco.Web.PublishedCache.NuCache
@@ -9,6 +10,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public override void Compose(Composition composition)
         {
             base.Compose(composition);
+
+            //Overriden on Run state in DatabaseServerRegistrarAndMessengerComposer
+            composition.Register<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>(Lifetime.Singleton);
 
             // register the NuCache database data source
             composition.Register<IDataSource, DatabaseDataSource>();
