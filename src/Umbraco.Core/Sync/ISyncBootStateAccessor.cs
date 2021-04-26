@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Umbraco.Core.Sync
 {
@@ -16,5 +12,10 @@ namespace Umbraco.Core.Sync
         /// </summary>
         /// <returns></returns>
         SyncBootState GetSyncBootState();
+
+        /// <summary>
+        /// Raised when the boot state is known
+        /// </summary>
+        event EventHandler<SyncBootState> Booting;
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace Umbraco.Core.Sync
 {
@@ -24,13 +25,8 @@ namespace Umbraco.Core.Sync
         /// </summary>
         public int MaxProcessingInstructionCount { get; set; }
 
-        /// <summary>
-        /// A list of callbacks that will be invoked if the lastsynced.txt file does not exist.
-        /// </summary>
-        /// <remarks>
-        /// These callbacks will typically be for eg rebuilding the xml cache file, or examine indexes, based on
-        /// the data in the database to get this particular server node up to date.
-        /// </remarks>
+        [Obsolete("This should not be used. If initialization calls need to be invoked on a cold boot, use the ISyncBootStateAccessor.Booting event.")]
+        [EditorBrowsable(EditorBrowsableState.Never)]
         public IEnumerable<Action> InitializingCallbacks { get; set; }
 
         /// <summary>

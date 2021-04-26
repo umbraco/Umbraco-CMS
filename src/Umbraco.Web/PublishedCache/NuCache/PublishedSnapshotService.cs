@@ -152,7 +152,10 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
                 _domainStore = new SnapDictionary<int, Domain>();
 
-                LoadCachesOnStartup();
+                _syncBootStateAccessor.Booting += (sender, args) =>
+                {
+                    LoadCachesOnStartup(args);
+                };
             }
 
             Guid GetUid(ContentStore store, int id) => store.LiveSnapshot.Get(id)?.Uid ?? default;
@@ -219,32 +222,31 @@ namespace Umbraco.Web.PublishedCache.NuCache
         /// Populates the stores
         /// </summary>
         /// <remarks>This is called inside of a lock for _storesLock</remarks>
-        private void LoadCachesOnStartup()
+        private void LoadCachesOnStartup(SyncBootState bootState)
         {
+            // TODO: This is super ugly that this does this as part of the ctor.
+            // In netcore this will be different, the initialization will happen
+            // outside of the ctor.
+
             var okContent = false;
             var okMedia = false;
-            if (_syncBootStateAccessor.GetSyncBootState() == SyncBootState.ColdBoot)
-            {
-                _logger.Info<PublishedSnapshotService>("Sync Service is in a Cold Boot state. Skip LoadCachesOnStartup as the Sync Service will trigger a full reload");
-                _isReady = true;
-                return;
-            }
+            
             try
             {
-                if (_localContentDbExists)
+                if (bootState != SyncBootState.ColdBoot && _localContentDbExists)
                 {
                     okContent = LockAndLoadContent(scope => LoadContentFromLocalDbLocked(true));
                     if (!okContent)
                         _logger.Warn<PublishedSnapshotService>("Loading content from local db raised warnings, will reload from database.");
                 }
 
-                if (_localMediaDbExists)
+                if (bootState != SyncBootState.ColdBoot && _localMediaDbExists)
                 {
                     okMedia = LockAndLoadMedia(scope => LoadMediaFromLocalDbLocked(true));
                     if (!okMedia)
                         _logger.Warn<PublishedSnapshotService>("Loading media from local db raised warnings, will reload from database.");
                 }
-                
+
                 if (!okContent)
                     LockAndLoadContent(scope => LoadContentFromDatabaseLocked(scope, true));
 

@@ -132,6 +132,7 @@
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Compose\BlockEditorComponent.cs" />
     <Compile Include="Compose\BlockEditorComposer.cs" />
+    <Compile Include="Compose\DatabaseServerRegistrarAndMessengerComposer.cs" />
     <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Compose\NotificationsComposer.cs" />
     <Compile Include="Compose\PublicAccessComposer.cs" />

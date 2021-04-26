@@ -72,7 +72,7 @@ namespace Umbraco.Tests.Services
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                new TestSyncBootStateAccessor(SyncBootState.HasSyncState));
+                new TestSyncBootStateAccessor(SyncBootState.WarmBoot));
         }
 
         public class LocalServerMessenger : ServerMessengerBase
