@@ -53,7 +53,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
         {
             string message;
             var success = false;
-            Uri url = _hostingEnvironment.ApplicationMainUrl;
+            var url = _hostingEnvironment.ApplicationMainUrl.GetLeftPart(UriPartial.Authority);;
 
             // Access the site home page and check for the headers
             var request = new HttpRequestMessage(HttpMethod.Head, url);
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Security
             }
             catch (Exception ex)
             {
-                message = _textService.Localize("healthcheck/httpsCheckInvalidUrl", new[] { url.ToString(), ex.Message });
+                message = _textService.Localize("healthcheck/healthCheckInvalidUrl", new[] { url.ToString(), ex.Message });
             }
 
             return

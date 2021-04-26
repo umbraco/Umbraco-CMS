@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -120,11 +120,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return new List<string>();
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
-
         #endregion
 
         #region Unit of Work Implementation
@@ -181,8 +176,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.ResetDirtyProperties();
 
             //Clear the cache entries that exist by uniqueid/item key
-            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.ItemKey));
-            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.Key));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(entity.ItemKey));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, Guid>(entity.Key));
         }
 
         protected override void PersistDeletedItem(IDictionaryItem entity)
@@ -193,8 +188,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = entity.Key });
 
             //Clear the cache entries that exist by uniqueid/item key
-            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.ItemKey));
-            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(entity.Key));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(entity.ItemKey));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, Guid>(entity.Key));
 
             entity.DeleteDate = DateTime.Now;
         }
@@ -210,8 +205,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 Database.Delete<DictionaryDto>("WHERE id = @Id", new { Id = dto.UniqueId });
 
                 //Clear the cache entries that exist by uniqueid/item key
-                IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(dto.Key));
-                IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem>(dto.UniqueId));
+                IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, string>(dto.Key));
+                IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IDictionaryItem, Guid>(dto.UniqueId));
             }
         }
 

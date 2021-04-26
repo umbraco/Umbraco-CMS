@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Net;
 
 namespace Umbraco.Cms.Core.Security
@@ -99,19 +98,7 @@ namespace Umbraco.Cms.Core.Security
             string password = _passwordGenerator.GeneratePassword();
             return password;
         }
-
-        /// <summary>
-        /// Generates a hashed password based on the default password hasher
-        /// No existing identity user is required and this does not validate the password
-        /// </summary>
-        /// <param name="password">The password to hash</param>
-        /// <returns>The hashed password</returns>
-        public string HashPassword(string password)
-        {
-            string hashedPassword = PasswordHasher.HashPassword(null, password);
-            return hashedPassword;
-        }
-
+        
         /// <summary>
         /// Used to validate the password without an identity user
         /// Validation code is based on the default ValidatePasswordAsync code

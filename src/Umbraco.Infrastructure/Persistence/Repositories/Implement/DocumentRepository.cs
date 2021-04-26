@@ -1,10 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence;
@@ -65,8 +66,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
             IDataTypeService dataTypeService,
-            IJsonSerializer serializer)
-            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService)
+            IJsonSerializer serializer,
+            IEventAggregator eventAggregator)
+            : base(scopeAccessor, appCaches, logger, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferenceFactories, dataTypeService, eventAggregator)
         {
             _contentTypeRepository = contentTypeRepository ?? throw new ArgumentNullException(nameof(contentTypeRepository));
             _templateRepository = templateRepository ?? throw new ArgumentNullException(nameof(templateRepository));
@@ -352,9 +354,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PerformDeleteVersion(int id, int versionId)
         {
-            // raise event first else potential FK issues
-            OnUowRemovingVersion(new ScopedVersionEventArgs(AmbientScope, id, versionId));
-
             Database.Delete<PropertyDataDto>("WHERE versionId = @versionId", new { versionId });
             Database.Delete<ContentVersionCultureVariationDto>("WHERE versionId = @versionId", new { versionId });
             Database.Delete<DocumentVersionDto>("WHERE id = @versionId", new { versionId });
@@ -497,7 +496,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             entity.SetCultureEdited(editedCultures);
 
             // trigger here, before we reset Published etc
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
 
             // flip the entity's published property
             // this also flips its published state
@@ -711,7 +710,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             // trigger here, before we reset Published etc
-            OnUowRefreshedEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            OnUowRefreshedEntity(new ContentRefreshNotification(entity, new EventMessages()));
 
             if (!isMoving)
             {
@@ -789,8 +788,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PersistDeletedItem(IContent entity)
         {
-            // raise event first else potential FK issues
-            OnUowRemovingEntity(new ScopedEntityEventArgs(AmbientScope, entity));
+            // Raise event first else potential FK issues
+            OnUowRemovingEntity(entity);
 
             //We need to clear out all access rules but we need to do this in a manual way since
             // nothing in that table is joined to a content id
@@ -935,6 +934,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public override int RecycleBinId => Cms.Core.Constants.System.RecycleBinContent;
 
+        public bool RecycleBinSmells()
+        {
+            var cache = _appCaches.RuntimeCache;
+            var cacheKey = CacheKeys.ContentRecycleBinCacheKey;
+
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(RecycleBinId) > 0);
+        }
+
         #endregion
 
         #region Read Repository implementation for Guid keys
@@ -956,6 +964,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         // reading repository purely for looking up by GUID
         // TODO: ugly and to fix we need to decouple the IRepositoryQueryable -> IRepository -> IReadRepository which should all be separate things!
+        // This sub-repository pattern is super old and totally unecessary anymore, caching can be handled in much nicer ways without this
         private class ContentByGuidReadRepository : EntityRepositoryBase<Guid, IContent>
         {
             private readonly DocumentRepository _outerRepo;
@@ -965,8 +974,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 _outerRepo = outerRepo;
             }
-
-            protected override Guid NodeObjectTypeId => _outerRepo.NodeObjectTypeId;
 
             protected override IContent PerformGet(Guid id)
             {
@@ -1177,7 +1184,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
-                    var cached = IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent, int>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.DocumentVersionDto.ContentVersionDto.Id)
                     {
                         content[i] = (Content)cached;

@@ -28,6 +28,7 @@ function js() {
         })
       );
     } else {
+      // rename the un-minified file so the client can reference it as '.min.js'
       task = task.pipe(rename(function(path) {
         path.basename += '.min';
       }));

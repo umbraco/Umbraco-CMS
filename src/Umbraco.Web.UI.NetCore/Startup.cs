@@ -5,6 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Extensions;
+using Microsoft.Extensions.Hosting;
 
 namespace Umbraco.Cms.Web.UI.NetCore
 {
@@ -40,7 +41,7 @@ namespace Umbraco.Cms.Web.UI.NetCore
         {
 #pragma warning disable IDE0022 // Use expression body for methods
             services.AddUmbraco(_env, _config)
-                .AddBackOffice()
+                .AddBackOffice()             
                 .AddWebsite()
                 .AddComposers()
                 .Build();
@@ -51,10 +52,25 @@ namespace Umbraco.Cms.Web.UI.NetCore
         /// <summary>
         /// Configures the application
         /// </summary>
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            app.UseUmbracoBackOffice();
-            app.UseUmbracoWebsite();
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
+
+            app.UseUmbraco()
+                .WithMiddleware(u =>
+                {
+                    u.WithBackOffice();
+                    u.WithWebsite();
+                })
+                .WithEndpoints(u =>
+                {
+                    u.UseInstallerEndpoints();
+                    u.UseBackOfficeEndpoints();
+                    u.UseWebsiteEndpoints();
+                });
         }
     }
 }

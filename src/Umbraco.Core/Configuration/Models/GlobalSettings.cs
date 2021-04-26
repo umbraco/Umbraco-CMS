@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
             StaticReservedPaths = "~/app_plugins/,~/install/,~/mini-profiler-resources/,~/umbraco/,"; // must end with a comma!
 
         internal const string
-            StaticReservedUrls = "~/config/splashes/noNodes.aspx,~/.well-known,"; // must end with a comma!
+            StaticReservedUrls = "~/.well-known,"; // must end with a comma!
 
         /// <summary>
         /// Gets or sets a value for the reserved URLs.

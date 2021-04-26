@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -123,8 +123,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                            };
             return list;
         }
-
-        protected override Guid NodeObjectTypeId => throw new NotImplementedException();
 
         #endregion
 

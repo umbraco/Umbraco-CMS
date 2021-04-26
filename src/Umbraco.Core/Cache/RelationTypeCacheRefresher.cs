@@ -1,18 +1,17 @@
-﻿using System;
+using System;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class RelationTypeCacheRefresher : CacheRefresherBase<RelationTypeCacheRefresher>
+    public sealed class RelationTypeCacheRefresher : CacheRefresherBase<RelationTypeCacheRefresherNotification>
     {
-        public RelationTypeCacheRefresher(AppCaches appCaches)
-            : base(appCaches)
+        public RelationTypeCacheRefresher(AppCaches appCaches, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, eventAggregator, factory)
         { }
 
         #region Define
-
-        protected override RelationTypeCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("D8375ABA-4FB3-4F86-B505-92FBA1B6F7C9");
 
@@ -33,7 +32,7 @@ namespace Umbraco.Cms.Core.Cache
         public override void Refresh(int id)
         {
             var cache = AppCaches.IsolatedCaches.Get<IRelationType>();
-            if (cache) cache.Result.Clear(RepositoryCacheKeys.GetKey<IRelationType>(id));
+            if (cache) cache.Result.Clear(RepositoryCacheKeys.GetKey<IRelationType, int>(id));
             base.Refresh(id);
         }
 
@@ -46,7 +45,7 @@ namespace Umbraco.Cms.Core.Cache
         public override void Remove(int id)
         {
             var cache = AppCaches.IsolatedCaches.Get<IRelationType>();
-            if (cache) cache.Result.Clear(RepositoryCacheKeys.GetKey<IRelationType>(id));
+            if (cache) cache.Result.Clear(RepositoryCacheKeys.GetKey<IRelationType, int>(id));
             base.Remove(id);
         }
 

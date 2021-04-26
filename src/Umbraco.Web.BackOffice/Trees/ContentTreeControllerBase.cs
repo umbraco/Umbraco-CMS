@@ -376,7 +376,6 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
                         "icon-trash",
                         RecycleBinSmells,
                         queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
-
                 }
 
                 return nodes;

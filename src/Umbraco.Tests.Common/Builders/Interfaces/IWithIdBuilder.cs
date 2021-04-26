@@ -7,4 +7,9 @@ namespace Umbraco.Cms.Tests.Common.Builders.Interfaces
     {
         int? Id { get; set; }
     }
+
+    public interface IWithIdBuilder<TId>
+    {
+        TId Id { get; set; }
+    }
 }

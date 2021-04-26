@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 
@@ -15,8 +16,8 @@ namespace Umbraco.Cms.Core.Cache
     {
         private readonly IServerMessenger _messenger;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
-        private readonly IDistributedCacheBinder _distributedCacheBinder;
         private readonly ILogger<DatabaseServerMessengerNotificationHandler> _logger;
+        private readonly IRuntimeState _runtimeState;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseServerMessengerNotificationHandler"/> class.
@@ -24,26 +25,28 @@ namespace Umbraco.Cms.Core.Cache
         public DatabaseServerMessengerNotificationHandler(
             IServerMessenger serverMessenger,
             IUmbracoDatabaseFactory databaseFactory,
-            IDistributedCacheBinder distributedCacheBinder,
-            ILogger<DatabaseServerMessengerNotificationHandler> logger)
+            ILogger<DatabaseServerMessengerNotificationHandler> logger,
+            IRuntimeState runtimeState)
         {
             _databaseFactory = databaseFactory;
-            _distributedCacheBinder = distributedCacheBinder;
             _logger = logger;
             _messenger = serverMessenger;
+            _runtimeState = runtimeState;
         }
 
         /// <inheritdoc/>
         public void Handle(UmbracoApplicationStarting notification)
         {
             if (_databaseFactory.CanConnect == false)
+			{
+				_logger.LogWarning("Cannot connect to the database, distributed calls will not be enabled for this server.");
+			}
+            else if (_runtimeState.Level != RuntimeLevel.Run)
             {
-                _logger.LogWarning("Cannot connect to the database, distributed calls will not be enabled for this server.");
+                _logger.LogWarning("Distributed calls are not available outside the Run runtime level");
             }
-            else
+			else
             {
-                _distributedCacheBinder.BindEvents();
-
                 // Sync on startup, this will run through the messenger's initialization sequence
                 _messenger?.Sync();
             }

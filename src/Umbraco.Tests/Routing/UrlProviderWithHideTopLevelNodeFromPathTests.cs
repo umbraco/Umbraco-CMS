@@ -49,7 +49,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             var result = publishedUrlProvider.GetUrl(nodeId);

@@ -1,6 +1,9 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
+using Umbraco.Cms.Core.Hosting;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
@@ -16,6 +19,6 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets a value for the keep alive ping URL.
         /// </summary>
-        public string KeepAlivePingUrl => "{umbracoApplicationUrl}/api/keepalive/ping";
+        public string KeepAlivePingUrl => "~/api/keepalive/ping";
     }
 }

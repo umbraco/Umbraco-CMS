@@ -344,13 +344,11 @@
     $this.CopyFiles("$templates", "*", "$tmp\Templates")
 
     Write-Host "Copy files for dotnet templates"
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Program.cs", "$tmp\Templates\UmbracoSolution")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\UmbracoSolution")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.json", "$tmp\Templates\UmbracoSolution")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.Development.json", "$tmp\Templates\UmbracoSolution")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\Views", "*", "$tmp\Templates\UmbracoSolution\Views")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Program.cs", "$tmp\Templates\UmbracoProject")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\UmbracoProject")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\Views", "*", "$tmp\Templates\UmbracoProject\Views")
 
-  $this.RemoveDirectory("$tmp\Templates\UmbracoSolution\bin")
+  $this.RemoveDirectory("$tmp\Templates\UmbracoProject\bin")
   })
 
   $ubuild.DefineMethod("PackageZip",
@@ -447,6 +445,12 @@
         -Version "$($this.Version.Semver.ToString())" `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmssqlce.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.SqlCe." }
+
+    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.StaticAssets.nuspec" `
+        -Properties BuildTmp="$($this.BuildTemp)" `
+        -Version "$($this.Version.Semver.ToString())" `
+        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsstaticassets.log"
+    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.StaticAssets." }
 
     &$this.BuildEnv.NuGet Pack "$templates\Umbraco.Templates.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -17,7 +17,6 @@ using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.WebAssets;
-using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Web.BackOffice.HealthChecks;
 using Umbraco.Cms.Web.BackOffice.Profiling;
 using Umbraco.Cms.Web.BackOffice.PropertyEditors;
@@ -51,6 +50,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly PreviewRoutes _previewRoutes;
         private readonly IEmailSender _emailSender;
+        private readonly MemberPasswordConfigurationSettings _memberPasswordConfigurationSettings;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
@@ -68,7 +68,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeExternalLoginProviders externalLogins,
             IImageUrlGenerator imageUrlGenerator,
             PreviewRoutes previewRoutes,
-            IEmailSender emailSender)
+            IEmailSender emailSender,
+            IOptions<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -86,6 +87,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _imageUrlGenerator = imageUrlGenerator;
             _previewRoutes = previewRoutes;
             _emailSender = emailSender;
+            _memberPasswordConfigurationSettings = memberPasswordConfigurationSettings.Value;
         }
 
         /// <summary>
@@ -97,8 +99,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //this is the filter for the keys that we'll keep based on the full version of the server vars
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
-                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail"}},
+                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl", "iconApiBaseUrl"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -188,6 +190,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {
                             "contentApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentController>(
                                 controller => controller.PostSave(null))
+                        },
+                        {
+                            "publicAccessApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PublicAccessController>(
+                                controller => controller.GetPublicAccess(0))
                         },
                         {
                             "mediaApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaController>(
@@ -405,6 +411,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {"showUserInvite", _emailSender.CanSendRequiredEmail()},
                         {"canSendRequiredEmail", _emailSender.CanSendRequiredEmail()},
                         {"showAllowSegmentationForDocumentTypes", false},
+                        {"minimumPasswordLength", _memberPasswordConfigurationSettings.RequiredLength},
+                        {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
                     }
                 },
                 {

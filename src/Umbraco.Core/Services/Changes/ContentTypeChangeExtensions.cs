@@ -9,11 +9,6 @@ namespace Umbraco.Extensions
 {
     public static class ContentTypeChangeExtensions
     {
-        public static ContentTypeChange<TItem>.EventArgs ToEventArgs<TItem>(this IEnumerable<ContentTypeChange<TItem>> changes)
-            where TItem : class, IContentTypeComposition
-        {
-            return new ContentTypeChange<TItem>.EventArgs(changes);
-        }
 
         public static bool HasType(this ContentTypeChangeTypes change, ContentTypeChangeTypes type)
         {

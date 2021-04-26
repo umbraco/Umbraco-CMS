@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Cms.Infrastructure.WebAssets;
@@ -97,15 +99,19 @@ namespace Umbraco.Extensions
 
             // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
             // would automatically just register for all implemented INotificationHandler{T}?
-            builder.AddNotificationHandler<UmbracoApplicationStarting, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ServerVariablesParsing, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ModelBindingError, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<UmbracoApplicationStarting, LiveModelsProvider>();
             builder.AddNotificationHandler<UmbracoRequestEnd, LiveModelsProvider>();
-            builder.AddNotificationHandler<UmbracoApplicationStarting, OutOfDateModelsStatus>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, LiveModelsProvider>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, LiveModelsProvider>();
+
             builder.Services.AddSingleton<ModelsGenerator>();
             builder.Services.AddSingleton<LiveModelsProvider>();
             builder.Services.AddSingleton<OutOfDateModelsStatus>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
             builder.Services.AddSingleton<ModelsGenerationError>();
 
             builder.Services.AddSingleton<PureLiveModelFactory>();

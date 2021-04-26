@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Events;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Install

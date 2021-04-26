@@ -9,7 +9,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Core.Logging.Serilog
 {
     ///<summary>
-    /// Implements <see cref="ILogger"/> on top of Serilog.
+    /// Implements MS ILogger on top of Serilog.
     ///</summary>
     public class SerilogLogger : IDisposable
     {

@@ -79,11 +79,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     }));
 
         /// <summary>
-        /// Gets the node object type for the repository's entity
-        /// </summary>
-        protected abstract Guid NodeObjectTypeId { get; }
-
-        /// <summary>
         /// Gets the repository cache policy
         /// </summary>
         protected IRepositoryCachePolicy<TEntity, TId> CachePolicy

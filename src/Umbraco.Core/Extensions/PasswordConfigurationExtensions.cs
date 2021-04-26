@@ -24,12 +24,17 @@ namespace Umbraco.Extensions
 
                     // TODO: This doesn't make a ton of sense with asp.net identity and also there's a bunch of other settings
                     // that we can consider with IPasswordConfiguration, but these are currently still based on how membership providers worked.
-                    {"minNonAlphaNumericChars", passwordConfiguration.RequireNonLetterOrDigit ? 2 : 0},
+                    {"minNonAlphaNumericChars", passwordConfiguration.GetMinNonAlphaNumericChars()},
 
                     // A flag to indicate if the current password box should be shown or not, only a user that has access to change other user/member passwords
                     // doesn't have to specify the current password for the user/member. A user changing their own password must specify their current password.
                     {"allowManuallyChangingPassword", allowManuallyChangingPassword},
                 };
+        }
+
+        public static int GetMinNonAlphaNumericChars(this IPasswordConfiguration passwordConfiguration)
+        {
+            return passwordConfiguration.RequireNonLetterOrDigit ? 2 : 0;
         }
 
     }

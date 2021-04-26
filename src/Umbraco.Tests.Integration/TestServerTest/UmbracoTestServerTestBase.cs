@@ -18,7 +18,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.DependencyInjection;
@@ -135,9 +134,10 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         public override void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
+            IWebHostEnvironment webHostEnvironment = TestHelper.GetWebHostEnvironment();
             TypeLoader typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
-                TestHelper.GetWebHostEnvironment(),
+                webHostEnvironment,
                 TestHelper.GetHostingEnvironment(),
                 TestHelper.ConsoleLoggerFactory,
                 AppCaches.NoCache,
@@ -179,9 +179,17 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         public override void Configure(IApplicationBuilder app)
         {
-            app.UseUmbraco();
-            app.UseUmbracoBackOffice();
-            app.UseUmbracoWebsite();
+            app.UseUmbraco()
+                .WithMiddleware(u =>
+                {
+                    u.WithBackOffice();
+                    u.WithWebsite();
+                })
+                .WithEndpoints(u =>
+                {
+                    u.UseBackOfficeEndpoints();
+                    u.UseWebsiteEndpoints();
+                });
         }
     }
 }

@@ -21,8 +21,8 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing;
 using Umbraco.Extensions;
-using Umbraco.Tests.Services.Importing;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
@@ -354,7 +354,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         public void Can_Import_Media_Package_Xml()
         {
             // Arrange
-            global::Umbraco.Cms.Core.Services.Implement.MediaTypeService.ClearScopeEvents();
             string strXml = ImportResources.MediaTypesAndMedia_Package_xml;
             var xml = XElement.Parse(strXml);
             XElement mediaTypesElement = xml.Descendants("MediaTypes").First();

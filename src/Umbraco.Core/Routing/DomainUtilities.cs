@@ -21,14 +21,14 @@ namespace Umbraco.Cms.Core.Routing
         /// <param name="contentPath">The document path.</param>
         /// <param name="current">An optional current Uri.</param>
         /// <param name="umbracoContext">An Umbraco context.</param>
-        /// <param name="siteDomainHelper">The site domain helper.</param>
+        /// <param name="siteDomainMapper">The site domain helper.</param>
         /// <returns>The culture assigned to the document by domains.</returns>
         /// <remarks>
         /// <para>In 1:1 multilingual setup, a document contains several cultures (there is not
         /// one document per culture), and domains, withing the context of a current Uri, assign
         /// a culture to that document.</para>
         /// </remarks>
-        public static string GetCultureFromDomains(int contentId, string contentPath, Uri current, IUmbracoContext umbracoContext, ISiteDomainHelper siteDomainHelper)
+        public static string GetCultureFromDomains(int contentId, string contentPath, Uri current, IUmbracoContext umbracoContext, ISiteDomainMapper siteDomainMapper)
         {
             if (umbracoContext == null)
                 throw new InvalidOperationException("A current UmbracoContext is required.");
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.Routing
             var pos = route.IndexOf('/');
             var domain = pos == 0
                 ? null
-                : DomainForNode(umbracoContext.Domains, siteDomainHelper, int.Parse(route.Substring(0, pos)), current);
+                : DomainForNode(umbracoContext.Domains, siteDomainMapper, int.Parse(route.Substring(0, pos)), current);
 
             var rootContentId = domain?.ContentId ?? -1;
             var wcDomain = FindWildcardDomainInPath(umbracoContext.Domains.GetAll(true), contentPath, rootContentId);
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Core.Routing
         /// Finds the domain for the specified node, if any, that best matches a specified uri.
         /// </summary>
         /// <param name="domainCache">A domain cache.</param>
-        /// <param name="siteDomainHelper">The site domain helper.</param>
+        /// <param name="siteDomainMapper">The site domain helper.</param>
         /// <param name="nodeId">The node identifier.</param>
         /// <param name="current">The uri, or null.</param>
         /// <param name="culture">The culture, or null.</param>
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core.Routing
         /// <para>If culture is null, uses the default culture for the installation instead. Otherwise,
         /// will try with the specified culture, else return null.</para>
         /// </remarks>
-        internal static DomainAndUri DomainForNode(IDomainCache domainCache, ISiteDomainHelper siteDomainHelper, int nodeId, Uri current, string culture = null)
+        internal static DomainAndUri DomainForNode(IDomainCache domainCache, ISiteDomainMapper siteDomainMapper, int nodeId, Uri current, string culture = null)
         {
             // be safe
             if (nodeId <= 0)
@@ -91,21 +91,21 @@ namespace Umbraco.Cms.Core.Routing
 
             // else filter
             // it could be that none apply (due to culture)
-            return SelectDomain(domains, current, culture, domainCache.DefaultCulture, siteDomainHelper.MapDomain);
+            return SelectDomain(domains, current, culture, domainCache.DefaultCulture, siteDomainMapper.MapDomain);
         }
 
         /// <summary>
         /// Find the domains for the specified node, if any, that match a specified uri.
         /// </summary>
         /// <param name="domainCache">A domain cache.</param>
-        /// <param name="siteDomainHelper">The site domain helper.</param>
+        /// <param name="siteDomainMapper">The site domain helper.</param>
         /// <param name="nodeId">The node identifier.</param>
         /// <param name="current">The uri, or null.</param>
         /// <param name="excludeDefault">A value indicating whether to exclude the current/default domain. True by default.</param>
         /// <returns>The domains and their uris, that match the specified uri, else null.</returns>
         /// <remarks>If at least a domain is set on the node then the method returns the domains that
         /// best match the specified uri, else it returns null.</remarks>
-        internal static IEnumerable<DomainAndUri> DomainsForNode(IDomainCache domainCache, ISiteDomainHelper siteDomainHelper, int nodeId, Uri current, bool excludeDefault = true)
+        internal static IEnumerable<DomainAndUri> DomainsForNode(IDomainCache domainCache, ISiteDomainMapper siteDomainMapper, int nodeId, Uri current, bool excludeDefault = true)
         {
             // be safe
             if (nodeId <= 0)
@@ -122,7 +122,7 @@ namespace Umbraco.Cms.Core.Routing
             var domainAndUris = SelectDomains(domains, current).ToArray();
 
             // filter
-            return siteDomainHelper.MapDomains(domainAndUris, current, excludeDefault, null, domainCache.DefaultCulture).ToArray();
+            return siteDomainMapper.MapDomains(domainAndUris, current, excludeDefault, null, domainCache.DefaultCulture).ToArray();
         }
 
         #endregion

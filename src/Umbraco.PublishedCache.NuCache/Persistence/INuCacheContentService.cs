@@ -63,6 +63,8 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
 
         void DeleteContentItem(IContentBase item);
 
+        void DeleteContentItems(IEnumerable<IContentBase> items);
+
         /// <summary>
         /// Refreshes the nucache database row for the <see cref="IContent"/>
         /// </summary>

@@ -1,6 +1,5 @@
 ﻿@using Microsoft.Extensions.Options;
 @using System.Globalization
-@using Umbraco.Cms.Core
 @using Umbraco.Cms.Core.Configuration
 @using Umbraco.Cms.Core.Configuration.Models
 @using Umbraco.Cms.Core.Hosting
@@ -47,7 +46,7 @@
         <div style="margin: 10px;">
             <h3><img src="assets/img/application/logo.png" alt="Umbraco logo" style="vertical-align: text-bottom;" /> Umbraco</h3>
             <p>For full functionality of Umbraco CMS it is necessary to enable JavaScript.</p>
-            <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
+            <p>Here are the <a href="https://www.enable-javascript.com/" target="_blank" rel="noopener" style="text-decoration: underline;">instructions how to enable JavaScript in your web browser</a>.</p>
         </div>
     </noscript>
 
@@ -115,12 +114,6 @@
             @await Html.AngularValueExternalLoginInfoScriptAsync(externalLogins, ViewData.GetExternalSignInProviderErrors())
             @Html.AngularValueResetPasswordCodeInfoScript(ViewData[ViewDataExtensions.TokenPasswordResetCode])
             @await Html.AngularValueTinyMceAssetsAsync(runtimeMinifier)
-
-            app.run(["iconHelper", function (iconHelper) {
-                @* We inject icons to the icon helper(service), since icons can only be loaded if user is authorized. By injecting these to the service they will not be requested as they will become cached. *@
-                iconHelper.defineIcon("icon-check", '@Html.Raw(IconService.GetIcon("icon-check")?.SvgString)');
-                iconHelper.defineIcon("icon-delete", '@Html.Raw(IconService.GetIcon("icon-delete")?.SvgString)');
-            }]);
             //required for the noscript trick
             document.getElementById("mainwrapper").style.display = "inherit";
         }

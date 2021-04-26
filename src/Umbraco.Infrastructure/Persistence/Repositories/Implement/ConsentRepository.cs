@@ -27,9 +27,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         { }
 
         /// <inheritdoc />
-        protected override Guid NodeObjectTypeId => throw new NotSupportedException();
-
-        /// <inheritdoc />
         protected override IConsent PerformGet(int id)
         {
             throw new NotSupportedException();
@@ -88,7 +85,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Database.Update(dto);
             entity.ResetDirtyProperties();
 
-            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IConsent>(entity.Id));
+            IsolatedCache.Clear(RepositoryCacheKeys.GetKey<IConsent, int>(entity.Id));
         }
 
         /// <inheritdoc />

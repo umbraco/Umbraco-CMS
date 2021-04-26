@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
         private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
 
-        private UmbracoMapper Mapper => GetRequiredService<UmbracoMapper>();
+        private IUmbracoMapper Mapper => GetRequiredService<IUmbracoMapper>();
 
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
 

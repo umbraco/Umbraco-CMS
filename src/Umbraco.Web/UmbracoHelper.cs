@@ -27,7 +27,6 @@ namespace Umbraco.Web
     {
         private readonly IPublishedContentQuery _publishedContentQuery;
         private readonly IUmbracoComponentRenderer _componentRenderer;
-        private readonly MembershipHelper _membershipHelper;
         private readonly ICultureDictionaryFactory _cultureDictionaryFactory;
 
         private IPublishedContent _currentPage;
@@ -47,12 +46,10 @@ namespace Umbraco.Web
         public UmbracoHelper(IPublishedContent currentPage,
             ICultureDictionaryFactory cultureDictionary,
             IUmbracoComponentRenderer componentRenderer,
-            IPublishedContentQuery publishedContentQuery,
-            MembershipHelper membershipHelper)
+            IPublishedContentQuery publishedContentQuery)
         {
             _cultureDictionaryFactory = cultureDictionary ?? throw new ArgumentNullException(nameof(cultureDictionary));
             _componentRenderer = componentRenderer ?? throw new ArgumentNullException(nameof(componentRenderer));
-            _membershipHelper = membershipHelper ?? throw new ArgumentNullException(nameof(membershipHelper));
             _publishedContentQuery = publishedContentQuery ?? throw new ArgumentNullException(nameof(publishedContentQuery));
             _currentPage = currentPage;
         }
@@ -120,7 +117,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlEncodedString RenderMacro(string alias)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, null);
+            return _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, null).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -131,7 +128,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlEncodedString RenderMacro(string alias, object parameters)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
+            return _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>()).GetAwaiter().GetResult();
         }
 
         /// <summary>
@@ -142,7 +139,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlEncodedString RenderMacro(string alias, IDictionary<string, object> parameters)
         {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters);
+            return _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, parameters).GetAwaiter().GetResult();
         }
 
         #endregion
@@ -189,90 +186,19 @@ namespace Umbraco.Web
         /// </summary>
         /// <param name="path">The full path of the document object to check</param>
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
-        public bool MemberHasAccess(string path)
-        {
-            return _membershipHelper.MemberHasAccess(path);
-        }
+        public bool MemberHasAccess(string path) => throw new NotImplementedException("Migrated to netcore");
 
         /// <summary>
         /// Whether or not the current member is logged in (based on the membership provider)
         /// </summary>
         /// <returns>True is the current user is logged in</returns>
-        public bool MemberIsLoggedOn()
-        {
-            return _membershipHelper.IsLoggedIn();
-        }
+        public bool MemberIsLoggedOn() => throw new NotImplementedException("Migrated to netcore");
 
         #endregion
 
 
 
         #region Member/Content/Media from Udi
-
-        #endregion
-
-        #region Members
-
-        public IPublishedContent Member(Udi id)
-        {
-            var guidUdi = id as GuidUdi;
-            return guidUdi == null ? null : Member(guidUdi.Guid);
-        }
-
-        public IPublishedContent Member(Guid id)
-        {
-            return _membershipHelper.GetById(id);
-        }
-
-        public IPublishedContent Member(int id)
-        {
-            return _membershipHelper.GetById(id);
-        }
-
-        public IPublishedContent Member(string id)
-        {
-            var asInt = id.TryConvertTo<int>();
-            return asInt ? _membershipHelper.GetById(asInt.Result) : _membershipHelper.GetByProviderKey(id);
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<int> ids)
-        {
-            return _membershipHelper.GetByIds(ids);
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<string> ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<Guid> ids)
-        {
-            return _membershipHelper.GetByIds(ids);
-        }
-
-        public IEnumerable<IPublishedContent> Members(IEnumerable<Udi> ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-        public IEnumerable<IPublishedContent> Members(params int[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(params string[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
-
-        public IEnumerable<IPublishedContent> Members(params Guid[] ids)
-        {
-            return _membershipHelper.GetByIds(ids);
-        }
-
-        public IEnumerable<IPublishedContent> Members(params Udi[] ids)
-        {
-            return ids.Select(Member).WhereNotNull();
-        }
 
         #endregion
 

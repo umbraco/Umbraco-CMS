@@ -17,6 +17,7 @@ using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
@@ -46,11 +47,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
             var globalSettings = new GlobalSettings();
             var connectionStrings = new ConnectionStrings();
             var f = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(), loggerFactory, Options.Create(globalSettings), Options.Create(connectionStrings), new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())), TestHelper.DbProviderFactoryCreator,
-                new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion()));
+                new DatabaseSchemaCreatorFactory(loggerFactory.CreateLogger<DatabaseSchemaCreator>(), loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>()));
             var fs = new FileSystems(mock.Object, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, IOHelper, Options.Create(globalSettings), Mock.Of<IHostingEnvironment>());
             var coreDebug = new CoreDebugSettings();
             IMediaFileSystem mediaFileSystem = Mock.Of<IMediaFileSystem>();
-            var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance);
+            IEventAggregator eventAggregator = Mock.Of<IEventAggregator>();
+            var p = new ScopeProvider(f, fs, Options.Create(coreDebug), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance, eventAggregator);
 
             mock.Setup(x => x.GetService(typeof(ILogger))).Returns(logger);
             mock.Setup(x => x.GetService(typeof(ILogger<ComponentCollection>))).Returns(loggerFactory.CreateLogger<ComponentCollection>);

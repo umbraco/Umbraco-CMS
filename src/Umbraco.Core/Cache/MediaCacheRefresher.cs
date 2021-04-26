@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
@@ -9,21 +10,19 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresher, MediaCacheRefresher.JsonPayload>
+    public sealed class MediaCacheRefresher : PayloadCacheRefresherBase<MediaCacheRefresherNotification, MediaCacheRefresher.JsonPayload>
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IIdKeyMap _idKeyMap;
 
-        public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdKeyMap idKeyMap)
-            : base(appCaches, serializer)
+        public MediaCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService, IIdKeyMap idKeyMap, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _publishedSnapshotService = publishedSnapshotService;
             _idKeyMap = idKeyMap;
         }
 
         #region Define
-
-        protected override MediaCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("B29286DD-2D40-4DDB-B325-681226589FEC");
 
@@ -44,6 +43,7 @@ namespace Umbraco.Cms.Core.Cache
             if (anythingChanged)
             {
                 AppCaches.ClearPartialViewCache();
+                AppCaches.RuntimeCache.ClearByKey(CacheKeys.MediaRecycleBinCacheKey);
 
                 var mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
 
@@ -57,8 +57,8 @@ namespace Umbraco.Cms.Core.Cache
                     // repository cache
                     // it *was* done for each pathId but really that does not make sense
                     // only need to do it for the current media
-                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia>(payload.Id));
-                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia>(payload.Key));
+                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
+                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
 
                     // remove those that are in the branch
                     if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))
