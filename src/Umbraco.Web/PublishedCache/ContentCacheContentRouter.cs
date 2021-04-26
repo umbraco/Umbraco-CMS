@@ -108,7 +108,7 @@ namespace Umbraco.Web.PublishedCache
         {
             var node = publishedCache.GetById(preview, contentId);
             if (node == null)
-                return new RouteByIdResult(RoutingOutcome.NotFound);
+                return RouteByIdResult.NotFound;
 
             hideTopLevelNode = hideTopLevelNode ?? _globalSettings.HideTopLevelNodeFromPath; // default = settings
 
@@ -121,7 +121,7 @@ namespace Umbraco.Web.PublishedCache
             while (hasDomains == false && n != null) // n is null at root
             {
                 // no segment indicates this is not published when this is a variant
-                if (urlSegment.IsNullOrWhiteSpace()) return new RouteByIdResult(RoutingOutcome.NotFound);
+                if (urlSegment.IsNullOrWhiteSpace()) return RouteByIdResult.NotFound;
 
                 pathParts.Add(urlSegment);
 
@@ -134,7 +134,7 @@ namespace Umbraco.Web.PublishedCache
             }
 
             // at this point this will be the urlSegment of the root, no segment indicates this is not published when this is a variant
-            if (urlSegment.IsNullOrWhiteSpace()) return new RouteByIdResult(RoutingOutcome.NotFound);
+            if (urlSegment.IsNullOrWhiteSpace()) return RouteByIdResult.NotFound;
 
             // no domain, respect HideTopLevelNodeFromPath for legacy purposes
             if (hasDomains == false && hideTopLevelNode.Value)

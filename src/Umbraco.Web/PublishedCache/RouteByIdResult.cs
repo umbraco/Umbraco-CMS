@@ -17,5 +17,7 @@ namespace Umbraco.Web.PublishedCache
         public string Url { get;}
         public int? DomainId { get; }
         public RoutingOutcome Outcome { get; }
+
+        public static readonly RouteByIdResult NotFound = new RouteByIdResult(RoutingOutcome.NotFound);
     }
 }
