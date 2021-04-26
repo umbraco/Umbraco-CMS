@@ -40,13 +40,21 @@ namespace Umbraco.Cms.Core.IO
         #region Constructor
 
         // DI wants a public ctor
-        public FileSystems(ILoggerFactory loggerFactory, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings, IHostingEnvironment hostingEnvironment)
+        public FileSystems(
+            ILoggerFactory loggerFactory,
+            IIOHelper ioHelper,
+            IOptions<GlobalSettings> globalSettings,
+            IHostingEnvironment hostingEnvironment,
+            IFileSystem stylesheetFileSystem)
         {
             _logger = loggerFactory.CreateLogger<FileSystems>();
             _loggerFactory = loggerFactory;
             _ioHelper = ioHelper;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
+
+            var stylesheetWrapper = (ShadowWrapper)CreateShadowWrapper(stylesheetFileSystem, "css");
+            _stylesheetsFileSystem = stylesheetWrapper;
         }
 
         // Ctor for tests, allows you to set the various filesystems
@@ -59,11 +67,10 @@ namespace Umbraco.Cms.Core.IO
             IFileSystem partialViewsFileSystem,
             IFileSystem stylesheetFileSystem,
             IFileSystem scriptsFileSystem,
-            IFileSystem mvcViewFileSystem) : this(loggerFactory, ioHelper, globalSettings, hostingEnvironment)
+            IFileSystem mvcViewFileSystem) : this(loggerFactory, ioHelper, globalSettings, hostingEnvironment, stylesheetFileSystem)
         {
             _macroPartialFileSystem = (ShadowWrapper)CreateShadowWrapper(macroPartialFileSystem, "macro-partials");
             _partialViewsFileSystem = (ShadowWrapper)CreateShadowWrapper(partialViewsFileSystem, "partials");
-            _stylesheetsFileSystem = (ShadowWrapper)CreateShadowWrapper(stylesheetFileSystem, "css");
             _scriptsFileSystem = (ShadowWrapper)CreateShadowWrapper(scriptsFileSystem, "scripts");
             _mvcViewsFileSystem = (ShadowWrapper)CreateShadowWrapper(mvcViewFileSystem, "view");
             // Set initialized to true so the filesystems doesn't get overwritten.
@@ -175,20 +182,17 @@ namespace Umbraco.Cms.Core.IO
             //TODO this is fucked, why do PhysicalFileSystem has a root url? Mvc views cannot be accessed by url!
             var macroPartialFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MacroPartials), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.MacroPartials));
             var partialViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.PartialViews), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.PartialViews));
-            var stylesheetsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger,  _hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoCssPath), _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoCssPath));
             var scriptsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger,  _hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoScriptsPath), _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoScriptsPath));
             var mvcViewsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger, _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.MvcViews), _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.MvcViews));
 
             _macroPartialFileSystem = new ShadowWrapper(macroPartialFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "macro-partials", IsScoped);
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "partials", IsScoped);
-            _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "css", IsScoped);
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "scripts", IsScoped);
             _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "views", IsScoped);
 
             // TODO: do we need a lock here?
             _shadowWrappers.Add(_macroPartialFileSystem);
             _shadowWrappers.Add(_partialViewsFileSystem);
-            _shadowWrappers.Add(_stylesheetsFileSystem);
             _shadowWrappers.Add(_scriptsFileSystem);
             _shadowWrappers.Add(_mvcViewsFileSystem);
 

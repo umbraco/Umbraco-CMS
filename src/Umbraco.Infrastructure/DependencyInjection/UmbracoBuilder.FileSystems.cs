@@ -34,10 +34,19 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         internal static IUmbracoBuilder AddFileSystems(this IUmbracoBuilder builder)
         {
             // register FileSystems, which manages all filesystems
-            // it needs to be registered (not only the interface) because it provides additional
-            // functionality eg for scoping, and is injected in the scope provider - whereas the
-            // interface is really for end-users to get access to filesystems.
-            builder.Services.AddUnique<FileSystems>();
+            // Takes a factory method for creating the stylesheet filesystem to allow it to be replaced.
+            builder.AddFileSystems(factory =>
+            {
+                IIOHelper ioHelper = factory.GetRequiredService<IIOHelper>();
+                IHostingEnvironment hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+                ILogger<PhysicalFileSystem> logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
+                GlobalSettings settings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
+
+                var path = settings.UmbracoCssPath;
+                var rootPath = hostingEnvironment.MapPathWebRoot(path);
+                var rootUrl = hostingEnvironment.ToAbsolute(path);
+                return new PhysicalFileSystem(ioHelper, hostingEnvironment, logger, rootPath, rootUrl);
+            });
 
             // register the scheme for media paths
             builder.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();

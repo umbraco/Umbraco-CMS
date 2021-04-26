@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         /// Sets the filesystem used by the MediaFileManager
         /// </summary>
         /// <param name="builder">A builder.</param>
-        /// <param name="mediaFileSystem">Instance of IMediaFileSystem to register</param>
+        /// <param name="filesystemFactory">Factory method to create an IFileSystem implementation used in the MediaFileManager</param>
         public static void SetMediaFileSystem(this IUmbracoBuilder builder,
             Func<IServiceProvider, IFileSystem> filesystemFactory) => builder.Services.AddSingleton(
             provider =>
@@ -125,6 +125,37 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 IFileSystem shadow = fileSystems.CreateShadowWrapper(filesystem, "media");
 
                 return provider.CreateInstance<MediaFileManager>(shadow);
+            });
+
+        /// <summary>
+        /// Register FileSystems with a specific IFileSystem for stylesheets
+        /// </summary>
+        /// <remarks>
+        /// Be careful when using this, the root path and root url must be correct for this to work.
+        /// </remarks>
+        /// <param name="builder">A builder.</param>
+        /// <param name="stylesheetFactory">Factory method to create an IFileSystem implementation used for stylesheets.</param>
+        /// <exception cref="InvalidOperationException">Throws exception if full path can't be resolved successfully.</exception>
+        public static void AddFileSystems(this IUmbracoBuilder builder,
+            Func<IServiceProvider, IFileSystem> stylesheetFactory) => builder.Services.AddUnique(
+            provider =>
+            {
+                IFileSystem stylesheetFileSystem = stylesheetFactory(provider);
+                // Verify that _rootUrl/_rootPath is correct
+                // We have to do this because there's a tight coupling
+                // to the VirtualPath we get with CodeFileDisplay from the frontend.
+                try
+                {
+                    var rootPath = stylesheetFileSystem.GetFullPath("/css/");
+                }
+                catch (UnauthorizedAccessException exception)
+                {
+                    throw new InvalidOperationException("Can't register the stylesheet filesystem, " +
+                                                        "this is most likely caused by using a PhysicalFileSystem with an incorrect " +
+                                                        "rootPath/rootUrl. RootPath must be <installation folder>\\wwwroot\\css" +
+                                                        " and rootUrl must be /css", exception);
+                }
+                return provider.CreateInstance<FileSystems>(stylesheetFileSystem);
             });
 
         /// <summary>
