@@ -53,8 +53,7 @@ namespace Umbraco.Cms.Core.IO
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
 
-            var stylesheetWrapper = (ShadowWrapper)CreateShadowWrapper(stylesheetFileSystem, "css");
-            _stylesheetsFileSystem = stylesheetWrapper;
+            _stylesheetsFileSystem = (ShadowWrapper)CreateShadowWrapper(stylesheetFileSystem, "css");
         }
 
         // Ctor for tests, allows you to set the various filesystems
