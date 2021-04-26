@@ -128,35 +128,30 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             });
 
         /// <summary>
-        /// Register FileSystems with a specific IFileSystem for stylesheets
+        /// Register FileSystems with a method to configure the <see cref="FileSystems"/>.
         /// </summary>
-        /// <remarks>
-        /// Be careful when using this, the root path and root url must be correct for this to work.
-        /// </remarks>
         /// <param name="builder">A builder.</param>
-        /// <param name="stylesheetFactory">Factory method to create an IFileSystem implementation used for stylesheets.</param>
+        /// <param name="configure">Method that configures the <see cref="FileSystems"/>.</param>
+        /// <exception cref="ArgumentNullException">Throws exception if <paramref name="configure"/> is null.</exception>
         /// <exception cref="InvalidOperationException">Throws exception if full path can't be resolved successfully.</exception>
         public static void AddFileSystems(this IUmbracoBuilder builder,
-            Func<IServiceProvider, IFileSystem> stylesheetFactory) => builder.Services.AddUnique(
-            provider =>
+            Action<IServiceProvider, FileSystems> configure)
+        {
+            if (configure == null)
             {
-                IFileSystem stylesheetFileSystem = stylesheetFactory(provider);
-                // Verify that _rootUrl/_rootPath is correct
-                // We have to do this because there's a tight coupling
-                // to the VirtualPath we get with CodeFileDisplay from the frontend.
-                try
+                throw new ArgumentNullException(nameof(configure));
+            }
+
+            builder.AddFileSystems();
+
+            builder.Services.AddUnique(
+                provider =>
                 {
-                    var rootPath = stylesheetFileSystem.GetFullPath("/css/");
-                }
-                catch (UnauthorizedAccessException exception)
-                {
-                    throw new InvalidOperationException("Can't register the stylesheet filesystem, " +
-                                                        "this is most likely caused by using a PhysicalFileSystem with an incorrect " +
-                                                        "rootPath/rootUrl. RootPath must be <installation folder>\\wwwroot\\css" +
-                                                        " and rootUrl must be /css", exception);
-                }
-                return provider.CreateInstance<FileSystems>(stylesheetFileSystem);
-            });
+                    FileSystems fileSystems = provider.CreateInstance<FileSystems>();
+                    configure(provider, fileSystems);
+                    return fileSystems;
+                });
+        }
 
         /// <summary>
         /// Sets the log viewer.

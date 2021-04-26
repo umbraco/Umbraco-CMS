@@ -77,8 +77,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
                 instance,
                 Mock.Of<IIOHelper>(),
                 Options.Create(new GlobalSettings()),
-                Mock.Of<IHostingEnvironment>(),
-                Mock.Of<IFileSystem>());
+                Mock.Of<IHostingEnvironment>());
 
             var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), Mock.Of<IMediaPathScheme>(),
                 instance.CreateLogger<MediaFileManager>(), Mock.Of<IShortStringHelper>());

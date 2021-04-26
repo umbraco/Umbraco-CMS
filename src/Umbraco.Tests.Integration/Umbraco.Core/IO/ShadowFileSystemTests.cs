@@ -395,7 +395,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
             var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
 
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(loggerFactory, IOHelper, globalSettings, HostingEnvironment, Mock.Of<IFileSystem>()) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(loggerFactory, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
             var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
             var sw = (ShadowWrapper)fileSystems.CreateShadowWrapper(phy, shadowPath);
 
@@ -486,7 +486,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
             var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
 
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment, Mock.Of<IFileSystem>()) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
             var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
             var sw = fileSystems.CreateShadowWrapper(phy, shadowPath);
 
@@ -537,7 +537,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
             var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
 
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment, Mock.Of<IFileSystem>()) { IsScoped = () => scopedFileSystems };
+            var fileSystems = new FileSystems(NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
             var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
             var sw = fileSystems.CreateShadowWrapper(phy, shadowPath);
 

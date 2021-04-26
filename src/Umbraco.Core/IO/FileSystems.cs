@@ -44,16 +44,13 @@ namespace Umbraco.Cms.Core.IO
             ILoggerFactory loggerFactory,
             IIOHelper ioHelper,
             IOptions<GlobalSettings> globalSettings,
-            IHostingEnvironment hostingEnvironment,
-            IFileSystem stylesheetFileSystem)
+            IHostingEnvironment hostingEnvironment)
         {
             _logger = loggerFactory.CreateLogger<FileSystems>();
             _loggerFactory = loggerFactory;
             _ioHelper = ioHelper;
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
-
-            _stylesheetsFileSystem = (ShadowWrapper)CreateShadowWrapper(stylesheetFileSystem, "css");
         }
 
         // Ctor for tests, allows you to set the various filesystems
@@ -66,10 +63,11 @@ namespace Umbraco.Cms.Core.IO
             IFileSystem partialViewsFileSystem,
             IFileSystem stylesheetFileSystem,
             IFileSystem scriptsFileSystem,
-            IFileSystem mvcViewFileSystem) : this(loggerFactory, ioHelper, globalSettings, hostingEnvironment, stylesheetFileSystem)
+            IFileSystem mvcViewFileSystem) : this(loggerFactory, ioHelper, globalSettings, hostingEnvironment)
         {
             _macroPartialFileSystem = (ShadowWrapper)CreateShadowWrapper(macroPartialFileSystem, "macro-partials");
             _partialViewsFileSystem = (ShadowWrapper)CreateShadowWrapper(partialViewsFileSystem, "partials");
+            _stylesheetsFileSystem = (ShadowWrapper)CreateShadowWrapper(stylesheetFileSystem, "css");
             _scriptsFileSystem = (ShadowWrapper)CreateShadowWrapper(scriptsFileSystem, "scripts");
             _mvcViewsFileSystem = (ShadowWrapper)CreateShadowWrapper(mvcViewFileSystem, "view");
             // Set initialized to true so the filesystems doesn't get overwritten.
@@ -170,6 +168,49 @@ namespace Umbraco.Cms.Core.IO
             }
         }
 
+        /// <summary>
+        /// Sets the stylesheet filesystem.
+        /// </summary>
+        /// <remarks>
+        /// Be careful when using this, the root path and root url must be correct for this to work.
+        /// </remarks>
+        /// <param name="fileSystem">The <see cref="IFileSystem"/>.</param>
+        /// <exception cref="ArgumentNullException">If the <paramref name="fileSystem"/> is <c>null</c></exception>
+        /// <exception cref="InvalidOperationException">Throws exception if the StylesheetFileSystem has already been initialized.</exception>
+        /// <exception cref="InvalidOperationException">Throws exception if full path can't be resolved successfully.</exception>
+        public void SetStylesheetFilesystem(IFileSystem fileSystem)
+        {
+            if (fileSystem == null)
+            {
+                throw new ArgumentNullException(nameof(fileSystem));
+            }
+
+            if (_stylesheetsFileSystem != null)
+            {
+                throw new InvalidOperationException(
+                    "The StylesheetFileSystem cannot be changed when it's already been initialized.");
+            }
+
+            // Verify that _rootUrl/_rootPath is correct
+            // We have to do this because there's a tight coupling
+            // to the VirtualPath we get with CodeFileDisplay from the frontend.
+            try
+            {
+                var rootPath = fileSystem.GetFullPath("/css/");
+            }
+            catch (UnauthorizedAccessException exception)
+            {
+                throw new InvalidOperationException(
+                    "Can't register the stylesheet filesystem, "
+                    + "this is most likely caused by using a PhysicalFileSystem with an incorrect "
+                    + "rootPath/rootUrl. RootPath must be <installation folder>\\wwwroot\\css"
+                    + " and rootUrl must be /css", exception);
+            }
+
+            _stylesheetsFileSystem = (ShadowWrapper) CreateShadowWrapper(fileSystem, "css");
+            _shadowWrappers.Add(_stylesheetsFileSystem);
+        }
+
         private void EnsureWellKnownFileSystems() => LazyInitializer.EnsureInitialized(ref _wkfsObject, ref _wkfsInitialized, ref _wkfsLock, CreateWellKnownFileSystems);
 
         // need to return something to LazyInitializer.EnsureInitialized
@@ -188,6 +229,17 @@ namespace Umbraco.Cms.Core.IO
             _partialViewsFileSystem = new ShadowWrapper(partialViewsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "partials", IsScoped);
             _scriptsFileSystem = new ShadowWrapper(scriptsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "scripts", IsScoped);
             _mvcViewsFileSystem = new ShadowWrapper(mvcViewsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "views", IsScoped);
+
+            if (_stylesheetsFileSystem == null)
+            {
+                var stylesheetsFileSystem = new PhysicalFileSystem(_ioHelper, _hostingEnvironment, logger,
+                    _hostingEnvironment.MapPathWebRoot(_globalSettings.UmbracoCssPath),
+                    _hostingEnvironment.ToAbsolute(_globalSettings.UmbracoCssPath));
+
+                _stylesheetsFileSystem = new ShadowWrapper(stylesheetsFileSystem, _ioHelper, _hostingEnvironment, _loggerFactory, "css", IsScoped);
+
+                _shadowWrappers.Add(_stylesheetsFileSystem);
+            }
 
             // TODO: do we need a lock here?
             _shadowWrappers.Add(_macroPartialFileSystem);
