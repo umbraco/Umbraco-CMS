@@ -114,7 +114,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         /// <param name="builder">A builder.</param>
         /// <param name="filesystemFactory">Factory method to create an IFileSystem implementation used in the MediaFileManager</param>
         public static void SetMediaFileSystem(this IUmbracoBuilder builder,
-            Func<IServiceProvider, IFileSystem> filesystemFactory) => builder.Services.AddSingleton(
+            Func<IServiceProvider, IFileSystem> filesystemFactory) => builder.Services.AddUnique(
             provider =>
             {
                 IFileSystem filesystem = filesystemFactory(provider);
