@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
@@ -115,6 +116,25 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         /// <param name="filesystemFactory">Factory method to create an IFileSystem implementation used in the MediaFileManager</param>
         public static void SetMediaFileSystem(this IUmbracoBuilder builder,
             Func<IServiceProvider, IFileSystem> filesystemFactory) => builder.Services.AddUnique(
+            provider =>
+            {
+                IFileSystem filesystem = filesystemFactory(provider);
+                // We need to use the Filesystems to create a shadow wrapper,
+                // because shadow wrapper requires the IsScoped delegate from the FileSystems.
+                // This is used by the scope provider when taking control of the filesystems.
+                FileSystems fileSystems = provider.GetRequiredService<FileSystems>();
+                IFileSystem shadow = fileSystems.CreateShadowWrapper(filesystem, "media");
+
+                return provider.CreateInstance<MediaFileManager>(shadow);
+            });
+
+        /// <summary>
+        /// Tries to et the filesystem used by the MediaFileManager, if there's already <see cref="MediaFileManager"/> registered it will not be overwritten.
+        /// </summary>
+        /// <param name="builder">A builder.</param>
+        /// <param name="filesystemFactory">Factory method to create an IFileSystem implementation used in the MediaFileManager</param>
+        public static void TrySetMediaFileSystem(this IUmbracoBuilder builder,
+            Func<IServiceProvider, IFileSystem> filesystemFactory) => builder.Services.TryAddSingleton(
             provider =>
             {
                 IFileSystem filesystem = filesystemFactory(provider);
