@@ -1,10 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 
@@ -49,10 +51,31 @@ namespace Umbraco.Extensions
                 return idkSvc;
             });
 
+            builder.AddNuCacheNotifications();
+
             // add the NuCache health check (hidden from type finder)
             // TODO: no NuCache health check yet
             // composition.HealthChecks().Add<NuCacheIntegrityHealthCheck>();
             return builder;
         }
+
+
+        private static IUmbracoBuilder AddNuCacheNotifications(this IUmbracoBuilder builder)
+        {
+            builder
+                .AddNotificationHandler<LanguageSavedNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MemberDeletingNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<ContentRefreshNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MediaRefreshNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MemberRefreshNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<ContentTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MediaTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<MemberTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
+                .AddNotificationHandler<ScopedEntityRemoveNotification, PublishedSnapshotServiceEventHandler>();
+
+            return builder;
+        }
+
+
     }
 }

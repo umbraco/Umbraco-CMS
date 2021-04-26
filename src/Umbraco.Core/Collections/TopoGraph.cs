@@ -101,7 +101,7 @@ namespace Umbraco.Cms.Core.Collections
                 var start = incr > 0 ? 0 : index;
                 var count = incr > 0 ? index : sorted.Length - index;
                 if (throwOnCycle && Contains(sorted, item, start, count) == false)
-                    throw new Exception(CycleDependencyError);
+                    throw new Exception(CycleDependencyError +": " + item);
                 return;
             }
 

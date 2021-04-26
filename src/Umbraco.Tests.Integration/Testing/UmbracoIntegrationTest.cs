@@ -217,6 +217,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()
                 .AddExamine()
+                .AddExamineLucene()
                 .AddTestServices(TestHelper, GetAppCaches());
 
             if (TestOptions.Mapper)
@@ -232,6 +233,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
             CustomTestSetup(builder);
 
+
+            builder.AddExamineIndexConfiguration();
             builder.Build();
         }
 

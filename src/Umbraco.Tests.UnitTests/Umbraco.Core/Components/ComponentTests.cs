@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration;
@@ -26,7 +27,6 @@ using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
 {
@@ -456,7 +456,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         }
 
         [ComposeAfter(typeof(Composer4))]
-        public class Composer2 : TestComposerBase, ICoreComposer
+        public class Composer2 : TestComposerBase
         {
         }
 
@@ -539,7 +539,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         }
 
         [ComposeAfter(typeof(Composer4), true)]
-        public class Composer12 : TestComposerBase, ICoreComposer
+        public class Composer12 : TestComposerBase
         {
         }
 

@@ -17,7 +17,6 @@ using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.PublishedCache;
-using Umbraco.Cms.Infrastructure.PublishedCache.Compose;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
@@ -53,8 +52,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
             builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
-            var composer = new NotificationsComposer();
-            composer.Compose(builder);
+       //     builder.AddCoreNotifications();
         }
 
         private void AssertJsonStartsWith(int id, string expected)

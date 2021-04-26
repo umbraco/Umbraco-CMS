@@ -4,20 +4,20 @@
 using Examine;
 using Examine.LuceneEngine.Directories;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine
 {
-    public sealed class ExamineLuceneComponent : IComponent
+    public sealed class ExamineLuceneStarting : INotificationHandler<UmbracoApplicationStarting>
     {
         private readonly IndexRebuilder _indexRebuilder;
         private readonly IExamineManager _examineManager;
         private readonly IMainDom _mainDom;
         private readonly ILoggerFactory _loggerFactory;
 
-        public ExamineLuceneComponent(IndexRebuilder indexRebuilder, IExamineManager examineManager, IMainDom mainDom, ILoggerFactory loggerFactory)
+        public ExamineLuceneStarting(IndexRebuilder indexRebuilder, IExamineManager examineManager, IMainDom mainDom, ILoggerFactory loggerFactory)
         {
             _indexRebuilder = indexRebuilder;
             _examineManager = examineManager;
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             _loggerFactory = loggerFactory;
         }
 
-        public void Initialize()
+        public void Handle(UmbracoApplicationStarting notification)
         {
             //we want to tell examine to use a different fs lock instead of the default NativeFSFileLock which could cause problems if the AppDomain
             //terminates and in some rare cases would only allow unlocking of the file if IIS is forcefully terminated. Instead we'll rely on the simplefslock
@@ -46,8 +46,5 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <param name="e"></param>
         private void IndexRebuilder_RebuildingIndexes(object sender, IndexRebuildingEventArgs e) => _examineManager.ConfigureIndexes(_mainDom, _loggerFactory.CreateLogger<IExamineManager>());
 
-        public void Terminate()
-        {
-        }
     }
 }

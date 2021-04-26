@@ -3,26 +3,26 @@
 
 using Examine;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine
 {
-    public class ExamineLuceneFinalComponent : IComponent
+    public class ExamineLuceneConfigureIndexes : INotificationHandler<UmbracoApplicationStarting>
     {
         private readonly ILoggerFactory _loggerFactory;
         private readonly IExamineManager _examineManager;
         private readonly IMainDom _mainDom;
 
-        public ExamineLuceneFinalComponent(ILoggerFactory loggerFactory, IExamineManager examineManager, IMainDom mainDom)
+        public ExamineLuceneConfigureIndexes(ILoggerFactory loggerFactory, IExamineManager examineManager, IMainDom mainDom)
         {
             _loggerFactory = loggerFactory;
             _examineManager = examineManager;
             _mainDom = mainDom;
         }
 
-        public void Initialize()
+        public void Handle(UmbracoApplicationStarting notification)
         {
             if (!_mainDom.IsMainDom) return;
 
@@ -30,8 +30,6 @@ namespace Umbraco.Cms.Infrastructure.Examine
             _examineManager.ConfigureIndexes(_mainDom, _loggerFactory.CreateLogger<IExamineManager>());
         }
 
-        public void Terminate()
-        {
-        }
+
     }
 }

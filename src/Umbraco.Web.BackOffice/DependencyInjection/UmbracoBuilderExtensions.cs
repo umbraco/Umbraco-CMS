@@ -1,8 +1,6 @@
 using System.Linq;
-using Ganss.XSS;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
@@ -48,7 +46,10 @@ namespace Umbraco.Extensions
                 .AddDistributedCache()
                 .AddModelsBuilderDashboard()
                 .AddUnattedInstallCreateUser()
-                .AddExamine();
+                .AddCoreNotifications()
+                .AddLogViewer()
+                .AddExamine()
+                .AddExamineLucene();
 
         /// <summary>
         /// Adds Umbraco preview support
