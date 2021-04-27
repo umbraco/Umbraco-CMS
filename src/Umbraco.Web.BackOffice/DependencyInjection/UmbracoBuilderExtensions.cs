@@ -48,8 +48,7 @@ namespace Umbraco.Extensions
                 .AddUnattedInstallCreateUser()
                 .AddCoreNotifications()
                 .AddLogViewer()
-                .AddExamine()
-                .AddExamineLucene();
+                .AddExamine();
 
         /// <summary>
         /// Adds Umbraco preview support
