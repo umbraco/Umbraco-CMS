@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using Umbraco.Cms.Core.Models;
@@ -157,30 +157,9 @@ namespace Umbraco.Cms.Core.Services
         /// <summary>
         /// Gets the template descendants
         /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        IEnumerable<ITemplate> GetTemplateDescendants(string alias);
-
-        /// <summary>
-        /// Gets the template descendants
-        /// </summary>
         /// <param name="masterTemplateId"></param>
         /// <returns></returns>
         IEnumerable<ITemplate> GetTemplateDescendants(int masterTemplateId);
-
-        /// <summary>
-        /// Gets the template children
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        IEnumerable<ITemplate> GetTemplateChildren(string alias);
-
-        /// <summary>
-        /// Gets the template children
-        /// </summary>
-        /// <param name="masterTemplateId"></param>
-        /// <returns></returns>
-        IEnumerable<ITemplate> GetTemplateChildren(int masterTemplateId);
 
         /// <summary>
         /// Saves a <see cref="ITemplate"/>
@@ -210,39 +189,11 @@ namespace Umbraco.Cms.Core.Services
         void DeleteTemplate(string alias, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
-        /// Validates a <see cref="ITemplate"/>
-        /// </summary>
-        /// <param name="template"><see cref="ITemplate"/> to validate</param>
-        /// <returns>True if template is valid, otherwise false</returns>
-        bool ValidateTemplate(ITemplate template);
-
-        /// <summary>
         /// Saves a collection of <see cref="Template"/> objects
         /// </summary>
         /// <param name="templates">List of <see cref="Template"/> to save</param>
         /// <param name="userId">Optional id of the user</param>
         void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId);
-
-        /// <summary>
-        /// Gets the content of a template as a stream.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the template.</param>
-        /// <returns>The content of the template.</returns>
-        Stream GetTemplateFileContentStream(string filepath);
-
-        /// <summary>
-        /// Sets the content of a template.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the template.</param>
-        /// <param name="content">The content of the template.</param>
-        void SetTemplateFileContent(string filepath, Stream content);
-
-        /// <summary>
-        /// Gets the size of a template.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the template.</param>
-        /// <returns>The size of the template.</returns>
-        long GetTemplateFileSize(string filepath);
 
         /// <summary>
         /// Gets the content of a stylesheet as a stream.
