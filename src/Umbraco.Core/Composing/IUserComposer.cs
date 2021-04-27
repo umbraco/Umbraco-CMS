@@ -6,7 +6,6 @@
     /// <remarks>
     /// <para>User composers compose after core composers, and before the final composer.</para>
     /// </remarks>
-    [ComposeAfter(typeof(IComposer))]
     public interface IUserComposer : IComposer
     { }
 }

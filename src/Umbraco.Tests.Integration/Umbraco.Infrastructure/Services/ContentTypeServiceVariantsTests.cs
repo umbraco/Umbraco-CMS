@@ -52,7 +52,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
             builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
-       //     builder.AddCoreNotifications();
         }
 
         private void AssertJsonStartsWith(int id, string expected)

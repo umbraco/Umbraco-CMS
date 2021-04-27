@@ -44,7 +44,6 @@ namespace Umbraco.Cms.Web.UI.NetCore
                 .AddBackOffice()
                 .AddWebsite()
                 .AddComposers()
-                .AddExamineIndexConfiguration()
                 .Build();
 #pragma warning restore IDE0022 // Use expression body for methods
 

@@ -464,6 +464,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         {
         }
 
+
         public class Composer4 : TestComposerBase
         {
         }
@@ -524,6 +525,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Components
         {
         }
 
+        [ComposeAfter(typeof(Composer2))]
+        [ComposeAfter(typeof(Composer4))]
         public class Composer9 : TestComposerBase, ITestComposer
         {
         }
