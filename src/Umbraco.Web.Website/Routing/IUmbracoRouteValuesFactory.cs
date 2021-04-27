@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.Routing;
@@ -12,6 +13,6 @@ namespace Umbraco.Cms.Web.Website.Routing
         /// <summary>
         /// Creates <see cref="UmbracoRouteValues"/>
         /// </summary>
-        UmbracoRouteValues Create(HttpContext httpContext, IPublishedRequest request);
+        Task<UmbracoRouteValues> CreateAsync(HttpContext httpContext, IPublishedRequest request);
     }
 }

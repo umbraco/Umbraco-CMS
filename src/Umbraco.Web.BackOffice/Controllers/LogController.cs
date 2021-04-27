@@ -11,9 +11,9 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Core.Persistence;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -24,26 +24,26 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class LogController : UmbracoAuthorizedJsonController
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IAuditService _auditService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IUserService _userService;
         private readonly AppCaches _appCaches;
         private readonly ISqlContext _sqlContext;
 
         public LogController(
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileSystem,
             IImageUrlGenerator imageUrlGenerator,
             IAuditService auditService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IUserService userService,
             AppCaches appCaches,
             ISqlContext sqlContext)
          {
-            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _imageUrlGenerator = imageUrlGenerator ?? throw new ArgumentNullException(nameof(imageUrlGenerator));
             _auditService = auditService ?? throw new ArgumentNullException(nameof(auditService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             var mappedItems = items.ToList();
             var userIds = mappedItems.Select(x => x.UserId).ToArray();
-            var userAvatars = Enumerable.ToDictionary(_userService.GetUsersById(userIds), x => x.Id, x => x.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator));
+            var userAvatars = Enumerable.ToDictionary(_userService.GetUsersById(userIds), x => x.Id, x => x.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator));
             var userNames = Enumerable.ToDictionary(_userService.GetUsersById(userIds), x => x.Id, x => x.Name);
             foreach (var item in mappedItems)
             {

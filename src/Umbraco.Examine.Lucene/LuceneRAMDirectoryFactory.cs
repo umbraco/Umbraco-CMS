@@ -4,7 +4,7 @@
 using System;
 using Lucene.Net.Store;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     public class LuceneRAMDirectoryFactory : ILuceneDirectoryFactory
     {

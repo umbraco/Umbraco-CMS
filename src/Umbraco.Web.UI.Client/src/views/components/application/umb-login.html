@@ -5,7 +5,7 @@
         <div class="login-overlay__background-image" ng-style="{'background-image': 'url('+vm.backgroundImage+')'}"></div>
 
         <div class="login-overlay__logo">
-            <img ng-src="{{vm.logoImage}}">
+            <img ng-src="{{vm.logoImage}}" alt=""/>
         </div>
 
         <div ng-if="!vm.denyLocalLogin" ng-show="vm.invitedUser != null" class="umb-login-container">
@@ -226,7 +226,8 @@
 
                         <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: vm.setPasswordForm.password.$invalid}">
                             <label for="umb-passwordThree"><localize key="user_newPassword">New password</localize></label>
-                            <input type="password" ng-model="vm.password" name="password" id="umb-passwordThree" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" focus-when="{{vm.view === 'set-password'}}" />
+                            <input type="password" ng-model="vm.password" name="password" id="umb-passwordThree" class="-full-width-input" localize="placeholder" placeholder="@placeholders_password" focus-when="{{vm.view === 'set-password'}}" ng-keyup="vm.newPasswordKeyUp($event)" />
+                            <umb-password-tip password-val="vm.passwordVal"></umb-password-tip>
                         </div>
 
                         <div ng-hide="vm.resetComplete" class="control-group" ng-class="{error: vm.setPasswordForm.confirmPassword.$invalid}">

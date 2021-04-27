@@ -26,7 +26,6 @@ using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Website.Controllers;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest
 {
@@ -107,7 +106,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         /// <returns>The string URL of the controller action.</returns>
         protected string PrepareUrl(string url)
         {
-            IBackOfficeSecurityFactory backofficeSecurityFactory = GetRequiredService<IBackOfficeSecurityFactory>();
             IUmbracoContextFactory umbracoContextFactory = GetRequiredService<IUmbracoContextFactory>();
             IHttpContextAccessor httpContextAccessor = GetRequiredService<IHttpContextAccessor>();
 
@@ -122,7 +120,6 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 }
             };
 
-            backofficeSecurityFactory.EnsureBackOfficeSecurity();
             umbracoContextFactory.EnsureUmbracoContext();
 
             return url;
@@ -137,9 +134,10 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
         public override void ConfigureServices(IServiceCollection services)
         {
             services.AddTransient<TestUmbracoDatabaseFactoryProvider>();
+            IWebHostEnvironment webHostEnvironment = TestHelper.GetWebHostEnvironment();
             TypeLoader typeLoader = services.AddTypeLoader(
                 GetType().Assembly,
-                TestHelper.GetWebHostEnvironment(),
+                webHostEnvironment,
                 TestHelper.GetHostingEnvironment(),
                 TestHelper.ConsoleLoggerFactory,
                 AppCaches.NoCache,
@@ -181,9 +179,17 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
 
         public override void Configure(IApplicationBuilder app)
         {
-            app.UseUmbraco();
-            app.UseUmbracoBackOffice();
-            app.UseUmbracoWebsite();
+            app.UseUmbraco()
+                .WithMiddleware(u =>
+                {
+                    u.WithBackOffice();
+                    u.WithWebsite();
+                })
+                .WithEndpoints(u =>
+                {
+                    u.UseBackOfficeEndpoints();
+                    u.UseWebsiteEndpoints();
+                });
         }
     }
 }

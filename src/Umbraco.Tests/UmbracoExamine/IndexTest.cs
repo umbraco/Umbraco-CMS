@@ -9,13 +9,13 @@ using Lucene.Net.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using NUnit.Framework;
-using Umbraco.Examine;
-using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Core.Models;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
+using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
+using Umbraco.Tests.TestHelpers.Entities;
 
 namespace Umbraco.Tests.UmbracoExamine
 {

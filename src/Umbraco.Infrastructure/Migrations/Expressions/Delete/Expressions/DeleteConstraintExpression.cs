@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+﻿using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Delete.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Expressions
 {
     public class DeleteConstraintExpression : MigrationExpressionBase
     {

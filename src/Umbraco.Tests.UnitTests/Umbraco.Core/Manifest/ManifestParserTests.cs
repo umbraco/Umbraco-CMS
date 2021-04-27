@@ -20,9 +20,8 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest
 {
@@ -218,6 +217,8 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
 
             IDataEditor editor = manifest.PropertyEditors[1];
             Assert.IsTrue((editor.Type & EditorType.MacroParameter) > 0);
+            Assert.IsNotEmpty(editor.DefaultConfiguration);
+            Assert.AreEqual("some default val", editor.DefaultConfiguration["key1"]);
 
             editor = manifest.PropertyEditors[0];
             Assert.AreEqual("Test.Test1", editor.Alias);

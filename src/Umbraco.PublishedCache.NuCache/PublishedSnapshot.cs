@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.PublishedCache;
@@ -22,12 +22,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public class PublishedSnapshotElements : IDisposable
         {
+#pragma warning disable IDE1006 // Naming Styles
             public ContentCache ContentCache;
             public MediaCache MediaCache;
             public MemberCache MemberCache;
             public DomainCache DomainCache;
             public IAppCache SnapshotCache;
             public IAppCache ElementsCache;
+#pragma warning restore IDE1006 // Naming Styles
 
             public void Dispose()
             {

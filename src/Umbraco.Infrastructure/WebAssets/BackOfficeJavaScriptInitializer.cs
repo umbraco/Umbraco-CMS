@@ -3,9 +3,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Core.Configuration;
 
-namespace Umbraco.Web.WebAssets
+namespace Umbraco.Cms.Infrastructure.WebAssets
 {
     /// <summary>
     /// Creates a JavaScript block to initialize the back office
@@ -43,7 +42,6 @@ namespace Umbraco.Web.WebAssets
                 jarray.Append("\"");
                 jarray.Append(file);
                 jarray.Append("\"");
-
             }
             jarray.Append("]");
 

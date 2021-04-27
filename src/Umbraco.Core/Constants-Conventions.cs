@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -129,10 +129,6 @@
                 /// if a role starts with __umbracoRole we won't show it as it's an internal role used for public access
                 /// </summary>
                 public static readonly string InternalRolePrefix = "__umbracoRole";
-
-                public static readonly string UmbracoMemberProviderName = "UmbracoMembershipProvider";
-
-                public static readonly string UmbracoRoleProviderName = "UmbracoRoleProvider";
 
                 /// <summary>
                 /// Property alias for the Comments on a Member
@@ -277,7 +273,7 @@
                 /// Developers should not manually use these relation types since they will all be cleared whenever an entity
                 /// (content, media or member) is saved since they are auto-populated based on property values.
                 /// </remarks>
-                public static string[] AutomaticRelationTypes = new[] { RelatedMediaAlias, RelatedDocumentAlias };
+                public static string[] AutomaticRelationTypes { get; } = new[] { RelatedMediaAlias, RelatedDocumentAlias };
 
                 //TODO: return a list of built in types so we can use that to prevent deletion in the uI
             }

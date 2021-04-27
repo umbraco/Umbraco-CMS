@@ -1,6 +1,6 @@
 ﻿using Examine;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Default implementation of <see cref="IIndexDiagnosticsFactory"/> which returns <see cref="GenericIndexDiagnostics"/> for indexes that don't have an implementation

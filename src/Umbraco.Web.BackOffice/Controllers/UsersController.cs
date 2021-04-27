@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -29,6 +30,8 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.BackOffice.Filters;
@@ -37,9 +40,7 @@ using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Core;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -51,7 +52,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [IsCurrentUserModelFilter]
     public class UsersController : UmbracoAuthorizedJsonController
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly ContentSettings _contentSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISqlContext _sqlContext;
@@ -63,17 +64,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IUserService _userService;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly GlobalSettings _globalSettings;
         private readonly IBackOfficeUserManager _userManager;
         private readonly ILoggerFactory _loggerFactory;
         private readonly LinkGenerator _linkGenerator;
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly UserEditorAuthorizationHelper _userEditorAuthorizationHelper;
+        private readonly IPasswordChanger<BackOfficeIdentityUser> _passwordChanger;
         private readonly ILogger<UsersController> _logger;
 
         public UsersController(
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             ISqlContext sqlContext,
@@ -85,15 +87,16 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IShortStringHelper shortStringHelper,
             IUserService userService,
             ILocalizedTextService localizedTextService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IOptions<GlobalSettings> globalSettings,
             IBackOfficeUserManager backOfficeUserManager,
             ILoggerFactory loggerFactory,
             LinkGenerator linkGenerator,
             IBackOfficeExternalLoginProviders externalLogins,
-            UserEditorAuthorizationHelper userEditorAuthorizationHelper)
+            UserEditorAuthorizationHelper userEditorAuthorizationHelper,
+            IPasswordChanger<BackOfficeIdentityUser> passwordChanger)
         {
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
             _contentSettings = contentSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _sqlContext = sqlContext;
@@ -112,6 +115,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _linkGenerator = linkGenerator;
             _externalLogins = externalLogins;
             _userEditorAuthorizationHelper = userEditorAuthorizationHelper;
+            _passwordChanger = passwordChanger;
             _logger = _loggerFactory.CreateLogger<UsersController>();
         }
 
@@ -121,7 +125,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         public ActionResult<string[]> GetCurrentUserAvatarUrls()
         {
-            var urls = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
+            var urls = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
             if (urls == null)
                 return new ValidationErrorResult("Could not access Gravatar endpoint");
 
@@ -132,10 +136,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IActionResult PostSetAvatar(int id, IList<IFormFile> file)
         {
-            return PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
+            return PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache, _mediaFileManager, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
         }
 
-        internal static IActionResult PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
+        internal static IActionResult PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, MediaFileManager mediaFileManager, IShortStringHelper shortStringHelper, ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
         {
             if (files is null)
             {
@@ -172,13 +176,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 using (var fs = file.OpenReadStream())
                 {
-                    mediaFileSystem.AddFile(user.Avatar, fs, true);
+                    mediaFileManager.FileSystem.AddFile(user.Avatar, fs, true);
                 }
 
                 userService.Save(user);
             }
 
-            return new OkObjectResult(user.GetUserAvatarUrls(cache, mediaFileSystem, imageUrlGenerator));
+            return new OkObjectResult(user.GetUserAvatarUrls(cache, mediaFileManager, imageUrlGenerator));
         }
 
         [AppendUserModifiedHeader("id")]
@@ -208,11 +212,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (filePath.IsNullOrWhiteSpace() == false)
             {
-                if (_mediaFileSystem.FileExists(filePath))
-                    _mediaFileSystem.DeleteFile(filePath);
+                if (_mediaFileManager.FileSystem.FileExists(filePath))
+                    _mediaFileManager.FileSystem.DeleteFile(filePath);
             }
 
-            return found.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
+            return found.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
         }
 
         /// <summary>
@@ -444,7 +448,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
-            if (!EmailSender.CanSendRequiredEmail(_globalSettings) && !_userManager.HasSendingUserInviteEventHandler)
+            if (!_emailSender.CanSendRequiredEmail())
             {
                 return new ValidationErrorResult("No Email server is configured");
             }
@@ -483,39 +487,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _userService.Save(user);
             var display = _umbracoMapper.Map<UserDisplay>(user);
 
-            UserInviteEventArgs inviteArgs;
-
-            try
-            {
-                inviteArgs = _userManager.RaiseSendingUserInvite(User, userSave, user);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred in a custom event handler while inviting the user");
-                return ValidationErrorResult.CreateNotificationValidationErrorResult($"An error occurred inviting the user (check logs for more info): {ex.Message}");
-            }
-
-            // If the event is handled then no need to send the email
-            if (inviteArgs.InviteHandled)
-            {
-                // if no user result was created then map the minimum args manually for the UI
-                if (!inviteArgs.ShowUserResult)
-                {
-                    display = new UserDisplay
-                    {
-                        Name = userSave.Name,
-                        Email = userSave.Email,
-                        Username = userSave.Username
-                    };
-                }
-            }
-            else
-            {
-                //send the email
-
-                await SendUserInviteEmailAsync(display, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Email, user, userSave.Message);
-
-            }
+            //send the email
+            await SendUserInviteEmailAsync(display, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Name, _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.Email, user, userSave.Message);
 
             display.AddSuccessNotification(_localizedTextService.Localize("speechBubbles/resendInviteHeader"), _localizedTextService.Localize("speechBubbles/resendInviteSuccess", new[] { user.Name }));
             return display;
@@ -693,21 +666,32 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return new ValidationErrorResult(new SimpleValidationModel(ModelState.ToErrorDictionary()));
             }
 
-            var intId = changingPasswordModel.Id.TryConvertTo<int>();
+            Attempt<int> intId = changingPasswordModel.Id.TryConvertTo<int>();
             if (intId.Success == false)
             {
                 return NotFound();
             }
 
-            var found = _userService.GetUserById(intId.Result);
+            IUser found = _userService.GetUserById(intId.Result);
             if (found == null)
             {
                 return NotFound();
             }
 
-            // TODO: Why don't we inject this? Then we can just inject a logger
-            var passwordChanger = new PasswordChanger(_loggerFactory.CreateLogger<PasswordChanger>());
-            var passwordChangeResult = await passwordChanger.ChangePasswordWithIdentityAsync(_backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser, found, changingPasswordModel, _userManager);
+            IUser currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
+
+            // if it's the current user, the current user cannot reset their own password
+            if (currentUser.Username == found.Username)
+            {
+                return new ValidationErrorResult("Password reset is not allowed");
+            }
+
+            if (!currentUser.IsAdmin() && found.IsAdmin())
+            {
+                return new ValidationErrorResult("The current user cannot change the password for the specified user");
+            }
+
+            Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);
 
             if (passwordChangeResult.Success)
             {
@@ -716,7 +700,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return result;
             }
 
-            foreach (var memberName in passwordChangeResult.Result.ChangeError.MemberNames)
+            foreach (string memberName in passwordChangeResult.Result.ChangeError.MemberNames)
             {
                 ModelState.AddModelError(memberName, passwordChangeResult.Result.ChangeError.ErrorMessage);
             }
@@ -799,7 +783,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     continue;
                 }
 
-                var unlockResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now);
+                var unlockResult = await _userManager.SetLockoutEndDateAsync(user, DateTimeOffset.Now.AddMinutes(-1));
                 if (unlockResult.Succeeded == false)
                 {
                     return new ValidationErrorResult(

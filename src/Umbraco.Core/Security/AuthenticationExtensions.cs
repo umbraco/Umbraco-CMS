@@ -2,9 +2,9 @@
 // See LICENSE for more details.
 
 using System.Globalization;
+using System.Security.Claims;
 using System.Security.Principal;
 using System.Threading;
-using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions
 {
@@ -24,9 +24,9 @@ namespace Umbraco.Extensions
 
         public static CultureInfo GetCulture(this IIdentity identity)
         {
-            if (identity is UmbracoBackOfficeIdentity umbIdentity && umbIdentity.IsAuthenticated)
+            if (identity is ClaimsIdentity umbIdentity && umbIdentity.VerifyBackOfficeIdentity(out _) && umbIdentity.IsAuthenticated)
             {
-                return CultureInfo.GetCultureInfo(umbIdentity.Culture);
+                return CultureInfo.GetCultureInfo(umbIdentity.GetCultureString());
             }
 
             return null;

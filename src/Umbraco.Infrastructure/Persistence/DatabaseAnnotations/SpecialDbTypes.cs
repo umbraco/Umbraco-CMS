@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Persistence.DatabaseAnnotations
+﻿namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations
 {
     /// <summary>
     /// Enum with the two special types that has to be supported because

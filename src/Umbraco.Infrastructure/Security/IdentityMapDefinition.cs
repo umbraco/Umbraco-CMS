@@ -3,7 +3,7 @@
 
 using System;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -11,27 +11,33 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     public class IdentityMapDefinition : IMapDefinition
     {
         private readonly ILocalizedTextService _textService;
         private readonly IEntityService _entityService;
-        private readonly GlobalSettings _globalSettings;
+        private readonly IOptions<GlobalSettings> _globalSettings;
+        private readonly AppCaches _appCaches;
 
-        public IdentityMapDefinition(ILocalizedTextService textService, IEntityService entityService, IOptions<GlobalSettings> globalSettings)
+        public IdentityMapDefinition(
+            ILocalizedTextService textService,
+            IEntityService entityService,
+            IOptions<GlobalSettings> globalSettings,
+            AppCaches appCaches)
         {
             _textService = textService;
             _entityService = entityService;
-            _globalSettings = globalSettings.Value;
+            _globalSettings = globalSettings;
+            _appCaches = appCaches;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IUser, BackOfficeIdentityUser>(
                 (source, context) =>
                 {
-                    var target = new BackOfficeIdentityUser(_globalSettings, source.Id, source.Groups);
+                    var target = new BackOfficeIdentityUser(_globalSettings.Value, source.Id, source.Groups);
                     target.DisableChangeTracking();
                     return target;
                 },
@@ -42,10 +48,10 @@ namespace Umbraco.Core.Security
                     target.EnableChangeTracking();
                 });
 
-            mapper.Define<IMember, MembersIdentityUser>(
+            mapper.Define<IMember, MemberIdentityUser>(
                 (source, context) =>
                 {
-                    var target = new MembersIdentityUser(source.Id);
+                    var target = new MemberIdentityUser(source.Id);
                     target.DisableChangeTracking();
                     return target;
                 },
@@ -57,18 +63,13 @@ namespace Umbraco.Core.Security
                 });
         }
 
-        // Umbraco.Code.MapAll -Id -Groups -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled
+        // Umbraco.Code.MapAll -Id -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled -ConcurrencyStamp -NormalizedEmail -NormalizedUserName -Roles
         private void Map(IUser source, BackOfficeIdentityUser target)
         {
-            // well, the ctor has been fixed
-            /*
-            // these two are already set in ctor but BackOfficeIdentityUser ctor is CompletelyBroken
-            target.Id = source.Id;
-            target.Groups = source.Groups.ToArray();
-            */
+            // NOTE: Groups/Roles are set in the BackOfficeIdentityUser ctor
 
-            target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService);
-            target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService);
+            target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
+            target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
             target.Email = source.Email;
             target.UserName = source.Username;
             target.LastPasswordChangeDateUtc = source.LastPasswordChangeDate.ToUniversalTime();
@@ -80,21 +81,14 @@ namespace Umbraco.Core.Security
             target.PasswordConfig = source.PasswordConfiguration;
             target.StartContentIds = source.StartContentIds;
             target.StartMediaIds = source.StartMediaIds;
-            target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString(); // project CultureInfo to string
+            target.Culture = source.GetUserCulture(_textService, _globalSettings.Value).ToString(); // project CultureInfo to string
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
-
-            // this was in AutoMapper but does not have a setter anyways
-            //target.AllowedSections = source.AllowedSections.ToArray(),
-
-            // these were marked as ignored for AutoMapper but don't have a setter anyways
-            //target.Logins =;
-            //target.Claims =;
-            //target.Roles =;
         }
 
-        private void Map(IMember source, MembersIdentityUser target)
+        // TODO: We need to validate this mapping is OK, we need to get Umbraco.Code working
+        private void Map(IMember source, MemberIdentityUser target)
         {
             target.Email = source.Email;
             target.UserName = source.Username;
@@ -108,6 +102,11 @@ namespace Umbraco.Core.Security
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
+            target.Comments = source.Comments;
+            target.LastLockoutDateUtc = source.LastLockoutDate == DateTime.MinValue ? null : source.LastLockoutDate.ToUniversalTime();
+            target.CreatedDateUtc = source.CreateDate.ToUniversalTime();
+            target.Key = source.Key;
+            target.MemberTypeAlias = source.ContentTypeAlias;
 
             // NB: same comments re AutoMapper as per BackOfficeUser
         }

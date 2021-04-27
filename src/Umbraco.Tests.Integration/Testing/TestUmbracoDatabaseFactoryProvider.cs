@@ -5,9 +5,9 @@ using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
 {
@@ -46,8 +46,8 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             return new UmbracoDatabaseFactory(
                 _loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 _loggerFactory,
-                _globalSettings.Value,
-                _connectionStrings.Value,
+                _globalSettings,
+                _connectionStrings,
                 _mappers,
                 _dbProviderFactoryCreator,
                 _databaseSchemaCreatorFactory);

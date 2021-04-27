@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -9,14 +9,14 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Represents the UserGroupRepository for doing CRUD operations for <see cref="IUserGroup"/>
@@ -291,8 +291,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
-
         protected override void PersistNewItem(IUserGroup entity)
         {
             entity.AddingEntity();
@@ -402,8 +400,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             {
                 throw new InvalidOperationException("This method won't be implemented.");
             }
-
-            protected override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
             #endregion
 

@@ -13,9 +13,9 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common.Builders;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
 {
@@ -74,21 +74,23 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Scoping
         private ScopeProvider GetScopeProvider(NullLoggerFactory instance)
         {
             var fileSystems = new FileSystems(
-                Mock.Of<IServiceProvider>(),
-                Mock.Of<ILogger<FileSystems>>(),
                 instance,
                 Mock.Of<IIOHelper>(),
                 Options.Create(new GlobalSettings()),
                 Mock.Of<IHostingEnvironment>());
 
+            var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), Mock.Of<IMediaPathScheme>(),
+                instance.CreateLogger<MediaFileManager>(), Mock.Of<IShortStringHelper>());
+
             return new ScopeProvider(
                 Mock.Of<IUmbracoDatabaseFactory>(),
                 fileSystems,
                 Options.Create(new CoreDebugSettings()),
-                Mock.Of<IMediaFileSystem>(),
+                mediaFileManager,
                 Mock.Of<ILogger<ScopeProvider>>(),
                 instance,
-                Mock.Of<IRequestCache>()
+                Mock.Of<IRequestCache>(),
+                Mock.Of<IEventAggregator>()
                 );
         }
 

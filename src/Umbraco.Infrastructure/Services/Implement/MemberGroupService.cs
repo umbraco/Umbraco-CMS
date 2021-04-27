@@ -1,49 +1,23 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Notifications;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class MemberGroupService : RepositoryService, IMemberGroupService
+    internal class MemberGroupService : RepositoryService, IMemberGroupService
     {
         private readonly IMemberGroupRepository _memberGroupRepository;
 
         public MemberGroupService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IMemberGroupRepository memberGroupRepository)
-            : base(provider, loggerFactory, eventMessagesFactory)
-        {
+            : base(provider, loggerFactory, eventMessagesFactory) =>
             _memberGroupRepository = memberGroupRepository;
-            //Proxy events!
-            MemberGroupRepository.SavedMemberGroup += MemberGroupRepository_SavedMemberGroup;
-            MemberGroupRepository.SavingMemberGroup += MemberGroupRepository_SavingMemberGroup;
-        }
-
-        #region Proxy event handlers
-
-        void MemberGroupRepository_SavingMemberGroup(IMemberGroupRepository sender, SaveEventArgs<IMemberGroup> e)
-        {
-            if (Saving.IsRaisedEventCancelled(new SaveEventArgs<IMemberGroup>(e.SavedEntities), this))
-                e.Cancel = true;
-        }
-
-        void MemberGroupRepository_SavedMemberGroup(IMemberGroupRepository sender, SaveEventArgs<IMemberGroup> e)
-        {
-            // same as above!
-
-            Saved.RaiseEvent(new SaveEventArgs<IMemberGroup>(e.SavedEntities, false), this);
-        }
-
-        #endregion
 
         public IEnumerable<IMemberGroup> GetAll()
         {
@@ -96,10 +70,13 @@ namespace Umbraco.Core.Services.Implement
             {
                 throw new InvalidOperationException("The name of a MemberGroup can not be empty");
             }
+
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IMemberGroup>(memberGroup);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                var savingNotification = new MemberGroupSavingNotification(memberGroup, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -110,18 +87,19 @@ namespace Umbraco.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
+                    scope.Notifications.Publish(new MemberGroupSavedNotification(memberGroup, evtMsgs).WithStateFrom(savingNotification));
                 }
             }
         }
 
         public void Delete(IMemberGroup memberGroup)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<IMemberGroup>(memberGroup);
-                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                var deletingNotification = new MemberGroupDeletingNotification(memberGroup, evtMsgs);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
@@ -129,35 +107,9 @@ namespace Umbraco.Core.Services.Implement
 
                 _memberGroupRepository.Delete(memberGroup);
                 scope.Complete();
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Deleted, this, deleteEventArgs);
+
+                scope.Notifications.Publish(new MemberGroupDeletedNotification(memberGroup, evtMsgs).WithStateFrom(deletingNotification));
             }
         }
-
-        /// <summary>
-        /// Occurs before Delete of a member group
-        /// </summary>
-        public static event TypedEventHandler<IMemberGroupService, DeleteEventArgs<IMemberGroup>> Deleting;
-
-        /// <summary>
-        /// Occurs after Delete of a member group
-        /// </summary>
-        public static event TypedEventHandler<IMemberGroupService, DeleteEventArgs<IMemberGroup>> Deleted;
-
-        /// <summary>
-        /// Occurs before Save of a member group
-        /// </summary>
-        /// <remarks>
-        /// We need to proxy these events because the events need to take place at the repo level
-        /// </remarks>
-        public static event TypedEventHandler<IMemberGroupService, SaveEventArgs<IMemberGroup>> Saving;
-
-        /// <summary>
-        /// Occurs after Save of a member group
-        /// </summary>
-        /// <remarks>
-        /// We need to proxy these events because the events need to take place at the repo level
-        /// </remarks>
-        public static event TypedEventHandler<IMemberGroupService, SaveEventArgs<IMemberGroup>> Saved;
     }
 }

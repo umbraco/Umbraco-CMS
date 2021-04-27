@@ -7,10 +7,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Security;
-using Umbraco.Extensions;
-using Umbraco.Web.WebAssets;
 
 namespace Umbraco.Extensions
 {
@@ -124,7 +123,7 @@ namespace Umbraco.Extensions
 
         public static async Task<IHtmlContent> AngularValueTinyMceAssetsAsync(this IHtmlHelper html, IRuntimeMinifier runtimeMinifier)
         {
-            var files = await runtimeMinifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoTinyMceJsBundleName);
+            var files = await runtimeMinifier.GetJsAssetPathsAsync(BackOfficeWebAssets.UmbracoTinyMceJsBundleName);
 
             var sb = new StringBuilder();
 

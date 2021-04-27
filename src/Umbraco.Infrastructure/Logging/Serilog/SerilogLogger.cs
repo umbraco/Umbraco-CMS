@@ -4,15 +4,12 @@ using Microsoft.Extensions.Configuration;
 using Serilog;
 using Serilog.Events;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Logging;
 using Umbraco.Extensions;
-using LogLevel = Umbraco.Cms.Core.Logging.LogLevel;
 
-namespace Umbraco.Core.Logging.Serilog
+namespace Umbraco.Cms.Core.Logging.Serilog
 {
-
     ///<summary>
-    /// Implements <see cref="ILogger"/> on top of Serilog.
+    /// Implements MS ILogger on top of Serilog.
     ///</summary>
     public class SerilogLogger : IDisposable
     {

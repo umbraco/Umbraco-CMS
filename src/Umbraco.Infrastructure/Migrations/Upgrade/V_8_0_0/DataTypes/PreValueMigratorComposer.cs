@@ -1,7 +1,7 @@
 ﻿using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0.DataTypes
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.DataTypes
 {
     public class PreValueMigratorComposer : ICoreComposer
 {

@@ -20,6 +20,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Diagnostics;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
@@ -33,11 +34,11 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.SqlCe;
 using Umbraco.Cms.Tests.Common;
-using Umbraco.Core;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
 using Umbraco.Extensions;
 using Umbraco.Web;
 using Umbraco.Web.Hosting;
@@ -62,7 +63,7 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             public override IDbProviderFactoryCreator DbProviderFactoryCreator { get; } = new UmbracoDbProviderFactoryCreator();
-            public DatabaseSchemaCreatorFactory DatabaseSchemaCreatorFactory { get; } = new DatabaseSchemaCreatorFactory(Mock.Of<ILogger<DatabaseSchemaCreator>>(), NullLoggerFactory.Instance, new UmbracoVersion());
+            public DatabaseSchemaCreatorFactory DatabaseSchemaCreatorFactory { get; } = new DatabaseSchemaCreatorFactory(Mock.Of<ILogger<DatabaseSchemaCreator>>(), NullLoggerFactory.Instance, new UmbracoVersion(), Mock.Of<IEventAggregator>());
 
             public override IBulkSqlInsertProvider BulkSqlInsertProvider { get; } = new SqlCeBulkSqlInsertProvider();
 

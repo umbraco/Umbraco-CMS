@@ -7,10 +7,11 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.2",
-    "cypress": "^6.0.1",
+    "cypress": "^6.7.0",
+    "del": "^6.0.0",
     "ncp": "^2.0.0",
     "prompt": "^1.0.0",
-    "umbraco-cypress-testhelpers": "^1.0.0-beta-52"
+    "umbraco-cypress-testhelpers": "^1.0.0-beta-53"
   },
   "dependencies": {
     "typescript": "^3.9.2"

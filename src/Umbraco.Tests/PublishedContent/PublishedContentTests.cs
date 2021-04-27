@@ -7,10 +7,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Logging;
@@ -25,13 +23,11 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PropertyEditors;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.PublishedContent
@@ -55,13 +51,14 @@ namespace Umbraco.Tests.PublishedContent
 
             var loggerFactory = NullLoggerFactory.Instance;
             var mediaService = Mock.Of<IMediaService>();
-            var mediaFileService = Mock.Of<IMediaFileSystem>();
             var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
             var backOfficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
             var publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
             var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
             var serializer = new ConfigurationEditorJsonSerializer();
+            var mediaFileService = new MediaFileManager(Mock.Of<IFileSystem>(), Mock.Of<IMediaPathScheme>(),
+                loggerFactory.CreateLogger<MediaFileManager>(), Mock.Of<IShortStringHelper>());
             var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, loggerFactory.CreateLogger<RichTextEditorPastedImages>(), HostingEnvironment, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper, publishedUrlProvider, serializer);
             var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
             var localizationService = Mock.Of<ILocalizationService>();
@@ -584,7 +581,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(3, result.Length);
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1174, 1173, 1046 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1174, 1173, 1046 }));
         }
 
         [Test]
@@ -597,7 +594,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(2, result.Length);
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1046 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1173, 1046 }));
         }
 
         [Test]
@@ -710,7 +707,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(10, result.Count());
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1046, 1173, 1174, 1176, 1175 }));
         }
 
         [Test]
@@ -723,7 +720,7 @@ namespace Umbraco.Tests.PublishedContent
             Assert.IsNotNull(result);
 
             Assert.AreEqual(9, result.Count());
-            Assert.IsTrue(result.Select(x => ((dynamic)x).Id).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
+            Assert.IsTrue(result.Select(x => ((dynamic)x).GetId()).ContainsAll(new dynamic[] { 1173, 1174, 1176, 1175, 4444 }));
         }
 
         [Test]

@@ -1,7 +1,6 @@
-﻿using NPoco;
-using Umbraco.Core.Migrations.Expressions.Insert.Expressions;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert.Expressions;
 
-namespace Umbraco.Core.Migrations.Expressions.Insert
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert
 {
     /// <summary>
     /// Implements <see cref="IInsertBuilder"/>.

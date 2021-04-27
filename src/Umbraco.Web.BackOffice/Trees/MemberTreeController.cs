@@ -6,17 +6,18 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Trees;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Extensions;
-using Umbraco.Web.Search;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees
@@ -41,8 +42,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor)
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            IEventAggregator eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _treeSearcher = treeSearcher;
             _menuItemCollectionFactory = menuItemCollectionFactory;

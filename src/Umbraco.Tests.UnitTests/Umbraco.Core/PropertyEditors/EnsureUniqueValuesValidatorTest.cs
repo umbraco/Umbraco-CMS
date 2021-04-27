@@ -10,10 +10,10 @@ using Moq;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Serialization;
-using Umbraco.Web.PropertyEditors;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 {

@@ -14,15 +14,15 @@ using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -37,12 +37,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IMemberTypeService MemberTypeService => GetRequiredService<IMemberTypeService>();
 
         private IMemberService MemberService => GetRequiredService<IMemberService>();
-
-        [SetUp]
-        public void SetupTest() =>
-
-            // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            global::Umbraco.Core.Services.Implement.MemberTypeService.ClearScopeEvents();
 
         [Test]
         public void Can_Update_Member_Property_Values()
@@ -225,6 +219,25 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             IEnumerable<int> found = MemberService.GetAllRolesIds();
 
             Assert.AreEqual(3, found.Count());
+        }
+
+        [Test]
+        public void Can_Replace_Roles()
+        {
+            IMemberType memberType = MemberTypeBuilder.CreateSimpleMemberType();
+            MemberTypeService.Save(memberType);
+            IMember member = MemberBuilder.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            MemberService.Save(member);
+
+            string[] roleNames1 = new[] { "TR1", "TR2" };
+            MemberService.AssignRoles(new[] { member.Id }, roleNames1);
+            IEnumerable<string> memberRoles = MemberService.GetAllRoles(member.Id);
+            CollectionAssert.AreEquivalent(roleNames1, memberRoles);
+
+            string[] roleNames2 = new[] { "TR3", "TR4" };
+            MemberService.ReplaceRoles(new[] { member.Id }, roleNames2);
+            memberRoles = MemberService.GetAllRoles(member.Id);
+            CollectionAssert.AreEquivalent(roleNames2, memberRoles);
         }
 
         [Test]

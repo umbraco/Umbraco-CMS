@@ -4,16 +4,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Smidge.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.Common.Profiler;
-using Umbraco.Core.Logging;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware
@@ -36,14 +42,23 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
         private readonly IUmbracoContextFactory _umbracoContextFactory;
         private readonly IRequestCache _requestCache;
-        private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
         private readonly PublishedSnapshotServiceEventHandler _publishedSnapshotServiceEventHandler;
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly UmbracoRequestPaths _umbracoRequestPaths;
+        private readonly BackOfficeWebAssets _backOfficeWebAssets;
+        private readonly SmidgeOptions _smidgeOptions;
         private readonly WebProfiler _profiler;
-        private static bool s_cacheInitialized = false;
+
+        private static bool s_cacheInitialized;
         private static bool s_cacheInitializedFlag = false;
         private static object s_cacheInitializedLock = new object();
+
+#pragma warning disable IDE0044 // Add readonly modifier
+        private static bool s_firstBackOfficeRequest;
+        private static bool s_firstBackOfficeReqestFlag;
+        private static object s_firstBackOfficeRequestLocker = new object();
+#pragma warning restore IDE0044 // Add readonly modifier
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRequestMiddleware"/> class.
@@ -52,19 +67,23 @@ namespace Umbraco.Cms.Web.Common.Middleware
             ILogger<UmbracoRequestMiddleware> logger,
             IUmbracoContextFactory umbracoContextFactory,
             IRequestCache requestCache,
-            IBackOfficeSecurityFactory backofficeSecurityFactory,
             PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler,
             IEventAggregator eventAggregator,
             IProfiler profiler,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            UmbracoRequestPaths umbracoRequestPaths,
+            BackOfficeWebAssets backOfficeWebAssets,
+            IOptions<SmidgeOptions> smidgeOptions)
         {
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
             _requestCache = requestCache;
-            _backofficeSecurityFactory = backofficeSecurityFactory;
             _publishedSnapshotServiceEventHandler = publishedSnapshotServiceEventHandler;
             _eventAggregator = eventAggregator;
             _hostingEnvironment = hostingEnvironment;
+            _umbracoRequestPaths = umbracoRequestPaths;
+            _backOfficeWebAssets = backOfficeWebAssets;
+            _smidgeOptions = smidgeOptions.Value;
             _profiler = profiler as WebProfiler; // Ignore if not a WebProfiler
         }
 
@@ -74,6 +93,8 @@ namespace Umbraco.Cms.Web.Common.Middleware
             // do not process if client-side request
             if (context.Request.IsClientSideRequest())
             {
+                // we need this here because for bundle requests, these are 'client side' requests that we need to handle
+                LazyInitializeBackOfficeServices(context.Request.Path);
                 await next(context);
                 return;
             }
@@ -84,27 +105,22 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
             EnsureContentCacheInitialized();
 
-            _backofficeSecurityFactory.EnsureBackOfficeSecurity();  // Needs to be before UmbracoContext, TODO: Why?
             UmbracoContextReference umbracoContextReference = _umbracoContextFactory.EnsureUmbracoContext();
 
             Uri currentApplicationUrl = GetApplicationUrlFromCurrentRequest(context.Request);
             _hostingEnvironment.EnsureApplicationMainUrl(currentApplicationUrl);
 
-
-            bool isFrontEndRequest = umbracoContextReference.UmbracoContext.IsFrontEndUmbracoRequest();
-
             var pathAndQuery = context.Request.GetEncodedPathAndQuery();
 
             try
             {
-                if (isFrontEndRequest)
-                {
-                    LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
-                    _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, pathAndQuery);
-                }
+                // Verbose log start of every request
+                LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
+                _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, pathAndQuery);
 
                 try
                 {
+                    LazyInitializeBackOfficeServices(context.Request.Path);
                     await _eventAggregator.PublishAsync(new UmbracoRequestBegin(umbracoContextReference.UmbracoContext));
                 }
                 catch (Exception ex)
@@ -127,18 +143,18 @@ namespace Umbraco.Cms.Web.Common.Middleware
             }
             finally
             {
-                if (isFrontEndRequest)
-                {
-                    LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
-                    _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, pathAndQuery, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
-                }
+                // Verbose log end of every request (in v8 we didn't log the end request of ALL requests, only the front-end which was
+                // strange since we always logged the beginning, so now we just log start/end of all requests)
+                LogHttpRequest.TryGetCurrentHttpRequestId(out Guid httpRequestId, _requestCache);
+                _logger.LogTrace("End Request [{HttpRequestId}]: {RequestUrl} ({RequestDuration}ms)", httpRequestId, pathAndQuery, DateTime.Now.Subtract(umbracoContextReference.UmbracoContext.ObjectCreated).TotalMilliseconds);
 
                 try
                 {
-                    DisposeRequestCacheItems(_logger, _requestCache, context.Request);
+                    DisposeHttpContextItems(context.Request);
                 }
                 finally
                 {
+                    // Dispose the umbraco context reference which will in turn dispose the UmbracoContext itself.
                     umbracoContextReference.Dispose();
                 }
             }
@@ -146,6 +162,30 @@ namespace Umbraco.Cms.Web.Common.Middleware
             // Profiling end needs to be last of the first things that happens.
             // Also MiniProfiler.Current becomes null if it is handled by the event aggregator due to async/await
             _profiler?.UmbracoApplicationEndRequest(context);
+        }
+
+        /// <summary>
+        /// Used to lazily initialize any back office services when the first request to the back office is made
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <returns></returns>
+        private void LazyInitializeBackOfficeServices(PathString absPath)
+        {
+            if (s_firstBackOfficeRequest)
+            {
+                return;
+            }
+
+            if (_umbracoRequestPaths.IsBackOfficeRequest(absPath)
+                || absPath.Value.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.CompositeFilePath}")
+                || absPath.Value.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.BundleFilePath}"))
+            {
+                LazyInitializer.EnsureInitialized(ref s_firstBackOfficeRequest, ref s_firstBackOfficeReqestFlag, ref s_firstBackOfficeRequestLocker, () =>
+                {
+                    _backOfficeWebAssets.CreateBundles();
+                    return true;
+                });
+            }
         }
 
         private Uri GetApplicationUrlFromCurrentRequest(HttpRequest request)
@@ -161,9 +201,9 @@ namespace Umbraco.Cms.Web.Common.Middleware
         }
 
         /// <summary>
-        /// Any object that is in the HttpContext.Items collection that is IDisposable will get disposed on the end of the request
+        /// Dispose some request scoped objects that we are maintaining the lifecycle for.
         /// </summary>
-        private static void DisposeRequestCacheItems(ILogger<UmbracoRequestMiddleware> logger, IRequestCache requestCache, HttpRequest request)
+        private void DisposeHttpContextItems(HttpRequest request)
         {
             // do not process if client-side request
             if (request.IsClientSideRequest())
@@ -171,37 +211,9 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 return;
             }
 
-            // get a list of keys to dispose
-            var keys = new HashSet<string>();
-            foreach (var i in requestCache)
-            {
-                if (i.Value is IDisposeOnRequestEnd || i.Key is IDisposeOnRequestEnd)
-                {
-                    keys.Add(i.Key);
-                }
-            }
-
-            // dispose each item and key that was found as disposable.
-            foreach (var k in keys)
-            {
-                try
-                {
-                    requestCache.Get(k).DisposeIfDisposable();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError("Could not dispose item with key " + k, ex);
-                }
-
-                try
-                {
-                    k.DisposeIfDisposable();
-                }
-                catch (Exception ex)
-                {
-                    logger.LogError("Could not dispose item key " + k, ex);
-                }
-            }
+            // ensure this is disposed by DI at the end of the request
+            IHttpScopeReference httpScopeReference = request.HttpContext.RequestServices.GetRequiredService<IHttpScopeReference>();            
+            httpScopeReference.Register();
         }
 
         /// <summary>

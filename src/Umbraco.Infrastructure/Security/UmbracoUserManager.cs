@@ -8,12 +8,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Net;
-using Umbraco.Cms.Core.Security;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Security;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
     /// <summary>
     /// Abstract class for Umbraco User Managers for back office users or front-end members
@@ -51,7 +47,7 @@ namespace Umbraco.Core.Security
 
         /// <inheritdoc />
         public override bool SupportsQueryableUsers => false; // It would be nice to support this but we don't need to currently and that would require IQueryable support for our user service/repository
-        
+
         /// <summary>
         /// Developers will need to override this to support custom 2 factor auth
         /// </summary>
@@ -102,19 +98,7 @@ namespace Umbraco.Core.Security
             string password = _passwordGenerator.GeneratePassword();
             return password;
         }
-
-        /// <summary>
-        /// Generates a hashed password based on the default password hasher
-        /// No existing identity user is required and this does not validate the password
-        /// </summary>
-        /// <param name="password">The password to hash</param>
-        /// <returns>The hashed password</returns>
-        public string HashPassword(string password)
-        {
-            string hashedPassword = PasswordHasher.HashPassword(null, password);
-            return hashedPassword;
-        }
-
+        
         /// <summary>
         /// Used to validate the password without an identity user
         /// Validation code is based on the default ValidatePasswordAsync code

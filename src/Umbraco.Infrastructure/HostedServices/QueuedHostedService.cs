@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Infrastructure.HostedServices
 {
 
     /// <summary>

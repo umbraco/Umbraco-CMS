@@ -8,18 +8,12 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core;
-using Umbraco.Core.Security;
-using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
     // NOTE: has all been ported to netcore but exists here just to keep the build working for tests
 
-    public class UmbracoContext : DisposableObjectSlim, IDisposeOnRequestEnd, IUmbracoContext
+    public class UmbracoContext : DisposableObjectSlim, IUmbracoContext
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;

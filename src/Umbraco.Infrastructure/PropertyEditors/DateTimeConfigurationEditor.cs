@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System.Collections.Generic;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Core.PropertyEditors;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration editor for the datetime value editor.

@@ -1,17 +1,18 @@
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
 using System.Linq;
 using System.Text;
 using HtmlAgilityPack;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Macros;
 using Umbraco.Extensions;
-using Umbraco.Web.Macros;
 
-namespace Umbraco.Web.PropertyEditors.ValueConverters
+namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
 {
     /// <summary>
     /// A value converter for TinyMCE that will ensure any macro content is rendered properly even when
@@ -59,11 +60,11 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                     //callback for when text block is found
                     textBlock => sb.Append(textBlock),
                     //callback for when macro syntax is found
-                    (macroAlias, macroAttributes) => sb.Append(_macroRenderer.Render(
+                    (macroAlias, macroAttributes) => sb.Append(_macroRenderer.RenderAsync(
                         macroAlias,
                         umbracoContext.PublishedRequest?.PublishedContent,
                         //needs to be explicitly casted to Dictionary<string, object>
-                        macroAttributes.ConvertTo(x => (string)x, x => x)).Text));
+                        macroAttributes.ConvertTo(x => (string)x, x => x)).GetAwaiter().GetResult().Text));
 
                 return sb.ToString();
             }

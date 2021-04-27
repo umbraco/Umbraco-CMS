@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.WebAssets;
 
-namespace Umbraco.Web.WebAssets
+namespace Umbraco.Extensions
 {
     public static class RuntimeMinifierExtensions
     {
@@ -15,8 +17,9 @@ namespace Umbraco.Web.WebAssets
         /// <returns></returns>
         public static async Task<string> GetScriptForLoadingBackOfficeAsync(this IRuntimeMinifier minifier, GlobalSettings globalSettings, IHostingEnvironment hostingEnvironment)
         {
-            var files = await minifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoJsBundleName);
-            var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(files, "umbraco", globalSettings, hostingEnvironment);
+            var coreScripts = await minifier.GetJsAssetPathsAsync(BackOfficeWebAssets.UmbracoCoreJsBundleName);
+            var extensionsScripts = await minifier.GetJsAssetPathsAsync(BackOfficeWebAssets.UmbracoExtensionsJsBundleName);
+            var result = BackOfficeJavaScriptInitializer.GetJavascriptInitialization(coreScripts.Union(extensionsScripts), "umbraco", globalSettings, hostingEnvironment);
             result += await GetStylesheetInitializationAsync(minifier);
 
             return result;
@@ -27,7 +30,7 @@ namespace Umbraco.Web.WebAssets
         /// </summary>
         private static async Task<string> GetStylesheetInitializationAsync(IRuntimeMinifier minifier)
         {
-            var files = await minifier.GetAssetPathsAsync(BackOfficeWebAssets.UmbracoCssBundleName);
+            var files = await minifier.GetCssAssetPathsAsync(BackOfficeWebAssets.UmbracoCssBundleName);
             var sb = new StringBuilder();
             foreach (var file in files)
                 sb.AppendFormat("{0}LazyLoad.css('{1}');", Environment.NewLine, file);

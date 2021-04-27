@@ -4,7 +4,7 @@
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Serialization
 {

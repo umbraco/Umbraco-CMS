@@ -22,6 +22,7 @@ namespace Umbraco.Extensions
     ///</summary>
     public static class StringExtensions
     {
+        private const char DefaultEscapedStringEscapeChar = '\\';
         private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
         private static readonly char[] ToCSharpEscapeChars;
 
@@ -40,7 +41,7 @@ namespace Umbraco.Extensions
         /// <returns></returns>
         public static int[] GetIdsFromPathReversed(this string path)
         {
-            var nodeIds = path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var nodeIds = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.TryConvertTo<int>())
                 .Where(x => x.Success)
                 .Select(x => x.Result)
@@ -190,7 +191,7 @@ namespace Umbraco.Extensions
             //remove any prefixed '&' or '?'
             for (var i = 0; i < queryStrings.Length; i++)
             {
-                queryStrings[i] = queryStrings[i].TrimStart('?', '&').TrimEnd('&');
+                queryStrings[i] = queryStrings[i].TrimStart(Constants.CharArrays.QuestionMarkAmpersand).TrimEnd(Constants.CharArrays.Ampersand);
             }
 
             var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
@@ -1100,7 +1101,7 @@ namespace Umbraco.Extensions
             {
                 return false;
             }
-            var idCheckList = csv.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            var idCheckList = csv.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
             return idCheckList.Contains(value);
         }
 
@@ -1115,7 +1116,7 @@ namespace Umbraco.Extensions
             fileName = fileName.StripFileExtension();
 
             // underscores and dashes to spaces
-            fileName = fileName.ReplaceMany(new[] { '_', '-' }, ' ');
+            fileName = fileName.ReplaceMany(Constants.CharArrays.UnderscoreDash, ' ');
 
             // any other conversions ?
 
@@ -1123,7 +1124,7 @@ namespace Umbraco.Extensions
             fileName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(fileName);
 
             // Replace multiple consecutive spaces with a single space
-            fileName = string.Join(" ", fileName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+            fileName = string.Join(" ", fileName.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries));
 
             return fileName;
         }
@@ -1436,6 +1437,45 @@ namespace Umbraco.Extensions
         public static string ToSafeFileName(this string text, IShortStringHelper shortStringHelper, string culture)
         {
             return shortStringHelper.CleanStringForSafeFileName(text, culture);
+        }
+
+        /// <summary>
+        /// Splits a string with an escape character that allows for the split character to exist in a string
+        /// </summary>
+        /// <param name="value">The string to split</param>
+        /// <param name="splitChar">The character to split on</param>
+        /// <param name="escapeChar">The character which can be used to escape the character to split on</param>
+        /// <returns>The string split into substrings delimited by the split character</returns>
+        public static IEnumerable<string> EscapedSplit(this string value, char splitChar, char escapeChar = DefaultEscapedStringEscapeChar)
+        {
+            if (value == null) yield break;
+
+            var sb = new StringBuilder(value.Length);
+            var escaped = false;
+
+            foreach (var chr in value.ToCharArray())
+            {
+                if (escaped)
+                {
+                    escaped = false;
+                    sb.Append(chr);
+                }
+                else if (chr == splitChar)
+                {
+                    yield return sb.ToString();
+                    sb.Clear();
+                }
+                else if (chr == escapeChar)
+                {
+                    escaped = true;
+                }
+                else
+                {
+                    sb.Append(chr);
+                }
+            }
+
+            yield return sb.ToString();
         }
     }
 }

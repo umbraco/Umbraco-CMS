@@ -7,10 +7,10 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Web.Common.Attributes;
-using Umbraco.Examine;
 using Umbraco.Extensions;
-using Umbraco.Web.Search;
 using Constants = Umbraco.Cms.Core.Constants;
 using SearchResult = Umbraco.Cms.Core.Models.ContentEditing.SearchResult;
 
@@ -25,7 +25,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
         private readonly IAppPolicyCache _runtimeCache;
         private readonly IndexRebuilder _indexRebuilder;
-
 
         public ExamineManagementController(IExamineManager examineManager, ILogger<ExamineManagementController> logger, IIOHelper ioHelper, IIndexDiagnosticsFactory indexDiagnosticsFactory,
             AppCaches appCaches,
@@ -81,13 +80,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 {
                     Id = x.Id,
                     Score = x.Score,
-                    //order the values by key
-                    Values = new Dictionary<string, string>(x.Values.OrderBy(y => y.Key).ToDictionary(y => y.Key, y => y.Value))
+                    Values = x.AllValues.OrderBy(y => y.Key).ToDictionary(y => y.Key, y => y.Value)
                 })
             };
         }
-
-
 
         /// <summary>
         /// Check if the index has been rebuilt
@@ -116,7 +112,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return found != null
                 ? null
                 : CreateModel(index);
-
         }
 
         /// <summary>
@@ -175,11 +170,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var indexDiag = _indexDiagnosticsFactory.Create(index);
 
             var isHealth = indexDiag.IsHealthy();
+
             var properties = new Dictionary<string, object>
             {
                 [nameof(IIndexDiagnostics.DocumentCount)] = indexDiag.DocumentCount,
                 [nameof(IIndexDiagnostics.FieldCount)] = indexDiag.FieldCount,
             };
+
             foreach (var p in indexDiag.Metadata)
                 properties[p.Key] = p.Value;
 
@@ -190,7 +187,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 ProviderProperties = properties,
                 CanRebuild = _indexRebuilder.CanRebuild(index)
             };
-
 
             return indexerModel;
         }
@@ -203,7 +199,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 searcher = index.GetSearcher();
                 return new OkResult();
             }
-
 
             //if we didn't find anything try to find it by an explicitly declared searcher
             if (_examineManager.TryGetSearcher(searcherName, out searcher))

@@ -1,15 +1,17 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     internal class UploadFileTypeValidator : IValueValidator
     {
@@ -37,7 +39,7 @@ namespace Umbraco.Web.PropertyEditors
                     yield break;
             }
 
-            var fileNames = selectedFiles?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var fileNames = selectedFiles?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
             if (fileNames == null || !fileNames.Any())
                 yield break;

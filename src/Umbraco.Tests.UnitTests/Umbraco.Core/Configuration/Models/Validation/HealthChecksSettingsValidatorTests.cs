@@ -4,9 +4,9 @@
 using System;
 using Microsoft.Extensions.Options;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Configuration.Models.Validation;
-using Umbraco.Core.Configuration;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models.Validation
 {

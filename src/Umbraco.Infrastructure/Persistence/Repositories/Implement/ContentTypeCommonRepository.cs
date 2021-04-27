@@ -7,13 +7,13 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Implements <see cref="IContentTypeCommonRepository"/>.
@@ -176,9 +176,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 while (compositionIx < compositionDtos.Count && compositionDtos[compositionIx].ChildId == contentType.Id)
                 {
                     var parentDto = compositionDtos[compositionIx];
-                    if (!contentTypes.TryGetValue(parentDto.ParentId, out var parentContentType)) continue;
-                    contentType.AddContentType(parentContentType);
                     compositionIx++;
+
+                    if (!contentTypes.TryGetValue(parentDto.ParentId, out var parentContentType))
+                        continue;
+                    contentType.AddContentType(parentContentType);
                 }
             }
         }

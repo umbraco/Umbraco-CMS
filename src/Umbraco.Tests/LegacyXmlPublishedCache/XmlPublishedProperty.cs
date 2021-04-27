@@ -4,11 +4,9 @@ using System.Xml.Serialization;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Xml;
-using Umbraco.Core.PropertyEditors;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
-
     /// <summary>
     /// Represents an IDocumentProperty which is created based on an Xml structure.
     /// </summary>

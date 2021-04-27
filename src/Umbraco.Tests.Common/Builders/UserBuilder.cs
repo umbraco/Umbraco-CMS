@@ -12,6 +12,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Common.Builders
 {
+
     public class UserBuilder : UserBuilder<object>
     {
         public UserBuilder()

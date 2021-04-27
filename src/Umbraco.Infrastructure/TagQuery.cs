@@ -6,11 +6,8 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Models;
-using Umbraco.Core.Services;
-using Umbraco.Web.Models;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Implements <see cref="ITagQuery"/>.
@@ -19,12 +16,12 @@ namespace Umbraco.Web
     {
         private readonly ITagService _tagService;
         private readonly IPublishedContentQuery _contentQuery;
-        private readonly UmbracoMapper _mapper;
+        private readonly IUmbracoMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TagQuery"/> class.
         /// </summary>
-        public TagQuery(ITagService tagService, IPublishedContentQuery contentQuery, UmbracoMapper mapper)
+        public TagQuery(ITagService tagService, IPublishedContentQuery contentQuery, IUmbracoMapper mapper)
         {
             _tagService = tagService ?? throw new ArgumentNullException(nameof(tagService));
             _contentQuery = contentQuery ?? throw new ArgumentNullException(nameof(contentQuery));

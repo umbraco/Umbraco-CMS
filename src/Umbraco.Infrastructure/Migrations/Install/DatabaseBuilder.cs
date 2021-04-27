@@ -4,14 +4,14 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Migrations.Upgrade;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Install
+namespace Umbraco.Cms.Infrastructure.Migrations.Install
 {
     /// <summary>
     /// Supports building and configuring the database.
@@ -156,7 +156,7 @@ namespace Umbraco.Core.Migrations.Install
         {
             _configManipulator.SaveConnectionString(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);
 
-            var path = _hostingEnvironment.MapPathContentRoot(Path.Combine("App_Data", "Umbraco.sdf"));
+            var path = _hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.Data, "Umbraco.sdf"));
             if (File.Exists(path) == false)
             {
                 // this should probably be in a "using (new SqlCeEngine)" clause but not sure

@@ -3,7 +3,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Querying
+namespace Umbraco.Cms.Infrastructure.Persistence.Querying
 {
     /// <summary>
     /// String extension methods used specifically to translate into SQL

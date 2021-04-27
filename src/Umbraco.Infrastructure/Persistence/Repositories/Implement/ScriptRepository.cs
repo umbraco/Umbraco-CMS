@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Represents the Script Repository
@@ -19,7 +19,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IIOHelper _ioHelper;
         private readonly GlobalSettings _globalSettings;
 
-        public ScriptRepository(IFileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
+        public ScriptRepository(FileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
             : base(fileSystems.ScriptsFileSystem)
         {
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));

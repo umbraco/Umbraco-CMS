@@ -10,10 +10,9 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Semver;
-using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     /// <summary>
     /// Represents the Packaging Service, which provides import/export functionality for the Core models of the API
@@ -23,6 +22,7 @@ namespace Umbraco.Core.Services.Implement
     {
         private readonly IPackageInstallation _packageInstallation;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly IEventAggregator _eventAggregator;
         private readonly IAuditService _auditService;
         private readonly ICreatedPackagesRepository _createdPackages;
         private readonly IInstalledPackagesRepository _installedPackages;
@@ -33,13 +33,15 @@ namespace Umbraco.Core.Services.Implement
             ICreatedPackagesRepository createdPackages,
             IInstalledPackagesRepository installedPackages,
             IPackageInstallation packageInstallation,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            IEventAggregator eventAggregator)
         {
             _auditService = auditService;
             _createdPackages = createdPackages;
             _installedPackages = installedPackages;
             _packageInstallation = packageInstallation;
             _hostingEnvironment = hostingEnvironment;
+            _eventAggregator = eventAggregator;
         }
 
         #region Package Files
@@ -118,8 +120,12 @@ namespace Umbraco.Core.Services.Implement
             var compiledPackage = GetCompiledPackageInfo(packageFile);
             if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFile);
 
-            if (ImportingPackage.IsRaisedEventCancelled(new ImportPackageEventArgs<string>(packageFile.Name, compiledPackage), this))
+            // Trigger the Importing Package Notification and stop execution if event/user is cancelling it
+            var importingPackageNotification = new ImportingPackageNotification(packageFile.Name, compiledPackage);
+            if (_eventAggregator.PublishCancelable(importingPackageNotification))
+            {
                 return new InstallationSummary { MetaData = compiledPackage };
+            }
 
             var summary = _packageInstallation.InstallPackageData(packageDefinition, compiledPackage, userId);
 
@@ -127,7 +133,8 @@ namespace Umbraco.Core.Services.Implement
 
             _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
 
-            ImportedPackage.RaiseEvent(new ImportPackageEventArgs<InstallationSummary>(summary, compiledPackage, false), this);
+            // trigger the ImportedPackage event
+            _eventAggregator.Publish(new ImportedPackageNotification(summary, compiledPackage).WithStateFrom(importingPackageNotification));
 
             return summary;
         }
@@ -169,7 +176,7 @@ namespace Umbraco.Core.Services.Implement
             }
 
             // trigger the UninstalledPackage event
-            UninstalledPackage.RaiseEvent(new UninstallPackageEventArgs(allSummaries, false), this);
+            _eventAggregator.Publish(new UninstallPackageNotification(allSummaries));
 
             return summary;
         }
@@ -237,26 +244,5 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
-
-        #region Event Handlers
-
-        /// <summary>
-        /// Occurs before Importing umbraco package
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<string>> ImportingPackage;
-
-        /// <summary>
-        /// Occurs after a package is imported
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, ImportPackageEventArgs<InstallationSummary>> ImportedPackage;
-
-        /// <summary>
-        /// Occurs after a package is uninstalled
-        /// </summary>
-        public static event TypedEventHandler<IPackagingService, UninstallPackageEventArgs> UninstalledPackage;
-
-        #endregion
-
-
     }
 }

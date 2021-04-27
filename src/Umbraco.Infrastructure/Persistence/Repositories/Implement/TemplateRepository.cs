@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -11,15 +11,14 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Represents the Template Repository
@@ -31,7 +30,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IFileSystem _viewsFileSystem;
         private readonly ViewHelper _viewHelper;
 
-        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TemplateRepository> logger, IFileSystems fileSystems,  IIOHelper ioHelper, IShortStringHelper shortStringHelper)
+        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TemplateRepository> logger, FileSystems fileSystems,  IIOHelper ioHelper, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger)
         {
             _ioHelper = ioHelper;
@@ -141,7 +140,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.Template;
+        protected Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.Template;
 
         protected override void PersistNewItem(ITemplate entity)
         {

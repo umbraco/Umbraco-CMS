@@ -1,9 +1,11 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using HtmlAgilityPack;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -15,9 +17,8 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     public sealed class RichTextEditorPastedImages
     {
@@ -26,21 +27,30 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMediaService _mediaService;
         private readonly IContentTypeBaseServiceProvider _contentTypeBaseServiceProvider;
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IJsonSerializer _serializer;
 
         const string TemporaryImageDataAttribute = "data-tmpimg";
 
-        public RichTextEditorPastedImages(IUmbracoContextAccessor umbracoContextAccessor, ILogger<RichTextEditorPastedImages> logger, IHostingEnvironment hostingEnvironment, IMediaService mediaService, IContentTypeBaseServiceProvider contentTypeBaseServiceProvider, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, IPublishedUrlProvider publishedUrlProvider,  IJsonSerializer serializer)
+        public RichTextEditorPastedImages(
+            IUmbracoContextAccessor umbracoContextAccessor,
+            ILogger<RichTextEditorPastedImages> logger,
+            IHostingEnvironment hostingEnvironment,
+            IMediaService mediaService,
+            IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
+            MediaFileManager mediaFileManager,
+            IShortStringHelper shortStringHelper,
+            IPublishedUrlProvider publishedUrlProvider,
+            IJsonSerializer serializer)
         {
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _hostingEnvironment = hostingEnvironment;
             _mediaService = mediaService ?? throw new ArgumentNullException(nameof(mediaService));
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider ?? throw new ArgumentNullException(nameof(contentTypeBaseServiceProvider));
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
             _shortStringHelper = shortStringHelper;
             _publishedUrlProvider = publishedUrlProvider;
             _serializer = serializer;
@@ -97,7 +107,7 @@ namespace Umbraco.Web.PropertyEditors
                     if (fileStream == null) throw new InvalidOperationException("Could not acquire file stream");
                     using (fileStream)
                     {
-                        mediaFile.SetValue(_mediaFileSystem, _shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File, safeFileName, fileStream);
+                        mediaFile.SetValue(_mediaFileManager, _shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File, safeFileName, fileStream);
                     }
 
                     _mediaService.Save(mediaFile, userId);

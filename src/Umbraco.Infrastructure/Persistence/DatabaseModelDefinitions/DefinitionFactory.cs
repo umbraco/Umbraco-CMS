@@ -3,11 +3,11 @@ using System.Linq;
 using System.Reflection;
 using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
+namespace Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions
 {
     internal static class DefinitionFactory
     {
@@ -161,7 +161,7 @@ namespace Umbraco.Core.Persistence.DatabaseModelDefinitions
 
             if (string.IsNullOrEmpty(attribute.ForColumns) == false)
             {
-                var columns = attribute.ForColumns.Split(',').Select(p => p.Trim());
+                var columns = attribute.ForColumns.Split(Constants.CharArrays.Comma).Select(p => p.Trim());
                 foreach (var column in columns)
                 {
                     definition.Columns.Add(new IndexColumnDefinition {Name = column, Direction = Direction.Ascending});

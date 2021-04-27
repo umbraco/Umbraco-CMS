@@ -5,14 +5,14 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Represents the Stylesheet Repository
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, IStylesheet>, IStylesheetRepository
     {
-        public StylesheetRepository(IFileSystems fileSystems)
+        public StylesheetRepository(FileSystems fileSystems)
             : base(fileSystems.StylesheetsFileSystem)
         {
         }

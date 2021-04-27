@@ -13,18 +13,18 @@ namespace Umbraco.Cms.Core.Media
     /// </summary>
     public class UploadAutoFillProperties
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly ILogger<UploadAutoFillProperties> _logger;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IImageDimensionExtractor _imageDimensionExtractor;
 
         public UploadAutoFillProperties(
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             ILogger<UploadAutoFillProperties> logger,
             IImageUrlGenerator imageUrlGenerator,
             IImageDimensionExtractor imageDimensionExtractor)
         {
-            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _imageUrlGenerator = imageUrlGenerator ?? throw new ArgumentNullException(nameof(imageUrlGenerator));
             _imageDimensionExtractor = imageDimensionExtractor ?? throw new ArgumentNullException(nameof(imageDimensionExtractor));
@@ -69,9 +69,9 @@ namespace Umbraco.Cms.Core.Media
                 // if anything goes wrong, just reset the properties
                 try
                 {
-                    using (var filestream = _mediaFileSystem.OpenFile(filepath))
+                    using (var filestream = _mediaFileManager.FileSystem.OpenFile(filepath))
                     {
-                        var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
+                        var extension = (Path.GetExtension(filepath) ?? "").TrimStart(Constants.CharArrays.Period);
                         var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (ImageSize?)_imageDimensionExtractor.GetDimensions(filestream) : null;
                         SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
                     }
@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Core.Media
             }
             else
             {
-                var extension = (Path.GetExtension(filepath) ?? "").TrimStart('.');
+                var extension = (Path.GetExtension(filepath) ?? "").TrimStart(Constants.CharArrays.Period);
                 var size = _imageUrlGenerator.IsSupportedImageFormat(extension) ? (ImageSize?)_imageDimensionExtractor.GetDimensions(filestream) : null;
                 SetProperties(content, autoFillConfig, size, filestream.Length, extension, culture, segment);
             }

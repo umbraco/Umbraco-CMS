@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using Examine;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Examine;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class EntityMapDefinition : IMapDefinition
     {
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IEntitySlim, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<PropertyType, EntityBasic>((source, context) => new EntityBasic(), Map);

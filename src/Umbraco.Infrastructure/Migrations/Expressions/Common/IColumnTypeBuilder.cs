@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations.Expressions.Common
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Common
 {
     /// <summary>
     /// Builds a column type expression.

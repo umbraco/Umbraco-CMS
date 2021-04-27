@@ -1,7 +1,8 @@
-﻿using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
+using System;
+using NPoco;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     [TableName(TableName)]
     [PrimaryKey("nodeId", AutoIncrement = false)]
@@ -30,6 +31,25 @@ namespace Umbraco.Core.Persistence.Dtos
         [Length(1000)]
         [Constraint(Default = "''")]
         public string Password { get; set; }
+
+        /// <summary>
+        /// This will represent a JSON structure of how the password has been created (i.e hash algorithm, iterations)
+        /// </summary>
+        [Column("passwordConfig")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(500)]
+        public string PasswordConfig { get; set; }
+
+        [Column("securityStampToken")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        [Length(255)]
+        public string SecurityStampToken { get; set; }
+
+        [Column("emailConfirmedDate")]
+        [NullSetting(NullSetting = NullSettings.Null)]
+        public DateTime? EmailConfirmedDate { get; set; }
+
+        // TODO: It would be SOOOOO much better to store all core member data here instead of hiding it in Umbraco properties
 
         [ResultColumn]
         [Reference(ReferenceType.OneToOne, ReferenceMemberName = "NodeId")]

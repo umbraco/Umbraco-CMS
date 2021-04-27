@@ -3,7 +3,7 @@ using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core;
-using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 
 namespace Umbraco.Extensions
 {
@@ -12,18 +12,22 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class ImageCropperTemplateExtensions
     {
+
+        private static readonly JsonSerializerSettings s_imageCropperValueJsonSerializerSettings = new JsonSerializerSettings
+        {
+            Culture = CultureInfo.InvariantCulture,
+            FloatParseHandling = FloatParseHandling.Decimal
+        };
+
         internal static ImageCropperValue DeserializeImageCropperValue(this string json)
         {
-            var imageCrops = new ImageCropperValue();
+            ImageCropperValue imageCrops = null;
+
             if (json.DetectIsJson())
             {
                 try
                 {
-                    imageCrops = JsonConvert.DeserializeObject<ImageCropperValue>(json, new JsonSerializerSettings
-                    {
-                        Culture = CultureInfo.InvariantCulture,
-                        FloatParseHandling = FloatParseHandling.Decimal
-                    });
+                    imageCrops = JsonConvert.DeserializeObject<ImageCropperValue>(json, s_imageCropperValueJsonSerializerSettings);
                 }
                 catch (Exception ex)
                 {
@@ -31,7 +35,9 @@ namespace Umbraco.Extensions
                 }
             }
 
+            imageCrops ??= new ImageCropperValue();
             return imageCrops;
+
         }
     }
 }

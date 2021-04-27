@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Migrations.Expressions.Rename.Column;
-using Umbraco.Core.Migrations.Expressions.Rename.Table;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Column;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Table;
 
-namespace Umbraco.Core.Migrations.Expressions.Rename
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename
 {
     /// <summary>
     /// Builds a Rename expression.

@@ -46,7 +46,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
             args.scope.$broadcast("formSubmitting", { scope: args.scope, action: args.action });
 
             this.focusOnFirstError(currentForm);
-            
+
             // Some property editors need to perform an action after all property editors have reacted to the formSubmitting.
             args.scope.$broadcast("formSubmittingFinalPhase", { scope: args.scope, action: args.action });
 
@@ -80,7 +80,7 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
          *
          * @description
          * Called by submitForm when a form has been submitted, it will fire a focus on the first found invalid umb-property it finds in the form..
-         * 
+         *
          * @param {object} form Pass in a form object.
          */
         focusOnFirstError: function(form) {
@@ -89,9 +89,9 @@ function formHelper(angularHelper, serverValidationManager, notificationsService
 
             if(firstInvalidNgForm.length !== 0) {
                 var focusableFields = [...firstInvalidNgForm.find("umb-range-slider .noUi-handle,input,textarea,select,button")];
-                if(focusableFields.length !== 0) { 
+                if(focusableFields.length !== 0) {
                     var firstErrorEl = focusableFields.find(el => el.type !== "hidden" && el.hasAttribute("readonly") === false);
-                    if(firstErrorEl.length !== 0) {
+                    if(firstErrorEl !== undefined) {
                         firstErrorEl.focus();
                     }
                 }

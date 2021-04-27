@@ -1,4 +1,4 @@
-namespace Umbraco.Core.Migrations.Expressions.Rename.Expressions
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Expressions
 {
     public class RenameColumnExpression : MigrationExpressionBase
     {

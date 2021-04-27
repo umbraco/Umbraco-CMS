@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
     {
         private readonly IContentService _contentService;
 
-        public BlueprintItemBinder(IJsonSerializer jsonSerializer, UmbracoMapper umbracoMapper, IContentService contentService, IContentTypeService contentTypeService, IHostingEnvironment hostingEnvironment) : base(jsonSerializer, umbracoMapper, contentService, contentTypeService, hostingEnvironment)
+        public BlueprintItemBinder(IJsonSerializer jsonSerializer, IUmbracoMapper umbracoMapper, IContentService contentService, IContentTypeService contentTypeService, IHostingEnvironment hostingEnvironment) : base(jsonSerializer, umbracoMapper, contentService, contentTypeService, hostingEnvironment)
         {
             _contentService = contentService;
         }

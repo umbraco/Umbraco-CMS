@@ -1,11 +1,9 @@
-﻿using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Core;
-using Umbraco.Core.PropertyEditors;
-using Constants = Umbraco.Cms.Core.Constants;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Web.PropertyEditors
+using Newtonsoft.Json.Linq;
+
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the grid value editor.

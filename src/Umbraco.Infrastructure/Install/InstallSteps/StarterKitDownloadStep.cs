@@ -8,11 +8,8 @@ using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Services;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Security;
 
-namespace Umbraco.Web.Install.InstallSteps
+namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall,
         "StarterKitDownload", "starterKit", 30, "Adding a simple website to Umbraco, will make it easier for you to get started",

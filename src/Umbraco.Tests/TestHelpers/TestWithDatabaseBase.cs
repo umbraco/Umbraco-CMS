@@ -11,29 +11,29 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Persistence.SqlCe;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.Testing;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.WebApi;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -145,7 +145,7 @@ namespace Umbraco.Tests.TestHelpers
 
         protected virtual ISqlSyntaxProvider GetSyntaxProvider()
         {
-            return new SqlCeSyntaxProvider();
+            return new SqlCeSyntaxProvider(Microsoft.Extensions.Options.Options.Create(new GlobalSettings()));
         }
 
         protected virtual string GetDbProviderName()
@@ -268,7 +268,6 @@ namespace Umbraco.Tests.TestHelpers
                 HostingEnvironment,
                 HostingLifetime,
                 ShortStringHelper,
-                new SiteDomainHelper(),
                 Factory.GetRequiredService<IEntityXmlSerializer>(),
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);
@@ -304,7 +303,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion);
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, Mock.Of<IEventAggregator>());
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 

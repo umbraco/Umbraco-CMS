@@ -32,13 +32,13 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Web.Common.AspNetCore;
-using Umbraco.Core;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Persistence.Mappers;
 using Constants = Umbraco.Cms.Core.Constants;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
         public static Lazy<ISqlContext> GetMockSqlContext()
         {
             ISqlContext sqlContext = Mock.Of<ISqlContext>();
-            var syntax = new SqlServerSyntaxProvider();
+            var syntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
             Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(syntax);
             return new Lazy<ISqlContext>(() => sqlContext);
         }

@@ -17,8 +17,8 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common;
-using Umbraco.Core.Serialization;
 using Umbraco.Extensions;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers.Stubs;
@@ -110,10 +110,8 @@ namespace Umbraco.Tests.TestHelpers
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),
                 container?.GetRequiredService<IPublishedValueFallback>() ?? Current.Factory.GetRequiredService<IPublishedValueFallback>(),
-                container?.GetRequiredService<IPublicAccessChecker>() ?? Current.Factory.GetRequiredService<IPublicAccessChecker>(),
                 container?.GetRequiredService<IFileService>() ?? Current.Factory.GetRequiredService<IFileService>(),
                 container?.GetRequiredService<IContentTypeService>() ?? Current.Factory.GetRequiredService<IContentTypeService>(),
-                container?.GetRequiredService<IPublicAccessService>() ?? Current.Factory.GetRequiredService<IPublicAccessService>(),
                 umbracoContextAccessor,
                 Mock.Of<IEventAggregator>()
             );

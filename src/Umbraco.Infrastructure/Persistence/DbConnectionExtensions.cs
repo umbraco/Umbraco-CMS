@@ -5,10 +5,10 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using StackExchange.Profiling.Data;
 using Umbraco.Cms.Core;
-using Umbraco.Core.Persistence.FaultHandling;
+using Umbraco.Cms.Infrastructure.Persistence.FaultHandling;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Extensions
 {
     public static class DbConnectionExtensions
     {

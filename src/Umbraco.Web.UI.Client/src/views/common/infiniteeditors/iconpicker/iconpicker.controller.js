@@ -10,6 +10,10 @@ function IconPickerController($scope, localizationService, iconHelper) {
 
     var vm = this;
 
+    vm.filter = {
+        searchTerm: ''
+    };
+
     vm.selectIcon = selectIcon;
     vm.selectColor = selectColor;
     vm.submit = submit;

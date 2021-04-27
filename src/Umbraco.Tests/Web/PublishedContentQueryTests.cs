@@ -8,10 +8,10 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Examine;
+using Umbraco.Cms.Infrastructure;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web;
-using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Tests.Web
 {

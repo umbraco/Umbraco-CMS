@@ -1,16 +1,14 @@
-﻿using System.Collections.Generic;
-using System.Text.RegularExpressions;
-using Examine;
-using Umbraco.Core;
+﻿using Examine;
+using Umbraco.Extensions;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Custom <see cref="FieldDefinitionCollection"/> allowing dynamic creation of <see cref="FieldDefinition"/>
     /// </summary>
     public class UmbracoFieldDefinitionCollection : FieldDefinitionCollection
     {
-        
+
         public UmbracoFieldDefinitionCollection()
             : base(UmbracoIndexFieldDefinitions)
         {
@@ -91,6 +89,6 @@ namespace Umbraco.Examine
             return false;
         }
 
-        
+
     }
 }

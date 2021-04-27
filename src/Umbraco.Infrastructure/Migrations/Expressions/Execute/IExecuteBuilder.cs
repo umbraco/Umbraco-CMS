@@ -1,8 +1,8 @@
 ﻿using NPoco;
-using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Core.Migrations.Expressions.Execute
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute
 {
     /// <summary>
     /// Builds and executes an Sql statement.

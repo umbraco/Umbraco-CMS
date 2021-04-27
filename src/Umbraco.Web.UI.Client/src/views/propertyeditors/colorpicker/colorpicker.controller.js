@@ -2,16 +2,16 @@ function ColorPickerController($scope, $timeout) {
 
     var vm = this;
 
-    //setup the default config
+    // setup the default config
     var config = {
         items: [],
         multiple: false
     };
     
-    //map the user config
-    angular.extend(config, $scope.model.config);
+    // map the user config
+    Utilities.extend(config, $scope.model.config);
 
-    //map back to the model
+    // map back to the model
     $scope.model.config = config;
     
     $scope.isConfigured = $scope.model.config && $scope.model.config.items && _.keys($scope.model.config.items).length > 0;
@@ -63,7 +63,7 @@ function ColorPickerController($scope, $timeout) {
         // this is required to re-validate
         $timeout(function () {
             var newColor = color ? color.value : null;
-            $scope.propertyForm.selectedColor.$setViewValue(newColor);
+            vm.modelValueForm.selectedColor.$setViewValue(newColor);
         });
     };
 

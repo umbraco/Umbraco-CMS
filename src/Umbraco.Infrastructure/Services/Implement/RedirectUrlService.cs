@@ -4,15 +4,11 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Events;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Scoping;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
-    internal class RedirectUrlService : ScopeRepositoryService, IRedirectUrlService
+    internal class RedirectUrlService : RepositoryService, IRedirectUrlService
     {
         private readonly IRedirectUrlRepository _redirectUrlRepository;
 

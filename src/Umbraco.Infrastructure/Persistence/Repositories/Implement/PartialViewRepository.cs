@@ -7,13 +7,13 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     internal class PartialViewRepository : FileRepository<string, IPartialView>, IPartialViewRepository
     {
         private readonly IIOHelper _ioHelper;
 
-        public PartialViewRepository(IFileSystems fileSystems, IIOHelper ioHelper)
+        public PartialViewRepository(FileSystems fileSystems, IIOHelper ioHelper)
             : base(fileSystems.PartialViewsFileSystem)
         {
             _ioHelper = ioHelper;

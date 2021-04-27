@@ -13,11 +13,10 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Security;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Filters
@@ -35,7 +34,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         private class CheckIfUserTicketDataIsStaleFilter : IAsyncActionFilter
         {
             private readonly IRequestCache _requestCache;
-            private readonly UmbracoMapper _umbracoMapper;
+            private readonly IUmbracoMapper _umbracoMapper;
             private readonly IUserService _userService;
             private readonly IEntityService _entityService;
             private readonly ILocalizedTextService _localizedTextService;
@@ -43,17 +42,19 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
             private readonly IBackOfficeSignInManager _backOfficeSignInManager;
             private readonly IBackOfficeAntiforgery _backOfficeAntiforgery;
             private readonly IScopeProvider _scopeProvider;
+            private readonly AppCaches _appCaches;
 
             public CheckIfUserTicketDataIsStaleFilter(
                 IRequestCache requestCache,
-                UmbracoMapper umbracoMapper,
+                IUmbracoMapper umbracoMapper,
                 IUserService userService,
                 IEntityService entityService,
                 ILocalizedTextService localizedTextService,
                 IOptions<GlobalSettings> globalSettings,
                 IBackOfficeSignInManager backOfficeSignInManager,
                 IBackOfficeAntiforgery backOfficeAntiforgery,
-                IScopeProvider scopeProvider)
+                IScopeProvider scopeProvider,
+                AppCaches appCaches)
             {
                 _requestCache = requestCache;
                 _umbracoMapper = umbracoMapper;
@@ -64,6 +65,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 _backOfficeSignInManager = backOfficeSignInManager;
                 _backOfficeAntiforgery = backOfficeAntiforgery;
                 _scopeProvider = scopeProvider;
+                _appCaches = appCaches;
             }
 
 
@@ -86,10 +88,9 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             private async Task UpdateTokensAndAppendCustomHeaders(ActionExecutingContext actionContext)
             {
-                var tokenFilter =
-                    new SetAngularAntiForgeryTokensAttribute.SetAngularAntiForgeryTokensFilter(_backOfficeAntiforgery,
-                        _globalSettings);
-                await tokenFilter.OnActionExecutionAsync(actionContext,
+                var tokenFilter = new SetAngularAntiForgeryTokensAttribute.SetAngularAntiForgeryTokensFilter(_backOfficeAntiforgery);
+                await tokenFilter.OnActionExecutionAsync(
+                    actionContext,
                     () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null)));
 
                 // add the header
@@ -112,13 +113,12 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         return;
                     }
 
-                    var identity = actionContext.HttpContext.User.Identity as UmbracoBackOfficeIdentity;
-                    if (identity == null)
+                    if (actionContext.HttpContext.User.Identity is not ClaimsIdentity identity)
                     {
                         return;
                     }
 
-                    Attempt<int> userId = identity.Id.TryConvertTo<int>();
+                    Attempt<int> userId = identity.GetId().TryConvertTo<int>();
                     if (userId == false)
                     {
                         return;
@@ -133,23 +133,23 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                     // a list of checks to execute, if any of them pass then we resync
                     var checks = new Func<bool>[]
                     {
-                        () => user.Username != identity.Username,
+                        () => user.Username != identity.GetUsername(),
                         () =>
                         {
                             CultureInfo culture = user.GetUserCulture(_localizedTextService, _globalSettings.Value);
-                            return culture != null && culture.ToString() != identity.Culture;
+                            return culture != null && culture.ToString() != identity.GetCultureString();
                         },
-                        () => user.AllowedSections.UnsortedSequenceEqual(identity.AllowedApplications) == false,
-                        () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false,
+                        () => user.AllowedSections.UnsortedSequenceEqual(identity.GetAllowedApplications()) == false,
+                        () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.GetRoles()) == false,
                         () =>
                         {
-                            var startContentIds = user.CalculateContentStartNodeIds(_entityService);
-                            return startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false;
+                            var startContentIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
+                            return startContentIds.UnsortedSequenceEqual(identity.GetStartContentNodes()) == false;
                         },
                         () =>
                         {
-                            var startMediaIds = user.CalculateMediaStartNodeIds(_entityService);
-                            return startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false;
+                            var startMediaIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+                            return startMediaIds.UnsortedSequenceEqual(identity.GetStartMediaNodes()) == false;
                         }
                     };
 

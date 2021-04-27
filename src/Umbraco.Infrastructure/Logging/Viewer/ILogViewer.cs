@@ -1,9 +1,7 @@
 ﻿using System.Collections.Generic;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Models;
 
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     public interface ILogViewer
     {
@@ -24,7 +22,7 @@ namespace Umbraco.Core.Logging.Viewer
 
         /// <summary>
         /// A count of number of errors
-        /// By counting Warnings with Exceptions, Errors & Fatal messages
+        /// By counting Warnings with Exceptions, Errors &amp; Fatal messages
         /// </summary>
         int GetNumberOfErrors(LogTimePeriod logTimePeriod);
 

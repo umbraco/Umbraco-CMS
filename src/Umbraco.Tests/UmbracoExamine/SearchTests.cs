@@ -5,13 +5,14 @@ using Examine;
 using Examine.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
-using NUnit.Framework;
-using Umbraco.Examine;
+using Umbraco.Extensions;
 
 namespace Umbraco.Tests.UmbracoExamine
 {

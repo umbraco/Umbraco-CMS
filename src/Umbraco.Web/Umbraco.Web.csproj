@@ -66,11 +66,14 @@
       <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.30" />
+    <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.11.31" />
     <PackageReference Include="HtmlSanitizer">
       <Version>5.0.376</Version>
     </PackageReference>
+    <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
-      <Version>2.7.0.100</Version>
+      <Version>2.9.1</Version>
     </PackageReference>
     <PackageReference Include="Markdown" Version="2.2.1" />
     <PackageReference Include="Microsoft.AspNet.Identity.Core" Version="2.2.3" />
@@ -78,8 +81,8 @@
     <PackageReference Include="Microsoft.AspNet.SignalR.Core" Version="2.4.1" />
     <PackageReference Include="Microsoft.AspNet.WebApi" Version="5.2.7" />
     <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="5.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.2" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="5.0.3" />
+    <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.3" />
     <PackageReference Include="Microsoft.Owin.Host.SystemWeb" Version="4.1.1" />
     <PackageReference Include="Microsoft.Owin.Security.Cookies" Version="4.1.1" />
     <PackageReference Include="Microsoft.Owin.Security.OAuth" Version="4.1.1" />
@@ -91,20 +94,21 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="MiniProfiler" Version="4.2.1" />
+    <PackageReference Include="MiniProfiler" Version="4.2.22" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NPoco" Version="4.0.2" />
     <PackageReference Include="MiniProfiler" Version="4.0.138" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="NPoco" Version="4.0.3" />
+    <PackageReference Include="NPoco" Version="3.9.4" />
     <PackageReference Include="SecurityCodeScan">
-      <Version>3.5.3</Version>
+      <Version>3.5.4</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="5.0.0" />
     <PackageReference Include="Umbraco.Code">
       <Version>1.0.5</Version>
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
@@ -133,21 +137,14 @@
     <Compile Include="AspNet\FrameworkMarchal.cs" />
     <Compile Include="AspNet\AspNetUmbracoApplicationLifetime.cs" />
     <Compile Include="HttpContextExtensions.cs" />
-    <Compile Include="Macros\MemberUserKeyProvider.cs" />
-    <Compile Include="Mvc\MemberAuthorizeAttribute.cs" />
     <Compile Include="Security\BackOfficeSecurity.cs" />
     <Compile Include="HttpContextAccessorExtensions.cs" />
-    <Compile Include="Models\Membership\UmbracoMembershipMember.cs" />
     <Compile Include="AspNet\AspNetBackOfficeInfo.cs" />
     <Compile Include="AspNet\AspNetCookieManager.cs" />
     <Compile Include="AspNet\AspNetHttpContextAccessor.cs" />
     <Compile Include="AspNet\AspNetIpResolver.cs" />
     <Compile Include="AspNet\AspNetPasswordHasher.cs" />
     <Compile Include="Runtime\AspNetUmbracoBootPermissionChecker.cs" />
-    <Compile Include="Security\MembershipProviderBase.cs" />
-    <Compile Include="Security\MembershipProviderExtensions.cs" />
-    <Compile Include="Security\PublicAccessChecker.cs" />
-    <Compile Include="Security\UmbracoMembershipProviderBase.cs" />
     <Compile Include="StringExtensions.cs" />
     <Compile Include="UmbracoContext.cs" />
     <Compile Include="UmbracoContextFactory.cs" />
@@ -156,10 +153,8 @@
     <Compile Include="Security\ActiveDirectoryBackOfficeUserPasswordChecker.cs" />
     <Compile Include="Security\BackOfficeUserPasswordCheckerResult.cs" />
     <Compile Include="Security\IBackOfficeUserPasswordChecker.cs" />
-    <Compile Include="UmbracoBuilderExtensions.cs" />
     <Compile Include="Composing\Current.cs" />
     <Compile Include="UmbracoApplicationBase.cs" />
-    <Compile Include="WebApi\HttpActionContextExtensions.cs" />
     <Compile Include="WebApi\SerializeVersionAttribute.cs" />
     <Compile Include="WebApi\TrimModelBinder.cs" />
     <Compile Include="WebApi\ParameterSwapControllerActionSelector.cs" />
@@ -173,17 +168,12 @@
     <Compile Include="Mvc\UmbracoVirtualNodeRouteHandler.cs" />
     <Compile Include="Security\AuthenticationOptionsExtensions.cs" />
     <Compile Include="Mvc\ViewDataDictionaryExtensions.cs" />
-    <Compile Include="Security\MembershipHelper.cs" />
     <Compile Include="HttpCookieExtensions.cs" />
-    <Compile Include="Security\Providers\MembersMembershipProvider.cs" />
-    <Compile Include="Security\Providers\MembersRoleProvider.cs" />
-    <Compile Include="Security\Providers\UmbracoMembershipProvider.cs" />
     <Compile Include="HttpRequestExtensions.cs" />
     <Compile Include="UrlHelperExtensions.cs" />
     <Compile Include="UrlHelperRenderExtensions.cs" />
     <Compile Include="WebApi\IsBackOfficeAttribute.cs" />
     <Compile Include="WebApi\HttpRequestMessageExtensions.cs" />
-    <Compile Include="WebApi\MemberAuthorizeAttribute.cs" />
     <Compile Include="WebApi\NamespaceHttpControllerSelector.cs" />
     <Compile Include="WebApi\UmbracoApiController.cs" />
     <Compile Include="WebApi\UmbracoApiControllerBase.cs" />
@@ -229,4 +219,28 @@
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <!--
+    copied from Microsoft.CSharp.targets
+    because we have webservices, we need to SGEN
+    but it's getting confused by us referencing System.ValueTuple which it cannot load
+
+      Name="UmbGenerateSerializationAssemblies"
+      Condition="'$(_SGenGenerateSerializationAssembliesConfig)' == 'On' or ('@(WebReferenceUrl)'!='' and '$(_SGenGenerateSerializationAssembliesConfig)' == 'Auto')"
+  -->
+  <!--  <Target Name="AfterBuild" DependsOnTargets="AssignTargetPaths;Compile;ResolveKeySource" Inputs="$(MSBuildAllProjects);@(IntermediateAssembly)" Outputs="$(IntermediateOutputPath)$(_SGenDllName)">-->
+  <!--    <PropertyGroup>-->
+  <!--      <SGenMSBuildArchitecture Condition="'$(SGenMSBuildArchitecture)' == ''">$(PlatformTargetAsMSBuildArchitecture)</SGenMSBuildArchitecture>-->
+  <!--    </PropertyGroup>-->
+  <!--    <ItemGroup>-->
+  <!--      &lt;!&ndash; we want to exclude all facade references ?! &ndash;&gt;-->
+  <!--      <FixedReferencePath Include="@(ReferencePath)" Condition="'%(ReferencePath.FileName)' != 'System.ValueTuple' and '%(ReferencePath.FileName)' != 'System.Net.Http' and '%(ReferencePath.FileName)' != 'System.Text.Encoding.CodePages' and '%(ReferencePath.FileName)' != 'System.Buffers' and '%(ReferencePath.FileName)' != 'System.Configuration.ConfigurationManager'" />-->
+  <!--    </ItemGroup>-->
+  <!--    <Delete Files="$(TargetDir)$(TargetName).XmlSerializers.dll" ContinueOnError="true" />-->
+  <!--    &lt;!&ndash;-->
+  <!--     ShouldGenerateSerializer="$(SGenShouldGenerateSerializer)"-->
+  <!--     &ndash;&gt;-->
+  <!--    <SGen BuildAssemblyName="$(TargetFileName)" BuildAssemblyPath="$(IntermediateOutputPath)" References="@(FixedReferencePath)" ShouldGenerateSerializer="true" UseProxyTypes="$(SGenUseProxyTypes)" UseKeep="$(SGenUseKeep)" KeyContainer="$(KeyContainerName)" KeyFile="$(KeyOriginatorFile)" DelaySign="$(DelaySign)" ToolPath="$(SGenToolPath)" SdkToolsPath="$(TargetFrameworkSDKToolsDirectory)" EnvironmentVariables="$(SGenEnvironment)" MSBuildArchitecture="$(SGenMSBuildArchitecture)" SerializationAssembly="$(IntermediateOutputPath)$(_SGenDllName)" Platform="$(SGenPlatformTarget)" Types="$(SGenSerializationTypes)">-->
+  <!--      <Output TaskParameter="SerializationAssembly" ItemName="SerializationAssembly" />-->
+  <!--    </SGen>-->
+  <!--  </Target>-->
 </Project>

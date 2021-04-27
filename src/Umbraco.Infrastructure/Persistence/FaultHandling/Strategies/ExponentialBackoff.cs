@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Umbraco.Core.Persistence.FaultHandling.Strategies
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies
 {
     /// <summary>
     /// A retry strategy with back-off parameters for calculating the exponential delay between retries.

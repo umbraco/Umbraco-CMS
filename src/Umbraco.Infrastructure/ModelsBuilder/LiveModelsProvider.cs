@@ -12,7 +12,10 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 {
     // supports LiveAppData - but not PureLive
-    public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStarting>,  INotificationHandler<UmbracoRequestEnd>
+    public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStarting>,
+        INotificationHandler<UmbracoRequestEnd>,
+        INotificationHandler<ContentTypeCacheRefresherNotification>,
+        INotificationHandler<DataTypeCacheRefresherNotification>
     {
         private static int s_req;
         private readonly ILogger<LiveModelsProvider> _logger;
@@ -53,16 +56,6 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             {
                 return;
             }
-
-            // Must register with maindom in order to function.
-            // If registration is not successful then events are not bound
-            // and we also don't generate models.
-            _mainDom.Register(() =>
-            {
-                // anything changes, and we want to re-generate models.
-                ContentTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
-                DataTypeCacheRefresher.CacheUpdated += RequestModelsGeneration;
-            });
         }
 
         // NOTE
@@ -72,8 +65,13 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
         // need to be generated. Could be by another request. Anyway. We could
         // have collisions but... you know the risk.
 
-        private void RequestModelsGeneration(object sender, EventArgs args)
+        private void RequestModelsGeneration()
         {
+            if (!_mainDom.IsMainDom)
+            {
+                return;
+            }
+
             _logger.LogDebug("Requested to generate models.");
             Interlocked.Exchange(ref s_req, 1);
         }
@@ -121,5 +119,9 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
                 GenerateModelsIfRequested();
             }
         }
+
+        public void Handle(ContentTypeCacheRefresherNotification notification) => RequestModelsGeneration();
+
+        public void Handle(DataTypeCacheRefresherNotification notification) => RequestModelsGeneration();
     }
 }

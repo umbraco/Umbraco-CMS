@@ -1,15 +1,12 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.PropertyEditors;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Factories
+namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     internal class ContentBaseFactory
     {
@@ -75,12 +72,12 @@ namespace Umbraco.Core.Persistence.Factories
         /// <summary>
         /// Builds an IMedia item from a dto and content type.
         /// </summary>
-        public static Media BuildEntity(ContentDto dto, IMediaType contentType)
+        public static Core.Models.Media BuildEntity(ContentDto dto, IMediaType contentType)
         {
             var nodeDto = dto.NodeDto;
             var contentVersionDto = dto.ContentVersionDto;
 
-            var content = new Media(nodeDto.Text, nodeDto.ParentId, contentType);
+            var content = new Core.Models.Media(nodeDto.Text, nodeDto.ParentId, contentType);
 
             try
             {
@@ -128,9 +125,12 @@ namespace Umbraco.Core.Persistence.Factories
                 content.DisableChangeTracking();
 
                 content.Id = dto.NodeId;
+                content.SecurityStamp = dto.SecurityStampToken;
+                content.EmailConfirmedDate = dto.EmailConfirmedDate;
+                content.PasswordConfiguration = dto.PasswordConfig;
                 content.Key = nodeDto.UniqueId;
                 content.VersionId = contentVersionDto.Id;
-
+                
                 // TODO: missing names?
 
                 content.Path = nodeDto.Path;
@@ -215,9 +215,11 @@ namespace Umbraco.Core.Persistence.Factories
                 LoginName = entity.Username,
                 NodeId = entity.Id,
                 Password = entity.RawPasswordValue,
-
+                SecurityStampToken = entity.SecurityStamp,
+                EmailConfirmedDate = entity.EmailConfirmedDate,
                 ContentDto = contentDto,
-                ContentVersionDto = BuildContentVersionDto(entity, contentDto)
+                ContentVersionDto = BuildContentVersionDto(entity, contentDto),
+                PasswordConfig = entity.PasswordConfiguration
             };
             return dto;
         }

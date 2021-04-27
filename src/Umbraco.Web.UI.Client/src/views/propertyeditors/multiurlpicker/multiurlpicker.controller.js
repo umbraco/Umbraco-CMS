@@ -1,4 +1,4 @@
-function multiUrlPickerController($scope, angularHelper, localizationService, entityResource, iconHelper, editorService) {
+function multiUrlPickerController($scope, localizationService, entityResource, iconHelper, editorService) {
 
     var vm = {
         labels: {
@@ -16,8 +16,6 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         $scope.model.value = [];
     }
 
-    var currentForm = angularHelper.getCurrentForm($scope);
-
     $scope.sortableOptions = {
         axis: "y",
         containment: "parent",
@@ -27,7 +25,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         scroll: true,
         zIndex: 6000,
         update: function () {
-            currentForm.$setDirty();
+            setDirty();
         }
     };
 
@@ -66,7 +64,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
     $scope.remove = function ($index) {
         $scope.renderModel.splice($index, 1);
 
-        currentForm.$setDirty();
+        setDirty();
     };
 
     $scope.openLinkPicker = function (link, $index) {
@@ -122,7 +120,7 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
                         link.published = true;
                     }
 
-                    currentForm.$setDirty();
+                    setDirty();
                 }
                 editorService.close();
             },
@@ -132,6 +130,12 @@ function multiUrlPickerController($scope, angularHelper, localizationService, en
         };
         editorService.linkPicker(linkPicker);
     };
+
+    function setDirty() {
+        if ($scope.multiUrlPickerForm) {
+            $scope.multiUrlPickerForm.modelValue.$setDirty();
+        }
+    }
 
     function init() {
         localizationService.localizeMany(["general_recycleBin"])

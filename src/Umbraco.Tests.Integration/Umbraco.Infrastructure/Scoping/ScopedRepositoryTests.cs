@@ -1,24 +1,24 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Logging;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services.Implement;
-using Umbraco.Core.Sync;
-using Umbraco.Web.Cache;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 {
@@ -46,11 +46,19 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             return result;
         }
 
-        [TearDown]
-        public void Teardown()
+        protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
-            _distributedCacheBinder?.UnbindEvents();
-            _distributedCacheBinder = null;
+            builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
+            builder
+                .AddNotificationHandler<DictionaryItemDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<DictionaryItemSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<LanguageSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<UserSavedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<LanguageDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MemberGroupDeletedNotification, DistributedCacheBinder>()
+                .AddNotificationHandler<MemberGroupSavedNotification, DistributedCacheBinder>();
+            builder.AddNotificationHandler<LanguageSavedNotification, PublishedSnapshotServiceEventHandler>();
         }
 
         [TestCase(true)]
@@ -63,17 +71,17 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             var user = (IUser)new User(GlobalSettings, "name", "email", "username", "rawPassword");
             service.Save(user);
 
-            // global cache contains the entity
+            // User has been saved so the cache has been cleared of it
             var globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
+            Assert.IsNull(globalCached);
+            // Get user again to load it into the cache again, this also ensure we don't modify the one that's in the cache.
+            user = service.GetUserById(user.Id);
+
+            // global cache contains the entity
+            globalCached = (IUser)globalCache.Get(GetCacheIdKey<IUser>(user.Id), () => null);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(user.Id, globalCached.Id);
             Assert.AreEqual("name", globalCached.Name);
-
-            // get user again - else we'd modify the one that's in the cache
-            user = service.GetUserById(user.Id);
-
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(ServerMessenger, CacheRefresherCollection), GetRequiredService<IUmbracoContextFactory>(), GetRequiredService<ILogger<DistributedCacheBinder>>());
-            _distributedCacheBinder.BindEvents(true);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (IScope scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
@@ -155,9 +163,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(lang.Id, globalCached.Id);
             Assert.AreEqual("fr-FR", globalCached.IsoCode);
-
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(ServerMessenger, CacheRefresherCollection), GetRequiredService<IUmbracoContextFactory>(), GetRequiredService<ILogger<DistributedCacheBinder>>());
-            _distributedCacheBinder.BindEvents(true);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (IScope scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))
@@ -246,14 +251,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             };
             service.Save(item);
 
+            // Refresh the cache manually because we can't unbind
+            service.GetDictionaryItemById(item.Id);
+            service.GetLanguageById(lang.Id);
+
             // global cache contains the entity
             var globalCached = (IDictionaryItem)globalCache.Get(GetCacheIdKey<IDictionaryItem>(item.Id), () => null);
             Assert.IsNotNull(globalCached);
             Assert.AreEqual(item.Id, globalCached.Id);
             Assert.AreEqual("item-key", globalCached.ItemKey);
-
-            _distributedCacheBinder = new DistributedCacheBinder(new DistributedCache(ServerMessenger, CacheRefresherCollection), GetRequiredService<IUmbracoContextFactory>(), GetRequiredService<ILogger<DistributedCacheBinder>>());
-            _distributedCacheBinder.BindEvents(true);
 
             Assert.IsNull(scopeProvider.AmbientScope);
             using (IScope scope = scopeProvider.CreateScope(repositoryCacheMode: RepositoryCacheMode.Scoped))

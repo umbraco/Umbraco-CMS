@@ -17,7 +17,9 @@
         <repository type="git" url="https://github.com/umbraco/umbraco-cms" />
         <dependencies>
             <group targetFramework="net5.0">
-                <dependency id="Umbraco.Cms.Web" version="[$version$]" />
+                <dependency id="Umbraco.Cms.Web.Website" version="[$version$]" />
+                <dependency id="Umbraco.Cms.Web.BackOffice" version="[$version$]" />
+                <dependency id="Umbraco.Cms.StaticAssets" version="[$version$]" />
             </group>
         </dependencies>
         <!--
@@ -27,16 +29,5 @@
         <contentFiles />
     </metadata>
     <files>
-        <!-- Content -->
-        <file src="$BuildTmp$\WebApp\wwwroot\umbraco\**\*.*" target="content\wwwroot\umbraco" />
-        <file src="$BuildTmp$\WebApp\umbraco\**\*.*" target="content\umbraco" />
-        <file src="$BuildTmp$\WebApp\config\**\*.*" target="content\config" />
-
-        <!-- Readme -->
-        <file src="tools\Readme.txt" target="Readme.txt" />
-        <file src="tools\ReadmeUpgrade.txt" target="ReadmeUpgrade.txt" />
-
-        <!-- UmbracoCms props and targets used to copy the content into the solution -->
-        <file src="build\**" target="build\" />
     </files>
 </package>
