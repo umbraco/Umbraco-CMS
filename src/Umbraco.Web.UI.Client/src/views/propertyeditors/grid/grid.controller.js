@@ -10,12 +10,17 @@ angular.module("umbraco")
             eventsService,
             editorService,
             overlayService,
-            $interpolate
+            $interpolate,
+            notificationsService,
+            localStorageService
         ) {
 
             // Grid status variables
             var placeHolder = "";
-            var currentForm = angularHelper.getCurrentForm($scope);
+            var currentForm = angularHelper.getCurrentForm($scope);           
+            var gridEditorClipboardAlias = "grid-editor-clipboard"; // TODO: Need to make const.
+            //var gridAreaClipboardAlias = "grid-area-clipboard"; // Posible extension in the future
+            var gridRowClipboardAlias = "grid-row-clipboard"; // TODO: Need to make const.
 
             $scope.currentRowWithActiveChild = null;
             $scope.currentCellWithActiveChild = null;
@@ -706,6 +711,145 @@ angular.module("umbraco")
             }
 
             // *********************************************
+            // Copy Paste : Editor + Row
+            // *********************************************
+            $scope.setGridClipboard = function () {
+                $scope.clipboard = {
+                    editors: localStorageService.get(gridEditorClipboardAlias),
+                    //areas: localStorageService.get(gridAreaClipboardAlias), // Posible extension in the future
+                    rows: localStorageService.get(gridRowClipboardAlias)
+                };
+
+                if (!Array.isArray($scope.clipboard.editors)) {
+                    $scope.clipboard.editors = [];
+                }
+
+                // Posible extension in the future
+                //if (!Array.isArray($scope.clipboard.areas)) {
+                //    $scope.clipboard.areas = [];
+                //}
+
+                if (!Array.isArray($scope.clipboard.rows)) {
+                    $scope.clipboard.rows = [];
+                }
+            };
+
+            $scope.copyEditor = function (control) {
+                if (!Array.isArray(localStorageService.get(gridEditorClipboardAlias))) {
+                    localStorageService.set(gridEditorClipboardAlias, []);
+                }
+
+                var newClipboard = localStorageService.get(gridEditorClipboardAlias);
+
+                newClipboard.push(control);
+
+                if (newClipboard.length > 12) {
+                    newClipboard.splice(0, newClipboard.length - 12);
+                }
+
+                localStorageService.set(gridEditorClipboardAlias, newClipboard);
+
+                // TODO: Need some localizationService
+                notificationsService.success("Clipboard", "Grid editor copied to clipboard.");
+
+                $scope.setGridClipboard();
+            };
+
+            $scope.copyRow = function (row) {
+                if (!Array.isArray(localStorageService.get(gridRowClipboardAlias))) {
+                    localStorageService.set(gridRowClipboardAlias, []);
+                }
+
+                var newClipboard = localStorageService.get(gridRowClipboardAlias);
+
+                newClipboard.push(row);
+
+                if (newClipboard.length > 12) {
+                    newClipboard.splice(0, newClipboard.length - 12);
+                }
+
+                localStorageService.set(gridRowClipboardAlias, newClipboard);
+
+                // TODO: Need some localizationService
+                notificationsService.success("Clipboard", "Grid row copied to clipboard.");
+
+                $scope.setGridClipboard();
+            };
+
+            $scope.pasteEditor = function (event, area, index, copied) {
+                if (typeof (copied) === "undefined") {
+                    var allowedEditors = $scope.allowedEditorsInClipboard(area);
+                    if (allowedEditors.length === 0) {
+                        return false;
+                    }
+                    else {
+                        copied = allowedEditors[allowedEditors.length - 1];
+                    }
+                }
+
+                var newControl = $.extend({}, copied);
+                if (copied && copied.editor) {
+
+                    if (index === undefined) {
+                        index = area.controls.length;
+                    }
+
+                    newControl.active = true;
+                    $scope.initControl(newControl, index + 1);
+                    area.controls.push(newControl);
+                }
+            };
+
+            $scope.pasteRow = function (section, copied) {
+                if (typeof (copied) === "undefined") {
+                    var allowedRows = $scope.allowedRowsInClipboard(section);
+                    if (allowedRows.length === 0) {
+                        return false;
+                    }
+                    else {
+                        copied = allowedRows[allowedRows.length - 1];
+                    }
+                }
+
+                var newRow = $.extend({}, copied);
+                if (copied) {
+                    newRow = $scope.initRow(newRow);
+                    section.rows.push(newRow);
+
+                    $scope.showRowConfigurations = false;
+                    eventsService.emit('grid.rowAdded', {
+                        scope: $scope,
+                        element: $element,
+                        row: newRow
+                    });
+                }
+            };
+
+            $scope.allowedEditorsInClipboard = function (area) {
+                var allowedEditors = area.$allowedEditors.map(function (editor) { return editor.alias; });
+                return $scope.clipboard.editors.filter(function (control) {
+                    return allowedEditors.indexOf(control.editor.alias) > -1;
+                });
+            };
+
+            $scope.allowedRowsInClipboard = function (section) {
+                var allowedRows = section.$allowedLayouts.map(function (layout) { return layout.name; });
+
+                return $scope.clipboard.rows.slice().reverse().filter(function (row) {
+                    return allowedRows.indexOf(row.name) > -1;
+                });
+            };
+
+            $scope.clearRowPaste = function (section) {
+                var allowedRowsInClipboard = $scope.allowedRowsInClipboard(section);
+                for (var i = 0; i < allowedRowsInClipboard.length; i++) {
+                    var index = $scope.clipboard.rows.indexOf(allowedRowsInClipboard[i]);
+                    $scope.clipboard.rows.splice(index, 1);
+                }
+                localStorageService.set(gridRowClipboardAlias, $scope.clipboard.rows);
+            };
+            
+            // *********************************************
             // Initialization
             // these methods are called from ng-init on the template
             // so we can controll their first load data
@@ -780,6 +924,8 @@ angular.module("umbraco")
                 if (clear) {
                     $scope.model.value = undefined;
                 }
+
+                $scope.setGridClipboard();
             };
 
             $scope.initSection = function (section) {

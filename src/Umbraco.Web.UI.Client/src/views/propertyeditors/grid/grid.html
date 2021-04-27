@@ -99,6 +99,11 @@
                                        </button>
                                    </div>
 
+                                    <!-- Copy Paste -->
+                                    <div class="cell-tools-edit row-tool">
+                                        <i class="icon icon-documents" title="@general_copy" localize="title" ng-click="copyRow(row)"></i>
+                                    </div>
+
                                     <div class="cell-tools-remove row-tool">
                                         <button class="icon-trash btn-reset" ng-click="togglePrompt(row)" type="button"></button>
                                         <umb-confirm-action
@@ -214,6 +219,15 @@
                                                                               </button>
                                                                           </div>
 
+                                                                            <!-- Copy Paste -->
+                                                                            <div class="umb-control-tool">
+                                                                                <button type="button" class="umb-control-tool-icon icon-documents btn-icon" title="@general_copy" localize="title" ng-click="copyEditor(control)">
+                                                                                    <span class="sr-only">
+                                                                                        <localize key="general_copy">Copy</localize>
+                                                                                    </span>
+                                                                                </button>
+                                                                            </div>
+
                                                                           <div class="umb-control-tool">
                                                                               <button class="umb-control-tool-icon icon-trash btn-reset" ng-click="togglePrompt(control)" type="button"></button>
                                                                               <umb-confirm-action ng-if="control.deletePrompt"
@@ -280,6 +294,42 @@
                     <div class="templates-preview" ng-if="showRowConfigurations">
 
                         <p ng-hide="section.rows.length > 0"><strong><localize key="grid_addRows">Add row</localize></strong></p>
+
+                        <!-- Copy Paste -->
+                        <div ng-if="allowedRowsInClipboard(section).length > 0">
+                            <p>
+                                <strong>
+                                    <localize key="content_createFromClipboard">Paste from clipboard</localize>
+                                </strong>
+                                <button ng-click="clearRowPaste(section)" title="@clipboard_labelForClearClipboard" localize="title" class="btn-icon">
+                                    <i class="icon-trash" aria-hidden="true"></i>
+                                </button>
+                            </p>
+                            <button class="preview-rows columns btn-reset"
+                                    ng-repeat="layout in  allowedRowsInClipboard(section)"
+                                    ng-show="layout.areas.length > 0"
+                                    ng-click="pasteRow(section, layout)"
+                                    type="button">
+
+                                <div class="preview-row">
+
+                                    <div class="preview-col" ng-style="{width: percentage(area.grid) + '%'}" ng-repeat="area in layout.areas">
+
+                                        <div class="preview-cell">
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div class="preview-overlay">
+                                </div>
+
+                                <small>{{layout.label || layout.name}}</small>
+
+                            </button>
+                            <hr />
+                        </div>
 
                         <button class="preview-rows columns btn-reset"
                              ng-repeat="layout in  section.$allowedLayouts"

@@ -28,6 +28,27 @@
         </li>
     </ul>
 
+    <!-- Copy Paste -->
+    <div ng-if="(allowedEditorsInClipboard(model.availableItems) | filter:filter.searchTerm).length > 0">
+        <div class="umb-overlay__section-header">
+            <h5><localize key="content_createFromClipboard">Paste from clipboard</localize></h5>
+            <button ng-click="clearPaste()" title="@clipboard_labelForClearClipboard" localize="title">
+                <i class="icon-trash" aria-hidden="true"></i>
+            </button>
+        </div>
+        <ul class="umb-card-grid" ng-class="{'-three-in-row': model.availableItems.length < 7, '-four-in-row': model.availableItems.length >= 7}">
+            <li ng-repeat="item in allowedEditorsInClipboard() | filter:filter.searchTerm">
+                <button type="button" class="umb-card-grid-item btn-reset" ng-click="pasteItem(item)">
+                    <span>
+                        <i class="{{ item.editor.icon }}" aria-hidden="true"></i>
+                        {{ item.editor.name | truncate:true:36 }}
+                    </span>
+                </button>
+            </li>
+        </ul>
+        <hr />
+    </div>
+
     <div class="umb-overlay__section-header" ng-if="model.pasteItems.length > 0 && (model.availableItems | filter:filter.searchTerm).length > 0">
         <h5><localize key="content_createEmpty">Create new</localize></h5>
     </div>
