@@ -86,7 +86,10 @@ namespace Umbraco.Cms.Core.Composing
                         if (Constants.Composing.UmbracoCoreAssemblyNames.Any(x=>assemblyName.FullName.StartsWith(x) || assemblyName.Name.EndsWith(".Views")))
                             continue;
 
-                        var assembly = Assembly.Load(assemblyName);
+                        // Can't do Assembly.Load() as in .NET Core it works by default only for assemblies that have been published as part of the app.
+                        // https://github.com/dotnet/runtime/issues/13511#issuecomment-537475896
+                        // So now we have to use LoadFrom and with the full path to the DLL on disk
+                        var assembly = Assembly.LoadFrom(dll);
                         assemblies.Add(assembly);
                     }
                 }
