@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
     public class ScopeFileSystemsTests : UmbracoIntegrationTest
     {
-        private IMediaFileSystem MediaFileSystem => GetRequiredService<IMediaFileSystem>();
+        private MediaFileManager MediaFileManager => GetRequiredService<MediaFileManager>();
 
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
@@ -35,7 +35,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         [TearDown]
         public void Teardown()
         {
-            FileSystems.ResetShadowId();
             ClearFiles(IOHelper);
         }
 
@@ -47,12 +46,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         }
 
         [Test]
-        public void MediaFileSystem_does_not_write_to_physical_file_system_when_scoped_if_scope_does_not_complete()
+        public void MediaFileManager_does_not_write_to_physical_file_system_when_scoped_if_scope_does_not_complete()
         {
             string rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
             string rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
-            IMediaFileSystem mediaFileSystem = MediaFileSystem;
+            MediaFileManager mediaFileManager = MediaFileManager;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
@@ -60,28 +59,28 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             {
                 using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 {
-                    mediaFileSystem.AddFile("f1.txt", ms);
+                    MediaFileManager.FileSystem.AddFile("f1.txt", ms);
                 }
 
-                Assert.IsTrue(mediaFileSystem.FileExists("f1.txt"));
+                Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
-                Assert.IsTrue(mediaFileSystem.FileExists("f1.txt"));
+                Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
             }
 
             // After scope is disposed ensure shadow wrapper didn't commit to physical
-            Assert.IsFalse(MediaFileSystem.FileExists("f1.txt"));
+            Assert.IsFalse(mediaFileManager.FileSystem.FileExists("f1.txt"));
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
         }
 
         [Test]
-        public void MediaFileSystem_writes_to_physical_file_system_when_scoped_and_scope_is_completed()
+        public void MediaFileManager_writes_to_physical_file_system_when_scoped_and_scope_is_completed()
         {
             string rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
             string rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
-            IMediaFileSystem mediaFileSystem = MediaFileSystem;
+            MediaFileManager mediaFileManager = MediaFileManager;
 
             Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
@@ -89,20 +88,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             {
                 using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 {
-                    mediaFileSystem.AddFile("f1.txt", ms);
+                    mediaFileManager.FileSystem.AddFile("f1.txt", ms);
                 }
 
-                Assert.IsTrue(mediaFileSystem.FileExists("f1.txt"));
+                Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
                 scope.Complete();
 
-                Assert.IsTrue(mediaFileSystem.FileExists("f1.txt"));
+                Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
             }
 
             // After scope is disposed ensure shadow wrapper writes to physical file system
-            Assert.IsTrue(MediaFileSystem.FileExists("f1.txt"));
+            Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
             Assert.IsTrue(physMediaFileSystem.FileExists("f1.txt"));
         }
 
@@ -112,7 +111,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             string rootPath = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoMediaPath);
             string rootUrl = HostingEnvironment.ToAbsolute(GlobalSettings.UmbracoMediaPath);
             var physMediaFileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), rootPath, rootUrl);
-            IMediaFileSystem mediaFileSystem = MediaFileSystem;
+            MediaFileManager mediaFileManager = MediaFileManager;
             var taskHelper = new TaskHelper(Mock.Of<ILogger<TaskHelper>>());
 
             IScopeProvider scopeProvider = ScopeProvider;
@@ -120,23 +119,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
             {
                 using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 {
-                    mediaFileSystem.AddFile("f1.txt", ms);
+                    mediaFileManager.FileSystem.AddFile("f1.txt", ms);
                 }
 
-                Assert.IsTrue(mediaFileSystem.FileExists("f1.txt"));
+                Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f1.txt"));
                 Assert.IsFalse(physMediaFileSystem.FileExists("f1.txt"));
 
                 // execute on another disconnected thread (execution context will not flow)
                 Task t = taskHelper.ExecuteBackgroundTask(() =>
                 {
-                    Assert.IsFalse(mediaFileSystem.FileExists("f1.txt"));
+                    Assert.IsFalse(mediaFileManager.FileSystem.FileExists("f1.txt"));
 
                     using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                     {
-                        mediaFileSystem.AddFile("f2.txt", ms);
+                        mediaFileManager.FileSystem.AddFile("f2.txt", ms);
                     }
 
-                    Assert.IsTrue(mediaFileSystem.FileExists("f2.txt"));
+                    Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f2.txt"));
                     Assert.IsTrue(physMediaFileSystem.FileExists("f2.txt"));
 
                     return Task.CompletedTask;
@@ -144,7 +143,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
                 Task.WaitAll(t);
 
-                Assert.IsTrue(mediaFileSystem.FileExists("f2.txt"));
+                Assert.IsTrue(mediaFileManager.FileSystem.FileExists("f2.txt"));
                 Assert.IsTrue(physMediaFileSystem.FileExists("f2.txt"));
             }
         }
@@ -170,7 +169,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
                     // not ok to create a 'scoped filesystems' other scope
                     // we will get a "Already shadowing." exception.
                     Assert.Throws<InvalidOperationException>(() =>
-                    {                       
+                    {
                         using IScope other = scopeProvider.CreateScope(scopeFileSystems: true);
                     });
 

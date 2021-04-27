@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.IO.MediaPathSchemes
         private bool _folderCounterInitialized;
 
         /// <inheritdoc />
-        public string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
+        public string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename, string previous = null)
         {
             string directory;
             if (previous != null)
@@ -33,11 +33,11 @@ namespace Umbraco.Cms.Core.IO.MediaPathSchemes
                 var pos = previous.IndexOf(sep, StringComparison.Ordinal);
                 var s = pos > 0 ? previous.Substring(0, pos) : null;
 
-                directory = pos > 0 && int.TryParse(s, out _) ? s : GetNextDirectory(fileSystem);
+                directory = pos > 0 && int.TryParse(s, out _) ? s : GetNextDirectory(fileManager.FileSystem);
             }
             else
             {
-                directory = GetNextDirectory(fileSystem);
+                directory = GetNextDirectory(fileManager.FileSystem);
             }
 
             if (directory == null)
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Core.IO.MediaPathSchemes
         }
 
         /// <inheritdoc />
-        public string GetDeleteDirectory(IMediaFileSystem fileSystem, string filepath)
+        public string GetDeleteDirectory(MediaFileManager fileSystem, string filepath)
         {
             return Path.GetDirectoryName(filepath);
         }

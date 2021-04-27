@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private readonly IFileSystem _viewsFileSystem;
         private readonly ViewHelper _viewHelper;
 
-        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TemplateRepository> logger, IFileSystems fileSystems,  IIOHelper ioHelper, IShortStringHelper shortStringHelper)
+        public TemplateRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<TemplateRepository> logger, FileSystems fileSystems,  IIOHelper ioHelper, IShortStringHelper shortStringHelper)
             : base(scopeAccessor, cache, logger)
         {
             _ioHelper = ioHelper;

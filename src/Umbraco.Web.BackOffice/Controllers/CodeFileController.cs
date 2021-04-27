@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class CodeFileController : BackOfficeNotificationsController
     {
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IFileSystems _fileSystems;
+        private readonly FileSystems _fileSystems;
         private readonly IFileService _fileService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public CodeFileController(
             IHostingEnvironment hostingEnvironment,
-            IFileSystems fileSystems,
+            FileSystems fileSystems,
             IFileService fileService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             ILocalizedTextService localizedTextService,

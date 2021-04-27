@@ -21,11 +21,11 @@ namespace Umbraco.Cms.Core.Models
         /// </summary>
         /// <param name="user"></param>
         /// <param name="cache"></param>
-        /// <param name="mediaFileSystem"></param>
+        /// <param name="mediaFileManager"></param>
         /// <returns>
         /// A list of 5 different sized avatar URLs
         /// </returns>
-        public static string[] GetUserAvatarUrls(this IUser user, IAppCache cache, IMediaFileSystem mediaFileSystem, IImageUrlGenerator imageUrlGenerator)
+        public static string[] GetUserAvatarUrls(this IUser user, IAppCache cache, MediaFileManager mediaFileManager, IImageUrlGenerator imageUrlGenerator)
         {
             // If FIPS is required, never check the Gravatar service as it only supports MD5 hashing.
             // Unfortunately, if the FIPS setting is enabled on Windows, using MD5 will throw an exception
@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Core.Models
             }
 
             //use the custom avatar
-            var avatarUrl = mediaFileSystem.GetUrl(user.Avatar);
+            var avatarUrl = mediaFileManager.FileSystem.GetUrl(user.Avatar);
             return new[]
             {
                 imageUrlGenerator.GetImageUrl(new ImageUrlGenerationOptions(avatarUrl) { ImageCropMode = ImageCropMode.Crop, Width = 30, Height = 30 }),

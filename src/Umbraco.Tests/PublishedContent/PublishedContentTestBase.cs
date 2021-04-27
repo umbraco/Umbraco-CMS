@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -50,7 +51,9 @@ namespace Umbraco.Tests.PublishedContent
             var serializer = new ConfigurationEditorJsonSerializer();
 
             var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
-            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, loggerFactory.CreateLogger<RichTextEditorPastedImages>(), HostingEnvironment,  Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>(), Mock.Of<IMediaFileSystem>(), ShortStringHelper, publishedUrlProvider, serializer);
+            var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), Mock.Of<IMediaPathScheme>(),
+                loggerFactory.CreateLogger<MediaFileManager>(), Mock.Of<IShortStringHelper>());
+            var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, loggerFactory.CreateLogger<RichTextEditorPastedImages>(), HostingEnvironment,  Mock.Of<IMediaService>(), Mock.Of<IContentTypeBaseServiceProvider>(), mediaFileManager, ShortStringHelper, publishedUrlProvider, serializer);
             var localLinkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new RichTextPropertyEditor(

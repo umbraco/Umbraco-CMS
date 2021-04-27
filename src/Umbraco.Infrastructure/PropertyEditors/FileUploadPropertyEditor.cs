@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
         INotificationHandler<MemberDeletedNotification>
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly ContentSettings _contentSettings;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
         private readonly IDataTypeService _dataTypeService;
@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         public FileUploadPropertyEditor(
             ILoggerFactory loggerFactory,
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IContentService contentService)
             : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
-            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
             _contentSettings = contentSettings.Value;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Options.Create(_contentSettings), JsonSerializer);
+            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileManager, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Options.Create(_contentSettings), JsonSerializer);
             editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, Options.Create(_contentSettings)));
             return editor;
         }
@@ -115,12 +115,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 //check if the published value contains data and return it
                 var propVal = propertyValue.PublishedValue;
                 if (propVal != null && propVal is string str1 && !str1.IsNullOrWhiteSpace())
-                    yield return _mediaFileSystem.GetRelativePath(str1);
+                    yield return _mediaFileManager.FileSystem.GetRelativePath(str1);
 
                 //check if the edited value contains data and return it
                 propVal = propertyValue.EditedValue;
                 if (propVal != null && propVal is string str2 && !str2.IsNullOrWhiteSpace())
-                    yield return _mediaFileSystem.GetRelativePath(str2);
+                    yield return _mediaFileManager.FileSystem.GetRelativePath(str2);
             }
         }
 
@@ -142,9 +142,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
                         continue;
                     }
 
-                    var sourcePath = _mediaFileSystem.GetRelativePath(str);
-                    var copyPath = _mediaFileSystem.CopyFile(notification.Copy, property.PropertyType, sourcePath);
-                    notification.Copy.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath), propertyValue.Culture, propertyValue.Segment);
+                    var sourcePath = _mediaFileManager.FileSystem.GetRelativePath(str);
+                    var copyPath = _mediaFileManager.CopyFile(notification.Copy, property.PropertyType, sourcePath);
+                    notification.Copy.SetValue(property.Alias, _mediaFileManager.FileSystem.GetUrl(copyPath), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
             }
@@ -165,7 +165,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
         {
             var filePathsToDelete = ContainedFilePaths(deletedEntities);
-            _mediaFileSystem.DeleteMediaFiles(filePathsToDelete);
+            _mediaFileManager.DeleteMediaFiles(filePathsToDelete);
         }
 
         public void Handle(MediaSavingNotification notification)
@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     if (string.IsNullOrWhiteSpace(svalue))
                         _uploadAutoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
                     else
-                        _uploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue), pvalue.Culture, pvalue.Segment);
+                        _uploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileManager.FileSystem.GetRelativePath(svalue), pvalue.Culture, pvalue.Segment);
                 }
             }
         }

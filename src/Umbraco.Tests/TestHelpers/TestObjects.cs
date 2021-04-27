@@ -84,11 +84,11 @@ namespace Umbraco.Tests.TestHelpers
                     new DatabaseSchemaCreatorFactory(Mock.Of<ILogger<DatabaseSchemaCreator>>(),loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>()));
             }
 
-            fileSystems ??= new FileSystems(Current.Factory, loggerFactory.CreateLogger<FileSystems>(), loggerFactory, TestHelper.IOHelper, globalSettings, TestHelper.GetHostingEnvironment());
+            fileSystems ??= new FileSystems(loggerFactory, TestHelper.IOHelper, globalSettings, TestHelper.GetHostingEnvironment());
             var coreDebug = TestHelper.CoreDebugSettings;
-            var mediaFileSystem = Mock.Of<IMediaFileSystem>();
+            var mediaFileManager = Mock.Of<MediaFileManager>();
             var eventAggregator = Mock.Of<IEventAggregator>();
-            return new ScopeProvider(databaseFactory, fileSystems, Options.Create(coreDebugSettings), mediaFileSystem, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance, eventAggregator);
+            return new ScopeProvider(databaseFactory, fileSystems, Options.Create(coreDebugSettings), mediaFileManager, loggerFactory.CreateLogger<ScopeProvider>(), loggerFactory, NoAppCache.Instance, eventAggregator);
         }
 
     }

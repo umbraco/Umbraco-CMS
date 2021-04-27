@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     {
         private readonly IIOHelper _ioHelper;
 
-        public PartialViewRepository(IFileSystems fileSystems, IIOHelper ioHelper)
+        public PartialViewRepository(FileSystems fileSystems, IIOHelper ioHelper)
             : base(fileSystems.PartialViewsFileSystem)
         {
             _ioHelper = ioHelper;

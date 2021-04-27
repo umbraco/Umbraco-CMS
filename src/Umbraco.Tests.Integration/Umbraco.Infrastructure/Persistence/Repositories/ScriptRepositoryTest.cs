@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using Moq;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
@@ -27,16 +28,18 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
     {
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
-        private IFileSystems _fileSystems;
+        private FileSystems _fileSystems;
         private IFileSystem _fileSystem;
 
         [SetUp]
         public void SetUpFileSystem()
         {
-            _fileSystems = Mock.Of<IFileSystems>();
             string path = GlobalSettings.UmbracoScriptsPath;
             _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, LoggerFactory.CreateLogger<PhysicalFileSystem>(), HostingEnvironment.MapPathWebRoot(path), HostingEnvironment.ToAbsolute(path));
-            Mock.Get(_fileSystems).Setup(x => x.ScriptsFileSystem).Returns(_fileSystem);
+
+            _fileSystems = FileSystemsCreator.CreateTestFileSystems(LoggerFactory, IOHelper, GetRequiredService<IOptions<GlobalSettings>>(),
+                HostingEnvironment,
+                null, null, null, _fileSystem, null);
             using (Stream stream = CreateStream("Umbraco.Sys.registerNamespace(\"Umbraco.Utils\");"))
             {
                 _fileSystem.AddFile("test-script.js", stream);

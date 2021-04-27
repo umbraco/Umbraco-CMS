@@ -19,10 +19,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
          * Create an implementation of IFileSystem and register it as the underlying filesystem for
          * MediaFileSystem with the following extension on composition.
          *
-         * composition.SetMediaFileSystem(factory => FactoryMethodToReturnYourImplementation())
-         *
-         * Alternatively you can just register an Implementation of IMediaFileSystem, however the
-         * extension above ensures that your IFileSystem implementation is wrapped by the "ShadowWrapper".
+         * builder.SetMediaFileSystem(factory => FactoryMethodToReturnYourImplementation())
          *
          * WHAT IS SHADOWING
          * -----------------
@@ -37,23 +34,17 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         internal static IUmbracoBuilder AddFileSystems(this IUmbracoBuilder builder)
         {
             // register FileSystems, which manages all filesystems
-            // it needs to be registered (not only the interface) because it provides additional
-            // functionality eg for scoping, and is injected in the scope provider - whereas the
-            // interface is really for end-users to get access to filesystems.
-            builder.Services.AddUnique(factory => factory.CreateInstance<FileSystems>(factory));
-
-            // register IFileSystems, which gives access too all filesystems
-            builder.Services.AddUnique<IFileSystems>(factory => factory.GetRequiredService<FileSystems>());
+            builder.Services.AddUnique<FileSystems>();
 
             // register the scheme for media paths
             builder.Services.AddUnique<IMediaPathScheme, UniqueMediaPathScheme>();
 
             builder.SetMediaFileSystem(factory =>
             {
-                var ioHelper = factory.GetRequiredService<IIOHelper>();
-                var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
-                var logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
-                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
+                IIOHelper ioHelper = factory.GetRequiredService<IIOHelper>();
+                IHostingEnvironment hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
+                ILogger<PhysicalFileSystem> logger = factory.GetRequiredService<ILogger<PhysicalFileSystem>>();
+                GlobalSettings globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
 
                 var rootPath = hostingEnvironment.MapPathWebRoot(globalSettings.UmbracoMediaPath);
                 var rootUrl = hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath);

@@ -1,5 +1,6 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.IO;
@@ -109,19 +110,47 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         }
 
         /// <summary>
-        /// Sets the underlying media filesystem.
+        /// Sets the filesystem used by the MediaFileManager
         /// </summary>
         /// <param name="builder">A builder.</param>
-        /// <param name="filesystemFactory">A filesystem factory.</param>
-        /// <remarks>
-        /// Using this helper will ensure that your IFileSystem implementation is wrapped by the ShadowWrapper
-        /// </remarks>
-        public static void SetMediaFileSystem(this IUmbracoBuilder builder, Func<IServiceProvider, IFileSystem> filesystemFactory)
-            => builder.Services.AddUnique<IMediaFileSystem>(factory =>
+        /// <param name="filesystemFactory">Factory method to create an IFileSystem implementation used in the MediaFileManager</param>
+        public static void SetMediaFileSystem(this IUmbracoBuilder builder,
+            Func<IServiceProvider, IFileSystem> filesystemFactory) => builder.Services.AddUnique(
+            provider =>
             {
-                var fileSystems = factory.GetRequiredService<FileSystems>();
-                return fileSystems.GetFileSystem<MediaFileSystem>(filesystemFactory(factory));
+                IFileSystem filesystem = filesystemFactory(provider);
+                // We need to use the Filesystems to create a shadow wrapper,
+                // because shadow wrapper requires the IsScoped delegate from the FileSystems.
+                // This is used by the scope provider when taking control of the filesystems.
+                FileSystems fileSystems = provider.GetRequiredService<FileSystems>();
+                IFileSystem shadow = fileSystems.CreateShadowWrapper(filesystem, "media");
+
+                return provider.CreateInstance<MediaFileManager>(shadow);
             });
+
+        /// <summary>
+        /// Register FileSystems with a method to configure the <see cref="FileSystems"/>.
+        /// </summary>
+        /// <param name="builder">A builder.</param>
+        /// <param name="configure">Method that configures the <see cref="FileSystems"/>.</param>
+        /// <exception cref="ArgumentNullException">Throws exception if <paramref name="configure"/> is null.</exception>
+        /// <exception cref="InvalidOperationException">Throws exception if full path can't be resolved successfully.</exception>
+        public static void ConfigureFileSystems(this IUmbracoBuilder builder,
+            Action<IServiceProvider, FileSystems> configure)
+        {
+            if (configure == null)
+            {
+                throw new ArgumentNullException(nameof(configure));
+            }
+
+            builder.Services.AddUnique(
+                provider =>
+                {
+                    FileSystems fileSystems = provider.CreateInstance<FileSystems>();
+                    configure(provider, fileSystems);
+                    return fileSystems;
+                });
+        }
 
         /// <summary>
         /// Sets the log viewer.
