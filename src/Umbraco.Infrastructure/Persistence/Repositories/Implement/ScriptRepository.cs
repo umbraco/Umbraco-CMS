@@ -1,9 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.Collections.Generic;
 using System.Linq;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -16,14 +12,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// </summary>
     internal class ScriptRepository : FileRepository<string, IScript>, IScriptRepository
     {
-        private readonly IIOHelper _ioHelper;
-        private readonly GlobalSettings _globalSettings;
-
-        public ScriptRepository(FileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
+        public ScriptRepository(FileSystems fileSystems)
             : base(fileSystems.ScriptsFileSystem)
         {
-            _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
-            _globalSettings = globalSettings.Value;
         }
 
         #region Implementation of IRepository<string,Script>
@@ -91,47 +82,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     yield return Get(file);
                 }
             }
-        }
-
-        public bool ValidateScript(IScript script)
-        {
-            // get full path
-            string fullPath;
-            try
-            {
-                // may throw for security reasons
-                fullPath = FileSystem.GetFullPath(script.Path);
-            }
-            catch
-            {
-                return false;
-            }
-
-            // validate path & extension
-            var validDir = _globalSettings.UmbracoScriptsPath;
-            var isValidPath = _ioHelper.VerifyEditPath(fullPath, validDir);
-            var validExts = new[] {"js"};
-            var isValidExtension = _ioHelper.VerifyFileExtension(script.Path, validExts);
-            return isValidPath && isValidExtension;
-        }
-
-        public Stream GetFileContentStream(string filepath)
-        {
-            if (FileSystem.FileExists(filepath) == false) return null;
-
-            try
-            {
-                return FileSystem.OpenFile(filepath);
-            }
-            catch
-            {
-                return null; // deal with race conds
-            }
-        }
-
-        public void SetFileContent(string filepath, Stream content)
-        {
-            FileSystem.AddFile(filepath, content, true);
         }
 
         #endregion

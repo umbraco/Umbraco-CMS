@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IScopeProvider provider = ScopeProvider;
             using (IScope scope = provider.CreateScope())
             {
-                var repository = new PartialViewRepository(fileSystems, IOHelper);
+                var repository = new PartialViewRepository(fileSystems);
 
                 var partialView = new PartialView(PartialViewType.PartialView, "test-path-1.cshtml") { Content = "// partialView" };
                 repository.Save(partialView);
