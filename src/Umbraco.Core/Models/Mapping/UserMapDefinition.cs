@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _imageUrlGenerator = imageUrlGenerator;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<UserGroupSave, IUserGroup>((source, context) => new UserGroup(_shortStringHelper) { CreateDate = DateTime.UtcNow }, Map);
             mapper.Define<UserInvite, IUser>(Map);

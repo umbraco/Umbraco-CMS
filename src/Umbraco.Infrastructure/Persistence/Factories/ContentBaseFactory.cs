@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.Models;
@@ -125,9 +125,12 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 content.DisableChangeTracking();
 
                 content.Id = dto.NodeId;
+                content.SecurityStamp = dto.SecurityStampToken;
+                content.EmailConfirmedDate = dto.EmailConfirmedDate;
+                content.PasswordConfiguration = dto.PasswordConfig;
                 content.Key = nodeDto.UniqueId;
                 content.VersionId = contentVersionDto.Id;
-
+                
                 // TODO: missing names?
 
                 content.Path = nodeDto.Path;
@@ -212,9 +215,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 LoginName = entity.Username,
                 NodeId = entity.Id,
                 Password = entity.RawPasswordValue,
-
+                SecurityStampToken = entity.SecurityStamp,
+                EmailConfirmedDate = entity.EmailConfirmedDate,
                 ContentDto = contentDto,
-                ContentVersionDto = BuildContentVersionDto(entity, contentDto)
+                ContentVersionDto = BuildContentVersionDto(entity, contentDto),
+                PasswordConfig = entity.PasswordConfiguration
             };
             return dto;
         }

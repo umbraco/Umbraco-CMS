@@ -54,14 +54,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IUserService _userService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IContentTypeService _contentTypeService;
-        private readonly UmbracoMapper _umbracoMapper;
-        private readonly IPublishedUrlProvider _publishedUrlProvider;        
+        private readonly IUmbracoMapper _umbracoMapper;
+        private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IDomainService _domainService;
         private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;        
+        private readonly ILocalizationService _localizationService;
         private readonly IFileService _fileService;
         private readonly INotificationService _notificationService;
-        private readonly ActionCollection _actionCollection;        
+        private readonly ActionCollection _actionCollection;
         private readonly ISqlContext _sqlContext;
         private readonly IAuthorizationService _authorizationService;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
@@ -80,7 +80,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IUserService userService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IContentTypeService contentTypeService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IPublishedUrlProvider publishedUrlProvider,
             IDomainService domainService,
             IDataTypeService dataTypeService,
@@ -2391,8 +2391,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return new ValidationErrorResult(notificationModel);
         }
 
-        
 
-        
+
+
     }
 }

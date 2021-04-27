@@ -7,14 +7,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Security
 {
-    // TODO: This is only for the back office, does it need to be in common?
-
     public class BackOfficeSecurity : IBackOfficeSecurity
     {
         private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        private object _currentUserLock = new object();
+        private readonly object _currentUserLock = new object();
         private IUser _currentUser;
 
         public BackOfficeSecurity(

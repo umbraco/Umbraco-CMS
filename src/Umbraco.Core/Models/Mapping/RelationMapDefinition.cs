@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _relationService = relationService;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IRelationType, RelationTypeDisplay>((source, context) => new RelationTypeDisplay(), Map);
             mapper.Define<IRelation, RelationDisplay>((source, context) => new RelationDisplay(), Map);

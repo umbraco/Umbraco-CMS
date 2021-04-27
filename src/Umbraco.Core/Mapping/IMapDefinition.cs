@@ -8,6 +8,6 @@
         /// <summary>
         /// Defines maps.
         /// </summary>
-        void DefineMaps(UmbracoMapper mapper);
+        void DefineMaps(IUmbracoMapper mapper);
     }
 }

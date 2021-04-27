@@ -19,19 +19,18 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
 {
-    // TODO: Make this into a base class that can be re-used
 
     /// <summary>
     /// The user store for back office users
     /// </summary>
-    public class BackOfficeUserStore : UserStoreBase<BackOfficeIdentityUser, IdentityRole<string>, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityUserToken<string>, IdentityRoleClaim<string>>
+    public class BackOfficeUserStore : UmbracoUserStore<BackOfficeIdentityUser, IdentityRole<string>>
     {
         private readonly IScopeProvider _scopeProvider;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
         private readonly IExternalLoginService _externalLoginService;
         private readonly GlobalSettings _globalSettings;
-        private readonly UmbracoMapper _mapper;
+        private readonly IUmbracoMapper _mapper;
         private readonly AppCaches _appCaches;
 
         /// <summary>
@@ -43,7 +42,7 @@ namespace Umbraco.Cms.Core.Security
             IEntityService entityService,
             IExternalLoginService externalLoginService,
             IOptions<GlobalSettings> globalSettings,
-            UmbracoMapper mapper,
+            IUmbracoMapper mapper,
             BackOfficeErrorDescriber describer,
             AppCaches appCaches)
             : base(describer)
@@ -58,19 +57,6 @@ namespace Umbraco.Cms.Core.Security
             _userService = userService;
             _externalLoginService = externalLoginService;
         }
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override IQueryable<BackOfficeIdentityUser> Users => throw new NotImplementedException();
-
-        /// <inheritdoc />
-        public override Task<string> GetNormalizedUserNameAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken) => GetUserNameAsync(user, cancellationToken);
-
-        /// <inheritdoc />
-        public override Task SetNormalizedUserNameAsync(BackOfficeIdentityUser user, string normalizedName, CancellationToken cancellationToken) => SetUserNameAsync(user, normalizedName, cancellationToken);
 
         /// <inheritdoc />
         public override Task<IdentityResult> CreateAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default)
@@ -216,9 +202,6 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override Task<BackOfficeIdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken = default) => FindUserAsync(userId, cancellationToken);
-
-        /// <inheritdoc />
         protected override Task<BackOfficeIdentityUser> FindUserAsync(string userId, CancellationToken cancellationToken)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -250,29 +233,6 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override async Task SetPasswordHashAsync(BackOfficeIdentityUser user, string passwordHash, CancellationToken cancellationToken = default)
-        {
-            await base.SetPasswordHashAsync(user, passwordHash, cancellationToken);
-
-            user.PasswordConfig = null; // Clear this so that it's reset at the repository level
-            user.LastPasswordChangeDateUtc = DateTime.UtcNow;
-        }
-
-        /// <inheritdoc />
-        public override async Task<bool> HasPasswordAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default)
-        {
-            // This checks if it's null
-            var result = await base.HasPasswordAsync(user, cancellationToken);
-            if (result)
-            {
-                // we also want to check empty
-                return string.IsNullOrEmpty(user.PasswordHash) == false;
-            }
-
-            return result;
-        }
-
-        /// <inheritdoc />
         public override Task<BackOfficeIdentityUser> FindByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -286,12 +246,13 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override Task<string> GetNormalizedEmailAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken)
-            => GetEmailAsync(user, cancellationToken);
+        public override async Task SetPasswordHashAsync(BackOfficeIdentityUser user, string passwordHash, CancellationToken cancellationToken = default)
+        {
+            await base.SetPasswordHashAsync(user, passwordHash, cancellationToken);
 
-        /// <inheritdoc />
-        public override Task SetNormalizedEmailAsync(BackOfficeIdentityUser user, string normalizedEmail, CancellationToken cancellationToken)
-            => SetEmailAsync(user, normalizedEmail, cancellationToken);
+            // Clear this so that it's reset at the repository level
+            user.PasswordConfig = null;
+        }
 
         /// <inheritdoc />
         public override Task AddLoginAsync(BackOfficeIdentityUser user, UserLoginInfo login, CancellationToken cancellationToken = default)
@@ -399,100 +360,6 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <summary>
-        /// Adds a user to a role (user group)
-        /// </summary>
-        public override Task AddToRoleAsync(BackOfficeIdentityUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            if (normalizedRoleName == null)
-            {
-                throw new ArgumentNullException(nameof(normalizedRoleName));
-            }
-
-            if (string.IsNullOrWhiteSpace(normalizedRoleName))
-            {
-                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(normalizedRoleName));
-            }
-
-            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == normalizedRoleName);
-
-            if (userRole == null)
-            {
-                user.AddRole(normalizedRoleName);
-            }
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Removes the role (user group) for the user
-        /// </summary>
-        public override Task RemoveFromRoleAsync(BackOfficeIdentityUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            if (normalizedRoleName == null)
-            {
-                throw new ArgumentNullException(nameof(normalizedRoleName));
-            }
-
-            if (string.IsNullOrWhiteSpace(normalizedRoleName))
-            {
-                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(normalizedRoleName));
-            }
-
-            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == normalizedRoleName);
-
-            if (userRole != null)
-            {
-                user.Roles.Remove(userRole);
-            }
-
-            return Task.CompletedTask;
-        }
-
-        /// <summary>
-        /// Gets a list of role names the specified user belongs to.
-        /// </summary>
-        public override Task<IList<string>> GetRolesAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            return Task.FromResult((IList<string>)user.Roles.Select(x => x.RoleId).ToList());
-        }
-
-        /// <summary>
-        /// Returns true if a user is in the role
-        /// </summary>
-        public override Task<bool> IsInRoleAsync(BackOfficeIdentityUser user, string normalizedRoleName, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            return Task.FromResult(user.Roles.Select(x => x.RoleId).InvariantContains(normalizedRoleName));
-        }
-
-        /// <summary>
         /// Lists all users of a given role.
         /// </summary>
         /// <remarks>
@@ -541,22 +408,6 @@ namespace Umbraco.Cms.Core.Security
 
             IdentityUserRole<string> found = user.Roles.FirstOrDefault(x => x.RoleId.InvariantEquals(roleId));
             return found;
-        }
-
-        /// <inheritdoc />
-        public override Task<string> GetSecurityStampAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            // the stamp cannot be null, so if it is currently null then we'll just return a hash of the password
-            return Task.FromResult(user.SecurityStamp.IsNullOrWhiteSpace()
-                ? user.PasswordHash.GenerateHash()
-                : user.SecurityStamp);
         }
 
         private BackOfficeIdentityUser AssignLoginsCallback(BackOfficeIdentityUser user)
@@ -678,36 +529,26 @@ namespace Umbraco.Cms.Core.Security
                 user.SecurityStamp = identityUser.SecurityStamp;
             }
 
-            // TODO: Fix this for Groups too
-            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Roles)) || identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Groups)))
+            if (identityUser.IsPropertyDirty(nameof(BackOfficeIdentityUser.Roles)))
             {
-                var userGroupAliases = user.Groups.Select(x => x.Alias).ToArray();
-
                 var identityUserRoles = identityUser.Roles.Select(x => x.RoleId).ToArray();
-                var identityUserGroups = identityUser.Groups.Select(x => x.Alias).ToArray();
 
-                var combinedAliases = identityUserRoles.Union(identityUserGroups).ToArray();
+                anythingChanged = true;
 
-                if (userGroupAliases.ContainsAll(combinedAliases) == false
-                    || combinedAliases.ContainsAll(userGroupAliases) == false)
+                // clear out the current groups (need to ToArray since we are modifying the iterator)
+                user.ClearGroups();
+
+                // go lookup all these groups
+                IReadOnlyUserGroup[] groups = _userService.GetUserGroupsByAlias(identityUserRoles).Select(x => x.ToReadOnlyGroup()).ToArray();
+
+                // use all of the ones assigned and add them
+                foreach (IReadOnlyUserGroup group in groups)
                 {
-                    anythingChanged = true;
-
-                    // clear out the current groups (need to ToArray since we are modifying the iterator)
-                    user.ClearGroups();
-
-                    // go lookup all these groups
-                    var groups = _userService.GetUserGroupsByAlias(combinedAliases).Select(x => x.ToReadOnlyGroup()).ToArray();
-
-                    // use all of the ones assigned and add them
-                    foreach (var group in groups)
-                    {
-                        user.AddGroup(group);
-                    }
-
-                    // re-assign
-                    identityUser.Groups = groups;
+                    user.AddGroup(group);
                 }
+
+                // re-assign
+                identityUser.SetGroups(groups);
             }
 
             // we should re-set the calculated start nodes
@@ -730,54 +571,6 @@ namespace Umbraco.Cms.Core.Security
 
             return Task.FromResult(false);
         }
-
-        private static int UserIdToInt(string userId)
-        {
-            Attempt<int> attempt = userId.TryConvertTo<int>();
-            if (attempt.Success)
-            {
-                return attempt.Result;
-            }
-
-            throw new InvalidOperationException("Unable to convert user ID to int", attempt.Exception);
-        }
-
-        private static string UserIdToString(int userId) => string.Intern(userId.ToString());
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override Task<IList<Claim>> GetClaimsAsync(BackOfficeIdentityUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override Task AddClaimsAsync(BackOfficeIdentityUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override Task ReplaceClaimAsync(BackOfficeIdentityUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override Task RemoveClaimsAsync(BackOfficeIdentityUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override Task<IList<BackOfficeIdentityUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
 
 
         /// <summary>
@@ -859,25 +652,5 @@ namespace Umbraco.Cms.Core.Security
 
             return Task.FromResult(token?.Value);
         }
-
-        /// <summary>
-        /// Not supported in Umbraco, see comments above on GetTokenAsync, RemoveTokenAsync, SetTokenAsync
-        /// </summary>
-        /// <inheritdoc />
-        protected override Task<IdentityUserToken<string>> FindTokenAsync(BackOfficeIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco, see comments above on GetTokenAsync, RemoveTokenAsync, SetTokenAsync
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected override Task AddUserTokenAsync(IdentityUserToken<string> token) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco, see comments above on GetTokenAsync, RemoveTokenAsync, SetTokenAsync
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected override Task RemoveUserTokenAsync(IdentityUserToken<string> token) => throw new NotImplementedException();
     }
 }

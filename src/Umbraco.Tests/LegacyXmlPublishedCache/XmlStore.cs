@@ -7,9 +7,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -20,6 +22,7 @@ using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -40,7 +43,19 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
     /// then passed to all <see cref="PublishedContentCache"/> instances that are created (one per request).</para>
     /// <para>This class should *not* be public.</para>
     /// </remarks>
-    internal class XmlStore : IDisposable
+    internal class XmlStore :
+        IDisposable,
+        INotificationHandler<ContentDeletingNotification>,
+        INotificationHandler<MediaDeletingNotification>,
+        INotificationHandler<MemberDeletingNotification>,
+        INotificationHandler<ContentDeletingVersionsNotification>,
+        INotificationHandler<MediaDeletingVersionsNotification>,
+        INotificationHandler<ContentRefreshNotification>,
+        INotificationHandler<MediaRefreshNotification>,
+        INotificationHandler<MemberRefreshNotification>,
+        INotificationHandler<ContentTypeRefreshedNotification>,
+        INotificationHandler<MediaTypeRefreshedNotification>,
+        INotificationHandler<MemberTypeRefreshedNotification>
     {
         private readonly IDocumentRepository _documentRepository;
         private readonly IMediaRepository _mediaRepository;
@@ -174,54 +189,10 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         private void Initialize(bool testing, bool enableRepositoryEvents)
         {
-            if (testing == false || enableRepositoryEvents)
-                InitializeRepositoryEvents();
-            if (testing)
-                return;
 
             // not so soon! if eg installing we may not be able to load content yet
             // so replace this by LazyInitializeContent() called in Xml ppty getter
             //InitializeContent();
-        }
-
-        private void InitializeRepositoryEvents()
-        {
-            // plug repository event handlers
-            // these trigger within the transaction to ensure consistency
-            // and are used to maintain the central, database-level XML cache
-            DocumentRepository.ScopeEntityRemove += OnContentRemovingEntity;
-            DocumentRepository.ScopeVersionRemove += OnContentRemovingVersion;
-            DocumentRepository.ScopedEntityRefresh += OnContentRefreshedEntity;
-            MediaRepository.ScopeEntityRemove += OnMediaRemovingEntity;
-            MediaRepository.ScopeVersionRemove += OnMediaRemovingVersion;
-            MediaRepository.ScopedEntityRefresh += OnMediaRefreshedEntity;
-            MemberRepository.ScopeEntityRemove += OnMemberRemovingEntity;
-            MemberRepository.ScopeVersionRemove += OnMemberRemovingVersion;
-            MemberRepository.ScopedEntityRefresh += OnMemberRefreshedEntity;
-
-            // plug
-            ContentTypeService.ScopedRefreshedEntity += OnContentTypeRefreshedEntity;
-            MediaTypeService.ScopedRefreshedEntity += OnMediaTypeRefreshedEntity;
-            MemberTypeService.ScopedRefreshedEntity += OnMemberTypeRefreshedEntity;
-
-        }
-
-        private void ClearEvents()
-        {
-            DocumentRepository.ScopeEntityRemove -= OnContentRemovingEntity;
-            DocumentRepository.ScopeVersionRemove -= OnContentRemovingVersion;
-            DocumentRepository.ScopedEntityRefresh -= OnContentRefreshedEntity;
-            MediaRepository.ScopeEntityRemove -= OnMediaRemovingEntity;
-            MediaRepository.ScopeVersionRemove -= OnMediaRemovingVersion;
-            MediaRepository.ScopedEntityRefresh -= OnMediaRefreshedEntity;
-            MemberRepository.ScopeEntityRemove -= OnMemberRemovingEntity;
-            MemberRepository.ScopeVersionRemove -= OnMemberRemovingVersion;
-            MemberRepository.ScopedEntityRefresh -= OnMemberRefreshedEntity;
-
-            ContentTypeService.ScopedRefreshedEntity -= OnContentTypeRefreshedEntity;
-            MediaTypeService.ScopedRefreshedEntity -= OnMediaTypeRefreshedEntity;
-            MemberTypeService.ScopedRefreshedEntity -= OnMemberTypeRefreshedEntity;
-
         }
 
         private void LazyInitializeContent()
@@ -245,7 +216,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
 
         public void Dispose()
         {
-            ClearEvents();
         }
 
         #endregion
@@ -1475,19 +1445,31 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
         // it is not the case at the moment, instead a global lock is used whenever content is modified - well,
         // almost: rollback or unpublish do not implement it - nevertheless
 
-        private static void OnContentRemovingEntity(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
+        public void Handle(ContentDeletingNotification notification)
         {
-            OnRemovedEntity(args.Scope.Database, args.Entity);
+            foreach (IContent entity in notification.DeletedEntities)
+            {
+                // We used to do args.Scope.Database, but can't any more because it's not supported by the notification pattern
+                OnRemovedEntity(null, entity);
+            }
         }
 
-        private static void OnMediaRemovingEntity(MediaRepository sender, MediaRepository.ScopedEntityEventArgs args)
+        public void Handle(MediaDeletingNotification notification)
         {
-            OnRemovedEntity(args.Scope.Database, args.Entity);
+            foreach (IMedia entity in notification.DeletedEntities)
+            {
+                // We used to do args.Scope.Database, but can't any more because it's not supported by the notification pattern
+                OnRemovedEntity(null, entity);
+            }
         }
 
-        private static void OnMemberRemovingEntity(MemberRepository sender, MemberRepository.ScopedEntityEventArgs args)
+        public void Handle(MemberDeletingNotification notification)
         {
-            OnRemovedEntity(args.Scope.Database, args.Entity);
+            foreach (IMember entity in notification.DeletedEntities)
+            {
+                // We used to do args.Scope.Database, but can't any more because it's not supported by the notification pattern
+                OnRemovedEntity(null, entity);
+            }
         }
 
         private static void OnRemovedEntity(IUmbracoDatabase db, IContentBase item)
@@ -1499,19 +1481,14 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             // note: could be optimized by using "WHERE nodeId IN (...)" delete clauses
         }
 
-        private static void OnContentRemovingVersion(DocumentRepository sender, DocumentRepository.ScopedVersionEventArgs args)
+        public void Handle(ContentDeletingVersionsNotification notification)
         {
-            OnRemovedVersion(args.Scope.Database, args.EntityId, args.VersionId);
+            OnRemovedVersion(null, notification.Id, notification.SpecificVersion);
         }
 
-        private static void OnMediaRemovingVersion(MediaRepository sender, MediaRepository.ScopedVersionEventArgs args)
+        public void Handle(MediaDeletingVersionsNotification notification)
         {
-            OnRemovedVersion(args.Scope.Database, args.EntityId, args.VersionId);
-        }
-
-        private static void OnMemberRemovingVersion(MemberRepository sender, MemberRepository.ScopedVersionEventArgs args)
-        {
-            OnRemovedVersion(args.Scope.Database, args.EntityId, args.VersionId);
+            OnRemovedVersion(null, notification.Id, notification.SpecificVersion);
         }
 
         private static void OnRemovedVersion(IUmbracoDatabase db, int entityId, int versionId)
@@ -1534,10 +1511,10 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             return PropertiesImpactingAllVersions.Any(content.IsPropertyDirty);
         }
 
-        private void OnContentRefreshedEntity(DocumentRepository sender, DocumentRepository.ScopedEntityEventArgs args)
+        public void Handle(ContentRefreshNotification notification)
         {
-            var db = args.Scope.Database;
-            var entity = args.Entity;
+            var db = Mock.Of<IUmbracoDatabase>(); // Notification no longer carries the scope, so we can't get the DB
+            var entity = notification.Entity;
 
             // serialize edit values for preview
             var editXml = _entitySerializer.Serialize(entity, false).ToDataString();
@@ -1575,10 +1552,10 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
 
         }
 
-        private void OnMediaRefreshedEntity(MediaRepository sender, MediaRepository.ScopedEntityEventArgs args)
+        public void Handle(MediaRefreshNotification notification)
         {
-            var db = args.Scope.Database;
-            var entity = args.Entity;
+            var db = Mock.Of<IUmbracoDatabase>(); // Notification no longer carries the scope, so we can't get the DB
+            var entity = notification.Entity;
 
             // for whatever reason we delete some xml when the media is trashed
             // at least that's what the MediaService implementation did
@@ -1591,10 +1568,10 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             OnRepositoryRefreshed(db, dto1);
         }
 
-        private void OnMemberRefreshedEntity(MemberRepository sender, MemberRepository.ScopedEntityEventArgs args)
+        public void Handle(MemberRefreshNotification notification)
         {
-            var db = args.Scope.Database;
-            var entity = args.Entity;
+            var db = Mock.Of<IUmbracoDatabase>(); // Notification no longer carries the scope, so we can't get the DB
+            var entity = notification.Entity;
 
             var xml = _entitySerializer.Serialize(entity).ToDataString();
 
@@ -1638,29 +1615,31 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 });
         }
 
-        private void OnContentTypeRefreshedEntity(IContentTypeService sender, ContentTypeChange<IContentType>.EventArgs args)
+        public void Handle(ContentTypeRefreshedNotification notification)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Create;
-            var contentTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
+            var contentTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (contentTypeIds.Any())
                 RebuildContentAndPreviewXml(contentTypeIds: contentTypeIds);
         }
 
-        private void OnMediaTypeRefreshedEntity(IMediaTypeService sender, ContentTypeChange<IMediaType>.EventArgs args)
+        public void Handle(MediaTypeRefreshedNotification notification)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Create;
-            var mediaTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
+            var mediaTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (mediaTypeIds.Any())
+            {
                 RebuildMediaXml(contentTypeIds: mediaTypeIds);
+            }
         }
 
-        private void OnMemberTypeRefreshedEntity(IMemberTypeService sender, ContentTypeChange<IMemberType>.EventArgs args)
+        public void Handle(MemberTypeRefreshedNotification notification)
         {
             const ContentTypeChangeTypes types // only for those that have been refreshed
                 = ContentTypeChangeTypes.RefreshMain | ContentTypeChangeTypes.RefreshOther | ContentTypeChangeTypes.Create;
-            var memberTypeIds = args.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
+            var memberTypeIds = notification.Changes.Where(x => x.ChangeTypes.HasTypesAny(types)).Select(x => x.Item.Id).ToArray();
             if (memberTypeIds.Any())
                 RebuildMemberXml(contentTypeIds: memberTypeIds);
         }

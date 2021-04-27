@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly ISqlContext _sqlContext;
@@ -83,7 +83,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IMediaService mediaService,
             IEntityService entityService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IDataTypeService dataTypeService,
             ISqlContext sqlContext,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,

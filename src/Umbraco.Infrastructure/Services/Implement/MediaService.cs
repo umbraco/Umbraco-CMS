@@ -363,8 +363,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-
-
         /// <summary>
         /// Gets an <see cref="IMedia"/> object by Id
         /// </summary>
@@ -1051,33 +1049,38 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 scope.WriteLock(Cms.Core.Constants.Locks.MediaTree);
 
-                // no idea what those events are for, keep a simplified version
+                // emptying the recycle bin means deleting whatever is in there - do it properly!
+                IQuery<IMedia> query = Query<IMedia>().Where(x => x.ParentId == Cms.Core.Constants.System.RecycleBinMedia);
+                IMedia[] medias = _mediaRepository.Get(query).ToArray();
 
-                // v7 EmptyingRecycleBin and EmptiedRecycleBin events are greatly simplified since
-                // each deleted items will have its own deleting/deleted events. so, files and such
-                // are managed by Delete, and not here.
-                var emptyingRecycleBinNotification = new MediaEmptyingRecycleBinNotification(messages);
+                var emptyingRecycleBinNotification = new MediaEmptyingRecycleBinNotification(medias, messages);
                 if (scope.Notifications.PublishCancelable(emptyingRecycleBinNotification))
                 {
                     scope.Complete();
                     return OperationResult.Cancel(messages);
                 }
 
-                // emptying the recycle bin means deleting whatever is in there - do it properly!
-                var query = Query<IMedia>().Where(x => x.ParentId == Cms.Core.Constants.System.RecycleBinMedia);
-                var medias = _mediaRepository.Get(query).ToArray();
-                foreach (var media in medias)
+                foreach (IMedia media in medias)
                 {
                     DeleteLocked(scope, media, messages);
                     deleted.Add(media);
                 }
-                scope.Notifications.Publish(new MediaEmptiedRecycleBinNotification(new EventMessages()).WithStateFrom(emptyingRecycleBinNotification));
+                scope.Notifications.Publish(new MediaEmptiedRecycleBinNotification(deleted, new EventMessages()).WithStateFrom(emptyingRecycleBinNotification));
                 scope.Notifications.Publish(new MediaTreeChangeNotification(deleted, TreeChangeTypes.Remove, messages));
                 Audit(AuditType.Delete, userId, Cms.Core.Constants.System.RecycleBinMedia, "Empty Media recycle bin");
                 scope.Complete();
             }
 
             return OperationResult.Succeed(messages);
+        }
+
+        public bool RecycleBinSmells()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.MediaTree);
+                return _mediaRepository.RecycleBinSmells();
+            }
         }
 
         #endregion

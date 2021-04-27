@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class MemberController : ContentControllerBase
     {
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
         private readonly IMemberManager _memberManager;
@@ -85,7 +85,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IEventMessagesFactory eventMessages,
             ILocalizedTextService localizedTextService,
             PropertyEditorCollection propertyEditors,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IMemberService memberService,
             IMemberTypeService memberTypeService,
             IMemberManager memberManager,

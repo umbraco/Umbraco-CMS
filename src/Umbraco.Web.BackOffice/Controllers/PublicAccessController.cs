@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IPublicAccessService _publicAccessService;
         private readonly IEntityService _entityService;
         private readonly IMemberService _memberService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IMemberRoleManager _memberRoleManager;
 
         public PublicAccessController(
@@ -35,7 +35,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IContentService contentService,
             IEntityService entityService,
             IMemberService memberService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IMemberRoleManager memberRoleManager)
         {
             _contentService = contentService;

@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -34,12 +35,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
         public MemberManager CreateSut()
         {
+            var scopeProvider = new Mock<IScopeProvider>().Object;
             _mockMemberService = new Mock<IMemberService>();
             _fakeMemberStore = new MemberUserStore(
                 _mockMemberService.Object,
-                new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>())),
-                new Mock<IScopeProvider>().Object,
-                new IdentityErrorDescriber());
+                new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>()), scopeProvider),
+                scopeProvider,
+                new IdentityErrorDescriber(),
+                Mock.Of<IPublishedSnapshotAccessor>());
 
             _mockIdentityOptions = new Mock<IOptions<IdentityOptions>>();
             var idOptions = new IdentityOptions { Lockout = { AllowedForNewUsers = false } };
@@ -94,7 +97,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             {
                 PasswordConfig = "testConfig"
             };
-            
+
             //act
             IdentityResult identityResult = await sut.CreateAsync(fakeUser);
 

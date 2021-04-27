@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
     [TestFixture]
     public class MemberControllerUnitTests
     {
-        private UmbracoMapper _mapper;
+        private IUmbracoMapper _mapper;
 
         [Test]
         [AutoMoqData]
@@ -503,7 +503,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                     globalSettings,
                     new Mock<IHostingEnvironment>().Object)
             });
-            _mapper = new UmbracoMapper(map);
+            var scopeProvider = Mock.Of<IScopeProvider>(x => x.CreateScope(
+                It.IsAny<IsolationLevel>(),
+                It.IsAny<RepositoryCacheMode>(),
+                It.IsAny<IEventDispatcher>(),
+                It.IsAny<bool?>(),
+                It.IsAny<bool>(),
+                It.IsAny<bool>()) == Mock.Of<IScope>());
+
+            _mapper = new UmbracoMapper(map, scopeProvider);
 
             return new MemberController(
                 new DefaultCultureDictionary(
@@ -523,13 +531,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
                 backOfficeSecurityAccessor,
                 new ConfigurationEditorJsonSerializer(),
                 passwordChanger,
-                Mock.Of<IScopeProvider>(x => x.CreateScope(
-                    It.IsAny<IsolationLevel>(),
-                    It.IsAny<RepositoryCacheMode>(),
-                    It.IsAny<IEventDispatcher>(),
-                    It.IsAny<bool?>(),
-                    It.IsAny<bool>(),
-                    It.IsAny<bool>()) == Mock.Of<IScope>()));
+                scopeProvider
+                );
         }
 
         /// <summary>

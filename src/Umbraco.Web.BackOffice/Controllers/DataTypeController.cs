@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly ContentSettings _contentSettings;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly PropertyEditorCollection _propertyEditorCollection;
         private readonly IContentTypeService _contentTypeService;
         private readonly IMediaTypeService _mediaTypeService;
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             PropertyEditorCollection propertyEditors,
             IDataTypeService dataTypeService,
             IOptions<ContentSettings> contentSettings,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             PropertyEditorCollection propertyEditorCollection,
             IContentTypeService contentTypeService,
             IMediaTypeService mediaTypeService,

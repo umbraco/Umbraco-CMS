@@ -48,9 +48,9 @@ namespace Umbraco.Extensions
         /// <typeparam name="T">The type of the site domain helper.</typeparam>
         /// <param name="builder"></param>
         public static void SetSiteDomainHelper<T>(this IUmbracoBuilder builder)
-            where T : class, ISiteDomainHelper
+            where T : class, ISiteDomainMapper
         {
-            builder.Services.AddUnique<ISiteDomainHelper, T>();
+            builder.Services.AddUnique<ISiteDomainMapper, T>();
         }
 
         /// <summary>
@@ -58,7 +58,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <param name="factory">A function creating a helper.</param>
-        public static void SetSiteDomainHelper(this IUmbracoBuilder builder, Func<IServiceProvider, ISiteDomainHelper> factory)
+        public static void SetSiteDomainHelper(this IUmbracoBuilder builder, Func<IServiceProvider, ISiteDomainMapper> factory)
         {
             builder.Services.AddUnique(factory);
         }
@@ -68,7 +68,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="builder">The builder.</param>
         /// <param name="helper">A helper.</param>
-        public static void SetSiteDomainHelper(this IUmbracoBuilder builder, ISiteDomainHelper helper)
+        public static void SetSiteDomainHelper(this IUmbracoBuilder builder, ISiteDomainMapper helper)
         {
             builder.Services.AddUnique(helper);
         }

@@ -774,7 +774,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         }
 
         public void Stop(bool immediate)
-        {            
+        {
             _watcher.EnableRaisingEvents = false;
             _watcher.Dispose();
             _locker.Dispose();

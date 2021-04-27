@@ -9,21 +9,25 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
 {
+
     /// <summary>
     /// A custom user store that uses Umbraco member data
     /// </summary>
-    public class MemberUserStore : UserStoreBase<MemberIdentityUser, UmbracoIdentityRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityUserToken<string>, IdentityRoleClaim<string>>
+    public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdentityRole>, IMemberUserStore
     {
         private const string genericIdentityErrorCode = "IdentityErrorUserStore";
         private readonly IMemberService _memberService;
-        private readonly UmbracoMapper _mapper;
+        private readonly IUmbracoMapper _mapper;
         private readonly IScopeProvider _scopeProvider;
+        private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MemberUserStore"/> class for the members identity store
@@ -32,29 +36,19 @@ namespace Umbraco.Cms.Core.Security
         /// <param name="mapper">The mapper for properties</param>
         /// <param name="scopeProvider">The scope provider</param>
         /// <param name="describer">The error describer</param>
-        public MemberUserStore(IMemberService memberService, UmbracoMapper mapper, IScopeProvider scopeProvider, IdentityErrorDescriber describer)
-        : base(describer)
+        public MemberUserStore(
+            IMemberService memberService,
+            IUmbracoMapper mapper,
+            IScopeProvider scopeProvider,
+            IdentityErrorDescriber describer,
+            IPublishedSnapshotAccessor publishedSnapshotAccessor)
+            : base(describer)
         {
             _memberService = memberService ?? throw new ArgumentNullException(nameof(memberService));
             _mapper = mapper ?? throw new ArgumentNullException(nameof(mapper));
             _scopeProvider = scopeProvider ?? throw new ArgumentNullException(nameof(scopeProvider));
+            _publishedSnapshotAccessor = publishedSnapshotAccessor;
         }
-
-        //TODO: why is this not supported?
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override IQueryable<MemberIdentityUser> Users => throw new NotImplementedException();
-
-        /// <inheritdoc />
-        public override Task<string> GetNormalizedUserNameAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
-            => GetUserNameAsync(user, cancellationToken);
-
-        /// <inheritdoc />
-        public override Task SetNormalizedUserNameAsync(MemberIdentityUser user, string normalizedName, CancellationToken cancellationToken = default)
-            => SetUserNameAsync(user, normalizedName, cancellationToken);
 
         /// <inheritdoc />
         public override Task<IdentityResult> CreateAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
@@ -67,6 +61,8 @@ namespace Umbraco.Cms.Core.Security
                 {
                     throw new ArgumentNullException(nameof(user));
                 }
+
+                using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
 
                 // create member
                 IMember memberEntity = _memberService.CreateMember(
@@ -130,36 +126,40 @@ namespace Umbraco.Cms.Core.Security
                     throw new InvalidOperationException("The user id must be an integer to work with Umbraco");
                 }
 
-                using (IScope scope = _scopeProvider.CreateScope())
+                using IScope scope = _scopeProvider.CreateScope(autoComplete: true);
+
+                IMember found = _memberService.GetById(asInt.Result);
+                if (found != null)
                 {
-                    IMember found = _memberService.GetById(asInt.Result);
-                    if (found != null)
+                    // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
+                    var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
+
+                    var memberChangeType = UpdateMemberProperties(found, user);
+                    if (memberChangeType == MemberDataChangeType.FullSave)
                     {
-                        // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
-                        var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
-
-                        if (UpdateMemberProperties(found, user))
-                        {
-                            _memberService.Save(found);
-                        }
-
-                        // TODO: when to implement external login service?
-
-                        //if (isLoginsPropertyDirty)
-                        //{
-                        //    _externalLoginService.Save(
-                        //        found.Id,
-                        //        user.Logins.Select(x => new ExternalLogin(
-                        //            x.LoginProvider,
-                        //            x.ProviderKey,
-                        //            x.UserData)));
-                        //}
+                        _memberService.Save(found);
+                    }
+                    else if (memberChangeType == MemberDataChangeType.LoginOnly)
+                    {
+                        // If the member is only logging in, just issue that command without
+                        // any write locks so we are creating a bottleneck.
+                        _memberService.SetLastLogin(found.Username, DateTime.Now);
                     }
 
-                    scope.Complete();
+                    // TODO: when to implement external login service?
 
-                    return Task.FromResult(IdentityResult.Success);
+                    //if (isLoginsPropertyDirty)
+                    //{
+                    //    _externalLoginService.Save(
+                    //        found.Id,
+                    //        user.Logins.Select(x => new ExternalLogin(
+                    //            x.LoginProvider,
+                    //            x.ProviderKey,
+                    //            x.UserData)));
+                    //}
                 }
+
+                return Task.FromResult(IdentityResult.Success);
             }
             catch (Exception ex)
             {
@@ -195,9 +195,6 @@ namespace Umbraco.Cms.Core.Security
                 return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = genericIdentityErrorCode, Description = ex.Message }));
             }
         }
-
-        /// <inheritdoc />
-        public override Task<MemberIdentityUser> FindByIdAsync(string userId, CancellationToken cancellationToken = default) => FindUserAsync(userId, cancellationToken);
 
         /// <inheritdoc />
         protected override Task<MemberIdentityUser> FindUserAsync(string userId, CancellationToken cancellationToken)
@@ -236,30 +233,6 @@ namespace Umbraco.Cms.Core.Security
         }
 
         /// <inheritdoc />
-        public override async Task SetPasswordHashAsync(MemberIdentityUser user, string passwordHash, CancellationToken cancellationToken = default)
-        {
-            await base.SetPasswordHashAsync(user, passwordHash, cancellationToken);
-
-            // Clear this so that it's reset at the repository level
-            user.PasswordConfig = null;
-            user.LastPasswordChangeDateUtc = DateTime.UtcNow;
-        }
-
-        /// <inheritdoc />
-        public override async Task<bool> HasPasswordAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
-        {
-            // This checks if it's null
-            bool result = await base.HasPasswordAsync(user, cancellationToken);
-            if (result)
-            {
-                // we also want to check empty
-                return string.IsNullOrEmpty(user.PasswordHash) == false;
-            }
-
-            return false;
-        }
-
-        /// <inheritdoc />
         public override Task<MemberIdentityUser> FindByEmailAsync(string email, CancellationToken cancellationToken = default)
         {
             cancellationToken.ThrowIfCancellationRequested();
@@ -271,14 +244,6 @@ namespace Umbraco.Cms.Core.Security
 
             return Task.FromResult(AssignLoginsCallback(result));
         }
-
-        /// <inheritdoc />
-        public override Task<string> GetNormalizedEmailAsync(MemberIdentityUser user, CancellationToken cancellationToken)
-            => GetEmailAsync(user, cancellationToken);
-
-        /// <inheritdoc />
-        public override Task SetNormalizedEmailAsync(MemberIdentityUser user, string normalizedEmail, CancellationToken cancellationToken)
-            => SetEmailAsync(user, normalizedEmail, cancellationToken);
 
         /// <inheritdoc />
         public override Task AddLoginAsync(MemberIdentityUser user, UserLoginInfo login, CancellationToken cancellationToken = default)
@@ -434,93 +399,33 @@ namespace Umbraco.Cms.Core.Security
             });
         }
 
-        /// <inheritdoc />
-        public override Task AddToRoleAsync(MemberIdentityUser user, string role, CancellationToken cancellationToken = default)
-        {
-            if (cancellationToken != null)
-            {
-                cancellationToken.ThrowIfCancellationRequested();
-            }
-
-            ThrowIfDisposed();
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            if (role == null)
-            {
-                throw new ArgumentNullException(nameof(role));
-            }
-
-            if (string.IsNullOrWhiteSpace(role))
-            {
-                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(role));
-            }
-
-            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == role);
-
-            if (userRole == null)
-            {
-                _memberService.AssignRole(user.UserName, role);
-                user.AddRole(role);
-            }
-
-            return Task.CompletedTask;
-        }
-
-        /// <inheritdoc/>
-        public override Task RemoveFromRoleAsync(MemberIdentityUser user, string role, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            if (role == null)
-            {
-                throw new ArgumentNullException(nameof(role));
-            }
-
-            if (string.IsNullOrWhiteSpace(role))
-            {
-                throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(role));
-            }
-
-            IdentityUserRole<string> userRole = user.Roles.SingleOrDefault(r => r.RoleId == role);
-
-            if (userRole != null)
-            {
-                _memberService.DissociateRole(user.UserName, userRole.RoleId);
-                user.Roles.Remove(userRole);
-            }
-
-            return Task.CompletedTask;
-        }
-
         /// <summary>
         /// Gets a list of role names the specified user belongs to.
         /// </summary>
+        /// <remarks>
+        /// This lazy loads the roles for the member
+        /// </remarks>
         public override Task<IList<string>> GetRolesAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            if (user == null)
+            EnsureRoles(user);
+            return base.GetRolesAsync(user, cancellationToken);
+        }
+
+        private void EnsureRoles(MemberIdentityUser user)
+        {
+            if (user.Roles.Count == 0)
             {
-                throw new ArgumentNullException(nameof(user));
+                // if there are no roles, they either haven't been loaded since we don't eagerly
+                // load for members, or they just have no roles.
+                IEnumerable<string> currentRoles = _memberService.GetAllRoles(user.UserName);
+                ICollection<IdentityUserRole<string>> roles = currentRoles.Select(role => new IdentityUserRole<string>
+                {
+                    RoleId = role,
+                    UserId = user.Id
+                }).ToList();
+
+                user.Roles = roles;
             }
-
-            IEnumerable<string> currentRoles = _memberService.GetAllRoles(user.UserName);
-            ICollection<IdentityUserRole<string>> roles = currentRoles.Select(role => new IdentityUserRole<string>
-            {
-                RoleId = role,
-                UserId = user.Id
-            }).ToList();
-
-            user.Roles = roles;
-            return Task.FromResult((IList<string>)user.Roles.Select(x => x.RoleId).ToList());
         }
 
         /// <summary>
@@ -528,19 +433,9 @@ namespace Umbraco.Cms.Core.Security
         /// </summary>
         public override Task<bool> IsInRoleAsync(MemberIdentityUser user, string roleName, CancellationToken cancellationToken = default)
         {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
+            EnsureRoles(user);
 
-            if (string.IsNullOrWhiteSpace(roleName))
-            {
-                throw new ArgumentNullException(nameof(roleName));
-            }
-
-            return Task.FromResult(user.Roles.Select(x => x.RoleId).InvariantContains(roleName));
+            return base.IsInRoleAsync(user, roleName, cancellationToken);
         }
 
         /// <summary>
@@ -597,22 +492,6 @@ namespace Umbraco.Cms.Core.Security
             return found;
         }
 
-        /// <inheritdoc />
-        public override Task<string> GetSecurityStampAsync(MemberIdentityUser user, CancellationToken cancellationToken = default)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            ThrowIfDisposed();
-            if (user == null)
-            {
-                throw new ArgumentNullException(nameof(user));
-            }
-
-            // the stamp cannot be null, so if it is currently null then we'll just return a hash of the password
-            return Task.FromResult(user.SecurityStamp.IsNullOrWhiteSpace()
-                ? user.PasswordHash.GenerateHash()
-                : user.SecurityStamp);
-        }
-
         private MemberIdentityUser AssignLoginsCallback(MemberIdentityUser user)
         {
             if (user != null)
@@ -624,70 +503,70 @@ namespace Umbraco.Cms.Core.Security
             return user;
         }
 
-        private bool UpdateMemberProperties(IMember member, MemberIdentityUser identityUserMember)
+        private MemberDataChangeType UpdateMemberProperties(IMember member, MemberIdentityUser identityUser)
         {
-            var anythingChanged = false;
+            var changeType = MemberDataChangeType.None;
 
             // don't assign anything if nothing has changed as this will trigger the track changes of the model
-            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDateUtc))
-                || (member.LastLoginDate != default && identityUserMember.LastLoginDateUtc.HasValue == false)
-                || (identityUserMember.LastLoginDateUtc.HasValue && member.LastLoginDate.ToUniversalTime() != identityUserMember.LastLoginDateUtc.Value))
+            if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDateUtc))
+                || (member.LastLoginDate != default && identityUser.LastLoginDateUtc.HasValue == false)
+                || (identityUser.LastLoginDateUtc.HasValue && member.LastLoginDate.ToUniversalTime() != identityUser.LastLoginDateUtc.Value))
             {
-                anythingChanged = true;
+                changeType = MemberDataChangeType.LoginOnly;
 
                 // if the LastLoginDate is being set to MinValue, don't convert it ToLocalTime
-                DateTime dt = identityUserMember.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUserMember.LastLoginDateUtc.Value.ToLocalTime();
+                DateTime dt = identityUser.LastLoginDateUtc == DateTime.MinValue ? DateTime.MinValue : identityUser.LastLoginDateUtc.Value.ToLocalTime();
                 member.LastLoginDate = dt;
             }
 
-            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.LastPasswordChangeDateUtc))
-                || (member.LastPasswordChangeDate != default && identityUserMember.LastPasswordChangeDateUtc.HasValue == false)
-                || (identityUserMember.LastPasswordChangeDateUtc.HasValue && member.LastPasswordChangeDate.ToUniversalTime() != identityUserMember.LastPasswordChangeDateUtc.Value))
+            if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastPasswordChangeDateUtc))
+                || (member.LastPasswordChangeDate != default && identityUser.LastPasswordChangeDateUtc.HasValue == false)
+                || (identityUser.LastPasswordChangeDateUtc.HasValue && member.LastPasswordChangeDate.ToUniversalTime() != identityUser.LastPasswordChangeDateUtc.Value))
             {
-                anythingChanged = true;
-                member.LastPasswordChangeDate = identityUserMember.LastPasswordChangeDateUtc.Value.ToLocalTime();
+                changeType = MemberDataChangeType.FullSave;
+                member.LastPasswordChangeDate = identityUser.LastPasswordChangeDateUtc.Value.ToLocalTime();
             }
 
-            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.Comments))
-                && member.Comments != identityUserMember.Comments && identityUserMember.Comments.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Comments))
+                && member.Comments != identityUser.Comments && identityUser.Comments.IsNullOrWhiteSpace() == false)
             {
-                anythingChanged = true;
-                member.Comments = identityUserMember.Comments;
+                changeType = MemberDataChangeType.FullSave;
+                member.Comments = identityUser.Comments;
             }
 
-            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.EmailConfirmed))
-                || (member.EmailConfirmedDate.HasValue && member.EmailConfirmedDate.Value != default && identityUserMember.EmailConfirmed == false)
-                || ((member.EmailConfirmedDate.HasValue == false || member.EmailConfirmedDate.Value == default) && identityUserMember.EmailConfirmed))
+            if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.EmailConfirmed))
+                || (member.EmailConfirmedDate.HasValue && member.EmailConfirmedDate.Value != default && identityUser.EmailConfirmed == false)
+                || ((member.EmailConfirmedDate.HasValue == false || member.EmailConfirmedDate.Value == default) && identityUser.EmailConfirmed))
             {
-                anythingChanged = true;
-                member.EmailConfirmedDate = identityUserMember.EmailConfirmed ? (DateTime?)DateTime.Now : null;
+                changeType = MemberDataChangeType.FullSave;
+                member.EmailConfirmedDate = identityUser.EmailConfirmed ? (DateTime?)DateTime.Now : null;
             }
 
-            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.Name))
-                && member.Name != identityUserMember.Name && identityUserMember.Name.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Name))
+                && member.Name != identityUser.Name && identityUser.Name.IsNullOrWhiteSpace() == false)
             {
-                anythingChanged = true;
-                member.Name = identityUserMember.Name;
+                changeType = MemberDataChangeType.FullSave;
+                member.Name = identityUser.Name;
             }
 
-            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.Email))
-                && member.Email != identityUserMember.Email && identityUserMember.Email.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Email))
+                && member.Email != identityUser.Email && identityUser.Email.IsNullOrWhiteSpace() == false)
             {
-                anythingChanged = true;
-                member.Email = identityUserMember.Email;
+                changeType = MemberDataChangeType.FullSave;
+                member.Email = identityUser.Email;
             }
 
-            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.AccessFailedCount))
-                && member.FailedPasswordAttempts != identityUserMember.AccessFailedCount)
+            if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.AccessFailedCount))
+                && member.FailedPasswordAttempts != identityUser.AccessFailedCount)
             {
-                anythingChanged = true;
-                member.FailedPasswordAttempts = identityUserMember.AccessFailedCount;
+                changeType = MemberDataChangeType.FullSave;
+                member.FailedPasswordAttempts = identityUser.AccessFailedCount;
             }
 
-            if (member.IsLockedOut != identityUserMember.IsLockedOut)
+            if (member.IsLockedOut != identityUser.IsLockedOut)
             {
-                anythingChanged = true;
-                member.IsLockedOut = identityUserMember.IsLockedOut;
+                changeType = MemberDataChangeType.FullSave;
+                member.IsLockedOut = identityUser.IsLockedOut;
 
                 if (member.IsLockedOut)
                 {
@@ -696,112 +575,66 @@ namespace Umbraco.Cms.Core.Security
                 }
             }
 
-            if (member.IsApproved != identityUserMember.IsApproved)
+            if (member.IsApproved != identityUser.IsApproved)
             {
-                anythingChanged = true;
-                member.IsApproved = identityUserMember.IsApproved;
+                changeType = MemberDataChangeType.FullSave;
+                member.IsApproved = identityUser.IsApproved;
             }
 
-            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.UserName))
-                && member.Username != identityUserMember.UserName && identityUserMember.UserName.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.UserName))
+                && member.Username != identityUser.UserName && identityUser.UserName.IsNullOrWhiteSpace() == false)
             {
-                anythingChanged = true;
-                member.Username = identityUserMember.UserName;
+                changeType = MemberDataChangeType.FullSave;
+                member.Username = identityUser.UserName;
             }
 
-            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.PasswordHash))
-                && member.RawPasswordValue != identityUserMember.PasswordHash && identityUserMember.PasswordHash.IsNullOrWhiteSpace() == false)
+            if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.PasswordHash))
+                && member.RawPasswordValue != identityUser.PasswordHash && identityUser.PasswordHash.IsNullOrWhiteSpace() == false)
             {
-                anythingChanged = true;
-                member.RawPasswordValue = identityUserMember.PasswordHash;
-                member.PasswordConfiguration = identityUserMember.PasswordConfig;
+                changeType = MemberDataChangeType.FullSave;
+                member.RawPasswordValue = identityUser.PasswordHash;
+                member.PasswordConfiguration = identityUser.PasswordConfig;
             }
 
-            if (member.SecurityStamp != identityUserMember.SecurityStamp)
+            if (member.SecurityStamp != identityUser.SecurityStamp)
             {
-                anythingChanged = true;
-                member.SecurityStamp = identityUserMember.SecurityStamp;
+                changeType = MemberDataChangeType.FullSave;
+                member.SecurityStamp = identityUser.SecurityStamp;
             }
 
-            // TODO: Fix this for Groups too (as per backoffice comment)
-            if (identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.Roles)) || identityUserMember.IsPropertyDirty(nameof(MemberIdentityUser.Groups)))
+            if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.Roles)))
             {
+                changeType = MemberDataChangeType.FullSave;
+
+                var identityUserRoles = identityUser.Roles.Select(x => x.RoleId).ToArray();
+                _memberService.ReplaceRoles(new[] { member.Id }, identityUserRoles);
             }
 
             // reset all changes
-            identityUserMember.ResetDirtyProperties(false);
+            identityUser.ResetDirtyProperties(false);
 
-            return anythingChanged;
+            return changeType;
         }
 
-        private static int UserIdToInt(string userId)
+        public IPublishedContent GetPublishedMember(MemberIdentityUser user)
         {
-            Attempt<int> attempt = userId.TryConvertTo<int>();
-            if (attempt.Success)
+            if (user == null)
             {
-                return attempt.Result;
+                return null;
             }
-
-            throw new InvalidOperationException("Unable to convert user ID to int", attempt.Exception);
+            IMember member = _memberService.GetByKey(user.Key);
+            if (member == null)
+            {
+                return null;
+            }
+            return _publishedSnapshotAccessor.PublishedSnapshot?.Members.Get(member);
         }
 
-        private static string UserIdToString(int userId) => string.Intern(userId.ToString());
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override Task<IList<Claim>> GetClaimsAsync(MemberIdentityUser user, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override Task AddClaimsAsync(MemberIdentityUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override Task ReplaceClaimAsync(MemberIdentityUser user, Claim claim, Claim newClaim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override Task RemoveClaimsAsync(MemberIdentityUser user, IEnumerable<Claim> claims, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        public override Task<IList<MemberIdentityUser>> GetUsersForClaimAsync(Claim claim, CancellationToken cancellationToken = default) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected override Task<IdentityUserToken<string>> FindTokenAsync(MemberIdentityUser user, string loginProvider, string name, CancellationToken cancellationToken) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected override Task AddUserTokenAsync(IdentityUserToken<string> token) => throw new NotImplementedException();
-
-        /// <summary>
-        /// Not supported in Umbraco
-        /// </summary>
-        /// <inheritdoc />
-        [EditorBrowsable(EditorBrowsableState.Never)]
-        protected override Task RemoveUserTokenAsync(IdentityUserToken<string> token) => throw new NotImplementedException();
-
+        private enum MemberDataChangeType
+        {
+            None,
+            LoginOnly,
+            FullSave
+        }
     }
 }

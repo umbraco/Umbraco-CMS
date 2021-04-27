@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IUserService _userService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IBackOfficeUserManager _backOfficeUserManager;
         private readonly ILoggerFactory _loggerFactory;
         private readonly ILocalizedTextService _localizedTextService;
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IImageUrlGenerator imageUrlGenerator,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IUserService userService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IBackOfficeUserManager backOfficeUserManager,
             ILoggerFactory loggerFactory,
             ILocalizedTextService localizedTextService,

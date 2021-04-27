@@ -32,8 +32,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         private ContentTypeService ContentTypeService => (ContentTypeService)GetRequiredService<IContentTypeService>();
 
-        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
-            .AddNotificationHandler<ContentMovedToRecycleBinNotification, ContentNotificationHandler>();
+        protected override void CustomTestSetup(IUmbracoBuilder builder)
+        {
+            builder.AddNotificationHandler<ContentMovedToRecycleBinNotification, ContentNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeDeletedNotification, ContentTypeNotificationHandler>();
+        }
 
         [Test]
         public void CanSaveAndGetIsElement()
@@ -474,7 +477,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentType contentType = ContentTypeBuilder.CreateSimpleContentType("page", "Page", defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType);
 
-            ContentTypeService.Deleted += (sender, args) => deletedEntities += args.DeletedEntities.Count();
+            ContentTypeNotificationHandler.Deleted += (notification) =>  deletedEntities += notification.DeletedEntities.Count();
 
             ContentTypeService.Delete(contentType);
 
@@ -494,7 +497,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             ContentType contentType2 = ContentTypeBuilder.CreateSimpleContentType("otherPage", "Other page", defaultTemplateId: template.Id);
             ContentTypeService.Save(contentType2);
 
-            ContentTypeService.Deleted += (sender, args) => deletedEntities += args.DeletedEntities.Count();
+            ContentTypeNotificationHandler.Deleted += (notification) => deletedEntities += notification.DeletedEntities.Count();
 
             ContentTypeService.Delete(contentType);
             ContentTypeService.Delete(contentType2);
@@ -516,7 +519,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             contentType2.ParentId = contentType.Id;
             ContentTypeService.Save(contentType2);
 
-            ContentTypeService.Deleted += (sender, args) => deletedEntities += args.DeletedEntities.Count();
+            ContentTypeNotificationHandler.Deleted += (notification) => deletedEntities += notification.DeletedEntities.Count();
 
             ContentTypeService.Delete(contentType);
 
@@ -1735,12 +1738,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             return list.ToArray();
         }
 
-        public class ContentNotificationHandler :
-            INotificationHandler<ContentMovedToRecycleBinNotification>
+        public class ContentNotificationHandler : INotificationHandler<ContentMovedToRecycleBinNotification>
         {
             public void Handle(ContentMovedToRecycleBinNotification notification) => MovedContentToRecycleBin?.Invoke(notification);
-
             public static Action<ContentMovedToRecycleBinNotification> MovedContentToRecycleBin { get; set; }
+        }
+
+        public class ContentTypeNotificationHandler : INotificationHandler<ContentTypeDeletedNotification>
+        {
+            public void Handle(ContentTypeDeletedNotification notification) => Deleted?.Invoke(notification);
+            public static Action<ContentTypeDeletedNotification> Deleted { get; set; }
         }
     }
 }
