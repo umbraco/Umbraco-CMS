@@ -236,8 +236,6 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
             CustomTestSetup(builder);
 
-
-            builder.AddExamineIndexConfiguration();
             builder.Build();
         }
 
