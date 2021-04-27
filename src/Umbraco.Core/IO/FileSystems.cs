@@ -200,7 +200,7 @@ namespace Umbraco.Cms.Core.IO
             }
             catch (UnauthorizedAccessException exception)
             {
-                throw new InvalidOperationException(
+                throw new UnauthorizedAccessException(
                     "Can't register the stylesheet filesystem, "
                     + "this is most likely caused by using a PhysicalFileSystem with an incorrect "
                     + "rootPath/rootUrl. RootPath must be <installation folder>\\wwwroot\\css"
