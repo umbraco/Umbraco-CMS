@@ -46,7 +46,7 @@
                 "defaultValue": "UmbracoProject",
                 "fallbackVariableName": "name"
             },
-            "replaces":"Umbraco.Web.UI.NetCore"
+            "replaces":"Umbraco.Cms.Web.UI.NetCore"
         },
         "PackageTestSiteName": {
             "type": "parameter",
