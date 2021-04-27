@@ -5,8 +5,8 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Umbraco.Cms.Core.Exceptions;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Infrastructure.PublishedCache.Snap;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache
 {

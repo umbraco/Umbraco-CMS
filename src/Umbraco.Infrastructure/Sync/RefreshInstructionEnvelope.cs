@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Cache;
 
-namespace Umbraco.Core.Sync
+namespace Umbraco.Cms.Infrastructure.Sync
 {
     /// <summary>
     /// Used for any 'Batched' <see cref="IServerMessenger"/> instances which specifies a set of <see cref="RefreshInstruction"/> targeting a collection of

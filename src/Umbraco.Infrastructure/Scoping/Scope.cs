@@ -1,17 +1,17 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
+using System.Text;
+using System.Threading;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
+using Umbraco.Extensions;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Events;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence;
 using CoreDebugSettings = Umbraco.Cms.Core.Configuration.Models.CoreDebugSettings;
 
-namespace Umbraco.Core.Scoping
+namespace Umbraco.Cms.Core.Scoping
 {
     /// <summary>
     /// Implements <see cref="IScope"/>.
@@ -21,7 +21,8 @@ namespace Umbraco.Core.Scoping
     {
         private readonly ScopeProvider _scopeProvider;
         private readonly CoreDebugSettings _coreDebugSettings;
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
+        private readonly IEventAggregator _eventAggregator;
         private readonly ILogger<Scope> _logger;
 
         private readonly IsolationLevel _isolationLevel;
@@ -38,12 +39,24 @@ namespace Umbraco.Core.Scoping
         private EventMessages _messages;
         private ICompletable _fscope;
         private IEventDispatcher _eventDispatcher;
+        // eventually this may need to be injectable - for now we'll create it explicitly and let future needs determine if it should be injectable
+        private IScopedNotificationPublisher _notificationPublisher;
+
+        private readonly object _dictionaryLocker;
+        private HashSet<int> _readLocks;
+        private HashSet<int> _writeLocks;
+        private Dictionary<Guid, Dictionary<int, int>> _readLockDictionary;
+        private Dictionary<Guid, Dictionary<int, int>> _writeLockDictionary;
+
+        internal Dictionary<Guid, Dictionary<int, int>> ReadLocks => _readLockDictionary;
+        internal Dictionary<Guid, Dictionary<int, int>> WriteLocks => _writeLockDictionary;
 
         // initializes a new scope
         private Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
+            IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             Scope parent,
@@ -58,7 +71,8 @@ namespace Umbraco.Core.Scoping
         {
             _scopeProvider = scopeProvider;
             _coreDebugSettings = coreDebugSettings;
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
+            _eventAggregator = eventAggregator;
             _logger = logger;
 
             Context = scopeContext;
@@ -72,23 +86,38 @@ namespace Umbraco.Core.Scoping
 
             Detachable = detachable;
 
+            _dictionaryLocker = new object();
+
 #if DEBUG_SCOPES
             _scopeProvider.RegisterScope(this);
-            Console.WriteLine("create " + InstanceId.ToString("N").Substring(0, 8));
 #endif
+            logger.LogTrace("Create {InstanceId} on thread {ThreadId}", InstanceId.ToString("N").Substring(0, 8), Thread.CurrentThread.ManagedThreadId);
 
             if (detachable)
             {
-                if (parent != null) throw new ArgumentException("Cannot set parent on detachable scope.", nameof(parent));
-                if (scopeContext != null) throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
-                if (autoComplete) throw new ArgumentException("Cannot auto-complete a detachable scope.", nameof(autoComplete));
+                if (parent != null)
+                {
+                    throw new ArgumentException("Cannot set parent on detachable scope.", nameof(parent));
+                }
+
+                if (scopeContext != null)
+                {
+                    throw new ArgumentException("Cannot set context on detachable scope.", nameof(scopeContext));
+                }
+
+                if (autoComplete)
+                {
+                    throw new ArgumentException("Cannot auto-complete a detachable scope.", nameof(autoComplete));
+                }
 
                 // detachable creates its own scope context
                 Context = new ScopeContext();
 
                 // see note below
                 if (scopeFileSystems == true)
+                {
                     _fscope = fileSystems.Shadow();
+                }
 
                 return;
             }
@@ -101,16 +130,22 @@ namespace Umbraco.Core.Scoping
                 // TODO: means that it's OK to go from L2 to None for reading purposes, but writing would be BAD!
                 // this is for XmlStore that wants to bypass caches when rebuilding XML (same for NuCache)
                 if (repositoryCacheMode != RepositoryCacheMode.Unspecified && parent.RepositoryCacheMode > repositoryCacheMode)
+                {
                     throw new ArgumentException($"Value '{repositoryCacheMode}' cannot be lower than parent value '{parent.RepositoryCacheMode}'.", nameof(repositoryCacheMode));
+                }
 
                 // cannot specify a dispatcher!
                 if (_eventDispatcher != null)
+                {
                     throw new ArgumentException("Value cannot be specified on nested scope.", nameof(eventDispatcher));
+                }
 
                 // cannot specify a different fs scope!
                 // can be 'true' only on outer scope (and false does not make much sense)
                 if (scopeFileSystems != null && parent._scopeFileSystem != scopeFileSystems)
+                {
                     throw new ArgumentException($"Value '{scopeFileSystems.Value}' be different from parent value '{parent._scopeFileSystem}'.", nameof(scopeFileSystems));
+                }
             }
             else
             {
@@ -118,7 +153,9 @@ namespace Umbraco.Core.Scoping
                 // every scoped FS to trigger the creation of shadow FS "on demand", and that would be
                 // pretty pointless since if scopeFileSystems is true, we *know* we want to shadow
                 if (scopeFileSystems == true)
+                {
                     _fscope = fileSystems.Shadow();
+                }
             }
         }
 
@@ -126,7 +163,8 @@ namespace Umbraco.Core.Scoping
         public Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
+            IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             bool detachable,
@@ -137,14 +175,15 @@ namespace Umbraco.Core.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileSystem, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, null, scopeContext, detachable, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         // initializes a new scope in a nested scopes chain, with its parent
         public Scope(
             ScopeProvider scopeProvider,
             CoreDebugSettings coreDebugSettings,
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
+            IEventAggregator eventAggregator,
             ILogger<Scope> logger,
             FileSystems fileSystems,
             Scope parent,
@@ -154,10 +193,12 @@ namespace Umbraco.Core.Scoping
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false)
-            : this(scopeProvider, coreDebugSettings, mediaFileSystem, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
+            : this(scopeProvider, coreDebugSettings, mediaFileManager, eventAggregator, logger, fileSystems, parent, null, false, isolationLevel, repositoryCacheMode, eventDispatcher, scopeFileSystems, callContext, autoComplete)
         { }
 
         public Guid InstanceId { get; } = Guid.NewGuid();
+
+        public int CreatedThreadId { get; } = Thread.CurrentThread.ManagedThreadId;
 
         public ISqlContext SqlContext => _scopeProvider.SqlContext;
 
@@ -166,8 +207,16 @@ namespace Umbraco.Core.Scoping
         {
             get
             {
-                if (_callContext) return true;
-                if (ParentScope != null) return ParentScope.CallContext;
+                if (_callContext)
+                {
+                    return true;
+                }
+
+                if (ParentScope != null)
+                {
+                    return ParentScope.CallContext;
+                }
+
                 return false;
             }
             set => _callContext = value;
@@ -177,7 +226,11 @@ namespace Umbraco.Core.Scoping
         {
             get
             {
-                if (ParentScope != null) return ParentScope.ScopedFileSystems;
+                if (ParentScope != null)
+                {
+                    return ParentScope.ScopedFileSystems;
+                }
+
                 return _fscope != null;
             }
         }
@@ -187,8 +240,16 @@ namespace Umbraco.Core.Scoping
         {
             get
             {
-                if (_repositoryCacheMode != RepositoryCacheMode.Unspecified) return _repositoryCacheMode;
-                if (ParentScope != null) return ParentScope.RepositoryCacheMode;
+                if (_repositoryCacheMode != RepositoryCacheMode.Unspecified)
+                {
+                    return _repositoryCacheMode;
+                }
+
+                if (ParentScope != null)
+                {
+                    return ParentScope.RepositoryCacheMode;
+                }
+
                 return RepositoryCacheMode.Default;
             }
         }
@@ -198,10 +259,12 @@ namespace Umbraco.Core.Scoping
         {
             get
             {
-                if (ParentScope != null) return ParentScope.IsolatedCaches;
+                if (ParentScope != null)
+                {
+                    return ParentScope.IsolatedCaches;
+                }
 
-                return _isolatedCaches ?? (_isolatedCaches
-                           = new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache())));
+                return _isolatedCaches ??= new IsolatedCaches(type => new DeepCloneAppCache(new ObjectCacheAppCache()));
             }
         }
 
@@ -227,8 +290,16 @@ namespace Umbraco.Core.Scoping
         {
             get
             {
-                if (_isolationLevel != IsolationLevel.Unspecified) return _isolationLevel;
-                if (ParentScope != null) return ParentScope.IsolationLevel;
+                if (_isolationLevel != IsolationLevel.Unspecified)
+                {
+                    return _isolationLevel;
+                }
+
+                if (ParentScope != null)
+                {
+                    return ParentScope.IsolationLevel;
+                }
+
                 return Database.SqlContext.SqlSyntax.DefaultIsolationLevel;
             }
         }
@@ -241,14 +312,19 @@ namespace Umbraco.Core.Scoping
                 EnsureNotDisposed();
 
                 if (_database != null)
+                {
                     return _database;
+                }
 
                 if (ParentScope != null)
                 {
-                    var database = ParentScope.Database;
-                    var currentLevel = database.GetCurrentTransactionIsolationLevel();
+                    IUmbracoDatabase database = ParentScope.Database;
+                    IsolationLevel currentLevel = database.GetCurrentTransactionIsolationLevel();
                     if (_isolationLevel > IsolationLevel.Unspecified && currentLevel < _isolationLevel)
+                    {
                         throw new Exception("Scope requires isolation level " + _isolationLevel + ", but got " + currentLevel + " from parent.");
+                    }
+
                     return _database = database;
                 }
 
@@ -285,8 +361,12 @@ namespace Umbraco.Core.Scoping
             get
             {
                 EnsureNotDisposed();
-                if (ParentScope != null) return ParentScope.Messages;
-                return _messages ?? (_messages = new EventMessages());
+                if (ParentScope != null)
+                {
+                    return ParentScope.Messages;
+                }
+
+                return _messages ??= new EventMessages();
 
                 // TODO: event messages?
                 // this may be a problem: the messages collection will be cleared at the end of the scope
@@ -312,8 +392,22 @@ namespace Umbraco.Core.Scoping
             get
             {
                 EnsureNotDisposed();
-                if (ParentScope != null) return ParentScope.Events;
-                return _eventDispatcher ?? (_eventDispatcher = new QueuingEventDispatcher(_mediaFileSystem));
+                if (ParentScope != null)
+                {
+                    return ParentScope.Events;
+                }
+
+                return _eventDispatcher ??= new QueuingEventDispatcher(_mediaFileManager);
+            }
+        }
+
+        public IScopedNotificationPublisher Notifications
+        {
+            get
+            {
+                EnsureNotDisposed();
+                if (ParentScope != null) return ParentScope.Notifications;
+                return _notificationPublisher ?? (_notificationPublisher = new ScopedNotificationPublisher(_eventAggregator));
             }
         }
 
@@ -321,14 +415,14 @@ namespace Umbraco.Core.Scoping
         public bool Complete()
         {
             if (_completed.HasValue == false)
+            {
                 _completed = true;
+            }
+
             return _completed.Value;
         }
 
-        public void Reset()
-        {
-            _completed = null;
-        }
+        public void Reset() => _completed = null;
 
         public void ChildCompleted(bool? completed)
         {
@@ -336,7 +430,9 @@ namespace Umbraco.Core.Scoping
             if (completed.HasValue == false || completed.Value == false)
             {
                 if (LogUncompletedScopes)
-                    _logger.LogDebug("Uncompleted Child Scope at\r\n {StackTrace}", Environment.StackTrace);
+                {
+                    _logger.LogWarning("Uncompleted Child Scope at\r\n {StackTrace}", Environment.StackTrace);
+                }
 
                 _completed = false;
             }
@@ -344,8 +440,17 @@ namespace Umbraco.Core.Scoping
 
         private void EnsureNotDisposed()
         {
+            // We can't be disposed
             if (_disposed)
-                throw new ObjectDisposedException(GetType().FullName);
+            {
+                throw new ObjectDisposedException($"The {nameof(Scope)} ({this.GetDebugInfo()}) is already disposed");
+            }
+
+            // And neither can our ancestors if we're trying to be disposed since
+            // a child must always be disposed before it's parent.
+            // This is a safety check, it's actually not entirely possible that a parent can be
+            // disposed before the child since that will end up with a "not the Ambient" exception.
+            ParentScope?.EnsureNotDisposed();
 
             // TODO: safer?
             //if (Interlocked.CompareExchange(ref _disposed, 1, 0) != 0)
@@ -358,38 +463,97 @@ namespace Umbraco.Core.Scoping
 
             if (this != _scopeProvider.AmbientScope)
             {
+                var failedMessage = $"The {nameof(Scope)} {this.InstanceId} being disposed is not the Ambient {nameof(Scope)} {(_scopeProvider.AmbientScope?.InstanceId.ToString() ?? "NULL")}. This typically indicates that a child {nameof(Scope)} was not disposed, or flowed to a child thread that was not awaited, or concurrent threads are accessing the same {nameof(Scope)} (Ambient context) which is not supported. If using Task.Run (or similar) as a fire and forget tasks or to run threads in parallel you must suppress execution context flow with ExecutionContext.SuppressFlow() and ExecutionContext.RestoreFlow().";
+
 #if DEBUG_SCOPES
-                var ambient = _scopeProvider.AmbientScope;
-                _logger.Debug<Scope>("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
+                Scope ambient = _scopeProvider.AmbientScope;
+                _logger.LogWarning("Dispose error (" + (ambient == null ? "no" : "other") + " ambient)");
                 if (ambient == null)
+                {
                     throw new InvalidOperationException("Not the ambient scope (no ambient scope).");
-                var ambientInfos = _scopeProvider.GetScopeInfo(ambient);
-                var disposeInfos = _scopeProvider.GetScopeInfo(this);
-                throw new InvalidOperationException("Not the ambient scope (see ctor stack traces).\r\n"
-                    + "- ambient ctor ->\r\n" + ambientInfos.CtorStack + "\r\n"
-                    + "- dispose ctor ->\r\n" + disposeInfos.CtorStack + "\r\n");
+                }
+
+                ScopeInfo ambientInfos = _scopeProvider.GetScopeInfo(ambient);
+                ScopeInfo disposeInfos = _scopeProvider.GetScopeInfo(this);
+                throw new InvalidOperationException($"{failedMessage} (see ctor stack traces).\r\n"
+                                                    + "- ambient ->\r\n" + ambientInfos.ToString() + "\r\n"
+                                                    + "- dispose ->\r\n" + disposeInfos.ToString() + "\r\n");
 #else
-                throw new InvalidOperationException("Not the ambient scope.");
+                throw new InvalidOperationException(failedMessage);
 #endif
             }
 
-            var parent = ParentScope;
-            _scopeProvider.AmbientScope = parent; // might be null = this is how scopes are removed from context objects
+            // Decrement the lock counters on the parent if any.
+            ClearLocks(InstanceId);
+            if (ParentScope is null)
+            {
+                // We're the parent scope, make sure that locks of all scopes has been cleared
+                // Since we're only reading we don't have to be in a lock
+                if (ReadLocks?.Count > 0 || WriteLocks?.Count > 0)
+                {
+                    var exception = new InvalidOperationException($"All scopes has not been disposed from parent scope: {InstanceId}, see log for more details.");
+                    _logger.LogError(exception, GenerateUnclearedScopesLogMessage());
+                    throw exception;
+                }
+            }
+
+            _scopeProvider.PopAmbientScope(this); // might be null = this is how scopes are removed from context objects
 
 #if DEBUG_SCOPES
             _scopeProvider.Disposed(this);
 #endif
 
             if (_autoComplete && _completed == null)
+            {
                 _completed = true;
+            }
 
-            if (parent != null)
-                parent.ChildCompleted(_completed);
+            if (ParentScope != null)
+            {
+                ParentScope.ChildCompleted(_completed);
+            }
             else
+            {
                 DisposeLastScope();
+            }
 
             _disposed = true;
-            GC.SuppressFinalize(this);
+        }
+
+        /// <summary>
+        /// Generates a log message with all scopes that hasn't cleared their locks, including how many, and what locks they have requested.
+        /// </summary>
+        /// <returns>Log message.</returns>
+        private string GenerateUnclearedScopesLogMessage()
+        {
+            // Dump the dicts into a message for the locks.
+            StringBuilder builder = new StringBuilder();
+            builder.AppendLine($"Lock counters aren't empty, suggesting a scope hasn't been properly disposed, parent id: {InstanceId}");
+            WriteLockDictionaryToString(ReadLocks, builder, "read locks");
+            WriteLockDictionaryToString(WriteLocks, builder, "write locks");
+            return builder.ToString();
+        }
+
+        /// <summary>
+        /// Writes a locks dictionary to a <see cref="StringBuilder"/> for logging purposes.
+        /// </summary>
+        /// <param name="dict">Lock dictionary to report on.</param>
+        /// <param name="builder">String builder to write to.</param>
+        /// <param name="dictName">The name to report the dictionary as.</param>
+        private void WriteLockDictionaryToString(Dictionary<Guid, Dictionary<int, int>> dict, StringBuilder builder, string dictName)
+        {
+            if (dict?.Count > 0)
+            {
+                builder.AppendLine($"Remaining {dictName}:");
+                foreach (var instance in dict)
+                {
+                    builder.AppendLine($"Scope {instance.Key}");
+                    foreach (var lockCounter in instance.Value)
+                    {
+                        builder.AppendLine($"\tLock ID: {lockCounter.Key} - times requested: {lockCounter.Value}");
+                    }
+                }
+            }
         }
 
         private void DisposeLastScope()
@@ -404,9 +568,13 @@ namespace Umbraco.Core.Scoping
                 try
                 {
                     if (completed)
+                    {
                         _database.CompleteTransaction();
+                    }
                     else
+                    {
                         _database.AbortTransaction();
+                    }
                 }
                 catch
                 {
@@ -419,7 +587,9 @@ namespace Umbraco.Core.Scoping
                     _database = null;
 
                     if (databaseException)
+                    {
                         RobustExit(false, true);
+                    }
                 }
             }
 
@@ -441,14 +611,20 @@ namespace Umbraco.Core.Scoping
         //    to ensure we don't leave a scope around, etc
         private void RobustExit(bool completed, bool onException)
         {
-             if (onException) completed = false;
+             if (onException)
+            {
+                completed = false;
+            }
 
             TryFinally(() =>
             {
                 if (_scopeFileSystem == true)
                 {
                     if (completed)
+                    {
                         _fscope.Complete();
+                    }
+
                     _fscope.Dispose();
                     _fscope = null;
                 }
@@ -456,7 +632,10 @@ namespace Umbraco.Core.Scoping
             {
                 // deal with events
                 if (onException == false)
+                {
                     _eventDispatcher?.ScopeExit(completed);
+                    _notificationPublisher?.ScopeExit(completed);
+                }
             }, () =>
             {
                 // if *we* created it, then get rid of it
@@ -469,7 +648,7 @@ namespace Umbraco.Core.Scoping
                     finally
                     {
                         // removes the ambient context (ambient scope already gone)
-                        _scopeProvider.SetAmbient(null);
+                        _scopeProvider.PopAmbientScopeContext();
                     }
                 }
             }, () =>
@@ -477,7 +656,18 @@ namespace Umbraco.Core.Scoping
                 if (Detachable)
                 {
                     // get out of the way, restore original
-                    _scopeProvider.SetAmbient(OrigScope, OrigContext);
+
+                    // TODO: Difficult to know if this is correct since this is all required
+                    // by Deploy which I don't fully understand since there is limited tests on this in the CMS
+                    if (OrigScope != _scopeProvider.AmbientScope)
+                    {
+                        _scopeProvider.PopAmbientScope(_scopeProvider.AmbientScope);
+                    }
+                    if (OrigContext != _scopeProvider.AmbientContext)
+                    {
+                        _scopeProvider.PopAmbientScopeContext();
+                    }
+
                     Attached = false;
                     OrigScope = null;
                     OrigContext = null;
@@ -485,14 +675,15 @@ namespace Umbraco.Core.Scoping
             });
         }
 
-        private static void TryFinally(params Action[] actions)
-        {
-            TryFinally(0, actions);
-        }
+        private static void TryFinally(params Action[] actions) => TryFinally(0, actions);
 
         private static void TryFinally(int index, Action[] actions)
         {
-            if (index == actions.Length) return;
+            if (index == actions.Length)
+            {
+                return;
+            }
+
             try
             {
                 actions[index]();
@@ -503,18 +694,198 @@ namespace Umbraco.Core.Scoping
             }
         }
 
-        // backing field for LogUncompletedScopes
-        private static bool? _logUncompletedScopes;
-
-        // caching config
         // true if Umbraco.CoreDebugSettings.LogUncompletedScope appSetting is set to "true"
-        private bool LogUncompletedScopes => (_logUncompletedScopes
-            ?? (_logUncompletedScopes = _coreDebugSettings.LogIncompletedScopes)).Value;
+        private bool LogUncompletedScopes => _coreDebugSettings.LogIncompletedScopes;
+
+        /// <summary>
+        /// Increment the counter of a locks dictionary, either ReadLocks or WriteLocks,
+        /// for a specific scope instance and lock identifier. Must be called within a lock.
+        /// </summary>
+        /// <param name="lockId">Lock ID to increment.</param>
+        /// <param name="instanceId">Instance ID of the scope requesting the lock.</param>
+        /// <param name="locks">Reference to the dictionary to increment on</param>
+        private void IncrementLock(int lockId, Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>> locks)
+        {
+            // Since we've already checked that we're the parent in the WriteLockInner method, we don't need to check again.
+            // If it's the very first time a lock has been requested the WriteLocks dict hasn't been instantiated yet.
+            locks ??= new Dictionary<Guid, Dictionary<int, int>>();
+
+            // Try and get the dict associated with the scope id.
+            var locksDictFound = locks.TryGetValue(instanceId, out var locksDict);
+            if (locksDictFound)
+            {
+                locksDict.TryGetValue(lockId, out var value);
+                locksDict[lockId] = value + 1;
+            }
+            else
+            {
+                // The scope hasn't requested a lock yet, so we have to create a dict for it.
+                locks.Add(instanceId, new Dictionary<int, int>());
+                locks[instanceId][lockId] = 1;
+            }
+        }
+
+        /// <summary>
+        /// Clears all lock counters for a given scope instance, signalling that the scope has been disposed.
+        /// </summary>
+        /// <param name="instanceId">Instance ID of the scope to clear.</param>
+        private void ClearLocks(Guid instanceId)
+        {
+            if (ParentScope is not null)
+            {
+                ParentScope.ClearLocks(instanceId);
+            }
+            else
+            {
+                lock (_dictionaryLocker)
+                {
+                    ReadLocks?.Remove(instanceId);
+                    WriteLocks?.Remove(instanceId);
+                }
+            }
+        }
 
         /// <inheritdoc />
-        public void ReadLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.ReadLock(Database, lockIds);
+        public void ReadLock(int lockId) => ReadLockInner(InstanceId, null, lockId);
 
         /// <inheritdoc />
-        public void WriteLock(params int[] lockIds) => Database.SqlContext.SqlSyntax.WriteLock(Database, lockIds);
+        public void ReadLock(TimeSpan timeout, int lockId) => ReadLockInner(InstanceId, timeout, lockId);
+
+        /// <inheritdoc />
+        public void WriteLock(int lockId) => WriteLockInner(InstanceId, null, lockId);
+
+        /// <inheritdoc />
+        public void WriteLock(TimeSpan timeout, int lockId) => WriteLockInner(InstanceId, timeout, lockId);
+
+        /// <summary>
+        /// Handles acquiring a read lock, will delegate it to the parent if there are any.
+        /// </summary>
+        /// <param name="instanceId">Instance ID of the requesting scope.</param>
+        /// <param name="timeout">Optional database timeout in milliseconds.</param>
+        /// <param name="lockId">Array of lock object identifiers.</param>
+        private void ReadLockInner(Guid instanceId, TimeSpan? timeout, int lockId)
+        {
+            if (ParentScope is not null)
+            {
+                // If we have a parent we delegate lock creation to parent.
+                ParentScope.ReadLockInner(instanceId, timeout, lockId);
+            }
+            else
+            {
+                // We are the outermost scope, handle the lock request.
+                LockInner(instanceId, ref _readLockDictionary, ref _readLocks, ObtainReadLock, ObtainTimeoutReadLock, timeout, lockId);
+            }
+        }
+
+        /// <summary>
+        /// Handles acquiring a write lock with a specified timeout, will delegate it to the parent if there are any.
+        /// </summary>
+        /// <param name="instanceId">Instance ID of the requesting scope.</param>
+        /// <param name="timeout">Optional database timeout in milliseconds.</param>
+        /// <param name="lockId">Array of lock object identifiers.</param>
+        private void WriteLockInner(Guid instanceId, TimeSpan? timeout, int lockId)
+        {
+            if (ParentScope is not null)
+            {
+                // If we have a parent we delegate lock creation to parent.
+                ParentScope.WriteLockInner(instanceId, timeout, lockId);
+            }
+            else
+            {
+                // We are the outermost scope, handle the lock request.
+                LockInner(instanceId, ref _writeLockDictionary, ref _writeLocks, ObtainWriteLock, ObtainTimeoutWriteLock, timeout, lockId);
+            }
+        }
+
+        /// <summary>
+        /// Handles acquiring a lock, this should only be called from the outermost scope.
+        /// </summary>
+        /// <param name="instanceId">Instance ID of the scope requesting the lock.</param>
+        /// <param name="locks">Reference to the applicable locks dictionary (ReadLocks or WriteLocks).</param>
+        /// <param name="locksSet">Reference to the applicable locks hashset (_readLocks or _writeLocks).</param>
+        /// <param name="obtainLock">Delegate used to request the lock from the database without a timeout.</param>
+        /// <param name="obtainLockTimeout">Delegate used to request the lock from the database with a timeout.</param>
+        /// <param name="timeout">Optional timeout parameter to specify a timeout.</param>
+        /// <param name="lockIds">Lock identifiers to lock on.</param>
+        private void LockInner(Guid instanceId, ref Dictionary<Guid, Dictionary<int, int>> locks, ref HashSet<int> locksSet,
+            Action<int> obtainLock, Action<int, TimeSpan> obtainLockTimeout, TimeSpan? timeout,
+            int lockId)
+        {
+            lock (_dictionaryLocker)
+            {
+                locksSet ??= new HashSet<int>();
+                // Only acquire the lock if we haven't done so yet.
+                if (!locksSet.Contains(lockId))
+                {
+                    IncrementLock(lockId, instanceId, ref locks);
+                    locksSet.Add(lockId);
+                    try
+                    {
+                        if (timeout is null)
+                        {
+                            // We just want an ordinary lock.
+                            obtainLock(lockId);
+                        }
+                        else
+                        {
+                            // We want a lock with a custom timeout
+                            obtainLockTimeout(lockId, timeout.Value);
+                        }
+                    }
+                    catch
+                    {
+                        // Something went wrong and we didn't get the lock
+                        // Since we at this point have determined that we haven't got any lock with an ID of LockID, it's safe to completely remove it instead of decrementing.
+                        locks[instanceId].Remove(lockId);
+                        // It needs to be removed from the HashSet as well, because that's how we determine to acquire a lock.
+                        locksSet.Remove(lockId);
+                        throw;
+                    }
+                }
+                else
+                {
+                    // We already have a lock, but need to update the dictionary for debugging purposes.
+                    IncrementLock(lockId, instanceId, ref locks);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Obtains an ordinary read lock.
+        /// </summary>
+        /// <param name="lockId">Lock object identifier to lock.</param>
+        private void ObtainReadLock(int lockId)
+        {
+            Database.SqlContext.SqlSyntax.ReadLock(Database, lockId);
+        }
+
+        /// <summary>
+        /// Obtains a read lock with a custom timeout.
+        /// </summary>
+        /// <param name="lockId">Lock object identifier to lock.</param>
+        /// <param name="timeout">TimeSpan specifying the timout period.</param>
+        private void ObtainTimeoutReadLock(int lockId, TimeSpan timeout)
+        {
+            Database.SqlContext.SqlSyntax.ReadLock(Database, timeout, lockId);
+        }
+
+        /// <summary>
+        /// Obtains an ordinary write lock.
+        /// </summary>
+        /// <param name="lockId">Lock object identifier to lock.</param>
+        private void ObtainWriteLock(int lockId)
+        {
+            Database.SqlContext.SqlSyntax.WriteLock(Database, lockId);
+        }
+
+        /// <summary>
+        /// Obtains a write lock with a custom timeout.
+        /// </summary>
+        /// <param name="lockId">Lock object identifier to lock.</param>
+        /// <param name="timeout">TimeSpan specifying the timout period.</param>
+        private void ObtainTimeoutWriteLock(int lockId, TimeSpan timeout)
+        {
+            Database.SqlContext.SqlSyntax.WriteLock(Database, timeout, lockId);
+        }
     }
 }

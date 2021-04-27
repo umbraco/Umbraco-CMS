@@ -1,4 +1,7 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -7,17 +10,14 @@ using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
-using Umbraco.Core.Models;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents a grid property and parameter editor.
@@ -202,8 +202,8 @@ namespace Umbraco.Web.PropertyEditors
                     _richTextPropertyValueEditor.GetReferences(x.Value)))
                     yield return umbracoEntityReference;
 
-                foreach (var umbracoEntityReference in mediaValues.SelectMany(x =>
-                    _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
+                foreach (var umbracoEntityReference in mediaValues.Where(x=>x.Value.HasValues)
+                    .SelectMany(x => _mediaPickerPropertyValueEditor.GetReferences(x.Value["udi"])))
                     yield return umbracoEntityReference;
             }
         }

@@ -5,7 +5,7 @@ using Newtonsoft.Json.Converters;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Serialization;
 
-namespace Umbraco.Core.Serialization
+namespace Umbraco.Cms.Infrastructure.Serialization
 {
     public class JsonNetSerializer : IJsonSerializer
     {

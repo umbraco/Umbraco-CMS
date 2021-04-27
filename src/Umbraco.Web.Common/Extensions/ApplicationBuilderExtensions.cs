@@ -5,16 +5,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Serilog.Context;
 using SixLabors.ImageSharp.Web.DependencyInjection;
-using Smidge;
-using Smidge.Nuglify;
 using StackExchange.Profiling;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.ApplicationBuilder;
 using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.Plugins;
-using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
 
 namespace Umbraco.Extensions
 {
@@ -26,8 +25,12 @@ namespace Umbraco.Extensions
         /// <summary>
         /// Configures and use services required for using Umbraco
         /// </summary>
-        public static IApplicationBuilder UseUmbraco(this IApplicationBuilder app)
+        public static IUmbracoApplicationBuilder UseUmbraco(this IApplicationBuilder app)
         {
+            IOptions<UmbracoPipelineOptions> startupOptions = app.ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
+
+            app.RunPrePipeline(startupOptions.Value);
+
             // TODO: Should we do some checks like this to verify that the corresponding "Add" methods have been called for the
             // corresponding "Use" methods?
             // https://github.com/dotnet/aspnetcore/blob/b795ac3546eb3e2f47a01a64feb3020794ca33bb/src/Mvc/Mvc.Core/src/Builder/MvcApplicationBuilderExtensions.cs#L132
@@ -66,22 +69,27 @@ namespace Umbraco.Extensions
             // Must be called after UseRouting and before UseEndpoints
             app.UseSession();
 
-            // Must come after the above!
-            app.UseUmbracoInstaller();
+            // DO NOT PUT ANY UseEndpoints declarations here!! Those must all come very last in the pipeline,
+            // endpoints are terminating middleware. All of our endpoints are declared in ext of IUmbracoApplicationBuilder
 
-            return app;
+            return ActivatorUtilities.CreateInstance<UmbracoApplicationBuilder>(
+                app.ApplicationServices,
+                new object[] { app });
+        }
+
+        private static void RunPrePipeline(this IApplicationBuilder app, UmbracoPipelineOptions startupOptions)
+        {
+            foreach (IUmbracoPipelineFilter filter in startupOptions.PipelineFilters)
+            {
+                filter.OnPrePipeline(app);
+            }
         }
 
         /// <summary>
         /// Returns true if Umbraco <see cref="IRuntimeState"/> is greater than <see cref="RuntimeLevel.BootFailed"/>
         /// </summary>
         public static bool UmbracoCanBoot(this IApplicationBuilder app)
-        {
-            var state = app.ApplicationServices.GetRequiredService<IRuntimeState>();
-
-            // can't continue if boot failed
-            return state.Level > RuntimeLevel.BootFailed;
-        }
+            => app.ApplicationServices.GetRequiredService<IRuntimeState>().UmbracoCanBoot();
 
         /// <summary>
         /// Enables core Umbraco functionality
@@ -121,10 +129,12 @@ namespace Umbraco.Extensions
 
             if (!app.UmbracoCanBoot())
             {
+                app.UseStaticFiles(); // We need static files to show the nice error page.
                 app.UseMiddleware<BootFailedMiddleware>();
             }
             else
             {
+                app.UseMiddleware<PreviewAuthenticationMiddleware>();
                 app.UseMiddleware<UmbracoRequestMiddleware>();
                 app.UseMiddleware<MiniProfilerMiddleware>();
             }
@@ -145,27 +155,6 @@ namespace Umbraco.Extensions
             if (!app.UmbracoCanBoot()) return app;
 
             app.UseMiddleware<UmbracoRequestLoggingMiddleware>();
-
-            return app;
-        }
-
-        /// <summary>
-        /// Enables runtime minification for Umbraco
-        /// </summary>
-        public static IApplicationBuilder UseUmbracoRuntimeMinification(this IApplicationBuilder app)
-        {
-            if (app == null)
-            {
-                throw new ArgumentNullException(nameof(app));
-            }
-
-            if (!app.UmbracoCanBoot())
-            {
-                return app;
-            }
-
-            app.UseSmidge();
-            app.UseSmidgeNuglify();
 
             return app;
         }

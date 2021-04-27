@@ -4,8 +4,6 @@ namespace Umbraco.Cms.Core
     {
         public static class Security
         {
-            public const string UserMembershipProviderName = "UsersMembershipProvider";
-
             /// <summary>
             /// Gets the identifier of the 'super' user.
             /// </summary>

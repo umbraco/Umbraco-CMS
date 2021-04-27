@@ -5,7 +5,6 @@ using System.Xml;
 using Examine;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
@@ -18,7 +17,6 @@ using Umbraco.Extensions;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.PublishedContent;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Tests.Testing;
 using Constants = Umbraco.Cms.Core.Constants;
 using Current = Umbraco.Web.Composing.Current;
 

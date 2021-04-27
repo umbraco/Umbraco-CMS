@@ -19,7 +19,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
     internal class ContentItemBinder : IModelBinder
     {
         private readonly IJsonSerializer _jsonSerializer;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
 
         public ContentItemBinder(
             IJsonSerializer jsonSerializer,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IContentService contentService,
             IContentTypeService contentTypeService,
             IHostingEnvironment hostingEnvironment)
@@ -79,7 +79,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
             bindingContext.Result = ModelBindingResult.Success(model);
         }
 
-        internal static void BindModel(ContentItemSave model, IContent persistedContent, ContentModelBinderHelper modelBinderHelper, UmbracoMapper umbracoMapper)
+        internal static void BindModel(ContentItemSave model, IContent persistedContent, ContentModelBinderHelper modelBinderHelper, IUmbracoMapper umbracoMapper)
         {
             model.PersistedContent =persistedContent;
 

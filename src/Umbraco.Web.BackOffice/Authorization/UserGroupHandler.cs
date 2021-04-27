@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
@@ -27,6 +28,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
+        private readonly AppCaches _appCaches;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserGroupHandler"/> class.
@@ -43,7 +45,8 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
             IContentService contentService,
             IMediaService mediaService,
             IEntityService entityService,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor)
+            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
+            AppCaches appCaches)
         {
             _httpContextAccessor = httpContextAccessor;
             _userService = userService;
@@ -51,6 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
             _mediaService = mediaService;
             _entityService = entityService;
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
+            _appCaches = appCaches;
         }
 
         /// <inheritdoc/>
@@ -80,7 +84,8 @@ namespace Umbraco.Cms.Web.BackOffice.Authorization
                 _userService,
                 _contentService,
                 _mediaService,
-                _entityService);
+                _entityService,
+                _appCaches);
 
             Attempt<string> isAuth = authHelper.AuthorizeGroupAccess(currentUser, intIds);
 

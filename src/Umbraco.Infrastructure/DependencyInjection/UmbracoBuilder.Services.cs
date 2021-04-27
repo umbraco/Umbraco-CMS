@@ -4,6 +4,7 @@ using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -12,13 +13,10 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Packaging;
-using Umbraco.Core.Services;
-using Umbraco.Core.Services.Implement;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     public static partial class UmbracoBuilderExtensions
     {
@@ -39,6 +37,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IPublicAccessService, PublicAccessService>();
             builder.Services.AddUnique<IDomainService, DomainService>();
             builder.Services.AddUnique<IAuditService, AuditService>();
+            builder.Services.AddUnique<ICacheInstructionService, CacheInstructionService>();
             builder.Services.AddUnique<ITagService, TagService>();
             builder.Services.AddUnique<IContentService, ContentService>();
             builder.Services.AddUnique<IUserService, UserService>();

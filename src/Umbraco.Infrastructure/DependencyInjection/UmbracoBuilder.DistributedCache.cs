@@ -6,13 +6,11 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Sync;
+using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Infrastructure.Sync;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Cache;
-using Umbraco.Web.Cache;
-using Umbraco.Web.Search;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     /// <summary>
     /// Provides extension methods to the <see cref="IUmbracoBuilder"/> class.
@@ -28,15 +26,6 @@ namespace Umbraco.Infrastructure.DependencyInjection
         /// </remarks>
         public static IUmbracoBuilder AddDistributedCache(this IUmbracoBuilder builder)
         {
-            var distCacheBinder = new UniqueServiceDescriptor(typeof(IDistributedCacheBinder), typeof(DistributedCacheBinder), ServiceLifetime.Singleton);
-            if (builder.Services.Contains(distCacheBinder))
-            {
-                // if this is called more than once just exit
-                return builder;
-            }
-
-            builder.Services.Add(distCacheBinder);
-
             builder.SetDatabaseServerMessengerCallbacks(GetCallbacks);
             builder.SetServerMessenger<BatchedDatabaseServerMessenger>();
             builder.AddNotificationHandler<UmbracoApplicationStarting, DatabaseServerMessengerNotificationHandler>();

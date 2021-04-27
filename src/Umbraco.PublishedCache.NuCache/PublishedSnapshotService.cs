@@ -21,9 +21,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
-using Umbraco.Web.PublishedCache;
 using Constants = Umbraco.Cms.Core.Constants;
 using File = System.IO.File;
 
@@ -1094,7 +1092,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             {
                 ContentCache = new ContentCache(previewDefault, contentSnap, snapshotCache, elementsCache, domainCache, Options.Create(_globalSettings), _variationContextAccessor),
                 MediaCache = new MediaCache(previewDefault, mediaSnap, _variationContextAccessor),
-                MemberCache = new MemberCache(previewDefault, snapshotCache, _serviceContext.MemberService, memberTypeCache, _publishedSnapshotAccessor, _variationContextAccessor, _entitySerializer, _publishedModelFactory),
+                MemberCache = new MemberCache(previewDefault, memberTypeCache, _publishedSnapshotAccessor, _variationContextAccessor, _publishedModelFactory),
                 DomainCache = domainCache,
                 SnapshotCache = snapshotCache,
                 ElementsCache = elementsCache

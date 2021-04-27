@@ -1,22 +1,20 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Xml.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
-using Umbraco.Web.PropertyEditors;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.Models
@@ -38,8 +36,9 @@ namespace Umbraco.Tests.Models
             var scheme = Mock.Of<IMediaPathScheme>();
             var contentSettings = new ContentSettings();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, loggerFactory.CreateLogger<MediaFileSystem>(), ShortStringHelper);
-            var ignored = new FileUploadPropertyEditor(loggerFactory, mediaFileSystem, Microsoft.Extensions.Options.Options.Create(contentSettings), DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, UploadAutoFillProperties, JsonNetSerializer);
+            var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), scheme,
+                loggerFactory.CreateLogger<MediaFileManager>(), ShortStringHelper);
+            var ignored = new FileUploadPropertyEditor(loggerFactory, mediaFileManager, Microsoft.Extensions.Options.Options.Create(contentSettings), DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, UploadAutoFillProperties, JsonNetSerializer, ContentService);
 
             var media = MockedMedia.CreateMediaImage(mediaType, -1);
             media.WriterId = -1; // else it's zero and that's not a user and it breaks the tests

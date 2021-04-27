@@ -1,16 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Security.Claims;
-using System.Security.Principal;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Cms.Core.Models.ContentEditing;
-using Umbraco.Cms.Core.Models.Membership;
-using Umbraco.Core.Models.Identity;
 
-namespace Umbraco.Core.Security
+namespace Umbraco.Cms.Core.Security
 {
-
     /// <summary>
     /// A user manager for Umbraco (either back office users or front-end members)
     /// </summary>
@@ -257,20 +252,13 @@ namespace Umbraco.Core.Security
         /// of the operation.
         /// </returns>
         Task<IdentityResult> CreateAsync(TUser user, string password);
-        
+
         /// <summary>
         /// Generate a password for a user based on the current password validator
         /// </summary>
         /// <returns>A generated password</returns>
         string GeneratePassword();
-
-        /// <summary>
-        /// Hashes a password for a null user based on the default password hasher
-        /// </summary>
-        /// <param name="password">The password to hash</param>
-        /// <returns>The hashed password</returns>
-        string HashPassword(string password);
-
+        
         /// <summary>
         /// Used to validate the password without an identity user
         /// Validation code is based on the default ValidatePasswordAsync code
@@ -387,16 +375,5 @@ namespace Umbraco.Core.Security
         /// A user can only support a phone number if the BackOfficeUserStore is replaced with another that implements IUserPhoneNumberStore
         /// </remarks>
         Task<string> GetPhoneNumberAsync(TUser user);
-
-        // TODO: These are raised from outside the signinmanager and usermanager in the auth and user controllers,
-        // let's see if there's a way to avoid that and only have these called within signinmanager and usermanager
-        // which means we can remove these from the interface (things like invite seems like they cannot be moved)
-        // TODO: When we change to not having the crappy static events this will need to be revisited
-        void RaiseForgotPasswordRequestedEvent(IPrincipal currentUser, string userId);
-        void RaiseForgotPasswordChangedSuccessEvent(IPrincipal currentUser, string userId);
-        SignOutAuditEventArgs RaiseLogoutSuccessEvent(IPrincipal currentUser, string userId);
-        UserInviteEventArgs RaiseSendingUserInvite(IPrincipal currentUser, UserInvite invite, IUser createdUser);
-        bool HasSendingUserInviteEventHandler { get; }
-
     }
 }

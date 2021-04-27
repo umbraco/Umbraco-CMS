@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using System;
+using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -9,11 +10,12 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Infrastructure.HostedServices
 {
     /// <summary>
     /// Hosted service implementation for keep alive feature.
@@ -57,7 +59,7 @@ namespace Umbraco.Infrastructure.HostedServices
             _httpClientFactory = httpClientFactory;
         }
 
-        internal override async Task PerformExecuteAsync(object state)
+        public override async Task PerformExecuteAsync(object state)
         {
             if (_keepAliveSettings.DisableKeepAliveTask)
             {
@@ -84,21 +86,18 @@ namespace Umbraco.Infrastructure.HostedServices
 
             using (_profilingLogger.DebugDuration<KeepAlive>("Keep alive executing", "Keep alive complete"))
             {
-                var keepAlivePingUrl = _keepAliveSettings.KeepAlivePingUrl;
+                var umbracoAppUrl = _hostingEnvironment.ApplicationMainUrl.ToString();
+                if (umbracoAppUrl.IsNullOrWhiteSpace())
+                {
+                    _logger.LogWarning("No umbracoApplicationUrl for service (yet), skip.");
+                    return;
+                }
+
+                // If the config is an absolute path, just use it
+                string keepAlivePingUrl = WebPath.Combine(umbracoAppUrl, _hostingEnvironment.ToAbsolute(_keepAliveSettings.KeepAlivePingUrl));
+
                 try
                 {
-                    if (keepAlivePingUrl.Contains("{umbracoApplicationUrl}"))
-                    {
-                        var umbracoAppUrl = _hostingEnvironment.ApplicationMainUrl.ToString();
-                        if (umbracoAppUrl.IsNullOrWhiteSpace())
-                        {
-                            _logger.LogWarning("No umbracoApplicationUrl for service (yet), skip.");
-                            return;
-                        }
-
-                        keepAlivePingUrl = keepAlivePingUrl.Replace("{umbracoApplicationUrl}", umbracoAppUrl.TrimEnd('/'));
-                    }
-
                     var request = new HttpRequestMessage(HttpMethod.Get, keepAlivePingUrl);
                     HttpClient httpClient = _httpClientFactory.CreateClient();
                     _ = await httpClient.SendAsync(request);

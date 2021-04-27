@@ -11,7 +11,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
+namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
 {
     /// <summary>
     /// Implements periodic server "touching" (to mark as active/deactive) as a hosted service.
@@ -47,7 +47,7 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
             _globalSettings = globalSettings.Value;
         }
 
-        internal override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object state)
         {
             if (_runtimeState.Level != RuntimeLevel.Run)
             {

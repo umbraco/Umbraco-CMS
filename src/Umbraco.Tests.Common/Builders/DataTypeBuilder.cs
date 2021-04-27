@@ -4,8 +4,8 @@
 using System;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
-using Umbraco.Core.Serialization;
 
 namespace Umbraco.Cms.Tests.Common.Builders
 {

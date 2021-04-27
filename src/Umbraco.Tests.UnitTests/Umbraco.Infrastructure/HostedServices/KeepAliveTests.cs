@@ -15,9 +15,9 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Scoping;
-using Umbraco.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
@@ -78,8 +78,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 DisableKeepAliveTask = !enabled,
             };
 
-            var mockRequestAccessor = new Mock<IHostingEnvironment>();
-            mockRequestAccessor.SetupGet(x => x.ApplicationMainUrl).Returns(new Uri(ApplicationUrl));
+            var mockHostingEnvironment = new Mock<IHostingEnvironment>();
+            mockHostingEnvironment.SetupGet(x => x.ApplicationMainUrl).Returns(new Uri(ApplicationUrl));
+            mockHostingEnvironment.Setup(x => x.ToAbsolute(It.IsAny<string>()))
+                .Returns((string s) => s.TrimStart('~'));
 
             var mockServerRegistrar = new Mock<IServerRoleAccessor>();
             mockServerRegistrar.Setup(x => x.CurrentServerRole).Returns(serverRole);
@@ -103,7 +105,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             mockHttpClientFactory.Setup(x => x.CreateClient(It.IsAny<string>())).Returns(httpClient);
 
             return new KeepAlive(
-                mockRequestAccessor.Object,
+                mockHostingEnvironment.Object,
                 mockMainDom.Object,
                 Options.Create(settings),
                 mockLogger.Object,

@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Infrastructure;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.Testing;

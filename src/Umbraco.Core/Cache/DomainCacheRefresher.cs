@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
@@ -6,19 +7,22 @@ using Umbraco.Cms.Core.Services.Changes;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class DomainCacheRefresher : PayloadCacheRefresherBase<DomainCacheRefresher, DomainCacheRefresher.JsonPayload>
+    public sealed class DomainCacheRefresher : PayloadCacheRefresherBase<DomainCacheRefresherNotification, DomainCacheRefresher.JsonPayload>
     {
         private readonly IPublishedSnapshotService _publishedSnapshotService;
 
-        public DomainCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IPublishedSnapshotService publishedSnapshotService)
-            : base(appCaches, serializer)
+        public DomainCacheRefresher(
+            AppCaches appCaches,
+            IJsonSerializer serializer,
+            IPublishedSnapshotService publishedSnapshotService,
+            IEventAggregator eventAggregator,
+            ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _publishedSnapshotService = publishedSnapshotService;
         }
 
         #region Define
-
-        protected override DomainCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("11290A79-4B57-4C99-AD72-7748A3CF38AF");
 

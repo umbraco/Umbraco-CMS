@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -12,15 +12,15 @@ using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Represent an abstract Repository for ContentType based repositories
@@ -43,6 +43,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         protected IContentTypeCommonRepository CommonRepository { get; }
         protected ILanguageRepository LanguageRepository { get; }
         protected abstract bool SupportsPublishing { get; }
+
+        /// <summary>
+        /// Gets the node object type for the repository's entity
+        /// </summary>
+        protected abstract Guid NodeObjectTypeId { get; }
 
         public IEnumerable<MoveEventInfo<TEntity>> Move(TEntity moving, EntityContainer container)
         {
@@ -1340,7 +1345,7 @@ WHERE cmsContentType." + aliasColumn + @" LIKE @pattern",
         /// <inheritdoc />
         public bool HasContainerInPath(string contentPath)
         {
-            var ids = contentPath.Split(',').Select(int.Parse).ToArray();
+            var ids = contentPath.Split(Constants.CharArrays.Comma).Select(int.Parse).ToArray();
             return HasContainerInPath(ids);
         }
 

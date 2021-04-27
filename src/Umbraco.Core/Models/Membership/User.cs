@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -134,18 +135,21 @@ namespace Umbraco.Cms.Core.Models.Membership
             get => _emailConfirmedDate;
             set => SetPropertyValueAndDetectChanges(value, ref _emailConfirmedDate, nameof(EmailConfirmedDate));
         }
+
         [DataMember]
         public DateTime? InvitedDate
         {
             get => _invitedDate;
             set => SetPropertyValueAndDetectChanges(value, ref _invitedDate, nameof(InvitedDate));
         }
+
         [DataMember]
         public string Username
         {
             get => _username;
             set => SetPropertyValueAndDetectChanges(value, ref _username, nameof(Username));
         }
+
         [DataMember]
         public string Email
         {
@@ -382,11 +386,10 @@ namespace Umbraco.Cms.Core.Models.Membership
             }
         }
 
-        /// <summary>
-        /// This is used as an internal cache for this entity - specifically for calculating start nodes so we don't re-calculated all of the time
-        /// </summary>
         [IgnoreDataMember]
         [DoNotClone]
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This should not be used, it's currently used for only a single edge case - should probably be removed for netcore")]
         internal IDictionary<string, object> AdditionalData
         {
             get

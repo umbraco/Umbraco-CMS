@@ -4,8 +4,6 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Tests.TestHelpers;
-using Umbraco.Web;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.Routing
 {

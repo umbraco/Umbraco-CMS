@@ -29,9 +29,9 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Web.Common.AspNetCore;
-using Umbraco.Core.Persistence;
 using Umbraco.Extensions;
 using File = System.IO.File;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Tests.Integration.Implementations
         public IWebHostEnvironment GetWebHostEnvironment() => _hostEnvironment;
 
         public override IDbProviderFactoryCreator DbProviderFactoryCreator =>
-            new SqlServerDbProviderFactoryCreator(DbProviderFactories.GetFactory);
+            new SqlServerDbProviderFactoryCreator(DbProviderFactories.GetFactory, Options.Create(new GlobalSettings()));
 
         public override IBulkSqlInsertProvider BulkSqlInsertProvider => new SqlServerBulkSqlInsertProvider();
 

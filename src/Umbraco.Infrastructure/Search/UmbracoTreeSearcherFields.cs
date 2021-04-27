@@ -1,8 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Examine;
+using Umbraco.Cms.Infrastructure.Examine;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Cms.Infrastructure.Search
 {
     public class UmbracoTreeSearcherFields : IUmbracoTreeSearcherFields
     {

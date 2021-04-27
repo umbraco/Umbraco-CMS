@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Migrations.Expressions
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Expressions
 {
     public interface IFluentBuilder
     { }

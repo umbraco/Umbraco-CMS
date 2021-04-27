@@ -10,12 +10,12 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Filters;
-using Umbraco.Core.Migrations.Install;
 using Umbraco.Extensions;
-using Umbraco.Web.Install;
 
 namespace Umbraco.Cms.Web.Common.Install
 {

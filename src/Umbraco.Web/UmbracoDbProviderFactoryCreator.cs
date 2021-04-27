@@ -1,11 +1,12 @@
 using System;
 using System.Data.Common;
 using System.Data.SqlServerCe;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Persistence.SqlCe;
-using Umbraco.Core;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Web
@@ -30,9 +31,9 @@ namespace Umbraco.Web
             switch (providerName)
             {
                 case Constants.DbProviderNames.SqlCe:
-                    return new SqlCeSyntaxProvider();
+                    return new SqlCeSyntaxProvider(Options.Create(new GlobalSettings()));
                 case Constants.DbProviderNames.SqlServer:
-                    return new SqlServerSyntaxProvider();
+                    return new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
                 default:
                     throw new InvalidOperationException($"Unknown provider name \"{providerName}\"");
             }

@@ -1,9 +1,9 @@
 ﻿using NPoco;
-using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Migrations.Expressions.Execute.Expressions;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute.Expressions;
+using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Core.Migrations.Expressions.Execute
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute
 {
     public class ExecuteBuilder : ExpressionBuilderBase<ExecuteSqlStatementExpression>,
         IExecuteBuilder, IExecutableBuilder

@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _logger = logger;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IMacro, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IMacro, MacroDisplay>((source, context) => new MacroDisplay(), Map);

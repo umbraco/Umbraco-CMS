@@ -6,18 +6,20 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
-using Umbraco.Core.Migrations;
-using Umbraco.Core.Migrations.Upgrade;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
@@ -36,7 +38,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 .Setup(x => x.Database)
                 .Returns(database);
 
-            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
+            var sqlContext = new SqlContext(new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())), DatabaseType.SQLCe, Mock.Of<IPocoDataFactory>());
             var scopeProvider = new MigrationTests.TestScopeProvider(scope) { SqlContext = sqlContext };
 
             IMigrationBuilder migrationBuilder = Mock.Of<IMigrationBuilder>();

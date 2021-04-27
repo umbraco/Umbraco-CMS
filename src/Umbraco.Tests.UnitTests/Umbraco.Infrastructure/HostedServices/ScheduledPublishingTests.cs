@@ -8,11 +8,12 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Infrastructure.HostedServices;
-using Umbraco.Web;
+using Umbraco.Cms.Infrastructure;
+using Umbraco.Cms.Infrastructure.HostedServices;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 {
@@ -107,8 +108,6 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
 
             var mockServerMessenger = new Mock<IServerMessenger>();
 
-            var mockBackOfficeSecurityFactory = new Mock<IBackOfficeSecurityFactory>();
-
             return new ScheduledPublishing(
                 mockRunTimeState.Object,
                 mockMainDom.Object,
@@ -116,8 +115,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
                 _mockContentService.Object,
                 mockUmbracoContextFactory.Object,
                 _mockLogger.Object,
-                mockServerMessenger.Object,
-                mockBackOfficeSecurityFactory.Object);
+                mockServerMessenger.Object);
         }
 
         private void VerifyScheduledPublishingNotPerformed() => VerifyScheduledPublishingPerformed(Times.Never());

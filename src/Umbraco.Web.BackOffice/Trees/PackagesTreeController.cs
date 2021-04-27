@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -21,8 +22,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         public PackagesTreeController(
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
-            IMenuItemCollectionFactory menuItemCollectionFactory)
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            IMenuItemCollectionFactory menuItemCollectionFactory,
+            IEventAggregator eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _menuItemCollectionFactory = menuItemCollectionFactory;
         }
@@ -44,7 +46,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             //this will load in a custom UI instead of the dashboard for the root node
             root.RoutePath = $"{Constants.Applications.Packages}/{Constants.Trees.Packages}/repo";
-            root.Icon = "icon-box";
+            root.Icon = Constants.Icons.Packages;
 
             root.HasChildren = false;
             return root;

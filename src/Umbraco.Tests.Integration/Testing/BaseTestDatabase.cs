@@ -10,10 +10,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
+using Moq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
 {
@@ -135,7 +137,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
                 using (NPoco.ITransaction transaction = database.GetTransaction())
                 {
-                    var schemaCreator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, new UmbracoVersion());
+                    var schemaCreator = new DatabaseSchemaCreator(database, _loggerFactory.CreateLogger<DatabaseSchemaCreator>(), _loggerFactory, new UmbracoVersion(), Mock.Of<IEventAggregator>());
                     schemaCreator.InitializeDatabaseSchema();
 
                     transaction.Complete();

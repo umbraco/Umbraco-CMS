@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -6,13 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using NUnit.Framework;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
@@ -24,6 +26,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private MediaService MediaService => (MediaService)GetRequiredService<IMediaService>();
 
         private IMediaTypeService MediaTypeService => GetRequiredService<IMediaTypeService>();
+
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder
+            .AddNotificationHandler<MediaMovedToRecycleBinNotification, ContentNotificationHandler>();
 
         [Test]
         public void Get_With_Missing_Guid()
@@ -94,7 +99,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         [Test]
         public void Deleting_Media_Types_With_Hierarchy_Of_Media_Items_Doesnt_Raise_Trashed_Event_For_Deleted_Items()
         {
-            MediaService.Trashed += MediaServiceOnTrashed;
+            ContentNotificationHandler.MovedMediaToRecycleBin = MovedMediaToRecycleBin;
 
             try
             {
@@ -130,13 +135,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             }
             finally
             {
-                MediaService.Trashed -= MediaServiceOnTrashed;
+                ContentNotificationHandler.MovedMediaToRecycleBin = null;
             }
         }
 
-        private void MediaServiceOnTrashed(IMediaService sender, MoveEventArgs<IMedia> e)
+        private void MovedMediaToRecycleBin(MediaMovedToRecycleBinNotification notification)
         {
-            foreach (MoveEventInfo<IMedia> item in e.MoveInfoCollection)
+            foreach (MoveEventInfo<IMedia> item in notification.MoveInfoCollection)
             {
                 // if this item doesn't exist then Fail!
                 IMedia exists = MediaService.GetById(item.Entity.Id);
@@ -212,6 +217,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             Assert.AreNotEqual(clonedMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id, originalMediaType.PropertyTypes.First(x => x.Alias.StartsWith("umbracoFile")).Id);
             Assert.AreNotEqual(clonedMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id, originalMediaType.PropertyGroups.First(x => x.Name.StartsWith("Media")).Id);
+        }
+
+        public class ContentNotificationHandler :
+            INotificationHandler<MediaMovedToRecycleBinNotification>
+        {
+            public void Handle(MediaMovedToRecycleBinNotification notification) => MovedMediaToRecycleBin?.Invoke(notification);
+
+            public static Action<MediaMovedToRecycleBinNotification> MovedMediaToRecycleBin { get; set; }
         }
     }
 }

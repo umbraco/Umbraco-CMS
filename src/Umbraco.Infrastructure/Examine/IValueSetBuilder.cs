@@ -1,8 +1,7 @@
-﻿using Examine;
-using System.Collections.Generic;
-using Umbraco.Core.Models;
+﻿using System.Collections.Generic;
+using Examine;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <summary>
     /// Creates a collection of <see cref="ValueSet"/> to be indexed based on a collection of <see cref="T"/>

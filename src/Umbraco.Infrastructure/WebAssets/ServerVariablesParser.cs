@@ -2,9 +2,8 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Core.Events;
 
-namespace Umbraco.Web.WebAssets
+namespace Umbraco.Cms.Infrastructure.WebAssets
 {
     /// <summary>
     /// Ensures the server variables are included in the outgoing JS script

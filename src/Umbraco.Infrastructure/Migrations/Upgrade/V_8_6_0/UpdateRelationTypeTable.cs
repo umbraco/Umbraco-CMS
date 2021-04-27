@@ -1,6 +1,4 @@
-﻿using Umbraco.Core.Persistence.Dtos;
-
-namespace Umbraco.Core.Migrations.Upgrade.V_8_6_0
+﻿namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0
 {
 
     public class UpdateRelationTypeTable : MigrationBase

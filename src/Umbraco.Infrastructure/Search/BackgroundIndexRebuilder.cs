@@ -6,11 +6,10 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Core;
-using Umbraco.Examine;
-using Umbraco.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.HostedServices;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Cms.Infrastructure.Search
 {
     /// <summary>
     /// Utility to rebuild all indexes on a background thread

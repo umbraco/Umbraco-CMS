@@ -4,9 +4,10 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using NPoco;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     /// <summary>
     /// A bulk sql insert provider for Sql Server

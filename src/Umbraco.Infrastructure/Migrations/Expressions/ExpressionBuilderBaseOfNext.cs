@@ -1,7 +1,7 @@
 ﻿using System.Data;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions
 {
     /// <summary>
     /// Provides a base class for expression builders.

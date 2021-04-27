@@ -1,14 +1,14 @@
-﻿using Serilog.Core;
+﻿using System;
+using Serilog.Core;
 using Serilog.Events;
-using System;
 using Umbraco.Cms.Core.Net;
 
-namespace Umbraco.Core.Logging.Serilog.Enrichers
+namespace Umbraco.Cms.Core.Logging.Serilog.Enrichers
 {
     /// <summary>
     /// Enrich log events with the HttpSessionId property.
     /// Original source - https://github.com/serilog-web/classic/blob/master/src/SerilogWeb.Classic/Classic/Enrichers/HttpSessionIdEnricher.cs
-    /// Nupkg: 'Serilog.Web.Classic' contains handlers & extra bits we do not want
+    /// Nupkg: 'Serilog.Web.Classic' contains handlers and extra bits we do not want
     /// </summary>
     public class HttpSessionIdEnricher : ILogEventEnricher
     {

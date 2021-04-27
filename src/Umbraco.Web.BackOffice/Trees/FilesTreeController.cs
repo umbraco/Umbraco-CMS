@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
@@ -18,8 +19,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             ILocalizedTextService localizedTextService,
             UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
             IMenuItemCollectionFactory menuItemCollectionFactory,
-            IPhysicalFileSystem fileSystem)
-            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory)
+            IPhysicalFileSystem fileSystem,
+            IEventAggregator eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, menuItemCollectionFactory, eventAggregator)
         {
             FileSystem = fileSystem;
         }

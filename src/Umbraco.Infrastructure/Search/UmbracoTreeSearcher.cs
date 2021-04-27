@@ -6,16 +6,15 @@ using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Models.Mapping;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
-using Umbraco.Core.Persistence;
-using Umbraco.Examine;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Search
+namespace Umbraco.Cms.Infrastructure.Search
 {
 
     /// <summary>
@@ -25,7 +24,7 @@ namespace Umbraco.Web.Search
     {
         private readonly ILocalizationService _languageService;
         private readonly IEntityService _entityService;
-        private readonly UmbracoMapper _mapper;
+        private readonly IUmbracoMapper _mapper;
         private readonly ISqlContext _sqlContext;
         private readonly IBackOfficeExamineSearcher _backOfficeExamineSearcher;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
@@ -34,7 +33,7 @@ namespace Umbraco.Web.Search
         public UmbracoTreeSearcher(
             ILocalizationService languageService,
             IEntityService entityService,
-            UmbracoMapper mapper,
+            IUmbracoMapper mapper,
             ISqlContext sqlContext,
             IBackOfficeExamineSearcher backOfficeExamineSearcher,
             IPublishedUrlProvider publishedUrlProvider)

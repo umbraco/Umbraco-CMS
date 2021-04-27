@@ -1,16 +1,20 @@
 ﻿using System;
 using System.Data.Common;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     public class SqlServerDbProviderFactoryCreator : IDbProviderFactoryCreator
     {
         private readonly Func<string, DbProviderFactory> _getFactory;
+        private readonly IOptions<GlobalSettings> _globalSettings;
 
-        public SqlServerDbProviderFactoryCreator(Func<string, DbProviderFactory> getFactory)
+        public SqlServerDbProviderFactoryCreator(Func<string, DbProviderFactory> getFactory, IOptions<GlobalSettings> globalSettings)
         {
             _getFactory = getFactory;
+            _globalSettings = globalSettings;
         }
 
         public DbProviderFactory CreateFactory(string providerName)
@@ -25,7 +29,7 @@ namespace Umbraco.Core.Persistence
             return providerName switch
             {
                 Cms.Core.Constants.DbProviderNames.SqlCe => throw new NotSupportedException("SqlCe is not supported"),
-                Cms.Core.Constants.DbProviderNames.SqlServer => new SqlServerSyntaxProvider(),
+                Cms.Core.Constants.DbProviderNames.SqlServer => new SqlServerSyntaxProvider(_globalSettings),
                 _ => throw new InvalidOperationException($"Unknown provider name \"{providerName}\""),
             };
         }

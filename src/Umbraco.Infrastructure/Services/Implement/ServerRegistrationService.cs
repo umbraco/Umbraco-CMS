@@ -2,23 +2,21 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     /// <summary>
     /// Manages server registrations in the database.
     /// </summary>
-    public sealed class ServerRegistrationService : ScopeRepositoryService, IServerRegistrationService
+    public sealed class ServerRegistrationService : RepositoryService, IServerRegistrationService
     {
         private readonly IServerRegistrationRepository _serverRegistrationRepository;
         private readonly IHostingEnvironment _hostingEnvironment;

@@ -1,14 +1,14 @@
-﻿using Microsoft.Extensions.Logging;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Core.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents a property editor for label properties.

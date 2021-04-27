@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -11,6 +11,7 @@ using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Features;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Services;
@@ -23,7 +24,6 @@ using Umbraco.Cms.Web.BackOffice.Routing;
 using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
-using Umbraco.Core;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -49,6 +49,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeExternalLoginProviders _externalLogins;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly PreviewRoutes _previewRoutes;
+        private readonly IEmailSender _emailSender;
+        private readonly MemberPasswordConfigurationSettings _memberPasswordConfigurationSettings;
 
         public BackOfficeServerVariables(
             LinkGenerator linkGenerator,
@@ -65,7 +67,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IRuntimeMinifier runtimeMinifier,
             IBackOfficeExternalLoginProviders externalLogins,
             IImageUrlGenerator imageUrlGenerator,
-            PreviewRoutes previewRoutes)
+            PreviewRoutes previewRoutes,
+            IEmailSender emailSender,
+            IOptions<MemberPasswordConfigurationSettings> memberPasswordConfigurationSettings)
         {
             _linkGenerator = linkGenerator;
             _runtimeState = runtimeState;
@@ -82,6 +86,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _externalLogins = externalLogins;
             _imageUrlGenerator = imageUrlGenerator;
             _previewRoutes = previewRoutes;
+            _emailSender = emailSender;
+            _memberPasswordConfigurationSettings = memberPasswordConfigurationSettings.Value;
         }
 
         /// <summary>
@@ -93,8 +99,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //this is the filter for the keys that we'll keep based on the full version of the server vars
             var keepOnlyKeys = new Dictionary<string, string[]>
             {
-                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl"}},
-                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail"}},
+                {"umbracoUrls", new[] {"authenticationApiBaseUrl", "serverVarsJs", "externalLoginsUrl", "currentUserApiBaseUrl", "previewHubUrl", "iconApiBaseUrl"}},
+                {"umbracoSettings", new[] {"allowPasswordReset", "imageFileTypes", "maxFileSize", "loginBackgroundImage", "loginLogoImage", "canSendRequiredEmail", "usernameIsEmail", "minimumPasswordLength", "minimumPasswordNonAlphaNum"}},
                 {"application", new[] {"applicationPath", "cacheBuster"}},
                 {"isDebuggingEnabled", new string[] { }},
                 {"features", new [] {"disabledFeatures"}}
@@ -184,6 +190,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         {
                             "contentApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<ContentController>(
                                 controller => controller.PostSave(null))
+                        },
+                        {
+                            "publicAccessApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<PublicAccessController>(
+                                controller => controller.GetPublicAccess(0))
                         },
                         {
                             "mediaApiBaseUrl", _linkGenerator.GetUmbracoApiServiceBaseUrl<MediaController>(
@@ -374,8 +384,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     "umbracoSettings", new Dictionary<string, object>
                     {
                         {"umbracoPath", _globalSettings.GetBackOfficePath(_hostingEnvironment)},
-                        {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath).TrimEnd('/')},
-                        {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd('/')},
+                        {"mediaPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoMediaPath).TrimEnd(Constants.CharArrays.ForwardSlash)},
+                        {"appPluginsPath", _hostingEnvironment.ToAbsolute(Constants.SystemDirectories.AppPlugins).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {
                             "imageFileTypes",
                             string.Join(",", _imageUrlGenerator.SupportedImageFileTypes)
@@ -394,13 +404,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                         },
                         {"keepUserLoggedIn", _securitySettings.KeepUserLoggedIn},
                         {"usernameIsEmail", _securitySettings.UsernameIsEmail},
-                        {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd('/')},
+                        {"cssPath", _hostingEnvironment.ToAbsolute(globalSettings.UmbracoCssPath).TrimEnd(Constants.CharArrays.ForwardSlash)},
                         {"allowPasswordReset", _securitySettings.AllowPasswordReset},
                         {"loginBackgroundImage", _contentSettings.LoginBackgroundImage},
                         {"loginLogoImage", _contentSettings.LoginLogoImage },
-                        {"showUserInvite", EmailSender.CanSendRequiredEmail(globalSettings)},
-                        {"canSendRequiredEmail", EmailSender.CanSendRequiredEmail(globalSettings)},
+                        {"showUserInvite", _emailSender.CanSendRequiredEmail()},
+                        {"canSendRequiredEmail", _emailSender.CanSendRequiredEmail()},
                         {"showAllowSegmentationForDocumentTypes", false},
+                        {"minimumPasswordLength", _memberPasswordConfigurationSettings.RequiredLength},
+                        {"minimumPasswordNonAlphaNum", _memberPasswordConfigurationSettings.GetMinNonAlphaNumericChars()},
                     }
                 },
                 {

@@ -9,9 +9,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Security;
-using Umbraco.Core.Security;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.TestServerTest
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
             ISystemClock clock,
             IBackOfficeSignInManager backOfficeSignInManager,
             IUserService userService,
-            UmbracoMapper umbracoMapper)
+            IUmbracoMapper umbracoMapper)
             : base(options, logger, encoder, clock)
         {
             _backOfficeSignInManager = backOfficeSignInManager;

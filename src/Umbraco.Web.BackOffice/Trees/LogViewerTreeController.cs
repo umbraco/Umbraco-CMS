@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -18,8 +19,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
     {
         public LogViewerTreeController(
             ILocalizedTextService localizedTextService,
-            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection)
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IEventAggregator eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
         }
 
@@ -49,8 +51,8 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             var root = rootResult.Value;
 
             //this will load in a custom UI instead of the dashboard for the root node
-            root.RoutePath = string.Format("{0}/{1}/{2}", Constants.Applications.Settings, Constants.Trees.LogViewer, "overview");
-            root.Icon = "icon-box-alt";
+            root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.LogViewer}/overview";
+            root.Icon = Constants.Icons.LogViewer;
             root.HasChildren = false;
             root.MenuUrl = null;
 

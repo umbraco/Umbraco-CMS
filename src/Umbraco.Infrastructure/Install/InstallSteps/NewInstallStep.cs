@@ -5,18 +5,17 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Install.Models;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.Install.InstallSteps
+namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
     /// <summary>
     /// This is the first UI step for a brand new install
@@ -116,7 +115,7 @@ namespace Umbraco.Web.Install.InstallSteps
                 return new
                 {
                     minCharLength = _passwordConfiguration.RequiredLength,
-                    minNonAlphaNumericLength = _passwordConfiguration.RequireNonLetterOrDigit ? 1 : 0,
+                    minNonAlphaNumericLength = _passwordConfiguration.GetMinNonAlphaNumericChars(),
                     quickInstallAvailable = DatabaseConfigureStep.IsSqlCeAvailable()
                 };
             }

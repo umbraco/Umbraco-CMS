@@ -1,10 +1,9 @@
 using System;
 using System.Security.Claims;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
@@ -12,7 +11,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     /// <summary>
     /// Used to configure <see cref="BackOfficeIdentityOptions"/> for the Umbraco Back office
     /// </summary>
-    public class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackOfficeIdentityOptions>
+    public sealed class ConfigureBackOfficeIdentityOptions : IConfigureOptions<BackOfficeIdentityOptions>
     {
         private readonly UserPasswordConfigurationSettings _userPasswordConfiguration;
 
@@ -23,26 +22,26 @@ namespace Umbraco.Cms.Web.BackOffice.Security
 
         public void Configure(BackOfficeIdentityOptions options)
         {
+            options.SignIn.RequireConfirmedAccount = true;          // uses our custom IUserConfirmation
+            options.SignIn.RequireConfirmedEmail = false;           // not implemented
+            options.SignIn.RequireConfirmedPhoneNumber = false;     // not implemented
+
             options.User.RequireUniqueEmail = true;
+
             options.ClaimsIdentity.UserIdClaimType = ClaimTypes.NameIdentifier;
             options.ClaimsIdentity.UserNameClaimType = ClaimTypes.Name;
             options.ClaimsIdentity.RoleClaimType = ClaimTypes.Role;
             options.ClaimsIdentity.SecurityStampClaimType = Constants.Security.SecurityStampClaimType;
+
             options.Lockout.AllowedForNewUsers = true;
+            // TODO: Implement this
             options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromDays(30);
 
-            ConfigurePasswordOptions(_userPasswordConfiguration, options.Password);
+            options.Password.ConfigurePasswordOptions(_userPasswordConfiguration);
 
             options.Lockout.MaxFailedAccessAttempts = _userPasswordConfiguration.MaxFailedAccessAttemptsBeforeLockout;
         }
 
-        public static void ConfigurePasswordOptions(IPasswordConfiguration input, PasswordOptions output)
-        {
-            output.RequiredLength = input.RequiredLength;
-            output.RequireNonAlphanumeric = input.RequireNonLetterOrDigit;
-            output.RequireDigit = input.RequireDigit;
-            output.RequireLowercase = input.RequireLowercase;
-            output.RequireUppercase = input.RequireUppercase;
-        }
+        
     }
 }

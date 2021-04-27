@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.IO;
@@ -31,6 +32,7 @@ using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
@@ -165,7 +167,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IGridConfig, GridConfig>();
 
             Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
-            Services.AddUnique<ISiteDomainHelper, SiteDomainHelper>();
+            Services.AddUnique<ISiteDomainMapper, SiteDomainMapper>();
 
             Services.AddUnique<HtmlLocalLinkParser>();
             Services.AddUnique<HtmlImageSourceParser>();
@@ -189,6 +191,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             // register distributed cache
             Services.AddUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(), f.GetRequiredService<CacheRefresherCollection>()));
+            Services.AddUnique<ICacheRefresherNotificationFactory, CacheRefresherNotificationFactory>();
 
             // register the http context and umbraco context accessors
             // we *should* use the HttpContextUmbracoContextAccessor, however there are cases when
@@ -218,6 +221,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // which may be replaced by models builder but the default is required to make plain old IPublishedContent
             // instances.
             Services.AddSingleton<IPublishedModelFactory>(factory => factory.CreateDefaultPublishedModelFactory());
+
+            Services
+                .AddNotificationHandler<MemberGroupSavedNotification, PublicAccessHandler>()
+                .AddNotificationHandler<MemberGroupDeletedNotification, PublicAccessHandler>();
         }
     }
 }

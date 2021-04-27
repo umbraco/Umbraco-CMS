@@ -4,10 +4,10 @@ using Serilog;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.DependencyInjection;
 
-namespace Umbraco.Core.Logging.Viewer
+namespace Umbraco.Cms.Core.Logging.Viewer
 {
     // ReSharper disable once UnusedMember.Global
     public class LogViewerComposer : ICoreComposer

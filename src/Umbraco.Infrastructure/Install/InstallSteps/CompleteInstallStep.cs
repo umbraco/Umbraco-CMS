@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Umbraco.Cms.Core.Install.Models;
 
-namespace Umbraco.Web.Install.InstallSteps
+namespace Umbraco.Cms.Infrastructure.Install.InstallSteps
 {
     [InstallSetupStep(InstallationType.NewInstall | InstallationType.Upgrade,
         "UmbracoVersion", 50, "Installation is complete! Get ready to be redirected to your new CMS.",

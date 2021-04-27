@@ -1,11 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Manifest;
@@ -13,7 +11,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.WebAssets
+namespace Umbraco.Cms.Infrastructure.WebAssets
 {
     public class BackOfficeWebAssets
     {
@@ -21,7 +19,8 @@ namespace Umbraco.Web.WebAssets
         public const string UmbracoPreviewCssBundleName = "umbraco-preview-css";
         public const string UmbracoCssBundleName = "umbraco-backoffice-css";
         public const string UmbracoInitCssBundleName = "umbraco-backoffice-init-css";
-        public const string UmbracoJsBundleName = "umbraco-backoffice-js";
+        public const string UmbracoCoreJsBundleName = "umbraco-backoffice-js";
+        public const string UmbracoExtensionsJsBundleName = "umbraco-backoffice-extensions-js";
         public const string UmbracoTinyMceJsBundleName = "umbraco-tinymce-js";
         public const string UmbracoUpgradeCssBundleName = "umbraco-authorize-upgrade-css";
 
@@ -49,37 +48,40 @@ namespace Umbraco.Web.WebAssets
         {
             // Create bundles
 
-            _runtimeMinifier.CreateCssBundle(UmbracoInitCssBundleName,
+            _runtimeMinifier.CreateCssBundle(UmbracoInitCssBundleName, false,
                 FormatPaths("lib/bootstrap-social/bootstrap-social.css",
-                "assets/css/umbraco.css",
+                "assets/css/umbraco.min.css",
                 "lib/font-awesome/css/font-awesome.min.css"));
 
-            _runtimeMinifier.CreateCssBundle(UmbracoUpgradeCssBundleName,
-                FormatPaths("assets/css/umbraco.css",
+            _runtimeMinifier.CreateCssBundle(UmbracoUpgradeCssBundleName, false,
+                FormatPaths("assets/css/umbraco.min.css",
                 "lib/bootstrap-social/bootstrap-social.css",
                 "lib/font-awesome/css/font-awesome.min.css"));
 
-            _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName,
-                FormatPaths("assets/css/canvasdesigner.css"));
+            _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName, false,
+                FormatPaths("assets/css/canvasdesigner.min.css"));
 
-            _runtimeMinifier.CreateJsBundle(UmbracoPreviewJsBundleName,
+            _runtimeMinifier.CreateJsBundle(UmbracoPreviewJsBundleName, false,
                 FormatPaths(GetScriptsForPreview()));
 
-            _runtimeMinifier.CreateJsBundle(UmbracoTinyMceJsBundleName,
+            _runtimeMinifier.CreateJsBundle(UmbracoTinyMceJsBundleName, false,
                 FormatPaths(GetScriptsForTinyMce()));
+
+            _runtimeMinifier.CreateJsBundle(UmbracoCoreJsBundleName, false,
+                FormatPaths(GetScriptsForBackOfficeCore()));
 
             var propertyEditorAssets = ScanPropertyEditors()
                 .GroupBy(x => x.AssetType)
                 .ToDictionary(x => x.Key, x => x.Select(c => c.FilePath));
 
             _runtimeMinifier.CreateJsBundle(
-                UmbracoJsBundleName,
+                UmbracoExtensionsJsBundleName, true,
                 FormatPaths(
-                    GetScriptsForBackOffice(
+                    GetScriptsForBackOfficeExtensions(
                         propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>())));
 
             _runtimeMinifier.CreateCssBundle(
-                UmbracoCssBundleName,
+                UmbracoCssBundleName, true,
                 FormatPaths(
                     GetStylesheetsForBackOffice(
                         propertyEditorAssets.TryGetValue(AssetType.Css, out var styles) ? styles : Enumerable.Empty<string>())));
@@ -89,16 +91,18 @@ namespace Umbraco.Web.WebAssets
         /// Returns scripts used to load the back office
         /// </summary>
         /// <returns></returns>
-        private string[] GetScriptsForBackOffice(IEnumerable<string> propertyEditorScripts)
+        private string[] GetScriptsForBackOfficeExtensions(IEnumerable<string> propertyEditorScripts)
         {
-            var umbracoInit = GetInitBackOfficeScripts();
             var scripts = new HashSet<string>();
-            foreach (var script in umbracoInit)
+            foreach (string script in _parser.Manifest.Scripts)
+            {
                 scripts.Add(script);
-            foreach (var script in _parser.Manifest.Scripts)
+            }
+
+            foreach (string script in propertyEditorScripts)
+            {
                 scripts.Add(script);
-            foreach (var script in propertyEditorScripts)
-                scripts.Add(script);
+            }
 
             return scripts.ToArray();
         }
@@ -107,10 +111,10 @@ namespace Umbraco.Web.WebAssets
         /// Returns the list of scripts for back office initialization
         /// </summary>
         /// <returns></returns>
-        private IEnumerable<string> GetInitBackOfficeScripts()
+        private string[] GetScriptsForBackOfficeCore()
         {
             var resources = JsonConvert.DeserializeObject<JArray>(Resources.JsInitialize);
-            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString());
+            return resources.Where(x => x.Type == JTokenType.String).Select(x => x.ToString()).ToArray();
         }
 
         /// <summary>
@@ -121,10 +125,15 @@ namespace Umbraco.Web.WebAssets
         {
             var stylesheets = new HashSet<string>();
 
-            foreach (var script in _parser.Manifest.Stylesheets)
+            foreach (string script in _parser.Manifest.Stylesheets)
+            {
                 stylesheets.Add(script);
-            foreach (var stylesheet in propertyEditorStyles)
+            }
+
+            foreach (string stylesheet in propertyEditorStyles)
+            {
                 stylesheets.Add(stylesheet);
+            }
 
             return stylesheets.ToArray();
         }

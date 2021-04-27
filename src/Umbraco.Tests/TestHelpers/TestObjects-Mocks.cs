@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.Common;
@@ -6,6 +6,8 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -14,9 +16,10 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Persistence.SqlCe;
 using Umbraco.Cms.Tests.Common;
-using Umbraco.Core.Persistence;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Extensions;
 using Umbraco.Web;
 
@@ -36,7 +39,7 @@ namespace Umbraco.Tests.TestHelpers
         /// <remarks>This is just a void factory that has no actual database.</remarks>
         public IUmbracoDatabaseFactory GetDatabaseFactoryMock(bool configured = true, bool canConnect = true)
         {
-            var sqlSyntax = new SqlCeSyntaxProvider();
+            var sqlSyntax = new SqlCeSyntaxProvider(Options.Create(new GlobalSettings()));
             var sqlContext = Mock.Of<ISqlContext>();
             Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(sqlSyntax);
 
@@ -141,23 +144,21 @@ namespace Umbraco.Tests.TestHelpers
         {
             return new GlobalSettings();
         }
-        public IFileSystems GetFileSystemsMock()
+        public FileSystems GetFileSystemsMock()
         {
-            var fileSystems = Mock.Of<IFileSystems>();
-
-            MockFs(fileSystems, x => x.MacroPartialsFileSystem);
-            MockFs(fileSystems, x => x.MvcViewsFileSystem);
-            MockFs(fileSystems, x => x.PartialViewsFileSystem);
-            MockFs(fileSystems, x => x.ScriptsFileSystem);
-            MockFs(fileSystems, x => x.StylesheetsFileSystem);
+            var fileSystems = FileSystemsCreator.CreateTestFileSystems(
+                NullLoggerFactory.Instance,
+                Mock.Of<IIOHelper>(),
+                Mock.Of<IOptions<GlobalSettings>>(),
+                Mock.Of<Cms.Core.Hosting.IHostingEnvironment>(),
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IFileSystem>(),
+                Mock.Of<IFileSystem>()
+            );
 
             return fileSystems;
-        }
-
-        private void MockFs(IFileSystems fileSystems, Expression<Func<IFileSystems, IFileSystem>> fileSystem)
-        {
-            var fs = Mock.Of<IFileSystem>();
-            Mock.Get(fileSystems).Setup(fileSystem).Returns(fs);
         }
 
         #region Inner classes

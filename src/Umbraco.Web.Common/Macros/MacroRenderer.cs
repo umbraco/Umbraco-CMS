@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
@@ -26,54 +28,51 @@ namespace Umbraco.Cms.Web.Common.Macros
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<MacroRenderer> _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
         private readonly ContentSettings _contentSettings;
         private readonly ILocalizedTextService _textService;
         private readonly AppCaches _appCaches;
         private readonly IMacroService _macroService;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ICookieManager _cookieManager;
-        private readonly IMemberUserKeyProvider _memberUserKeyProvider;
         private readonly ISessionManager _sessionManager;
         private readonly IRequestAccessor _requestAccessor;
+        private readonly PartialViewMacroEngine _partialViewMacroEngine;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public MacroRenderer(
             IProfilingLogger profilingLogger,
             ILogger<MacroRenderer> logger,
             IUmbracoContextAccessor umbracoContextAccessor,
-            IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             IOptions<ContentSettings> contentSettings,
             ILocalizedTextService textService,
             AppCaches appCaches,
             IMacroService macroService,
             IHostingEnvironment hostingEnvironment,
             ICookieManager cookieManager,
-            IMemberUserKeyProvider memberUserKeyProvider,
             ISessionManager sessionManager,
             IRequestAccessor requestAccessor,
-             IHttpContextAccessor httpContextAccessor)
+            PartialViewMacroEngine partialViewMacroEngine,
+            IHttpContextAccessor httpContextAccessor)
         {
             _profilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
             _logger = logger;
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
-            _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
             _textService = textService;
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _cookieManager = cookieManager;
-            _memberUserKeyProvider = memberUserKeyProvider;
             _sessionManager = sessionManager;
             _requestAccessor = requestAccessor;
+            _partialViewMacroEngine = partialViewMacroEngine;
             _httpContextAccessor = httpContextAccessor;
         }
 
         #region MacroContent cache
 
         // gets this macro content cache identifier
-        private string GetContentCacheIdentifier(MacroModel model, int pageId, string cultureName)
+        private async Task<string> GetContentCacheIdentifier(MacroModel model, int pageId, string cultureName)
         {
             var id = new StringBuilder();
 
@@ -93,9 +92,14 @@ namespace Umbraco.Cms.Web.Common.Macros
             {
                 object key = 0;
 
-                if (_backOfficeSecurityAccessor.BackOfficeSecurity.IsAuthenticated())
+                if (_httpContextAccessor.HttpContext?.User?.Identity?.IsAuthenticated ?? false)
                 {
-                    key = _memberUserKeyProvider.GetMemberProviderUserKey() ?? 0;
+                    var memberManager = _httpContextAccessor.HttpContext.RequestServices.GetRequiredService<IMemberManager>();
+                    var member = await memberManager.GetCurrentMemberAsync();
+                    if (member is not null)
+                    {
+                        key = member.Key;
+                    }
                 }
 
                 id.AppendFormat("m{0}-", key);
@@ -145,7 +149,7 @@ namespace Umbraco.Cms.Web.Common.Macros
         }
 
         // stores macro content into the cache
-        private void AddMacroContentToCache(MacroModel model, MacroContent macroContent)
+        private async Task AddMacroContentToCacheAsync(MacroModel model, MacroContent macroContent)
         {
             // only if cache is enabled
             if (_umbracoContextAccessor.UmbracoContext.InPreviewMode || model.CacheDuration <= 0)
@@ -158,9 +162,12 @@ namespace Umbraco.Cms.Web.Common.Macros
             // do not cache if it should cache by member and there's not member
             if (model.CacheByMember)
             {
-                var key = _memberUserKeyProvider.GetMemberProviderUserKey();
-                if (key is null)
+                var memberManager = _httpContextAccessor.HttpContext.RequestServices.GetRequiredService<IMemberManager>();
+                var member = await memberManager.GetCurrentMemberAsync();
+                if (member is null)
+                {
                     return;
+                }
             }
 
             // remember when we cache the content
@@ -216,7 +223,7 @@ namespace Umbraco.Cms.Web.Common.Macros
 
         #region Render/Execute
 
-        public MacroContent Render(string macroAlias, IPublishedContent content, IDictionary<string, object> macroParams)
+        public async Task<MacroContent> RenderAsync(string macroAlias, IPublishedContent content, IDictionary<string, object> macroParams)
         {
             var m = _appCaches.RuntimeCache.GetCacheItem(CacheKeys.MacroFromAliasCacheKey + macroAlias, () => _macroService.GetByAlias(macroAlias));
 
@@ -226,10 +233,10 @@ namespace Umbraco.Cms.Web.Common.Macros
             var macro = new MacroModel(m);
 
             UpdateMacroModelProperties(macro, macroParams);
-            return Render(macro, content);
+            return await RenderAsync(macro, content);
         }
 
-        private MacroContent Render(MacroModel macro, IPublishedContent content)
+        private async Task<MacroContent> RenderAsync(MacroModel macro, IPublishedContent content)
         {
             if (content == null)
                 throw new ArgumentNullException(nameof(content));
@@ -242,7 +249,7 @@ namespace Umbraco.Cms.Web.Common.Macros
                     prop.Value = ParseAttribute(prop.Value);
 
                 var cultureName = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
-                macro.CacheIdentifier = GetContentCacheIdentifier(macro, content.Id, cultureName);
+                macro.CacheIdentifier = await GetContentCacheIdentifier(macro, content.Id, cultureName);
 
                 // get the macro from cache if it is there
                 var macroContent = GetMacroContentFromCache(macro);
@@ -269,7 +276,7 @@ namespace Umbraco.Cms.Web.Common.Macros
                 if (attempt.Success)
                 {
                     // write to cache (if appropriate)
-                    AddMacroContentToCache(macro, macroContent);
+                    await AddMacroContentToCacheAsync(macro, macroContent);
                 }
 
                 return macroContent;
@@ -338,37 +345,26 @@ namespace Umbraco.Cms.Web.Common.Macros
         private Attempt<MacroContent> ExecuteMacroOfType(MacroModel model, IPublishedContent content)
         {
             if (model == null)
+            {
                 throw new ArgumentNullException(nameof(model));
+            }
 
             // ensure that we are running against a published node (ie available in XML)
             // that may not be the case if the macro is embedded in a RTE of an unpublished document
 
             if (content == null)
+            {
                 return Attempt.Fail(new MacroContent { Text = "[macro failed (no content)]" });
+            }
 
-            var textService = _textService;
 
             return ExecuteMacroWithErrorWrapper(model,
                           $"Executing PartialView: MacroSource=\"{model.MacroSource}\".",
                           "Executed PartialView.",
-                          () => ExecutePartialView(model, content),
-                          () => textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
+                          () => _partialViewMacroEngine.Execute(model, content),
+                          () => _textService.Localize("errors/macroErrorLoadingPartialView", new[] { model.MacroSource }));
         }
 
-
-        #endregion
-
-        #region Execute engines
-
-        /// <summary>
-        /// Renders a PartialView Macro.
-        /// </summary>
-        /// <returns>The text output of the macro execution.</returns>
-        private MacroContent ExecutePartialView(MacroModel macro, IPublishedContent content)
-        {
-            var engine = new PartialViewMacroEngine(_httpContextAccessor, _hostingEnvironment);
-            return engine.Execute(macro, content);
-        }
 
         #endregion
 
@@ -383,7 +379,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             if (attributeValue.StartsWith("[") == false)
                 return attributeValue;
 
-            var tokens = attributeValue.Split(',').Select(x => x.Trim()).ToArray();
+            var tokens = attributeValue.Split(Core.Constants.CharArrays.Comma).Select(x => x.Trim()).ToArray();
 
             // ensure we only process valid input ie each token must be [?x] and not eg a json array
             // like [1,2,3] which we don't want to parse - however the last one can be a literal, so

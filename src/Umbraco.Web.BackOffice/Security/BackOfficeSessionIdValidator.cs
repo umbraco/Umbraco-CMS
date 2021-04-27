@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 

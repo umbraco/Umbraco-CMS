@@ -3,7 +3,7 @@
 
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Infrastructure.Media;
+using Umbraco.Cms.Infrastructure.Media;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Media
 {

@@ -161,7 +161,14 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
         else {
             $scope.model.value = null;
         }
-        angularHelper.getCurrentForm($scope).$setDirty();
+
+        setDirty();
+    }
+
+    function setDirty() {
+        if ($scope.datePickerForm) {
+            $scope.datePickerForm.datepicker.$setDirty();
+        }
     }
 
     /** Sets the value of the date picker control adn associated viewModel objects based on the model value */

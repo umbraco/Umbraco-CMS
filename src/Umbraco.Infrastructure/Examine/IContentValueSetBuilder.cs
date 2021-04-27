@@ -1,8 +1,6 @@
-﻿using Examine;
-using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Models;
+﻿using Umbraco.Cms.Core.Models;
 
-namespace Umbraco.Examine
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <inheritdoc />
     /// <summary>

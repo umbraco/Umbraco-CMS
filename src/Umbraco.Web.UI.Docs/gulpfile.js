@@ -18,7 +18,7 @@ gulp.task('docs', [], function (cb) {
     var options = {
         html5Mode: false,
         startPage: '/api',
-        title: "Umbraco 8 Backoffice UI API Documentation",
+        title: "Umbraco 9 Backoffice UI API Documentation",
         dest: './api',
         styles: ['./umb-docs.css'],
         image: "https://our.umbraco.com/assets/images/logo.svg"
@@ -34,7 +34,7 @@ gulp.task('docs', [], function (cb) {
     .pipe(gulpDocs.process(options))
     .pipe(gulp.dest('./api'))
     .pipe(connect.reload());
-    
+
 });
 
 gulp.task('connect:docs', function (cb) {

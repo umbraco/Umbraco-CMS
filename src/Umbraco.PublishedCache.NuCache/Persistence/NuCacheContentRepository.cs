@@ -8,15 +8,15 @@ using NPoco;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -719,17 +719,18 @@ AND cmsContentNu.nodeId IS NULL
             return s;
         }
 
+        private static readonly JsonSerializerSettings NestedContentDataJsonSerializerSettings = new JsonSerializerSettings
+        {
+            Converters = new List<JsonConverter> { new ForceInt32Converter() }
+        };
+
         private static ContentNestedData DeserializeNestedData(string data)
         {
             // by default JsonConvert will deserialize our numeric values as Int64
             // which is bad, because they were Int32 in the database - take care
 
-            var settings = new JsonSerializerSettings
-            {
-                Converters = new List<JsonConverter> { new ForceInt32Converter() }
-            };
-
-            return JsonConvert.DeserializeObject<ContentNestedData>(data, settings);
+            return JsonConvert.DeserializeObject<ContentNestedData>(data, NestedContentDataJsonSerializerSettings
+            );
         }
     }
 }

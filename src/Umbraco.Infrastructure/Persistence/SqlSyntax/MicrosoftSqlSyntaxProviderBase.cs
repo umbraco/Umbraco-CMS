@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Data;
 using System.Linq;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 
-namespace Umbraco.Core.Persistence.SqlSyntax
+namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
     /// <summary>
     /// Abstract class for defining MS sql implementations
@@ -34,7 +35,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             if (tableName.Contains(".") == false)
                 return $"[{tableName}]";
 
-            var tableNameParts = tableName.Split(new[] { '.' }, 2);
+            var tableNameParts = tableName.Split(Constants.CharArrays.Period, 2);
             return $"[{tableNameParts[0]}].[{tableNameParts[1]}]";
         }
 

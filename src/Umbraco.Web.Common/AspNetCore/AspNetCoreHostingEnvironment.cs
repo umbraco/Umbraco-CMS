@@ -128,7 +128,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
                 return virtualPath;
             }
 
-            string fullPath = ApplicationVirtualPath.EnsureEndsWith('/') + virtualPath.TrimStart('~', '/');
+            string fullPath = ApplicationVirtualPath.EnsureEndsWith('/') + virtualPath.TrimStart(Core.Constants.CharArrays.TildeForwardSlash);
 
             return fullPath;
         }

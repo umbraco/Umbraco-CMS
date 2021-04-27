@@ -1,5 +1,5 @@
-﻿using System;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Web.Common.Security;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
 {
@@ -9,9 +9,7 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     public class ConfigureBackOfficeSecurityStampValidatorOptions : IConfigureOptions<BackOfficeSecurityStampValidatorOptions>
     {
         public void Configure(BackOfficeSecurityStampValidatorOptions options)
-        {
-            options.ValidationInterval = TimeSpan.FromMinutes(30);
-        }
+            => ConfigureSecurityStampOptions.ConfigureOptions(options);
     }
 
 

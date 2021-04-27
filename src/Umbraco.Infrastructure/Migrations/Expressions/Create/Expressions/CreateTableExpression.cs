@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using NPoco;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Create.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Expressions
 {
     public class CreateTableExpression : MigrationExpressionBase
     {

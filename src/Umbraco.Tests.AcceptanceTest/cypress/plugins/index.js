@@ -11,6 +11,7 @@
 
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
+const del = require('del')
 
 /**
  * @type {Cypress.PluginConfig}
@@ -23,6 +24,14 @@ module.exports = (on, config) => {
   if (baseUrl) {
     config.baseUrl = baseUrl;
   }
+
+  on('after:spec', (spec, results) => {
+    if(results.stats.failures === 0 && results.video) {
+      // `del()` returns a promise, so it's important to return it to ensure
+      // deleting the video is finished before moving
+      return del(results.video)
+    }
+  })
 
   return config;
 }

@@ -24,19 +24,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class MemberGroupController : UmbracoAuthorizedJsonController
     {
         private readonly IMemberGroupService _memberGroupService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
 
         public MemberGroupController(
             IMemberGroupService memberGroupService,
-            UmbracoMapper umbracoMapper,
-            ILocalizedTextService localizedTextService
-            )
+            IUmbracoMapper umbracoMapper,
+            ILocalizedTextService localizedTextService)
         {
             _memberGroupService = memberGroupService ?? throw new ArgumentNullException(nameof(memberGroupService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
-            _localizedTextService =
-                localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
+            _localizedTextService = localizedTextService ?? throw new ArgumentNullException(nameof(localizedTextService));
         }
 
         /// <summary>
@@ -46,16 +44,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         public ActionResult<MemberGroupDisplay> GetById(int id)
         {
-            var memberGroup = _memberGroupService.GetById(id);
+            IMemberGroup memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
                 return NotFound();
             }
 
-            var dto = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+            MemberGroupDisplay dto = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
             return dto;
         }
-
 
         /// <summary>
         /// Gets the member group json for the member group guid
@@ -64,7 +61,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         public ActionResult<MemberGroupDisplay> GetById(Guid id)
         {
-            var memberGroup = _memberGroupService.GetById(id);
+            IMemberGroup memberGroup = _memberGroupService.GetById(id);
             if (memberGroup == null)
             {
                 return NotFound();
@@ -82,9 +79,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             var guidUdi = id as GuidUdi;
             if (guidUdi == null)
+            {
                 return NotFound();
+            }
 
-            var memberGroup = _memberGroupService.GetById(guidUdi.Guid);
+            IMemberGroup memberGroup = _memberGroupService.GetById(guidUdi.Guid);
             if (memberGroup == null)
             {
                 return NotFound();
@@ -93,11 +92,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
         }
 
-        public IEnumerable<MemberGroupDisplay> GetByIds([FromQuery]int[] ids)
-        {
-            return _memberGroupService.GetByIds(ids)
-                    .Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>);
-        }
+        public IEnumerable<MemberGroupDisplay> GetByIds([FromQuery] int[] ids)
+            => _memberGroupService.GetByIds(ids).Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>);
 
         [HttpDelete]
         [HttpPost]
@@ -114,10 +110,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         public IEnumerable<MemberGroupDisplay> GetAllGroups()
-        {
-            return _memberGroupService.GetAll()
+            => _memberGroupService.GetAll()
                     .Select(_umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>);
-        }
 
         public MemberGroupDisplay GetEmpty()
         {
@@ -129,7 +123,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
 
             var id = int.Parse(saveModel.Id.ToString());
-            var memberGroup = id > 0 ? _memberGroupService.GetById(id) : new MemberGroup();
+            IMemberGroup memberGroup = id > 0 ? _memberGroupService.GetById(id) : new MemberGroup();
             if (memberGroup == null)
             {
                 return NotFound();
@@ -138,7 +132,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             memberGroup.Name = saveModel.Name;
             _memberGroupService.Save(memberGroup);
 
-            var display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+            MemberGroupDisplay display = _umbracoMapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
 
             display.AddSuccessNotification(
                             _localizedTextService.Localize("speechBubbles/memberGroupSavedHeader"),

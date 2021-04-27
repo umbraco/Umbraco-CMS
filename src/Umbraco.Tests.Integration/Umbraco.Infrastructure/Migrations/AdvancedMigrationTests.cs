@@ -8,15 +8,16 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Migrations;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Migrations.Upgrade;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Scoping;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
 {
@@ -27,6 +28,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
         private readonly ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
 
         private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
+        private IEventAggregator EventAggregator => GetRequiredService<IEventAggregator>();
 
         [Test]
         public void CreateTableOfTDto()
@@ -53,7 +55,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
 
                 upgrader.Execute(ScopeProvider, builder, Mock.Of<IKeyValueService>(), _loggerFactory.CreateLogger<Upgrader>(), _loggerFactory);
 
-                var helper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion);
+                var helper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, EventAggregator);
                 bool exists = helper.TableExists("umbracoUser");
                 Assert.IsTrue(exists);
 

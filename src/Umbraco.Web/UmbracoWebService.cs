@@ -6,9 +6,6 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 
 namespace Umbraco.Web

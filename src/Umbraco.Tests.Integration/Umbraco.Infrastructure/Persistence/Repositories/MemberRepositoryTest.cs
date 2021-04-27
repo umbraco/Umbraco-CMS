@@ -6,27 +6,31 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
@@ -53,7 +57,23 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             IRelationRepository relationRepository = GetRequiredService<IRelationRepository>();
             var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
             var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-            return new MemberRepository(accessor, AppCaches.Disabled, LoggerFactory.CreateLogger<MemberRepository>(), MemberTypeRepository, MemberGroupRepository, tagRepo, Mock.Of<ILanguageRepository>(), relationRepository, relationTypeRepository, PasswordHasher, propertyEditors, dataValueReferences, DataTypeService, JsonSerializer);
+            return new MemberRepository(
+                accessor,
+                AppCaches.Disabled,
+                LoggerFactory.CreateLogger<MemberRepository>(),
+                MemberTypeRepository,
+                MemberGroupRepository,
+                tagRepo,
+                Mock.Of<ILanguageRepository>(),
+                relationRepository,
+                relationTypeRepository,
+                PasswordHasher,
+                propertyEditors,
+                dataValueReferences,
+                DataTypeService,
+                JsonSerializer,
+                Mock.Of<IEventAggregator>(),
+                Options.Create(new MemberPasswordConfigurationSettings()));
         }
 
         [Test]

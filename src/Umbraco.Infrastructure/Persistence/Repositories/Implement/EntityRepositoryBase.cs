@@ -8,12 +8,10 @@ using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Provides a base class to all <see cref="IEntity"/> based repositories.
@@ -79,11 +77,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                         IQuery<TEntity> query = _hasIdQuery ?? (_hasIdQuery = AmbientScope.SqlContext.Query<TEntity>().Where(x => x.Id != 0));
                         return PerformCount(query);
                     }));
-
-        /// <summary>
-        /// Gets the node object type for the repository's entity
-        /// </summary>
-        protected abstract Guid NodeObjectTypeId { get; }
 
         /// <summary>
         /// Gets the repository cache policy

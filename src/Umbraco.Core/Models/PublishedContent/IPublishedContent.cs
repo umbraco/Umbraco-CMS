@@ -1,8 +1,9 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace Umbraco.Cms.Core.Models.PublishedContent
 {
+
     /// <inheritdoc />
     /// <summary>
     /// Represents a published content item.

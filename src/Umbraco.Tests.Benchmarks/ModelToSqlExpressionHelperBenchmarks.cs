@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Linq.Expressions;
 using BenchmarkDotNet.Attributes;
+using Microsoft.Extensions.Options;
 using Moq;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Persistence.SqlCe;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Infrastructure.Persistence.Mappers;
 
 namespace Umbraco.Tests.Benchmarks
 {
@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Benchmarks
         protected Lazy<ISqlContext> MockSqlContext()
         {
             var sqlContext = Mock.Of<ISqlContext>();
-            var syntax = new SqlCeSyntaxProvider();
+            var syntax = new SqlCeSyntaxProvider(Options.Create(new GlobalSettings()));
             Mock.Get(sqlContext).Setup(x => x.SqlSyntax).Returns(syntax);
             return new Lazy<ISqlContext>(() => sqlContext);
         }
@@ -36,7 +36,7 @@ namespace Umbraco.Tests.Benchmarks
             _mapperCollection = mapperCollection.Object;
         }
 
-        private readonly ISqlSyntaxProvider _syntaxProvider = new SqlCeSyntaxProvider();
+        private readonly ISqlSyntaxProvider _syntaxProvider = new SqlCeSyntaxProvider(Options.Create(new GlobalSettings()));
         private readonly CachedExpression _cachedExpression;
         private readonly IMapperCollection _mapperCollection;
 

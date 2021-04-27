@@ -3,11 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Text.RegularExpressions;
 using NPoco;
-using Umbraco.Core.Persistence.DatabaseAnnotations;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Core.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 
-namespace Umbraco.Core.Persistence.SqlSyntax
+namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
     /// <summary>
     /// Defines an SqlSyntaxProvider
@@ -130,6 +130,9 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         /// unspecified.</para>
         /// </remarks>
         bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName);
+
+        void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
+        void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
 
         void ReadLock(IDatabase db, params int[] lockIds);
         void WriteLock(IDatabase db, params int[] lockIds);

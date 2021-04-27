@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Linq.Expressions;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Querying
+namespace Umbraco.Cms.Infrastructure.Persistence.Querying
 {
     /// <summary>
     /// An expression tree parser to create SQL statements and SQL parameters based on a strongly typed expression,

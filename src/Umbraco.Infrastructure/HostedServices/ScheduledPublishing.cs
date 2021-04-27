@@ -12,13 +12,8 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core;
-using Umbraco.Core.Security;
-using Umbraco.Core.Services;
-using Umbraco.Core.Sync;
-using Umbraco.Web;
 
-namespace Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Infrastructure.HostedServices
 {
     /// <summary>
     /// Hosted service implementation for scheduled publishing feature.
@@ -32,7 +27,6 @@ namespace Umbraco.Infrastructure.HostedServices
         private readonly IMainDom _mainDom;
         private readonly IRuntimeState _runtimeState;
         private readonly IServerMessenger _serverMessenger;
-        private readonly IBackOfficeSecurityFactory _backofficeSecurityFactory;
         private readonly IServerRoleAccessor _serverRegistrar;
         private readonly IUmbracoContextFactory _umbracoContextFactory;
 
@@ -54,8 +48,7 @@ namespace Umbraco.Infrastructure.HostedServices
             IContentService contentService,
             IUmbracoContextFactory umbracoContextFactory,
             ILogger<ScheduledPublishing> logger,
-            IServerMessenger serverMessenger,
-            IBackOfficeSecurityFactory backofficeSecurityFactory)
+            IServerMessenger serverMessenger)
             : base(TimeSpan.FromMinutes(1), DefaultDelay)
         {
             _runtimeState = runtimeState;
@@ -65,10 +58,9 @@ namespace Umbraco.Infrastructure.HostedServices
             _umbracoContextFactory = umbracoContextFactory;
             _logger = logger;
             _serverMessenger = serverMessenger;
-            _backofficeSecurityFactory = backofficeSecurityFactory;
         }
 
-        internal override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object state)
         {
             if (Suspendable.ScheduledPublishing.CanRun == false)
             {
@@ -111,8 +103,7 @@ namespace Umbraco.Infrastructure.HostedServices
                 // - batched messenger should not depend on a current HttpContext
                 //    but then what should be its "scope"? could we attach it to scopes?
                 // - and we should definitively *not* have to flush it here (should be auto)
-                //
-                _backofficeSecurityFactory.EnsureBackOfficeSecurity();
+
                 using UmbracoContextReference contextReference = _umbracoContextFactory.EnsureUmbracoContext();
                 try
                 {

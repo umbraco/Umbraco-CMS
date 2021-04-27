@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
-using Umbraco.Cms.Core.IO;
-using Umbraco.Cms.Core.PropertyEditors;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Core.PropertyEditors
+using System.Collections.Generic;
+using Umbraco.Cms.Core.IO;
+
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration for the label value editor.

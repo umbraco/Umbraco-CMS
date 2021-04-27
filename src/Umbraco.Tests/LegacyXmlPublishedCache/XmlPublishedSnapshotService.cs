@@ -7,22 +7,13 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Runtime;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services;
-using Umbraco.Web;
-using Umbraco.Web.Cache;
-using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Routing;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache
 {
@@ -36,18 +27,14 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly PublishedContentTypeCache _contentTypeCache;
         private readonly IDomainService _domainService;
-        private readonly IMemberService _memberService;
         private readonly IMediaService _mediaService;
         private readonly IUserService _userService;
         private readonly IAppCache _requestCache;
         private readonly GlobalSettings _globalSettings;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
-        private readonly ISiteDomainHelper _siteDomainHelper;
         private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IVariationContextAccessor _variationContextAccessor;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
-        private readonly IApplicationShutdownRegistry _hostingLifetime;
-        private readonly IHostingEnvironment _hostingEnvironment;
 
         #region Constructors
 
@@ -69,7 +56,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IShortStringHelper shortStringHelper,
-            ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
             MainDom mainDom,
             bool testing = false,
@@ -78,7 +64,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor,
                 documentRepository, mediaRepository, memberRepository,
                 defaultCultureAccessor,
-                loggerFactory, globalSettings, hostingEnvironment, hostingLifetime, shortStringHelper, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
+                loggerFactory, globalSettings, hostingEnvironment, hostingLifetime, shortStringHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -101,7 +87,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
             IShortStringHelper shortStringHelper,
-            ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
             PublishedContentTypeCache contentTypeCache,
             MainDom mainDom,
@@ -118,7 +103,6 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 documentRepository, mediaRepository, memberRepository, entitySerializer, hostingEnvironment, hostingLifetime, shortStringHelper);
 
             _domainService = serviceContext.DomainService;
-            _memberService = serviceContext.MemberService;
             _mediaService = serviceContext.MediaService;
             _userService = serviceContext.UserService;
             _defaultCultureAccessor = defaultCultureAccessor;
@@ -126,10 +110,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _requestCache = requestCache;
             _umbracoContextAccessor = umbracoContextAccessor;
             _globalSettings = globalSettings;
-            _siteDomainHelper = siteDomainHelper;
             _entitySerializer = entitySerializer;
-            _hostingEnvironment = hostingEnvironment;
-            _hostingLifetime = hostingLifetime;
         }
 
         public void Dispose()
@@ -151,7 +132,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             return new PublishedSnapshot(
                 new PublishedContentCache(_xmlStore, domainCache, _requestCache, _globalSettings, _contentTypeCache, _routesCache, _variationContextAccessor, previewToken),
                 new PublishedMediaCache(_xmlStore, _mediaService, _userService, _requestCache, _contentTypeCache, _entitySerializer, _umbracoContextAccessor, _variationContextAccessor),
-                new PublishedMemberCache(_xmlStore, _requestCache, _memberService, _contentTypeCache, _userService, _variationContextAccessor),
+                new PublishedMemberCache(_contentTypeCache, _variationContextAccessor),
                 domainCache);
         }
 

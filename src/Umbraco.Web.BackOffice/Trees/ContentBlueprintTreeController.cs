@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Actions;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Trees;
@@ -40,8 +41,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
             IMenuItemCollectionFactory menuItemCollectionFactory,
             IContentService contentService,
             IContentTypeService contentTypeService,
-            IEntityService entityService)
-            : base(localizedTextService, umbracoApiControllerTypeCollection)
+            IEntityService entityService,
+            IEventAggregator eventAggregator)
+            : base(localizedTextService, umbracoApiControllerTypeCollection, eventAggregator)
         {
             _menuItemCollectionFactory = menuItemCollectionFactory ?? throw new ArgumentNullException(nameof(menuItemCollectionFactory));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));

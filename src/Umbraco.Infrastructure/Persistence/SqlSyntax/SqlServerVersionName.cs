@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Persistence.SqlSyntax
+﻿namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
     /// <summary>
     /// Represents the version name of SQL server (i.e. the year 2008, 2005, etc...)
