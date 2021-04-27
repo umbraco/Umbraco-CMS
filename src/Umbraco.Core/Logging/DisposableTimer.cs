@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 
@@ -118,7 +118,7 @@ namespace Umbraco.Cms.Core.Logging
             {
                 if (_failed)
                 {
-                    if (_failMessageArgs == null)
+                    if (_failMessageArgs is null)
                     {
                         _logger.LogError(_failException, "{FailMessage} ({Duration}ms) [Timing {TimingId}]", _failMessage, Stopwatch.ElapsedMilliseconds, _timingId);
                     }
@@ -144,8 +144,8 @@ namespace Umbraco.Cms.Core.Logging
                             {
                                 var args = new object[_endMessageArgs.Length + 2];
                                 _endMessageArgs.CopyTo(args, 0);
-                                args[_endMessageArgs.Length - 1] = Stopwatch.ElapsedMilliseconds;
-                                args[_endMessageArgs.Length] = _timingId;
+                                args[args.Length - 1] = Stopwatch.ElapsedMilliseconds;
+                                args[args.Length] = _timingId;
                                 _logger.LogDebug(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
                             }
                             break;
@@ -161,7 +161,7 @@ namespace Umbraco.Cms.Core.Logging
                                 args[_endMessageArgs.Length - 1] = Stopwatch.ElapsedMilliseconds;
                                 args[_endMessageArgs.Length] = _timingId;
                                 _logger.LogInformation(_endMessage + " ({Duration}ms) [Timing {TimingId}]", args);
-                            }                            
+                            }
                             break;
                             // filtered in the ctor
                             //default:
