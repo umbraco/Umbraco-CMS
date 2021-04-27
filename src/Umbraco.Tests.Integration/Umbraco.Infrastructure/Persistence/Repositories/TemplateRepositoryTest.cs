@@ -374,13 +374,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 IEnumerable<ITemplate> childrenById = repository.GetChildren(created[1].Id);
-                IEnumerable<ITemplate> childrenByAlias = repository.GetChildren(created[1].Alias);
 
                 // Assert
                 Assert.AreEqual(2, childrenById.Count());
                 Assert.AreEqual(2, childrenById.DistinctBy(x => x.Id).Count());
-                Assert.AreEqual(2, childrenByAlias.Count());
-                Assert.AreEqual(2, childrenByAlias.DistinctBy(x => x.Id).Count());
             }
         }
 
@@ -418,14 +415,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 IEnumerable<ITemplate> descendantsById = repository.GetDescendants(created[1].Id);
-                IEnumerable<ITemplate> descendantsByAlias = repository.GetDescendants(created[1].Alias);
 
                 // Assert
                 Assert.AreEqual(3, descendantsById.Count());
                 Assert.AreEqual(3, descendantsById.DistinctBy(x => x.Id).Count());
-
-                Assert.AreEqual(3, descendantsByAlias.Count());
-                Assert.AreEqual(3, descendantsByAlias.DistinctBy(x => x.Id).Count());
             }
         }
 

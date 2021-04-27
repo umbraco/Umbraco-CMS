@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         private IScriptRepository CreateRepository()
         {
             var globalSettings = new GlobalSettings();
-            return new ScriptRepository(_fileSystems, IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
+            return new ScriptRepository(_fileSystems);
         }
 
         [Test]

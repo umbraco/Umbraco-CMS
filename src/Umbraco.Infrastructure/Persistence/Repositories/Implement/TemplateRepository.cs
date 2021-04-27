@@ -449,16 +449,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
-        public void SetFileContent(string filepath, Stream content)
-        {
-            GetFileSystem(filepath).AddFile(filepath, content, true);
-        }
-
-        public long GetFileSize(string filepath)
-        {
-            return GetFileSystem(filepath).GetSize(filepath);
-        }
-
         private IFileSystem GetFileSystem(string filepath)
         {
             var ext = Path.GetExtension(filepath);
@@ -507,14 +497,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return children;
         }
 
-        public IEnumerable<ITemplate> GetChildren(string alias)
-        {
-            //return from base.GetAll, this is all cached
-            return base.GetMany().Where(x => alias.IsNullOrWhiteSpace()
-                ? x.MasterTemplateAlias.IsNullOrWhiteSpace()
-                : x.MasterTemplateAlias.InvariantEquals(alias));
-        }
-
         public IEnumerable<ITemplate> GetDescendants(int masterTemplateId)
         {
             //return from base.GetAll, this is all cached
@@ -541,30 +523,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return descendants;
         }
 
-        public IEnumerable<ITemplate> GetDescendants(string alias)
-        {
-            var all = base.GetMany().ToArray();
-            var descendants = new List<ITemplate>();
-            if (alias.IsNullOrWhiteSpace() == false)
-            {
-                var parent = all.FirstOrDefault(x => x.Alias.InvariantEquals(alias));
-                if (parent == null) return Enumerable.Empty<ITemplate>();
-                //recursively add all children
-                AddChildren(all, descendants, parent.Alias);
-            }
-            else
-            {
-                descendants.AddRange(all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace()));
-                foreach (var parent in descendants)
-                {
-                    //recursively add all children with a level
-                    AddChildren(all, descendants, parent.Alias);
-                }
-            }
-            //return the list - it will be naturally ordered by level
-            return descendants;
-        }
-
         private void AddChildren(ITemplate[] all, List<ITemplate> descendants, string masterAlias)
         {
             var c = all.Where(x => x.MasterTemplateAlias.InvariantEquals(masterAlias)).ToArray();
@@ -575,56 +533,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             {
                 AddChildren(all, descendants, child.Alias);
             }
-        }
-
-        /// <summary>
-        /// Validates a <see cref="ITemplate"/>
-        /// </summary>
-        /// <param name="template"><see cref="ITemplate"/> to validate</param>
-        /// <returns>True if Script is valid, otherwise false</returns>
-        public bool ValidateTemplate(ITemplate template)
-        {
-            // get path
-            // TODO: templates should have a real Path somehow - but anyways
-            // are we using Path for something else?!
-            var path = template.VirtualPath;
-
-            // get valid paths
-            var validDirs = new[] { Cms.Core.Constants.SystemDirectories.MvcViews };
-
-            // get valid extensions
-            var validExts = new List<string>();
-            validExts.Add("cshtml");
-            validExts.Add("vbhtml");
-
-            // validate path and extension
-            var validFile = _ioHelper.VerifyEditPath(path, validDirs);
-            var validExtension = _ioHelper.VerifyFileExtension(path, validExts);
-            return validFile && validExtension;
-        }
-
-        private static IEnumerable<TemplateNode> CreateChildren(TemplateNode parent, IEnumerable<ITemplate> childTemplates, ITemplate[] allTemplates)
-        {
-            var children = new List<TemplateNode>();
-            foreach (var childTemplate in childTemplates)
-            {
-                var template = allTemplates.Single(x => x.Id == childTemplate.Id);
-                var child = new TemplateNode(template)
-                    {
-                        Parent = parent
-                    };
-
-                //add to our list
-                children.Add(child);
-
-                //get this node's children
-                var local = childTemplate;
-                var kids = allTemplates.Where(x => x.MasterTemplateAlias.InvariantEquals(local.Alias));
-
-                //recurse
-                child.Children = CreateChildren(child, kids, allTemplates);
-            }
-            return children;
         }
 
         #endregion
