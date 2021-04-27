@@ -65,11 +65,11 @@ namespace Umbraco.Cms.Core.IO
             IFileSystem scriptsFileSystem,
             IFileSystem mvcViewFileSystem) : this(loggerFactory, ioHelper, globalSettings, hostingEnvironment)
         {
-            _macroPartialFileSystem = (ShadowWrapper)CreateShadowWrapper(macroPartialFileSystem, "macro-partials");
-            _partialViewsFileSystem = (ShadowWrapper)CreateShadowWrapper(partialViewsFileSystem, "partials");
-            _stylesheetsFileSystem = (ShadowWrapper)CreateShadowWrapper(stylesheetFileSystem, "css");
-            _scriptsFileSystem = (ShadowWrapper)CreateShadowWrapper(scriptsFileSystem, "scripts");
-            _mvcViewsFileSystem = (ShadowWrapper)CreateShadowWrapper(mvcViewFileSystem, "view");
+            _macroPartialFileSystem = CreateShadowWrapperInternal(macroPartialFileSystem, "macro-partials");
+            _partialViewsFileSystem = CreateShadowWrapperInternal(partialViewsFileSystem, "partials");
+            _stylesheetsFileSystem = CreateShadowWrapperInternal(stylesheetFileSystem, "css");
+            _scriptsFileSystem = CreateShadowWrapperInternal(scriptsFileSystem, "scripts");
+            _mvcViewsFileSystem = CreateShadowWrapperInternal(mvcViewFileSystem, "view");
             // Set initialized to true so the filesystems doesn't get overwritten.
             _wkfsInitialized = true;
 
@@ -207,7 +207,7 @@ namespace Umbraco.Cms.Core.IO
                     + " and rootUrl must be /css", exception);
             }
 
-            _stylesheetsFileSystem = (ShadowWrapper) CreateShadowWrapper(fileSystem, "css");
+            _stylesheetsFileSystem = CreateShadowWrapperInternal(fileSystem, "css");
         }
 
         private void EnsureWellKnownFileSystems() => LazyInitializer.EnsureInitialized(ref _wkfsObject, ref _wkfsInitialized, ref _wkfsLock, CreateWellKnownFileSystems);
@@ -342,13 +342,18 @@ namespace Umbraco.Cms.Core.IO
         /// <param name="shadowPath"></param>
         /// <returns></returns>
         [EditorBrowsable(EditorBrowsableState.Never)]
-        public IFileSystem CreateShadowWrapper(IFileSystem filesystem, string shadowPath)
+        public IFileSystem CreateShadowWrapper(IFileSystem filesystem, string shadowPath) => CreateShadowWrapperInternal(filesystem, shadowPath);
+
+        private ShadowWrapper CreateShadowWrapperInternal(IFileSystem filesystem, string shadowPath)
         {
             lock (_shadowLocker)
             {
                 var wrapper = new ShadowWrapper(filesystem, _ioHelper, _hostingEnvironment, _loggerFactory, shadowPath,() => IsScoped());
                 if (_shadowCurrentId != null)
+                {
                     wrapper.Shadow(_shadowCurrentId);
+                }
+
                 _shadowWrappers.Add(wrapper);
                 return wrapper;
             }
