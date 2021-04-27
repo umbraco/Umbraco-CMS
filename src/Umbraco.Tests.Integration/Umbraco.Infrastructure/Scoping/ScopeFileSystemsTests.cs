@@ -35,7 +35,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
         [TearDown]
         public void Teardown()
         {
-            FileSystems.ResetShadowId();
             ClearFiles(IOHelper);
         }
 

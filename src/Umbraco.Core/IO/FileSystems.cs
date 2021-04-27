@@ -75,9 +75,6 @@ namespace Umbraco.Cms.Core.IO
 
         }
 
-        // for tests only, totally unsafe
-        internal static void ResetShadowId() => _shadowCurrentId = null;
-
         /// <summary>
         /// Used be Scope provider to take control over the filesystems, should never be used for anything else.
         /// </summary>
