@@ -426,14 +426,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public IEnumerable<ITemplate> GetTemplateDescendants(string alias)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.GetDescendants(alias);
-            }
-        }
-
         /// <summary>
         /// Gets the template descendants
         /// </summary>
@@ -444,32 +436,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 return _templateRepository.GetDescendants(masterTemplateId);
-            }
-        }
-
-        /// <summary>
-        /// Gets the template children
-        /// </summary>
-        /// <param name="alias"></param>
-        /// <returns></returns>
-        public IEnumerable<ITemplate> GetTemplateChildren(string alias)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.GetChildren(alias);
-            }
-        }
-
-        /// <summary>
-        /// Gets the template children
-        /// </summary>
-        /// <param name="masterTemplateId"></param>
-        /// <returns></returns>
-        public IEnumerable<ITemplate> GetTemplateChildren(int masterTemplateId)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.GetChildren(masterTemplateId);
             }
         }
 
@@ -570,44 +536,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
                 Audit(AuditType.Delete, userId, template.Id, ObjectTypes.GetName(UmbracoObjectTypes.Template));
                 scope.Complete();
-            }
-        }
-
-        /// <summary>
-        /// Validates a <see cref="ITemplate"/>
-        /// </summary>
-        /// <param name="template"><see cref="ITemplate"/> to validate</param>
-        /// <returns>True if Script is valid, otherwise false</returns>
-        public bool ValidateTemplate(ITemplate template)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.ValidateTemplate(template);
-            }
-        }
-
-        public Stream GetTemplateFileContentStream(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.GetFileContentStream(filepath);
-            }
-        }
-
-        public void SetTemplateFileContent(string filepath, Stream content)
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                _templateRepository.SetFileContent(filepath, content);
-                scope.Complete();
-            }
-        }
-
-        public long GetTemplateFileSize(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _templateRepository.GetFileSize(filepath);
             }
         }
 
