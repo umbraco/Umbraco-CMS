@@ -298,8 +298,7 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
     }
 
     /**
-     * Based on the current state of the application, this configures the scope variables that
-     * l the main tree and language drop down
+     * Based on the current state of the application, this configures the scope variables that control the main tree and language drop down
      */
     function configureTreeAndLanguages() {
 
