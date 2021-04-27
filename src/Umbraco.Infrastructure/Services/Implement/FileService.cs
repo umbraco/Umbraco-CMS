@@ -600,14 +600,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             }
         }
 
-        public IEnumerable<IPartialView> GetPartialViewMacros(params string[] names)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _partialViewMacroRepository.GetMany(names).OrderBy(x => x.Name);
-            }
-        }
-
         public Attempt<IPartialView> CreatePartialView(IPartialView partialView, string snippetName = null, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             return CreatePartialViewMacro(partialView, PartialViewType.PartialView, snippetName, userId);
@@ -762,22 +754,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             return Attempt.Succeed(partialView);
         }
 
-        public bool ValidatePartialView(IPartialView partialView)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _partialViewRepository.ValidatePartialView(partialView);
-            }
-        }
-
-        public bool ValidatePartialViewMacro(IPartialView partialView)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _partialViewMacroRepository.ValidatePartialView(partialView);
-            }
-        }
-
         internal string StripPartialViewHeader(string contents)
         {
             var headerMatch = new Regex("^@inherits\\s+?.*$", RegexOptions.Multiline);
@@ -797,40 +773,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 : Attempt<string>.Fail();
         }
 
-        public Stream GetPartialViewMacroFileContentStream(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _partialViewMacroRepository.GetFileContentStream(filepath);
-            }
-        }
-
-        public void SetPartialViewMacroFileContent(string filepath, Stream content)
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                _partialViewMacroRepository.SetFileContent(filepath, content);
-                scope.Complete();
-            }
-        }
-
-        public Stream GetPartialViewFileContentStream(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _partialViewRepository.GetFileContentStream(filepath);
-            }
-        }
-
-        public void SetPartialViewFileContent(string filepath, Stream content)
-        {
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                _partialViewRepository.SetFileContent(filepath, content);
-                scope.Complete();
-            }
-        }
-
         public void CreatePartialViewFolder(string folderPath)
         {
             using (var scope = ScopeProvider.CreateScope())
@@ -846,22 +788,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 _partialViewMacroRepository.AddFolder(folderPath);
                 scope.Complete();
-            }
-        }
-
-        public long GetPartialViewMacroFileSize(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _partialViewMacroRepository.GetFileSize(filepath);
-            }
-        }
-
-        public long GetPartialViewFileSize(string filepath)
-        {
-            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
-            {
-                return _partialViewRepository.GetFileSize(filepath);
             }
         }
 

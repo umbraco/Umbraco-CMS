@@ -11,18 +11,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     internal class PartialViewRepository : FileRepository<string, IPartialView>, IPartialViewRepository
     {
-        private readonly IIOHelper _ioHelper;
-
-        public PartialViewRepository(FileSystems fileSystems, IIOHelper ioHelper)
+        public PartialViewRepository(FileSystems fileSystems)
             : base(fileSystems.PartialViewsFileSystem)
         {
-            _ioHelper = ioHelper;
         }
 
-        protected PartialViewRepository(IFileSystem fileSystem, IIOHelper ioHelper)
+        protected PartialViewRepository(IFileSystem fileSystem)
             : base(fileSystem)
         {
-            _ioHelper = ioHelper;
         }
 
         protected virtual PartialViewType ViewType => PartialViewType.PartialView;
@@ -91,29 +87,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     yield return Get(file);
                 }
             }
-        }
-
-        private static readonly List<string> ValidExtensions = new List<string> { "cshtml" };
-
-        public virtual bool ValidatePartialView(IPartialView partialView)
-        {
-            // get full path
-            string fullPath;
-            try
-            {
-                // may throw for security reasons
-                fullPath = FileSystem.GetFullPath(partialView.Path);
-            }
-            catch
-            {
-                return false;
-            }
-
-            // validate path & extension
-            var validDir = Cms.Core.Constants.SystemDirectories.MvcViews;
-            var isValidPath = _ioHelper.VerifyEditPath(fullPath, validDir);
-            var isValidExtension = _ioHelper.VerifyFileExtension(fullPath, ValidExtensions);
-            return isValidPath && isValidExtension;
         }
 
         public Stream GetFileContentStream(string filepath)

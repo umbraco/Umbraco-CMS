@@ -6,8 +6,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     internal class PartialViewMacroRepository : PartialViewRepository, IPartialViewMacroRepository
     {
-        public PartialViewMacroRepository(FileSystems fileSystems, IIOHelper ioHelper)
-            : base(fileSystems.MacroPartialsFileSystem, ioHelper)
+        public PartialViewMacroRepository(FileSystems fileSystems)
+            : base(fileSystems.MacroPartialsFileSystem)
         { }
 
         protected override PartialViewType ViewType => PartialViewType.PartialViewMacro;
