@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         private IStylesheetRepository CreateRepository()
         {
             var globalSettings = new GlobalSettings();
-            return new StylesheetRepository(GetRequiredService<ILogger<StylesheetRepository>>(), _fileSystems, IOHelper, Microsoft.Extensions.Options.Options.Create(globalSettings));
+            return new StylesheetRepository(_fileSystems);
         }
 
         [Test]

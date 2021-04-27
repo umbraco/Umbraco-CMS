@@ -52,13 +52,6 @@ namespace Umbraco.Cms.Core.Services
         void DeleteStylesheet(string path, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
-        /// Validates a <see cref="IStylesheet"/>
-        /// </summary>
-        /// <param name="stylesheet"><see cref="IStylesheet"/> to validate</param>
-        /// <returns>True if Stylesheet is valid, otherwise false</returns>
-        bool ValidateStylesheet(IStylesheet stylesheet);
-
-        /// <summary>
         /// Gets a <see cref="IScript"/> object by its name
         /// </summary>
         /// <param name="name">Name of the script incl. extension</param>
@@ -178,27 +171,6 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="templates">List of <see cref="Template"/> to save</param>
         /// <param name="userId">Optional id of the user</param>
         void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId);
-
-        /// <summary>
-        /// Gets the content of a stylesheet as a stream.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the stylesheet.</param>
-        /// <returns>The content of the stylesheet.</returns>
-        Stream GetStylesheetFileContentStream(string filepath);
-
-        /// <summary>
-        /// Sets the content of a stylesheet.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the stylesheet.</param>
-        /// <param name="content">The content of the stylesheet.</param>
-        void SetStylesheetFileContent(string filepath, Stream content);
-
-        /// <summary>
-        /// Gets the size of a stylesheet.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the stylesheet.</param>
-        /// <returns>The size of the stylesheet.</returns>
-        long GetStylesheetFileSize(string filepath);
 
         /// <summary>
         /// Gets the content of a macro partial view snippet as a string

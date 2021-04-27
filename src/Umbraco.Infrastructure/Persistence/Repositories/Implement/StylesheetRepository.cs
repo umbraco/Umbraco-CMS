@@ -1,10 +1,5 @@
-﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -17,16 +12,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
     /// </summary>
     internal class StylesheetRepository : FileRepository<string, IStylesheet>, IStylesheetRepository
     {
-        private readonly ILogger<StylesheetRepository> _logger;
-        private readonly IIOHelper _ioHelper;
-        private readonly GlobalSettings _globalSettings;
-
-        public StylesheetRepository(ILogger<StylesheetRepository> logger, FileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
+        public StylesheetRepository(FileSystems fileSystems)
             : base(fileSystems.StylesheetsFileSystem)
         {
-            _logger = logger;
-            _ioHelper = ioHelper;
-            _globalSettings = globalSettings.Value;
         }
 
         #region Overrides of FileRepository<string,Stylesheet>
@@ -107,80 +95,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 {
                     yield return Get(file);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Gets a list of all <see cref="Stylesheet"/> that exist at the relative path specified.
-        /// </summary>
-        /// <param name="rootPath">
-        /// If null or not specified, will return the stylesheets at the root path relative to the IFileSystem
-        /// </param>
-        /// <returns></returns>
-        public IEnumerable<IStylesheet> GetStylesheetsAtPath(string rootPath = null)
-        {
-            return FileSystem.GetFiles(rootPath ?? string.Empty, "*.css").Select(Get);
-        }
-
-        private static readonly List<string> ValidExtensions = new List<string> { "css" };
-
-        public bool ValidateStylesheet(IStylesheet stylesheet)
-        {
-            // get full path
-            string fullPath;
-            try
-            {
-                // may throw for security reasons
-
-                fullPath = FileSystem.GetFullPath(stylesheet.Path);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogWarning(ex, "Can't get full path");
-                return false;
-            }
-
-            // validate path and extension
-            var validDir = _globalSettings.UmbracoCssPath;
-            _logger.LogWarning("fullPath {fullPath}, validDir: {validDir}",fullPath,  validDir);
-
-            var isValidPath = _ioHelper.VerifyEditPath(fullPath, validDir);
-            var isValidExtension = _ioHelper.VerifyFileExtension(stylesheet.Path, ValidExtensions);
-
-            _logger.LogWarning("isValidPath {isValidPath}, isValidExtension: {isValidExtension}",isValidPath,  isValidExtension);
-            return isValidPath && isValidExtension;
-        }
-
-        public Stream GetFileContentStream(string filepath)
-        {
-            if (FileSystem.FileExists(filepath) == false) return null;
-
-            try
-            {
-                return FileSystem.OpenFile(filepath);
-            }
-            catch
-            {
-                return null; // deal with race conds
-            }
-        }
-
-        public void SetFileContent(string filepath, Stream content)
-        {
-            FileSystem.AddFile(filepath, content, true);
-        }
-
-        public new long GetFileSize(string filepath)
-        {
-            if (FileSystem.FileExists(filepath) == false) return -1;
-
-            try
-            {
-                return FileSystem.GetSize(filepath);
-            }
-            catch
-            {
-                return -1; // deal with race conds
             }
         }
 
