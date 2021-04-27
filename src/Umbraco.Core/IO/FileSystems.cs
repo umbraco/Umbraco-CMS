@@ -208,7 +208,6 @@ namespace Umbraco.Cms.Core.IO
             }
 
             _stylesheetsFileSystem = (ShadowWrapper) CreateShadowWrapper(fileSystem, "css");
-            _shadowWrappers.Add(_stylesheetsFileSystem);
         }
 
         private void EnsureWellKnownFileSystems() => LazyInitializer.EnsureInitialized(ref _wkfsObject, ref _wkfsInitialized, ref _wkfsLock, CreateWellKnownFileSystems);
