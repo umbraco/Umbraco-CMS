@@ -2,31 +2,27 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Notifications;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
-using Umbraco.Core.Services.Implement;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     /// <summary>
     /// Represents the MemberService.
     /// </summary>
-    public class MemberService : ScopeRepositoryService, IMemberService
+    public class MemberService : RepositoryService, IMemberService
     {
         private readonly IMemberRepository _memberRepository;
         private readonly IMemberTypeRepository _memberTypeRepository;
         private readonly IMemberGroupRepository _memberGroupRepository;
         private readonly IAuditRepository _auditRepository;
-        private readonly IMemberTypeService _memberTypeService;
 
         private readonly IMemberGroupService _memberGroupService;
 
@@ -61,7 +57,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
 
                 IQuery<IMember> query;
 
@@ -71,10 +67,10 @@ namespace Umbraco.Core.Services.Implement
                         query = Query<IMember>();
                         break;
                     case MemberCountType.LockedOut:
-                        query = Query<IMember>().Where(x => x.PropertyTypeAlias == Cms.Core.Constants.Conventions.Member.IsLockedOut && ((Member) x).BoolPropertyValue);
+                        query = Query<IMember>().Where(x => x.PropertyTypeAlias == Constants.Conventions.Member.IsLockedOut && ((Member) x).BoolPropertyValue);
                         break;
                     case MemberCountType.Approved:
-                        query = Query<IMember>().Where(x => x.PropertyTypeAlias == Cms.Core.Constants.Conventions.Member.IsApproved && ((Member) x).BoolPropertyValue);
+                        query = Query<IMember>().Where(x => x.PropertyTypeAlias == Constants.Conventions.Member.IsApproved && ((Member) x).BoolPropertyValue);
                         break;
                     default:
                         throw new ArgumentOutOfRangeException(nameof(countType));
@@ -94,7 +90,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.Count(memberTypeAlias);
             }
         }
@@ -123,10 +119,7 @@ namespace Umbraco.Core.Services.Implement
                 throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias));
             }
 
-            var member = new Member(name, email.ToLower().Trim(), username, memberType);
-            using IScope scope = ScopeProvider.CreateScope();
-            CreateMember(scope, member, 0, false);
-            scope.Complete();
+            var member = new Member(name, email.ToLower().Trim(), username, memberType, 0);
 
             return member;
         }
@@ -146,12 +139,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (memberType == null) throw new ArgumentNullException(nameof(memberType));
 
-            var member = new Member(name, email.ToLower().Trim(), username, memberType);
-            using (var scope = ScopeProvider.CreateScope())
-            {
-                CreateMember(scope, member, 0, false);
-                scope.Complete();
-            }
+            var member = new Member(name, email.ToLower().Trim(), username, memberType, 0);
 
             return member;
         }
@@ -222,16 +210,15 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope())
             {
                 // locking the member tree secures member types too
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.WriteLock(Constants.Locks.MemberTree);
 
                 var memberType = GetMemberType(scope, memberTypeAlias); // + locks // + locks
                 if (memberType == null)
                     throw new ArgumentException("No member type with that alias.", nameof(memberTypeAlias)); // causes rollback // causes rollback
 
-                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved);
-                CreateMember(scope, member, -1, true);
+                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
 
-                scope.Complete();
+                Save(member);
                 return member;
             }
         }
@@ -292,7 +279,7 @@ namespace Umbraco.Core.Services.Implement
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.WriteLock(Constants.Locks.MemberTree);
 
                 // ensure it all still make sense
                 // ensure it all still make sense
@@ -300,39 +287,11 @@ namespace Umbraco.Core.Services.Implement
 
                 if (vrfy == null || vrfy.Id != memberType.Id)
                     throw new ArgumentException($"Member type with alias {memberType.Alias} does not exist or is a different member type."); // causes rollback
-                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved);
+                var member = new Member(name, email.ToLower().Trim(), username, passwordValue, memberType, isApproved, -1);
 
-                CreateMember(scope, member, -1, true);
-                scope.Complete();
+                Save(member);
                 return member;
             }
-        }
-
-        private void CreateMember(IScope scope, Member member, int userId, bool withIdentity)
-        {
-            member.CreatorId = userId;
-
-            if (withIdentity)
-            {
-                // if saving is cancelled, media remains without an identity
-                var saveEventArgs = new SaveEventArgs<IMember>(member);
-                if (scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
-                {
-                    return;
-                }
-
-                _memberRepository.Save(member);
-
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(Saved, this, saveEventArgs);
-            }
-
-            if (withIdentity == false)
-            {
-                return;
-            }
-
-            Audit(AuditType.New, member.CreatorId, member.Id, $"Member '{member.Name}' was created with Id {member.Id}");
         }
 
         #endregion
@@ -348,7 +307,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.Get(id);
             }
         }
@@ -364,7 +323,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 var query = Query<IMember>().Where(x => x.Key == id);
                 return _memberRepository.Get(query).FirstOrDefault();
             }
@@ -381,7 +340,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.GetPage(null, pageIndex, pageSize, out totalRecords, null, Ordering.By("LoginName"));
             }
         }
@@ -397,7 +356,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 var query1 = memberTypeAlias == null ? null : Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
                 var query2 = filter == null ? null : Query<IMember>().Where(x => x.Name.Contains(filter) || x.Username.Contains(filter) || x.Email.Contains(filter));
                 return _memberRepository.GetPage(query1, pageIndex, pageSize, out totalRecords, query2, Ordering.By(orderBy, orderDirection, isCustomField: !orderBySystemField));
@@ -431,7 +390,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 var query = Query<IMember>().Where(x => x.Email.Equals(email));
                 return _memberRepository.Get(query).FirstOrDefault();
             }
@@ -446,7 +405,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.GetByUsername(username);
             }
         }
@@ -460,7 +419,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 var query = Query<IMember>().Where(x => x.ContentTypeAlias == memberTypeAlias);
                 return _memberRepository.Get(query);
             }
@@ -475,7 +434,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 var query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
                 return _memberRepository.Get(query);
             }
@@ -490,7 +449,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.GetByMemberGroup(memberGroupName);
             }
         }
@@ -505,7 +464,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.GetMany(ids);
             }
         }
@@ -523,7 +482,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 var query = Query<IMember>();
 
                 switch (matchType)
@@ -564,7 +523,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 var query = Query<IMember>();
 
                 switch (matchType)
@@ -605,7 +564,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 var query = Query<IMember>();
 
                 switch (matchType)
@@ -644,7 +603,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 IQuery<IMember> query;
 
                 switch (matchType)
@@ -680,7 +639,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 IQuery<IMember> query;
 
                 switch (matchType)
@@ -718,7 +677,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 var query = Query<IMember>().Where(x => ((Member) x).PropertyTypeAlias == propertyTypeAlias && ((Member) x).BoolPropertyValue == value);
 
                 return _memberRepository.Get(query);
@@ -736,7 +695,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 IQuery<IMember> query;
 
                 switch (matchType)
@@ -774,7 +733,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.Exists(id);
             }
         }
@@ -788,7 +747,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.Exists(username);
             }
         }
@@ -814,10 +773,12 @@ namespace Umbraco.Core.Services.Implement
             member.Username = member.Username.Trim();
             member.Email = member.Email.Trim();
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IMember>(member);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                var savingNotification = new MemberSavingNotification(member, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -828,14 +789,13 @@ namespace Umbraco.Core.Services.Implement
                     throw new ArgumentException("Cannot save member with empty name.");
                 }
 
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.WriteLock(Constants.Locks.MemberTree);
 
                 _memberRepository.Save(member);
 
                 if (raiseEvents)
                 {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
+                    scope.Notifications.Publish(new MemberSavedNotification(member, evtMsgs).WithStateFrom(savingNotification));
                 }
 
                 Audit(AuditType.Save, 0, member.Id);
@@ -849,16 +809,18 @@ namespace Umbraco.Core.Services.Implement
         {
             var membersA = members.ToArray();
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IMember>(membersA);
-                if (raiseEvents && scope.Events.DispatchCancelable(Saving, this, saveEventArgs))
+                var savingNotification = new MemberSavingNotification(membersA, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
                 }
 
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.WriteLock(Constants.Locks.MemberTree);
 
                 foreach (var member in membersA)
                 {
@@ -871,8 +833,7 @@ namespace Umbraco.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(Saved, this, saveEventArgs);
+                    scope.Notifications.Publish(new MemberSavedNotification(membersA, evtMsgs).WithStateFrom(savingNotification));
                 }
                 Audit(AuditType.Save, 0, -1, "Save multiple Members");
 
@@ -890,32 +851,30 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="member"><see cref="IMember"/> to Delete</param>
         public void Delete(IMember member)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<IMember>(member);
-                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                var deletingNotification = new MemberDeletingNotification(member, evtMsgs);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
                 }
 
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
-                DeleteLocked(scope, member, deleteEventArgs);
+                scope.WriteLock(Constants.Locks.MemberTree);
+                DeleteLocked(scope, member, evtMsgs, deletingNotification.State);
 
                 Audit(AuditType.Delete, 0, member.Id);
                 scope.Complete();
             }
         }
 
-        private void DeleteLocked(IScope scope, IMember member, DeleteEventArgs<IMember> args = null)
+        private void DeleteLocked(IScope scope, IMember member, EventMessages evtMsgs, IDictionary<string, object> notificationState = null)
         {
             // a member has no descendants
             _memberRepository.Delete(member);
-            if (args == null)
-                args = new DeleteEventArgs<IMember>(member, false); // raise event & get flagged files
-            else
-                args.CanCancel = false;
-            scope.Events.Dispatch(Deleted, this, args);
+            scope.Notifications.Publish(new MemberDeletedNotification(member, evtMsgs).WithState(notificationState));
 
             // media files deleted by QueuingEventDispatcher
         }
@@ -928,7 +887,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (var scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.CreateIfNotExists(roleName);
                 scope.Complete();
             }
@@ -943,7 +902,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberGroupRepository.GetMany().Distinct();
             }
         }
@@ -957,7 +916,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 var result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
                 return result.Select(x => x.Name).Distinct();
             }
@@ -967,7 +926,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(username);
                 return result.Select(x => x.Name).Distinct();
             }
@@ -977,7 +936,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberGroupRepository.GetMany().Select(x => x.Id).Distinct();
             }
         }
@@ -986,7 +945,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(memberId);
                 return result.Select(x => x.Id).Distinct();
             }
@@ -996,7 +955,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 IEnumerable<IMemberGroup> result = _memberGroupRepository.GetMemberGroupsForMember(username);
                 return result.Select(x => x.Id).Distinct();
             }
@@ -1006,7 +965,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.GetByMemberGroup(roleName);
             }
         }
@@ -1015,7 +974,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                scope.ReadLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.ReadLock(Constants.Locks.MemberTree);
                 return _memberRepository.FindMembersInRole(roleName, usernameToMatch, matchType);
             }
         }
@@ -1024,7 +983,7 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.WriteLock(Constants.Locks.MemberTree);
 
                 if (throwIfBeingUsed)
                 {
@@ -1055,10 +1014,10 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
-                int[] ids = _memberGroupRepository.GetMemberIds(usernames);
+                scope.WriteLock(Constants.Locks.MemberTree);
+                int[] ids = _memberRepository.GetMemberIds(usernames);
                 _memberGroupRepository.AssignRoles(ids, roleNames);
-                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(ids, roleNames), nameof(AssignedRoles));
+                scope.Notifications.Publish(new AssignedMemberRolesNotification(ids, roleNames));
                 scope.Complete();
             }
         }
@@ -1069,10 +1028,10 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
-                int[] ids = _memberGroupRepository.GetMemberIds(usernames);
+                scope.WriteLock(Constants.Locks.MemberTree);
+                int[] ids = _memberRepository.GetMemberIds(usernames);
                 _memberGroupRepository.DissociateRoles(ids, roleNames);
-                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(ids, roleNames), nameof(RemovedRoles));
+                scope.Notifications.Publish(new RemovedMemberRolesNotification(ids, roleNames));
                 scope.Complete();
             }
         }
@@ -1083,9 +1042,9 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.AssignRoles(memberIds, roleNames);
-                scope.Events.Dispatch(AssignedRoles, this, new RolesEventArgs(memberIds, roleNames), nameof(AssignedRoles));
+                scope.Notifications.Publish(new AssignedMemberRolesNotification(memberIds, roleNames));
                 scope.Complete();
             }
         }
@@ -1096,9 +1055,32 @@ namespace Umbraco.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.WriteLock(Constants.Locks.MemberTree);
                 _memberGroupRepository.DissociateRoles(memberIds, roleNames);
-                scope.Events.Dispatch(RemovedRoles, this, new RolesEventArgs(memberIds, roleNames), nameof(RemovedRoles));
+                scope.Notifications.Publish(new RemovedMemberRolesNotification(memberIds, roleNames));
+                scope.Complete();
+            }
+        }
+
+        public void ReplaceRoles(string[] usernames, string[] roleNames)
+        {
+            using (IScope scope = ScopeProvider.CreateScope())
+            {
+                scope.WriteLock(Constants.Locks.MemberTree);
+                int[] ids = _memberRepository.GetMemberIds(usernames);
+                _memberGroupRepository.ReplaceRoles(ids, roleNames);
+                scope.Notifications.Publish(new AssignedMemberRolesNotification(ids, roleNames));
+                scope.Complete();
+            }
+        }
+
+        public void ReplaceRoles(int[] memberIds, string[] roleNames)
+        {
+            using (IScope scope = ScopeProvider.CreateScope())
+            {
+                scope.WriteLock(Constants.Locks.MemberTree);
+                _memberGroupRepository.ReplaceRoles(memberIds, roleNames);
+                scope.Notifications.Publish(new AssignedMemberRolesNotification(memberIds, roleNames));
                 scope.Complete();
             }
         }
@@ -1108,45 +1090,6 @@ namespace Umbraco.Core.Services.Implement
         #region Private Methods
 
         private void Audit(AuditType type, int userId, int objectId, string message = null) => _auditRepository.Save(new AuditItem(objectId, type, userId, ObjectTypes.GetName(UmbracoObjectTypes.Member), message));
-
-        #endregion
-
-        #region Event Handlers
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleting;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, DeleteEventArgs<IMember>> Deleted;
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saving;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, SaveEventArgs<IMember>> Saved;
-
-        /// <summary>
-        /// Occurs after roles have been assigned.
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, RolesEventArgs> AssignedRoles;
-
-        /// <summary>
-        /// Occurs after roles have been removed.
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, RolesEventArgs> RemovedRoles;
-
-        /// <summary>
-        /// Occurs after members have been exported.
-        /// </summary>
-        public static event TypedEventHandler<IMemberService, ExportedMemberEventArgs> Exported;
 
         #endregion
 
@@ -1186,7 +1129,7 @@ namespace Umbraco.Core.Services.Implement
                     Properties = new List<MemberExportProperty>(GetPropertyExportItems(member))
                 };
 
-                scope.Events.Dispatch(Exported, this, new ExportedMemberEventArgs(member, model));
+                scope.Notifications.Publish(new ExportedMemberNotification(member, model));
 
                 return model;
             }
@@ -1228,18 +1171,19 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="memberTypeId">Id of the MemberType</param>
         public void DeleteMembersOfType(int memberTypeId)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             // note: no tree to manage here
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                scope.WriteLock(Cms.Core.Constants.Locks.MemberTree);
+                scope.WriteLock(Constants.Locks.MemberTree);
 
                 // TODO: What about content that has the contenttype as part of its composition?
                 IQuery<IMember> query = Query<IMember>().Where(x => x.ContentTypeId == memberTypeId);
 
                 IMember[] members = _memberRepository.Get(query).ToArray();
-                var deleteEventArgs = new DeleteEventArgs<IMember>(members);
 
-                if (scope.Events.DispatchCancelable(Deleting, this, deleteEventArgs))
+                if (scope.Notifications.PublishCancelable(new MemberDeletingNotification(members, evtMsgs)))
                 {
                     scope.Complete();
                     return;
@@ -1249,7 +1193,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     // delete media
                     // triggers the deleted event (and handles the files)
-                    DeleteLocked(scope, member);
+                    DeleteLocked(scope, member, evtMsgs);
                 }
 
                 scope.Complete();
@@ -1268,7 +1212,7 @@ namespace Umbraco.Core.Services.Implement
                 throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(memberTypeAlias));
             }
 
-            scope.ReadLock(Cms.Core.Constants.Locks.MemberTypes);
+            scope.ReadLock(Constants.Locks.MemberTypes);
 
             IMemberType memberType = _memberTypeRepository.Get(memberTypeAlias);
 

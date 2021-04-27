@@ -5,10 +5,10 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Xml.XPath;
-using Microsoft.Extensions.Logging;
 using Examine;
 using Examine.Search;
 using Lucene.Net.Store;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
@@ -17,10 +17,9 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Core.Xml;
+using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Extensions;
-using Umbraco.Examine;
 using Umbraco.Web.Composing;
-using Umbraco.Web.PublishedCache;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.LegacyXmlPublishedCache

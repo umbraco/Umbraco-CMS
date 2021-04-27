@@ -1,28 +1,29 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NPoco;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Notifications;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     internal class MemberGroupRepository : EntityRepositoryBase<int, IMemberGroup>, IMemberGroupRepository
     {
-        public MemberGroupRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberGroupRepository> logger)
-            : base(scopeAccessor, cache, logger)
-        { }
+        private readonly IEventMessagesFactory _eventMessagesFactory;
+
+        public MemberGroupRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger<MemberGroupRepository> logger, IEventMessagesFactory eventMessagesFactory)
+            : base(scopeAccessor, cache, logger) =>
+            _eventMessagesFactory = eventMessagesFactory;
 
         protected override IMemberGroup PerformGet(int id)
         {
@@ -91,7 +92,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.MemberGroup;
+        protected Guid NodeObjectTypeId => Cms.Core.Constants.ObjectTypes.MemberGroup;
 
         protected override void PersistNewItem(IMemberGroup entity)
         {
@@ -132,7 +133,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         public IMemberGroup GetByName(string name)
         {
             return IsolatedCache.GetCacheItem<IMemberGroup>(
-                typeof (IMemberGroup).FullName + "." + name,
+                typeof(IMemberGroup).FullName + "." + name,
                 () =>
                 {
                     var qry = Query<IMemberGroup>().Where(group => group.Name.Equals(name));
@@ -150,7 +151,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             var qry = Query<IMemberGroup>().Where(group => group.Name.Equals(roleName));
             var result = Get(qry);
 
-            if (result.Any()) return null;
+            if (result.Any())
+                return null;
 
             var grp = new MemberGroup
             {
@@ -158,10 +160,14 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             };
             PersistNewItem(grp);
 
-            if (AmbientScope.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(grp)))
+            var evtMsgs = _eventMessagesFactory.Get();
+            if (AmbientScope.Notifications.PublishCancelable(new MemberGroupSavingNotification(grp, evtMsgs)))
+            {
                 return null;
+            }
 
-            AmbientScope.Events.Dispatch(SavedMemberGroup, this, new SaveEventArgs<IMemberGroup>(grp));
+            AmbientScope.Notifications.Publish(new MemberGroupSavedNotification(grp, evtMsgs));
+
             return grp;
         }
 
@@ -171,7 +177,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Select("umbracoNode.*")
                 .From<NodeDto>()
                 .InnerJoin<Member2MemberGroupDto>()
-                .On<NodeDto, Member2MemberGroupDto>( dto => dto.NodeId, dto => dto.MemberGroup)
+                .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
                 .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
                 .Where<Member2MemberGroupDto>(x => x.Member == memberId);
 
@@ -197,73 +203,67 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 .Select(x => MemberGroupFactory.BuildEntity(x));
         }
 
-        public int[] GetMemberIds(string[] usernames)
-        {
-            var memberObjectType = Cms.Core.Constants.ObjectTypes.Member;
+        
 
-            var memberSql = Sql()
-                .Select("umbracoNode.id")
-                .From<NodeDto>()
-                .InnerJoin<MemberDto>()
-                .On<NodeDto, MemberDto>(dto => dto.NodeId, dto => dto.NodeId)
-                .Where<NodeDto>(x => x.NodeObjectType == memberObjectType)
-                .Where("cmsMember.LoginName in (@usernames)", new { /*usernames =*/ usernames });
-            return Database.Fetch<int>(memberSql).ToArray();
-        }
+        public void ReplaceRoles(int[] memberIds, string[] roleNames) => AssignRolesInternal(memberIds, roleNames, true);
 
-        public void AssignRoles(string[] usernames, string[] roleNames)
-        {
-            AssignRolesInternal(GetMemberIds(usernames), roleNames);
-        }
+        public void AssignRoles(int[] memberIds, string[] roleNames) => AssignRolesInternal(memberIds, roleNames);
 
-        public void DissociateRoles(string[] usernames, string[] roleNames)
-        {
-            DissociateRolesInternal(GetMemberIds(usernames), roleNames);
-        }
-
-        public void AssignRoles(int[] memberIds, string[] roleNames)
-        {
-            AssignRolesInternal(memberIds, roleNames);
-        }
-
-        public void AssignRolesInternal(int[] memberIds, string[] roleNames)
+        private void AssignRolesInternal(int[] memberIds, string[] roleNames, bool replace = false)
         {
             //ensure they're unique
             memberIds = memberIds.Distinct().ToArray();
 
             //create the missing roles first
 
-            var existingSql = Sql()
+            Sql<ISqlContext> existingSql = Sql()
                .SelectAll()
                .From<NodeDto>()
                .Where<NodeDto>(dto => dto.NodeObjectType == NodeObjectTypeId)
                .Where("umbracoNode." + SqlSyntax.GetQuotedColumnName("text") + " in (@names)", new { names = roleNames });
-            var existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
-            var missingRoles = roleNames.Except(existingRoles, StringComparer.CurrentCultureIgnoreCase);
-            var missingGroups = missingRoles.Select(x => new MemberGroup {Name = x}).ToArray();
+            IEnumerable<string> existingRoles = Database.Fetch<NodeDto>(existingSql).Select(x => x.Text);
+            IEnumerable<string> missingRoles = roleNames.Except(existingRoles, StringComparer.CurrentCultureIgnoreCase);
+            MemberGroup[] missingGroups = missingRoles.Select(x => new MemberGroup { Name = x }).ToArray();
 
-            if (AmbientScope.Events.DispatchCancelable(SavingMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups)))
+            var evtMsgs = _eventMessagesFactory.Get();
+            if (AmbientScope.Notifications.PublishCancelable(new MemberGroupSavingNotification(missingGroups, evtMsgs)))
+            {
                 return;
+            }
 
-            foreach (var m in missingGroups)
+            foreach (MemberGroup m in missingGroups)
+            {
                 PersistNewItem(m);
+            }
 
-            AmbientScope.Events.Dispatch(SavedMemberGroup, this, new SaveEventArgs<IMemberGroup>(missingGroups));
+            AmbientScope.Notifications.Publish(new MemberGroupSavedNotification(missingGroups, evtMsgs));
 
             //now go get all the dto's for roles with these role names
-            var rolesForNames = Database.Fetch<NodeDto>(existingSql).ToArray();
+            var rolesForNames = Database.Fetch<NodeDto>(existingSql)
+                .ToDictionary(x => x.Text, StringComparer.InvariantCultureIgnoreCase);
 
-            //get the groups that are currently assigned to any of these members
+            AssignedRolesDto[] currentlyAssigned;
+            if (replace)
+            {
+                // delete all assigned groups first
+                Database.Execute("DELETE FROM cmsMember2MemberGroup WHERE Member IN (@memberIds)", new { memberIds });
 
-            var assignedSql = Sql()
-                .Select($"{SqlSyntax.GetQuotedColumnName("text")},{SqlSyntax.GetQuotedColumnName("Member")},{SqlSyntax.GetQuotedColumnName("MemberGroup")}")
-                .From<NodeDto>()
-                .InnerJoin<Member2MemberGroupDto>()
-                .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
-                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
-                .Where("cmsMember2MemberGroup.Member in (@ids)", new { ids = memberIds });
+                currentlyAssigned = Array.Empty<AssignedRolesDto>();
+            }
+            else
+            {
+                //get the groups that are currently assigned to any of these members
 
-            var currentlyAssigned = Database.Fetch<AssignedRolesDto>(assignedSql).ToArray();
+                Sql<ISqlContext> assignedSql = Sql()
+                    .Select($"{SqlSyntax.GetQuotedColumnName("text")},{SqlSyntax.GetQuotedColumnName("Member")},{SqlSyntax.GetQuotedColumnName("MemberGroup")}")
+                    .From<NodeDto>()
+                    .InnerJoin<Member2MemberGroupDto>()
+                    .On<NodeDto, Member2MemberGroupDto>(dto => dto.NodeId, dto => dto.MemberGroup)
+                    .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                    .Where("cmsMember2MemberGroup.Member in (@ids)", new { ids = memberIds });
+
+                currentlyAssigned = Database.Fetch<AssignedRolesDto>(assignedSql).ToArray();
+            }
 
             //assign the roles for each member id
 
@@ -272,14 +272,18 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 //find any roles for the current member that are currently assigned that
                 //exist in the roleNames list, then determine which ones are not currently assigned.
                 var mId = memberId;
-                var found = currentlyAssigned.Where(x => x.MemberId == mId).ToArray();
-                var assignedRoles = found.Where(x => roleNames.Contains(x.RoleName, StringComparer.CurrentCultureIgnoreCase)).Select(x => x.RoleName);
-                var nonAssignedRoles = roleNames.Except(assignedRoles, StringComparer.CurrentCultureIgnoreCase);
-                foreach (var toAssign in nonAssignedRoles)
-                {
-                    var groupId = rolesForNames.First(x => x.Text.InvariantEquals(toAssign)).NodeId;
-                    Database.Insert(new Member2MemberGroupDto { Member = mId, MemberGroup = groupId });
-                }
+                AssignedRolesDto[] found = currentlyAssigned.Where(x => x.MemberId == mId).ToArray();
+                IEnumerable<string> assignedRoles = found.Where(x => roleNames.Contains(x.RoleName, StringComparer.CurrentCultureIgnoreCase)).Select(x => x.RoleName);
+                IEnumerable<string> nonAssignedRoles = roleNames.Except(assignedRoles, StringComparer.CurrentCultureIgnoreCase);
+
+                IEnumerable<Member2MemberGroupDto> dtos = nonAssignedRoles
+                    .Select(x => new Member2MemberGroupDto
+                    {
+                        Member = mId,
+                        MemberGroup = rolesForNames[x].NodeId
+                    });
+
+                Database.InsertBulk(dtos);
             }
         }
 
@@ -312,17 +316,5 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             [Column("MemberGroup")]
             public int MemberGroupId { get; set; }
         }
-
-        // TODO: understand why we need these two repository-level events, move them back to service
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        internal static event TypedEventHandler<IMemberGroupRepository, SaveEventArgs<IMemberGroup>> SavingMemberGroup;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        internal static event TypedEventHandler<IMemberGroupRepository, SaveEventArgs<IMemberGroup>> SavedMemberGroup;
     }
 }

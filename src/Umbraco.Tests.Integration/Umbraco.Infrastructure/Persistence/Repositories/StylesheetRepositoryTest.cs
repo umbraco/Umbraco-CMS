@@ -8,16 +8,17 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
-using Moq;
+using Microsoft.Extensions.Options;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Tests.Common.TestHelpers;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Persistence.Repositories.Implement;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -25,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
     [UmbracoTest(Database = UmbracoTestOptions.Database.None, Logger = UmbracoTestOptions.Logger.Console)]
     public class StylesheetRepositoryTest : UmbracoIntegrationTest
     {
-        private IFileSystems _fileSystems;
+        private FileSystems _fileSystems;
         private IFileSystem _fileSystem;
 
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
@@ -33,10 +34,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [SetUp]
         public void SetUpFileSystem()
         {
-            _fileSystems = Mock.Of<IFileSystems>();
             string path = HostingEnvironment.MapPathWebRoot(GlobalSettings.UmbracoCssPath);
             _fileSystem = new PhysicalFileSystem(IOHelper, HostingEnvironment, GetRequiredService<ILogger<PhysicalFileSystem>>(), path, "/css");
-            Mock.Get(_fileSystems).Setup(x => x.StylesheetsFileSystem).Returns(_fileSystem);
+
+            _fileSystems = FileSystemsCreator.CreateTestFileSystems(LoggerFactory, IOHelper, GetRequiredService<IOptions<GlobalSettings>>(),
+                HostingEnvironment,
+                null, null, _fileSystem, null, null);
+
             Stream stream = CreateStream("body {background:#EE7600; color:#FFF;}");
             _fileSystem.AddFile("styles.css", stream);
         }

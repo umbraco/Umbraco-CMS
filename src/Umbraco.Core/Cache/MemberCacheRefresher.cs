@@ -1,6 +1,7 @@
 //using Newtonsoft.Json;
 
 using System;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Serialization;
@@ -9,12 +10,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
 {
-    public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresher, MemberCacheRefresher.JsonPayload>
+    public sealed class MemberCacheRefresher : PayloadCacheRefresherBase<MemberCacheRefresherNotification, MemberCacheRefresher.JsonPayload>
     {
         private readonly IIdKeyMap _idKeyMap;
 
-        public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap)
-            : base(appCaches, serializer)
+        public MemberCacheRefresher(AppCaches appCaches, IJsonSerializer serializer, IIdKeyMap idKeyMap, IEventAggregator eventAggregator, ICacheRefresherNotificationFactory factory)
+            : base(appCaches, serializer, eventAggregator, factory)
         {
             _idKeyMap = idKeyMap;
         }
@@ -22,19 +23,19 @@ namespace Umbraco.Cms.Core.Cache
         public class JsonPayload
         {
             //[JsonConstructor]
-            public JsonPayload(int id, string username)
+            public JsonPayload(int id, string username, bool removed)
             {
                 Id = id;
                 Username = username;
+                Removed = removed;
             }
 
             public int Id { get; }
             public string Username { get; }
+            public bool Removed { get; }
         }
 
         #region Define
-
-        protected override MemberCacheRefresher This => this;
 
         public static readonly Guid UniqueId = Guid.Parse("E285DF34-ACDC-4226-AE32-C0CB5CF388DA");
 
@@ -54,13 +55,13 @@ namespace Umbraco.Cms.Core.Cache
 
         public override void Refresh(int id)
         {
-            ClearCache(new JsonPayload(id, null));
+            ClearCache(new JsonPayload(id, null, false));
             base.Refresh(id);
         }
 
         public override void Remove(int id)
         {
-            ClearCache(new JsonPayload(id, null));
+            ClearCache(new JsonPayload(id, null, false));
             base.Remove(id);
         }
 
@@ -74,8 +75,8 @@ namespace Umbraco.Cms.Core.Cache
                 _idKeyMap.ClearCache(p.Id);
                 if (memberCache)
                 {
-                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember>(p.Id));
-                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember>(p.Username));
+                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember, int>(p.Id));
+                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember, string>(p.Username));
                 }
             }
 

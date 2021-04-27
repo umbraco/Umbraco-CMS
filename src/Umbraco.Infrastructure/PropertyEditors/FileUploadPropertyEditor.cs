@@ -1,22 +1,23 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     [DataEditor(
         Constants.PropertyEditors.Aliases.UploadField,
@@ -24,33 +25,39 @@ namespace Umbraco.Web.PropertyEditors
         "fileupload",
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = "icon-download-alt")]
-    public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator
+    public class FileUploadPropertyEditor : DataEditor, IMediaUrlGenerator,
+        INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
+        INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
+        INotificationHandler<MemberDeletedNotification>
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly ContentSettings _contentSettings;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly IContentService _contentService;
 
         public FileUploadPropertyEditor(
             ILoggerFactory loggerFactory,
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
             IDataTypeService dataTypeService,
             ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             UploadAutoFillProperties uploadAutoFillProperties,
-            IJsonSerializer jsonSerializer)
+            IJsonSerializer jsonSerializer,
+            IContentService contentService)
             : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
         {
-            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
             _contentSettings = contentSettings.Value;
             _dataTypeService = dataTypeService;
             _localizationService = localizationService;
             _localizedTextService = localizedTextService;
             _uploadAutoFillProperties = uploadAutoFillProperties;
+            _contentService = contentService;
         }
 
         /// <summary>
@@ -59,7 +66,7 @@ namespace Umbraco.Web.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileSystem, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Options.Create(_contentSettings), JsonSerializer);
+            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileManager, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Options.Create(_contentSettings), JsonSerializer);
             editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, Options.Create(_contentSettings)));
             return editor;
         }
@@ -86,16 +93,14 @@ namespace Umbraco.Web.PropertyEditors
         }
 
         /// <summary>
-        /// Ensures any files associated are removed
+        /// The paths to all file upload property files contained within a collection of content entities
         /// </summary>
-        /// <param name="deletedEntities"></param>
-        internal IEnumerable<string> ServiceDeleted(IEnumerable<ContentBase> deletedEntities)
-        {
-            return deletedEntities.SelectMany(x => x.Properties)
-                .Where(IsUploadField)
-                .SelectMany(GetFilePathsFromPropertyValues)
-                .Distinct();
-        }
+        /// <param name="entities"></param>
+        private IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
+            .SelectMany(x => x.Properties)
+            .Where(IsUploadField)
+            .SelectMany(GetFilePathsFromPropertyValues)
+            .Distinct();
 
         /// <summary>
         /// Look through all property values stored against the property and resolve any file paths stored
@@ -110,24 +115,19 @@ namespace Umbraco.Web.PropertyEditors
                 //check if the published value contains data and return it
                 var propVal = propertyValue.PublishedValue;
                 if (propVal != null && propVal is string str1 && !str1.IsNullOrWhiteSpace())
-                    yield return _mediaFileSystem.GetRelativePath(str1);
+                    yield return _mediaFileManager.FileSystem.GetRelativePath(str1);
 
                 //check if the edited value contains data and return it
                 propVal = propertyValue.EditedValue;
                 if (propVal != null && propVal is string str2 && !str2.IsNullOrWhiteSpace())
-                    yield return _mediaFileSystem.GetRelativePath(str2);
+                    yield return _mediaFileManager.FileSystem.GetRelativePath(str2);
             }
         }
 
-        /// <summary>
-        /// After a content has been copied, also copy uploaded files.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
-        internal void ContentServiceCopied(IContentService sender, CopyEventArgs<IContent> args)
+        public void Handle(ContentCopiedNotification notification)
         {
             // get the upload field properties with a value
-            var properties = args.Original.Properties.Where(IsUploadField);
+            var properties = notification.Original.Properties.Where(IsUploadField);
 
             // copy files
             var isUpdated = false;
@@ -137,49 +137,43 @@ namespace Umbraco.Web.PropertyEditors
                 foreach (var propertyValue in property.Values)
                 {
                     var propVal = property.GetValue(propertyValue.Culture, propertyValue.Segment);
-                    if (propVal == null || !(propVal is string str) || str.IsNullOrWhiteSpace()) continue;
-                    var sourcePath = _mediaFileSystem.GetRelativePath(str);
-                    var copyPath = _mediaFileSystem.CopyFile(args.Copy, property.PropertyType, sourcePath);
-                    args.Copy.SetValue(property.Alias, _mediaFileSystem.GetUrl(copyPath), propertyValue.Culture, propertyValue.Segment);
+                    if (propVal == null || !(propVal is string str) || str.IsNullOrWhiteSpace())
+                    {
+                        continue;
+                    }
+
+                    var sourcePath = _mediaFileManager.FileSystem.GetRelativePath(str);
+                    var copyPath = _mediaFileManager.CopyFile(notification.Copy, property.PropertyType, sourcePath);
+                    notification.Copy.SetValue(property.Alias, _mediaFileManager.FileSystem.GetUrl(copyPath), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
             }
 
             // if updated, re-save the copy with the updated value
             if (isUpdated)
-                sender.Save(args.Copy);
+            {
+                _contentService.Save(notification.Copy);
+            }
         }
 
-        /// <summary>
-        /// After a media has been created, auto-fill the properties.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
-        internal void MediaServiceCreated(IMediaService sender, NewEventArgs<IMedia> args)
+        public void Handle(ContentDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+
+        public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+
+        public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+
+        private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
         {
-            AutoFillProperties(args.Entity);
+            var filePathsToDelete = ContainedFilePaths(deletedEntities);
+            _mediaFileManager.DeleteMediaFiles(filePathsToDelete);
         }
 
-        /// <summary>
-        /// After a media has been saved, auto-fill the properties.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
-        public void MediaServiceSaving(IMediaService sender, SaveEventArgs<IMedia> args)
+        public void Handle(MediaSavingNotification notification)
         {
-            foreach (var entity in args.SavedEntities)
+            foreach (var entity in notification.SavedEntities)
+            {
                 AutoFillProperties(entity);
-        }
-
-        /// <summary>
-        /// After a content item has been saved, auto-fill the properties.
-        /// </summary>
-        /// <param name="sender">The event sender.</param>
-        /// <param name="args">The event arguments.</param>
-        public void ContentServiceSaving(IContentService sender, SaveEventArgs<IContent> args)
-        {
-            foreach (var entity in args.SavedEntities)
-                AutoFillProperties(entity);
+            }
         }
 
         /// <summary>
@@ -200,7 +194,7 @@ namespace Umbraco.Web.PropertyEditors
                     if (string.IsNullOrWhiteSpace(svalue))
                         _uploadAutoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
                     else
-                        _uploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(svalue), pvalue.Culture, pvalue.Segment);
+                        _uploadAutoFillProperties.Populate(model, autoFillConfig, _mediaFileManager.FileSystem.GetRelativePath(svalue), pvalue.Culture, pvalue.Segment);
                 }
             }
         }

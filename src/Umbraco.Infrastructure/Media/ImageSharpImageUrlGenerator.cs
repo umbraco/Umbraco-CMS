@@ -5,7 +5,7 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.Media
+namespace Umbraco.Cms.Infrastructure.Media
 {
     public class ImageSharpImageUrlGenerator : IImageUrlGenerator
     {

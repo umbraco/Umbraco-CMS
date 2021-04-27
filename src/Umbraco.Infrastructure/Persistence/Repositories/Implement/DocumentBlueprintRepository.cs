@@ -1,17 +1,14 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Cache;
-using Umbraco.Core.PropertyEditors;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Override the base content repository so we can change the node object type
@@ -38,10 +35,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditorCollection,
             IDataTypeService dataTypeService,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IJsonSerializer serializer)
+            IJsonSerializer serializer,
+            IEventAggregator eventAggregator)
             : base(scopeAccessor, appCaches, logger, loggerFactory, contentTypeRepository, templateRepository,
                 tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection,
-                dataValueReferenceFactories, dataTypeService, serializer)
+                dataValueReferenceFactories, dataTypeService, serializer, eventAggregator)
         {
         }
 

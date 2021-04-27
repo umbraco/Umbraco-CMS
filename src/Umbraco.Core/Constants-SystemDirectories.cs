@@ -37,6 +37,7 @@ namespace Umbraco.Cms.Core
             public const string Install = "~/install";
 
             public const string AppPlugins = "/App_Plugins";
+            public static string AppPluginIcons => "/Backoffice/Icons";
 
             public const string MvcViews = "~/Views";
 

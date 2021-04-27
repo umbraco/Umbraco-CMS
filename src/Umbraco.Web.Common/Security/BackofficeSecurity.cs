@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
@@ -7,14 +7,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Security
 {
-    // TODO: This is only for the back office, does it need to be in common?
-
     public class BackOfficeSecurity : IBackOfficeSecurity
     {
         private readonly IUserService _userService;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        private object _currentUserLock = new object();
+        private readonly object _currentUserLock = new object();
         private IUser _currentUser;
 
         public BackOfficeSecurity(
@@ -55,7 +53,7 @@ namespace Umbraco.Cms.Web.Common.Security
         public Attempt<int> GetUserId()
         {
             var identity = _httpContextAccessor.HttpContext?.GetCurrentIdentity();
-            return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(identity.Id);
+            return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(identity.GetId());
         }
 
         /// <inheritdoc />

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
 using System.Diagnostics;
@@ -7,20 +7,21 @@ using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NPoco;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Runtime;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
-using MapperCollection = Umbraco.Core.Persistence.Mappers.MapperCollection;
+using MapperCollection = Umbraco.Cms.Infrastructure.Persistence.Mappers.MapperCollection;
 
-namespace Umbraco.Core.Runtime
+namespace Umbraco.Cms.Infrastructure.Runtime
 {
     public class SqlMainDomLock : IMainDomLock
     {
@@ -28,25 +29,28 @@ namespace Umbraco.Core.Runtime
         private const string MainDomKeyPrefix = "Umbraco.Core.Runtime.SqlMainDom";
         private const string UpdatedSuffix = "_updated";
         private readonly ILogger<SqlMainDomLock> _logger;
+        private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private IUmbracoDatabase _db;
         private CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
-        private SqlServerSyntaxProvider _sqlServerSyntax = new SqlServerSyntaxProvider();
+        private SqlServerSyntaxProvider _sqlServerSyntax;
         private bool _mainDomChanging = false;
         private readonly UmbracoDatabaseFactory _dbFactory;
         private bool _errorDuringAcquiring;
         private object _locker = new object();
         private bool _hasTable = false;
 
-        public SqlMainDomLock(ILogger<SqlMainDomLock> logger, ILoggerFactory loggerFactory, GlobalSettings globalSettings, ConnectionStrings connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment, DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
+        public SqlMainDomLock(ILogger<SqlMainDomLock> logger, ILoggerFactory loggerFactory, IOptions<GlobalSettings> globalSettings, IOptions<ConnectionStrings> connectionStrings, IDbProviderFactoryCreator dbProviderFactoryCreator, IHostingEnvironment hostingEnvironment, DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
         {
             // unique id for our appdomain, this is more unique than the appdomain id which is just an INT counter to its safer
             _lockId = Guid.NewGuid().ToString();
             _logger = logger;
-_hostingEnvironment = hostingEnvironment;
+            _globalSettings = globalSettings;
+            _sqlServerSyntax = new SqlServerSyntaxProvider(_globalSettings);
+            _hostingEnvironment = hostingEnvironment;
             _dbFactory = new UmbracoDatabaseFactory(loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 loggerFactory,
-               globalSettings,
+                _globalSettings,
                connectionStrings,
                new Lazy<IMapperCollection>(() => new MapperCollection(Enumerable.Empty<BaseMapper>())),
                dbProviderFactoryCreator,
@@ -79,6 +83,7 @@ _hostingEnvironment = hostingEnvironment;
             try
             {
                 db = _dbFactory.CreateDatabase();
+
 
                 _hasTable = db.HasTable(Cms.Core.Constants.DatabaseSchema.Tables.KeyValue);
                 if (!_hasTable)
@@ -253,37 +258,40 @@ _hostingEnvironment = hostingEnvironment;
         {
             var updatedTempId = tempId + UpdatedSuffix;
 
-            return Task.Run(() =>
+            using (ExecutionContext.SuppressFlow())
             {
-                try
+                return Task.Run(() =>
                 {
-                    using var db = _dbFactory.CreateDatabase();
-
-                    var watch = new Stopwatch();
-                    watch.Start();
-                    while (true)
+                    try
                     {
-                        // poll very often, we need to take over as fast as we can
-                        // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
-                        Thread.Sleep(1000);
+                        using var db = _dbFactory.CreateDatabase();
 
-                        var acquired = TryAcquire(db, tempId, updatedTempId);
-                        if (acquired.HasValue)
-                            return acquired.Value;
-
-                        if (watch.ElapsedMilliseconds >= millisecondsTimeout)
+                        var watch = new Stopwatch();
+                        watch.Start();
+                        while (true)
                         {
-                            return AcquireWhenMaxWaitTimeElapsed(db);
+                            // poll very often, we need to take over as fast as we can
+                            // local testing shows the actual query to be executed from client/server is approx 300ms but would change depending on environment/IO
+                            Thread.Sleep(1000);
+
+                            var acquired = TryAcquire(db, tempId, updatedTempId);
+                            if (acquired.HasValue)
+                                return acquired.Value;
+
+                            if (watch.ElapsedMilliseconds >= millisecondsTimeout)
+                            {
+                                return AcquireWhenMaxWaitTimeElapsed(db);
+                            }
                         }
                     }
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "An error occurred trying to acquire and waiting for existing SqlMainDomLock to shutdown");
-                    return false;
-                }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "An error occurred trying to acquire and waiting for existing SqlMainDomLock to shutdown");
+                        return false;
+                    }
 
-            }, _cancellationTokenSource.Token);
+                }, _cancellationTokenSource.Token);
+            }
         }
 
         private bool? TryAcquire(IUmbracoDatabase db, string tempId, string updatedTempId)
@@ -313,14 +321,14 @@ _hostingEnvironment = hostingEnvironment;
 
                     // so now we update the row with our appdomain id
                     InsertLockRecord(_lockId, db);
-                            _logger.LogDebug("Acquired with ID {LockId}", _lockId);
-                            return true;
-                        }
-                        else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
-                        {
-                            // in this case, the prefixed ID is different which  means
-                            // another new AppDomain has come online and is wanting to take over. In that case, we will not
-                            // acquire.
+                    _logger.LogDebug("Acquired with ID {LockId}", _lockId);
+                    return true;
+                }
+                else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
+                {
+                    // in this case, the prefixed ID is different which  means
+                    // another new AppDomain has come online and is wanting to take over. In that case, we will not
+                    // acquire.
 
                     _logger.LogDebug("Cannot acquire, another booting application detected.");
                     return false;

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Controllers;
@@ -13,6 +14,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
@@ -48,6 +50,7 @@ namespace Umbraco.Cms.Web.Website.Routing
         private readonly IRoutableDocumentFilter _routableDocumentFilter;
         private readonly IDataProtectionProvider _dataProtectionProvider;
         private readonly IControllerActionSearcher _controllerActionSearcher;
+        private readonly IEventAggregator _eventAggregator;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRouteValueTransformer"/> class.
@@ -62,7 +65,8 @@ namespace Umbraco.Cms.Web.Website.Routing
             IUmbracoRouteValuesFactory routeValuesFactory,
             IRoutableDocumentFilter routableDocumentFilter,
             IDataProtectionProvider dataProtectionProvider,
-            IControllerActionSearcher controllerActionSearcher)
+            IControllerActionSearcher controllerActionSearcher,
+            IEventAggregator eventAggregator)
         {
             if (globalSettings is null)
             {
@@ -79,6 +83,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             _routableDocumentFilter = routableDocumentFilter ?? throw new ArgumentNullException(nameof(routableDocumentFilter));
             _dataProtectionProvider = dataProtectionProvider;
             _controllerActionSearcher = controllerActionSearcher;
+            _eventAggregator = eventAggregator;
         }
 
         /// <inheritdoc/>
@@ -110,9 +115,9 @@ namespace Umbraco.Cms.Web.Website.Routing
                 return values;
             }
 
-            IPublishedRequest publishedRequest = await RouteRequestAsync(_umbracoContextAccessor.UmbracoContext);
+            IPublishedRequest publishedRequest = await RouteRequestAsync(httpContext, _umbracoContextAccessor.UmbracoContext);
 
-            UmbracoRouteValues umbracoRouteValues = _routeValuesFactory.Create(httpContext, publishedRequest);
+            UmbracoRouteValues umbracoRouteValues = await _routeValuesFactory.CreateAsync(httpContext, publishedRequest);
 
             // Store the route values as a httpcontext feature
             httpContext.Features.Set(umbracoRouteValues);
@@ -133,7 +138,7 @@ namespace Umbraco.Cms.Web.Website.Routing
             return values;
         }
 
-        private async Task<IPublishedRequest> RouteRequestAsync(IUmbracoContext umbracoContext)
+        private async Task<IPublishedRequest> RouteRequestAsync(HttpContext httpContext, IUmbracoContext umbracoContext)
         {
             // ok, process
 

@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
-namespace Umbraco.Infrastructure.HostedServices
+namespace Umbraco.Cms.Infrastructure.HostedServices
 {
     /// <summary>
     /// Provides a base class for recurring background tasks implemented as hosted services.
@@ -54,7 +54,7 @@ namespace Umbraco.Infrastructure.HostedServices
             // Hat-tip: https://stackoverflow.com/a/14207615/489433
             await PerformExecuteAsync(state);
 
-        internal abstract Task PerformExecuteAsync(object state);
+        public abstract Task PerformExecuteAsync(object state);
 
         /// <inheritdoc/>
         public Task StopAsync(CancellationToken cancellationToken)

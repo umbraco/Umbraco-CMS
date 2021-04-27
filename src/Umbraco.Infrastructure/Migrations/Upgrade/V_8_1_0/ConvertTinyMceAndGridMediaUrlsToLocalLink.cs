@@ -5,13 +5,12 @@ using System.Text.RegularExpressions;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Migrations.PostMigrations;
-using Umbraco.Core.Migrations.Upgrade.V_8_0_0.Models;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0.Models;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade.V_8_1_0
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0
 {
     public class ConvertTinyMceAndGridMediaUrlsToLocalLink : MigrationBase
     {

@@ -1,18 +1,18 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using NPoco;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Scoping;
 using Microsoft.Extensions.Logging;
+using NPoco;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// A (sub) repository that exposes functionality to modify assigned permissions to a node
@@ -279,8 +279,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             return new List<string>();
         }
-
-        protected override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
         protected override void PersistDeletedItem(ContentPermissionSet entity)
         {

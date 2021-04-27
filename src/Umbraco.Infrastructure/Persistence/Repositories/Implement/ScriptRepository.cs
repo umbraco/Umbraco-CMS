@@ -1,18 +1,18 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Represents the Script Repository
     /// </summary>
     internal class ScriptRepository : FileRepository<string, IScript>, IScriptRepository
     {
-        public ScriptRepository(IFileSystems fileSystems)
+        public ScriptRepository(FileSystems fileSystems)
             : base(fileSystems.ScriptsFileSystem)
         {
         }

@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using NPoco;
-using Umbraco.Core.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Cms.Infrastructure.Persistence
 {
     public interface IUmbracoDatabase : IDatabase
     {

@@ -8,6 +8,8 @@ var sort = require('gulp-sort');
 var concat = require('gulp-concat');
 var wrap = require("gulp-wrap-js");
 var embedTemplates = require('gulp-angular-embed-templates');
+var minify = require('gulp-minify');
+var rename = require('gulp-rename');
 var _ = require('lodash');
 
 module.exports = function (files, out) {
@@ -33,6 +35,21 @@ module.exports = function (files, out) {
     }
     
     task = task.pipe(concat(out)).pipe(wrap('(function(){\n%= body %\n})();'))
+
+    if (config.compile.current.minify === true) {
+      task = task.pipe(
+        minify({
+          noSource:true,
+          ext: {min:'.min.js'},
+          mangle: false
+        })
+      );
+    } else {
+      // rename the un-minified file so the client can reference it as '.min.js'
+      task = task.pipe(rename(function(path) {
+        path.basename += '.min';
+      }));
+    }
 
     _.forEach(config.roots, function(root){
         task = task.pipe(gulp.dest(root + config.targets.js));

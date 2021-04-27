@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
+using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 
-namespace Umbraco.Core.Migrations.Expressions.Insert.Expressions
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Insert.Expressions
 {
     public class InsertDataExpression : MigrationExpressionBase
     {

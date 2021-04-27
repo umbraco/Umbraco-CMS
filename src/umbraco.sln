@@ -37,10 +37,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B5BD12C1
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C3B55-80E5-4E7E-A802-BE16C5128B9D}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\NuSpecs\UmbracoCms.Core.nuspec = ..\build\NuSpecs\UmbracoCms.Core.nuspec
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
 		..\build\NuSpecs\UmbracoCms.SqlCe.nuspec = ..\build\NuSpecs\UmbracoCms.SqlCe.nuspec
-		..\build\NuSpecs\UmbracoCms.Web.nuspec = ..\build\NuSpecs\UmbracoCms.Web.nuspec
+		..\build\NuSpecs\UmbracoCms.Examine.Lucene.nuspec = ..\build\NuSpecs\UmbracoCms.Examine.Lucene.nuspec
+		..\build\NuSpecs\UmbracoCms.StaticAssets.nuspec = ..\build\NuSpecs\UmbracoCms.StaticAssets.nuspec
 	EndProjectSection
 EndProject
 Project("{E24C65DC-7377-472B-9ABA-BC803B73C61A}") = "Umbraco.Web.UI.Client", "http://localhost:3961", "{3819A550-DCEC-4153-91B4-8BA9F7F0B9B4}"
@@ -114,8 +114,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tools", "tools", "{E3F9F378
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{5B03EF4E-E0AC-4905-861B-8C3EC1A0D458}"
 	ProjectSection(SolutionItems) = preProject
-		..\build\NuSpecs\build\Umbraco.Cms.props = ..\build\NuSpecs\build\Umbraco.Cms.props
-		..\build\NuSpecs\build\Umbraco.Cms.targets = ..\build\NuSpecs\build\Umbraco.Cms.targets
+		..\build\NuSpecs\build\Umbraco.Cms.StaticAssets.props = ..\build\NuSpecs\build\Umbraco.Cms.StaticAssets.props
+		..\build\NuSpecs\build\Umbraco.Cms.StaticAssets.targets = ..\build\NuSpecs\build\Umbraco.Cms.StaticAssets.targets
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DocTools", "DocTools", "{53594E5B-64A2-4545-8367-E3627D266AE8}"

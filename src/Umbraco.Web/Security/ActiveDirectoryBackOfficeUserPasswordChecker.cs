@@ -3,7 +3,7 @@ using System.DirectoryServices.AccountManagement;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Web.Security
 {

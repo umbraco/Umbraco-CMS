@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.Dictionary;
@@ -30,6 +31,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Web.BackOffice.ActionResults;
 using Umbraco.Cms.Web.BackOffice.Authorization;
 using Umbraco.Cms.Web.BackOffice.Extensions;
@@ -38,9 +40,7 @@ using Umbraco.Cms.Web.BackOffice.ModelBinders;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Core.Persistence;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly ISqlContext _sqlContext;
@@ -69,6 +69,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IJsonSerializer _serializer;
         private readonly IAuthorizationService _authorizationService;
+        private readonly AppCaches _appCaches;
         private readonly ILogger<MediaController> _logger;
 
         public MediaController(
@@ -82,17 +83,18 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IMediaService mediaService,
             IEntityService entityService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IDataTypeService dataTypeService,
             ISqlContext sqlContext,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             IRelationService relationService,
             PropertyEditorCollection propertyEditors,
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IJsonSerializer serializer,
-            IAuthorizationService authorizationService)
+            IAuthorizationService authorizationService,
+            AppCaches appCaches)
             : base(cultureDictionary, loggerFactory, shortStringHelper, eventMessages, localizedTextService, serializer)
         {
             _shortStringHelper = shortStringHelper;
@@ -108,12 +110,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _relationService = relationService;
             _propertyEditors = propertyEditors;
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
             _hostingEnvironment = hostingEnvironment;
             _logger = loggerFactory.CreateLogger<MediaController>();
             _imageUrlGenerator = imageUrlGenerator;
             _serializer = serializer;
             _authorizationService = authorizationService;
+            _appCaches = appCaches;
         }
 
         /// <summary>
@@ -285,13 +288,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly IHostingEnvironment _hostingEnvironment;
 
 
         protected int[] UserStartNodes
         {
-            get { return _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService)); }
+            get { return _userStartNodes ?? (_userStartNodes = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.CalculateMediaStartNodeIds(_entityService, _appCaches)); }
         }
 
         /// <summary>
@@ -642,7 +645,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // Authorize...
             var requirement = new MediaPermissionsResourceRequirement();
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, _mediaService.GetById(sorted.ParentId), requirement);
+            var resource = new MediaPermissionsResource(sorted.ParentId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, resource, requirement);
             if (!authorizationResult.Succeeded)
             {
                 return Forbid();
@@ -726,7 +730,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (!string.IsNullOrEmpty(path))
             {
 
-                var folders = path.Split('/');
+                var folders = path.Split(Constants.CharArrays.ForwardSlash);
 
                 for (int i = 0; i < folders.Length - 1; i++)
                 {
@@ -775,7 +779,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //get the files
             foreach (var formFile in file)
             {
-                var fileName =  formFile.FileName.Trim(new[] { '\"' }).TrimEnd();
+                var fileName =  formFile.FileName.Trim(Constants.CharArrays.DoubleQuote).TrimEnd();
                 var safeFileName = fileName.ToSafeFileName(ShortStringHelper);
                 var ext = safeFileName.Substring(safeFileName.LastIndexOf('.') + 1).ToLower();
 
@@ -802,7 +806,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     await using (var stream = formFile.OpenReadStream())
                     {
-                        f.SetValue(_mediaFileSystem,_shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File,fileName, stream);
+                        f.SetValue(_mediaFileManager,_shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File,fileName, stream);
                     }
 
 
@@ -974,6 +978,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             return new ActionResult<IMedia>(toMove);
         }
+
 
         public PagedResult<EntityBasic> GetPagedReferences(int id, string entityType, int pageNumber = 1, int pageSize = 100)
         {

@@ -1,9 +1,8 @@
 ﻿using System;
 using System.Threading;
-using Umbraco.Core.Logging;
-using Umbraco.Core.Persistence.FaultHandling.Strategies;
+using Umbraco.Cms.Infrastructure.Persistence.FaultHandling.Strategies;
 
-namespace Umbraco.Core.Persistence.FaultHandling
+namespace Umbraco.Cms.Infrastructure.Persistence.FaultHandling
 {
     /// <summary>
     /// Provides the base implementation of the retry mechanism for unreliable actions and transient conditions.

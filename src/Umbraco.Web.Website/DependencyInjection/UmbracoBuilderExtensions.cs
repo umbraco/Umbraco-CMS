@@ -2,12 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Cms.Web.Website.Collections;
 using Umbraco.Cms.Web.Website.Controllers;
+using Umbraco.Cms.Web.Website.Middleware;
+using Umbraco.Cms.Web.Website.Models;
 using Umbraco.Cms.Web.Website.Routing;
 using Umbraco.Cms.Web.Website.ViewEngines;
-using Umbraco.Infrastructure.DependencyInjection;
 
 namespace Umbraco.Extensions
 {
@@ -33,6 +35,7 @@ namespace Umbraco.Extensions
 
             // TODO figure out if we need more to work on load balanced setups
             builder.Services.AddDataProtection();
+            builder.Services.AddAntiforgery();
 
             builder.Services.AddScoped<UmbracoRouteValueTransformer>();
             builder.Services.AddSingleton<IControllerActionSearcher, ControllerActionSearcher>();
@@ -42,12 +45,17 @@ namespace Umbraco.Extensions
 
             builder.Services.AddSingleton<FrontEndRoutes>();
 
+            builder.Services.AddSingleton<MemberModelBuilderFactory>();
+
+            builder.Services.AddSingleton<PublicAccessMiddleware>();
+
             builder
                 .AddDistributedCache()
                 .AddModelsBuilder();
 
+            builder.AddMembersIdentity();
+
             return builder;
         }
-
     }
 }

@@ -10,7 +10,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// Represents the Stylesheet Repository
@@ -21,7 +21,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         private readonly IIOHelper _ioHelper;
         private readonly GlobalSettings _globalSettings;
 
-        public StylesheetRepository(ILogger<StylesheetRepository> logger, IFileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
+        public StylesheetRepository(ILogger<StylesheetRepository> logger, FileSystems fileSystems, IIOHelper ioHelper, IOptions<GlobalSettings> globalSettings)
             : base(fileSystems.StylesheetsFileSystem)
         {
             _logger = logger;

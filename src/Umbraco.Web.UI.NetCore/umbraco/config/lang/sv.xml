@@ -136,7 +136,7 @@
     <key alias="select">Välj</key>
     <key alias="saveAndPreview">Förhandsgranska</key>
     <key alias="showPageDisabled">Förhandsgranskning är avstängt på grund av att det inte finns någon mall tilldelad</key>
-    <key alias="somethingElse">Ångra</key>
+    <key alias="somethingElse">Gör något annat</key>
     <key alias="styleChoose">Välj stil</key>
     <key alias="styleShow">Visa stil</key>
     <key alias="tableInsert">Infoga tabell</key>
@@ -272,6 +272,8 @@
     <key alias="copiedItemOfItems">Kopierade %0% av %1% objekt</key>
   </area>
   <area alias="defaultdialogs">
+    <key alias="nodeNameLinkPicker">Länktitel</key>
+    <key alias="urlLinkPicker">Länk</key>
     <key alias="anchorInsert">Namn</key>
     <key alias="assignDomain">Hantera domännamn</key>
     <key alias="closeThisWindow">Stäng fönstret</key>
@@ -300,7 +302,7 @@
     <key alias="recycleBinDeleting">Allt som ligger i papperskorgen tas nu bort. Stäng inte detta fönster förrän detta är klart</key>
     <key alias="recycleBinIsEmpty">Papperskorgen är nu tom</key>
     <key alias="recycleBinWarning">Om du tömmer papperskorgen kommer allt som ligger i den att tas bort permanent</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>'s webbtjänst har för närvarande driftsstörningar. Tyvärr kan vi inte göra något åt detta.]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>'s webbtjänst har för närvarande driftsstörningar. Tyvärr kan vi inte göra något åt detta.]]></key>
     <key alias="regexSearchHelp">Sök efter en regular expression som kan validera ett formulärsfält. t.ex. 'email' eller 'URL'</key>
     <key alias="removeMacro">Ta bort makro</key>
     <key alias="requiredField">Obligatoriskt formulärsfält</key>
@@ -308,7 +310,9 @@
     <key alias="siterepublished">Cache för webbplatsen har uppdaterats. Allt publicerat innehåll är nu uppdaterat. Innehåll som inte har publicerats är fortfarande opublicerat.</key>
     <key alias="siterepublishHelp">Webbplatsens cache kommer att uppdateras. Allt innehåll som är publicerat kommer att uppdateras. Innehåll som inte är publicerat kommer att förbli opublicerat.</key>
     <key alias="selectContentStartNode">Välj startnod för innehåll</key>
+    <key alias="selectMedia">Välj media</key>
     <key alias="selectIcon">Välj ikon</key>
+    <key alias="selectLink">Välj länk</key>
     <key alias="selectMediaStartNode">Välj startnod för media</key>
     <key alias="selectUserGroups">Välj användargrupper</key>
     <key alias="selectSections">Välj sektioner</key>
@@ -318,6 +322,9 @@
     <key alias="thumbnailimageclickfororiginal">Klicka på förhandsgranskningsbilden för att se bilden i full storlek</key>
     <key alias="treepicker">Välj ett objekt</key>
     <key alias="viewCacheItem">Se cachat objekt</key>
+    <key alias="linkToPage">Länk till sida</key>
+    <key alias="openInNewWindow">Öppnar länken i ett nytt fönster eller flik</key>
+    <key alias="linkToMedia">Länk till media</key>
   </area>
   <area alias="dictionaryItem">
     <key alias="description">Redigera de olika översättningarna för ordboksinlägget %0% nedan. Du kan lägga till ytterligare språk under 'språk' i menyn till vänster.</key>
@@ -551,7 +558,7 @@
     <key alias="theEndHeader">Umbraco %0% är installerat och klart för användning</key>
     <key alias="theEndInstallFailed"><![CDATA[För att avsluta installationen måste du manuellt redigera <strong>/web.config</strong> filen och ändra AppSettingsnyckeln <strong>UmbracoConfigurationStatus</strong> på slutet till <strong>%0%</strong>]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Du kan <strong>börja omedelbart</strong> genom att klicka på "Starta Umbraco"-knappen nedan. <br />Om du är en <strong>ny Umbraco användare</strong>kan du hitta massor av resurser på våra kom igång sidor.]]></key>
-    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara Umbraco back office och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
+    <key alias="theEndOpenUmbraco"><![CDATA[<h3>Starta Umbraco</h3> För att administrera din webbplats öppnar du bara Umbraco backoffice och börjar lägga till innehåll, uppdatera mallar och stilmallar eller lägga till nya funktioner.]]></key>
     <key alias="Unavailable">Anslutningen till databasen misslyckades.</key>
     <key alias="watch">Se</key>
     <key alias="welcomeIntro"><![CDATA[Den här guiden kommer att guida dig genom processen med att konfigurera <strong>Umbraco %0%</strong> antingen för en ny installation eller en uppgradering från version 3.0. <br /><br /> Tryck på <strong>"next"</strong> för att börja.]]></key>
@@ -567,7 +574,7 @@
     <key alias="renewSession">Förnya nu för att spara ditt arbete</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
     <key alias="greeting0">Happy super Sunday</key>
     <key alias="greeting1">Happy manic Monday</key>
     <key alias="greeting2">Happy tremendous Tuesday</key>
@@ -725,7 +732,6 @@
     <key alias="users">Användare</key>
   </area>
   <area alias="settings">
-    <key alias="asAContentMasterType">som huvudinnehållstyp. Tabbar från huvudinnehållstyper visas inte och kan endast redigeras på själva huvudinnehållstypen.</key>
     <key alias="contentTypeEnabled">Huvudinnehållstyp påslagen</key>
     <key alias="contentTypeUses">Denna huvudinnehållstyp använder</key>
     <key alias="defaulttemplate">Defaultmall</key>
@@ -940,7 +946,7 @@
     <key alias="changePassword">Ändra lösenord</key>
     <key alias="changePhoto">Ändra bild</key>
     <key alias="confirmNewPassword">Bekräfta det nya lösenordet</key>
-    <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco Back Office genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
+    <key alias="changePasswordDescription">Du kan byta ditt lösenord för Umbraco backoffice genom att fylla i nedanstående formulär och klicka på knappen "Ändra lösenord".</key>
     <key alias="contentChannel">Innehållskanal</key>
     <key alias="createAnotherUser">Skapa en till användare</key>
     <key alias="createUserHelp">Skapa nya användare för att ge dom åtkomst till Umbraco. När en ny användare skapas kommer ett lösenord genereras som du kan dela med användaren.</key>

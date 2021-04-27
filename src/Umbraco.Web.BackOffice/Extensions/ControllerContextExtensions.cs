@@ -2,8 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Authorization.Policy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Umbraco.Cms.Web.BackOffice.Extensions
 {
@@ -15,7 +19,34 @@ namespace Umbraco.Cms.Web.BackOffice.Extensions
         /// <returns>Whether the user is authenticated or not.</returns>
         internal static async Task<bool> InvokeAuthorizationFiltersForRequest(this ControllerContext controllerContext, ActionContext actionContext)
         {
+
             var actionDescriptor = controllerContext.ActionDescriptor;
+
+            var metadataCollection = new EndpointMetadataCollection(actionDescriptor.EndpointMetadata.Union(new []{actionDescriptor}));
+
+            var authorizeData = metadataCollection.GetOrderedMetadata<IAuthorizeData>();
+            var policyProvider = controllerContext.HttpContext.RequestServices.GetRequiredService<IAuthorizationPolicyProvider>();
+            var policy = await AuthorizationPolicy.CombineAsync(policyProvider, authorizeData);
+            if (policy is not null)
+            {
+                var policyEvaluator = controllerContext.HttpContext.RequestServices.GetRequiredService<IPolicyEvaluator>();
+                var authenticateResult = await policyEvaluator.AuthenticateAsync(policy, controllerContext.HttpContext);
+
+                if (!authenticateResult.Succeeded)
+                {
+                    return false;
+                }
+
+                // TODO this is super hacky, but we rely on the FeatureAuthorizeHandler can still handle endpoints
+                // (The way before .NET 5). The .NET 5 way would need to use han http context, for the "inner" request
+                // with the nested controller
+                var resource = new Endpoint(null,metadataCollection, null);
+                var authorizeResult = await policyEvaluator.AuthorizeAsync(policy, authenticateResult, controllerContext.HttpContext, resource);
+                if (!authorizeResult.Succeeded)
+                {
+                    return false;
+                }
+            }
 
             var filters = actionDescriptor.FilterDescriptors;
             var filterGrouping = new FilterGrouping(filters, controllerContext.HttpContext.RequestServices);

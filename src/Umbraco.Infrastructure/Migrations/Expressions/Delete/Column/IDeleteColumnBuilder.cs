@@ -1,6 +1,6 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Core.Migrations.Expressions.Delete.Column
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Delete.Column
 {
     /// <summary>
     /// Builds a Delete Column expression.

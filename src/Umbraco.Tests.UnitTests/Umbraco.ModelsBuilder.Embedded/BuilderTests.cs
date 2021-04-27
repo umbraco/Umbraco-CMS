@@ -60,11 +60,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.ModelsBuilder.Embedded
 using System;
 using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.PublishedModels
@@ -99,7 +97,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
-		public string Prop1 => this.Value<string>(_publishedValueFallback, ""prop1"");
+		public virtual string Prop1 => this.Value<string>(_publishedValueFallback, ""prop1"");
 	}
 }
 ";
@@ -168,11 +166,9 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 using System;
 using System.Linq.Expressions;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.PublishedModels
@@ -207,7 +203,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		[ImplementPropertyType(""foo"")]
-		public global::System.Collections.Generic.IEnumerable<global::Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::Foo>>(_publishedValueFallback, ""foo"");
+		public virtual global::System.Collections.Generic.IEnumerable<global::" + modelsBuilderConfig.ModelsNamespace + @".Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::" + modelsBuilderConfig.ModelsNamespace + @".Foo>>(_publishedValueFallback, ""foo"");
 	}
 }
 ";

@@ -1,6 +1,4 @@
 using System;
-using System.IO;
-using System.Text;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
@@ -9,9 +7,6 @@ using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Services;
-using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web

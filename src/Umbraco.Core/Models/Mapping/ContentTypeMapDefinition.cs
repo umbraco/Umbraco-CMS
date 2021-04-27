@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<DocumentTypeSave, IContentType>((source, context) => new ContentType(_shortStringHelper, source.ParentId), Map);
             mapper.Define<MediaTypeSave, IMediaType>((source, context) => new MediaType(_shortStringHelper, source.ParentId), Map);
@@ -592,7 +592,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
                 return Enumerable.Empty<string>();
 
             var aliases = new List<string>();
-            var ancestorIds = parent.Path.Split(',').Select(int.Parse);
+            var ancestorIds = parent.Path.Split(Constants.CharArrays.Comma).Select(int.Parse);
             // loop through all content types and return ordered aliases of ancestors
             var allContentTypes = _contentTypeService.GetAll().ToArray();
             foreach (var ancestorId in ancestorIds)

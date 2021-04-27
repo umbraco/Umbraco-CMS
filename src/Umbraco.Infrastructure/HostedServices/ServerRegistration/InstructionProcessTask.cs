@@ -9,10 +9,8 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Core;
-using Umbraco.Core.Sync;
 
-namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
+namespace Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration
 {
     /// <summary>
     /// Implements periodic database instruction processing as a hosted service.
@@ -38,7 +36,7 @@ namespace Umbraco.Infrastructure.HostedServices.ServerRegistration
             _logger = logger;
         }
 
-        internal override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object state)
         {
             if (_runtimeState.Level != RuntimeLevel.Run)
             {

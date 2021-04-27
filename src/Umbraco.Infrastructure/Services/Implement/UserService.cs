@@ -6,24 +6,23 @@ using System.Linq;
 using System.Linq.Expressions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Services.Notifications;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Services.Implement
+namespace Umbraco.Cms.Core.Services.Implement
 {
     /// <summary>
     /// Represents the UserService, which is an easy access to operations involving <see cref="IProfile"/>, <see cref="IMembershipUser"/> and eventually Backoffice Users.
     /// </summary>
-    public class UserService : ScopeRepositoryService, IUserService
+    internal class UserService : RepositoryService, IUserService
     {
         private readonly IUserRepository _userRepository;
         private readonly IUserGroupRepository _userGroupRepository;
@@ -111,6 +110,8 @@ namespace Umbraco.Core.Services.Implement
             if (username == null) throw new ArgumentNullException(nameof(username));
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(username));
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             // TODO: PUT lock here!!
 
             User user;
@@ -131,8 +132,8 @@ namespace Umbraco.Core.Services.Implement
                     IsApproved = isApproved
                 };
 
-                var saveEventArgs = new SaveEventArgs<IUser>(user);
-                if (scope.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
+                var savingNotification = new UserSavingNotification(user, evtMsgs);
+                if (scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return user;
@@ -140,8 +141,7 @@ namespace Umbraco.Core.Services.Implement
 
                 _userRepository.Save(user);
 
-                saveEventArgs.CanCancel = false;
-                scope.Events.Dispatch(SavedUser, this, saveEventArgs);
+                scope.Notifications.Publish(new UserSavedNotification(user, evtMsgs).WithStateFrom(savingNotification));
                 scope.Complete();
             }
 
@@ -241,10 +241,12 @@ namespace Umbraco.Core.Services.Implement
             }
             else
             {
+                var evtMsgs = EventMessagesFactory.Get();
+
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var deleteEventArgs = new DeleteEventArgs<IUser>(user);
-                    if (scope.Events.DispatchCancelable(DeletingUser, this, deleteEventArgs))
+                    var deletingNotification = new UserDeletingNotification(user, evtMsgs);
+                    if (scope.Notifications.PublishCancelable(deletingNotification))
                     {
                         scope.Complete();
                         return;
@@ -252,8 +254,7 @@ namespace Umbraco.Core.Services.Implement
 
                     _userRepository.Delete(user);
 
-                    deleteEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(DeletedUser, this, deleteEventArgs);
+                    scope.Notifications.Publish(new UserDeletedNotification(user, evtMsgs).WithStateFrom(deletingNotification));
                     scope.Complete();
                 }
             }
@@ -274,10 +275,12 @@ namespace Umbraco.Core.Services.Implement
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IUser entity, bool raiseEvents = true)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IUser>(entity);
-                if (raiseEvents && scope.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
+                var savingNotification = new UserSavingNotification(entity, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -294,8 +297,7 @@ namespace Umbraco.Core.Services.Implement
                     _userRepository.Save(entity);
                     if (raiseEvents)
                     {
-                        saveEventArgs.CanCancel = false;
-                        scope.Events.Dispatch(SavedUser, this, saveEventArgs);
+                        scope.Notifications.Publish(new UserSavedNotification(entity, evtMsgs).WithStateFrom(savingNotification));
                     }
 
                     scope.Complete();
@@ -321,12 +323,14 @@ namespace Umbraco.Core.Services.Implement
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IEnumerable<IUser> entities, bool raiseEvents = true)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             var entitiesA = entities.ToArray();
 
             using (var scope = ScopeProvider.CreateScope())
             {
-                var saveEventArgs = new SaveEventArgs<IUser>(entitiesA);
-                if (raiseEvents && scope.Events.DispatchCancelable(SavingUser, this, saveEventArgs))
+                var savingNotification = new UserSavingNotification(entitiesA, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
                 {
                     scope.Complete();
                     return;
@@ -346,8 +350,7 @@ namespace Umbraco.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(SavedUser, this, saveEventArgs);
+                    scope.Notifications.Publish(new UserSavedNotification(entitiesA, evtMsgs).WithStateFrom(savingNotification));
                 }
 
                 //commit the whole lot in one go
@@ -711,14 +714,16 @@ namespace Umbraco.Core.Services.Implement
             if (entityIds.Length == 0)
                 return;
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 _userGroupRepository.ReplaceGroupPermissions(groupId, permissions, entityIds);
                 scope.Complete();
 
                 var assigned = permissions.Select(p => p.ToString(CultureInfo.InvariantCulture)).ToArray();
-                scope.Events.Dispatch(UserGroupPermissionsAssigned, this,
-                    new SaveEventArgs<EntityPermission>(entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray(), false));
+                var entityPermissions = entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
+                scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));
             }
         }
 
@@ -733,14 +738,16 @@ namespace Umbraco.Core.Services.Implement
             if (entityIds.Length == 0)
                 return;
 
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 _userGroupRepository.AssignGroupPermission(groupId, permission, entityIds);
                 scope.Complete();
 
                 var assigned = new[] { permission.ToString(CultureInfo.InvariantCulture) };
-                scope.Events.Dispatch(UserGroupPermissionsAssigned, this,
-                    new SaveEventArgs<EntityPermission>(entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray(), false));
+                var entityPermissions = entityIds.Select(x => new EntityPermission(groupId, x, assigned)).ToArray();
+                scope.Notifications.Publish(new AssignedUserGroupPermissionsNotification(entityPermissions, evtMsgs));
             }
         }
 
@@ -811,6 +818,8 @@ namespace Umbraco.Core.Services.Implement
         /// Default is <c>True</c> otherwise set to <c>False</c> to not raise events</param>
         public void Save(IUserGroup userGroup, int[] userIds = null, bool raiseEvents = true)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
                 // we need to figure out which users have been added / removed, for audit purposes
@@ -828,9 +837,19 @@ namespace Umbraco.Core.Services.Implement
                     removedUsers = groupIds.Except(userIds).Select(x => xGroupUsers[x]).Where(x => x.Id != 0).ToArray();
                 }
 
-                var saveEventArgs = new SaveEventArgs<UserGroupWithUsers>(new UserGroupWithUsers(userGroup, addedUsers, removedUsers));
+                var userGroupWithUsers = new UserGroupWithUsers(userGroup, addedUsers, removedUsers);
 
-                if (raiseEvents && scope.Events.DispatchCancelable(SavingUserGroup, this, saveEventArgs))
+                // this is the default/expected notification for the IUserGroup entity being saved
+                var savingNotification = new UserGroupSavingNotification(userGroup, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingNotification))
+                {
+                    scope.Complete();
+                    return;
+                }
+
+                // this is an additional notification for special auditing
+                var savingUserGroupWithUsersNotification = new UserGroupWithUsersSavingNotification(userGroupWithUsers, evtMsgs);
+                if (raiseEvents && scope.Notifications.PublishCancelable(savingUserGroupWithUsersNotification))
                 {
                     scope.Complete();
                     return;
@@ -840,8 +859,8 @@ namespace Umbraco.Core.Services.Implement
 
                 if (raiseEvents)
                 {
-                    saveEventArgs.CanCancel = false;
-                    scope.Events.Dispatch(SavedUserGroup, this, saveEventArgs);
+                    scope.Notifications.Publish(new UserGroupSavedNotification(userGroup, evtMsgs).WithStateFrom(savingNotification));
+                    scope.Notifications.Publish(new UserGroupWithUsersSavedNotification(userGroupWithUsers, evtMsgs).WithStateFrom(savingUserGroupWithUsersNotification));
                 }
 
                 scope.Complete();
@@ -854,10 +873,12 @@ namespace Umbraco.Core.Services.Implement
         /// <param name="userGroup">UserGroup to delete</param>
         public void DeleteUserGroup(IUserGroup userGroup)
         {
+            var evtMsgs = EventMessagesFactory.Get();
+
             using (var scope = ScopeProvider.CreateScope())
             {
-                var deleteEventArgs = new DeleteEventArgs<IUserGroup>(userGroup);
-                if (scope.Events.DispatchCancelable(DeletingUserGroup, this, deleteEventArgs))
+                var deletingNotification = new UserGroupDeletingNotification(userGroup, evtMsgs);
+                if (scope.Notifications.PublishCancelable(deletingNotification))
                 {
                     scope.Complete();
                     return;
@@ -865,8 +886,7 @@ namespace Umbraco.Core.Services.Implement
 
                 _userGroupRepository.Delete(userGroup);
 
-                deleteEventArgs.CanCancel = false;
-                scope.Events.Dispatch(DeletedUserGroup, this, deleteEventArgs);
+                scope.Notifications.Publish(new UserGroupDeletedNotification(userGroup, evtMsgs).WithStateFrom(deletingNotification));
 
                 scope.Complete();
             }
@@ -1146,49 +1166,5 @@ namespace Umbraco.Core.Services.Implement
         }
 
         #endregion
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<IUser>> SavingUser;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<IUser>> SavedUser;
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUser>> DeletingUser;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUser>> DeletedUser;
-
-        /// <summary>
-        /// Occurs before Save
-        /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavingUserGroup;
-
-        /// <summary>
-        /// Occurs after Save
-        /// </summary>
-        public static event TypedEventHandler<IUserService, SaveEventArgs<UserGroupWithUsers>> SavedUserGroup;
-
-        /// <summary>
-        /// Occurs before Delete
-        /// </summary>
-        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserGroup>> DeletingUserGroup;
-
-        /// <summary>
-        /// Occurs after Delete
-        /// </summary>
-        public static event TypedEventHandler<IUserService, DeleteEventArgs<IUserGroup>> DeletedUserGroup;
-
-        // TODO: still don't know if we need this yet unless we start caching permissions, but that also means we'll need another
-        // event on the ContentService since there's a method there to modify node permissions too, or we can proxy events if needed.
-        public static event TypedEventHandler<IUserService, SaveEventArgs<EntityPermission>> UserGroupPermissionsAssigned;
     }
 }

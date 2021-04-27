@@ -5,13 +5,13 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Web.Routing;
-using System.Web.Security;
 using System.Xml.Linq;
 using Examine;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Serilog;
@@ -39,38 +39,33 @@ using Umbraco.Cms.Core.Net;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Infrastructure;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Media;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common;
 using Umbraco.Cms.Tests.Common.Testing;
-using Umbraco.Core;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Mappers;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
-using Umbraco.Core.Services.Implement;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.DependencyInjection;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Stubs;
 using Umbraco.Web;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Hosting;
-using Umbraco.Web.Media;
-using Umbraco.Web.PropertyEditors;
 using Umbraco.Web.Security;
-using Umbraco.Web.Security.Providers;
-using FileSystems = Umbraco.Cms.Core.IO.FileSystems;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
 
 namespace Umbraco.Tests.Testing
@@ -115,9 +110,9 @@ namespace Umbraco.Tests.Testing
 
         protected UmbracoTestAttribute Options { get; private set; }
 
-        protected static bool FirstTestInSession = true;
+        protected static bool FirstTestInSession { get; set; } = true;
 
-        protected bool FirstTestInFixture = true;
+        protected bool FirstTestInFixture { get; set; } = true;
 
         internal TestObjects TestObjects { get; private set; }
 
@@ -161,8 +156,9 @@ namespace Umbraco.Tests.Testing
 
         protected IMapperCollection Mappers => Factory.GetRequiredService<IMapperCollection>();
 
-        protected UmbracoMapper Mapper => Factory.GetRequiredService<UmbracoMapper>();
+        protected IUmbracoMapper Mapper => Factory.GetRequiredService<IUmbracoMapper>();
         protected IHttpContextAccessor HttpContextAccessor => Factory.GetRequiredService<IHttpContextAccessor>();
+        protected IContentService ContentService => Factory.GetRequiredService<IContentService>();
         protected IRuntimeState RuntimeState => MockRuntimeState(RuntimeLevel.Run);
         private ILoggerFactory _loggerFactory;
 
@@ -230,15 +226,11 @@ namespace Umbraco.Tests.Testing
             services.AddUnique(ipResolver);
             services.AddUnique<IPasswordHasher, AspNetPasswordHasher>();
             services.AddUnique(TestHelper.ShortStringHelper);
-            services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
+            //services.AddUnique<IPublicAccessChecker, PublicAccessChecker>();
 
 
             var memberService = Mock.Of<IMemberService>();
             var memberTypeService = Mock.Of<IMemberTypeService>();
-            var membershipProvider = new MembersMembershipProvider(memberService, memberTypeService, Mock.Of<IUmbracoVersion>(), TestHelper.GetHostingEnvironment(), TestHelper.GetIpResolver());
-            var membershipHelper = new MembershipHelper(Mock.Of<IHttpContextAccessor>(), Mock.Of<IPublishedMemberCache>(), membershipProvider, Mock.Of<RoleProvider>(), memberService, memberTypeService, Mock.Of<IPublicAccessService>(), AppCaches.Disabled, loggerFactory, ShortStringHelper, Mock.Of<IEntityService>());
-
-            services.AddUnique(membershipHelper);
 
             TestObjects = new TestObjects();
             Compose();
@@ -303,11 +295,11 @@ namespace Umbraco.Tests.Testing
         {
             // imported from TestWithSettingsBase
             // which was inherited by TestWithApplicationBase so pretty much used everywhere
-            Umbraco.Web.Composing.Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
+            Current.UmbracoContextAccessor = new TestUmbracoContextAccessor();
 
             // web
             Builder.Services.AddUnique(Current.UmbracoContextAccessor);
-            Builder.Services.AddUnique<IBackOfficeSecurityAccessor>(new HybridBackofficeSecurityAccessor(AppCaches.NoCache.RequestCache));
+            Builder.Services.AddUnique<IBackOfficeSecurityAccessor>(Mock.Of<IBackOfficeSecurityAccessor>());
             Builder.Services.AddUnique<IPublishedRouter, PublishedRouter>();
             Builder.WithCollectionBuilder<ContentFinderCollectionBuilder>();
 
@@ -471,8 +463,8 @@ namespace Umbraco.Tests.Testing
 
             var scheme = Mock.Of<IMediaPathScheme>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, _loggerFactory.CreateLogger<MediaFileSystem>(), TestHelper.ShortStringHelper);
-            Builder.Services.AddUnique<IMediaFileSystem>(factory => mediaFileSystem);
+            var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), scheme, Mock.Of<ILogger<MediaFileManager>>(), Mock.Of<IShortStringHelper>());
+            Builder.Services.AddUnique(factory => mediaFileManager);
 
             // no factory (noop)
             Builder.Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();
@@ -483,8 +475,8 @@ namespace Umbraco.Tests.Testing
 
             Builder.Services.AddUnique<IEventMessagesFactory>(_ => new TransientEventMessagesFactory());
 
-            var globalSettings = new GlobalSettings();
-            var connectionStrings = new ConnectionStrings();
+            var globalSettings = Microsoft.Extensions.Options.Options.Create(new GlobalSettings());
+            var connectionStrings = Microsoft.Extensions.Options.Options.Create(new ConnectionStrings());
 
             Builder.Services.AddUnique<IUmbracoDatabaseFactory>(f => new UmbracoDatabaseFactory(_loggerFactory.CreateLogger<UmbracoDatabaseFactory>(),
                 LoggerFactory,
@@ -492,7 +484,7 @@ namespace Umbraco.Tests.Testing
                 connectionStrings,
                 new Lazy<IMapperCollection>(f.GetRequiredService<IMapperCollection>),
                 TestHelper.DbProviderFactoryCreator,
-                new DatabaseSchemaCreatorFactory(LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion)));
+                new DatabaseSchemaCreatorFactory(LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, Mock.Of<IEventAggregator>())));
 
             Builder.Services.AddUnique(f => f.GetService<IUmbracoDatabaseFactory>().SqlContext);
 
@@ -586,14 +578,6 @@ namespace Umbraco.Tests.Testing
 
             // reset all other static things that should not be static ;(
             UriUtility.ResetAppDomainAppVirtualPath(HostingEnvironment);
-
-            // clear static events
-            DocumentRepository.ClearScopeEvents();
-            MediaRepository.ClearScopeEvents();
-            MemberRepository.ClearScopeEvents();
-            ContentTypeService.ClearScopeEvents();
-            MediaTypeService.ClearScopeEvents();
-            MemberTypeService.ClearScopeEvents();
         }
 
         #endregion

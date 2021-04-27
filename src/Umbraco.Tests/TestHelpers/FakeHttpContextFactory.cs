@@ -6,8 +6,6 @@ using System.Security.Principal;
 using System.Web;
 using System.Web.Routing;
 using Moq;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
 
 namespace Umbraco.Tests.TestHelpers
 {

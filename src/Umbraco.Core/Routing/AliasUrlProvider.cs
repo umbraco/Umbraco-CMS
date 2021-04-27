@@ -15,15 +15,15 @@ namespace Umbraco.Cms.Core.Routing
     public class AliasUrlProvider : IUrlProvider
     {
         private readonly RequestHandlerSettings _requestConfig;
-        private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly ISiteDomainMapper _siteDomainMapper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
         private readonly IPublishedValueFallback _publishedValueFallback;
 
-        public AliasUrlProvider(IOptions<RequestHandlerSettings> requestConfig, ISiteDomainHelper siteDomainHelper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback, IUmbracoContextAccessor umbracoContextAccessor)
+        public AliasUrlProvider(IOptions<RequestHandlerSettings> requestConfig, ISiteDomainMapper siteDomainMapper, UriUtility uriUtility, IPublishedValueFallback publishedValueFallback, IUmbracoContextAccessor umbracoContextAccessor)
         {
             _requestConfig = requestConfig.Value;
-            _siteDomainHelper = siteDomainHelper;
+            _siteDomainMapper = siteDomainMapper;
             _uriUtility = uriUtility;
             _publishedValueFallback = publishedValueFallback;
             _umbracoContextAccessor = umbracoContextAccessor;
@@ -68,12 +68,12 @@ namespace Umbraco.Cms.Core.Routing
 
             // look for domains, walking up the tree
             var n = node;
-            var domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, false);
+            var domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
             while (domainUris == null && n != null) // n is null at root
             {
                 // move to parent node
                 n = n.Parent;
-                domainUris = n == null ? null : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, excludeDefault: false);
+                domainUris = n == null ? null : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, excludeDefault: false);
             }
 
             // determine whether the alias property varies
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Core.Routing
                     yield break;
 
                 var umbracoUrlName = node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
-                var aliases = umbracoUrlName?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                var aliases = umbracoUrlName?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
                 if (aliases == null || aliases.Any() == false)
                     yield break;
@@ -117,7 +117,7 @@ namespace Umbraco.Cms.Core.Routing
                         ? node.Value<string>(_publishedValueFallback,Constants.Conventions.Content.UrlAlias, culture: domainUri.Culture)
                         : node.Value<string>(_publishedValueFallback, Constants.Conventions.Content.UrlAlias);
 
-                    var aliases = umbracoUrlName?.Split(new [] {','}, StringSplitOptions.RemoveEmptyEntries);
+                    var aliases = umbracoUrlName?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
                     if (aliases == null || aliases.Any() == false)
                         continue;
@@ -138,8 +138,8 @@ namespace Umbraco.Cms.Core.Routing
 
         string CombinePaths(string path1, string path2)
         {
-            string path = path1.TrimEnd('/') + path2;
-            return path == "/" ? path : path.TrimEnd('/');
+            string path = path1.TrimEnd(Constants.CharArrays.ForwardSlash) + path2;
+            return path == "/" ? path : path.TrimEnd(Constants.CharArrays.ForwardSlash);
         }
 
         #endregion

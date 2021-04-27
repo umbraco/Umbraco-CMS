@@ -1,6 +1,6 @@
 ﻿using NPoco;
 
-namespace Umbraco.Core.Persistence.Dtos
+namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
 {
     // this is a special Dto that does not have a corresponding table
     // and is only used in our code to represent a media item, similar

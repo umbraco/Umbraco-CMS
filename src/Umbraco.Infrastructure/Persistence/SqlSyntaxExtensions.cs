@@ -3,10 +3,9 @@ using System.Linq.Expressions;
 using System.Reflection;
 using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Provides extension methods to <see cref="ISqlSyntaxProvider"/>.

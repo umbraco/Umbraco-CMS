@@ -2,22 +2,16 @@
 using System.Collections.Generic;
 using System.Xml.XPath;
 using Examine.Search;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Xml;
-using Umbraco.Core;
-using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Web
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Query methods used for accessing strongly typed content in templates
     /// </summary>
     public interface IPublishedContentQuery
     {
-
-
-
         IPublishedContent Content(int id);
         IPublishedContent Content(Guid id);
         IPublishedContent Content(Udi id);

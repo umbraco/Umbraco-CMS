@@ -9,10 +9,9 @@ using Serilog.Formatting;
 using Serilog.Formatting.Compact;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
-using Umbraco.Core.Logging.Serilog.Enrichers;
-using Umbraco.Extensions;
+using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 
-namespace Umbraco.Core.Logging.Serilog
+namespace Umbraco.Extensions
 {
     public static class LoggerConfigExtensions
     {

@@ -1,16 +1,18 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Semver;
-using Umbraco.Core.Migrations.Upgrade.Common;
-using Umbraco.Core.Migrations.Upgrade.V_8_0_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_0_1;
-using Umbraco.Core.Migrations.Upgrade.V_8_1_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_6_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_9_0;
-using Umbraco.Core.Migrations.Upgrade.V_8_10_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_1;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_1_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_10_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_6_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_7_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_9_0;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_9_0_0;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations.Upgrade
+namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
 {
     /// <summary>
     /// Represents Umbraco's migration plan.
@@ -194,8 +196,17 @@ namespace Umbraco.Core.Migrations.Upgrade
 
             // to 8.9.0
             To<ExternalLoginTableUserData>("{B5838FF5-1D22-4F6C-BCEB-F83ACB14B575}");
-// to 8.10.0
+
+            // to 8.10.0
             To<AddPropertyTypeLabelOnTopColumn>("{D6A8D863-38EC-44FB-91EC-ACD6A668BD18}");
+
+            // to 9.0.0
+            To<MigrateLogViewerQueriesFromFileToDb>("{22D801BA-A1FF-4539-BFCC-2139B55594F8}");
+            To<ExternalLoginTableIndexes>("{50A43237-A6F4-49E2-A7A6-5DAD65C84669}");
+            To<ExternalLoginTokenTable>("{3D8DADEF-0FDA-4377-A5F0-B52C2110E8F2}");
+            To<MemberTableColumns>("{1303BDCF-2295-4645-9526-2F32E8B35ABD}");
+            To<AddPasswordConfigToMemberTable>("{86AC839A-0D08-4D09-B7B5-027445E255A1}");
+
             //FINAL
         }
     }

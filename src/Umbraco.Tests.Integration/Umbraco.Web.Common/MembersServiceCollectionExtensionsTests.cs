@@ -2,8 +2,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Tests.Integration.Umbraco.Web.Common
@@ -11,15 +11,15 @@ namespace Umbraco.Tests.Integration.Umbraco.Web.Common
     [TestFixture]
     public class MembersServiceCollectionExtensionsTests : UmbracoIntegrationTest
     {
-        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.Services.AddMembersIdentity();
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddMembersIdentity();
 
         [Test]
         public void AddMembersIdentity_ExpectMembersUserStoreResolvable()
         {
-            IUserStore<MembersIdentityUser> userStore = Services.GetService<IUserStore<MembersIdentityUser>>();
+            IUserStore<MemberIdentityUser> userStore = Services.GetService<IUserStore<MemberIdentityUser>>();
 
             Assert.IsNotNull(userStore);
-            Assert.AreEqual(typeof(MembersUserStore), userStore.GetType());
+            Assert.AreEqual(typeof(MemberUserStore), userStore.GetType());
         }
 
         [Test]

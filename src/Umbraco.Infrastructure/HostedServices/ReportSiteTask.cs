@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Http;
 using System.Runtime.Serialization;
 using System.Text;
@@ -9,9 +9,8 @@ using Newtonsoft.Json;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.HostedServices;
 
-namespace Umbraco.Web.Telemetry
+namespace Umbraco.Cms.Infrastructure.HostedServices
 {
     public class ReportSiteTask : RecurringHostedServiceBase
     {
@@ -36,7 +35,7 @@ namespace Umbraco.Web.Telemetry
         /// Runs the background task to send the anonymous ID
         /// to telemetry service
         /// </summary>
-        internal override async Task PerformExecuteAsync(object state)
+        public override async Task PerformExecuteAsync(object state)
         {
             // Try & get a value stored in umbracoSettings.config on the backoffice XML element ID attribute
             var backofficeIdentifierRaw = _globalSettings.Value.Id;

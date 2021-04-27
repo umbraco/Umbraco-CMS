@@ -1,7 +1,7 @@
 ﻿using System.Data;
-using Umbraco.Core.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Core.Migrations.Expressions.Create.ForeignKey
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.ForeignKey
 {
     public interface ICreateForeignKeyCascadeBuilder : IFluentBuilder, IExecutableBuilder
     {

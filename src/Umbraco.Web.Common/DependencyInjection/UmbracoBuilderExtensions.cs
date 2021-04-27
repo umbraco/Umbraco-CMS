@@ -4,6 +4,7 @@ using System.Data.SqlClient;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using Dazinator.Extensions.FileProviders.GlobPatternFilter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -15,6 +16,8 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Smidge;
+using Smidge.FileProcessors;
+using Smidge.InMemory;
 using Smidge.Nuglify;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -31,6 +34,13 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Core.WebAssets;
+using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Web.Common;
 using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
@@ -43,28 +53,20 @@ using Umbraco.Cms.Web.Common.Middleware;
 using Umbraco.Cms.Web.Common.ModelBinders;
 using Umbraco.Cms.Web.Common.Mvc;
 using Umbraco.Cms.Web.Common.Profiler;
-using Umbraco.Cms.Web.Common.Routing;
+using Umbraco.Cms.Web.Common.RuntimeMinification;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Cms.Web.Common.Templates;
 using Umbraco.Cms.Web.Common.UmbracoContext;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Infrastructure.DependencyInjection;
-using Umbraco.Infrastructure.HostedServices;
-using Umbraco.Infrastructure.HostedServices.ServerRegistration;
-using Umbraco.Web.Telemetry;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
 namespace Umbraco.Extensions
 {
-
     // TODO: We could add parameters to configure each of these for flexibility
 
     /// <summary>
     /// Extension methods for <see cref="IUmbracoBuilder"/> for the common Umbraco functionality
     /// </summary>
-    public static class UmbracoBuilderExtensions
+    public static partial class UmbracoBuilderExtensions
     {
         /// <summary>
         /// Creates an <see cref="IUmbracoBuilder"/> and registers basic Umbraco services
@@ -86,15 +88,18 @@ namespace Umbraco.Extensions
 
             IHostingEnvironment tempHostingEnvironment = GetTemporaryHostingEnvironment(webHostEnvironment, config);
 
-            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.LogFiles);
+            var loggingDir = tempHostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.LogFiles);
             var loggingConfig = new LoggingConfiguration(loggingDir);
 
             services.AddLogger(tempHostingEnvironment, loggingConfig, config);
 
+            // Manually create and register the HttpContextAccessor. In theory this should not be registered
+            // again by the user but if that is the case it's not the end of the world since HttpContextAccessor
+            // is just based on AsyncLocal, see https://github.com/dotnet/aspnetcore/blob/main/src/Http/Http/src/HttpContextAccessor.cs
             IHttpContextAccessor httpContextAccessor = new HttpContextAccessor();
             services.AddSingleton(httpContextAccessor);
 
-            var requestCache = new GenericDictionaryRequestAppCache(() => httpContextAccessor.HttpContext?.Items);
+            var requestCache = new HttpContextRequestAppCache(httpContextAccessor);
             var appCaches = AppCaches.Create(requestCache);
             services.AddUnique(appCaches);
 
@@ -106,7 +111,7 @@ namespace Umbraco.Extensions
 
             // adds the umbraco startup filter which will call UseUmbraco early on before
             // other start filters are applied (depending on the ordering of IStartupFilters in DI).
-            services.AddTransient<IStartupFilter, UmbracoStartupFilter>();
+            services.AddTransient<IStartupFilter, UmbracoApplicationServicesCapture>();
 
             return new UmbracoBuilder(services, config, typeLoader, loggerFactory);
         }
@@ -182,9 +187,14 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<WebProfilerHtml>();
 
             builder.Services.AddMiniProfiler(options =>
-
+            {
                 // WebProfiler determine and start profiling. We should not use the MiniProfilerMiddleware to also profile
-                options.ShouldProfile = request => false);
+                options.ShouldProfile = request => false;
+
+                // this is a default path and by default it performs a 'contains' check which will match our content controller
+                // (and probably other requests) and ignore them.
+                options.IgnoredPaths.Remove("/content/");
+            });
 
             builder.AddNotificationHandler<UmbracoApplicationStarting, InitializeWebProfiling>();
             return builder;
@@ -210,8 +220,28 @@ namespace Umbraco.Extensions
         /// </summary>
         public static IUmbracoBuilder AddRuntimeMinifier(this IUmbracoBuilder builder)
         {
-            builder.Services.AddSmidge(builder.Config.GetSection(Cms.Core.Constants.Configuration.ConfigRuntimeMinification));
+            // Add custom ISmidgeFileProvider to include the additional App_Plugins location
+            // to load assets from.
+            builder.Services.AddSingleton<ISmidgeFileProvider>(f =>
+            {
+                IWebHostEnvironment hostEnv = f.GetRequiredService<IWebHostEnvironment>();
+
+                return new SmidgeFileProvider(
+                    hostEnv.WebRootFileProvider,
+                    new GlobPatternFilterFileProvider(
+                        hostEnv.ContentRootFileProvider,
+                        // only include js or css files within App_Plugins
+                        new[] { "/App_Plugins/**/*.js", "/App_Plugins/**/*.css" }));
+            });
+
+            builder.Services.AddSmidge(builder.Config.GetSection(Constants.Configuration.ConfigRuntimeMinification));
             builder.Services.AddSmidgeNuglify();
+            builder.Services.AddSmidgeInMemory(false); // it will be enabled based on config/cachebuster
+
+            builder.Services.AddUnique<IRuntimeMinifier, SmidgeRuntimeMinifier>();
+            builder.Services.AddUnique<SmidgeHelperAccessor>();
+            builder.Services.AddTransient<IPreProcessor, SmidgeNuglifyJs>();
+            builder.Services.ConfigureOptions<SmidgeOptionsSetup>();
 
             return builder;
         }
@@ -235,17 +265,16 @@ namespace Umbraco.Extensions
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, UmbracoApiBehaviorApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, BackOfficeApplicationModelProvider>());
             builder.Services.TryAddEnumerable(ServiceDescriptor.Transient<IApplicationModelProvider, VirtualPageApplicationModelProvider>());
-            builder.Services.AddUmbracoImageSharp(builder.Config);
+            builder.AddUmbracoImageSharp();
 
             // AspNetCore specific services
-            builder.Services.AddUnique<IHttpContextAccessor, HttpContextAccessor>();
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
             builder.AddNotificationHandler<UmbracoRequestBegin, AspNetCoreRequestAccessor>();
 
             // Password hasher
             builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
 
-            builder.Services.AddUnique<ICookieManager, AspNetCoreCookieManager>();
+            builder.Services.AddUnique<Cms.Core.Web.ICookieManager, AspNetCoreCookieManager>();
             builder.Services.AddTransient<IIpResolver, AspNetCoreIpResolver>();
             builder.Services.AddUnique<IUserAgentProvider, AspNetCoreUserAgentProvider>();
 
@@ -256,14 +285,12 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<IProfilerHtml, WebProfilerHtml>();
 
             builder.Services.AddUnique<IMacroRenderer, MacroRenderer>();
-            builder.Services.AddUnique<IMemberUserKeyProvider, MemberUserKeyProvider>();
+            builder.Services.AddUnique<PartialViewMacroEngine>();
 
             // register the umbraco context factory
 
             builder.Services.AddUnique<IUmbracoContextFactory, UmbracoContextFactory>();
-            builder.Services.AddUnique<IBackOfficeSecurityFactory, BackOfficeSecurityFactory>();
-            builder.Services.AddUnique<IBackOfficeSecurityAccessor, HybridBackofficeSecurityAccessor>();
-            builder.Services.AddUnique<IUmbracoWebsiteSecurityAccessor, HybridUmbracoWebsiteSecurityAccessor>();
+            builder.Services.AddUnique<IBackOfficeSecurityAccessor, BackOfficeSecurityAccessor>();
 
             var umbracoApiControllerTypes = builder.TypeLoader.GetUmbracoApiControllers().ToList();
             builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
@@ -272,6 +299,7 @@ namespace Umbraco.Extensions
             builder.Services.AddUnique<InstallAreaRoutes>();
 
             builder.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
+            builder.Services.AddUnique<PreviewAuthenticationMiddleware>();
             builder.Services.AddUnique<UmbracoRequestMiddleware>();
             builder.Services.AddUnique<BootFailedMiddleware>();
 
@@ -283,12 +311,19 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<ContentModelBinder>();
 
             builder.Services.AddScoped<UmbracoHelper>();
+            builder.Services.AddScoped<IBackOfficeSecurity, BackOfficeSecurity>();
 
             builder.AddHttpClients();
 
             // TODO: Does this belong in web components??
             builder.AddNuCache();
 
+            return builder;
+        }
+
+        public static IUmbracoBuilder AddUnattedInstallCreateUser(this IUmbracoBuilder builder)
+        {
+            builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
             return builder;
         }
 
@@ -393,7 +428,8 @@ namespace Umbraco.Extensions
             var wrappedHostingSettings = new OptionsMonitorAdapter<HostingSettings>(hostingSettings);
             var wrappedWebRoutingSettings = new OptionsMonitorAdapter<WebRoutingSettings>(webRoutingSettings);
 
-            return new AspNetCoreHostingEnvironment(wrappedHostingSettings,wrappedWebRoutingSettings, webHostEnvironment);
+            return new AspNetCoreHostingEnvironment(wrappedHostingSettings, wrappedWebRoutingSettings, webHostEnvironment);
         }
+
     }
 }

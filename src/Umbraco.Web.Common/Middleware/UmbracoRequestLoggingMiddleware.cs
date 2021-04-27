@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Serilog.Context;
-using Umbraco.Core.Logging.Serilog.Enrichers;
+using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.Middleware

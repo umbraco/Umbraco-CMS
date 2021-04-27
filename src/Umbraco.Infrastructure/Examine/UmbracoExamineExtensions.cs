@@ -2,9 +2,9 @@
 using System.Text.RegularExpressions;
 using Examine;
 using Examine.Search;
-using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Examine;
 
-namespace Umbraco.Examine
+namespace Umbraco.Extensions
 {
     public static class UmbracoExamineExtensions
     {

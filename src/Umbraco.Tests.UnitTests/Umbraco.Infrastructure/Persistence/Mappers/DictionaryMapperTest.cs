@@ -2,8 +2,8 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
-using Umbraco.Core.Persistence.Mappers;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Persistence.Mappers
 {

@@ -2,7 +2,7 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
-using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {

@@ -2,12 +2,9 @@
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Core;
-using Umbraco.Core.Security;
 
 namespace Umbraco.Web.Security
 {
-
     // NOTE: Moved to netcore
     public class BackOfficeSecurity : IBackOfficeSecurity
     {

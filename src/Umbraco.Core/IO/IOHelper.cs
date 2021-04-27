@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.IO
                 retval = virtualPath.Replace("~", _hostingEnvironment.ApplicationVirtualPath);
 
             if (virtualPath.StartsWith("/") && !PathStartsWith(virtualPath, _hostingEnvironment.ApplicationVirtualPath))
-                retval = _hostingEnvironment.ApplicationVirtualPath + "/" + virtualPath.TrimStart('/');
+                retval = _hostingEnvironment.ApplicationVirtualPath + "/" + virtualPath.TrimStart(Constants.CharArrays.ForwardSlash);
 
             return retval;
         }
@@ -58,14 +58,14 @@ namespace Umbraco.Cms.Core.IO
             {
                 var result = (!string.IsNullOrEmpty(path) && (path.StartsWith("~") || PathStartsWith(path, _hostingEnvironment.ApplicationVirtualPath)))
                     ? _hostingEnvironment.MapPathWebRoot(path)
-                    : _hostingEnvironment.MapPathWebRoot("~/" + path.TrimStart('/'));
+                    : _hostingEnvironment.MapPathWebRoot("~/" + path.TrimStart(Constants.CharArrays.ForwardSlash));
 
                 if (result != null) return result;
             }
 
             var dirSepChar = Path.DirectorySeparatorChar;
             var root = Assembly.GetExecutingAssembly().GetRootDirectorySafe();
-            var newPath = path.TrimStart('~', '/').Replace('/', dirSepChar);
+            var newPath = path.TrimStart(Constants.CharArrays.TildeForwardSlash).Replace('/', dirSepChar);
             var retval = root + dirSepChar.ToString(CultureInfo.InvariantCulture) + newPath;
 
             return retval;
@@ -141,7 +141,7 @@ namespace Umbraco.Cms.Core.IO
         public bool VerifyFileExtension(string filePath, IEnumerable<string> validFileExtensions)
         {
             var ext = Path.GetExtension(filePath);
-            return ext != null && validFileExtensions.Contains(ext.TrimStart('.'));
+            return ext != null && validFileExtensions.Contains(ext.TrimStart(Constants.CharArrays.Period));
         }
 
         public abstract bool PathStartsWith(string path, string root, params char[] separators);

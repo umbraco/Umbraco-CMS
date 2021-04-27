@@ -1,6 +1,6 @@
 ﻿using System.Data;
 
-namespace Umbraco.Core.Migrations.Expressions.Common
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Common
 {
     public interface IForeignKeyCascadeBuilder<out TNext, out TNextFk> : IFluentBuilder
         where TNext : IFluentBuilder

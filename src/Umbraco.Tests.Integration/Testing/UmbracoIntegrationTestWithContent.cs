@@ -5,8 +5,8 @@ using System;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Tests.Common.Builders;
-using Umbraco.Core.Services.Implement;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
 {

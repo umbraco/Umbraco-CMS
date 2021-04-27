@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
-using Umbraco.Cms.Core.IO;
-using Umbraco.Core.PropertyEditors;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
 
-namespace Umbraco.Web.PropertyEditors
+using System.Collections.Generic;
+using Umbraco.Cms.Core.IO;
+
+namespace Umbraco.Cms.Core.PropertyEditors
 {
     /// <summary>
     /// Represents the configuration editor for the image cropper value editor.

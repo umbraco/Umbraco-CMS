@@ -11,7 +11,6 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Extensions;
@@ -33,10 +32,8 @@ namespace Umbraco.Cms.Core.Routing
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IRequestAccessor _requestAccessor;
         private readonly IPublishedValueFallback _publishedValueFallback;
-        private readonly IPublicAccessChecker _publicAccessChecker;
         private readonly IFileService _fileService;
         private readonly IContentTypeService _contentTypeService;
-        private readonly IPublicAccessService _publicAccessService;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IEventAggregator _eventAggregator;
 
@@ -53,10 +50,8 @@ namespace Umbraco.Cms.Core.Routing
             IPublishedUrlProvider publishedUrlProvider,
             IRequestAccessor requestAccessor,
             IPublishedValueFallback publishedValueFallback,
-            IPublicAccessChecker publicAccessChecker,
             IFileService fileService,
             IContentTypeService contentTypeService,
-            IPublicAccessService publicAccessService,
             IUmbracoContextAccessor umbracoContextAccessor,
             IEventAggregator eventAggregator)
         {
@@ -69,10 +64,8 @@ namespace Umbraco.Cms.Core.Routing
             _publishedUrlProvider = publishedUrlProvider;
             _requestAccessor = requestAccessor;
             _publishedValueFallback = publishedValueFallback;
-            _publicAccessChecker = publicAccessChecker;
             _fileService = fileService;
             _contentTypeService = contentTypeService;
-            _publicAccessService = publicAccessService;
             _umbracoContextAccessor = umbracoContextAccessor;
             _eventAggregator = eventAggregator;
         }
@@ -104,13 +97,11 @@ namespace Umbraco.Cms.Core.Routing
         {
             FindDomain(request);
 
-            // TODO: This was ported from v8 but how could it possibly have a redirect here?
             if (request.IsRedirect())
             {
                 return request.Build();
             }
 
-            // TODO: This was ported from v8 but how could it possibly have content here?
             if (request.HasPublishedContent())
             {
                 return request.Build();
@@ -133,54 +124,78 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc />
-        public async Task<IPublishedRequest> RouteRequestAsync(IPublishedRequestBuilder request, RouteRequestOptions options)
+        public async Task<IPublishedRequest> RouteRequestAsync(IPublishedRequestBuilder builder, RouteRequestOptions options)
         {
             // outbound routing performs different/simpler logic
             if (options.RouteDirection == RouteDirection.Outbound)
             {
-                return TryRouteRequest(request);
+                return TryRouteRequest(builder);
             }
 
             // find domain
-            FindDomain(request);
-
-            // TODO: This was ported from v8 but how could it possibly have a redirect here?
-            // if request has been flagged to redirect then return
-            // whoever called us is in charge of actually redirecting
-            if (request.IsRedirect())
+            if (builder.Domain == null)
             {
-                return request.Build();
+                FindDomain(builder);
+            }
+
+            await RouteRequestInternalAsync(builder);
+
+            // complete the PCR and assign the remaining values
+            return BuildRequest(builder);
+        }
+
+        private async Task RouteRequestInternalAsync(IPublishedRequestBuilder builder)
+        {
+            // if request builder was already flagged to redirect then return
+            // whoever called us is in charge of actually redirecting
+            if (builder.IsRedirect())
+            {
+                return;
             }
 
             // set the culture
-            SetVariationContext(request.Culture);
+            SetVariationContext(builder.Culture);
 
-            // find the published content if it's not assigned. This could be manually assigned with a custom route handler, or
-            // with something like EnsurePublishedContentRequestAttribute or UmbracoVirtualNodeRouteHandler. Those in turn call this method
+            var foundContentByFinders = false;
+
+            // Find the published content if it's not assigned.
+            // This could be manually assigned with a custom route handler, etc...
+            // which in turn could call this method
             // to setup the rest of the pipeline but we don't want to run the finders since there's one assigned.
-            // TODO: This might very well change when we look into porting custom routes in netcore like EnsurePublishedContentRequestAttribute or UmbracoVirtualNodeRouteHandler.
-            if (!request.HasPublishedContent())
+            if (!builder.HasPublishedContent())
             {
-                // find the document & template
-                FindPublishedContentAndTemplate(request);
+                _logger.LogDebug("FindPublishedContentAndTemplate: Path={UriAbsolutePath}", builder.Uri.AbsolutePath);
+
+                // run the document finders
+                foundContentByFinders = FindPublishedContent(builder);
             }
 
-            // handle wildcard domains
-            HandleWildcardDomains(request);
+            // if we are not a redirect
+            if (!builder.IsRedirect())
+            {
+                // handle not-found, redirects, access...
+                HandlePublishedContent(builder);
 
-            // set the culture  -- again, 'cos it might have changed due to a finder or wildcard domain
-            SetVariationContext(request.Culture);
+                // find a template
+                FindTemplate(builder, foundContentByFinders);
+
+                // handle umbracoRedirect
+                FollowExternalRedirect(builder);
+
+                // handle wildcard domains
+                HandleWildcardDomains(builder);
+
+                // set the culture  -- again, 'cos it might have changed due to a finder or wildcard domain
+                SetVariationContext(builder.Culture);
+            }
 
             // trigger the routing request (used to be called Prepared) event - at that point it is still possible to change about anything
             // even though the request might be flagged for redirection - we'll redirect _after_ the event
-            var routingRequest = new RoutingRequestNotification(request);
+            var routingRequest = new RoutingRequestNotification(builder);
             await _eventAggregator.PublishAsync(routingRequest);
 
             // we don't take care of anything so if the content has changed, it's up to the user
             // to find out the appropriate template
-
-            // complete the PCR and assign the remaining values
-            return BuildRequest(request);
         }
 
         /// <summary>
@@ -193,11 +208,11 @@ namespace Umbraco.Cms.Core.Routing
         /// This method logic has been put into it's own method in case developers have created a custom PCR or are assigning their own values
         /// but need to finalize it themselves.
         /// </remarks>
-        internal IPublishedRequest BuildRequest(IPublishedRequestBuilder frequest)
+        internal IPublishedRequest BuildRequest(IPublishedRequestBuilder builder)
         {
-            IPublishedRequest result = frequest.Build();
+            IPublishedRequest result = builder.Build();
 
-            if (!frequest.HasPublishedContent())
+            if (!builder.HasPublishedContent())
             {
                 return result;
             }
@@ -209,23 +224,26 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <inheritdoc />
-        public IPublishedRequestBuilder UpdateRequestToNotFound(IPublishedRequest request)
+        public async Task<IPublishedRequest> UpdateRequestAsync(IPublishedRequest request, IPublishedContent publishedContent)
         {
-            var builder = new PublishedRequestBuilder(request.Uri, _fileService);
-
-            // clear content
+            // store the original (if any)
             IPublishedContent content = request.PublishedContent;
-            builder.SetPublishedContent(null);
 
-            HandlePublishedContent(builder); // will go 404
-            FindTemplate(builder, false);
+            IPublishedRequestBuilder builder = new PublishedRequestBuilder(request.Uri, _fileService);
 
-            // if request has been flagged to redirect then return
-            if (request.IsRedirect())
+            // set to the new content (or null if specified)
+            builder.SetPublishedContent(publishedContent);
+
+            // re-route
+            await RouteRequestInternalAsync(builder);
+            
+            // return if we are redirect
+            if (builder.IsRedirect())
             {
-                return builder;
+                return BuildRequest(builder);
             }
 
+            // this will occur if publishedContent is null and the last chance finders also don't assign content
             if (!builder.HasPublishedContent())
             {
                 // means the engine could not find a proper document to handle 404
@@ -233,7 +251,7 @@ namespace Umbraco.Cms.Core.Routing
                 builder.SetPublishedContent(content);
             }
 
-            return builder;
+            return BuildRequest(builder);
         }
 
         /// <summary>
@@ -360,43 +378,10 @@ namespace Umbraco.Cms.Core.Routing
         }
 
         /// <summary>
-        /// Finds the Umbraco document (if any) matching the request, and updates the PublishedRequest accordingly.
-        /// </summary>
-        private void FindPublishedContentAndTemplate(IPublishedRequestBuilder request)
-        {
-            _logger.LogDebug("FindPublishedContentAndTemplate: Path={UriAbsolutePath}", request.Uri.AbsolutePath);
-
-            // run the document finders
-            FindPublishedContent(request);
-
-            // if request has been flagged to redirect then return
-            // whoever called us is in charge of actually redirecting
-            // -- do not process anything any further --
-            if (request.IsRedirect())
-            {
-                return;
-            }
-
-            var foundContentByFinders = request.HasPublishedContent();
-
-            // not handling umbracoRedirect here but after LookupDocument2
-            // so internal redirect, 404, etc has precedence over redirect
-
-            // handle not-found, redirects, access...
-            HandlePublishedContent(request);
-
-            // find a template
-            FindTemplate(request, foundContentByFinders);
-
-            // handle umbracoRedirect
-            FollowExternalRedirect(request);
-        }
-
-        /// <summary>
         /// Tries to find the document matching the request, by running the IPublishedContentFinder instances.
         /// </summary>
         /// <exception cref="InvalidOperationException">There is no finder collection.</exception>
-        internal void FindPublishedContent(IPublishedRequestBuilder request)
+        internal bool FindPublishedContent(IPublishedRequestBuilder request)
         {
             const string tracePrefix = "FindPublishedContent: ";
 
@@ -413,6 +398,17 @@ namespace Umbraco.Cms.Core.Routing
                     _logger.LogDebug("Finder {ContentFinderType}", finder.GetType().FullName);
                     return finder.TryFindContent(request);
                 });
+
+                _logger.LogDebug(
+                    "Found? {Found}, Content: {PublishedContentId}, Template: {TemplateAlias}, Domain: {Domain}, Culture: {Culture}, StatusCode: {StatusCode}",
+                    found,
+                    request.HasPublishedContent() ? request.PublishedContent.Id : "NULL",
+                    request.HasTemplate() ? request.Template?.Alias : "NULL",
+                    request.HasDomain() ? request.Domain.ToString() : "NULL",
+                    request.Culture ?? "NULL",
+                    request.ResponseStatusCode);
+
+                return found;
             }
         }
 
@@ -421,7 +417,7 @@ namespace Umbraco.Cms.Core.Routing
         /// </summary>
         /// <param name="request">The request builder.</param>
         /// <remarks>
-        /// Handles "not found", internal redirects, access validation...
+        /// Handles "not found", internal redirects ...
         /// things that must be handled in one place because they can create loops
         /// </remarks>
         private void HandlePublishedContent(IPublishedRequestBuilder request)
@@ -458,12 +454,6 @@ namespace Umbraco.Cms.Core.Routing
                 if (j == maxLoop)
                 {
                     break;
-                }
-
-                // ensure access
-                if (request.PublishedContent != null)
-                {
-                    EnsurePublishedContentAccess(request);
                 }
 
                 // loop while we don't have page, ie the redirect or access
@@ -562,63 +552,6 @@ namespace Umbraco.Cms.Core.Routing
             }
 
             return redirect;
-        }
-
-        /// <summary>
-        /// Ensures that access to current node is permitted.
-        /// </summary>
-        /// <remarks>Redirecting to a different site root and/or culture will not pick the new site root nor the new culture.</remarks>
-        private void EnsurePublishedContentAccess(IPublishedRequestBuilder request)
-        {
-            if (request.PublishedContent == null)
-            {
-                throw new InvalidOperationException("There is no PublishedContent.");
-            }
-
-            var path = request.PublishedContent.Path;
-
-            Attempt<PublicAccessEntry> publicAccessAttempt = _publicAccessService.IsProtected(path);
-
-            if (publicAccessAttempt)
-            {
-                _logger.LogDebug("EnsurePublishedContentAccess: Page is protected, check for access");
-
-                PublicAccessStatus status = _publicAccessChecker.HasMemberAccessToContent(request.PublishedContent.Id);
-                switch (status)
-                {
-                    case PublicAccessStatus.NotLoggedIn:
-                        _logger.LogDebug("EnsurePublishedContentAccess: Not logged in, redirect to login page");
-                        SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.LoginNodeId);
-                        break;
-                    case PublicAccessStatus.AccessDenied:
-                        _logger.LogDebug("EnsurePublishedContentAccess: Current member has not access, redirect to error page");
-                        SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.NoAccessNodeId);
-                        break;
-                    case PublicAccessStatus.LockedOut:
-                        _logger.LogDebug("Current member is locked out, redirect to error page");
-                        SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.NoAccessNodeId);
-                        break;
-                    case PublicAccessStatus.NotApproved:
-                        _logger.LogDebug("Current member is unapproved, redirect to error page");
-                        SetPublishedContentAsOtherPage(request, publicAccessAttempt.Result.NoAccessNodeId);
-                        break;
-                    case PublicAccessStatus.AccessAccepted:
-                        _logger.LogDebug("Current member has access");
-                        break;
-                }
-            }
-            else
-            {
-                _logger.LogDebug("EnsurePublishedContentAccess: Page is not protected");
-            }
-        }
-
-        private void SetPublishedContentAsOtherPage(IPublishedRequestBuilder request, int errorPageId)
-        {
-            if (errorPageId != request.PublishedContent.Id)
-            {
-                request.SetPublishedContent(_umbracoContextAccessor.UmbracoContext.PublishedSnapshot.Content.GetById(errorPageId));
-            }
         }
 
         /// <summary>

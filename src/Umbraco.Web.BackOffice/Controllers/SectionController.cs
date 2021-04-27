@@ -9,12 +9,12 @@ using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Trees;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
-using Umbraco.Web.Models.Trees;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
@@ -31,14 +31,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ILocalizedTextService _localizedTextService;
         private readonly ISectionService _sectionService;
         private readonly ITreeService _treeService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
         public SectionController(
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             ILocalizedTextService localizedTextService,
             IDashboardService dashboardService, ISectionService sectionService, ITreeService treeService,
-            UmbracoMapper umbracoMapper, IControllerFactory controllerFactory,
+            IUmbracoMapper umbracoMapper, IControllerFactory controllerFactory,
             IActionDescriptorCollectionProvider actionDescriptorCollectionProvider)
         {
             _backofficeSecurityAccessor = backofficeSecurityAccessor;

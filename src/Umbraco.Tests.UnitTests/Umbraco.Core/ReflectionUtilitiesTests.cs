@@ -8,7 +8,7 @@ using System.Reflection;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
-using Umbraco.Core;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core
 {

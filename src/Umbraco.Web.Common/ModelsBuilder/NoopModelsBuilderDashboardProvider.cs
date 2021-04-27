@@ -1,4 +1,4 @@
-namespace Umbraco.Web.Common.ModelsBuilder
+namespace Umbraco.Cms.Web.Common.ModelsBuilder
 {
     public class NoopModelsBuilderDashboardProvider: IModelsBuilderDashboardProvider
     {

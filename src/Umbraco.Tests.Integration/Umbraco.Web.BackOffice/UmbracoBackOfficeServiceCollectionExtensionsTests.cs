@@ -5,8 +5,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.DependencyInjection;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Security;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice
@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice
     [TestFixture]
     public class UmbracoBackOfficeServiceCollectionExtensionsTests : UmbracoIntegrationTest
     {
-        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.Services.AddUmbracoBackOfficeIdentity();
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddBackOfficeIdentity();
 
         [Test]
         public void AddUmbracoBackOfficeIdentity_ExpectBackOfficeUserStoreResolvable()

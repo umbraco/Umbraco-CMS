@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Web.Common.Attributes;
@@ -19,8 +20,9 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
         public LanguageTreeController(
             ILocalizedTextService textService,
-            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection)
-            : base(textService, umbracoApiControllerTypeCollection)
+            UmbracoApiControllerTypeCollection umbracoApiControllerTypeCollection,
+            IEventAggregator eventAggregator)
+            : base(textService, umbracoApiControllerTypeCollection, eventAggregator)
         {
         }
         protected override ActionResult<TreeNodeCollection> GetTreeNodes(string id, FormCollection queryStrings)
@@ -50,7 +52,7 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
 
             //this will load in a custom UI instead of the dashboard for the root node
             root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.Languages}/overview";
-            root.Icon = "icon-globe";
+            root.Icon = Constants.Icons.Language;
             root.HasChildren = false;
             root.MenuUrl = null;
 

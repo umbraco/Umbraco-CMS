@@ -1,22 +1,22 @@
-﻿using System;
+﻿// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Core.Models.Blocks;
-using static Umbraco.Core.Models.Blocks.BlockItemData;
 using Umbraco.Extensions;
 
-namespace Umbraco.Web.PropertyEditors
+namespace Umbraco.Cms.Core.PropertyEditors
 {
-
     /// <summary>
     /// Abstract class for block editor based editors
     /// </summary>
@@ -314,7 +314,7 @@ namespace Umbraco.Web.PropertyEditors
                             if (!row.PropertyValues.ContainsKey(elementTypeProp.Alias))
                             {
                                 // set values to null
-                                row.PropertyValues[elementTypeProp.Alias] = new BlockPropertyValue(null, elementTypeProp);
+                                row.PropertyValues[elementTypeProp.Alias] = new BlockItemData.BlockPropertyValue(null, elementTypeProp);
                                 row.RawPropertyValues[elementTypeProp.Alias] = null;
                             }
                         }
@@ -398,7 +398,7 @@ namespace Umbraco.Web.PropertyEditors
                 if (!contentTypePropertyTypes.TryGetValue(contentType.Alias, out var propertyTypes))
                     propertyTypes = contentTypePropertyTypes[contentType.Alias] = contentType.CompositionPropertyTypes.ToDictionary(x => x.Alias, x => x);
 
-                var propValues = new Dictionary<string, BlockPropertyValue>();
+                var propValues = new Dictionary<string, BlockItemData.BlockPropertyValue>();
 
                 // find any keys that are not real property types and remove them
                 foreach (var prop in block.RawPropertyValues.ToList())
@@ -413,7 +413,7 @@ namespace Umbraco.Web.PropertyEditors
                     else
                     {
                         // set the value to include the resolved property type
-                        propValues[prop.Key] = new BlockPropertyValue(prop.Value, propType);
+                        propValues[prop.Key] = new BlockItemData.BlockPropertyValue(prop.Value, propType);
                     }
                 }
 

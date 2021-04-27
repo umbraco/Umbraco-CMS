@@ -6,24 +6,26 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Repositories.Implement;
-using Umbraco.Core.Persistence.SqlSyntax;
-using Umbraco.Core.Scoping;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -47,7 +49,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
-        private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
+        private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
         private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
 
@@ -55,9 +57,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         public void SetUpData()
         {
             CreateTestData();
-
-            // TODO: remove this once IPublishedSnapShotService has been implemented with nucache.
-            global::Umbraco.Core.Services.Implement.ContentTypeService.ClearScopeEvents();
 
             ContentRepositoryBase.ThrowOnWarning = true;
         }
@@ -138,7 +137,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 propertyEditors,
                 dataValueReferences,
                 DataTypeService,
-                ConfigurationEditorJsonSerializer);
+                ConfigurationEditorJsonSerializer,
+                Mock.Of<IEventAggregator>());
             return repository;
         }
 
@@ -747,7 +747,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         [Test]
         public void AliasRegexTest()
         {
-            System.Text.RegularExpressions.Regex regex = new SqlServerSyntaxProvider().AliasRegex;
+            System.Text.RegularExpressions.Regex regex = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings())).AliasRegex;
             Assert.AreEqual(@"(\[\w+]\.\[\w+])\s+AS\s+(\[\w+])", regex.ToString());
             const string sql = "SELECT [table].[column1] AS [alias1], [table].[column2] AS [alias2] FROM [table];";
             System.Text.RegularExpressions.MatchCollection matches = regex.Matches(sql);

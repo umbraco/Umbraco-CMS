@@ -5,16 +5,11 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
-using Umbraco.Core.Models;
-using Umbraco.Core.Scoping;
-using Umbraco.Web;
 
 namespace Umbraco.Tests.Testing.Objects
 {
-
     internal class TestDataSource : INuCacheContentService
     {
-
         private IPublishedModelFactory PublishedModelFactory { get; } = new NoopPublishedModelFactory();
 
         public TestDataSource(params ContentNodeKit[] kits)
@@ -61,6 +56,7 @@ namespace Umbraco.Tests.Testing.Objects
 
         public IEnumerable<ContentNodeKit> GetTypeMediaSources(IEnumerable<int> ids) => Enumerable.Empty<ContentNodeKit>();
         public void DeleteContentItem(IContentBase item) => throw new NotImplementedException();
+        public void DeleteContentItems(IEnumerable<IContentBase> items) => throw new NotImplementedException();
         public void RefreshContent(IContent content) => throw new NotImplementedException();
         public void RefreshEntity(IContentBase content) => throw new NotImplementedException();
         public bool VerifyContentDbCache() => throw new NotImplementedException();

@@ -1,12 +1,11 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Examine;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
-using Umbraco.Examine;
-using Umbraco.Web.PublishedCache;
+using Umbraco.Cms.Infrastructure.Examine;
 
-namespace Umbraco.Web
+namespace Umbraco.Extensions
 {
     /// <summary>
     /// Extension methods for Examine.
@@ -76,8 +75,7 @@ namespace Umbraco.Web
                             content = snapshot.Media.GetById(contentId);
                             break;
                         case IndexTypes.Member:
-                            content = snapshot.Members.GetById(contentId);
-                            break;
+                            throw new NotSupportedException("Cannot convert search results to member instances");
                         default:
                             continue;
                     }

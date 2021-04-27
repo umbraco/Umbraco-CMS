@@ -1,7 +1,7 @@
 ﻿using System;
 using Umbraco.Cms.Core.Migrations;
 
-namespace Umbraco.Core.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations
 {
     public interface IMigrationBuilder
     {

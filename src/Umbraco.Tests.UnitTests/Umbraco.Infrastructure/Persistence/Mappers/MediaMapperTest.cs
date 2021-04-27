@@ -2,8 +2,8 @@
 // See LICENSE for more details.
 
 using NUnit.Framework;
+using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Tests.UnitTests.TestHelpers;
-using Umbraco.Core.Persistence.Mappers;
 using Constants = Umbraco.Cms.Core.Constants;
 using MediaModel = Umbraco.Cms.Core.Models.Media;
 

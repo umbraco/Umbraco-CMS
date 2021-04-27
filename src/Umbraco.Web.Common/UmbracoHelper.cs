@@ -9,7 +9,6 @@ using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Xml;
 using Umbraco.Extensions;
-using Umbraco.Web;
 
 namespace Umbraco.Cms.Web.Common
 {
@@ -108,10 +107,8 @@ namespace Umbraco.Cms.Web.Common
         /// </summary>
         /// <param name="alias">The alias.</param>
         /// <returns></returns>
-        public IHtmlEncodedString RenderMacro(string alias)
-        {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, null);
-        }
+        public async Task<IHtmlEncodedString> RenderMacroAsync(string alias)
+            => await _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, null);
 
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
@@ -119,10 +116,8 @@ namespace Umbraco.Cms.Web.Common
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        public IHtmlEncodedString RenderMacro(string alias, object parameters)
-        {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
-        }
+        public async Task<IHtmlEncodedString> RenderMacroAsync(string alias, object parameters)
+            => await _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
 
         /// <summary>
         /// Renders the macro with the specified alias, passing in the specified parameters.
@@ -130,10 +125,8 @@ namespace Umbraco.Cms.Web.Common
         /// <param name="alias">The alias.</param>
         /// <param name="parameters">The parameters.</param>
         /// <returns></returns>
-        public IHtmlEncodedString RenderMacro(string alias, IDictionary<string, object> parameters)
-        {
-            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters);
-        }
+        public async Task<IHtmlEncodedString> RenderMacroAsync(string alias, IDictionary<string, object> parameters)
+            => await _componentRenderer.RenderMacroAsync(AssignedContentItem?.Id ?? 0, alias, parameters);
 
         #endregion
 

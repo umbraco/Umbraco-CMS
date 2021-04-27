@@ -1,21 +1,28 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Core.Security;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
-using IUser = Umbraco.Cms.Core.Models.Membership.IUser;
 
-namespace Umbraco.Cms.Web.BackOffice.Security
+namespace Umbraco.Cms.Web.Common.Security
 {
-    internal class PasswordChanger
+    /// <summary>
+    /// Changes the password for an identity user
+    /// </summary>
+    internal class PasswordChanger<TUser> : IPasswordChanger<TUser>  where TUser : UmbracoIdentityUser
     {
-        private readonly ILogger<PasswordChanger> _logger;
+        private readonly ILogger<PasswordChanger<TUser>> _logger;
 
-        public PasswordChanger(ILogger<PasswordChanger> logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PasswordChanger"/> class.
+        /// Password changing functionality
+        /// </summary>
+        /// <param name="logger">Logger for this class</param>
+        public PasswordChanger(ILogger<PasswordChanger<TUser>> logger)
         {
             _logger = logger;
         }
@@ -23,55 +30,48 @@ namespace Umbraco.Cms.Web.BackOffice.Security
         /// <summary>
         /// Changes the password for a user based on the many different rules and config options
         /// </summary>
-        /// <param name="currentUser">The user performing the password save action</param>
-        /// <param name="savingUser">The user who's password is being changed</param>
-        /// <param name="passwordModel"></param>
-        /// <param name="userMgr"></param>
-        /// <returns></returns>
+        /// <param name="changingPasswordModel">The changing password model</param>
+        /// <param name="userMgr">The identity manager to use to update the password</param>
+        /// Create an adapter to pass through everything - adapting the member into a user for this functionality
+        /// <returns>The outcome of the password changed model</returns>
         public async Task<Attempt<PasswordChangedModel>> ChangePasswordWithIdentityAsync(
-            IUser currentUser,
-            IUser savingUser,
-            ChangingPasswordModel passwordModel,
-            IBackOfficeUserManager userMgr)
+            ChangingPasswordModel changingPasswordModel,
+            IUmbracoUserManager<TUser> userMgr)
         {
-            if (passwordModel == null) throw new ArgumentNullException(nameof(passwordModel));
-            if (userMgr == null) throw new ArgumentNullException(nameof(userMgr));
+            if (changingPasswordModel == null)
+            {
+                throw new ArgumentNullException(nameof(changingPasswordModel));
+            }
 
-            if (passwordModel.NewPassword.IsNullOrWhiteSpace())
+            if (userMgr == null)
+            {
+                throw new ArgumentNullException(nameof(userMgr));
+            }
+
+            if (changingPasswordModel.NewPassword.IsNullOrWhiteSpace())
             {
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Cannot set an empty password", new[] { "value" }) });
             }
 
-            var backOfficeIdentityUser = await userMgr.FindByIdAsync(savingUser.Id.ToString());
-            if (backOfficeIdentityUser == null)
+            var userId = changingPasswordModel.Id.ToString();
+            TUser identityUser = await userMgr.FindByIdAsync(userId);
+            if (identityUser == null)
             {
-                //this really shouldn't ever happen... but just in case
+                // this really shouldn't ever happen... but just in case
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password could not be verified", new[] { "oldPassword" }) });
             }
 
-            //Are we just changing another user's password?
-            if (passwordModel.OldPassword.IsNullOrWhiteSpace())
+            // Are we just changing another user/member's password?
+            if (changingPasswordModel.OldPassword.IsNullOrWhiteSpace())
             {
-                //if it's the current user, the current user cannot reset their own password
-                if (currentUser.Username == savingUser.Username)
-                {
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Password reset is not allowed", new[] { "value" }) });
-                }
+                // ok, we should be able to reset it
+                string resetToken = await userMgr.GeneratePasswordResetTokenAsync(identityUser);
 
-                //if the current user has access to reset/manually change the password
-                if (currentUser.HasSectionAccess(Constants.Applications.Users) == false)
-                {
-                    return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("The current user is not authorized", new[] { "value" }) });
-                }
-
-                //ok, we should be able to reset it
-                var resetToken = await userMgr.GeneratePasswordResetTokenAsync(backOfficeIdentityUser);
-
-                var resetResult = await userMgr.ChangePasswordWithResetAsync(savingUser.Id.ToString(), resetToken, passwordModel.NewPassword);
+                IdentityResult resetResult = await userMgr.ChangePasswordWithResetAsync(userId, resetToken, changingPasswordModel.NewPassword);
 
                 if (resetResult.Succeeded == false)
                 {
-                    var errors = resetResult.Errors.ToErrorMessage();
+                    string errors = resetResult.Errors.ToErrorMessage();
                     _logger.LogWarning("Could not reset user password {PasswordErrors}", errors);
                     return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "value" }) });
                 }
@@ -79,24 +79,25 @@ namespace Umbraco.Cms.Web.BackOffice.Security
                 return Attempt.Succeed(new PasswordChangedModel());
             }
 
-            //is the old password correct?
-            var validateResult = await userMgr.CheckPasswordAsync(backOfficeIdentityUser, passwordModel.OldPassword);
+            // is the old password correct?
+            bool validateResult = await userMgr.CheckPasswordAsync(identityUser, changingPasswordModel.OldPassword);
             if (validateResult == false)
             {
-                //no, fail with an error message for "oldPassword"
+                // no, fail with an error message for "oldPassword"
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult("Incorrect password", new[] { "oldPassword" }) });
             }
-            //can we change to the new password?
-            var changeResult = await userMgr.ChangePasswordAsync(backOfficeIdentityUser, passwordModel.OldPassword, passwordModel.NewPassword);
+
+            // can we change to the new password?
+            IdentityResult changeResult = await userMgr.ChangePasswordAsync(identityUser, changingPasswordModel.OldPassword, changingPasswordModel.NewPassword);
             if (changeResult.Succeeded == false)
             {
-                //no, fail with error messages for "password"
-                var errors = changeResult.Errors.ToErrorMessage();
+                // no, fail with error messages for "password"
+                string errors = changeResult.Errors.ToErrorMessage();
                 _logger.LogWarning("Could not change user password {PasswordErrors}", errors);
                 return Attempt.Fail(new PasswordChangedModel { ChangeError = new ValidationResult(errors, new[] { "password" }) });
             }
+
             return Attempt.Succeed(new PasswordChangedModel());
         }
-
     }
 }

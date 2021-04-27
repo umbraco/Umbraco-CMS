@@ -1,7 +1,7 @@
-﻿using Umbraco.Core.Migrations.Expressions.Common;
-using Umbraco.Core.Migrations.Expressions.Rename.Expressions;
+﻿using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
+using Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Expressions;
 
-namespace Umbraco.Core.Migrations.Expressions.Rename.Table
+namespace Umbraco.Cms.Infrastructure.Migrations.Expressions.Rename.Table
 {
     public class RenameTableBuilder : ExpressionBuilderBase<RenameTableExpression>,
         IRenameTableBuilder, IExecutableBuilder

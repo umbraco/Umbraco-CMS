@@ -8,6 +8,14 @@
     <NeutralLanguage>en-US</NeutralLanguage>
     <Company>Umbraco CMS</Company>
     <Copyright>Copyright © Umbraco 2021</Copyright>
+    <Authors>Umbraco HQ</Authors>
+    <PackageProjectUrl>https://umbraco.com/</PackageProjectUrl>
+    <PackageIconUrl>https://umbraco.com/dist/nuget/logo-small.png</PackageIconUrl>
+    <PackageLicenseUrl>https://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PackageTags>umbraco</PackageTags>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/umbraco/umbraco-cms</RepositoryUrl>
   </PropertyGroup>
 </Project>
 

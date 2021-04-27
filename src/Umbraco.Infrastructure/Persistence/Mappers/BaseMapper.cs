@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using NPoco;
-using Umbraco.Core.Persistence.SqlSyntax;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Persistence.Mappers;
 
-namespace Umbraco.Core.Persistence.Mappers
+namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 {
     public abstract class BaseMapper
     {

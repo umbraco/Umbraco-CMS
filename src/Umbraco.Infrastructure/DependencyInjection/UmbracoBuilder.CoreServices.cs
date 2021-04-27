@@ -10,50 +10,39 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
+using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
 using Umbraco.Cms.Core.Web;
-using Umbraco.Core;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Logging.Serilog.Enrichers;
-using Umbraco.Core.Manifest;
-using Umbraco.Core.Migrations;
-using Umbraco.Core.Migrations.Install;
-using Umbraco.Core.Migrations.PostMigrations;
-using Umbraco.Core.Packaging;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Runtime;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Serialization;
-using Umbraco.Examine;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.HealthChecks;
+using Umbraco.Cms.Infrastructure.HostedServices;
+using Umbraco.Cms.Infrastructure.Install;
+using Umbraco.Cms.Infrastructure.Media;
+using Umbraco.Cms.Infrastructure.Migrations;
+using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Runtime;
+using Umbraco.Cms.Infrastructure.Search;
+using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Extensions;
-using Umbraco.Infrastructure.Examine;
-using Umbraco.Infrastructure.HealthChecks;
-using Umbraco.Infrastructure.HostedServices;
-using Umbraco.Infrastructure.Install;
-using Umbraco.Infrastructure.Logging.Serilog.Enrichers;
-using Umbraco.Infrastructure.Media;
-using Umbraco.Infrastructure.Runtime;
-using Umbraco.Web;
-using Umbraco.Web.Media;
-using Umbraco.Web.Migrations.PostMigrations;
-using Umbraco.Web.PropertyEditors;
-using Umbraco.Web.PropertyEditors.ValueConverters;
-using Umbraco.Web.Routing;
-using Umbraco.Web.Search;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     public static partial class UmbracoBuilderExtensions
     {
@@ -77,7 +66,8 @@ namespace Umbraco.Infrastructure.DependencyInjection
                 .AddRepositories()
                 .AddServices()
                 .AddCoreMappingProfiles()
-                .AddFileSystems();
+                .AddFileSystems()
+                .AddWebAssets();
 
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
@@ -88,6 +78,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.Services.AddUnique<ScopeProvider>(); // implements both IScopeProvider and IScopeAccessor
             builder.Services.AddUnique<IScopeProvider>(f => f.GetRequiredService<ScopeProvider>());
             builder.Services.AddUnique<IScopeAccessor>(f => f.GetRequiredService<ScopeProvider>());
+            builder.Services.AddScoped<IHttpScopeReference, HttpScopeReference>();
 
             builder.Services.AddUnique<IJsonSerializer, JsonNetSerializer>();
             builder.Services.AddUnique<IConfigurationEditorJsonSerializer, ConfigurationEditorJsonSerializer>();
@@ -134,8 +125,6 @@ namespace Umbraco.Infrastructure.DependencyInjection
                 .Remove<SimpleTinyMceValueConverter>();
 
             builder.Services.AddUnique<IImageUrlGenerator, ImageSharpImageUrlGenerator>();
-
-            builder.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
 
             // register *all* checks, except those marked [HideFromTypeFinder] of course
             builder.Services.AddUnique<IMarkdownToHtmlConverter, MarkdownToHtmlConverter>();
@@ -202,8 +191,8 @@ namespace Umbraco.Infrastructure.DependencyInjection
         {
             builder.Services.AddUnique<IMainDomLock>(factory =>
             {
-                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>().Value;
-                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>().Value;
+                var globalSettings = factory.GetRequiredService<IOptions<GlobalSettings>>();
+                var connectionStrings = factory.GetRequiredService<IOptions<ConnectionStrings>>();
                 var hostingEnvironment = factory.GetRequiredService<IHostingEnvironment>();
 
                 var dbCreator = factory.GetRequiredService<IDbProviderFactoryCreator>();
@@ -211,7 +200,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
                 var isWindows = RuntimeInformation.IsOSPlatform(OSPlatform.Windows);
                 var loggerFactory = factory.GetRequiredService<ILoggerFactory>();
 
-                return globalSettings.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
+                return globalSettings.Value.MainDomLock.Equals("SqlMainDomLock") || isWindows == false
                     ? (IMainDomLock)new SqlMainDomLock(loggerFactory.CreateLogger<SqlMainDomLock>(), loggerFactory, globalSettings, connectionStrings, dbCreator, hostingEnvironment, databaseSchemaCreatorFactory)
                     : new MainDomSemaphoreLock(loggerFactory.CreateLogger<MainDomSemaphoreLock>(), hostingEnvironment);
             });

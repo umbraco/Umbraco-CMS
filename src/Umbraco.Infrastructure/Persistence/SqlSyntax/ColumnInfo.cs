@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Persistence.SqlSyntax
+﻿namespace Umbraco.Cms.Infrastructure.Persistence.SqlSyntax
 {
     public class ColumnInfo
     {

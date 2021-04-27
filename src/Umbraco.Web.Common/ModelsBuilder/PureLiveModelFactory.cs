@@ -777,6 +777,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         {
             _watcher.EnableRaisingEvents = false;
             _watcher.Dispose();
+            _locker.Dispose();
             _hostingLifetime.UnregisterObject(this);
         }
 

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Semver;
-using Umbraco.Core.Migrations;
+using Umbraco.Cms.Infrastructure.Migrations;
 
-namespace Umbraco.Core.Events
+namespace Umbraco.Cms.Core.Events
 {
     public class MigrationEventArgs : CancellableObjectEventArgs<IList<Type>>, IEquatable<MigrationEventArgs>
     {

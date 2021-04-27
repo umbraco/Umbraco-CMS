@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Concurrent;
-using Umbraco.Cms.Core.Models.Identity;
-using Umbraco.Core.Models.Identity;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Infrastructure.Persistence.Mappers;
+using System;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
-namespace Umbraco.Core.Persistence.Mappers
+namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 {
     [MapperFor(typeof(IIdentityUserLogin))]
     [MapperFor(typeof(IdentityUserLogin))]

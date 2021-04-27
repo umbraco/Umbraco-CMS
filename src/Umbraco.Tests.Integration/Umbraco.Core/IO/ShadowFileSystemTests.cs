@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -34,17 +34,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
         [SetUp]
         public void SetUp()
         {
-            SafeCallContext.Clear();
             ClearFiles(HostingEnvironment);
-            FileSystems.ResetShadowId();
         }
 
         [TearDown]
         public void TearDown()
         {
-            SafeCallContext.Clear();
             ClearFiles(HostingEnvironment);
-            FileSystems.ResetShadowId();
         }
 
         private void ClearFiles(IHostingEnvironment hostingEnvironment)
@@ -385,13 +381,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
             Assert.IsFalse(File.Exists(path + "/ShadowTests/sub/sub/f2.txt"));
         }
 
-        class FS : FileSystemWrapper
-        {
-            public FS(IFileSystem innerFileSystem)
-                : base(innerFileSystem)
-            { }
-        }
-
         [Test]
         public void ShadowScopeComplete()
         {
@@ -405,11 +394,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
 
             var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
 
-            var container = Mock.Of<IServiceProvider>();
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(container, Mock.Of<ILogger<FileSystems>>(), loggerFactory, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
-            var fs = fileSystems.GetFileSystem<FS>(phy);
-            var sw = (ShadowWrapper) fs.InnerFileSystem;
+            var fileSystems = new FileSystems(loggerFactory, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
+            var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
+            var sw = (ShadowWrapper)fileSystems.CreateShadowWrapper(phy, shadowPath);
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f1.txt", ms);
@@ -441,8 +429,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
             var typedDir = dirs.FirstOrDefault(x => x.Replace('\\', '/').EndsWith("/x"));
             Assert.IsNotNull(typedDir);
             dirs = Directory.GetDirectories(typedDir);
-            var suid = fileSystems.Paths[typeof(FS)];
-            var scopedDir = dirs.FirstOrDefault(x => x.Replace('\\', '/').EndsWith("/" + suid)); // this is where files go
+            var scopedDir = dirs.FirstOrDefault(x => x.Replace('\\', '/').EndsWith("/" + shadowPath)); // this is where files go
             Assert.IsNotNull(scopedDir);
             scope.Dispose();
             scopedFileSystems = false;
@@ -498,11 +485,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
 
             var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
 
-            var container = Mock.Of<IServiceProvider>();
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(container, Mock.Of<ILogger<FileSystems>>(), NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
-            var fs = fileSystems.GetFileSystem<FS>( phy);
-            var sw = (ShadowWrapper) fs.InnerFileSystem;
+            var fileSystems = new FileSystems(NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
+            var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
+            var sw = fileSystems.CreateShadowWrapper(phy, shadowPath);
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f1.txt", ms);
@@ -550,11 +536,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.IO
 
             var phy = new PhysicalFileSystem(IOHelper, HostingEnvironment, Logger, path, "ignore");
 
-            var container = Mock.Of<IServiceProvider>();
             var globalSettings = Options.Create(new GlobalSettings());
-            var fileSystems = new FileSystems(container, Mock.Of<ILogger<FileSystems>>(), NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
-            var fs = fileSystems.GetFileSystem<FS>( phy);
-            var sw = (ShadowWrapper)fs.InnerFileSystem;
+            var fileSystems = new FileSystems(NullLoggerFactory.Instance, IOHelper, globalSettings, HostingEnvironment) { IsScoped = () => scopedFileSystems };
+            var shadowPath = $"x/{Guid.NewGuid().ToString("N").Substring(0, 6)}";
+            var sw = fileSystems.CreateShadowWrapper(phy, shadowPath);
 
             using (var ms = new MemoryStream(Encoding.UTF8.GetBytes("foo")))
                 sw.AddFile("sub/f1.txt", ms);

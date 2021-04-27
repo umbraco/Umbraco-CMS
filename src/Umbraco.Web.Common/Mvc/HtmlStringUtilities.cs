@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
-using System.Web;
 using HtmlAgilityPack;
 using Microsoft.AspNetCore.Html;
 
@@ -23,7 +23,7 @@ namespace Umbraco.Cms.Web.Common.Mvc
         /// </returns>
         public IHtmlContent ReplaceLineBreaks(string text)
         {
-            var value = HttpUtility.HtmlEncode(text)?
+            var value = WebUtility.HtmlEncode(text)?
                 .Replace("\r\n", "<br />")
                 .Replace("\r", "<br />")
                 .Replace("\n", "<br />");

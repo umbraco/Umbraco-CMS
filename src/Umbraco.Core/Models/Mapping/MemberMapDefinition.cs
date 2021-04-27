@@ -1,14 +1,13 @@
 using Umbraco.Cms.Core.Mapping;
-using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
-namespace Umbraco.Core.Models.Mapping
+namespace Umbraco.Cms.Core.Models.Mapping
 {
     /// <inheritdoc />
     public class MemberMapDefinition : IMapDefinition
     {
         /// <inheritdoc />
-        public void DefineMaps(UmbracoMapper mapper) => mapper.Define<MemberSave, IMember>(Map);
+        public void DefineMaps(IUmbracoMapper mapper) => mapper.Define<MemberSave, IMember>(Map);
 
         private static void Map(MemberSave source, IMember target, MapperContext context)
         {

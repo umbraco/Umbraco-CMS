@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Core.Persistence.Querying
+﻿namespace Umbraco.Cms.Infrastructure.Persistence.Querying
 {
     public enum TextColumnType
     {

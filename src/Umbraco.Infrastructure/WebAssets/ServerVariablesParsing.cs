@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Core.Events;
 
-namespace Umbraco.Web.WebAssets
+namespace Umbraco.Cms.Infrastructure.WebAssets
 {
     /// <summary>
     /// A notification for when server variables are parsing

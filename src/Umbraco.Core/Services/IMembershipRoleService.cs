@@ -43,5 +43,10 @@ namespace Umbraco.Cms.Core.Services
         void DissociateRole(int memberId, string roleName);
 
         void DissociateRoles(int[] memberIds, string[] roleNames);
+
+        void ReplaceRoles(string[] usernames, string[] roleNames);
+
+        void ReplaceRoles(int[] memberIds, string[] roleNames);
+
     }
 }

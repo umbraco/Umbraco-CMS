@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +8,13 @@ using System.Text;
 using System.Text.RegularExpressions;
 using NPoco;
 using Umbraco.Cms.Core;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Extensions;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 
-namespace Umbraco.Core.Persistence
+namespace Umbraco.Extensions
 {
     public static partial class NPocoSqlExtensions
     {
-
         #region Where
 
         /// <summary>
@@ -1016,6 +1015,7 @@ namespace Umbraco.Core.Persistence
         /// </summary>
         /// <param name="sql">The Sql statement.</param>
         /// <returns>The Sql statement.</returns>
+        /// <remarks>NOTE: This method will not work for all queries, only simple ones!</remarks>
         public static Sql<ISqlContext> ForUpdate(this Sql<ISqlContext> sql)
         {
             // go find the first FROM clause, and append the lock hint

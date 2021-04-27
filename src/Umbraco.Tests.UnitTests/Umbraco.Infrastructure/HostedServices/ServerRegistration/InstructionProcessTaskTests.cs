@@ -10,7 +10,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Infrastructure.HostedServices.ServerRegistration;
+using Umbraco.Cms.Infrastructure.HostedServices.ServerRegistration;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices.ServerRegistration
 {

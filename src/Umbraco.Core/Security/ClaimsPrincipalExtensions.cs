@@ -7,39 +7,53 @@ using System.Linq;
 using System.Security.Claims;
 using System.Security.Principal;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Security;
 
 namespace Umbraco.Extensions
 {
     public static class ClaimsPrincipalExtensions
     {
-        /// <summary>
-        /// This will return the current back office identity if the IPrincipal is the correct type
-        /// </summary>
-        /// <param name="user"></param>
-        /// <returns></returns>
-        public static UmbracoBackOfficeIdentity GetUmbracoIdentity(this IPrincipal user)
-        {
-            // TODO: It would be nice to get rid of this and only rely on Claims, not a strongly typed identity instance
 
+        public static bool IsBackOfficeAuthenticationType(this ClaimsIdentity claimsIdentity)
+        {
+            if (claimsIdentity is null)
+            {
+                return false;
+            }
+
+            return claimsIdentity.IsAuthenticated && claimsIdentity.AuthenticationType == Constants.Security.BackOfficeAuthenticationType;
+        }
+        /// <summary>
+        /// This will return the current back office identity if the IPrincipal is the correct type and authenticated.
+        /// </summary>
+        /// <param name="principal"></param>
+        /// <returns></returns>
+        public static ClaimsIdentity GetUmbracoIdentity(this IPrincipal principal)
+        {
             //If it's already a UmbracoBackOfficeIdentity
-            if (user.Identity is UmbracoBackOfficeIdentity backOfficeIdentity) return backOfficeIdentity;
+            if (principal.Identity is ClaimsIdentity claimsIdentity
+                && claimsIdentity.IsBackOfficeAuthenticationType()
+                && claimsIdentity.VerifyBackOfficeIdentity(out var backOfficeIdentity))
+            {
+                return backOfficeIdentity;
+            }
 
             //Check if there's more than one identity assigned and see if it's a UmbracoBackOfficeIdentity and use that
-            if (user is ClaimsPrincipal claimsPrincipal)
+            // We can have assigned more identities if it is a preview request.
+            if (principal is ClaimsPrincipal claimsPrincipal )
             {
-                backOfficeIdentity = claimsPrincipal.Identities.OfType<UmbracoBackOfficeIdentity>().FirstOrDefault();
-                if (backOfficeIdentity != null) return backOfficeIdentity;
+                claimsIdentity = claimsPrincipal.Identities.FirstOrDefault(x=>x.IsBackOfficeAuthenticationType());
+                if (claimsIdentity.VerifyBackOfficeIdentity(out backOfficeIdentity))
+                {
+                    return backOfficeIdentity;
+                }
             }
 
             //Otherwise convert to a UmbracoBackOfficeIdentity if it's auth'd
-            if (user.Identity is ClaimsIdentity claimsIdentity
-                && claimsIdentity.IsAuthenticated
-                && UmbracoBackOfficeIdentity.FromClaimsIdentity(claimsIdentity, out var umbracoIdentity))
+            if (principal.Identity is ClaimsIdentity claimsIdentity2
+                && claimsIdentity2.VerifyBackOfficeIdentity(out backOfficeIdentity))
             {
-                return umbracoIdentity;
+                return backOfficeIdentity;
             }
-
             return null;
         }
 

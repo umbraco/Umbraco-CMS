@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
@@ -7,13 +7,11 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Core.Cache;
-using Umbraco.Core.Models;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Extensions;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     /// <summary>
     /// An internal repository for managing entity containers such as doc type, media type, data type containers.
@@ -115,20 +113,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return sql;
         }
 
-        protected override string GetBaseWhereClause()
-        {
-            return "umbracoNode.id = @id and nodeObjectType = @NodeObjectType";
-        }
+        protected override string GetBaseWhereClause() => "umbracoNode.id = @id and nodeObjectType = @NodeObjectType";
 
-        protected override IEnumerable<string> GetDeleteClauses()
-        {
-            throw new NotImplementedException();
-        }
+        protected override IEnumerable<string> GetDeleteClauses() => throw new NotImplementedException();
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { return _containerObjectType; }
-        }
+        protected Guid NodeObjectTypeId => _containerObjectType;
 
         protected override void PersistDeletedItem(EntityContainer entity)
         {

@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Examine
+﻿namespace Umbraco.Cms.Infrastructure.Examine
 {
     /// <inheritdoc />
     /// <summary>

@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Concurrent;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Composing;
-using Umbraco.Infrastructure.Persistence.Mappers;
 
-namespace Umbraco.Core.Persistence.Mappers
+namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 {
     public class MapperCollectionBuilder : SetCollectionBuilderBase<MapperCollectionBuilder, MapperCollection, BaseMapper>
     {
@@ -53,9 +50,11 @@ namespace Umbraco.Core.Persistence.Mappers
             Add<UmbracoEntityMapper>();
             Add<UserMapper>();
             Add<ExternalLoginMapper>();
+            Add<ExternalLoginTokenMapper>();
             Add<UserGroupMapper>();
             Add<AuditEntryMapper>();
             Add<ConsentMapper>();
+            Add<LogViewerQueryMapper>();
             return this;
         }
     }

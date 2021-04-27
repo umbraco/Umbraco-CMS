@@ -1,10 +1,9 @@
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Extensions;
 
-namespace Umbraco.Infrastructure.DependencyInjection
+namespace Umbraco.Cms.Infrastructure.DependencyInjection
 {
     /// <summary>
     /// Composes repositories.
@@ -19,6 +18,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
             // repositories
             builder.Services.AddUnique<IAuditRepository, AuditRepository>();
             builder.Services.AddUnique<IAuditEntryRepository, AuditEntryRepository>();
+            builder.Services.AddUnique<ICacheInstructionRepository, CacheInstructionRepository>();
             builder.Services.AddUnique<IContentTypeRepository, ContentTypeRepository>();
             builder.Services.AddUnique<IDataTypeContainerRepository, DataTypeContainerRepository>();
             builder.Services.AddUnique<IDataTypeRepository, DataTypeRepository>();
@@ -56,6 +56,7 @@ namespace Umbraco.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IKeyValueRepository, KeyValueRepository>();
             builder.Services.AddUnique<IInstallationRepository, InstallationRepository>();
             builder.Services.AddUnique<IUpgradeCheckRepository, UpgradeCheckRepository>();
+            builder.Services.AddUnique<ILogViewerQueryRepository, LogViewerQueryRepository>();
 
             return builder;
         }

@@ -9,15 +9,20 @@ using Microsoft.Extensions.Hosting;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Sync;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.PublishedCache.Compose;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
@@ -43,6 +48,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // Ensure that the events are bound on each test
             PublishedSnapshotServiceEventHandler eventBinder = host.Services.GetRequiredService<PublishedSnapshotServiceEventHandler>();
             eventBinder.Initialize();
+        }
+
+        protected override void CustomTestSetup(IUmbracoBuilder builder)
+        {
+            builder.Services.AddUnique<IServerMessenger, ScopedRepositoryTests.LocalServerMessenger>();
+            var composer = new NotificationsComposer();
+            composer.Compose(builder);
         }
 
         private void AssertJsonStartsWith(int id, string expected)

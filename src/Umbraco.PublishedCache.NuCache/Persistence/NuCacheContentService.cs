@@ -1,11 +1,10 @@
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Core.Scoping;
-using Umbraco.Core.Services.Implement;
-using Constants = Umbraco.Cms.Core.Constants;
+using Umbraco.Cms.Core.Services.Implement;
 
 namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
 {
@@ -54,6 +53,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         /// <inheritdoc/>
         public void DeleteContentItem(IContentBase item)
             => _repository.DeleteContentItem(item);
+
+        public void DeleteContentItems(IEnumerable<IContentBase> items)
+        {
+            foreach (IContentBase item in items)
+            {
+                _repository.DeleteContentItem(item);
+            }
+        }
 
         /// <inheritdoc/>
         public void RefreshContent(IContent content)

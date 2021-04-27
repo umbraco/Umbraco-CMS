@@ -2,7 +2,7 @@
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Migrations
+namespace Umbraco.Cms.Infrastructure.Migrations
 {
     public class MigrationBuilder : IMigrationBuilder
     {

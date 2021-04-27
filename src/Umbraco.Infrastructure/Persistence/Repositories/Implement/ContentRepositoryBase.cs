@@ -13,24 +13,23 @@ using Umbraco.Cms.Core.Persistence;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Core.Persistence.Dtos;
-using Umbraco.Core.Persistence.Factories;
-using Umbraco.Core.Persistence.Querying;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Infrastructure.Persistence.Dtos;
+using Umbraco.Cms.Infrastructure.Persistence.Factories;
+using Umbraco.Cms.Infrastructure.Persistence.Querying;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Persistence.SqlExtensionsStatics;
 
-namespace Umbraco.Core.Persistence.Repositories.Implement
+namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 {
     internal sealed class ContentRepositoryBase
     {
         /// <summary>
-        ///
         /// This is used for unit tests ONLY
         /// </summary>
-        public static bool ThrowOnWarning = false;
+        public static bool ThrowOnWarning { get; set; } = false;
     }
 
     public abstract class ContentRepositoryBase<TId, TEntity, TRepository> : EntityRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
@@ -39,6 +38,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     {
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
         private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
+        private readonly IEventAggregator _eventAggregator;
 
         /// <summary>
         ///
@@ -59,7 +59,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             IRelationTypeRepository relationTypeRepository,
             Lazy<PropertyEditorCollection> propertyEditors,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IDataTypeService dataTypeService)
+            IDataTypeService dataTypeService,
+            IEventAggregator eventAggregator)
             : base(scopeAccessor, cache, logger)
         {
             DataTypeService = dataTypeService;
@@ -68,9 +69,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             RelationTypeRepository = relationTypeRepository;
             _propertyEditors = propertyEditors;
             _dataValueReferenceFactories = dataValueReferenceFactories;
+            _eventAggregator = eventAggregator;
         }
 
         protected abstract TRepository This { get; }
+
+        /// <summary>
+        /// Gets the node object type for the repository's entity
+        /// </summary>
+        protected abstract Guid NodeObjectTypeId { get; }
 
         protected ILanguageRepository LanguageRepository { get; }
         protected IDataTypeService DataTypeService { get; }
@@ -525,7 +532,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 currentParentIds.Add(node.NodeId);
 
                 // paths parts without the roots
-                var pathParts = node.Path.Split(',').Where(x => !rootIds.Contains(int.Parse(x))).ToArray();
+                var pathParts = node.Path.Split(Constants.CharArrays.Comma).Where(x => !rootIds.Contains(int.Parse(x))).ToArray();
 
                 if (!prevParentIds.Contains(node.ParentId))
                 {
@@ -767,112 +774,26 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return SqlContext.SqlSyntax.GetQuotedTableName(tableName) + "." + SqlContext.SqlSyntax.GetQuotedColumnName(fieldName);
         }
 
-        #region UnitOfWork Events
+        #region UnitOfWork Notification
 
         /*
-         * TODO: The reason these events are in the repository is for legacy, the events should exist at the service
-         * level now since we can fire these events within the transaction...
-         * The reason these events 'need' to fire in the transaction is to ensure data consistency with Nucache (currently
-         * the only thing that uses them). For example, if the transaction succeeds and NuCache listened to ContentService.Saved
-         * and then NuCache failed at persisting data after the trans completed, then NuCache would be out of sync. This way
-         * the entire trans is rolled back if NuCache files. This is part of the discussion about removing the static events,
-         * possibly there's 3 levels of eventing, "ing", "scoped" (in trans) and "ed" (after trans).
-         * These particular events can be moved to the service level. However, see the notes below, it seems the only event we
-         * really need is the ScopedEntityRefresh. The only tricky part with moving that to the service level is that the
-         * handlers of that event will need to deal with the data a little differently because it seems that the
-         * "Published" flag on the content item matters and this event is raised before that flag is switched. Weird.
-         * We have the ability with IContent to see if something "WasPublished", etc.. so i think we could still use that.
+         * The reason why EntityRefreshNotification is published from the repository and not the service is because
+         * the published state of the IContent must be "Publishing" when the event is raised for the cache to handle it correctly.
+         * This state is changed half way through the repository method, meaning that if we publish the notification
+         * after the state will be "Published" and the cache won't handle it correctly,
+         * It wont call OnRepositoryRefreshed with the published flag set to true, the same is true for unpublishing
+         * where it wont remove the entity from the nucache.
+         * We can't publish the notification before calling Save method on the repository either,
+         * because that method sets certain fields such as create date, update date, etc...
          */
 
-        public class ScopedEntityEventArgs : EventArgs
-        {
-            public ScopedEntityEventArgs(IScope scope, TEntity entity)
-            {
-                Scope = scope;
-                Entity = entity;
-            }
-
-            public IScope Scope { get; }
-            public TEntity Entity { get; }
-        }
-
-        public class ScopedVersionEventArgs : EventArgs
-        {
-            /// <summary>
-            /// Initializes a new instance of the <see cref="ScopedVersionEventArgs"/> class.
-            /// </summary>
-            public ScopedVersionEventArgs(IScope scope, int entityId, int versionId)
-            {
-                Scope = scope;
-                EntityId = entityId;
-                VersionId = versionId;
-            }
-
-            /// <summary>
-            /// Gets the current <see cref="IScope"/>
-            /// </summary>
-            public IScope Scope { get; }
-
-            /// <summary>
-            /// Gets the entity id
-            /// </summary>
-            public int EntityId { get; }
-
-            /// <summary>
-            /// Gets the version id
-            /// </summary>
-            public int VersionId { get; }
-        }
-
         /// <summary>
-        /// Occurs when an <see cref="TEntity"/> is created or updated from within the <see cref="IScope"/> (transaction)
+        /// Publishes a notification, used to publish <see cref="EntityRefreshNotification{T}"/> for caching purposes.
         /// </summary>
-        public static event TypedEventHandler<TRepository, ScopedEntityEventArgs> ScopedEntityRefresh;
+        protected void OnUowRefreshedEntity(INotification notification) => _eventAggregator.Publish(notification);
 
-        /// <summary>
-        /// Occurs when an <see cref="TEntity"/> is being deleted from within the <see cref="IScope"/> (transaction)
-        /// </summary>
-        /// <remarks>
-        /// TODO: This doesn't seem to be necessary at all, the service "Deleting" events for this would work just fine
-        /// since they are raised before the item is actually deleted just like this event.
-        /// </remarks>
-        public static event TypedEventHandler<TRepository, ScopedEntityEventArgs> ScopeEntityRemove;
 
-        /// <summary>
-        /// Occurs when a version for an <see cref="TEntity"/> is being deleted from within the <see cref="IScope"/> (transaction)
-        /// </summary>
-        /// <remarks>
-        /// TODO: This doesn't seem to be necessary at all, the service "DeletingVersions" events for this would work just fine
-        /// since they are raised before the item is actually deleted just like this event.
-        /// </remarks>
-        public static event TypedEventHandler<TRepository, ScopedVersionEventArgs> ScopeVersionRemove;
-
-        // used by tests to clear events
-        internal static void ClearScopeEvents()
-        {
-            ScopedEntityRefresh = null;
-            ScopeEntityRemove = null;
-            ScopeVersionRemove = null;
-        }
-
-        /// <summary>
-        /// Raises the <see cref="ScopedEntityRefresh"/> event
-        /// </summary>
-        protected void OnUowRefreshedEntity(ScopedEntityEventArgs args)
-            => ScopedEntityRefresh.RaiseEvent(args, This);
-
-        /// <summary>
-        /// Raises the <see cref="ScopeEntityRemove"/> event
-        /// </summary>
-        protected void OnUowRemovingEntity(ScopedEntityEventArgs args)
-            => ScopeEntityRemove.RaiseEvent(args, This);
-
-        /// <summary>
-        /// Raises the <see cref="ScopeVersionRemove"/> event
-        /// </summary>
-        protected void OnUowRemovingVersion(ScopedVersionEventArgs args)
-            => ScopeVersionRemove.RaiseEvent(args, This);
-
+        protected void OnUowRemovingEntity(IContentBase entity) => _eventAggregator.Publish(new ScopedEntityRemoveNotification(entity, new EventMessages()));
         #endregion
 
         #region Classes

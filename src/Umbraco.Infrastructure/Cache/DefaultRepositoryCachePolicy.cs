@@ -1,12 +1,14 @@
-﻿using System;
+// Copyright (c) Umbraco.
+// See LICENSE for more details.
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Core.Scoping;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Extensions;
 
-namespace Umbraco.Core.Cache
+namespace Umbraco.Cms.Core.Cache
 {
     /// <summary>
     /// Represents the default cache policy.
@@ -22,7 +24,7 @@ namespace Umbraco.Core.Cache
     public class DefaultRepositoryCachePolicy<TEntity, TId> : RepositoryCachePolicyBase<TEntity, TId>
         where TEntity : class, IEntity
     {
-        private static readonly TEntity[] EmptyEntities = new TEntity[0]; // const
+        private static readonly TEntity[] s_emptyEntities = new TEntity[0]; // const
         private readonly RepositoryCachePolicyOptions _options;
 
         public DefaultRepositoryCachePolicy(IAppPolicyCache cache, IScopeAccessor scopeAccessor, RepositoryCachePolicyOptions options)
@@ -31,21 +33,29 @@ namespace Umbraco.Core.Cache
             _options = options ?? throw new ArgumentNullException(nameof(options));
         }
 
-        protected string GetEntityCacheKey(object id)
+        protected string GetEntityCacheKey(int id) => EntityTypeCacheKey + id;
+
+        protected string GetEntityCacheKey(TId id)
         {
-            if (id == null) throw new ArgumentNullException(nameof(id));
-            return GetEntityTypeCacheKey() + id;
+            if (EqualityComparer<TId>.Default.Equals(id, default))
+            {
+                return string.Empty;
+            }
+
+            if (typeof(TId).IsValueType)
+            {
+                return EntityTypeCacheKey + id;
+            }
+            else
+            {
+                return EntityTypeCacheKey + id.ToString().ToUpperInvariant();
+            }
         }
 
-        protected string GetEntityTypeCacheKey()
-        {
-            return $"uRepo_{typeof (TEntity).Name}_";
-        }
+        protected string EntityTypeCacheKey { get; } = $"uRepo_{typeof(TEntity).Name}_";
 
         protected virtual void InsertEntity(string cacheKey, TEntity entity)
-        {
-            Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
-        }
+            => Cache.Insert(cacheKey, () => entity, TimeSpan.FromMinutes(5), true);
 
         protected virtual void InsertEntities(TId[] ids, TEntity[] entities)
         {
@@ -54,7 +64,7 @@ namespace Umbraco.Core.Cache
                 // getting all of them, and finding nothing.
                 // if we can cache a zero count, cache an empty array,
                 // for as long as the cache is not cleared (no expiration)
-                Cache.Insert(GetEntityTypeCacheKey(), () => EmptyEntities);
+                Cache.Insert(EntityTypeCacheKey, () => s_emptyEntities);
             }
             else
             {
@@ -83,7 +93,7 @@ namespace Umbraco.Core.Cache
                 }
 
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
-                Cache.Clear(GetEntityTypeCacheKey());
+                Cache.Clear(EntityTypeCacheKey);
             }
             catch
             {
@@ -93,7 +103,7 @@ namespace Umbraco.Core.Cache
                 Cache.Clear(GetEntityCacheKey(entity.Id));
 
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
-                Cache.Clear(GetEntityTypeCacheKey());
+                Cache.Clear(EntityTypeCacheKey);
 
                 throw;
             }
@@ -115,7 +125,7 @@ namespace Umbraco.Core.Cache
                 }
 
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
-                Cache.Clear(GetEntityTypeCacheKey());
+                Cache.Clear(EntityTypeCacheKey);
             }
             catch
             {
@@ -125,7 +135,7 @@ namespace Umbraco.Core.Cache
                 Cache.Clear(GetEntityCacheKey(entity.Id));
 
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
-                Cache.Clear(GetEntityTypeCacheKey());
+                Cache.Clear(EntityTypeCacheKey);
 
                 throw;
             }
@@ -146,7 +156,7 @@ namespace Umbraco.Core.Cache
                 var cacheKey = GetEntityCacheKey(entity.Id);
                 Cache.Clear(cacheKey);
                 // if there's a GetAllCacheAllowZeroCount cache, ensure it is cleared
-                Cache.Clear(GetEntityTypeCacheKey());
+                Cache.Clear(EntityTypeCacheKey);
             }
         }
 
@@ -158,11 +168,16 @@ namespace Umbraco.Core.Cache
 
             // if found in cache then return else fetch and cache
             if (fromCache != null)
+            {
                 return fromCache;
+            }
+
             var entity = performGet(id);
 
             if (entity != null && entity.HasIdentity)
+            {
                 InsertEntity(cacheKey, entity);
+            }
 
             return entity;
         }
@@ -197,7 +212,7 @@ namespace Umbraco.Core.Cache
             else
             {
                 // get everything we have
-                var entities = Cache.GetCacheItemsByKeySearch<TEntity>(GetEntityTypeCacheKey())
+                var entities = Cache.GetCacheItemsByKeySearch<TEntity>(EntityTypeCacheKey)
                     .ToArray(); // no need for null checks, we are not caching nulls
 
                 if (entities.Length > 0)
@@ -220,7 +235,7 @@ namespace Umbraco.Core.Cache
                 {
                     // if none of them were in the cache
                     // and we allow zero count - check for the special (empty) entry
-                    var empty = Cache.GetCacheItem<TEntity[]>(GetEntityTypeCacheKey());
+                    var empty = Cache.GetCacheItem<TEntity[]>(EntityTypeCacheKey);
                     if (empty != null) return empty;
                 }
             }
@@ -240,7 +255,7 @@ namespace Umbraco.Core.Cache
         /// <inheritdoc />
         public override void ClearAll()
         {
-            Cache.ClearByKey(GetEntityTypeCacheKey());
+            Cache.ClearByKey(EntityTypeCacheKey);
         }
     }
 }
