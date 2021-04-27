@@ -129,40 +129,19 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             });
 
         /// <summary>
-        /// Tries to et the filesystem used by the MediaFileManager, if there's already <see cref="MediaFileManager"/> registered it will not be overwritten.
-        /// </summary>
-        /// <param name="builder">A builder.</param>
-        /// <param name="filesystemFactory">Factory method to create an IFileSystem implementation used in the MediaFileManager</param>
-        public static void TrySetMediaFileSystem(this IUmbracoBuilder builder,
-            Func<IServiceProvider, IFileSystem> filesystemFactory) => builder.Services.TryAddSingleton(
-            provider =>
-            {
-                IFileSystem filesystem = filesystemFactory(provider);
-                // We need to use the Filesystems to create a shadow wrapper,
-                // because shadow wrapper requires the IsScoped delegate from the FileSystems.
-                // This is used by the scope provider when taking control of the filesystems.
-                FileSystems fileSystems = provider.GetRequiredService<FileSystems>();
-                IFileSystem shadow = fileSystems.CreateShadowWrapper(filesystem, "media");
-
-                return provider.CreateInstance<MediaFileManager>(shadow);
-            });
-
-        /// <summary>
         /// Register FileSystems with a method to configure the <see cref="FileSystems"/>.
         /// </summary>
         /// <param name="builder">A builder.</param>
         /// <param name="configure">Method that configures the <see cref="FileSystems"/>.</param>
         /// <exception cref="ArgumentNullException">Throws exception if <paramref name="configure"/> is null.</exception>
         /// <exception cref="InvalidOperationException">Throws exception if full path can't be resolved successfully.</exception>
-        public static void AddFileSystems(this IUmbracoBuilder builder,
+        public static void ConfigureFileSystems(this IUmbracoBuilder builder,
             Action<IServiceProvider, FileSystems> configure)
         {
             if (configure == null)
             {
                 throw new ArgumentNullException(nameof(configure));
             }
-
-            builder.AddFileSystems();
 
             builder.Services.AddUnique(
                 provider =>
