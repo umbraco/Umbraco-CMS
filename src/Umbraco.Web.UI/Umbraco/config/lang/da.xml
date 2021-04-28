@@ -1847,6 +1847,9 @@ Mange hilsner fra Umbraco robotten
     <key alias="labelForArrayOfItemsFrom">%0% fra %1%</key>
     <key alias="labelForRemoveAllEntries">Fjern alle elementer</key>
     <key alias="labelForClearClipboard">Ryd udklipsholder</key>
+    <key alias="clipboard">Udklipsholder</key>
+    <key alias="gridEditorCopiedToClipboard">Grid editor kopieret til udklipsholder</key>
+    <key alias="gridRowCopiedToClipboard">Grid række kopieret til udklipsholder</key>
   </area>
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Åben egenskabshandlinger</key>

@@ -749,8 +749,11 @@ angular.module("umbraco")
 
                 localStorageService.set(gridEditorClipboardAlias, newClipboard);
 
-                // TODO: Need some localizationService
-                notificationsService.success("Clipboard", "Grid editor copied to clipboard.");
+                localizationService.localizeMany(["clipboard_clipboard", "clipboard_gridEditorCopiedToClipboard"]).then(function (data) {
+                    var header = data[0];
+                    var message = data[1];
+                    notificationService.success(header, message);
+                });
 
                 $scope.setGridClipboard();
             };
@@ -770,8 +773,11 @@ angular.module("umbraco")
 
                 localStorageService.set(gridRowClipboardAlias, newClipboard);
 
-                // TODO: Need some localizationService
-                notificationsService.success("Clipboard", "Grid row copied to clipboard.");
+                localizationService.localizeMany(["clipboard_clipboard", "clipboard_gridRowCopiedToClipboard"]).then(function (data) {
+                    var header = data[0];
+                    var message = data[1];
+                    notificationService.success(header, message);
+                });
 
                 $scope.setGridClipboard();
             };
