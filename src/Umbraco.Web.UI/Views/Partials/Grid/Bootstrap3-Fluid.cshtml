@@ -2,31 +2,31 @@
 @using Umbraco.Web.Templates
 @using Newtonsoft.Json.Linq
 
-@* 
+@*
     Razor helpers located at the bottom of this file
 *@
 
-@if (Model != null && Model.sections != null)
+@if (Model != null && Model.GetType() == typeof(JObject) && Model.sections != null)
 {
     var oneColumn = ((System.Collections.ICollection)Model.sections).Count == 1;
-    
+
     <div class="umb-grid">
         @if (oneColumn)
         {
             foreach (var section in Model.sections) {
                 <div class="grid-section">
                     @foreach (var row in section.rows) {
-                        @renderRow(row);
+                        @renderRow(row)
                     }
                 </div>
-            }   
-        }else { 
+            }
+        }else {
             <div class="row clearfix">
                 @foreach (var s in Model.sections) {
                     <div class="grid-section">
                         <div class="col-md-@s.grid column">
                             @foreach (var row in s.rows) {
-                                @renderRow(row);
+                                @renderRow(row)
                             }
                         </div>
                     </div>

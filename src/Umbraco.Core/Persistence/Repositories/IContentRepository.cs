@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Querying;
@@ -77,5 +78,7 @@ namespace Umbraco.Core.Persistence.Repositories
         /// <remarks>Here, <paramref name="filter"/> can be null but <paramref name="ordering"/> cannot.</remarks>
         IEnumerable<TEntity> GetPage(IQuery<TEntity> query, long pageIndex, int pageSize, out long totalRecords,
             IQuery<TEntity> filter, Ordering ordering);
+
+        ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options);
     }
 }

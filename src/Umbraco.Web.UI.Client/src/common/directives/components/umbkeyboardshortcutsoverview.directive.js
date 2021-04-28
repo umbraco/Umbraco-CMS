@@ -120,26 +120,26 @@ When this combination is hit an overview is opened with shortcuts based on the m
 
             scope.toggleShortcutsOverlay = function () {
 
-                if(overlay) {
+                if (overlay) {
                     scope.close();
                 } else {
                     scope.open();
                 }
 
-                if(scope.onToggle) {
+                if (scope.onToggle) {
                     scope.onToggle();
                 }
 
             };
 
-            scope.open = function() {
-                if(!overlay) {
+            scope.open = function () {
+                if (!overlay) {
                     overlay = {
                         title: "Keyboard shortcuts",
                         view: "keyboardshortcuts",
                         hideSubmitButton: true,
                         shortcuts: scope.model,
-                        close: function() {
+                        close: function () {
                             scope.close();
                         }
                     };
@@ -147,20 +147,20 @@ When this combination is hit an overview is opened with shortcuts based on the m
                 }
             };
 
-            scope.close = function() {
-                if(overlay) {
+            scope.close = function () {
+                if (overlay) {
                     overlayService.close();
                     overlay = null;
-                    if(scope.onClose) {
+                    if (scope.onClose) {
                         scope.onClose();
                     }
                 }
             };
 
             function onInit() {
-                angular.forEach(scope.model, function (shortcutGroup) {
-                    angular.forEach(shortcutGroup.shortcuts, function (shortcut) {
+                Utilities.forEach(scope.model, shortcutGroup => {
 
+                    Utilities.forEach(shortcutGroup.shortcuts, shortcut => {
                         shortcut.platformKeys = [];
 
                         // get shortcut keys for mac
@@ -173,30 +173,29 @@ When this combination is hit an overview is opened with shortcuts based on the m
                         } else if (shortcut.keys && shortcut && shortcut.keys.length > 0) {
                             shortcut.platformKeys = shortcut.keys;
                         }
-
-                    });
+                    })
                 });
             }
 
             onInit();
 
-            eventBindings.push(scope.$watch('model', function(newValue, oldValue){
+            eventBindings.push(scope.$watch('model', function (newValue, oldValue) {
                 if (newValue !== oldValue) {
                     onInit();
                 }
             }));
 
-            eventBindings.push(scope.$watch('showOverlay', function(newValue, oldValue){
+            eventBindings.push(scope.$watch('showOverlay', function (newValue, oldValue) {
 
-                if(newValue === oldValue) {
+                if (newValue === oldValue) {
                     return;
                 }
 
-                if(newValue === true) {
+                if (newValue === true) {
                     scope.open();
                 }
 
-                if(newValue === false) {
+                if (newValue === false) {
                     scope.close();
                 }
 

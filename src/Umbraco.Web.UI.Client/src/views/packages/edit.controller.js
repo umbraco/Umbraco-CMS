@@ -39,8 +39,25 @@
 
         vm.versionRegex = /^(\d+\.)(\d+\.)(\*|\d+)$/;
 
+        vm.aceOption = {
+            mode: "xml",
+            theme: "chrome",
+            showPrintMargin: false,
+            advanced: {
+                fontSize: '14px',
+                enableSnippets: true,
+                enableBasicAutocompletion: true,
+                enableLiveAutocompletion: false
+            },
+            onLoad: function (_editor) {
+                vm.editor = _editor;
+
+                vm.editor.setValue(vm.package.actions);
+            }
+        };
+
         function onInit() {
-           
+
             if (create) {
                 // Pre populate package with some values
                 packageResource.getEmpty().then(scaffold => {
@@ -78,7 +95,7 @@
 
                 });
 
-                
+
                 localizationService.localizeMany(["buttons_save", "packager_includeAllChildNodes"]).then(function (values) {
                     vm.labels.button = values[0];
                     vm.labels.includeAllChildNodes = values[1];
@@ -194,7 +211,7 @@
                     vm.package = updatedPackage;
                     vm.buttonState = "success";
 
-                    formHelper.resetForm({ scope: $scope });
+                    formHelper.resetForm({ scope: $scope, formCtrl: editPackageForm });
 
                     if (create) {
                         //if we are creating, then redirect to the correct url and reload
@@ -204,6 +221,7 @@
                     }
 
                 }, function (err) {
+                    formHelper.resetForm({ scope: $scope, formCtrl: editPackageForm, hasErrors: true });
                     formHelper.handleError(err);
                     vm.buttonState = "error";
                 });
@@ -232,7 +250,7 @@
 
         function openFilePicker() {
 
-            let selection = angular.copy(vm.package.files);
+            let selection = Utilities.copy(vm.package.files);
 
             const filePicker = {
                 title: "Select files",

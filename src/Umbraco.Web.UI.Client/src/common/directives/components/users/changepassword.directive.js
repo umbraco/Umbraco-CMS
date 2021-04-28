@@ -11,6 +11,7 @@
         vm.cancelChange = cancelChange;
         vm.showOldPass = showOldPass;
         vm.showCancelBtn = showCancelBtn;
+        vm.newPasswordKeyUp = newPasswordKeyUp;
 
         var unsubscribe = [];
 
@@ -55,8 +56,13 @@
                 vm.config.minPasswordLength = 0;
             }
 
+            // Check non-alpha pwd settings for tooltip display
+            if (vm.config.minNonAlphaNumericChars === undefined) {
+                vm.config.minNonAlphaNumericChars = 0;
+            }
+
             //set the model defaults
-            if (!angular.isObject(vm.passwordValues)) {
+            if (!Utilities.isObject(vm.passwordValues)) {
                 //if it's not an object then just create a new one
                 vm.passwordValues = {
                     newPassword: null,
@@ -152,6 +158,9 @@
             return vm.config.disableToggle !== true && vm.config.hasPassword;
         };
 
+        function newPasswordKeyUp(event) {
+            vm.passwordVal = event.target.value;
+        }
     }
 
     var component = {

@@ -13,7 +13,6 @@
         vm.labels = {};
         vm.initIsDefault = false;
         vm.showDefaultLanguageInfo = false;
-
         vm.save = save;
         vm.back = back;
         vm.goToPage = goToPage;
@@ -21,7 +20,7 @@
         vm.toggleDefault = toggleDefault;
 
         var currCulture = null;
-
+        
         function init() {
 
             // localize labels
@@ -35,7 +34,8 @@
                 "languages_noFallbackLanguageOption",
                 "languages_fallbackLanguageDescription",
                 "languages_fallbackLanguage",
-                "defaultdialogs_confirmSure"
+                "defaultdialogs_confirmSure",
+                "defaultdialogs_editlanguage"
             ];
 
             localizationService.localizeMany(labelKeys).then(function (values) {
@@ -47,6 +47,7 @@
                 vm.labels.addLanguage = values[5];
                 vm.labels.noFallbackLanguageOption = values[6];
                 vm.labels.areYouSure = values[9];
+                vm.labels.editLanguage = values[10];
 
                 $scope.properties = {
                     fallbackLanguage: {
@@ -57,7 +58,8 @@
                 };
 
                 if ($routeParams.create) {
-                    vm.page.name = vm.labels.addLanguage;                    
+                    vm.page.name = vm.labels.addLanguage;
+                    $scope.$emit("$changeTitle", vm.labels.addLanguage);
                 }
             });
 
@@ -68,7 +70,7 @@
             //load all culture/languages
             promises.push(languageResource.getCultures().then(function (culturesDictionary) {
                 var cultures = [];
-                angular.forEach(culturesDictionary, function (value, key) {
+                Object.entries(culturesDictionary).forEach(function ([key, value]) {
                     cultures.push({
                         name: key,
                         displayName: value
@@ -91,10 +93,10 @@
                     vm.language = lang;
 
                     vm.page.name = vm.language.name;
-
+                    $scope.$emit("$changeTitle", vm.labels.editLanguage + ": " + vm.page.name);
                     /* we need to store the initial default state so we can disable the toggle if it is the default.
                     we need to prevent from not having a default language. */
-                    vm.initIsDefault = angular.copy(vm.language.isDefault);
+                    vm.initIsDefault = Utilities.copy(vm.language.isDefault);
 
                     makeBreadcrumbs();
 
@@ -161,7 +163,7 @@
 
             }, function (err) {
                 vm.page.saveButtonState = "error";
-
+                formHelper.resetForm({ scope: $scope, hasErrors: true });
                 formHelper.handleError(err);
 
             });
@@ -182,12 +184,12 @@
         function toggleDefault() {
 
             // it shouldn't be possible to uncheck the default language
-            if(vm.initIsDefault) {
+            if (vm.initIsDefault) {
                 return;
             }
 
             vm.language.isDefault = !vm.language.isDefault;
-            if(vm.language.isDefault) {
+            if (vm.language.isDefault) {
                 vm.showDefaultLanguageInfo = true;
             } else {
                 vm.showDefaultLanguageInfo = false;

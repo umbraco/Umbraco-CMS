@@ -18,7 +18,7 @@ namespace Umbraco.Web.PropertyEditors
         "fileupload",
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = "icon-download-alt")]
-    public class FileUploadPropertyEditor : DataEditor
+    public class FileUploadPropertyEditor : DataEditor, IDataEditorWithMediaPath
     {
         private readonly IMediaFileSystem _mediaFileSystem;
         private readonly IContentSection _contentSection;
@@ -32,6 +32,10 @@ namespace Umbraco.Web.PropertyEditors
             _uploadAutoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSection);
         }
 
+
+        /// <inheritdoc />
+        protected override IConfigurationEditor CreateConfigurationEditor() => new FileUploadConfigurationEditor();
+
         /// <summary>
         /// Creates the corresponding property value editor.
         /// </summary>
@@ -43,6 +47,8 @@ namespace Umbraco.Web.PropertyEditors
             return editor;
         }
 
+        public string GetMediaPath(object value) => value?.ToString();
+
         /// <summary>
         /// Gets a value indicating whether a property is an upload field.
         /// </summary>
@@ -52,7 +58,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             return property.PropertyType.PropertyEditorAlias == Constants.PropertyEditors.Aliases.UploadField;
         }
-        
+
         /// <summary>
         /// Ensures any files associated are removed
         /// </summary>

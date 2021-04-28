@@ -50,7 +50,7 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="relation in vm.references.documentTypes">
-                                        <td><span title="{{::relation.name}}({{::relation.alias}})"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</span></td>
+                                        <td><a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</a></td>
                                         <td><div><p class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}</p></div></td>
                                     </tr>
                                 </tbody>
@@ -74,7 +74,7 @@
                                 </thead>
                                 <tbody>
                                     <tr ng-repeat="relation in vm.references.mediaTypes">
-                                        <td><span title="{{::relation.name}}({{::relation.alias}})"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</span></td>
+                                        <td><a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</a></td>
                                         <td><div><p class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}</p></div></td>
                                     </tr>
                                 </tbody>
@@ -98,7 +98,7 @@
                                     </thead>
                                     <tbody>
                                         <tr ng-repeat="relation in vm.references.memberTypes">
-                                            <td><span title="{{::relation.name}}({{::relation.alias}})"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</span></td>
+                                            <td><a title="{{::relation.name}}({{::relation.alias}})" href="#/settings/documentTypes/edit/{{::relation.id}}" ng-click="vm.onReferenceClicked($event)"><i class="umb-table-body__icon {{relation.icon}}"></i>{{::relation.name}}</a></td>
                                             <td><div><p class="red" ng-repeat="property in relation.properties"><i class="icon icon-alert red"></i>{{::property.name}}</p></div></td>
                                         </tr>
                                     </tbody>
@@ -106,17 +106,16 @@
 
                         </div>
 
-                        <umb-checkbox model="vm.confirmed" text="{{vm.labels.deleteConfirm}}">
-                        </umb-checkbox>
+                        <umb-checkbox model="vm.confirmed" text="{{vm.labels.deleteConfirm}}"></umb-checkbox>
 
                     </div>
 
 
-                <umb-confirm ng-if="vm.confirmed || vm.hasReferences === false"
-                            on-confirm="vm.performDelete"
-                            on-cancel="vm.cancel"
-                            confirm-button-style="danger"
-                            confirm-label-key="general_delete">
+                <umb-confirm confirm-disabled="!(vm.confirmed || vm.hasReferences === false)"
+                             on-confirm="vm.performDelete"
+                             on-cancel="vm.cancel"
+                             confirm-button-style="danger"
+                             confirm-label-key="general_delete">
                 </umb-confirm>
             </div>
         </ng-switch>

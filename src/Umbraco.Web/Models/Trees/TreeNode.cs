@@ -1,10 +1,9 @@
-﻿using System.Runtime.Serialization;
-using Umbraco.Core.IO;
+﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
+using Umbraco.Core.IO;
 using Umbraco.Web.Models.ContentEditing;
 
 namespace Umbraco.Web.Models.Trees
@@ -27,7 +26,8 @@ namespace Umbraco.Web.Models.Trees
         /// <param name="menuUrl"></param>
         internal TreeNode(string nodeId, string parentId, string getChildNodesUrl, string menuUrl)
         {
-            if (string.IsNullOrWhiteSpace(nodeId)) throw new ArgumentNullOrEmptyException(nameof(nodeId));
+            if (nodeId == null) throw new ArgumentNullException(nameof(nodeId));
+            if (string.IsNullOrWhiteSpace(nodeId)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(nodeId));
 
             Id = nodeId;
             ParentId = parentId;
@@ -64,13 +64,13 @@ namespace Umbraco.Web.Models.Trees
         public string RoutePath { get; set; }
 
         /// <summary>
-        /// The JSON url to load the nodes children
+        /// The JSON URL to load the nodes children
         /// </summary>
         [DataMember(Name = "childNodesUrl")]
         public string ChildNodesUrl { get; set; }
 
         /// <summary>
-        /// The JSON url to load the menu from
+        /// The JSON URL to load the menu from
         /// </summary>
         [DataMember(Name = "menuUrl")]
         public string MenuUrl { get; set; }
@@ -110,7 +110,7 @@ namespace Umbraco.Web.Models.Trees
 
                 //absolute path with or without tilde
                 if (Icon.StartsWith("~") || Icon.StartsWith("/"))
-                    return IOHelper.ResolveUrl("~" + Icon.TrimStart('~'));
+                    return IOHelper.ResolveUrl("~" + Icon.TrimStart(Constants.CharArrays.Tilde));
 
                 //legacy icon path
                 return string.Format("{0}images/umbraco/{1}", Current.Configs.Global().Path.EnsureEndsWith("/"), Icon);

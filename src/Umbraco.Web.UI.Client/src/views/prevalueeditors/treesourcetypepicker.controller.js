@@ -7,7 +7,6 @@ function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeRe
 
     var allItemTypes = null;
     var currentItemType = null;
-    var initialLoad = true;
 
     function init() {
         vm.loading = true;
@@ -84,17 +83,27 @@ function TreeSourceTypePickerController($scope, contentTypeResource, mediaTypeRe
         $scope.model.value = _.pluck(vm.itemTypes, "alias").join();
         angularHelper.getCurrentForm($scope).$setDirty();
     }
-
-    eventsService.on("treeSourceChanged", function (e, args) {
-        currentItemType = args.value;
+    var evts = [];
+    evts.push(eventsService.on("treeSourceChanged", function (e, args) {
         // reset the model value if we changed node type (but not on the initial load)
-        if (!initialLoad) {
+        if (!!currentItemType && currentItemType !== args.value) {
             vm.itemTypes = [];
             updateModel();
         }
-        initialLoad = false;
+        currentItemType = args.value;
         init();
+    }));
+
+    $scope.$on('$destroy', function () {
+        for (var e in evts) {
+            eventsService.unsubscribe(evts[e]);
+        }
     });
+
+    if ($scope.model.config.itemType) {
+        currentItemType = $scope.model.config.itemType;
+        init();
+    }
 }
 
 angular.module('umbraco').controller("Umbraco.PrevalueEditors.TreeSourceTypePickerController", TreeSourceTypePickerController);

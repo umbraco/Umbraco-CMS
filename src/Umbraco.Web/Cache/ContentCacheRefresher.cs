@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
@@ -45,6 +46,7 @@ namespace Umbraco.Web.Cache
         public override void Refresh(JsonPayload[] payloads)
         {
             AppCaches.RuntimeCache.ClearOfType<PublicAccessEntry>();
+            AppCaches.RuntimeCache.ClearByKey(CacheKeys.ContentRecycleBinCacheKey);
 
             var idsRemoved = new HashSet<int>();
             var isolatedCache = AppCaches.IsolatedCaches.GetOrCreate<IContent>();
@@ -139,6 +141,14 @@ namespace Umbraco.Web.Cache
 
         public class JsonPayload
         {
+            [Obsolete("Use the constructor specifying a GUID instead, using this constructor will result in not refreshing all caches")]
+            public JsonPayload(int id, TreeChangeTypes changeTypes)
+            {
+                Id = id;
+                ChangeTypes = changeTypes;
+            }
+
+            [JsonConstructor]
             public JsonPayload(int id, Guid? key, TreeChangeTypes changeTypes)
             {
                 Id = id;

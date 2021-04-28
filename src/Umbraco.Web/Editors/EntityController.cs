@@ -174,7 +174,7 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = GetResultForId(id, type);
 
-            return foundContent.Path.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+            return foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
 
         /// <summary>
@@ -187,7 +187,7 @@ namespace Umbraco.Web.Editors
         {
             var foundContent = GetResultForKey(id, type);
 
-            return foundContent.Path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
+            return foundContent.Path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(int.Parse);
         }
 
         /// <summary>
@@ -207,7 +207,36 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the url of an entity
+        /// Gets the URL of an entity
+        /// </summary>
+        /// <param name="udi">UDI of the entity to fetch URL for</param>
+        /// <param name="culture">The culture to fetch the URL for</param>
+        /// <returns>The URL or path to the item</returns>
+        public HttpResponseMessage GetUrl(Udi udi, string culture = "*")
+        {
+            var intId = Services.EntityService.GetId(udi);
+            if (!intId.Success)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            UmbracoEntityTypes entityType;
+            switch(udi.EntityType)
+            {
+                case Constants.UdiEntityType.Document:
+                    entityType = UmbracoEntityTypes.Document;
+                    break;
+                case Constants.UdiEntityType.Media:
+                    entityType = UmbracoEntityTypes.Media;
+                    break;
+                case Constants.UdiEntityType.Member:
+                    entityType = UmbracoEntityTypes.Member;
+                    break;
+                default:
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+            return GetUrl(intId.Result, entityType, culture);
+        }
+
+        /// <summary>
+        /// Gets the URL of an entity
         /// </summary>
         /// <param name="id">Int id of the entity to fetch URL for</param>
         /// <param name="type">The type of entity such as Document, Media, Member</param>
@@ -286,7 +315,7 @@ namespace Umbraco.Web.Editors
                 getPath: nodeid =>
                 {
                     var ent = Services.EntityService.Get(nodeid);
-                    return ent.Path.Split(',').Reverse();
+                    return ent.Path.Split(Constants.CharArrays.Comma).Reverse();
                 },
                 publishedContentExists: i => Umbraco.Content(i) != null);
         }
@@ -303,7 +332,9 @@ namespace Umbraco.Web.Editors
         [HttpGet]
         public UrlAndAnchors GetUrlAndAnchors(int id, string culture = "*")
         {
-            var url = UmbracoContext.UrlProvider.GetUrl(id);
+            culture = culture ?? ClientCulture();
+
+            var url = UmbracoContext.UrlProvider.GetUrl(id, culture: culture);
             var anchorValues = Services.ContentService.GetAnchorValuesFromRTEs(id, culture);
             return new UrlAndAnchors(url, anchorValues);
         }
@@ -639,9 +670,9 @@ namespace Umbraco.Web.Editors
             switch (type)
             {
                 case UmbracoEntityTypes.Document:
-                    return Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                    return Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService, AppCaches);
                 case UmbracoEntityTypes.Media:
-                    return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                    return Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches);
                 default:
                     return  Array.Empty<int>();
             }
@@ -661,6 +692,9 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             if (pageSize <= 0)
                 throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            // re-normalize since NULL can be passed in
+            filter = filter ?? string.Empty;
 
             var objectType = ConvertToObjectType(type);
             if (objectType.HasValue)
@@ -734,7 +768,8 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private IEnumerable<SearchResultEntity> ExamineSearch(string query, UmbracoEntityTypes entityType, string searchFrom = null, bool ignoreUserStartNodes = false)
         {
-            return _treeSearcher.ExamineSearch(query, entityType, 200, 0, out _, searchFrom, ignoreUserStartNodes);
+            var culture = ClientCulture();
+            return _treeSearcher.ExamineSearch(query, entityType, 200, 0, culture, out _, searchFrom, ignoreUserStartNodes);
         }
 
         private IEnumerable<EntityBasic> GetResultForChildren(int id, UmbracoEntityTypes entityType)
@@ -767,7 +802,7 @@ namespace Umbraco.Web.Editors
             {
                 // TODO: Need to check for Object types that support hierarchic here, some might not.
 
-                var ids = Services.EntityService.Get(id).Path.Split(',').Select(int.Parse).Distinct().ToArray();
+                var ids = Services.EntityService.Get(id).Path.Split(Constants.CharArrays.Comma).Select(int.Parse).Distinct().ToArray();
 
                 var ignoreUserStartNodes = IsDataTypeIgnoringUserStartNodes(queryStrings?.GetValue<Guid?>("dataTypeId"));
                 if (ignoreUserStartNodes == false)
@@ -776,10 +811,10 @@ namespace Umbraco.Web.Editors
                     switch (entityType)
                     {
                         case UmbracoEntityTypes.Document:
-                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
+                            aids = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService, AppCaches);
                             break;
                         case UmbracoEntityTypes.Media:
-                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
+                            aids = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches);
                             break;
                     }
 
@@ -1079,7 +1114,7 @@ namespace Umbraco.Web.Editors
         {
             if (postFilter.IsNullOrWhiteSpace()) return entities;
 
-            var postFilterConditions = postFilter.Split('&');
+            var postFilterConditions = postFilter.Split(Constants.CharArrays.Ampersand);
 
             foreach (var postFilterCondition in postFilterConditions)
             {
@@ -1096,9 +1131,7 @@ namespace Umbraco.Web.Editors
             return entities;
         }
 
-        private static QueryCondition BuildQueryCondition<T>(string postFilter)
-        {
-            var postFilterParts = postFilter.Split(new[]
+        private static readonly string[] _postFilterSplitStrings = new[]
             {
                 "=",
                 "==",
@@ -1108,7 +1141,10 @@ namespace Umbraco.Web.Editors
                 "<",
                 ">=",
                 "<="
-            }, 2, StringSplitOptions.RemoveEmptyEntries);
+            };
+        private static QueryCondition BuildQueryCondition<T>(string postFilter)
+        {
+            var postFilterParts = postFilter.Split(_postFilterSplitStrings, 2, StringSplitOptions.RemoveEmptyEntries);
 
             if (postFilterParts.Length != 2)
             {

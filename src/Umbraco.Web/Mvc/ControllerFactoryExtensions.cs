@@ -25,7 +25,10 @@ namespace Umbraco.Web.Mvc
 
             //we have no choice but to instantiate the controller
             var instance = factory.CreateController(requestContext, controllerName);
-            return instance?.GetType();
+            var controllerType = instance?.GetType();
+            factory.ReleaseController(instance);
+
+            return controllerType;
         }
     }
 }

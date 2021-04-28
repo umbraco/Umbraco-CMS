@@ -4,7 +4,7 @@
     </umb-load-indicator>
 
     <umb-editor-view ng-if="!vm.loading">
-        <umb-editor-header 
+        <umb-editor-header
             name="vm.title"
             hide-alias="true"
             hide-description="true"
@@ -24,22 +24,29 @@
             </umb-box>
 
             <table class="table table-hover" ng-if="vm.items.length > 0">
+                <caption class="sr-only"><localize key="visuallyHiddenTexts_dictionaryListCaption"></localize></caption>
                 <thead>
                     <tr>
                         <th><localize key="general_name">Name</localize></th>
-                        <th ng-repeat="column in vm.items[0].translations">{{column.displayName}}</th>
+                        <th ng-repeat="column in vm.items[0].translations | orderBy:'displayName'">{{column.displayName}}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="item in vm.items track by item.id" ng-click="vm.clickItem(item.id)" style="cursor: pointer;">
-                        <td>
-                            <span class="bold" ng-style="item.style">{{item.name}}</span>
+                    <tr ng-repeat="item in vm.items track by item.id" style="cursor: pointer;">
+                        <th>
+                            <button type="button" ng-style="item.style" class="btn-reset bold" ng-click="vm.clickItem(item.id)">{{item.name}}</button>
+                        </th>
+                        <td ng-repeat="column in item.translations | orderBy:'displayName'">
+                            <button type="button" class="btn-reset" ng-click="vm.clickItem(item.id)">
+                                <umb-icon icon="{{ column.hasTranslation ? 'icon-check' : 'icon-alert' }}" 
+                                    class="{{ column.hasTranslation ? 'color-green' : 'color-red' }}"></umb-icon>
+                                <span class="sr-only">
+                                    <localize ng-if="column.hasTranslation" key="visuallyHiddenTexts_hasTranslation"></localize>
+                                    <localize ng-if="!column.hasTranslation" key="visuallyHiddenTexts_noTranslation"></localize>
+                                </span>
+                            </button>
                         </td>
-                        <td ng-repeat="column in item.translations">
-                            <i ng-if="column.hasTranslation" class="icon-check color-green"></i>
-                            <i ng-if="!column.hasTranslation" class="icon-alert color-red"></i>
-                        </td>
-                    </tr>
+                    </tr> 
                 </tbody>
             </table>
 

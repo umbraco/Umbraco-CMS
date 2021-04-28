@@ -48,6 +48,7 @@ namespace Umbraco.Web.Cache
             if (anythingChanged)
             {
                 Current.AppCaches.ClearPartialViewCache();
+                AppCaches.RuntimeCache.ClearByKey(CacheKeys.MediaRecycleBinCacheKey);
 
                 var mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
 

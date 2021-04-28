@@ -12,6 +12,7 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Persistence.Repositories.Implement;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Scoping;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.TestHelpers.Entities;
@@ -237,11 +238,16 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var templateRepository = CreateRepository(ScopeProvider);
 
-                var tagRepository = new TagRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger);
+                var tagRepository = new TagRepository(ScopeProvider, AppCaches.Disabled, Logger);
                 var commonRepository = new ContentTypeCommonRepository(ScopeProvider, templateRepository, AppCaches);
-                var languageRepository = new LanguageRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger);
-                var contentTypeRepository = new ContentTypeRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
-                var contentRepo = new DocumentRepository((IScopeAccessor) ScopeProvider, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository);
+                var languageRepository = new LanguageRepository(ScopeProvider, AppCaches.Disabled, Logger);
+                var contentTypeRepository = new ContentTypeRepository(ScopeProvider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
+                var relationTypeRepository = new RelationTypeRepository(ScopeProvider, AppCaches.Disabled, Logger);
+                var entityRepository = new EntityRepository(ScopeProvider);
+                var relationRepository = new RelationRepository(ScopeProvider, Logger, relationTypeRepository, entityRepository);
+                var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
+                var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
+                var contentRepo = new DocumentRepository(ScopeProvider, AppCaches.Disabled, Logger, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences);
 
                 var contentType = MockedContentTypes.CreateSimpleContentType("umbTextpage2", "Textpage");
                 ServiceContext.FileService.SaveTemplate(contentType.DefaultTemplate); // else, FK violation on contentType!

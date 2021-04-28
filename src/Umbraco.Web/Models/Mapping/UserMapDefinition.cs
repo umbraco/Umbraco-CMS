@@ -273,8 +273,8 @@ namespace Umbraco.Web.Models.Mapping
         {
             target.AvailableCultures = _textService.GetSupportedCultures().ToDictionary(x => x.Name, x => x.DisplayName);
             target.Avatars = source.GetUserAvatarUrls(_appCaches.RuntimeCache);
-            target.CalculatedStartContentIds = GetStartNodes(source.CalculateContentStartNodeIds(_entityService), UmbracoObjectTypes.Document, "content/contentRoot", context);
-            target.CalculatedStartMediaIds = GetStartNodes(source.CalculateMediaStartNodeIds(_entityService), UmbracoObjectTypes.Media, "media/mediaRoot", context);
+            target.CalculatedStartContentIds = GetStartNodes(source.CalculateContentStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Document, "content/contentRoot", context);
+            target.CalculatedStartMediaIds = GetStartNodes(source.CalculateMediaStartNodeIds(_entityService, _appCaches), UmbracoObjectTypes.Media, "media/mediaRoot", context);
             target.CreateDate = source.CreateDate;
             target.Culture = source.GetUserCulture(_textService, _globalSettings).ToString();
             target.Email = source.Email;
@@ -327,8 +327,8 @@ namespace Umbraco.Web.Models.Mapping
             target.Email = source.Email;
             target.EmailHash = source.Email.ToLowerInvariant().Trim().GenerateHash();
             target.Name = source.Name;
-            target.StartContentIds = source.CalculateContentStartNodeIds(_entityService);
-            target.StartMediaIds = source.CalculateMediaStartNodeIds(_entityService);
+            target.StartContentIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
+            target.StartMediaIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
             target.UserId = source.Id;
 
             //we need to map the legacy UserType
@@ -380,8 +380,8 @@ namespace Umbraco.Web.Models.Mapping
                 .ToDictionary(x => x.Key, x => (IEnumerable<Permission>)x.ToArray());
         }
 
-        private static string MapContentTypeIcon(EntitySlim entity)
-            => entity is ContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
+        private static string MapContentTypeIcon(IEntitySlim entity)
+            => entity is IContentEntitySlim contentEntity ? contentEntity.ContentTypeIcon : null;
 
         private IEnumerable<EntityBasic> GetStartNodes(int[] startNodeIds, UmbracoObjectTypes objectType, string localizedKey, MapperContext context)
         {

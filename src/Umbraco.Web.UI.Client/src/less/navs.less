@@ -12,7 +12,10 @@
   padding-right: 7px;
 }
 
-.icon.handle{color: @gray-8;}
+.umb-icon.handle,
+.icon.handle {
+  color: @gray-8;
+}
 
 
 // BASE CLASS
@@ -168,8 +171,7 @@
 
 // Active state
 .nav-pills > .active > a,
-.nav-pills > .active > a:hover,
-.nav-pills > .active > a:focus {
+.nav-pills > .active > a:hover {
   color: @white;
   background-color: @linkColor;
 }
@@ -184,7 +186,14 @@
   float: none;
 }
 .nav-stacked > li > a {
+  position: relative;
   margin-right: 0; // no need for the gap between nav items
+  color: @ui-action-discreet-type;
+  border-radius: 3px;
+}
+.nav-stacked > li > a:hover {
+  color: @ui-action-discreet-type-hover;
+  background-color: @ui-action-discreet-hover;
 }
 
 // Tabs
@@ -233,11 +242,14 @@
 }
 
 .dropdown-menu > li > a {
+    position: relative;
     padding: 8px 20px;
     color: @ui-option-type;
+    text-decoration: none;
 }
 
 .dropdown-menu > li > button {
+    position: relative;
   background: transparent;
   border: 0;
   padding: 8px 20px;
@@ -253,11 +265,9 @@
 }
 
 .dropdown-menu > li > a:hover, 
-.dropdown-menu > li > a:focus, 
 .dropdown-menu > li > button:hover, 
-.dropdown-menu > li > button:focus, 
 .dropdown-submenu:hover > a, 
-.dropdown-submenu:focus > a {
+.dropdown-submenu:hover > button {
     color: @ui-option-type-hover;
     background: @ui-option-hover;
 }
@@ -300,8 +310,7 @@
 
 // Active:hover/:focus dropdown links
 // -------------------------
-.nav > .dropdown.active > a:hover,
-.nav > .dropdown.active > a:focus {
+.nav > .dropdown.active > a:hover {
   cursor: pointer;
 }
 
@@ -309,24 +318,21 @@
 // -------------------------
 .nav-tabs .open .dropdown-toggle,
 .nav-pills .open .dropdown-toggle,
-.nav > li.dropdown.open.active > a:hover,
-.nav > li.dropdown.open.active > a:focus {
+.nav > li.dropdown.open.active > a:hover {
   /*color: @white;*/
   background-color: @gray-8;
   border-color: @gray-8;
 }
 .nav li.dropdown.open .caret,
 .nav li.dropdown.open.active .caret,
-.nav li.dropdown.open a:hover .caret,
-.nav li.dropdown.open a:focus .caret {
+.nav li.dropdown.open a:hover .caret {
   border-top-color: @white;
   border-bottom-color: @white;
   .opacity(100);
 }
 
 // Dropdowns in stacked tabs
-.tabs-stacked .open > a:hover,
-.tabs-stacked .open > a:focus {
+.tabs-stacked .open > a:hover {
   border-color: @gray-8;
 }
 
@@ -377,15 +383,13 @@
 }
 .tabs-below > .nav-tabs > li > a {
   .border-radius(0 0 4px 4px);
-  &:hover,
-  &:focus {
+  &:hover {
     border-bottom-color: transparent;
     border-top-color: @gray-8;
   }
 }
 .tabs-below > .nav-tabs > .active > a,
-.tabs-below > .nav-tabs > .active > a:hover,
-.tabs-below > .nav-tabs > .active > a:focus {
+.tabs-below > .nav-tabs > .active > a:hover {
   border-color: transparent @gray-8 @gray-8 @gray-8;
 }
 
@@ -414,13 +418,11 @@
   margin-right: -1px;
   .border-radius(4px 0 0 4px);
 }
-.tabs-left > .nav-tabs > li > a:hover,
-.tabs-left > .nav-tabs > li > a:focus {
+.tabs-left > .nav-tabs > li > a:hover {
   border-color: @gray-10 @gray-8 @gray-10 @gray-10;
 }
 .tabs-left > .nav-tabs .active > a,
-.tabs-left > .nav-tabs .active > a:hover,
-.tabs-left > .nav-tabs .active > a:focus {
+.tabs-left > .nav-tabs .active > a:hover {
   border-color: @gray-8 transparent @gray-8 @gray-8;
   *border-right-color: @white;
 }
@@ -435,13 +437,11 @@
   margin-left: -1px;
   .border-radius(0 4px 4px 0);
 }
-.tabs-right > .nav-tabs > li > a:hover,
-.tabs-right > .nav-tabs > li > a:focus {
+.tabs-right > .nav-tabs > li > a:hover {
   border-color: @gray-10 @gray-10 @gray-10 @gray-8;
 }
 .tabs-right > .nav-tabs .active > a,
-.tabs-right > .nav-tabs .active > a:hover,
-.tabs-right > .nav-tabs .active > a:focus {
+.tabs-right > .nav-tabs .active > a:hover {
   border-color: @gray-8 @gray-8 @gray-8 transparent;
   *border-left-color: @white;
 }
@@ -456,8 +456,7 @@
   color: @gray-8;
 }
 // Nuke hover/focus effects
-.nav > .disabled > a:hover,
-.nav > .disabled > a:focus {
+.nav > .disabled > a:hover {
   text-decoration: none;
   background-color: transparent;
   cursor: default;

@@ -51,6 +51,12 @@ function DataTypeDeleteController($scope, dataTypeResource, treeService, navigat
         navigationService.hideDialog();
     };
 
+    vm.onReferenceClicked = function(event) {
+        if (event.metaKey !== true) {
+            navigationService.hideDialog();
+        }
+    };
+
     vm.labels = {};
     localizationService
         .localize("editdatatype_acceptDeleteConsequence", [$scope.currentNode.name])

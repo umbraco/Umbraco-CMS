@@ -126,12 +126,12 @@ namespace Umbraco.Web.Trees
             switch (RecycleBinId)
             {
                 case Constants.System.RecycleBinMedia:
-                    startNodeIds = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService);
-                    startNodePaths = Security.CurrentUser.GetMediaStartNodePaths(Services.EntityService);
+                    startNodeIds = Security.CurrentUser.CalculateMediaStartNodeIds(Services.EntityService, AppCaches);
+                    startNodePaths = Security.CurrentUser.GetMediaStartNodePaths(Services.EntityService, AppCaches);
                     break;
                 case Constants.System.RecycleBinContent:
-                    startNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService);
-                    startNodePaths = Security.CurrentUser.GetContentStartNodePaths(Services.EntityService);
+                    startNodeIds = Security.CurrentUser.CalculateContentStartNodeIds(Services.EntityService, AppCaches);
+                    startNodePaths = Security.CurrentUser.GetContentStartNodePaths(Services.EntityService, AppCaches);
                     break;
                 default:
                     throw new NotSupportedException("Path access is only determined on content or media");
@@ -175,7 +175,7 @@ namespace Umbraco.Web.Trees
                 // TODO: in the future we could return a validation statement so we can have some UI to notify the user they don't have access
                 if (ignoreUserStartNodes == false && HasPathAccess(id, queryStrings) == false)
                 {
-                    Logger.Warn<ContentTreeControllerBase>("User {Username} does not have access to node with id {Id}", Security.CurrentUser.Username, id);
+                    Logger.Warn<ContentTreeControllerBase, string, string>("User {Username} does not have access to node with id {Id}", Security.CurrentUser.Username, id);
                     return nodes;
                 }
 
@@ -195,19 +195,29 @@ namespace Umbraco.Web.Trees
             //get the current user start node/paths
             GetUserStartNodes(out var userStartNodes, out var userStartNodePaths);
 
-            nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
-
             // if the user does not have access to the root node, what we have is the start nodes,
-            // but to provide some context we also need to add their topmost nodes when they are not
+            // but to provide some context we need to add their topmost nodes when they are not
             // topmost nodes themselves (level > 1).
             if (id == rootIdString && hasAccessToRoot == false)
             {
-                var topNodeIds = entities.Where(x => x.Level > 1).Select(GetTopNodeId).Where(x => x != 0).Distinct().ToArray();
+                // first add the entities that are topmost to the nodes collection
+                var topMostEntities = entities.Where(x => x.Level == 1).ToArray();
+                nodes.AddRange(topMostEntities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
+
+                // now add the topmost nodes of the entities that aren't topmost to the nodes collection as well
+                // - these will appear as "no-access" nodes in the tree, but will allow the editors to drill down through the tree
+                //   until they reach their start nodes
+                var topNodeIds = entities.Except(topMostEntities).Select(GetTopNodeId).Where(x => x != 0).Distinct().ToArray();
                 if (topNodeIds.Length > 0)
                 {
                     var topNodes = Services.EntityService.GetAll(UmbracoObjectType, topNodeIds.ToArray());
                     nodes.AddRange(topNodes.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
                 }
+            }
+            else
+            {
+                // the user has access to the root, just add the entities
+                nodes.AddRange(entities.Select(x => GetSingleTreeNodeWithAccessCheck(x, id, queryStrings, userStartNodes, userStartNodePaths)).Where(x => x != null));
             }
 
             return nodes;
@@ -281,8 +291,8 @@ namespace Umbraco.Web.Trees
         {
             if (entity == null) return false;
             return RecycleBinId == Constants.System.RecycleBinContent
-                ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService)
-                : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService);
+                ? Security.CurrentUser.HasContentPathAccess(entity, Services.EntityService, AppCaches)
+                : Security.CurrentUser.HasMediaPathAccess(entity, Services.EntityService, AppCaches);
         }
 
         /// <summary>
@@ -312,8 +322,10 @@ namespace Umbraco.Web.Trees
 
                 var nodes = GetTreeNodesInternal(id, queryStrings);
 
-                //only render the recycle bin if we are not in dialog and the start id id still the root
-                if (IsDialog(queryStrings) == false && id == Constants.System.RootString)
+                //only render the recycle bin if we are not in dialog and the start id is still the root
+                //we need to check for the "application" key in the queryString because its value is required here,
+                //and for some reason when there are no dashboards, this parameter is missing  
+                if (IsDialog(queryStrings) == false && id == Constants.System.RootString && queryStrings.HasKey("application"))
                 {
                     nodes.Add(CreateTreeNode(
                         RecycleBinId.ToInvariantString(),
@@ -323,7 +335,6 @@ namespace Umbraco.Web.Trees
                         "icon-trash",
                         RecycleBinSmells,
                         queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/recyclebin"));
-
                 }
 
                 return nodes;
@@ -354,7 +365,12 @@ namespace Umbraco.Web.Trees
                 var startNodes = Services.EntityService.GetAll(UmbracoObjectType, UserStartNodes);
                 //if any of these start nodes' parent is current, then we need to render children normally so we need to switch some logic and tell
                 // the UI that this node does have children and that it isn't a container
-                if (startNodes.Any(x => x.ParentId == e.Id))
+
+                if (startNodes.Any(x =>
+                {
+                    var pathParts = x.Path.Split(Constants.CharArrays.Comma);
+                    return pathParts.Contains(e.Id.ToInvariantString());
+                }))
                 {
                     renderChildren = true;
                 }
@@ -454,8 +470,8 @@ namespace Umbraco.Web.Trees
 
         internal IEnumerable<MenuItem> GetAllowedUserMenuItemsForNode(IUmbracoEntity dd)
         {
-            var permission = Services.UserService.GetPermissions(Security.CurrentUser, dd.Path);
-            return Current.Actions.FromEntityPermission(permission).Select(x => new MenuItem(x));
+            var permissionsForPath = Services.UserService.GetPermissionsForPath(Security.CurrentUser, dd.Path).GetAllPermissions();
+            return Current.Actions.GetByLetters(permissionsForPath).Select(x => new MenuItem(x));
         }
 
         /// <summary>

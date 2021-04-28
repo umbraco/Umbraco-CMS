@@ -87,7 +87,7 @@ function currentUserResource($q, $http, umbRequestHelper, umbDataFormatter) {
                     umbRequestHelper.getApiUrl(
                         "currentUserApiBaseUrl",
                         "PostSetInvitedUserPassword"),
-                    angular.toJson(newPassword)),
+                    Utilities.toJson(newPassword)),
                 'Failed to change password');
         },
 

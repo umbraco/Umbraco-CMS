@@ -4,8 +4,6 @@ using System.Collections.Specialized;
 using System.Diagnostics;
 using System.Linq;
 using System.Runtime.Serialization;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Models.Entities;
 
 namespace Umbraco.Core.Models
@@ -140,7 +138,11 @@ namespace Umbraco.Core.Models
             get => _properties;
             set
             {
-                if (_properties != null) _properties.CollectionChanged -= PropertiesChanged;
+                if (_properties != null)
+                {
+                    _properties.ClearCollectionChangedEvents();
+                }
+
                 _properties = value;
                 _properties.CollectionChanged += PropertiesChanged;
             }
@@ -175,10 +177,15 @@ namespace Umbraco.Core.Models
             }
             set
             {
-                if (_cultureInfos != null) _cultureInfos.CollectionChanged -= CultureInfosCollectionChanged;
+                if (_cultureInfos != null)
+                {
+                    _cultureInfos.ClearCollectionChangedEvents();
+                }
                 _cultureInfos = value;
                 if (_cultureInfos != null)
+                {
                     _cultureInfos.CollectionChanged += CultureInfosCollectionChanged;
+                }   
             }
         }
 
@@ -229,8 +236,8 @@ namespace Umbraco.Core.Models
 
         private void ClearCultureInfo(string culture)
         {
-            if (culture.IsNullOrWhiteSpace())
-                throw new ArgumentNullOrEmptyException(nameof(culture));
+            if (culture == null) throw new ArgumentNullException(nameof(culture));
+            if (string.IsNullOrWhiteSpace(culture)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(culture));
 
             if (_cultureInfos == null) return;
             _cultureInfos.Remove(culture);
@@ -481,7 +488,7 @@ namespace Umbraco.Core.Models
             //if culture infos exist then deal with event bindings
             if (clonedContent._cultureInfos != null)
             {
-                clonedContent._cultureInfos.CollectionChanged -= CultureInfosCollectionChanged;          //clear this event handler if any
+                clonedContent._cultureInfos.ClearCollectionChangedEvents();          //clear this event handler if any
                 clonedContent._cultureInfos = (ContentCultureInfosCollection)_cultureInfos.DeepClone(); //manually deep clone
                 clonedContent._cultureInfos.CollectionChanged += clonedContent.CultureInfosCollectionChanged;    //re-assign correct event handler
             }
@@ -489,7 +496,7 @@ namespace Umbraco.Core.Models
             //if properties exist then deal with event bindings
             if (clonedContent._properties != null)
             {
-                clonedContent._properties.CollectionChanged -= PropertiesChanged;         //clear this event handler if any
+                clonedContent._properties.ClearCollectionChangedEvents();         //clear this event handler if any
                 clonedContent._properties = (PropertyCollection)_properties.DeepClone(); //manually deep clone
                 clonedContent._properties.CollectionChanged += clonedContent.PropertiesChanged;   //re-assign correct event handler
             }

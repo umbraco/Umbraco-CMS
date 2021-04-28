@@ -1,0 +1,51 @@
+.umb-mini-search {
+    position: relative;
+    display: block;
+
+    .icon {
+        position: absolute;
+        width: 30px;
+        height: 30px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin: 1px;
+        padding: 0;
+        pointer-events: none;
+        color: @ui-action-discreet-type;
+        transition: color .1s linear;
+    }
+
+    input {
+        width: 0px;
+        padding-left: 24px;
+        margin-bottom: 0px;
+        background-color: transparent;
+        border-color: @ui-action-discreet-border;
+        transition: background-color .1s linear, border-color .1s linear, color .1s linear, width .1s ease-in-out, padding-left .1s ease-in-out;
+        cursor: pointer;
+    }
+
+    &:focus-within, &:hover {
+        .icon {
+            color: @ui-action-discreet-type-hover;
+        }
+        input {
+            color: @ui-action-discreet-border-hover;
+            border-color: @ui-action-discreet-border-hover;
+        }
+    }
+
+    input:focus, &:focus-within input {
+        background-color: white;
+        color: @ui-action-discreet-border-hover;
+        border-color: @ui-action-discreet-border-hover;
+        cursor: unset;
+    }
+    
+    input:focus, &:focus-within input, &.--has-value input {
+        width: 190px;
+        padding-left:30px;
+    }
+
+}

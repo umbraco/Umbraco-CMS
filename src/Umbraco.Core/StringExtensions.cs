@@ -10,9 +10,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Web.Security;
 using Newtonsoft.Json;
-using Umbraco.Core.Configuration;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Strings;
 
@@ -24,7 +22,7 @@ namespace Umbraco.Core
     ///</summary>
     public static class StringExtensions
     {
-
+        private const char DefaultEscapedStringEscapeChar = '\\';
         private static readonly char[] ToCSharpHexDigitLower = "0123456789abcdef".ToCharArray();
         private static readonly char[] ToCSharpEscapeChars;
 
@@ -43,7 +41,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         internal static int[] GetIdsFromPathReversed(this string path)
         {
-            var nodeIds = path.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var nodeIds = path.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => x.TryConvertTo<int>())
                 .Where(x => x.Success)
                 .Select(x => x.Result)
@@ -82,6 +80,21 @@ namespace Umbraco.Core
         }
 
         /// <summary>
+        /// Determines the extension of the path or URL
+        /// </summary>
+        /// <param name="file"></param>
+        /// <returns>Extension of the file</returns>
+        public static string GetFileExtension(this string file)
+        {
+            //Find any characters between the last . and the start of a query string or the end of the string
+            const string pattern = @"(?<extension>\.[^\.\?]+)(\?.*|$)";
+            var match = Regex.Match(file, pattern);
+            return match.Success
+                ? match.Groups["extension"].Value
+                : string.Empty;
+        }
+
+        /// <summary>
         /// Based on the input string, this will detect if the string is a JS path or a JS snippet.
         /// If a path cannot be determined, then it is assumed to be a snippet the original text is returned
         /// with an invalid attempt, otherwise a valid attempt is returned with the resolved path
@@ -93,7 +106,7 @@ namespace Umbraco.Core
         /// </remarks>
         internal static Attempt<string> DetectIsJavaScriptPath(this string input)
         {
-            //validate that this is a url, if it is not, we'll assume that it is a text block and render it as a text
+            //validate that this is a URL, if it is not, we'll assume that it is a text block and render it as a text
             //block instead.
             var isValid = true;
 
@@ -101,7 +114,7 @@ namespace Umbraco.Core
             {
                 //ok it validates, but so does alert('hello'); ! so we need to do more checks
 
-                //here are the valid chars in a url without escaping
+                //here are the valid chars in a URL without escaping
                 if (Regex.IsMatch(input, @"[^a-zA-Z0-9-._~:/?#\[\]@!$&'\(\)*\+,%;=]"))
                     isValid = false;
 
@@ -243,7 +256,7 @@ namespace Umbraco.Core
             //remove any prefixed '&' or '?'
             for (var i = 0; i < queryStrings.Length; i++)
             {
-                queryStrings[i] = queryStrings[i].TrimStart('?', '&').TrimEnd('&');
+                queryStrings[i] = queryStrings[i].TrimStart(Constants.CharArrays.QuestionMarkAmpersand).TrimEnd(Constants.CharArrays.Ampersand);
             }
 
             var nonEmpty = queryStrings.Where(x => !x.IsNullOrWhiteSpace()).ToArray();
@@ -302,7 +315,7 @@ namespace Umbraco.Core
             if (value == null)
                 return null;
 
-            string[] parts = value.Split('\n');
+            string[] parts = value.Split(Constants.CharArrays.LineFeed);
 
             StringBuilder decryptedValue = new StringBuilder();
 
@@ -843,7 +856,7 @@ namespace Umbraco.Core
             var pos = str.IndexOf('=');
             if (pos < 0) pos = str.Length;
 
-            // replace chars that would cause problems in urls
+            // replace chars that would cause problems in URLs
             var chArray = new char[pos];
             for (var i = 0; i < pos; i++)
             {
@@ -1082,34 +1095,36 @@ namespace Umbraco.Core
             return Current.ShortStringHelper.CleanStringForSafeAlias(alias, culture);
         }
 
-        // the new methods to get a url segment
+        // the new methods to get a URL segment
 
         /// <summary>
-        /// Cleans a string to produce a string that can safely be used in an url segment.
+        /// Cleans a string to produce a string that can safely be used in an URL segment.
         /// </summary>
         /// <param name="text">The text to filter.</param>
-        /// <returns>The safe url segment.</returns>
+        /// <returns>The safe URL segment.</returns>
         public static string ToUrlSegment(this string text)
         {
-            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullOrEmptyException(nameof(text));
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
             return Current.ShortStringHelper.CleanStringForUrlSegment(text);
         }
 
         /// <summary>
-        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an url segment.
+        /// Cleans a string, in the context of a specified culture, to produce a string that can safely be used in an URL segment.
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
-        /// <returns>The safe url segment.</returns>
+        /// <returns>The safe URL segment.</returns>
         public static string ToUrlSegment(this string text, string culture)
         {
-            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentNullOrEmptyException(nameof(text));
+            if (text == null) throw new ArgumentNullException(nameof(text));
+            if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
             return Current.ShortStringHelper.CleanStringForUrlSegment(text, culture);
         }
 
-        // the new methods to clean a string (to alias, url segment...)
+        // the new methods to clean a string (to alias, URL segment...)
 
         /// <summary>
         /// Cleans a string.
@@ -1190,7 +1205,7 @@ namespace Umbraco.Core
 
         /// <summary>
         /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
-        /// both internally (on disk) and externally (as a url).
+        /// both internally (on disk) and externally (as a URL).
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <returns>The safe filename.</returns>
@@ -1201,7 +1216,7 @@ namespace Umbraco.Core
 
         /// <summary>
         /// Cleans a string, in the context of the invariant culture, to produce a string that can safely be used as a filename,
-        /// both internally (on disk) and externally (as a url).
+        /// both internally (on disk) and externally (as a URL).
         /// </summary>
         /// <param name="text">The text to filter.</param>
         /// <param name="culture">The culture.</param>
@@ -1332,7 +1347,7 @@ namespace Umbraco.Core
             {
                 return false;
             }
-            var idCheckList = csv.Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            var idCheckList = csv.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
             return idCheckList.Contains(value);
         }
 
@@ -1347,7 +1362,7 @@ namespace Umbraco.Core
             fileName = fileName.StripFileExtension();
 
             // underscores and dashes to spaces
-            fileName = fileName.ReplaceMany(new[] { '_', '-' }, ' ');
+            fileName = fileName.ReplaceMany(Constants.CharArrays.UnderscoreDash, ' ');
 
             // any other conversions ?
 
@@ -1355,7 +1370,7 @@ namespace Umbraco.Core
             fileName = CultureInfo.InvariantCulture.TextInfo.ToTitleCase(fileName);
 
             // Replace multiple consecutive spaces with a single space
-            fileName = string.Join(" ", fileName.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries));
+            fileName = string.Join(" ", fileName.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries));
 
             return fileName;
         }
@@ -1475,5 +1490,44 @@ namespace Umbraco.Core
         /// </summary>
         public static string NullOrWhiteSpaceAsNull(this string text)
             => string.IsNullOrWhiteSpace(text) ? null : text;
+
+        /// <summary>
+        /// Splits a string with an escape character that allows for the split character to exist in a string
+        /// </summary>
+        /// <param name="value">The string to split</param>
+        /// <param name="splitChar">The character to split on</param>
+        /// <param name="escapeChar">The character which can be used to escape the character to split on</param>
+        /// <returns>The string split into substrings delimited by the split character</returns>
+        public static IEnumerable<string> EscapedSplit(this string value, char splitChar, char escapeChar = DefaultEscapedStringEscapeChar)
+        {
+            if (value == null) yield break;
+
+            var sb = new StringBuilder(value.Length);
+            var escaped = false;
+
+            foreach (var chr in value.ToCharArray())
+            {
+                if (escaped)
+                {
+                    escaped = false;
+                    sb.Append(chr);
+                }
+                else if (chr == splitChar)
+                {
+                    yield return sb.ToString();
+                    sb.Clear();
+                }
+                else if (chr == escapeChar)
+                {
+                    escaped = true;
+                }
+                else
+                {
+                    sb.Append(chr);
+                }
+            }
+
+            yield return sb.ToString();
+        }
     }
 }

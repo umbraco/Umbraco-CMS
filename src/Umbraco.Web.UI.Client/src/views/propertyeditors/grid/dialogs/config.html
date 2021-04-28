@@ -13,8 +13,12 @@
         <umb-editor-container>
             <ng-form name="gridItemConfigEditor" val-form-manager>
 
-                <umb-box ng-if="model.config">
-                    <umb-box-header title-key="grid_settings" />
+                <umb-empty-state position="center" ng-if="vm.showEmptyState">
+                    <localize key="grid_noConfiguration">No further configuration available</localize>
+                </umb-empty-state>
+
+                <umb-box ng-if="vm.showConfig">
+                    <umb-box-header title-key="grid_settings"></umb-box-header>
                     <umb-box-content>
                         <div>
                             <umb-property property="configValue"
@@ -25,8 +29,8 @@
                     </umb-box-content>
                 </umb-box>
 
-                <umb-box ng-if="model.styles">
-                    <umb-box-header title-key="grid_styles" />
+                <umb-box ng-if="vm.showStyles">
+                    <umb-box-header title-key="grid_styles"></umb-box-header>
                     <umb-box-content>
                         <div>
                             <umb-property property="styleValue"
@@ -48,7 +52,8 @@
                             shortcut="esc"
                             action="vm.close()">
                 </umb-button>
-                <umb-button type="button"
+                <umb-button ng-if="vm.showConfig || vm.showStyles"
+                            type="button"
                             button-style="success"
                             label-key="general_submit"
                             action="vm.submit()">

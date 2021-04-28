@@ -3,7 +3,7 @@
     * @name umbraco.resources.memberTypeResource
     * @description Loads in data for member types
     **/
-function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
+function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter, localizationService) {
 
     return {
 
@@ -16,16 +16,15 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
             }
 
             var query = "";
-            _.each(filterContentTypes, function (item) {
-                query += "filterContentTypes=" + item + "&";
-            });
+            filterContentTypes.forEach(fct => query += `filterContentTypes=${fct}&`);
+
             // if filterContentTypes array is empty we need a empty variable in the querystring otherwise the service returns a error
             if (filterContentTypes.length === 0) {
                 query += "filterContentTypes=&";
             }
-            _.each(filterPropertyTypes, function (item) {
-                query += "filterPropertyTypes=" + item + "&";
-            });
+
+            filterPropertyTypes.forEach(fpt => query += `filterPropertyTypes=${fpt}&`);
+
             // if filterPropertyTypes array is empty we need a empty variable in the querystring otherwise the service returns a error
             if (filterPropertyTypes.length === 0) {
                 query += "filterPropertyTypes=&";
@@ -103,8 +102,29 @@ function memberTypeResource($q, $http, umbRequestHelper, umbDataFormatter) {
             return umbRequestHelper.resourcePromise(
                  $http.post(umbRequestHelper.getApiUrl("memberTypeApiBaseUrl", "PostSave"), saveModel),
                 'Failed to save data for member type id ' + contentType.id);
-        }
+        },
 
+        copy: function (args) {
+            if (!args) {
+                throw "args cannot be null";
+            }
+            if (!args.parentId) {
+                throw "args.parentId cannot be null";
+            }
+            if (!args.id) {
+                throw "args.id cannot be null";
+            }
+
+            var promise = localizationService.localize("memberType_copyFailed");
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(umbRequestHelper.getApiUrl("memberTypeApiBaseUrl", "PostCopy"),
+                    {
+                        parentId: args.parentId,
+                        id: args.id
+                    }, { responseType: 'text' }),
+                promise);
+        }
     };
 }
 angular.module('umbraco.resources').factory('memberTypeResource', memberTypeResource);

@@ -327,6 +327,11 @@ namespace Umbraco.Core.Services
         OperationResult EmptyRecycleBin(int userId = Constants.Security.SuperUserId);
 
         /// <summary>
+        /// Returns true if there is any content in the recycle bin
+        /// </summary>
+        bool RecycleBinSmells();
+
+        /// <summary>
         /// Sorts documents.
         /// </summary>
         OperationResult Sort(IEnumerable<IContent> items, int userId = Constants.Security.SuperUserId, bool raiseEvents = true);
@@ -526,6 +531,6 @@ namespace Umbraco.Core.Services
         OperationResult Rollback(int id, int versionId, string culture = "*", int userId = Constants.Security.SuperUserId);
 
         #endregion
-      
+
     }
 }

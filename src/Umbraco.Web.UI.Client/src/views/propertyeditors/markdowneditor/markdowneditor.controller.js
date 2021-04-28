@@ -1,5 +1,5 @@
 //inject umbracos assetsServce and dialog service
-function MarkdownEditorController($scope, $element, assetsService, editorService, angularHelper, $timeout) {
+function MarkdownEditorController($scope, $element, assetsService, editorService, $timeout) {
 
     //tell the assets service to load the markdown.editor libs from the markdown editors
     //plugin folder
@@ -25,6 +25,26 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
             }
         };
         editorService.mediaPicker(mediaPicker);
+    }
+
+    function openLinkPicker(callback) {
+        var linkPicker = {
+            hideTarget: true,
+            submit: function(model) {
+                callback(model.target.url, model.target.name);
+                editorService.close();
+            },
+            close: function() {
+                editorService.close();
+            }
+        };
+        editorService.linkPicker(linkPicker);
+    }
+
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
     }
 
     assetsService
@@ -53,12 +73,18 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
                         return true; // tell the editor that we'll take care of getting the image url
                     });
 
+                    //subscribe to the link dialog clicks
+                    editor2.hooks.set("insertLinkDialog", function (callback) {
+                        openLinkPicker(callback);
+                        return true; // tell the editor that we'll take care of getting the link url
+                    });
+
                     editor2.hooks.set("onPreviewRefresh", function () {
                         // We must manually update the model as there is no way to hook into the markdown editor events without exstensive edits to the library.
                         if ($scope.model.value !== $("textarea", $element).val()) {
                             if ($scope.markdownEditorInitComplete) {
                                 //only set dirty after init load to avoid "unsaved" dialogue when we don't want it
-                                angularHelper.getCurrentForm($scope).$setDirty();
+                                setDirty();
                             } else {
                                 $scope.markdownEditorInitComplete = true;
                             }

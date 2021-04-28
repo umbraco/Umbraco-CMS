@@ -134,15 +134,16 @@ namespace Umbraco.Core.Persistence.Factories
                     // publishing = deal with edit and published values
                     foreach (var propertyValue in property.Values)
                     {
-                        var isInvariantValue = propertyValue.Culture == null;
-                        var isCultureValue = propertyValue.Culture != null && propertyValue.Segment == null;
+                        var isInvariantValue = propertyValue.Culture == null && propertyValue.Segment == null;
+                        var isCultureValue = propertyValue.Culture != null;
+                        var isSegmentValue = propertyValue.Segment != null;
 
                         // deal with published value
-                        if (propertyValue.PublishedValue != null && publishedVersionId > 0)
+                        if ((propertyValue.PublishedValue != null || isSegmentValue) && publishedVersionId > 0)
                             propertyDataDtos.Add(BuildDto(publishedVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.PublishedValue));
 
                         // deal with edit value
-                        if (propertyValue.EditedValue != null)
+                        if (propertyValue.EditedValue != null || isSegmentValue)
                             propertyDataDtos.Add(BuildDto(currentVersionId, property, languageRepository.GetIdByIsoCode(propertyValue.Culture), propertyValue.Segment, propertyValue.EditedValue));
 
                         // property.Values will contain ALL of it's values, both variant and invariant which will be populated if the

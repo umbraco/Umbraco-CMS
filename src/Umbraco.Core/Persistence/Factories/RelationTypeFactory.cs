@@ -9,7 +9,7 @@ namespace Umbraco.Core.Persistence.Factories
 
         public static IRelationType BuildEntity(RelationTypeDto dto)
         {
-            var entity = new RelationType(dto.ChildObjectType, dto.ParentObjectType, dto.Alias);
+            var entity = new RelationType(dto.Name, dto.Alias, dto.Dual, dto.ParentObjectType, dto.ChildObjectType);
 
             try
             {
@@ -17,8 +17,6 @@ namespace Umbraco.Core.Persistence.Factories
 
                 entity.Id = dto.Id;
                 entity.Key = dto.UniqueId;
-                entity.IsBidirectional = dto.Dual;
-                entity.Name = dto.Name;
 
                 // reset dirty initial properties (U4-1946)
                 entity.ResetDirtyProperties(false);

@@ -1097,11 +1097,12 @@ namespace Umbraco.Tests.Integration
             ResetEvents();
             ServiceContext.ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
 
-            Assert.AreEqual(2, _msgCount);
-            Assert.AreEqual(2, _events.Count);
+            Assert.AreEqual(3, _msgCount);
+            Assert.AreEqual(3, _events.Count);
             var i = 0;
             var m = 0;
-            Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content.Id}", _events[i++].ToString());
+            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content.Id}", _events[i++].ToString());
+            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{Constants.System.RecycleBinContent}", _events[i++].ToString());
             m++;
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content.Id}", _events[i].ToString());
         }
@@ -1122,12 +1123,14 @@ namespace Umbraco.Tests.Integration
             ResetEvents();
             ServiceContext.ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
 
-            Assert.AreEqual(3, _msgCount);
-            Assert.AreEqual(4, _events.Count);
+            Assert.AreEqual(4, _msgCount);
+            Assert.AreEqual(5, _events.Count);
             var i = 0;
             var m = 0;
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1.Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content2.Id}", _events[i++].ToString());
+            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content2.Id}", _events[i++].ToString());
+
+            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{Constants.System.RecycleBinContent}", _events[i++].ToString());
             m++;
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}", _events[i++].ToString());
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content2.Id}", _events[i].ToString());
@@ -1153,8 +1156,8 @@ namespace Umbraco.Tests.Integration
 
             ServiceContext.ContentService.EmptyRecycleBin(Constants.Security.SuperUserId);
 
-            Assert.AreEqual(14, _msgCount);
-            Assert.AreEqual(14, _events.Count);
+            Assert.AreEqual(15, _msgCount);
+            Assert.AreEqual(15, _events.Count);
             var i = 0;
             var m = 0;
 
@@ -1170,7 +1173,9 @@ namespace Umbraco.Tests.Integration
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content2C[1].Id}", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content2C[0].Id}", _events[i++].ToString());
             Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1C[0].Id}", _events[i++].ToString());
-            Assert.AreEqual($"{m:000}: ContentRepository/Remove/{content1.Id}", _events[i++].ToString());
+            Assert.AreEqual($"{m++:000}: ContentRepository/Remove/{content1.Id}", _events[i++].ToString());
+
+            Assert.AreEqual($"{m:000}: ContentCacheRefresher/RefreshNode/{Constants.System.RecycleBinContent}", _events[i++].ToString());
             m++;
             Assert.AreEqual($"{m:000}: ContentCacheRefresher/Remove/{content1.Id}", _events[i].ToString());
         }
@@ -2171,7 +2176,7 @@ namespace Umbraco.Tests.Integration
         [Test]
         public void HasInitialContent()
         {
-            Assert.AreEqual(4, ServiceContext.ContentService.Count());
+            Assert.AreEqual(5, ServiceContext.ContentService.Count());
         }
 
         #endregion

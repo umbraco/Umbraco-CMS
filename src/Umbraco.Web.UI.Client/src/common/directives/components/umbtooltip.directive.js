@@ -77,13 +77,17 @@ Use this directive to render a tooltip.
          scope.tooltipStyles.left = 0;
          scope.tooltipStyles.top = 0;
 
-         function setTooltipPosition(event) {
+          function setTooltipPosition(event) {
 
-            var container = $("#contentwrapper");
-            var containerLeft = container[0].offsetLeft;
-            var containerRight = containerLeft + container[0].offsetWidth;
-            var containerTop = container[0].offsetTop;
-            var containerBottom = containerTop + container[0].offsetHeight;
+            var overlay = $(event.target).closest('.umb-overlay');
+            var container = overlay.length > 0 ? overlay : $("#contentwrapper");
+
+            let rect = container[0].getBoundingClientRect();
+
+            var containerLeft = rect.left;
+            var containerRight = containerLeft + rect.width;
+            var containerTop = rect.top;
+            var containerBottom = containerTop + rect.height;
 
             var elementHeight = null;
             var elementWidth = null;
@@ -102,39 +106,43 @@ Use this directive to render a tooltip.
             position.left = event.pageX - (elementWidth / 2);
             position.top = event.pageY;
 
-            // check to see if element is outside screen
-            // outside right
-            if (position.left + elementWidth > containerRight) {
-               position.right = 10;
-               position.left = "inherit";
+            if (overlay.length > 0) {
+                position.left = event.pageX - rect.left - (elementWidth / 2);
+                position.top = event.pageY - rect.top;
             }
+            else {
+                // check to see if element is outside screen
+                // outside right
+                if (position.left + elementWidth > containerRight) {
+                    position.right = 10;
+                    position.left = "inherit";
+                }
 
-            // outside bottom
-            if (position.top + elementHeight > containerBottom) {
-               position.bottom = 10;
-               position.top = "inherit";
-            }
+                // outside bottom
+                if (position.top + elementHeight > containerBottom) {
+                    position.bottom = 10;
+                    position.top = "inherit";
+                }
 
-            // outside left
-            if (position.left < containerLeft) {
-               position.left = containerLeft + 10;
-               position.right = "inherit";
-            }
+                // outside left
+                if (position.left < containerLeft) {
+                    position.left = containerLeft + 10;
+                    position.right = "inherit";
+                }
 
-            // outside top
-            if (position.top < containerTop) {
-               position.top = 10;
-               position.bottom = "inherit";
+                // outside top
+                if (position.top < containerTop) {
+                    position.top = 10;
+                    position.bottom = "inherit";
+                }
             }
 
             scope.tooltipStyles = position;
 
             el.css(position);
-
          }
 
          setTooltipPosition(scope.event);
-
       }
 
       var directive = {

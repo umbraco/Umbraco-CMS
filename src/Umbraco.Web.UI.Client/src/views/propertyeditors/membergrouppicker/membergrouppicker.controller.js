@@ -18,6 +18,12 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
         });
     }
 
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
+    }
+
     $scope.openMemberGroupPicker = function() {
         var memberGroupPicker = {
             multiPicker: true,
@@ -32,6 +38,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
                 if (newGroupIds && newGroupIds.length) {
                     memberGroupResource.getByIds(newGroupIds).then(function (groups) {
                         $scope.renderModel = _.union($scope.renderModel, groups);
+                        setDirty();
                         editorService.close();
                     });
                 }
@@ -39,7 +46,6 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
                     // no new groups selected
                     editorService.close();
                 }
-                editorService.close();
             },
             close: function() {
                 editorService.close();
@@ -48,10 +54,13 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
         editorService.memberGroupPicker(memberGroupPicker);
     };
 
-    $scope.remove =function(index){
+    // TODO: I don't believe this is used
+    $scope.remove = function(index){
         $scope.renderModel.splice(index, 1);
+        setDirty();
     };
 
+    // TODO: I don't believe this is used
     $scope.add = function (item) {
         var currIds = _.map($scope.renderModel, function (i) {
             return i.id;
@@ -59,11 +68,14 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
 
         if (currIds.indexOf(item) < 0) {
             $scope.renderModel.push({ name: item, id: item, icon: 'icon-users' });
+            setDirty();
         }	
     };
 
+    // TODO: I don't believe this is used
     $scope.clear = function() {
         $scope.renderModel = [];
+        setDirty();
     };
 
     function renderModelIds() {

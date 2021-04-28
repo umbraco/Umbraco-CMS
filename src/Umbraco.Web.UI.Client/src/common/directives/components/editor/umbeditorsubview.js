@@ -6,7 +6,7 @@
      **/
     function EditorSubViewDirective() {
 
-        function link(scope, el, attr, ctrl) {
+        function link(scope) {
             //The model can contain: view, viewModel, name, alias, icon
 
             if (!scope.model.view) {
@@ -20,6 +20,7 @@
             templateUrl: 'views/components/editor/umb-editor-sub-view.html',
             scope: {
                 model: "=",
+                variantContent: "=?",
                 content: "="
             },
             link: link

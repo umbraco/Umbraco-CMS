@@ -12,6 +12,11 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         void ClearSchedule(DateTime date);
 
+        void ClearSchedule(DateTime date, ContentScheduleAction action);
+
+        bool HasContentForExpiration(DateTime date);
+        bool HasContentForRelease(DateTime date);
+
         /// <summary>
         /// Gets <see cref="IContent"/> objects having an expiration date before (lower than, or equal to) a specified date.
         /// </summary>
@@ -68,5 +73,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="permission"></param>
         void AddOrUpdatePermissions(ContentPermissionSet permission);
+
+        /// <summary>
+        /// Returns true if there is any content in the recycle bin
+        /// </summary>
+        bool RecycleBinSmells();
     }
 }

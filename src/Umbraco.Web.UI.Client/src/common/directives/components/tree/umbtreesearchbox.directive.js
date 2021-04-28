@@ -14,7 +14,9 @@ function treeSearchBox(localizationService, searchService, $q) {
             section: "@",
             datatypeKey: "@",
             hideSearchCallback: "=",
-            searchCallback: "="
+            searchCallback: "=",
+            inputId: "@",
+            autoFocus: "="
         },
         restrict: "E",    // restrict to an element
         replace: true,   // replace the html element with the template

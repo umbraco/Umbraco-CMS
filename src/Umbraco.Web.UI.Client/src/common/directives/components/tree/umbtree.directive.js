@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService) {
+function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService, backdropService) {
 
     return {
         restrict: 'E',
@@ -65,6 +65,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             vm.reloadNode = reloadNode;
             vm.syncTree = syncTree;
             vm.loadChildren = loadChildren;
+            vm.hasTree = hasTree;
 
             //wire up the exposed api object for hosting controllers
             if ($scope.api) {
@@ -72,6 +73,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 $scope.api.load = vm.load;
                 $scope.api.reloadNode = vm.reloadNode;
                 $scope.api.syncTree = vm.syncTree;
+                $scope.api.hasTree = vm.hasTree;
             }
 
             //flag to track the last loaded section when the tree 'un-loads'. We use this to determine if we should
@@ -85,10 +87,9 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
             /** Helper function to emit tree events */
             function emitEvent(eventName, args) {
-                if (registeredCallbacks[eventName] && angular.isArray(registeredCallbacks[eventName])) {
-                    _.each(registeredCallbacks[eventName], function (c) {
-                        c(args);//call it
-                    });
+                if (registeredCallbacks[eventName] && Utilities.isArray(registeredCallbacks[eventName])) {
+                    // call it
+                    registeredCallbacks[eventName].forEach(c => c(args));
                 }
             }
 
@@ -98,7 +99,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
              * @param {any} args either a string representing the 'section' or an object containing: 'section', 'treeAlias', 'customTreeParams', 'cacheKey'
              */
             function load(args) {
-                if (angular.isString(args)) {
+                if (Utilities.isString(args)) {
                     $scope.section = args;
                 }
                 else if (args) {
@@ -145,7 +146,7 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                     throw "args.path cannot be null";
                 }
 
-                if (angular.isString(args.path)) {
+                if (Utilities.isString(args.path)) {
                     args.path = args.path.replace('"', '').split(',');
                 }
 
@@ -201,6 +202,25 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 return _.filter(roots, function (node) {
                     return node && node.metaData && node.metaData.treeAlias;
                 });
+            }
+
+            //given a tree alias, this will search the current section tree for the specified tree alias and set the current active tree to it's root node
+            function hasTree(treeAlias) {
+
+                if (!$scope.tree) {
+                    throw "Err in umbtree.directive.loadActiveTree, $scope.tree is null";
+                }
+
+                if (!treeAlias) {
+                    return false;
+                }
+
+                var treeRoots = getTreeRootNodes();
+                var foundTree = _.find(treeRoots, function (node) {
+                    return node.metaData.treeAlias.toUpperCase() === treeAlias.toUpperCase();
+                });
+
+                return foundTree !== undefined;
             }
 
             //given a tree alias, this will search the current section tree for the specified tree alias and set the current active tree to it's root node
@@ -298,6 +318,18 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 }
             }
 
+            // Close any potential backdrop and remove the #leftcolumn modifier class
+            function closeBackdrop() {
+                var aboveClass = 'above-backdrop';
+                var leftColumn = $('#leftcolumn');
+                var isLeftColumnOnTop = leftColumn.hasClass(aboveClass);
+
+                if(isLeftColumnOnTop){
+                    backdropService.close();
+                    leftColumn.removeClass(aboveClass);
+                }
+            }
+
             /** Returns the css classses assigned to the node (div element) */
             $scope.getNodeCssClass = function (node) {
                 if (!node) {
@@ -309,26 +341,17 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
 
                 var css = [];
                 if (node.cssClasses) {
-                    _.each(node.cssClasses, function (c) {
-                        css.push(c);
-                    });
+                    node.cssClasses.forEach(c => css.push(c));
                 }
 
                 return css.join(" ");
             };
 
-            $scope.selectEnabledNodeClass = function (node) {
-                return node ?
-                    node.selected ?
-                        'icon umb-tree-icon sprTree icon-check green temporary' :
-                        '' :
-                    '';
-            };
+            $scope.selectEnabledNodeClass = node =>
+                node && node.selected ? 'icon sprTree icon-check green temporary' : '-hidden';
 
             /* helper to force reloading children of a tree node */
-            $scope.loadChildren = function (node, forceReload) {
-                return loadChildren(node, forceReload);
-            };
+            $scope.loadChildren = (node, forceReload) => loadChildren(node, forceReload);
 
             /**
               Method called when the options button next to the root node is called.
@@ -347,6 +370,8 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
             */
             $scope.select = function (n, ev) {
 
+                closeBackdrop()
+                
                 if (n.metaData && n.metaData.noAccess === true) {
                     ev.preventDefault();
                     return;
@@ -384,8 +409,8 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                 //load the tree
                 loadTree().then(function () {
                     //because angular doesn't return a promise for the resolve method, we need to resort to some hackery, else
-                    //like normal JS promises we could do resolve(...).then() 
-                    if (args && args.onLoaded && angular.isFunction(args.onLoaded)) {
+                    //like normal JS promises we could do resolve(...).then()
+                    if (args && args.onLoaded && Utilities.isFunction(args.onLoaded)) {
                         args.onLoaded();
                     }
                 });

@@ -17,13 +17,36 @@ namespace Umbraco.Core.Models
         private IRelationType _relationType;
         private string _comment;
 
+        /// <summary>
+        /// Constructor for constructing the entity to be created
+        /// </summary>
+        /// <param name="parentId"></param>
+        /// <param name="childId"></param>
+        /// <param name="relationType"></param>
         public Relation(int parentId, int childId, IRelationType relationType)
         {
             _parentId = parentId;
             _childId = childId;
             _relationType = relationType;
         }
-        
+
+        /// <summary>
+        /// Constructor for reconstructing the entity from the data source
+        /// </summary>
+        /// <param name="parentId"></param>
+        /// <param name="childId"></param>
+        /// <param name="parentObjectType"></param>
+        /// <param name="childObjectType"></param>
+        /// <param name="relationType"></param>
+        public Relation(int parentId, int childId, Guid parentObjectType, Guid childObjectType, IRelationType relationType)
+        {
+            _parentId = parentId;
+            _childId = childId;
+            _relationType = relationType;
+            ParentObjectType = parentObjectType;
+            ChildObjectType = childObjectType;
+        }
+
 
         /// <summary>
         /// Gets or sets the Parent Id of the Relation (Source)
@@ -35,6 +58,9 @@ namespace Umbraco.Core.Models
             set => SetPropertyValueAndDetectChanges(value, ref _parentId, nameof(ParentId));
         }
 
+        [DataMember]
+        public Guid ParentObjectType { get; set; }
+
         /// <summary>
         /// Gets or sets the Child Id of the Relation (Destination)
         /// </summary>
@@ -44,6 +70,9 @@ namespace Umbraco.Core.Models
             get => _childId;
             set => SetPropertyValueAndDetectChanges(value, ref _childId, nameof(ChildId));
         }
+
+        [DataMember]
+        public Guid ChildObjectType { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="RelationType"/> for the Relation

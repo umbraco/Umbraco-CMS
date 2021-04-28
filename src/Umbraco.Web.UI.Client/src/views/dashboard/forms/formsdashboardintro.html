@@ -2,20 +2,25 @@
 	<div class="installer-wrapper">
 
 		<div class="installer-intro">
-			<i class="icon icon-umb-contour"></i>
-			<h3>Umbraco Forms</h3>
+			<i class="icon icon-umb-contour" aria-hidden="true"></i>
+			<h3>
+				<localize key="formsDashboard_formsHeadline">Umbraco Forms</localize>
+			</h3>
 		</div>
 
         <!-- STEP one -->
 		<div class="step-one" ng-hide="vm.state">
 
-			<p class="step-text">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</p>
+			<p class="step-text">
+				<localize key="formsDashboard_formsDescription">Create forms using an intuitive drag and drop interface. From simple contact forms that sends e-mails to advanced questionaires that integrate with CRM systems. Your clients will love it!</localize>
+			</p>
 
 			<umb-button
 				class="forms-install-button"
 				type="button"
 				button-style="success"
 				label="Install"
+				label-key="general_install"
 				action="vm.installForms()">
 			</umb-button>
 
@@ -23,7 +28,7 @@
 
         <!-- STEP two -->
 		<div class="step-two" ng-if="vm.state">
-			<p id="installer" class="step-text">Installing...</p>
+			<p id="installer" class="step-text"><localize key="general_installing">Installing</localize>...</p>
 
             <div class="installing">
 

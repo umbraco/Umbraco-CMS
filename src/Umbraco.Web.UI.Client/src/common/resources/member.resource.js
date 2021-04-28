@@ -53,10 +53,10 @@ function memberResource($q, $http, umbDataFormatter, umbRequestHelper) {
 
             //converts the value to a js bool
             function toBool(v) {
-                if (angular.isNumber(v)) {
+                if (Utilities.isNumber(v)) {
                     return v > 0;
                 }
-                if (angular.isString(v)) {
+                if (Utilities.isString(v)) {
                     return v === "true";
                 }
                 if (typeof v === "boolean") {

@@ -28,12 +28,18 @@ function dependencies() {
                 "./node_modules/ace-builds/src-min-noconflict/snippets/text.js",
                 "./node_modules/ace-builds/src-min-noconflict/snippets/javascript.js",
                 "./node_modules/ace-builds/src-min-noconflict/snippets/css.js",
+                "./node_modules/ace-builds/src-min-noconflict/snippets/json.js",
+                "./node_modules/ace-builds/src-min-noconflict/snippets/xml.js",
                 "./node_modules/ace-builds/src-min-noconflict/theme-chrome.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-razor.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-javascript.js",
                 "./node_modules/ace-builds/src-min-noconflict/mode-css.js",
+                "./node_modules/ace-builds/src-min-noconflict/mode-json.js",
+                "./node_modules/ace-builds/src-min-noconflict/mode-xml.js",
                 "./node_modules/ace-builds/src-min-noconflict/worker-javascript.js",
-                "./node_modules/ace-builds/src-min-noconflict/worker-css.js"
+                "./node_modules/ace-builds/src-min-noconflict/worker-css.js",
+                "./node_modules/ace-builds/src-min-noconflict/worker-json.js",
+                "./node_modules/ace-builds/src-min-noconflict/worker-xml.js"
             ],
             "base": "./node_modules/ace-builds"
         },
@@ -44,7 +50,8 @@ function dependencies() {
         },
         {
             "name": "angular-aria",
-            "src":  ["./node_modules/angular-aria/angular-aria.min.js"],
+            "src":  ["./node_modules/angular-aria/angular-aria.min.js",
+                    "./node_modules/angular-aria/angular-aria.min.js.map"],
             "base": "./node_modules/angular-aria"
         },
         {
@@ -213,10 +220,10 @@ function dependencies() {
         {
             "name": "spectrum",
             "src":  [
-                "./node_modules/spectrum-colorpicker/spectrum.js",
-                "./node_modules/spectrum-colorpicker/spectrum.css"
+                "./node_modules/spectrum-colorpicker2/dist/spectrum.js",
+                "./node_modules/spectrum-colorpicker2/dist/spectrum.css"
             ],
-            "base": "./node_modules/spectrum-colorpicker"
+            "base": "./node_modules/spectrum-colorpicker2/dist"
         },
         {
             "name": "tinymce",
@@ -237,6 +244,14 @@ function dependencies() {
             "name": "underscore",
             "src":  ["node_modules/underscore/underscore-min.js"],
             "base": "./node_modules/underscore"
+        },
+        {
+            "name": "wicg-inert",
+            "src": [
+                "./node_modules/wicg-inert/dist/inert.min.js",
+                "./node_modules/wicg-inert/dist/inert.min.js.map"
+            ],
+            "base": "./node_modules/wicg-inert"
         }
     ];
 
@@ -259,19 +274,18 @@ function dependencies() {
     //css, fonts and image files
     
     var assetsTask = gulp.src(config.sources.globs.assets, { allowEmpty: true });
-    if (global.isProd === true) {
-        assetsTask = assetsTask.pipe(imagemin([
-            imagemin.gifsicle({interlaced: true}),
-            imagemin.jpegtran({progressive: true}),
-            imagemin.optipng({optimizationLevel: 5}),
-            imagemin.svgo({
-                plugins: [
-                    {removeViewBox: true},
-                    {cleanupIDs: false}
-                ]
-            })
-        ]));
-    }
+    assetsTask = assetsTask.pipe(imagemin([
+        imagemin.gifsicle({interlaced: true}),
+        imagemin.jpegtran({progressive: true}),
+        imagemin.optipng({optimizationLevel: 5}),
+        imagemin.svgo({
+            plugins: [
+                {removeViewBox: true},
+                {cleanupIDs: false}
+            ]
+        })
+    ]));
+    
     assetsTask = assetsTask.pipe(gulp.dest(config.root + config.targets.assets));
     
     stream.add(assetsTask);

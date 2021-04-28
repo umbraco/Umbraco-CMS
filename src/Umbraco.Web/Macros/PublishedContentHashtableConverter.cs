@@ -100,7 +100,7 @@ namespace Umbraco.Web.Macros
             Elements.Add("createDate", createDate);
             Elements.Add("updateDate", updateDate);
             Elements.Add("path", path);
-            Elements.Add("splitpath", path.Split(','));
+            Elements.Add("splitpath", path.Split(Constants.CharArrays.Comma));
         }
 
         /// <summary>
@@ -248,8 +248,10 @@ namespace Umbraco.Web.Macros
 
             public string UrlSegment => throw new NotImplementedException();
 
+            [Obsolete("Use WriterName(IUserService) extension instead")]
             public string WriterName { get; }
 
+            [Obsolete("Use CreatorName(IUserService) extension instead")]
             public string CreatorName { get; }
 
             public int WriterId => _inner.WriterId;

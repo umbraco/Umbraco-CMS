@@ -1,5 +1,4 @@
 ﻿using System;
-using Umbraco.Core.Exceptions;
 
 namespace Umbraco.Core.PropertyEditors
 {
@@ -53,17 +52,17 @@ namespace Umbraco.Core.PropertyEditors
         /// </remarks>
         public DataEditorAttribute(string alias, EditorType type, string name, string view)
         {
-            if ((type & ~(EditorType.PropertyValue | EditorType.MacroParameter)) > 0)
-                throw new ArgumentOutOfRangeException(nameof(type), $"Not a valid {typeof(EditorType)} value.");
+            if (alias == null) throw new ArgumentNullException(nameof(alias));
+            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(alias));
+            if ((type & ~(EditorType.PropertyValue | EditorType.MacroParameter)) > 0) throw new ArgumentOutOfRangeException(nameof(type), type, $"Not a valid {typeof(EditorType)} value.");
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            if (view == null) throw new ArgumentNullException(nameof(view));
+            if (string.IsNullOrWhiteSpace(view)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(view));
+
             Type = type;
-
-            if (string.IsNullOrWhiteSpace(alias)) throw new ArgumentNullOrEmptyException(nameof(alias));
             Alias = alias;
-
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullOrEmptyException(nameof(name));
             Name = name;
-
-            if (string.IsNullOrWhiteSpace(view)) throw new ArgumentNullOrEmptyException(nameof(view));
             View = view == NullView ? null : view;
         }
 
@@ -100,8 +99,10 @@ namespace Umbraco.Core.PropertyEditors
             get => _valueType;
             set
             {
-                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentNullOrEmptyException(nameof(value));
-                if (!ValueTypes.IsValue(value)) throw new ArgumentOutOfRangeException(nameof(value), $"Not a valid {typeof(ValueTypes)} value.");
+                if (value == null) throw new ArgumentNullException(nameof(value));
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(value));
+                if (!ValueTypes.IsValue(value)) throw new ArgumentOutOfRangeException(nameof(value), value, $"Not a valid {typeof(ValueTypes)} value.");
+
                 _valueType = value;
             }
         }

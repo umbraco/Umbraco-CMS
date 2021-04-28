@@ -1,4 +1,4 @@
-function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper) {
+function listViewController($scope, $interpolate, $routeParams, $injector, $timeout, currentUserResource, notificationsService, iconHelper, editorState, localizationService, appState, $location, listViewHelper, navigationService, editorService, overlayService, languageResource, mediaHelper, eventsService) {
 
     //this is a quick check to see if we're in create mode, if so just exit - we cannot show children for content
     // that isn't created yet, if we continue this will use the parent id in the route params which isn't what
@@ -147,6 +147,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
 
     var listParamsForCurrent = $routeParams.id == $routeParams.list;
     $scope.options = {
+        useInfiniteEditor: $scope.model.config.useInfiniteEditor === true,
         pageSize: $scope.model.config.pageSize ? $scope.model.config.pageSize : 10,
         pageNumber: (listParamsForCurrent && $routeParams.page && Number($routeParams.page) != NaN && Number($routeParams.page) > 0) ? $routeParams.page : 1,
         filter: (listParamsForCurrent && $routeParams.filter ? $routeParams.filter : '').trim(),
@@ -227,26 +228,21 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         if (err.status && err.status >= 500) {
 
             // Open ysod overlay
-            $scope.ysodOverlay = {
-                view: "ysod",
-                error: err,
-                show: true
-            };
+            overlayService.ysod(err);
         }
 
         $timeout(function () {
             $scope.bulkStatus = "";
             $scope.actionInProgress = false;
-        },
-            500);
+        }, 500);
 
-        if (successMsgPromise) {
-            localizationService.localize("bulk_done")
-                .then(function (v) {
-                    successMsgPromise.then(function (successMsg) {
-                        notificationsService.success(v, successMsg);
-                    })
-                });
+        if (successMsgPromise)
+        {
+            localizationService.localize("bulk_done").then(function (v) {
+                successMsgPromise.then(function (successMsg) {
+                    notificationsService.success(v, successMsg);
+                })
+            });
         }
     }
 
@@ -271,11 +267,13 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     with simple values */
 
     $scope.getContent = function (contentId) {
-
         $scope.reloadView($scope.contentId, true);
     }
 
     $scope.reloadView = function (id, reloadActiveNode) {
+        if (!id) {
+            return;
+        }
         $scope.viewLoaded = false;
         $scope.folders = [];
 
@@ -324,31 +322,15 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         });
     };
 
-    var searchListView = _.debounce(function () {
-        $scope.$apply(function () {
-            makeSearch();
-        });
-    }, 500);
-
-    $scope.forceSearch = function (ev) {
-        //13: enter
-        switch (ev.keyCode) {
-            case 13:
-                makeSearch();
-                break;
-        }
-    };
-
-    $scope.enterSearch = function () {
-        $scope.viewLoaded = false;
-        searchListView();
-    };
-
-    function makeSearch() {
+    $scope.makeSearch = function() {
         if ($scope.options.filter !== null && $scope.options.filter !== undefined) {
             $scope.options.pageNumber = 1;
             $scope.reloadView($scope.contentId);
         }
+    }
+
+    $scope.onSearchStartTyping = function() {
+        $scope.viewLoaded = false;
     }
 
     $scope.selectedItemsCount = function () {
@@ -393,7 +375,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         return serial(selected, fn, getStatusMsg, 0).then(function (result) {
             // executes once the whole selection has been processed
             // in case of an error (caught by serial), result will be the error
-            if (!(result.data && angular.isArray(result.data.notifications)))
+            if (!(result.data && Utilities.isArray(result.data.notifications)))
                 showNotificationsAndReset(result, true, getSuccessMsg(selected.length));
         });
     }
@@ -419,7 +401,6 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             dialog.title = value;
             overlayService.open(dialog);
         });
-
     };
 
     function performDelete() {
@@ -634,7 +615,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             currentNode: $scope.contentId,
             submit: function (model) {
                 if (model.target) {
-                    performCopy(model.target, model.relateToOriginal);
+                    performCopy(model.target, model.relateToOriginal, model.includeDescendants);
                 }
                 editorService.close();
             },
@@ -645,9 +626,9 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
         editorService.copy(copyEditor);
     };
 
-    function performCopy(target, relateToOriginal) {
+    function performCopy(target, relateToOriginal, includeDescendants) {
         applySelected(
-            function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal }); },
+            function (selected, index) { return contentResource.copy({ parentId: target.id, id: getIdCallback(selected[index]), relateToOriginal: relateToOriginal, recursive: includeDescendants }); },
             function (count, total) {
                 var key = (total === 1 ? "bulk_copiedItemOfItem" : "bulk_copiedItemOfItems");
                 return localizationService.localize(key, [count, total]);
@@ -707,7 +688,7 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
 
             if (e.nameExp) {
                 var newValue = e.nameExp({ value });
-                if (newValue && (newValue = $.trim(newValue))) {
+                if (newValue && (newValue = newValue.trim())) {
                     value = newValue;
                 }
             }
@@ -715,56 +696,21 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             // set what we've got on the result
             result[alias] = value;
         });
-
-
     }
 
     function isDate(val) {
-        if (angular.isString(val)) {
+        if (Utilities.isString(val)) {
             return val.match(/^(\d{4})\-(\d{2})\-(\d{2})\ (\d{2})\:(\d{2})\:(\d{2})$/);
         }
         return false;
     }
 
     function initView() {
-        //default to root id if the id is undefined
         var id = $routeParams.id;
         if (id === undefined) {
-            id = -1;
+            // no ID found in route params - don't list anything as we don't know for sure where we are
+            return;
         }
-
-        getContentTypesCallback(id).then(function (listViewAllowedTypes) {
-          $scope.listViewAllowedTypes = listViewAllowedTypes;
-
-          var blueprints = false;
-          _.each(listViewAllowedTypes, function (allowedType) {
-              if (_.isEmpty(allowedType.blueprints)) {
-                // this helps the view understand that there are no blueprints available
-                allowedType.blueprints = null;
-              }
-              else {
-                blueprints = true;
-                // turn the content type blueprints object into an array of sortable objects for the view
-                allowedType.blueprints = _.map(_.pairs(allowedType.blueprints || {}), function (pair) {
-                  return {
-                    id: pair[0],
-                    name: pair[1]
-                  };
-                });
-              }
-            });
-
-            if (listViewAllowedTypes.length === 1 && blueprints === false) {
-                $scope.createAllowedButtonSingle = true;
-            }
-            if (listViewAllowedTypes.length === 1 && blueprints === true) {
-                $scope.createAllowedButtonSingleWithBlueprints = true;
-            }
-            if (listViewAllowedTypes.length > 1) {
-                $scope.createAllowedButtonMultiWithBlueprints = true;
-            }
-        });
-
 
         $scope.contentId = id;
         $scope.isTrashed = editorState.current ? editorState.current.trashed : id === "-20" || id === "-21";
@@ -778,6 +724,40 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
             $scope.options.allowBulkCopy ||
             $scope.options.allowBulkMove ||
             $scope.options.allowBulkDelete;
+
+        if ($scope.isTrashed === false) {
+            getContentTypesCallback(id).then(function (listViewAllowedTypes) {
+                $scope.listViewAllowedTypes = listViewAllowedTypes;
+
+                var blueprints = false;
+                _.each(listViewAllowedTypes, function (allowedType) {
+                    if (_.isEmpty(allowedType.blueprints)) {
+                        // this helps the view understand that there are no blueprints available
+                        allowedType.blueprints = null;
+                    }
+                    else {
+                        blueprints = true;
+                        // turn the content type blueprints object into an array of sortable objects for the view
+                        allowedType.blueprints = _.map(_.pairs(allowedType.blueprints || {}), function (pair) {
+                            return {
+                                id: pair[0],
+                                name: pair[1]
+                            };
+                        });
+                    }
+                });
+
+                if (listViewAllowedTypes.length === 1 && blueprints === false) {
+                    $scope.createAllowedButtonSingle = true;
+                }
+                if (listViewAllowedTypes.length === 1 && blueprints === true) {
+                    $scope.createAllowedButtonSingleWithBlueprints = true;
+                }
+                if (listViewAllowedTypes.length > 1) {
+                    $scope.createAllowedButtonMultiWithBlueprints = true;
+                }
+            });
+        }
 
         $scope.reloadView($scope.contentId);
     }
@@ -821,6 +801,42 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     }
 
     function createBlank(entityType, docTypeAlias) {
+        if ($scope.options.useInfiniteEditor) {
+            
+            var editorModel = {
+                create: true,
+                submit: function(model) {
+                    editorService.close();
+                    $scope.reloadView($scope.contentId);
+                },
+                close: function() {
+                    editorService.close();
+                    $scope.reloadView($scope.contentId);
+                }
+            };
+
+            if (entityType == "content")
+            {
+                editorModel.parentId = $scope.contentId;
+                editorModel.documentTypeAlias = docTypeAlias;
+                editorService.contentEditor(editorModel);
+                return;
+            }
+
+            if (entityType == "media")
+            {
+                editorService.mediaEditor(editorModel);
+                return;
+            }
+
+            if (entityType == "member")
+            {
+                editorModel.doctype = docTypeAlias;
+                editorService.memberEditor(editorModel);
+                return;
+            }
+        }
+
         $location
             .path("/" + entityType + "/" + entityType + "/edit/" + $scope.contentId)
             .search("doctype", docTypeAlias)
@@ -847,6 +863,19 @@ function listViewController($scope, $interpolate, $routeParams, $injector, $time
     $scope.createFromBlueprint = createFromBlueprint;
     $scope.toggleDropdown = toggleDropdown;
     $scope.leaveDropdown = leaveDropdown;
+
+    // if this listview has sort order in it, make sure it is updated when sorting is performed on the current content
+    if (_.find($scope.options.includeProperties, property => property.alias === "sortOrder")) {
+        var eventSubscription = eventsService.on("sortCompleted", function (e, args) {
+            if (parseInt(args.id) === parseInt($scope.contentId)) {
+                $scope.reloadView($scope.contentId);
+            }
+        });
+
+        $scope.$on('$destroy', function () {
+            eventsService.unsubscribe(eventSubscription);
+        });
+    }
 
     //GO!
     initView();

@@ -154,7 +154,7 @@ app.config(function ($routeProvider) {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we replace the template dynamically based on the current tree.
-            controller: function ($scope, $routeParams, treeService) {
+            controller: function ($scope, $routeParams, navigationService) {
 
                 if (!$routeParams.method) {
                     $scope.templateUrl = "views/common/dashboard.html";
@@ -176,24 +176,7 @@ app.config(function ($routeProvider) {
                     $scope.templateUrl = "views/users/overview.html";
                     return;
                 }
-
-                // Here we need to figure out if this route is for a user's package tree and if so then we need
-                // to change it's convention view path to:
-                // /App_Plugins/{mypackage}/backoffice/{treetype}/{method}.html
-
-                // otherwise if it is a core tree we use the core paths:
-                // views/{treetype}/{method}.html
-
-                var packageTreeFolder = treeService.getTreePackageFolder($routeParams.tree);
-
-                if (packageTreeFolder) {
-                    $scope.templateUrl = (Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
-                        "/" + packageTreeFolder +
-                        "/backoffice/" + $routeParams.tree + "/" + $routeParams.method + ".html");
-                }
-                else {
-                    $scope.templateUrl = ('views/' + $routeParams.tree + '/' + $routeParams.method + '.html');
-                }
+                $scope.templateUrl = navigationService.getTreeTemplateUrl($routeParams.tree, $routeParams.method);
             },
             reloadOnSearch: false,
             resolve: canRoute(true)
@@ -202,30 +185,13 @@ app.config(function ($routeProvider) {
             //This allows us to dynamically change the template for this route since you cannot inject services into the templateUrl method.
             template: "<div ng-include='templateUrl'></div>",
             //This controller will execute for this route, then we replace the template dynamically based on the current tree.
-            controller: function ($scope, $route, $routeParams, treeService) {
+            controller: function ($scope, $routeParams, navigationService) {
 
                 if (!$routeParams.tree || !$routeParams.method) {
                     $scope.templateUrl = "views/common/dashboard.html";
+                    return;
                 }
-
-                // Here we need to figure out if this route is for a package tree and if so then we need
-                // to change it's convention view path to:
-                // /App_Plugins/{mypackage}/backoffice/{treetype}/{method}.html
-
-                // otherwise if it is a core tree we use the core paths:
-                // views/{treetype}/{method}.html
-
-                var packageTreeFolder = treeService.getTreePackageFolder($routeParams.tree);
-
-                if (packageTreeFolder) {
-                    $scope.templateUrl = (Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
-                        "/" + packageTreeFolder +
-                        "/backoffice/" + $routeParams.tree + "/" + $routeParams.method + ".html");
-                }
-                else {
-                    $scope.templateUrl = ('views/' + $routeParams.tree + '/' + $routeParams.method + '.html');
-                }
-
+                $scope.templateUrl = navigationService.getTreeTemplateUrl($routeParams.tree, $routeParams.method);
             },
             reloadOnSearch: false,
             reloadOnUrl: false,

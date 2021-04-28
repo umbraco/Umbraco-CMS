@@ -1,13 +1,13 @@
 //
 // Container styles
 // --------------------------------------------------
-.umb-property-editor { 
+.umb-property-editor {
     width: 100%;
 }
 
 .umb-property-editor-tiny {
     width: 60px;
-    
+
 	&.umb-editor-push {
 		width:30%;
 		min-width:0;
@@ -30,7 +30,7 @@
 }
 
 .umb-codeeditor{
-  width: 99%; 
+  width: 99%;
 }
 
 // displays property inline with preceeding
@@ -104,6 +104,20 @@
 // --------------------------------------------------
 
 /* pre-value editor */
+.umb-prevalues-multivalues.umb-colors {
+    max-width: 600px;
+    width: 100%;
+    min-width: 66.6%;
+
+    @media (min-width: 1101px) and (max-width: 1300px), (max-width: 930px) {
+        max-width: none;
+    }
+
+    .umb-overlay__form & {
+        width: 100%;
+    }
+}
+
 .control-group.color-picker-preval {
     .thumbnail {
         width: 34px;
@@ -131,7 +145,7 @@
 
         pre {
             display: inline-flex;
-            font-family: monospace;
+            font-family: @monoFontFamily;
             margin-left: 15px;
             margin-right: 15px;
             white-space: nowrap;
@@ -139,7 +153,7 @@
             margin-bottom: 0;
             vertical-align: middle;
             padding: 6px 10px;
-            background: #f7f7f7;
+            background: @gray-11;
             flex: 0 0 auto;
         }
 
@@ -160,17 +174,12 @@
         width: auto;
     }
 
-    .sp-replacer {
-        display: inline-flex;
-        margin-right: 18px;
-    }
-
     label {
         border: 1px solid @white;
         padding: 6px 10px;
-        font-family: monospace;
-        border: 1px solid #dfdfe1;
-        background: #f7f7f7;
+        font-family: @monoFontFamily;
+        border: 1px solid @gray-8;
+        background: @gray-11;
         margin: 0 15px 0 3px;
         border-radius: 3px;
     }
@@ -232,6 +241,7 @@
 }
 .umb-mediapicker-multi > div {
     width:100%;
+    .umb-property-editor--limit-width();
 }
 
 
@@ -248,25 +258,10 @@
 
     transition: all 150ms ease-in-out;
 
-    &:focus,
+    &:active,
     &:hover {
         color: @ui-action-discreet-type-hover;
         border-color: @ui-action-discreet-type-hover;
-    }
-    
-    &:focus {
-        outline: none;
-        .tabbing-active &:after {
-            content: '';
-            position: absolute;
-            z-index: 10000;
-            top: -6px;
-            bottom: -6px;
-            left: -6px;
-            right: -6px;
-            border-radius: 3px;
-            box-shadow: 0 0 2px @blueMid, inset 0 0 2px 1px @blueMid;
-        }
     }
 }
 
@@ -334,6 +329,11 @@
   box-shadow:none !important;
 }
 
+.umb-sortable-thumbnails-container {
+    display: flex;
+    flex-wrap: wrap;
+    background-color: @white;
+}
 
 .umb-sortable-thumbnails {
     list-style-type: none;
@@ -358,11 +358,11 @@
     max-width: 100%;
 }
 .umb-mediapicker {
-    
+
     .umb-sortable-thumbnails li {
         border:none;
     }
-    
+
 }
 
 .umb-mediapicker .umb-sortable-thumbnails li {
@@ -463,9 +463,16 @@
 
 .umb-cropper{
     position: relative;
+    width: 100%;
 }
 
-.umb-cropper img, .umb-cropper-gravity img{
+.umb-cropper .crop-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 9 / 16 * 100%;
+}
+
+.umb-cropper img {
     position: relative;
     max-width: 100%;
     height: auto;
@@ -477,74 +484,71 @@
     max-width: none;
  }
 
- .umb-cropper .overlay, .umb-cropper-gravity .overlay {
-    top: 0;
-    left: 0;
+ .umb-cropper .overlay {
+    position: absolute;
+    top: 0 !important;
+    bottom: 0;
+    left: 0 !important;
+    right: 0;
     cursor: move;
     z-index: @zindexCropperOverlay;
-    position: absolute;
+    border: 1px solid @inputBorder;
+    outline: none;
+
+    &:focus {
+        border-color: @inputBorderFocus;
+    }
 }
 
-.umb-cropper .viewport{
+.umb-cropper .viewport {
+    position: absolute;
     overflow: hidden;
-    position: relative;
-    margin: auto;
-    max-width: 100%;
-    height: auto;
- }
-
-.umb-cropper-gravity .viewport{
-    overflow: hidden;
-    position: relative;
     width: 100%;
     height: 100%;
-}
+    .checkeredBackground();
+    contain: strict;
 
+    > img {
+        position: absolute;
+    }
+ }
 
-.umb-cropper .viewport:after {
-    content: "";
+.umb-cropper .viewport .__mask {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: @zindexCropperOverlay - 1;
-    opacity: .75;
-    box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
+    box-shadow: 0 0 0 2000px rgba(255, 255, 255, .8);
+}
+.umb-cropper .viewport .__mask-info {
+    position: absolute;
+    bottom: -20px;
+    height: 20px;
+    right: 0;
+    z-index: @zindexCropperOverlay - 1;
+    font-size: 12px;
+    opacity: 0.7;
+    padding: 0px 6px;
 }
 
-.umb-cropper-gravity .overlay{
-    width: 14px;
-    height: 14px;
-    text-align: center;
-    border-radius: 20px;
-    background: @pinkLight;
-    border: 3px solid @white;
-    opacity: 0.8;
-}
-
-.umb-cropper-gravity .overlay i {
-    font-size: 26px;
-    line-height: 26px;
-    opacity: 0.8 !important;
-}
-
-.umb-cropper .crop-container {
-    text-align: center;
+.umb-cropper .crop-controls-wrapper {
+    display: flex;
+    height: 50px;
+    align-items: center;
+    background-color: #fff;
+    .btn:last-of-type {
+        margin-right: 10px;
+    }
 }
 
 .umb-cropper .crop-slider-wrapper {
-    padding: 10px;
-    border-top: 1px solid @gray-10;
-    margin-top: 10px;
+    flex: auto;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-
-    @media (min-width: 769px) {
-        padding: 10px 50px 10px 50px;
-    }
 
     i {
         color: @gray-3;
@@ -558,11 +562,20 @@
     }
 
     .crop-slider {
-        padding: 50px 15px 40px 15px;
-        width: 66.6%;
+        width: calc(100% - 100px);
     }
 }
 
+.umb-cropper .crop-controls-wrapper__icon-left {
+    margin-right: 10px;
+
+}
+.umb-cropper .crop-controls-wrapper__icon-right {
+    margin-left: 10px;
+    font-size: 22px;
+}
+
+/*
    .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
         display: inline-block;
         max-width: 100%;
@@ -572,36 +585,113 @@
         float: left;
     }
 
+    .umb-cropper-imageholder umb-image-gravity {
+        display:block;
+    }
+    */
+
+    .umb-crop-thumbnail-container {
+        img {
+            max-width: unset;
+        }
+    }
+
     .cropList {
         display: inline-block;
         position: relative;
         vertical-align: top;
+        flex:0;
     }
 
-    .gravity-container {
-        border: 1px solid @gray-8;
+    .umb-cropper-gravity .gravity-container {
+        border: 1px solid @inputBorder;
+        box-sizing: border-box;
         line-height: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        .checkeredBackground();
+        contain: content;
+
+        &:focus, &:focus-within {
+            border-color: @inputBorderFocus;
+        }
 
         .viewport {
-            max-width: 600px;
-            .checkeredBackground();
+            position: relative;
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
             img {
                 display: block;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            img {
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
+                max-width: 100%;
+                max-height: 100%;
             }
 
             &:hover {
                 cursor: pointer;
             }
         }
+    }
+
+    
+    .umb-cropper-gravity img {
+        position: relative;
+        max-width: 100%;
+        height: auto;
+        top: 0;
+        left: 0;
+    }
+    
+    .umb-cropper-gravity .overlayViewport {
+        position: absolute;
+        top:0;
+        bottom:0;
+        left:0;
+        right:0;
+        contain: strict;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .umb-cropper-gravity .overlay {
+        position: relative;
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        cursor: crosshair;
+    }
+    .umb-cropper-gravity .overlay .focalPoint {
+        position: absolute;
+        top: 0;
+        left: 0;
+        cursor: move;
+        z-index: @zindexCropperOverlay;
+
+        width: 14px;
+        height: 14px;
+        // this element should have no width or height as its preventing the jQuery draggable-plugin to go all the way to the sides:
+        margin-left: -10px;
+        margin-top: -10px;
+        margin-right: -10px;
+        margin-bottom: -10px;
+        
+        text-align: center;
+        border-radius: 20px;
+        background: @pinkLight;
+        border: 3px solid @white;
+        opacity: 0.8;
+    }
+
+    .umb-cropper-gravity .overlay .focalPoint i {
+        font-size: 26px;
+        line-height: 26px;
+        opacity: 0.8 !important;
     }
 
     .imagecropper {
@@ -611,24 +701,13 @@
 
         @media (max-width: 768px) {
             flex-direction: column;
-            float: left;
-            max-width: 100%;
         }
-
-        .viewport img {
-            .checkeredBackground();
-        }
+        
     }
 
     .imagecropper .umb-cropper__container {
         position: relative;
-        margin-bottom: 10px;
-        max-width: 100%; 
-        border: 1px solid @gray-10;
-
-        @media (min-width: 769px) {
-            width: 600px;
-        }
+        width: 100%;
     }
 
     .imagecropper .umb-cropper__container .button-drawer {
@@ -686,7 +765,8 @@
     }
 
     .imagecropper .umb-sortable-thumbnails li .crop-name,
-    .imagecropper .umb-sortable-thumbnails li .crop-size {
+    .imagecropper .umb-sortable-thumbnails li .crop-size,
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
         display: block;
         text-align: left;
         font-size: 13px;
@@ -698,10 +778,15 @@
         margin: 10px 0 5px;
     }
 
-    .imagecropper .umb-sortable-thumbnails li .crop-size {
+    .imagecropper .umb-sortable-thumbnails li .crop-size,
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
         font-size: 10px;
         font-style: italic;
         margin: 0 0 5px;
+    }
+
+    .imagecropper .umb-sortable-thumbnails li .crop-annotation {
+        color: @gray-6;
     }
 
     .btn-crop-delete {
@@ -709,8 +794,15 @@
         text-align: left;
     }
 
+    .imagecropper .cropList-container {
+        h5 {
+            margin-left: 10px;
+            margin-top: 0;
+        }
+    }
+
 //
-// folder-browser
+// Folder browser
 // --------------------------------------------------
 .umb-folderbrowser .add-link {
   display: inline-block;
@@ -724,6 +816,11 @@
 //
 // File upload
 // --------------------------------------------------
+.umb-fileupload {
+    display: flex;
+    flex-direction: column;
+}
+
 .umb-fileupload .preview {
   border-radius: 5px;
   border: 1px solid @gray-6;
@@ -804,81 +901,62 @@
 
 
 //
+// Slider
+// --------------------------------------------------
+.umb-slider {
+    .umb-property-editor--limit-width();
+}
+
+//
 // Tags
 // --------------------------------------------------
 .umb-tags {
-    border: @inputBorder solid 1px;
-    padding: 5px;
-    min-height: 54px;
-    font-size: 13px;
-    text-shadow: none;
-    box-sizing: border-box;
     .umb-property-editor--limit-width();
-
-    .tag {
-        cursor: default;
-        margin: 10px;
-        padding: 10px 15px;
-        background: @blueExtraDark;
-        position: relative;
-        user-select: all;
-        
-        .icon-trash {
-            position: relative;
-            cursor: pointer;
-            padding-left: 2px;
-            font-size: 15px;
-            right: -5px;
-            bottom: -1px;
-        }
-
-        .umb_confirm-action__overlay.-left{
-            top: 6px;
-            left: auto;
-            right: 15px;
-        }
-    }
-
-    input {
-        border: none;
-        background: @white;
-    }
-    
-    .twitter-typeahead {
-        margin: 10px;
-        margin-top: 16px;
-        vertical-align: top;
-        input {
-            padding-left: 0;
-        }
-    }
 }
 
 //
 // Date/time picker
 // --------------------------------------------------
-.bootstrap-datetimepicker-widget .btn{padding: 0;}
-.bootstrap-datetimepicker-widget .picker-switch .btn{ background: none; border: none;}
-.umb-datepicker .input-append .add-on{cursor: pointer;}
-.umb-datepicker .input-append .on-top {
+.bootstrap-datetimepicker-widget .btn {padding: 0;}
+.bootstrap-datetimepicker-widget .picker-switch .btn { background: none; border: none;}
+.umb-datepicker .input-append .btn-clear {
+    border: none;
     position: absolute;
     margin-left: -31px;
     margin-top: 1px;
-    display: inline-block;
-    height: 22px;
-    padding: 5px 6px 3px 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 4px 6px;
     font-size: @baseFontSize;
     font-weight: normal;
     line-height: @baseLineHeight;
     text-align: center;
     background-color: @white;
     color: @ui-option-type;
+
     &:hover {
         color: @ui-option-type-hover;
     }
 }
 .umb-datepicker p {margin-top:10px;}
 .umb-datepicker p a{color: @gray-3;}
+
+//
+// Link picker
+// --------------------------------------------------
+.umb-linkpicker {
+    .umb-linkpicker__url {
+        width: 50%;
+        padding-right: 5px;
+    }
+
+    .umb-linkpicker__anchor {
+        width: 50%;
+        padding-left: 5px;
+    }
+}
 
 //
 // Code mirror - even though this isn't a proprety editor right now, it could be so I'm putting the styles here

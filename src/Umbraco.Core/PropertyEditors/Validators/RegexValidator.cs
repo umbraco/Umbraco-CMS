@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using Umbraco.Core.Composing;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Core.PropertyEditors.Validators
@@ -48,8 +47,9 @@ namespace Umbraco.Core.PropertyEditors.Validators
             get => _regex;
             set
             {
-                if (string.IsNullOrWhiteSpace(value))
-                    throw new ArgumentNullOrEmptyException(nameof(value));
+                if (value == null) throw new ArgumentNullException(nameof(value));
+                if (string.IsNullOrWhiteSpace(value)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(value));
+
                 _regex = value;
             }
         }
@@ -58,7 +58,9 @@ namespace Umbraco.Core.PropertyEditors.Validators
         public IEnumerable<ValidationResult> Validate(object value, string valueType, object dataTypeConfiguration)
         {
             if (_regex == null)
+            {
                 throw new InvalidOperationException("The validator has not been configured.");
+            }
 
             return ValidateFormat(value, valueType, _regex);
         }
@@ -66,9 +68,12 @@ namespace Umbraco.Core.PropertyEditors.Validators
         /// <inheritdoc cref="IValueFormatValidator.ValidateFormat"/>
         public IEnumerable<ValidationResult> ValidateFormat(object value, string valueType, string format)
         {
-            if (string.IsNullOrWhiteSpace(format)) throw new ArgumentNullOrEmptyException(nameof(format));
+            if (format == null) throw new ArgumentNullException(nameof(format));
+            if (string.IsNullOrWhiteSpace(format)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(format));
             if (value == null || !new Regex(format).IsMatch(value.ToString()))
+            {
                 yield return new ValidationResult(_textService.Localize("validation", "invalidPattern"), new[] { "value" });
+            }
         }
     }
 }

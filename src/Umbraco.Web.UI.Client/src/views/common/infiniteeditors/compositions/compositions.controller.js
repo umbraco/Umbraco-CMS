@@ -1,15 +1,17 @@
 (function () {
     "use strict";
 
-    function CompositionsController($scope, $location, $filter, overlayService, localizationService) {
+    function CompositionsController($scope, $location, $filter, $timeout, overlayService, localizationService) {
 
         var vm = this;
         var oldModel = null;
 
         vm.showConfirmSubmit = false;
+        vm.loadingAlias = null;
 
         vm.isSelected = isSelected;
         vm.openContentType = openContentType;
+        vm.selectCompositeContentType = selectCompositeContentType;
         vm.submit = submit;
         vm.close = close;
 
@@ -17,16 +19,19 @@
 
             /* make a copy of the init model so it is possible to roll 
             back the changes on cancel */
-            oldModel = angular.copy($scope.model);
+            oldModel = Utilities.copy($scope.model);
 
             if (!$scope.model.title) {
                 $scope.model.title = "Compositions";
             }
 
-            // group the content types by their container paths
+            // Group the content types by their container paths
             vm.availableGroups = $filter("orderBy")(
                 _.map(
                     _.groupBy($scope.model.availableCompositeContentTypes, function (compositeContentType) {
+                        
+                        compositeContentType.selected = isSelected(compositeContentType.contentType.alias);
+
                         return compositeContentType.contentType.metaData.containerPath;
                     }), function (group) {
                         return {
@@ -40,16 +45,35 @@
         }
 
         
-
         function isSelected(alias) {
             if ($scope.model.contentType.compositeContentTypes.indexOf(alias) !== -1) {
                 return true;
             }
+            return false;
         }
 
         function openContentType(contentType, section) {
             var url = (section === "documentType" ? "/settings/documenttypes/edit/" : "/settings/mediaTypes/edit/") + contentType.id;
             $location.path(url);
+        }
+
+        function selectCompositeContentType(compositeContentType) {
+            vm.loadingAlias = compositeContentType.contentType.alias
+            
+            var contentType = compositeContentType.contentType;
+
+            $scope.model.selectCompositeContentType(contentType).then(function (response) {
+                vm.loadingAlias = null;
+            });
+
+            // Check if the template is already selected.
+            var index = $scope.model.contentType.compositeContentTypes.indexOf(contentType.alias);
+
+            if (index === -1) {
+                $scope.model.contentType.compositeContentTypes.push(contentType.alias);
+            } else {
+                $scope.model.contentType.compositeContentTypes.splice(index, 1);
+            }
         }
 
         function submit() {
@@ -68,7 +92,7 @@
                 or the confirm checkbox has been checked */
                 if (compositionRemoved) {
                     vm.allowSubmit = false;
-                    localizationService.localize("general_remove").then(function(value) {
+                    localizationService.localize("general_remove").then(function (value) {
                         const dialog = {
                             view: "views/common/infiniteeditors/compositions/overlays/confirmremove.html",
                             title: value,

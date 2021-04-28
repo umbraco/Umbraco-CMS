@@ -16,7 +16,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void EmailAddress()
         {
-            Assert.AreEqual(SettingsSection.Content.NotificationEmailAddress, "robot@umbraco.dk");
+            Assert.AreEqual("robot@umbraco.dk", SettingsSection.Content.NotificationEmailAddress);
         }
         [Test]
         public virtual void DisableHtmlEmail()
@@ -27,17 +27,17 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public virtual void Can_Set_Multiple()
         {
-            Assert.AreEqual(SettingsSection.Content.Error404Collection.Count(), 3);
-            Assert.AreEqual(SettingsSection.Content.Error404Collection.ElementAt(0).Culture, "default");
-            Assert.AreEqual(SettingsSection.Content.Error404Collection.ElementAt(0).ContentId, 1047);
+            Assert.AreEqual(3, SettingsSection.Content.Error404Collection.Count());
+            Assert.AreEqual("default", SettingsSection.Content.Error404Collection.ElementAt(0).Culture);
+            Assert.AreEqual(1047, SettingsSection.Content.Error404Collection.ElementAt(0).ContentId);
             Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(0).HasContentId);
             Assert.IsFalse(SettingsSection.Content.Error404Collection.ElementAt(0).HasContentKey);
-            Assert.AreEqual(SettingsSection.Content.Error404Collection.ElementAt(1).Culture, "en-US");
-            Assert.AreEqual(SettingsSection.Content.Error404Collection.ElementAt(1).ContentXPath, "$site/error [@name = 'error']");
+            Assert.AreEqual("en-US", SettingsSection.Content.Error404Collection.ElementAt(1).Culture);
+            Assert.AreEqual("$site/error [@name = 'error']", SettingsSection.Content.Error404Collection.ElementAt(1).ContentXPath);
             Assert.IsFalse(SettingsSection.Content.Error404Collection.ElementAt(1).HasContentId);
             Assert.IsFalse(SettingsSection.Content.Error404Collection.ElementAt(1).HasContentKey);
-            Assert.AreEqual(SettingsSection.Content.Error404Collection.ElementAt(2).Culture, "en-UK");
-            Assert.AreEqual(SettingsSection.Content.Error404Collection.ElementAt(2).ContentKey, new Guid("8560867F-B88F-4C74-A9A4-679D8E5B3BFC"));
+            Assert.AreEqual("en-UK", SettingsSection.Content.Error404Collection.ElementAt(2).Culture);
+            Assert.AreEqual(new Guid("8560867F-B88F-4C74-A9A4-679D8E5B3BFC"), SettingsSection.Content.Error404Collection.ElementAt(2).ContentKey);
             Assert.IsTrue(SettingsSection.Content.Error404Collection.ElementAt(2).HasContentKey);
             Assert.IsFalse(SettingsSection.Content.Error404Collection.ElementAt(2).HasContentId);
         }
@@ -47,23 +47,23 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         {
             Assert.IsTrue(SettingsSection.Content.ImageFileTypes.All(x => "jpeg,jpg,gif,bmp,png,tiff,tif".Split(',').Contains(x)));
         }
-        
+
         [Test]
         public virtual void ImageAutoFillProperties()
         {
-            Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.Count(), 2);
-            Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).Alias, "umbracoFile");
-            Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).WidthFieldAlias, "umbracoWidth");
-            Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).HeightFieldAlias, "umbracoHeight");
-            Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).LengthFieldAlias, "umbracoBytes");
-            Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).ExtensionFieldAlias, "umbracoExtension");
-            Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).Alias, "umbracoFile2");
-            Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).WidthFieldAlias, "umbracoWidth2");
-            Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).HeightFieldAlias, "umbracoHeight2");
-            Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).LengthFieldAlias, "umbracoBytes2");
-            Assert.AreEqual(SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).ExtensionFieldAlias, "umbracoExtension2");
+            Assert.AreEqual(2, SettingsSection.Content.ImageAutoFillProperties.Count());
+            Assert.AreEqual("umbracoFile", SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).Alias);
+            Assert.AreEqual("umbracoWidth", SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).WidthFieldAlias);
+            Assert.AreEqual("umbracoHeight", SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).HeightFieldAlias);
+            Assert.AreEqual("umbracoBytes", SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).LengthFieldAlias);
+            Assert.AreEqual("umbracoExtension", SettingsSection.Content.ImageAutoFillProperties.ElementAt(0).ExtensionFieldAlias);
+            Assert.AreEqual("umbracoFile2", SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).Alias);
+            Assert.AreEqual("umbracoWidth2", SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).WidthFieldAlias);
+            Assert.AreEqual("umbracoHeight2", SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).HeightFieldAlias);
+            Assert.AreEqual("umbracoBytes2", SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).LengthFieldAlias);
+            Assert.AreEqual("umbracoExtension2", SettingsSection.Content.ImageAutoFillProperties.ElementAt(1).ExtensionFieldAlias);
         }
-        
+
         [Test]
         public void PreviewBadge()
         {
@@ -83,7 +83,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
         [Test]
         public void DisallowedUploadFiles()
         {
-            Assert.IsTrue(SettingsSection.Content.DisallowedUploadFiles.All(x => "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd".Split(',').Contains(x)));
+            Assert.IsTrue(SettingsSection.Content.DisallowedUploadFiles.All(x => "ashx,aspx,ascx,config,cshtml,vbhtml,asmx,air,axd,xamlx".Split(',').Contains(x)));
         }
 
         [Test]
@@ -116,7 +116,7 @@ namespace Umbraco.Tests.Configurations.UmbracoSettings
             Debug.WriteLine("AllowedContainsExtension: {0}", allowedContainsExtension);
             Debug.WriteLine("DisallowedContainsExtension: {0}", disallowedContainsExtension);
 
-            Assert.AreEqual(SettingsSection.Content.IsFileAllowedForUpload(extension), expected);
+            Assert.AreEqual(expected, SettingsSection.Content.IsFileAllowedForUpload(extension));
         }
     }
 }

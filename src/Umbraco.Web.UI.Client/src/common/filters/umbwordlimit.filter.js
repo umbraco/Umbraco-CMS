@@ -13,11 +13,11 @@
     function umbWordLimitFilter() {
         return function (collection, property) {
 
-            if (!angular.isString(collection)) {
+            if (!Utilities.isString(collection)) {
                 return collection;
             }
 
-            if (angular.isUndefined(property)) {
+            if (Utilities.isUndefined(property)) {
                 return collection;
             }
 

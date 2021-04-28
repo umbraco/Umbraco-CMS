@@ -28,15 +28,5 @@ namespace Umbraco.Web.Actions
                 .WhereNotNull()
                 .ToList();
         }
-
-        internal IReadOnlyList<IAction> FromEntityPermission(EntityPermission entityPermission)
-        {
-            var actions = this.ToArray(); // no worry: internally, it's already an array
-            return entityPermission.AssignedPermissions
-                .Where(x => x.Length == 1)
-                .SelectMany(x => actions.Where(y => y.Letter == x[0]))
-                .WhereNotNull()
-                .ToList();
-        }
     }
 }

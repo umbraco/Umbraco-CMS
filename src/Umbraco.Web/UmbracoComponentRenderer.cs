@@ -27,12 +27,14 @@ namespace Umbraco.Web
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IMacroRenderer _macroRenderer;
         private readonly ITemplateRenderer _templateRenderer;
+        private readonly HtmlLocalLinkParser _linkParser;
 
-        public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, ITemplateRenderer templateRenderer)
+        public UmbracoComponentRenderer(IUmbracoContextAccessor umbracoContextAccessor, IMacroRenderer macroRenderer, ITemplateRenderer templateRenderer, HtmlLocalLinkParser linkParser)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
             _macroRenderer = macroRenderer;
             _templateRenderer = templateRenderer ?? throw new ArgumentNullException(nameof(templateRenderer));
+            _linkParser = linkParser;
         }
 
         /// <summary>
@@ -77,7 +79,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(int contentId, string alias, object parameters)
         {
-            return RenderMacro(contentId, alias, parameters.ToDictionary<object>());
+            return RenderMacro(contentId, alias, parameters?.ToDictionary<object>());
         }
 
         /// <summary>
@@ -92,12 +94,21 @@ namespace Umbraco.Web
             if (contentId == default)
                 throw new ArgumentException("Invalid content id " + contentId);
 
-            var content = _umbracoContextAccessor.UmbracoContext.Content?.GetById(true, contentId);
+            var content = _umbracoContextAccessor.UmbracoContext.Content?.GetById(contentId);
 
             if (content == null)
                 throw new InvalidOperationException("Cannot render a macro, no content found by id " + contentId);
 
-            return RenderMacro(alias, parameters, content);
+            return RenderMacro(content, alias, parameters);
+        }
+
+
+        public IHtmlString RenderMacroForContent(IPublishedContent content, string alias, IDictionary<string, object> parameters)
+        {
+            if(content == null)
+                throw new InvalidOperationException("Cannot render a macro, IPublishedContent is null");
+
+            return RenderMacro(content, alias, parameters);
         }
 
         /// <summary>
@@ -107,61 +118,17 @@ namespace Umbraco.Web
         /// <param name="parameters">The parameters.</param>
         /// <param name="content">The content used for macro rendering</param>
         /// <returns></returns>
-        private IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters, IPublishedContent content)
+        private IHtmlString RenderMacro(IPublishedContent content, string alias, IDictionary<string, object> parameters)
         {
             if (content == null) throw new ArgumentNullException(nameof(content));
 
             // TODO: We are doing at ToLower here because for some insane reason the UpdateMacroModel method looks for a lower case match. the whole macro concept needs to be rewritten.
             //NOTE: the value could have HTML encoded values, so we need to deal with that
-            var macroProps = parameters.ToDictionary(
+            var macroProps = parameters?.ToDictionary(
                 x => x.Key.ToLowerInvariant(),
                 i => (i.Value is string) ? HttpUtility.HtmlDecode(i.Value.ToString()) : i.Value);
             
-            var macroControl = _macroRenderer.Render(alias, content, macroProps).GetAsControl();
-
-            string html;
-            if (macroControl is LiteralControl control)
-            {
-                // no need to execute, we already have text
-                html = control.Text;
-            }
-            else
-            {
-                using (var containerPage = new FormlessPage())
-                {
-                    containerPage.Controls.Add(macroControl);
-
-                    using (var output = new StringWriter())
-                    {
-                        // .Execute() does a PushTraceContext/PopTraceContext and writes trace output straight into 'output'
-                        // and I do not see how we could wire the trace context to the current context... so it creates dirty
-                        // trace output right in the middle of the page.
-                        //
-                        // The only thing we can do is fully disable trace output while .Execute() runs and restore afterwards
-                        // which means trace output is lost if the macro is a control (.ascx or user control) that is invoked
-                        // from within Razor -- which makes sense anyway because the control can _not_ run correctly from
-                        // within Razor since it will never be inserted into the page pipeline (which may even not exist at all
-                        // if we're running MVC).
-                        //
-                        // I'm sure there's more things that will get lost with this context changing but I guess we'll figure
-                        // those out as we go along. One thing we lose is the content type response output.
-                        // http://issues.umbraco.org/issue/U4-1599 if it is setup during the macro execution. So
-                        // here we'll save the content type response and reset it after execute is called.
-
-                        var contentType = _umbracoContextAccessor.UmbracoContext.HttpContext.Response.ContentType;
-                        var traceIsEnabled = containerPage.Trace.IsEnabled;
-                        containerPage.Trace.IsEnabled = false;
-                        _umbracoContextAccessor.UmbracoContext.HttpContext.Server.Execute(containerPage, output, true);
-                        containerPage.Trace.IsEnabled = traceIsEnabled;
-                        //reset the content type
-                        _umbracoContextAccessor.UmbracoContext.HttpContext.Response.ContentType = contentType;
-
-                        //Now, we need to ensure that local links are parsed
-                        html = TemplateUtilities.ParseInternalLinks(output.ToString(), _umbracoContextAccessor.UmbracoContext.UrlProvider);
-                    }
-                }
-                    
-            }
+            string html = _macroRenderer.Render(alias, content, macroProps).GetAsText();
 
             return new HtmlString(html);
         }

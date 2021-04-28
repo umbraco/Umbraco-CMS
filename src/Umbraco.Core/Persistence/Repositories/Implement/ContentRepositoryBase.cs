@@ -9,6 +9,7 @@ using Umbraco.Core.Composing;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Editors;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
@@ -24,26 +25,48 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     internal sealed class ContentRepositoryBase
     {
         /// <summary>
+        ///
         /// This is used for unit tests ONLY
         /// </summary>
         public static bool ThrowOnWarning = false;
     }
 
     internal abstract class ContentRepositoryBase<TId, TEntity, TRepository> : NPocoRepositoryBase<TId, TEntity>, IContentRepository<TId, TEntity>
-        where TEntity : class, IUmbracoEntity
+        where TEntity : class, IContentBase
         where TRepository : class, IRepository
     {
-        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILanguageRepository languageRepository, ILogger logger)
+        private readonly Lazy<PropertyEditorCollection> _propertyEditors;
+        private readonly DataValueReferenceFactoryCollection _dataValueReferenceFactories;
+
+        /// <summary>
+        ///
+        /// </summary>
+        /// <param name="scopeAccessor"></param>
+        /// <param name="cache"></param>
+        /// <param name="logger"></param>
+        /// <param name="languageRepository"></param>
+        /// <param name="propertyEditors">
+        ///     Lazy property value collection - must be lazy because we have a circular dependency since some property editors require services, yet these services require property editors
+        /// </param>
+        protected ContentRepositoryBase(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger,
+            ILanguageRepository languageRepository, IRelationRepository relationRepository, IRelationTypeRepository relationTypeRepository,
+            Lazy<PropertyEditorCollection> propertyEditors, DataValueReferenceFactoryCollection dataValueReferenceFactories)
             : base(scopeAccessor, cache, logger)
         {
             LanguageRepository = languageRepository;
+            RelationRepository = relationRepository;
+            RelationTypeRepository = relationTypeRepository;
+            _propertyEditors = propertyEditors;
+            _dataValueReferenceFactories = dataValueReferenceFactories;
         }
 
         protected abstract TRepository This { get; }
 
         protected ILanguageRepository LanguageRepository { get; }
+        protected IRelationRepository RelationRepository { get; }
+        protected IRelationTypeRepository RelationTypeRepository { get; }
 
-        protected PropertyEditorCollection PropertyEditors => Current.PropertyEditors; // TODO: inject
+        protected PropertyEditorCollection PropertyEditors => _propertyEditors.Value;
 
         #region Versions
 
@@ -60,7 +83,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         // gets all version ids, current first
         public virtual IEnumerable<int> GetVersionIds(int nodeId, int maxRows)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersionIds", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetVersionIds, tsql =>
                 tsql.Select<ContentVersionDto>(x => x.Id)
                     .From<ContentVersionDto>()
                     .Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId"))
@@ -76,7 +99,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // TODO: test object node type?
 
             // get the version we want to delete
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersion", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetVersion, tsql =>
                 tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.Id == SqlTemplate.Arg<int>("versionId"))
             );
             var versionDto = Database.Fetch<ContentVersionDto>(template.Sql(new { versionId })).FirstOrDefault();
@@ -98,7 +121,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             // TODO: test object node type?
 
             // get the versions we want to delete, excluding the current one
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetVersions", tsql =>
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetVersions, tsql =>
                 tsql.Select<ContentVersionDto>().From<ContentVersionDto>().Where<ContentVersionDto>(x => x.NodeId == SqlTemplate.Arg<int>("nodeId") && !x.Current && x.VersionDate < SqlTemplate.Arg<DateTime>("versionDate"))
             );
             var versionDtos = Database.Fetch<ContentVersionDto>(template.Sql(new { nodeId, versionDate }));
@@ -380,7 +403,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             }
 
             // content type alias is invariant
-            if(ordering.OrderBy.InvariantEquals("contentTypeAlias"))
+            if (ordering.OrderBy.InvariantEquals("contentTypeAlias"))
             {
                 var joins = Sql()
                     .InnerJoin<ContentTypeDto>("ctype").On<ContentDto, ContentTypeDto>((content, contentType) => content.ContentTypeId == contentType.NodeId, aliasRight: "ctype");
@@ -453,6 +476,123 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             long pageIndex, int pageSize, out long totalRecords,
             IQuery<TEntity> filter,
             Ordering ordering);
+
+        public ContentDataIntegrityReport CheckDataIntegrity(ContentDataIntegrityReportOptions options)
+        {
+            var report = new Dictionary<int, ContentDataIntegrityReportEntry>();
+
+            var sql = SqlContext.Sql()
+                .Select<NodeDto>()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId)
+                .OrderBy<NodeDto>(x => x.Level, x => x.ParentId, x => x.SortOrder);
+
+            var nodesToRebuild = new Dictionary<int, List<NodeDto>>();
+            var validNodes = new Dictionary<int, NodeDto>();
+            var rootIds = new[] {Constants.System.Root, Constants.System.RecycleBinContent, Constants.System.RecycleBinMedia};
+            var currentParentIds = new HashSet<int>(rootIds);
+            var prevParentIds = currentParentIds;
+            var lastLevel = -1;
+
+            // use a forward cursor (query)
+            foreach (var node in Database.Query<NodeDto>(sql))
+            {
+                if (node.Level != lastLevel)
+                {
+                    // changing levels
+                    prevParentIds = currentParentIds;
+                    currentParentIds = null;
+                    lastLevel = node.Level;
+                }
+
+                if (currentParentIds == null)
+                {
+                    // we're reset
+                    currentParentIds = new HashSet<int>();
+                }
+
+                currentParentIds.Add(node.NodeId);
+
+                // paths parts without the roots
+                var pathParts = node.Path.Split(Constants.CharArrays.Comma).Where(x => !rootIds.Contains(int.Parse(x))).ToArray();
+
+                if (!prevParentIds.Contains(node.ParentId))
+                {
+                    // invalid, this will be because the level is wrong (which prob means path is wrong too)
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathAndLevelByParentId));
+                    AppendNodeToFix(nodesToRebuild, node);
+                }
+                else if (pathParts.Length  == 0)
+                {
+                    // invalid path
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathEmpty));
+                    AppendNodeToFix(nodesToRebuild, node);
+                }
+                else if (pathParts.Length != node.Level)
+                {
+                    // invalid, either path or level is wrong
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathLevelMismatch));
+                    AppendNodeToFix(nodesToRebuild, node);
+                }
+                else if (pathParts[pathParts.Length - 1] != node.NodeId.ToString())
+                {
+                    // invalid path
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathById));
+                    AppendNodeToFix(nodesToRebuild, node);
+                }
+                else if (!rootIds.Contains(node.ParentId) && pathParts[pathParts.Length - 2] != node.ParentId.ToString())
+                {
+                    // invalid path
+                    report.Add(node.NodeId, new ContentDataIntegrityReportEntry(ContentDataIntegrityReport.IssueType.InvalidPathByParentId));
+                    AppendNodeToFix(nodesToRebuild, node);
+                }
+                else
+                {
+                    // it's valid!
+
+                    // don't track unless we are configured to fix
+                    if (options.FixIssues)
+                        validNodes.Add(node.NodeId, node);
+                }
+            }
+
+            var updated = new List<NodeDto>();
+
+            if (options.FixIssues)
+            {
+                // iterate all valid nodes to see if these are parents for invalid nodes
+                foreach (var (nodeId, node) in validNodes)
+                {
+                    if (!nodesToRebuild.TryGetValue(nodeId, out var invalidNodes)) continue;
+
+                    // now we can try to rebuild the invalid paths.
+
+                    foreach (var invalidNode in invalidNodes)
+                    {
+                        invalidNode.Level = (short)(node.Level + 1);
+                        invalidNode.Path = node.Path + "," + invalidNode.NodeId;
+                        updated.Add(invalidNode);
+                    }
+                }
+
+                foreach (var node in updated)
+                {
+                    Database.Update(node);
+                    if (report.TryGetValue(node.NodeId, out var entry))
+                        entry.Fixed = true;
+                }
+            }
+
+            return new ContentDataIntegrityReport(report);
+        }
+
+        private static void AppendNodeToFix(IDictionary<int, List<NodeDto>> nodesToRebuild, NodeDto node)
+        {
+            if (nodesToRebuild.TryGetValue(node.ParentId, out var childIds))
+                childIds.Add(node);
+            else
+                nodesToRebuild[node.ParentId] = new List<NodeDto> { node };
+        }
 
         // here, filter can be null and ordering cannot
         protected IEnumerable<TEntity> GetPage<TDto>(IQuery<TEntity> query,
@@ -561,7 +701,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 {
                     if (ContentRepositoryBase.ThrowOnWarning)
                         throw new InvalidOperationException($"The query returned multiple property sets for content {temp.Id}, {temp.ContentType.Name}");
-                    Logger.Warn<ContentRepositoryBase<TId, TEntity, TRepository>>("The query returned multiple property sets for content {ContentId}, {ContentTypeName}", temp.Id, temp.ContentType.Name);
+                    Logger.Warn<ContentRepositoryBase<TId, TEntity, TRepository>, int, string>("The query returned multiple property sets for content {ContentId}, {ContentTypeName}", temp.Id, temp.ContentType.Name);
                 }
 
                 result[temp.VersionId] = new PropertyCollection(properties);
@@ -747,10 +887,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual string EnsureUniqueNodeName(int parentId, string nodeName, int id = 0)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.EnsureUniqueNodeName", tsql => tsql
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.EnsureUniqueNodeName, tsql => tsql
                 .Select<NodeDto>(x => Alias(x.NodeId, "id"), x => Alias(x.Text, "name"))
                 .From<NodeDto>()
-                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId")));
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId"))
+            );
 
             var sql = template.Sql(NodeObjectTypeId, parentId);
             var names = Database.Fetch<SimilarNodeName>(sql);
@@ -760,28 +901,43 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected virtual int GetNewChildSortOrder(int parentId, int first)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetSortOrder", tsql =>
-                tsql.Select($"COALESCE(MAX(sortOrder),{first - 1})").From<NodeDto>().Where<NodeDto>(x => x.ParentId == SqlTemplate.Arg<int>("parentId") && x.NodeObjectType == NodeObjectTypeId)
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetSortOrder, tsql => tsql
+                .Select("MAX(sortOrder)")
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType") && x.ParentId == SqlTemplate.Arg<int>("parentId"))
             );
 
-            return Database.ExecuteScalar<int>(template.Sql(new { parentId })) + 1;
+            var sql = template.Sql(NodeObjectTypeId, parentId);
+            var sortOrder = Database.ExecuteScalar<int?>(sql);
+
+            return (sortOrder + 1) ?? first;
         }
 
         protected virtual NodeDto GetParentNodeDto(int parentId)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetParentNode", tsql =>
-                tsql.Select<NodeDto>().From<NodeDto>().Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetParentNode, tsql => tsql
+                .Select<NodeDto>()
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.NodeId == SqlTemplate.Arg<int>("parentId"))
             );
 
-            return Database.Fetch<NodeDto>(template.Sql(parentId)).First();
+            var sql = template.Sql(parentId);
+            var nodeDto = Database.First<NodeDto>(sql);
+
+            return nodeDto;
         }
 
         protected virtual int GetReservedId(Guid uniqueId)
         {
-            var template = SqlContext.Templates.Get("Umbraco.Core.VersionableRepository.GetReservedId", tsql =>
-                tsql.Select<NodeDto>(x => x.NodeId).From<NodeDto>().Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
+            var template = SqlContext.Templates.Get(Constants.SqlTemplates.VersionableRepository.GetReservedId, tsql => tsql
+                .Select<NodeDto>(x => x.NodeId)
+                .From<NodeDto>()
+                .Where<NodeDto>(x => x.UniqueId == SqlTemplate.Arg<Guid>("uniqueId") && x.NodeObjectType == Constants.ObjectTypes.IdReservation)
             );
-            var id = Database.ExecuteScalar<int?>(template.Sql(new { uniqueId = uniqueId }));
+
+            var sql = template.Sql(new { uniqueId });
+            var id = Database.ExecuteScalar<int?>(sql);
+
             return id ?? 0;
         }
 
@@ -797,5 +953,131 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         #endregion
+
+        protected void PersistRelations(TEntity entity)
+        {
+            // Get all references from our core built in DataEditors/Property Editors
+            // Along with seeing if deverlopers want to collect additional references from the DataValueReferenceFactories collection
+            var trackedRelations = new List<UmbracoEntityReference>();
+            trackedRelations.AddRange(_dataValueReferenceFactories.GetAllReferences(entity.Properties, PropertyEditors));
+
+            //First delete all auto-relations for this entity
+            RelationRepository.DeleteByParent(entity.Id, Constants.Conventions.RelationTypes.AutomaticRelationTypes);
+
+            if (trackedRelations.Count == 0) return;
+
+            trackedRelations = trackedRelations.Distinct().ToList();
+            var udiToGuids = trackedRelations.Select(x => x.Udi as GuidUdi)
+                .ToDictionary(x => (Udi)x, x => x.Guid);
+
+            //lookup in the DB all INT ids for the GUIDs and chuck into a dictionary
+            var keyToIds = Database.Fetch<NodeIdKey>(Sql().Select<NodeDto>(x => x.NodeId, x => x.UniqueId).From<NodeDto>().WhereIn<NodeDto>(x => x.UniqueId, udiToGuids.Values))
+                .ToDictionary(x => x.UniqueId, x => x.NodeId);
+
+            var allRelationTypes = RelationTypeRepository.GetMany(Array.Empty<int>())
+                .ToDictionary(x => x.Alias, x => x);
+
+            var toSave = trackedRelations.Select(rel =>
+                {
+                    if (!allRelationTypes.TryGetValue(rel.RelationTypeAlias, out var relationType))
+                        throw new InvalidOperationException($"The relation type {rel.RelationTypeAlias} does not exist");
+
+                    if (!udiToGuids.TryGetValue(rel.Udi, out var guid))
+                        return null; // This shouldn't happen!
+
+                    if (!keyToIds.TryGetValue(guid, out var id))
+                        return null; // This shouldn't happen!
+
+                    return new Relation(entity.Id, id, relationType);
+                }).WhereNotNull();
+
+            // Save bulk relations
+            RelationRepository.Save(toSave);
+
+        }
+
+        /// <summary>
+        /// Inserts property values for the content entity
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="publishedVersionId"></param>
+        /// <param name="edited"></param>
+        /// <param name="editedCultures"></param>
+        /// <remarks>
+        /// Used when creating a new entity
+        /// </remarks>
+        protected void InsertPropertyValues(TEntity entity, int publishedVersionId, out bool edited, out HashSet<string> editedCultures)
+        {
+            // persist the property data
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
+            foreach (var propertyDataDto in propertyDataDtos)
+            {
+                Database.Insert(propertyDataDto);
+            }
+            // TODO: we can speed this up: Use BulkInsert and then do one SELECT to re-retrieve the property data inserted with assigned IDs.
+            // This is a perfect thing to benchmark with Benchmark.NET to compare perf between Nuget releases.
+        }
+
+        /// <summary>
+        /// Used to atomically replace the property values for the entity version specified
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <param name="versionId"></param>
+        /// <param name="publishedVersionId"></param>
+        /// <param name="edited"></param>
+        /// <param name="editedCultures"></param>
+
+        protected void ReplacePropertyValues(TEntity entity, int versionId, int publishedVersionId, out bool edited, out HashSet<string> editedCultures)
+        {
+            // Replace the property data.
+            // Lookup the data to update with a UPDLOCK (using ForUpdate()) this is because we need to be atomic
+            // and handle DB concurrency. Doing a clear and then re-insert is prone to concurrency issues.
+
+            var propDataSql = SqlContext.Sql().Select("*").From<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionId).ForUpdate();
+            var existingPropData = Database.Fetch<PropertyDataDto>(propDataSql);
+            var propertyTypeToPropertyData = new Dictionary<(int propertyTypeId, int versionId, int? languageId, string segment), PropertyDataDto>();
+            var existingPropDataIds = new List<int>();
+            foreach (var p in existingPropData)
+            {
+                existingPropDataIds.Add(p.Id);
+                propertyTypeToPropertyData[(p.PropertyTypeId, p.VersionId, p.LanguageId, p.Segment)] = p;
+            }
+            var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishedVersionId, entity.Properties, LanguageRepository, out edited, out editedCultures);
+
+            foreach (var propertyDataDto in propertyDataDtos)
+            {
+
+                // Check if this already exists and update, else insert a new one
+                if (propertyTypeToPropertyData.TryGetValue((propertyDataDto.PropertyTypeId, propertyDataDto.VersionId, propertyDataDto.LanguageId, propertyDataDto.Segment), out var propData))
+                {
+                    propertyDataDto.Id = propData.Id;
+                    Database.Update(propertyDataDto);
+                }
+                else
+                {
+                    // TODO: we can speed this up: Use BulkInsert and then do one SELECT to re-retrieve the property data inserted with assigned IDs.
+                    // This is a perfect thing to benchmark with Benchmark.NET to compare perf between Nuget releases.
+                    Database.Insert(propertyDataDto);
+                }
+
+                // track which ones have been processed
+                existingPropDataIds.Remove(propertyDataDto.Id);
+            }
+            // For any remaining that haven't been processed they need to be deleted
+            if (existingPropDataIds.Count > 0)
+            {
+                Database.Execute(SqlContext.Sql().Delete<PropertyDataDto>().WhereIn<PropertyDataDto>(x => x.Id, existingPropDataIds));
+            }
+
+        }
+
+        private class NodeIdKey
+        {
+            [Column("id")]
+            public int NodeId { get; set; }
+
+            [Column("uniqueId")]
+            public Guid UniqueId { get; set; }
+        }
     }
 }

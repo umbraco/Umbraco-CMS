@@ -25,6 +25,12 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType)
             => PropertyCacheLevel.Element;
 
+        private static readonly JsonSerializerSettings ImageCropperValueJsonSerializerSettings = new JsonSerializerSettings
+        {
+            Culture = CultureInfo.InvariantCulture,
+            FloatParseHandling = FloatParseHandling.Decimal
+        };
+
         /// <inheritdoc />
         public override object ConvertSourceToIntermediate(IPublishedElement owner, IPublishedPropertyType propertyType, object source, bool preview)
         {
@@ -34,20 +40,16 @@ namespace Umbraco.Core.PropertyEditors.ValueConverters
             ImageCropperValue value;
             try
             {
-                value = JsonConvert.DeserializeObject<ImageCropperValue>(sourceString, new JsonSerializerSettings
-                {
-                    Culture = CultureInfo.InvariantCulture,
-                    FloatParseHandling = FloatParseHandling.Decimal
-                });
+                value = JsonConvert.DeserializeObject<ImageCropperValue>(sourceString, ImageCropperValueJsonSerializerSettings);
             }
             catch (Exception ex)
             {
                 // cannot deserialize, assume it may be a raw image url
-                Current.Logger.Error<ImageCropperValueConverter>(ex, "Could not deserialize string '{JsonString}' into an image cropper value.", sourceString);
+                Current.Logger.Error<ImageCropperValueConverter, string>(ex, "Could not deserialize string '{JsonString}' into an image cropper value.", sourceString);
                 value = new ImageCropperValue { Src = sourceString };
             }
 
-            value.ApplyConfiguration(propertyType.DataType.ConfigurationAs<ImageCropperConfiguration>());
+            value?.ApplyConfiguration(propertyType.DataType.ConfigurationAs<ImageCropperConfiguration>());
 
             return value;
         }

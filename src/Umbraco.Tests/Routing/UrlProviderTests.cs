@@ -158,7 +158,7 @@ namespace Umbraco.Tests.Routing
             var umbracoSettings = Current.Configs.Settings();
 
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
+            var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
 
             var publishedContentCache = new Mock<IPublishedContentCache>();
@@ -184,7 +184,7 @@ namespace Umbraco.Tests.Routing
                 globalSettings: globalSettings.Object,
                 snapshotService: snapshotService.Object);
 
-            //even though we are asking for a specific culture URL, there are no domains assigned so all that can be returned is a normal relative url.
+            //even though we are asking for a specific culture URL, there are no domains assigned so all that can be returned is a normal relative URL.
             var url = umbracoContext.UrlProvider.GetUrl(1234, culture: "fr-FR");
 
             Assert.AreEqual("/home/test-fr/", url);
@@ -203,7 +203,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoSettings = Current.Configs.Settings();
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
+            var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
 
             var publishedContentCache = new Mock<IPublishedContentCache>();
@@ -257,7 +257,7 @@ namespace Umbraco.Tests.Routing
 
             var umbracoSettings = Current.Configs.Settings();
 
-            var contentType = new PublishedContentType(666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
+            var contentType = new PublishedContentType(Guid.NewGuid(), 666, "alias", PublishedItemType.Content, Enumerable.Empty<string>(), Enumerable.Empty<PublishedPropertyType>(), ContentVariation.Culture);
             var publishedContent = new SolidPublishedContent(contentType) { Id = 1234 };
 
             var publishedContentCache = new Mock<IPublishedContentCache>();

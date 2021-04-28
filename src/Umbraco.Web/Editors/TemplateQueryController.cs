@@ -71,7 +71,11 @@ namespace Umbraco.Web.Editors
                 QueryExpression = queryExpression.ToString(),
                 ResultCount = results.Count,
                 ExecutionTime = timer.ElapsedMilliseconds,
-                SampleResults = results.Take(20).Select(x => new TemplateQueryResult { Icon = "icon-file", Name = x.Name })
+                SampleResults = results.Take(20).Select(x => new TemplateQueryResult
+                {
+                    Icon = "icon-document",
+                    Name = x.Name
+                })
             };
         }
 

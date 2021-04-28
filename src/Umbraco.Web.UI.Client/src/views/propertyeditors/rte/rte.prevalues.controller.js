@@ -3,7 +3,7 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
         var cfg = tinyMceService.defaultPrevalues();
 
         if($scope.model.value){
-            if(angular.isString($scope.model.value)){
+            if(Utilities.isString($scope.model.value)){
                 $scope.model.value = cfg;
             }
         }else{
@@ -29,18 +29,28 @@ angular.module("umbraco").controller("Umbraco.PrevalueEditors.RteController",
             // extend commands with properties for font-icon and if it is a custom command
             $scope.tinyMceConfig.commands = _.map($scope.tinyMceConfig.commands, function (obj) {
                 var icon = getFontIcon(obj.alias);
-                return angular.extend(obj, {
+
+                var objCmd = Utilities.extend(obj, {
                     fontIcon: icon.name,
                     isCustom: icon.isCustom,
-                    selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0
+                    selected: $scope.model.value.toolbar.indexOf(obj.alias) >= 0,
+                    icon: "mce-ico " + (icon.isCustom ? ' mce-i-custom ' : ' mce-i-') + icon.name
                 });
+
+                return objCmd;
             });
         });
 
         stylesheetResource.getAll().then(function(stylesheets){
             $scope.stylesheets = stylesheets;
-
-            _.each($scope.stylesheets, function (stylesheet) {
+            
+            // if the CSS directory changes, previously assigned stylesheets are retained, but will not be visible
+            // and will throw a 404 when loading the RTE. Remove them here. Still needs to be saved...
+            let cssPath = Umbraco.Sys.ServerVariables.umbracoSettings.cssPath;
+            $scope.model.value.stylesheets = $scope.model.value.stylesheets
+                .filter(sheet => sheet.startsWith(cssPath));
+            
+            $scope.stylesheets.forEach(stylesheet => {
                 // support both current format (full stylesheet path) and legacy format (stylesheet name only) 
                 stylesheet.selected = $scope.model.value.stylesheets.indexOf(stylesheet.path) >= 0 ||$scope.model.value.stylesheets.indexOf(stylesheet.name) >= 0;
             });

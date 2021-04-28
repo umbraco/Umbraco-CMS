@@ -208,7 +208,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
                 throw "args.id cannot be null";
             }
 
-            var promise = localizationService.localize("media_moveFailed");
+            var promise = localizationService.localize("mediaType_moveFailed");
 
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl", "PostMove"),
@@ -230,7 +230,7 @@ function mediaTypeResource($q, $http, umbRequestHelper, umbDataFormatter, locali
                 throw "args.id cannot be null";
             }
 
-            var promise = localizationService.localize("media_copyFailed");
+            var promise = localizationService.localize("mediaType_copyFailed");
 
             return umbRequestHelper.resourcePromise(
                 $http.post(umbRequestHelper.getApiUrl("mediaTypeApiBaseUrl", "PostCopy"),

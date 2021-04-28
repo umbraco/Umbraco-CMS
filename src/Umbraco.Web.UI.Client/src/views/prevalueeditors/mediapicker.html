@@ -15,12 +15,11 @@
 		</umb-node-preview>
 	</div>
 
-	<a ng-show="model.config.multiPicker === true || renderModel.length === 0"
-		class="umb-node-preview-add"
-		href=""
-		ng-click="openTreePicker()"
-		prevent-default>
+	<button type="button"
+            class="umb-node-preview-add"
+            ng-show="model.config.multiPicker === true || renderModel.length === 0"
+            ng-click="openTreePicker()">
 		<localize key="general_add">Add</localize>
-	</a>
+	</button>
 
 </div>

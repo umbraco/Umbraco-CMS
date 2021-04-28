@@ -8,11 +8,7 @@ using System.Web.Mvc;
 using System.Web.Mvc.Html;
 using System.Web.Routing;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
-using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
-using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
@@ -68,7 +64,8 @@ namespace Umbraco.Web
                 var htmlBadge =
                     String.Format(Current.Configs.Settings().Content.PreviewBadge,
                                   IOHelper.ResolveUrl(SystemDirectories.Umbraco),
-                                  Current.UmbracoContext.HttpContext.Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Path));
+                                  Current.UmbracoContext.HttpContext.Server.UrlEncode(Current.UmbracoContext.HttpContext.Request.Path),
+                                  Current.UmbracoContext.PublishedRequest.PublishedContent.Id);
                 return new MvcHtmlString(htmlBadge);
             }
             return new MvcHtmlString("");
@@ -86,6 +83,12 @@ namespace Umbraco.Web
             Func<object, ViewDataDictionary, string> contextualKeyBuilder = null)
         {
             var cacheKey = new StringBuilder(partialViewName);
+             //let's always cache by the current culture to allow variants to have different cache results
+            var cultureName = System.Threading.Thread.CurrentThread.CurrentUICulture.Name;
+            if (!string.IsNullOrEmpty(cultureName))
+            {
+                cacheKey.AppendFormat("{0}-", cultureName);
+            }
             if (cacheByPage)
             {
                 if (Current.UmbracoContext == null)
@@ -169,8 +172,9 @@ namespace Umbraco.Web
         /// <returns></returns>
         public static IHtmlString Action(this HtmlHelper htmlHelper, string actionName, Type surfaceType)
         {
+            if (actionName == null) throw new ArgumentNullException(nameof(actionName));
+            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(actionName));
             if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
-            if (string.IsNullOrWhiteSpace(actionName)) throw new ArgumentNullOrEmptyException(nameof(actionName));
 
             var routeVals = new RouteValueDictionary(new {area = ""});
 
@@ -221,7 +225,7 @@ namespace Umbraco.Web
             {
                 _viewContext = viewContext;
                 _method = method;
-			    _controllerName = controllerName;
+                _controllerName = controllerName;
                 _encryptedString = UrlHelperRenderExtensions.CreateEncryptedRouteString(controllerName, controllerAction, area, additionalRouteVals);
             }
 
@@ -230,7 +234,7 @@ namespace Umbraco.Web
             private readonly FormMethod _method;
             private bool _disposed;
             private readonly string _encryptedString;
-		    private readonly string _controllerName;
+            private readonly string _controllerName;
 
             protected override void Dispose(bool disposing)
             {
@@ -243,24 +247,24 @@ namespace Umbraco.Web
                     || _controllerName == "UmbProfile"
                     || _controllerName == "UmbLoginStatus"
                     || _controllerName == "UmbLogin")
-			    {
+                {
                     _viewContext.Writer.Write(AntiForgery.GetHtml().ToString());
-			    }
+                }
 
                 //write out the hidden surface form routes
-                _viewContext.Writer.Write("<input name='ufprt' type='hidden' value='" + _encryptedString + "' />");
+                _viewContext.Writer.Write("<input name=\"ufprt\" type=\"hidden\" value=\"" + _encryptedString + "\" />");
 
                 base.Dispose(disposing);
             }
         }
 
         /// <summary>
-        /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller
+        /// Helper method to create a new form to execute in the Umbraco request pipeline against a locally declared controller.
         /// </summary>
-        /// <param name="html"></param>
-        /// <param name="action"></param>
-        /// <param name="controllerName"></param>
-        /// <param name="method"></param>
+        /// <param name="html">The HTML helper.</param>
+        /// <param name="action">Name of the action.</param>
+        /// <param name="controllerName">Name of the controller.</param>
+        /// <param name="method">The method.</param>
         /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName, FormMethod method)
         {
@@ -317,9 +321,9 @@ namespace Umbraco.Web
         /// <param name="method"></param>
         /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName,
-                                               object additionalRouteVals,
-                                               object htmlAttributes,
-                                               FormMethod method)
+            object additionalRouteVals,
+            object htmlAttributes,
+            FormMethod method)
         {
             return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes), method);
         }
@@ -334,8 +338,8 @@ namespace Umbraco.Web
         /// <param name="htmlAttributes"></param>
         /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName,
-                                               object additionalRouteVals,
-                                               object htmlAttributes)
+            object additionalRouteVals,
+            object htmlAttributes)
         {
             return html.BeginUmbracoForm(action, controllerName, additionalRouteVals, HtmlHelper.AnonymousObjectToHtmlAttributes(htmlAttributes));
         }
@@ -351,12 +355,14 @@ namespace Umbraco.Web
         /// <param name="method"></param>
         /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName,
-                                               object additionalRouteVals,
-                                               IDictionary<string, object> htmlAttributes,
-                                               FormMethod method)
+            object additionalRouteVals,
+            IDictionary<string, object> htmlAttributes,
+            FormMethod method)
         {
-            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
-            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
             return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes, method);
         }
@@ -371,11 +377,13 @@ namespace Umbraco.Web
         /// <param name="htmlAttributes"></param>
         /// <returns></returns>
         public static MvcForm BeginUmbracoForm(this HtmlHelper html, string action, string controllerName,
-                                               object additionalRouteVals,
-                                               IDictionary<string, object> htmlAttributes)
+            object additionalRouteVals,
+            IDictionary<string, object> htmlAttributes)
         {
-            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
-            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
             return html.BeginUmbracoForm(action, controllerName, "", additionalRouteVals, htmlAttributes);
         }
@@ -575,7 +583,9 @@ namespace Umbraco.Web
                                                IDictionary<string, object> htmlAttributes,
                                                FormMethod method)
         {
-            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentNullOrEmptyException(nameof(action));
+
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrWhiteSpace(action)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(action));
             if (surfaceType == null) throw new ArgumentNullException(nameof(surfaceType));
 
             var area = "";
@@ -687,8 +697,10 @@ namespace Umbraco.Web
                                                IDictionary<string, object> htmlAttributes,
                                                FormMethod method)
         {
-            if (string.IsNullOrEmpty(action)) throw new ArgumentNullOrEmptyException(nameof(action));
-            if (string.IsNullOrEmpty(controllerName)) throw new ArgumentNullOrEmptyException(nameof(controllerName));
+            if (action == null) throw new ArgumentNullException(nameof(action));
+            if (string.IsNullOrEmpty(action)) throw new ArgumentException("Value can't be empty.", nameof(action));
+            if (controllerName == null) throw new ArgumentNullException(nameof(controllerName));
+            if (string.IsNullOrWhiteSpace(controllerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(controllerName));
 
             var formAction = Current.UmbracoContext.OriginalRequestUrl.PathAndQuery;
             return html.RenderForm(formAction, method, htmlAttributes, controllerName, action, area, additionalRouteVals);
@@ -834,19 +846,32 @@ namespace Umbraco.Web
         #region If
 
         /// <summary>
-        /// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
+        /// If <paramref name="test" /> is <c>true</c>, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <see cref="string.Empty" />.
         /// </summary>
-        public static IHtmlString If(this HtmlHelper html, bool test, string valueIfTrue, string valueIfFalse)
+        /// <param name="html">The HTML helper.</param>
+        /// <param name="test">If set to <c>true</c> returns <paramref name="valueIfTrue" />; otherwise, <see cref="string.Empty" />.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
+        public static IHtmlString If(this HtmlHelper html, bool test, string valueIfTrue)
         {
-            return test ? new HtmlString(valueIfTrue) : new HtmlString(valueIfFalse);
+            return If(html, test, valueIfTrue, string.Empty);
         }
 
         /// <summary>
-        /// If the test is true, the string valueIfTrue will be returned, otherwise the valueIfFalse will be returned.
+        /// If <paramref name="test" /> is <c>true</c>, the HTML encoded <paramref name="valueIfTrue" /> will be returned; otherwise, <paramref name="valueIfFalse" />.
         /// </summary>
-        public static IHtmlString If(this HtmlHelper html, bool test, string valueIfTrue)
+        /// <param name="html">The HTML helper.</param>
+        /// <param name="test">If set to <c>true</c> returns <paramref name="valueIfTrue" />; otherwise, <paramref name="valueIfFalse" />.</param>
+        /// <param name="valueIfTrue">The value if <c>true</c>.</param>
+        /// <param name="valueIfFalse">The value if <c>false</c>.</param>
+        /// <returns>
+        /// The HTML encoded value.
+        /// </returns>
+        public static IHtmlString If(this HtmlHelper html, bool test, string valueIfTrue, string valueIfFalse)
         {
-            return test ? new HtmlString(valueIfTrue) : new HtmlString(string.Empty);
+            return new HtmlString(HttpUtility.HtmlEncode(test ? valueIfTrue : valueIfFalse));
         }
 
         #endregion
@@ -856,14 +881,30 @@ namespace Umbraco.Web
         private static readonly HtmlStringUtilities StringUtilities = new HtmlStringUtilities();
 
         /// <summary>
-        /// Replaces text line breaks with HTML line breaks
+        /// Replaces text line breaks with HTML line breaks.
         /// </summary>
-        /// <param name="helper"></param>
+        /// <param name="helper">The HTML helper.</param>
         /// <param name="text">The text.</param>
-        /// <returns>The text with text line breaks replaced with HTML line breaks (<br/>)</returns>
+        /// <returns>
+        /// The text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
+        /// </returns>
+        [Obsolete("This method doesn't HTML encode the text. Use ReplaceLineBreaks instead.")]
         public static IHtmlString ReplaceLineBreaksForHtml(this HtmlHelper helper, string text)
         {
             return StringUtilities.ReplaceLineBreaksForHtml(text);
+        }
+
+        /// <summary>
+        /// HTML encodes the text and replaces text line breaks with HTML line breaks.
+        /// </summary>
+        /// <param name="helper">The HTML helper.</param>
+        /// <param name="text">The text.</param>
+        /// <returns>
+        /// The HTML encoded text with text line breaks replaced with HTML line breaks (<c>&lt;br /&gt;</c>).
+        /// </returns>
+        public static IHtmlString ReplaceLineBreaks(this HtmlHelper helper, string text)
+        {
+            return StringUtilities.ReplaceLineBreaks(text);
         }
 
         /// <summary>

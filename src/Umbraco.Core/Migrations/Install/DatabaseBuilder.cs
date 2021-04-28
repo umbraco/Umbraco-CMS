@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Exceptions;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Migrations.Upgrade;
@@ -110,6 +109,14 @@ namespace Umbraco.Core.Migrations.Install
                 }
                 scope.Complete();
                 return has;
+            }
+        }
+
+        internal bool IsUmbracoInstalled()
+        {
+            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            {
+                return scope.Database.IsUmbracoInstalled(_logger);
             }
         }
 
@@ -278,8 +285,10 @@ namespace Umbraco.Core.Migrations.Install
         /// <param name="logger">A logger.</param>
         private static void SaveConnectionString(string connectionString, string providerName, ILogger logger)
         {
-            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentNullOrEmptyException(nameof(connectionString));
-            if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentNullOrEmptyException(nameof(providerName));
+            if (connectionString == null) throw new ArgumentNullException(nameof(connectionString));
+            if (string.IsNullOrWhiteSpace(connectionString)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(connectionString));
+            if (providerName == null) throw new ArgumentNullException(nameof(providerName));
+            if (string.IsNullOrWhiteSpace(providerName)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(providerName));
 
             var fileSource = "web.config";
             var fileName = IOHelper.MapPath(SystemDirectories.Root +"/" + fileSource);
@@ -323,9 +332,9 @@ namespace Umbraco.Core.Migrations.Install
             }
 
             // save
-            logger.Info<DatabaseBuilder>("Saving connection string to {ConfigFile}.", fileSource);
+            logger.Info<DatabaseBuilder, string>("Saving connection string to {ConfigFile}.", fileSource);
             xml.Save(fileName, SaveOptions.DisableFormatting);
-            logger.Info<DatabaseBuilder>("Saved connection string to {ConfigFile}.", fileSource);
+            logger.Info<DatabaseBuilder, string>("Saved connection string to {ConfigFile}.", fileSource);
         }
 
         private static void AddOrUpdateAttribute(XElement element, string name, string value)
@@ -345,7 +354,7 @@ namespace Umbraco.Core.Migrations.Install
             var sqlCeDatabaseExists = false;
             if (dbIsSqlCe)
             {
-                var parts = databaseSettings.ConnectionString.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries);
+                var parts = databaseSettings.ConnectionString.Split(Constants.CharArrays.Semicolon, StringSplitOptions.RemoveEmptyEntries);
                 var dataSourcePart = parts.FirstOrDefault(x => x.InvariantStartsWith("Data Source="));
                 if (dataSourcePart != null)
                 {
@@ -390,15 +399,15 @@ namespace Umbraco.Core.Migrations.Install
         private DatabaseSchemaResult ValidateSchema(IScope scope)
         {
             if (_databaseFactory.Initialized == false)
-                return new DatabaseSchemaResult(_databaseFactory.SqlContext.SqlSyntax);
+                return new DatabaseSchemaResult();
 
             if (_databaseSchemaValidationResult != null)
                 return _databaseSchemaValidationResult;
 
-            var database = scope.Database;
-            var dbSchema = new DatabaseSchemaCreator(database, _logger);
-            _databaseSchemaValidationResult = dbSchema.ValidateSchema();
+            _databaseSchemaValidationResult = scope.Database.ValidateSchema(_logger);
+
             scope.Complete();
+
             return _databaseSchemaValidationResult;
         }
 
@@ -437,11 +446,9 @@ namespace Umbraco.Core.Migrations.Install
 
                 var schemaResult = ValidateSchema();
                 var hasInstalledVersion = schemaResult.DetermineHasInstalledVersion();
-                //var installedSchemaVersion = schemaResult.DetermineInstalledVersion();
-                //var hasInstalledVersion = !installedSchemaVersion.Equals(new Version(0, 0, 0));
 
-                //If Configuration Status is empty and the determined version is "empty" its a new install - otherwise upgrade the existing
-                if (string.IsNullOrEmpty(_globalSettings.ConfigurationStatus) && !hasInstalledVersion)
+                //If the determined version is "empty" its a new install - otherwise upgrade the existing
+                if (!hasInstalledVersion)
                 {
                     if (_runtime.Level == RuntimeLevel.Run)
                         throw new Exception("Umbraco is already configured!");
@@ -452,7 +459,7 @@ namespace Umbraco.Core.Migrations.Install
                     message = message + "<p>Installation completed!</p>";
 
                     //now that everything is done, we need to determine the version of SQL server that is executing
-                    _logger.Info<DatabaseBuilder>("Database configuration status: {DbConfigStatus}", message);
+                    _logger.Info<DatabaseBuilder, string>("Database configuration status: {DbConfigStatus}", message);
                     return new Result { Message = message, Success = true, Percentage = "100" };
                 }
 
@@ -501,7 +508,7 @@ namespace Umbraco.Core.Migrations.Install
 
                 //now that everything is done, we need to determine the version of SQL server that is executing
 
-                _logger.Info<DatabaseBuilder>("Database configuration status: {DbConfigStatus}", message);
+                _logger.Info<DatabaseBuilder, string>("Database configuration status: {DbConfigStatus}", message);
 
                 return new Result { Message = message, Success = true, Percentage = "100" };
             }
@@ -532,7 +539,7 @@ namespace Umbraco.Core.Migrations.Install
 
             if (_databaseSchemaValidationResult != null)
             {
-                _logger.Info<DatabaseBuilder>("The database schema validation produced the following summary: {DbSchemaSummary}", _databaseSchemaValidationResult.GetSummary());
+                _logger.Info<DatabaseBuilder, string>("The database schema validation produced the following summary: {DbSchemaSummary}", _databaseSchemaValidationResult.GetSummary());
             }
 
             return new Result

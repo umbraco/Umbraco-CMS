@@ -29,7 +29,7 @@ label.control-label, .control-label {
   }
 
 
-.controls-row label{padding: 0 10px 0 10px; vertical-align: middle;}
+.controls-row label:not(.umb-form-check){padding: 0 10px 0 10px; vertical-align: middle;}
 
 
 
@@ -68,8 +68,9 @@ label.control-label, .control-label {
 .form-search .icon, .form-search .icon-search {
   position: absolute;
   z-index: 1;
-  top: 6px;
+  top: 50%;
   left: 6px;
+  transform: translateY(-50%);
   color: @gray-8;
 }
 
@@ -113,6 +114,13 @@ label.control-label, .control-label {
     }
 }
 
+.form-search .umb-search-field {
+    width: 100%;
+}
+
+.macro-select .form-search {
+    margin: 0 0 10px;
+}
 
 // GENERAL STYLES
 // --------------
@@ -252,7 +260,7 @@ input[type="color"],
     outline: 0;
 
     .tabbing-active & {
-        outline: 2px solid @inputBorderTabFocus;
+        outline: 2px solid @ui-outline;
     }
   }
 }
@@ -297,11 +305,17 @@ select[size] {
 }
 
 // Focus for select, file, radio, and checkbox
-select:focus,
-input[type="file"]:focus,
-input[type="radio"]:focus,
-input[type="checkbox"]:focus {
-  .tab-focus();
+input[type="file"],
+input[type="radio"],
+input[type="checkbox"] {
+  &:focus {
+    border-color: @inputBorderFocus;
+    outline: 0;
+
+    .tabbing-active & {
+      outline: 2px solid @ui-outline;
+    }
+  }
 }
 
 
@@ -528,7 +542,8 @@ input[type="checkbox"][readonly] {
 .help-inline {
   display: inline-block;
   vertical-align: middle;
-  padding-left: 5px;
+  padding-top: 4px;
+  padding-left: 2px;
 }
 
 div.help {
@@ -574,19 +589,21 @@ table.domains .help-inline {
     }
   }
   .add-on {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     width: auto;
     height: 22px;
     min-width: 18px;
-    padding: 5px 6px 3px 6px;
+    padding: 4px 6px;
     font-size: @baseFontSize;
     font-weight: normal;
     line-height: @baseLineHeight;
     text-align: center;
-    //text-shadow: 0 1px 0 @white;
     background-color: @white;
     border: 1px solid @inputBorder;
     color: @ui-option-type;
+
     &:hover {
         border-color:@inputBorderFocus;
         color: @ui-option-type-hover;
@@ -792,9 +809,12 @@ legend + .control-group {
 
 // adjustments for properties tab
 .form-horizontal .block-form .control-label {
-  display: block;
-  float: none;
-  width: 100%;
+    display: block;
+    float: none;
+    width: 100%;
+}
+.form-horizontal .block-form .controls {
+    margin-left: 0;
 }
 
 //make sure buttons are always on top
@@ -810,6 +830,7 @@ legend + .control-group {
   // Labels on own row
   .form-horizontal .control-label {
     float:none;
+    text-align: inherit;
     width: 100%;
   }
   .form-horizontal .controls {
