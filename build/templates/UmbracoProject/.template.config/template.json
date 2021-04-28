@@ -99,8 +99,8 @@
             "generator": "port",
             "replaces": "HTTPS_PORT_FROM_TEMPLATE",
             "parameters": {
-                "high": 65535,
-                "low": 1024,
+                "low": 44300,
+                "high": 44399,
                 "fallback": 5001
             }
         },
