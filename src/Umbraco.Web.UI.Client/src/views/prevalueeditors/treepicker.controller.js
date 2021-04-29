@@ -49,7 +49,7 @@ angular.module('umbraco')
             });
         }
 
-        $scope.openContentPicker = function () {
+        $scope.openTreePicker = function () {
             var treePicker = config;
             treePicker.section = config.type;
 
