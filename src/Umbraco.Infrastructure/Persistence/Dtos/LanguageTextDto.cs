@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
     [TableName(Cms.Core.Constants.DatabaseSchema.Tables.DictionaryValue)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
-    internal class LanguageTextDto
+    public class LanguageTextDto
     {
         [Column("pk")]
         [PrimaryKeyColumn]
