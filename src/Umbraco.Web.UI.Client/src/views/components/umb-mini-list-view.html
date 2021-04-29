@@ -75,13 +75,13 @@
                 </div>
 
                 <!-- Load indicator when the list doesn't have items -->
-                <div ng-if="!miniListView.loading && !miniListView.children" class="umb-table-row umb-table-row--empty">
+                <div ng-if="!miniListView.loading && miniListView.children.length === 0" class="umb-table-row umb-table-row--empty">
                     <span ng-if="search === ''"><localize key="general_noItemsInList">No items have been added</localize></span>
                     <span ng-if="search !== ''"><localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize></span>
                 </div>
 
                 <!-- Load indicator when the list doesn't have items -->
-                <div ng-if="miniListView.loading && !miniListView.children" class="umb-table-row umb-table-row--empty">
+                <div ng-if="miniListView.loading && miniListView.children.length === 0" class="umb-table-row umb-table-row--empty">
                     <umb-load-indicator></umb-load-indicator>
                 </div>
 
