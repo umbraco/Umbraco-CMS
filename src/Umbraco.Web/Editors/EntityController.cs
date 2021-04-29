@@ -29,8 +29,8 @@ using Umbraco.Web.Services;
 using Umbraco.Web.Trees;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
-
 using Constants = Umbraco.Core.Constants;
+
 namespace Umbraco.Web.Editors
 {
     /// <summary>
@@ -456,7 +456,7 @@ namespace Umbraco.Web.Editors
             }
 
             //all udi types will need to be the same in this list so we'll determine by the first
-            //currently we only support GuidIdi for this method
+            //currently we only support GuidUdi for this method
 
             var guidUdi = ids[0] as GuidUdi;
             if (guidUdi != null)
@@ -1132,16 +1132,17 @@ namespace Umbraco.Web.Editors
         }
 
         private static readonly string[] _postFilterSplitStrings = new[]
-            {
-                "=",
-                "==",
-                "!=",
-                "<>",
-                ">",
-                "<",
-                ">=",
-                "<="
-            };
+        {
+            "=",
+            "==",
+            "!=",
+            "<>",
+            ">",
+            "<",
+            ">=",
+            "<="
+        };
+
         private static QueryCondition BuildQueryCondition<T>(string postFilter)
         {
             var postFilterParts = postFilter.Split(_postFilterSplitStrings, 2, StringSplitOptions.RemoveEmptyEntries);
