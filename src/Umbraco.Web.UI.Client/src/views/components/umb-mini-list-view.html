@@ -74,7 +74,7 @@
                     <div class="umb-table-cell black" ng-class="{'umb-table-cell--faded':child.published === false}">{{ child.name }}</div>
                 </div>
 
-                <!-- Load indicator when the list doesn't have items -->
+                <!-- Show a message when no items are found, depending on whether you searched or the list was empty anyway -->
                 <div ng-if="!miniListView.loading && miniListView.children.length === 0" class="umb-table-row umb-table-row--empty">
                     <span ng-if="search === ''"><localize key="general_noItemsInList">No items have been added</localize></span>
                     <span ng-if="search !== ''"><localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize></span>
