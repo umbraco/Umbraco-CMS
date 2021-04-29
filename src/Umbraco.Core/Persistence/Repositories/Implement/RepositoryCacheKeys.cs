@@ -16,9 +16,6 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             return s_keys.TryGetValue(type, out var key) ? key : (s_keys[type] = "uRepo_" + type.Name + "_");
         }
 
-        [Obsolete("Use GetKey<T, TId> instead")]
-        public static string GetKey<T>(object id) => GetKey<T>() + id.ToString().ToUpperInvariant();
-
         public static string GetKey<T, TId>(TId id)
         {
             if (EqualityComparer<TId>.Default.Equals(id, default))
