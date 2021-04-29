@@ -80,7 +80,7 @@
                     <span ng-if="search !== ''"><localize key="general_searchNoResult">Sorry, we can not find what you are looking for.</localize></span>
                 </div>
 
-                <!-- Load indicator when the list doesn't have items -->
+                <!-- Load indicator while items are retrieved -->
                 <div ng-if="miniListView.loading && miniListView.children.length === 0" class="umb-table-row umb-table-row--empty">
                     <umb-load-indicator></umb-load-indicator>
                 </div>
