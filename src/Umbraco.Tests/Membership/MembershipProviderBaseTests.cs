@@ -388,9 +388,10 @@ namespace Umbraco.Tests.Membership
             var provider = providerMock.Object;
             provider.Initialize("test", new NameValueCollection { {"useLegacyEncoding", "true"}, { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
 
-            var alg = provider.GetHashAlgorithm("blah");
-
-            Assert.IsTrue(alg is HMACSHA1);
+            using (var alg = provider.GetHashAlgorithm("blah"))
+            {
+                Assert.IsTrue(alg is HMACSHA1);
+            }
         }
 
         [Test]
@@ -400,9 +401,10 @@ namespace Umbraco.Tests.Membership
             var provider = providerMock.Object;
             provider.Initialize("test", new NameValueCollection { { "passwordFormat", "Hashed" }, { "hashAlgorithmType", "HMACSHA256" } });
 
-            var alg = provider.GetHashAlgorithm("blah");
-
-            Assert.IsTrue(alg is HMACSHA256);
+            using (var alg = provider.GetHashAlgorithm("blah"))
+            {
+                Assert.IsTrue(alg is HMACSHA256);
+            }
         }
 
 

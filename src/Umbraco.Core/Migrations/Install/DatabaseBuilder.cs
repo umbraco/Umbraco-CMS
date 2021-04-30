@@ -141,11 +141,10 @@ namespace Umbraco.Core.Migrations.Install
             var path = Path.Combine(IOHelper.GetRootDirectorySafe(), "App_Data", "Umbraco.sdf");
             if (File.Exists(path) == false)
             {
-                // this should probably be in a "using (new SqlCeEngine)" clause but not sure
-                // of the side effects and it's been like this for quite some time now
-
-                var engine = new SqlCeEngine(EmbeddedDatabaseConnectionString);
-                engine.CreateDatabase();
+                using(var engine = new SqlCeEngine(EmbeddedDatabaseConnectionString))
+                {
+                    engine.CreateDatabase();
+                }
             }
 
             factory.Configure(EmbeddedDatabaseConnectionString, Constants.DbProviderNames.SqlCe);

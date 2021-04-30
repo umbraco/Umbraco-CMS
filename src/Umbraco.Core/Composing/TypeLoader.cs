@@ -27,7 +27,7 @@ namespace Umbraco.Core.Composing
     /// <para>This class caches the types it knows to avoid excessive assembly scanning and shorten startup times, relying
     /// on a hash of the DLLs in the ~/bin folder to check for cache expiration.</para>
     /// </remarks>
-    public class TypeLoader
+    public class TypeLoader : IDisposable
     {
         private const string CacheKey = "umbraco-types.list";
 
@@ -44,6 +44,7 @@ namespace Umbraco.Core.Composing
         private string _currentAssembliesHash;
         private IEnumerable<Assembly> _assemblies;
         private bool _reportedChange;
+        private bool _disposedValue;
         private readonly string _localTempPath;
         private readonly Lazy<string> _fileBasePath;
 
@@ -459,7 +460,10 @@ namespace Umbraco.Core.Composing
                     }
                     catch { /* bah - just don't die */ }
                     if (!_timing)
+                    {
+                        _timer?.Dispose();
                         _timer = null;
+                    }
                 }
             }
 
@@ -942,6 +946,26 @@ namespace Umbraco.Core.Composing
             protected CachedTypeNotFoundInFileException(SerializationInfo info, StreamingContext context)
                 : base(info, context)
             { }
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!_disposedValue)
+            {
+                if (disposing)
+                {
+                    _timer?.Dispose();
+                }
+
+                _disposedValue = true;
+            }
+        }
+
+        public void Dispose()
+        {
+            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+            Dispose(disposing: true);
+            GC.SuppressFinalize(this);
         }
 
         #endregion
