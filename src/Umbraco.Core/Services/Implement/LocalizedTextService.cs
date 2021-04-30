@@ -11,7 +11,7 @@ namespace Umbraco.Core.Services.Implement
 {
     // TODO: Convert all of this over to Niels K's localization framework one day
 
-    public class LocalizedTextService :  ILocalizedTextService2
+    public class LocalizedTextService : ILocalizedTextService2
     {
         private readonly ILogger _logger;
         private readonly Lazy<LocalizedTextServiceFileSources> _fileSources;
@@ -30,39 +30,47 @@ namespace Umbraco.Core.Services.Implement
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
             if (fileSources == null) throw new ArgumentNullException("fileSources");
-            _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(()=> FileSourcesToDictionarySources(fileSources.Value).WithArea);
-            _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => FileSourcesToDictionarySources(fileSources.Value).WithoutArea);
+            _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(() => FileSourcesToAreaDictionarySources(fileSources.Value));
+            _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => FileSourcesToNoAreaDictionarySources(fileSources.Value));
             _fileSources = fileSources;
         }
 
-        private (IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> WithArea, IDictionary<CultureInfo, IDictionary<string, string>> WithoutArea) FileSourcesToDictionarySources(LocalizedTextServiceFileSources fileSources)
+        private IDictionary<CultureInfo, IDictionary<string, string>> FileSourcesToNoAreaDictionarySources(LocalizedTextServiceFileSources fileSources)
         {
             var xmlSources = fileSources.GetXmlSources();
-            return XmlSourcesToDictionarySources(xmlSources);
+
+            return XmlSourceToNoAreaDictionary(xmlSources);
         }
-        private (IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> WithArea, IDictionary<CultureInfo, IDictionary<string, string>> WithoutArea) XmlSourcesToDictionarySources(IDictionary<CultureInfo, Lazy<XDocument>> source)
+
+        private IDictionary<CultureInfo, IDictionary<string, string>> XmlSourceToNoAreaDictionary(IDictionary<CultureInfo, Lazy<XDocument>> xmlSources)
+        {
+            var cultureNoAreaDictionary = new Dictionary<CultureInfo, IDictionary<string, string>>();
+            foreach (var xmlSource in xmlSources)
+            {
+                var noAreaAliasValue = GetNoAreaStoredTranslations(xmlSources, xmlSource.Key);
+                cultureNoAreaDictionary.Add(xmlSource.Key, noAreaAliasValue);
+            }
+            return cultureNoAreaDictionary;
+        }
+
+        private IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> FileSourcesToAreaDictionarySources(LocalizedTextServiceFileSources fileSources)
+        {
+            var xmlSources = fileSources.GetXmlSources();
+            return XmlSourcesToAreaDictionary(xmlSources);
+        }
+
+        private IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> XmlSourcesToAreaDictionary(IDictionary<CultureInfo, Lazy<XDocument>> xmlSources)
         {
             var cultureDictionary = new Dictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>();
-            var cultureNoAreaDictionary = new Dictionary<CultureInfo, IDictionary<string, string>>();
-            foreach (var xmlSource in source)
+            foreach (var xmlSource in xmlSources)
             {
-                var areaAliaValue = GetAreaStoredTranslations(source, xmlSource.Key);
+                var areaAliaValue = GetAreaStoredTranslations(xmlSources, xmlSource.Key);
                 cultureDictionary.Add(xmlSource.Key, areaAliaValue);
-                var aliasValue = new Dictionary<string, string>(StringComparer.InvariantCulture);
-                foreach (var area in areaAliaValue)
-                {
-                    foreach (var alias in area.Value)
-                    {
-                        if (!aliasValue.ContainsKey(alias.Key))
-                        {
-                            aliasValue.Add(alias.Key, alias.Value);
-                        }
-                    }
-                }
-                cultureNoAreaDictionary.Add(xmlSource.Key, aliasValue);
+
             }
-            return (cultureDictionary, cultureNoAreaDictionary);
+            return cultureDictionary;
         }
+
         /// <summary>
         /// Initializes with an XML source
         /// </summary>
@@ -73,9 +81,9 @@ namespace Umbraco.Core.Services.Implement
             if (source == null) throw new ArgumentNullException("source");
             if (logger == null) throw new ArgumentNullException("logger");
             _logger = logger;
-            _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(()=> XmlSourcesToDictionarySources(source).WithArea);
-            _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => XmlSourcesToDictionarySources(source).WithoutArea);
-            
+            _dictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>>>(() => XmlSourcesToAreaDictionary(source));
+            _noAreaDictionarySourceLazy = new Lazy<IDictionary<CultureInfo, IDictionary<string, string>>>(() => XmlSourceToNoAreaDictionary(source));
+
         }
 
 
@@ -133,7 +141,7 @@ namespace Umbraco.Core.Services.Implement
             // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
             culture = ConvertToSupportedCultureWithRegionCode(culture);
 
-                return GetFromDictionarySource(culture, area, alias, tokens);
+            return GetFromDictionarySource(culture, area, alias, tokens);
         }
 
         /// <summary>
@@ -146,9 +154,6 @@ namespace Umbraco.Core.Services.Implement
 
             // TODO: Hack, see notes on ConvertToSupportedCultureWithRegionCode
             culture = ConvertToSupportedCultureWithRegionCode(culture);
-
-         
-
 
             if (_dictionarySource.ContainsKey(culture) == false)
             {
@@ -169,7 +174,6 @@ namespace Umbraco.Core.Services.Implement
                     }
                 }
             }
-
             return result;
         }
 
@@ -191,7 +195,66 @@ namespace Umbraco.Core.Services.Implement
                 }
                 overallResult.Add(area.Attribute("alias").Value, result);
             }
+
+            //Merge English Dictionary
+            var englishCulture = new CultureInfo("en-US");
+            if (!cult.Equals(englishCulture))
+            {
+                var enUS = xmlSource[englishCulture].Value.XPathSelectElements("//area");
+                foreach (var area in enUS)
+                {
+                    IDictionary<string, string> result = new Dictionary<string, string>(StringComparer.InvariantCulture);
+                    if (overallResult.ContainsKey(area.Attribute("alias").Value))
+                    {
+                        result = overallResult[area.Attribute("alias").Value];
+                    }
+                    var keys = area.XPathSelectElements("./key");
+                    foreach (var key in keys)
+                    {
+                        var dictionaryKey =
+                            (string)key.Attribute("alias");
+                        //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
+                        if (result.ContainsKey(dictionaryKey) == false)
+                            result.Add(dictionaryKey, key.Value);
+                    }
+                    if (!overallResult.ContainsKey(area.Attribute("alias").Value))
+                    {
+                        overallResult.Add(area.Attribute("alias").Value, result);
+                    }
+                }
+            }
             return overallResult;
+        }
+        private Dictionary<string, string> GetNoAreaStoredTranslations(IDictionary<CultureInfo, Lazy<XDocument>> xmlSource, CultureInfo cult)
+        {
+            var result = new Dictionary<string, string>(StringComparer.InvariantCulture);
+            var keys = xmlSource[cult].Value.XPathSelectElements("//key");
+
+            foreach (var key in keys)
+            {
+                var dictionaryKey =
+                    (string)key.Attribute("alias");
+                //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
+                if (result.ContainsKey(dictionaryKey) == false)
+                    result.Add(dictionaryKey, key.Value);
+            }
+
+            //Merge English Dictionary
+            var englishCulture = new CultureInfo("en-US");
+            if (!cult.Equals(englishCulture))
+            {
+                var keysEn = xmlSource[englishCulture].Value.XPathSelectElements("//key");
+
+                foreach (var key in keys)
+                {
+                    var dictionaryKey =
+                        (string)key.Attribute("alias");
+                    //there could be duplicates if the language file isn't formatted nicely - which is probably the case for quite a few lang files
+                    if (result.ContainsKey(dictionaryKey) == false)
+                        result.Add(dictionaryKey, key.Value);
+                }
+            }
+            return result;
         }
         private Dictionary<string, IDictionary<string, string>> GetAreaStoredTranslations(IDictionary<CultureInfo, IDictionary<string, IDictionary<string, string>>> dictionarySource, CultureInfo cult)
         {
@@ -251,7 +314,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (_dictionarySource.ContainsKey(culture) == false)
             {
-                _logger.Warn<LocalizedTextService,CultureInfo>("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                _logger.Warn<LocalizedTextService, CultureInfo>("The culture specified {Culture} was not found in any configured sources for this service", culture);
                 return "[" + key + "]";
             }
 
@@ -267,7 +330,7 @@ namespace Umbraco.Core.Services.Implement
                 {
                     areaDictionary.TryGetValue(key, out found);
                 }
-                if(found == null)
+                if (found == null)
                 {
                     _noAreaDictionarySource[culture].TryGetValue(key, out found);
                 }
