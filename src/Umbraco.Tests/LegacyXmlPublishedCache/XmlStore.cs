@@ -702,7 +702,7 @@ AND (umbracoNode.id=@id)";
                 // if something goes wrong remove the file
                 DeleteXmlFile();
 
-                Current.Logger.Error<XmlStore>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
+                Current.Logger.Error<XmlStore, string>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
             }
         }
 
@@ -742,7 +742,7 @@ AND (umbracoNode.id=@id)";
                 // if something goes wrong remove the file
                 DeleteXmlFile();
 
-                Current.Logger.Error<XmlStore>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
+                Current.Logger.Error<XmlStore, string>(ex, "Failed to save Xml to file '{FileName}'.", _xmlFileName);
             }
         }
 
@@ -799,7 +799,7 @@ AND (umbracoNode.id=@id)";
             }
             catch (Exception ex)
             {
-                Current.Logger.Error<XmlStore>(ex, "Failed to load Xml from file '{FileName}'.", _xmlFileName);
+                Current.Logger.Error<XmlStore, string>(ex, "Failed to load Xml from file '{FileName}'.", _xmlFileName);
                 try
                 {
                     DeleteXmlFile();
@@ -1039,7 +1039,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
             {
                 foreach (var payload in payloads)
                 {
-                    Current.Logger.Debug<XmlStore>("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
+                    Current.Logger.Debug<XmlStore,TreeChangeTypes,int>("Notified {ChangeTypes} for content {ContentId}", payload.ChangeTypes, payload.Id);
 
                     if (payload.ChangeTypes.HasType(TreeChangeTypes.RefreshAll))
                     {
@@ -1072,7 +1072,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                     if (content == null || content.Published == false || content.Trashed)
                     {
                         // no published version
-                        Current.Logger.Debug<XmlStore>("Notified, content {ContentId} has no published version.", payload.Id);
+                        Current.Logger.Debug<XmlStore,int>("Notified, content {ContentId} has no published version.", payload.Id);
 
                         if (current != null)
                         {
@@ -1111,7 +1111,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                             if (dtos.MoveNext() == false)
                             {
                                 // gone fishing, remove (possible race condition)
-                                Current.Logger.Debug<XmlStore>("Notified, content {ContentId} gone fishing.", payload.Id);
+                                Current.Logger.Debug<XmlStore,int>("Notified, content {ContentId} gone fishing.", payload.Id);
 
                                 if (current != null)
                                 {
@@ -1225,7 +1225,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 .ToArray();
 
             foreach (var payload in payloads)
-                Current.Logger.Debug<XmlStore>("Notified {ChangeTypes} for content type {ContentTypeId}", payload.ChangeTypes, payload.Id);
+                Current.Logger.Debug<XmlStore,ContentTypeChangeTypes,int>("Notified {ChangeTypes} for content type {ContentTypeId}", payload.ChangeTypes, payload.Id);
 
             if (ids.Length > 0) // must have refreshes, not only removes
                 RefreshContentTypes(ids);
@@ -1244,7 +1244,7 @@ ORDER BY umbracoNode.level, umbracoNode.sortOrder";
                 _contentTypeCache.ClearDataType(payload.Id);
 
             foreach (var payload in payloads)
-                Current.Logger.Debug<XmlStore>("Notified {RemovedStatus} for data type {payload.Id}",
+                Current.Logger.Debug<XmlStore, string,int>("Notified {RemovedStatus} for data type {payload.Id}",
                     payload.Removed ? "Removed" : "Refreshed",
                     payload.Id);
 

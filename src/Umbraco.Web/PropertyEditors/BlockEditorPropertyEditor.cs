@@ -148,7 +148,7 @@ namespace Umbraco.Web.PropertyEditors
                         {
                             // deal with weird situations by ignoring them (no comment)
                             row.PropertyValues.Remove(prop.Key);
-                            _logger.Warn<BlockEditorPropertyValueEditor>(
+                            _logger.Warn<BlockEditorPropertyValueEditor,string,Guid,string>(
                                 "ToEditor removed property value {PropertyKey} in row {RowId} for property type {PropertyTypeAlias}",
                                 prop.Key, row.Key, property.PropertyType.Alias);
                             continue;

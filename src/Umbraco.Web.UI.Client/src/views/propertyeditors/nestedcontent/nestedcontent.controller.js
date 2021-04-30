@@ -105,12 +105,13 @@
         localizationService.localizeMany(["grid_addElement", "content_createEmpty", "actions_copy"]).then(function (data) {
             labels.grid_addElement = data[0];
             labels.content_createEmpty = data[1];
-            labels.copy_icon_title = data[2]
+            labels.copy_icon_title = data[2];
         });
 
-        function setCurrentNode(node) {
+        function setCurrentNode(node, focusNode) {
             updateModel();
             vm.currentNode = node;
+            vm.focusOnNode = focusNode;
         }
 
         var copyAllEntries = function () {
@@ -180,7 +181,7 @@
 
             var newNode = createNode(scaffold, null);
 
-            setCurrentNode(newNode);
+            setCurrentNode(newNode, true);
             setDirty();
             validate();
         };
@@ -202,7 +203,6 @@
             });
 
             const dialog = {
-                view: "itempicker",
                 orderBy: "$index",
                 view: "itempicker",
                 event: $event,
@@ -277,9 +277,9 @@
 
         vm.editNode = function (idx) {
             if (vm.currentNode && vm.currentNode.key === vm.nodes[idx].key) {
-                setCurrentNode(null);
+                setCurrentNode(null, false);
             } else {
-                setCurrentNode(vm.nodes[idx]);
+                setCurrentNode(vm.nodes[idx], true);
             }
         };
 
@@ -500,15 +500,17 @@
             setDirty();
             //updateModel();// done by setting current node...
 
-            setCurrentNode(newNode);
+            setCurrentNode(newNode, true);
         }
 
         function checkAbilityToPasteContent() {
             vm.showPaste = clipboardService.hasEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, contentTypeAliases);
         }
 
-        eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
-
+        var storageUpdate = eventsService.on("clipboardService.storageUpdate", checkAbilityToPasteContent);
+        $scope.$on('$destroy', function () {
+            storageUpdate();
+        });
         var notSupported = [
             "Umbraco.Tags",
             "Umbraco.UploadField",
@@ -590,7 +592,7 @@
 
                 // If there is only one item, set it as current node
                 if (vm.singleMode || (vm.nodes.length === 1 && vm.maxItems === 1)) {
-                    setCurrentNode(vm.nodes[0]);
+                    setCurrentNode(vm.nodes[0], false);
                 }
 
                 validate();

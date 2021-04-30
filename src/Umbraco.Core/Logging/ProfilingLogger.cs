@@ -127,6 +127,64 @@ namespace Umbraco.Core.Logging
         public void Verbose(Type reporting, string messageTemplate, params object[] propertyValues)
             => Logger.Verbose(reporting, messageTemplate, propertyValues);
 
+        public void Fatal<T0, T1, T2>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0,
+            T1 propertyValue1, T2 propertyValue2)
+            => Logger.Fatal<T0, T1, T2>(reporting, exception, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
+
+        public void Fatal<T0, T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+            => Logger.Fatal<T0, T1>(reporting, exception, messageTemplate, propertyValue0, propertyValue1);
+
+        public void Fatal<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0)
+            => Logger.Fatal<T0>(reporting, exception, messageTemplate, propertyValue0);
+
+        public void Error<T0, T1, T2>(Type reporting, Exception exception, string messageTemplate,
+            T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+            => Logger.Error<T0, T1, T2>(reporting, exception, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
+
+        public void Error<T0, T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+            => Logger.Error<T0, T1>(reporting, exception, messageTemplate, propertyValue0, propertyValue1);
+
+        public void Error<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0)
+            => Logger.Error<T0>(reporting, exception, messageTemplate, propertyValue0);
+
+        public void Warn<T0, T1, T2>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+            => Logger.Warn<T0, T1, T2>(reporting, exception, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
+
+        public void Warn<T0, T1>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+            => Logger.Warn<T0, T1>(reporting, exception, messageTemplate, propertyValue0, propertyValue1);
+
+        public void Warn<T0>(Type reporting, Exception exception, string messageTemplate, T0 propertyValue0)
+            => Logger.Warn<T0>(reporting, exception, messageTemplate, propertyValue0);
+
+        public void Warn<T0>(Type reporting, string message, T0 propertyValue0) => Logger.Warn(reporting, message, propertyValue0);
+
+        public void Info<T0, T1, T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+            => Logger.Info<T0, T1, T2>(reporting, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
+
+        public void Info<T0, T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+            => Logger.Info<T0, T1>(reporting, messageTemplate, propertyValue0, propertyValue1);
+
+        public void Info<T0>(Type reporting, string messageTemplate, T0 propertyValue0)
+            => Logger.Info<T0>(reporting, messageTemplate, propertyValue0);
+
+        public void Debug<T0, T1, T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+            => Logger.Debug<T0, T1, T2>(reporting, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
+
+        public void Debug<T0, T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+            => Logger.Debug<T0, T1>(reporting, messageTemplate, propertyValue0, propertyValue1);
+
+        public void Debug<T0>(Type reporting, string messageTemplate, T0 propertyValue0)
+            => Logger.Debug<T0>(reporting, messageTemplate, propertyValue0);
+
+        public void Verbose<T0, T1, T2>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1, T2 propertyValue2)
+            => Logger.Verbose<T0, T1, T2>(reporting, messageTemplate, propertyValue0, propertyValue1, propertyValue2);
+
+        public void Verbose<T0, T1>(Type reporting, string messageTemplate, T0 propertyValue0, T1 propertyValue1)
+            => Logger.Verbose<T0, T1>(reporting, messageTemplate, propertyValue0, propertyValue1);
+
+        public void Verbose<T0>(Type reporting, string messageTemplate, T0 propertyValue0)
+            => Logger.Verbose<T0>(reporting, messageTemplate, propertyValue0);
+
         #endregion
     }
 }

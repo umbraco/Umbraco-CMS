@@ -297,11 +297,11 @@ namespace Umbraco.Tests.Services
   <slideshow><![CDATA[1250,1251,1252]]></slideshow>
   <panelContent1><![CDATA[<h2>Built by Creative Founds</h2>
 <p><img src='/images/web_applications.jpg' alt='Web Applications' class='fr'/><strong>Creative Founds</strong> design and build first class software solutions that deliver big results. We provide ASP.NET web and mobile applications, Umbraco development service &amp; technical consultancy.</p>
-<p><a href='http://www.creativefounds.co.uk' target='_blank'>www.creativefounds.co.uk</a></p>]]></panelContent1>
+<p><a href='http://www.creativefounds.co.uk' target='_blank' rel='noopener'>www.creativefounds.co.uk</a></p>]]></panelContent1>
   <panelContent2><![CDATA[<h2>Umbraco Development</h2>
 <p><img src='/images/umbraco_square.jpg' alt='Umbraco' class='fr'/>Umbraco the the leading ASP.NET open source CMS, under pinning over 150,000 websites. Our Certified Developers are experts in developing high performance and feature rich websites.</p>]]></panelContent2>
   <panelContent3><![CDATA[<h2>Contact Us</h2>
-<p><a href='http://www.twitter.com/chriskoiak' target='_blank'><img src='/images/twitter_square.png' alt='Contact Us on Twitter' class='fr'/></a>We'd love to hear how this package has helped you and how it can be improved. Get in touch on the <a href='https://our.umbraco.com/projects/starter-kits/standard-website-mvc' target='_blank'>project website</a> or via <a href='http://www.twitter.com/chriskoiak' target='_blank'>twitter</a></p>]]></panelContent3>
+<p><a href='http://www.twitter.com/chriskoiak' target='_blank' rel='noopener'><img src='/images/twitter_square.png' alt='Contact Us on Twitter' class='fr'/></a>We'd love to hear how this package has helped you and how it can be improved. Get in touch on the <a href='https://our.umbraco.com/projects/starter-kits/standard-website-mvc' target='_blank' rel='noopener'>project website</a> or via <a href='http://www.twitter.com/chriskoiak' target='_blank' rel='noopener'>twitter</a></p>]]></panelContent3>
   <primaryNavigation><![CDATA[1231,1232,1236,1238,1239]]></primaryNavigation>
   <address>Standard Website MVC, Company Address, Glasgow, Postcode</address>
   <copyright>Copyright &amp;copy; 2012 Your Company</copyright>

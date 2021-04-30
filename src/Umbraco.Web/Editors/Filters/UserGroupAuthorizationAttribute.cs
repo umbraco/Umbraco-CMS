@@ -54,7 +54,8 @@ namespace Umbraco.Web.Editors.Filters
                 Current.Services.UserService,
                 Current.Services.ContentService,
                 Current.Services.MediaService,
-                Current.Services.EntityService);
+                Current.Services.EntityService,
+                Current.AppCaches);
             return authHelper.AuthorizeGroupAccess(currentUser, intIds);
         }
     }
