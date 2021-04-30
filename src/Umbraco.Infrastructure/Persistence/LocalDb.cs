@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence
     /// Studio which can be used to connect to LocalDB databases.</para>
     /// <para>See also https://github.com/ritterim/automation-sql which is a somewhat simpler version of this.</para>
     /// </remarks>
-    internal class LocalDb
+    public class LocalDb
     {
         private int _version;
         private bool _hasVersion;
