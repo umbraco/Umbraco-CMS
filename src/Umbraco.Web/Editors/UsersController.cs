@@ -638,11 +638,11 @@ namespace Umbraco.Web.Editors
             var userHasChangedOwnLanguage =
                 user.Id == Security.CurrentUser.Id && Security.CurrentUser.Language != user.Language;
 
-            var textToLocalise = userHasChangedOwnLanguage ? "speechBubbles/operationSavedHeaderReloadUser" : "speechBubbles/operationSavedHeader";
+            var textToLocaliseAlias = userHasChangedOwnLanguage ? "operationSavedHeaderReloadUser" : "operationSavedHeader";
             var culture = userHasChangedOwnLanguage
                 ? CultureInfo.GetCultureInfo(user.Language)
                 : Thread.CurrentThread.CurrentUICulture;
-            display.AddSuccessNotification(Services.TextService.Localize(textToLocalise, culture), Services.TextService.Localize("speechBubbles/editUserSaved", culture));
+            display.AddSuccessNotification(Services.TextService.Localize("speechBubbles", textToLocaliseAlias, culture), Services.TextService.Localize("speechBubbles","editUserSaved", culture));
             return display;
         }
 
