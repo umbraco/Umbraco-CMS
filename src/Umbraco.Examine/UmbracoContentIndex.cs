@@ -134,7 +134,7 @@ namespace Umbraco.Examine
 
                 var selectedFields = filtered.SelectFields(_idOnlyFieldSet);
                 var results = selectedFields.Execute();
-                ProfilingLogger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
+                ProfilingLogger.Debug<string, long>(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
                 //need to queue a delete item for each one found
                 QueueIndexOperation(results.Select(r => new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete)));

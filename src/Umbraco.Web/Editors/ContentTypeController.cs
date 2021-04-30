@@ -359,7 +359,7 @@ namespace Umbraco.Web.Editors
                 var tryCreateTemplate = Services.FileService.CreateTemplateForContentType(contentTypeAlias, contentTypeName);
                 if (tryCreateTemplate == false)
                 {
-                    Logger.Warn<ContentTypeController>("Could not create a template for Content Type: \"{ContentTypeAlias}\", status: {Status}",
+                    Logger.Warn<ContentTypeController, string, OperationResultType>("Could not create a template for Content Type: \"{ContentTypeAlias}\", status: {Status}",
                         contentTypeAlias, tryCreateTemplate.Result.Result);
                 }
 
@@ -544,7 +544,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error<ContentTypeController>(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
+                Logger.Error<ContentTypeController, string>(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
@@ -591,7 +591,7 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error<ContentTypeController>(ex, "Error uploading udt file to App_Data: {File}", destFileName);
+                Logger.Error<ContentTypeController, string>(ex, "Error uploading udt file to App_Data: {File}", destFileName);
             }
 
             if (ext.InvariantEquals("udt"))
