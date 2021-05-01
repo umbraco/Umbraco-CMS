@@ -121,11 +121,25 @@
          * @param {any} type publish or unpublish
          */
         function datePickerShow(variant, type) {
+            var activeDatePickerInstance;
             if (type === 'publish') {
                 variant.releaseDatePickerOpen = true;
+                activeDatePickerInstance = variant.releaseDatePickerInstance;
             } else if (type === 'unpublish') {
                 variant.expireDatePickerOpen = true;
+                activeDatePickerInstance = variant.expireDatePickerInstance;
             }
+
+            // Prevent enter key in time fields from submitting the overlay before the associated input gets the updated time
+            if (activeDatePickerInstance && !activeDatePickerInstance.hourElement.hasAttribute("overlay-submit-on-enter"))
+            {
+                activeDatePickerInstance.hourElement.setAttribute("overlay-submit-on-enter", "false");
+            }
+            if (activeDatePickerInstance && !activeDatePickerInstance.minuteElement.hasAttribute("overlay-submit-on-enter"))
+            {
+                activeDatePickerInstance.minuteElement.setAttribute("overlay-submit-on-enter", "false");
+            }
+
             checkForBackdropClick();
             $scope.model.disableSubmitButton = !canSchedule();
         }
