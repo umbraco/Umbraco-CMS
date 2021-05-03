@@ -649,7 +649,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     formHelper.handleServerValidation(args.err.data.ModelState);
 
                     var messageType = 2;//error
-                    console.log(args)
                     if (args.action === "save") {
                         messageType = 4;//warning
                     }
