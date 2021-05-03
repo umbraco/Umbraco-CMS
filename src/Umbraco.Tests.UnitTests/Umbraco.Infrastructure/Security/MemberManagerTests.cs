@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
                 _mockPasswordHasher.Object,
                 userValidators,
                 pwdValidators,
-                new MembersErrorDescriber(),
+                new MembersErrorDescriber(Mock.Of<ILocalizedTextService>()),
                 _mockServiceProviders.Object,
                 new Mock<ILogger<UserManager<MemberIdentityUser>>>().Object,
                 _mockPasswordConfiguration.Object,

@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Security
                     Mock.Of<IPasswordHasher<MemberIdentityUser>>(),
                     Enumerable.Empty<IUserValidator<MemberIdentityUser>>(),
                     Enumerable.Empty<IPasswordValidator<MemberIdentityUser>>(),
-                    new MembersErrorDescriber(),
+                    new MembersErrorDescriber(Mock.Of<ILocalizedTextService>()),
                     Mock.Of<IServiceProvider>(),
                     Mock.Of<ILogger<UserManager<MemberIdentityUser>>>(),
                     Options.Create(new MemberPasswordConfigurationSettings()),
