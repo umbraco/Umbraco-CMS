@@ -204,31 +204,39 @@ angular.module("umbraco.directives")
                             return false;
                         }
 
-                        const dialog = {
-                            view: "itempicker",
-                            filter: filteredMediaTypes.length > 8,
-                            availableItems: filteredMediaTypes,
-                            submit: function (model) {
-                                scope.contentTypeAlias = model.selectedItem.alias;
-                                _processQueueItem();
 
-                                overlayService.close();
-                            },
-                            close: function () {
+                        localizationService.localizeMany(["defaultdialogs_selectMediaType", "mediaType_autoPickMediaType"]).then(function (translations) {
 
-                                scope.queue.map(function (file) {
-                                    file.uploadStatus = "error";
-                                    file.serverErrorMessage = "No files uploaded, no mediatype selected";
-                                    scope.rejected.push(file);
-                                });
-                                scope.queue = [];
+                            filteredMediaTypes.push({
+                                alias: "umbracoAutoSelect",
+                                name: translations[1],
+                                icon: "icon-wand"
+                            });
 
-                                overlayService.close();
-                            }
-                        };
+                            const dialog = {
+                                view: "itempicker",
+                                filter: filteredMediaTypes.length > 8,
+                                availableItems: filteredMediaTypes,
+                                submit: function (model) {
+                                    scope.contentTypeAlias = model.selectedItem.alias;
+                                    _processQueueItem();
 
-                        localizationService.localize("defaultdialogs_selectMediaType").then(value => {
-                            dialog.title = value;
+                                    overlayService.close();
+                                },
+                                close: function () {
+
+                                    scope.queue.map(function (file) {
+                                        file.uploadStatus = "error";
+                                        file.serverErrorMessage = "No files uploaded, no mediatype selected";
+                                        scope.rejected.push(file);
+                                    });
+                                    scope.queue = [];
+
+                                    overlayService.close();
+                                }
+                            };
+
+                            dialog.title = translations[0];
                             overlayService.open(dialog);
                         });
 

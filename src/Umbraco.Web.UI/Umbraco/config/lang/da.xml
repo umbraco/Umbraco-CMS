@@ -343,6 +343,7 @@
   <area alias="mediaType">
      <key alias="copyFailed">Kopiering af medietypen fejlede</key>
      <key alias="moveFailed">Flytning af medietypen fejlede</key>
+     <key alias="autoPickMediaType">Auto vælg</key>
   </area>
   <area alias="memberType">
      <key alias="copyFailed">Kopiering af medlemstypen fejlede</key>
