@@ -25,7 +25,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
     function ValFormManagerController($scope) {
         //This exposes an API for direct use with this directive
 
-        // We need this as a way to reference this directive in the scope chain. Since this directive isn't a component and 
+        // We need this as a way to reference this directive in the scope chain. Since this directive isn't a component and
         // because it's an attribute instead of an element, we can't use controllerAs or anything like that. Plus since this is
         // an attribute an isolated scope doesn't work so it's a bit weird. By doing this we are able to lookup the parent valFormManager
         // in the scope hierarchy even if the DOM hierarchy doesn't match (i.e. in infinite editing)
@@ -109,9 +109,9 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                 labels.stayButton = values[3];
             });
 
-            //watch the list of validation errors to notify the application of any validation changes
-            // TODO: Wouldn't it be easier/faster to watch formCtrl.$invalid ?
-            scope.$watch(() => angularHelper.countAllFormErrors(formCtrl),
+
+            // watch the list of validation errors to notify the application of any validation changes
+            scope.$watch(() => formCtrl.$invalid,
                 function (e) {
 
                     notify(scope);
