@@ -85,7 +85,7 @@
 
         /** Called when the component has linked all elements, this is when the form controller is available */
         function postLink() {
-            
+
         }
 
         function initialize() {
@@ -186,7 +186,7 @@
                         });
                     }
                 }
-                
+
             }
         }
 
@@ -325,7 +325,8 @@
              */
             onFilesChanged: "&",
             onInit: "&",
-            required: "="
+            required: "=",
+            acceptFileExt: "<?"
         },
         transclude: true,
         controllerAs: 'vm',

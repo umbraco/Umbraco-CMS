@@ -254,9 +254,17 @@
     <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
+    <Compile Include="PropertyEditors\IFileExtensionConfigItem.cs" />
+    <Compile Include="PropertyEditors\FileExtensionConfigItem.cs" />
+    <Compile Include="PropertyEditors\IFileExtensionConfig.cs" />
     <Compile Include="PropertyEditors\EyeDropperColorPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EyeDropperColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
+    <Compile Include="PropertyEditors\FileUploadConfiguration.cs" />
+    <Compile Include="PropertyEditors\FileUploadConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3Configuration.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3ConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3PropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PropertyEditors\Validation\ComplexEditorElementTypeValidationResult.cs" />
@@ -266,6 +274,7 @@
     <Compile Include="PropertyEditors\Validation\ValidationResultConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockEditorConverter.cs" />
     <Compile Include="PropertyEditors\ValueConverters\BlockListPropertyValueConverter.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MediaPickerWithCropsValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />
