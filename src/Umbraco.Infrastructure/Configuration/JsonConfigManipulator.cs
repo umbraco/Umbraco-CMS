@@ -74,7 +74,7 @@ namespace Umbraco.Cms.Core.Configuration
 
             var json = GetJson(provider);
 
-            var item = GetDisableRedirectUrlItem(disable.ToString().ToLowerInvariant());
+            var item = GetDisableRedirectUrlItem(disable);
 
             json.Merge(item, new JsonMergeSettings());
 
@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Core.Configuration
             return writer.Token;
         }
 
-        private JToken GetDisableRedirectUrlItem(string value)
+        private JToken GetDisableRedirectUrlItem(bool value)
         {
             JTokenWriter writer = new JTokenWriter();
 
