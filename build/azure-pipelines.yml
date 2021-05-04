@@ -432,7 +432,7 @@ stages:
                   displayName: Copy NuPkg Files to Staging
                   inputs:
                       SourceFolder: build.out
-                      Contents: '*.nupkg'
+                      Contents: '*.*nupkg'
                       TargetFolder: $(build.artifactstagingdirectory)
                       CleanTargetFolder: true
                 - task: PublishBuildArtifacts@1
