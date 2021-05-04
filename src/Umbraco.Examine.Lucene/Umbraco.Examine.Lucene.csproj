@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net472</TargetFramework>
@@ -10,6 +10,16 @@
         <IsPackable>false</IsPackable>
         <!-- But we still need to have PackageId for the depdents to know the actual name of the package. -->
         <PackageId>Umbraco.Cms.Examine.Lucene</PackageId>
+
+        <!-- SourceLink: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element)-->
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+        <!-- SourceLink: Embed source files that are not tracked by the source control manager in the PDB -->
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+        <!-- SourceLink: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -36,11 +46,11 @@
 
     <ItemGroup>
       <PackageReference Include="Examine.Lucene" Version="2.0.0-alpha.20200128.15" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub">
-            <Version>1.0.0</Version>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
+      <PackageReference Include="Microsoft.SourceLink.GitHub">
+          <Version>1.0.0</Version>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
       <PackageReference Include="NPoco" Version="4.0.2" />
         <PackageReference Include="SecurityCodeScan">

@@ -3,6 +3,16 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <RootNamespace>Umbraco.Cms.Web.UI.NetCore</RootNamespace>
+
+    <!-- SourceLink: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element)-->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+    <!-- SourceLink: Embed source files that are not tracked by the source control manager in the PDB -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+    <!-- SourceLink: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DocumentationFile>bin\Release\Umbraco.Web.UI.NetCore.xml</DocumentationFile>
@@ -73,6 +83,10 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
     <PackageReference Include="Umbraco.Code" Version="1.1.1">
