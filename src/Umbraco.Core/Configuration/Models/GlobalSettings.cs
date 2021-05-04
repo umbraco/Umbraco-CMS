@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value indicating whether to hide the top level node from the path.
         /// </summary>
-        public bool HideTopLevelNodeFromPath { get; set; } = false;
+        public bool HideTopLevelNodeFromPath { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating whether HTTPS should be used.
