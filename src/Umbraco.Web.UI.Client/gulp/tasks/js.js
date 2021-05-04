@@ -19,12 +19,17 @@ function js() {
     var stream = new MergeStream();
 
     var task = gulp.src(config.sources.globs.js);
+    // NOTE: if you change something here, you probably also need to change it in the processJs util
     if (config.compile.current.minify === true) {
       task = task.pipe(
         minify({
           noSource: true,
           ext: { min: '.min.js' },
-          mangle: false
+          mangle: false,
+          compress: {
+            keep_classnames: true,
+            keep_fnames: true
+          }
         })
       );
     } else {
