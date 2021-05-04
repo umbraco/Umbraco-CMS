@@ -319,8 +319,6 @@ namespace Umbraco.Cms.Core.Routing
             {
                 // not matching any existing domain
                 _logger.LogDebug("{TracePrefix}Matches no domain", tracePrefix);
-
-                request.SetCulture(defaultCulture ?? CultureInfo.CurrentUICulture.Name);
             }
 
             _logger.LogDebug("{TracePrefix}Culture={CultureName}", tracePrefix, request.Culture);
