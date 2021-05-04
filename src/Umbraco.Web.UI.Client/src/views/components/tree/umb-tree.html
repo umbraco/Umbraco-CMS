@@ -1,7 +1,7 @@
 <ul class="umb-tree" ng-class="{'hide-options': hideoptions === 'true'}">
 
     <li ng-if="!tree.root.containsGroups">
-        <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(tree.root)" ng-hide="hideheader === 'true'" on-right-click="altSelect(tree.root, $event)">
+        <div class="umb-tree-root" data-element="tree-root" ng-class="getNodeCssClass(tree.root)" ng-if="hideheader !== 'true'" on-right-click="altSelect(tree.root, $event)">
             <h5>
                 <a ng-href="#/{{section}}" ng-click="select(tree.root, $event)" class="umb-tree-root-link umb-outline" data-element="tree-root-link">
                     <umb-icon icon="icon-check"
