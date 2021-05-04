@@ -369,6 +369,7 @@
   <area alias="mediaType">
      <key alias="copyFailed">Failed to copy media type</key>
      <key alias="moveFailed">Failed to move media type</key>
+     <key alias="autoPickMediaType">Auto pick</key>
   </area>
   <area alias="memberType">
      <key alias="copyFailed">Failed to copy member type</key>
