@@ -18,6 +18,13 @@ namespace Umbraco.Tests.TestHelpers
 
         public event EventHandler<SyncBootState> Booting;
 
+        /// <summary>
+        /// Call after constructing published snapshot service
+        /// </summary>
+        public void RaiseBooting()
+        {
+            Booting?.Invoke(this, _syncBootState);
+        }
         public SyncBootState GetSyncBootState()
         {
             return _syncBootState;

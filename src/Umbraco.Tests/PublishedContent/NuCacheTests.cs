@@ -184,6 +184,8 @@ namespace Umbraco.Tests.PublishedContent
 
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
+
+            var testSyncBootStateAccessor = new TestSyncBootStateAccessor(SyncBootState.WarmBoot);
             _snapshotService = new PublishedSnapshotService(options,
                 null,
                 runtime,
@@ -203,8 +205,8 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                new TestSyncBootStateAccessor(SyncBootState.WarmBoot));
-
+                testSyncBootStateAccessor);
+            testSyncBootStateAccessor.RaiseBooting();
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();
 
