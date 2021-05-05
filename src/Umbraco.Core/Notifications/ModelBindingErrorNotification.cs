@@ -1,19 +1,17 @@
 using System;
 using System.Text;
-using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Notifications;
 
-namespace Umbraco.Cms.Web.Common.ModelBinders
+namespace Umbraco.Cms.Core.Notifications
 {
     /// <summary>
     /// Contains event data for the <see cref="ModelBindingException"/> event.
     /// </summary>
-    public class ModelBindingError : INotification
+    public class ModelBindingErrorNotification : INotification
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ModelBindingError"/> class.
+        /// Initializes a new instance of the <see cref="ModelBindingErrorNotification"/> class.
         /// </summary>
-        public ModelBindingError(Type sourceType, Type modelType, StringBuilder message)
+        public ModelBindingErrorNotification(Type sourceType, Type modelType, StringBuilder message)
         {
             SourceType = sourceType;
             ModelType = modelType;

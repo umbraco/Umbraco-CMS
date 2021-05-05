@@ -100,8 +100,8 @@ namespace Umbraco.Extensions
             // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
             // would automatically just register for all implemented INotificationHandler{T}?
             builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
-            builder.AddNotificationHandler<ServerVariablesParsing, ModelsBuilderNotificationHandler>();
-            builder.AddNotificationHandler<ModelBindingError, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<UmbracoApplicationStartingNotification, LiveModelsProvider>();
             builder.AddNotificationHandler<UmbracoRequestEndNotification, LiveModelsProvider>();
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, LiveModelsProvider>();
