@@ -153,9 +153,8 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                 }
             }
 
-            //watch the list of validation errors to notify the application of any validation changes
-            // TODO: Wouldn't it be easier/faster to watch formCtrl.$invalid ?
-            scope.$watch(() => angularHelper.countAllFormErrors(formCtrl),
+            // watch the list of validation errors to notify the application of any validation changes
+            scope.$watch(() => formCtrl.$invalid,
                 function (e) {
 
                     notify(scope);
