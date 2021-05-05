@@ -29,8 +29,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         {
             builder.SetDatabaseServerMessengerCallbacks(GetCallbacks);
             builder.SetServerMessenger<BatchedDatabaseServerMessenger>();
-            builder.AddNotificationHandler<UmbracoApplicationStarting, DatabaseServerMessengerNotificationHandler>();
-            builder.AddNotificationHandler<UmbracoRequestEnd, DatabaseServerMessengerNotificationHandler>();
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, DatabaseServerMessengerNotificationHandler>();
+            builder.AddNotificationHandler<UmbracoRequestEndNotification, DatabaseServerMessengerNotificationHandler>();
             return builder;
         }
 

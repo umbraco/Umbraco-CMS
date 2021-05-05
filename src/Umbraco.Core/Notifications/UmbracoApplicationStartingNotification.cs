@@ -4,13 +4,13 @@
 namespace Umbraco.Cms.Core.Notifications
 {
 
-    public class UmbracoApplicationStarting : INotification
+    public class UmbracoApplicationStartingNotification : INotification
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoApplicationStarting"/> class.
+        /// Initializes a new instance of the <see cref="UmbracoApplicationStartingNotification"/> class.
         /// </summary>
         /// <param name="runtimeLevel">The runtime level</param>
-        public UmbracoApplicationStarting(RuntimeLevel runtimeLevel) => RuntimeLevel = runtimeLevel;
+        public UmbracoApplicationStartingNotification(RuntimeLevel runtimeLevel) => RuntimeLevel = runtimeLevel;
 
         /// <summary>
         /// Gets the runtime level of execution.

@@ -197,7 +197,7 @@ namespace Umbraco.Extensions
                 options.IgnoredPaths.Remove("/content/");
             });
 
-            builder.AddNotificationHandler<UmbracoApplicationStarting, InitializeWebProfiling>();
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, InitializeWebProfiling>();
             return builder;
         }
 
@@ -270,7 +270,7 @@ namespace Umbraco.Extensions
 
             // AspNetCore specific services
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
-            builder.AddNotificationHandler<UmbracoRequestBegin, AspNetCoreRequestAccessor>();
+            builder.AddNotificationHandler<UmbracoRequestBeginNotification, AspNetCoreRequestAccessor>();
 
             // Password hasher
             builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();

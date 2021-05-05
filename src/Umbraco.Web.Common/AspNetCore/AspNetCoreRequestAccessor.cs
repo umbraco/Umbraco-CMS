@@ -12,7 +12,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.Common.AspNetCore
 {
-    public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBegin>
+    public class AspNetCoreRequestAccessor : IRequestAccessor, INotificationHandler<UmbracoRequestBeginNotification>
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly WebRoutingSettings _webRoutingSettings;
@@ -90,7 +90,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         /// TODO: This doesn't belong here, the GetApplicationUrl doesn't belong to IRequestAccessor
         /// this should be part of middleware not a lazy init based on an INotification
         /// </summary>
-        public void Handle(UmbracoRequestBegin notification)
+        public void Handle(UmbracoRequestBeginNotification notification)
             => LazyInitializer.EnsureInitialized(ref _hasAppUrl, ref _isInit, ref _initLocker, () =>
             {
                 GetApplicationUrl();

@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Core.Runtime
 {
-    public class EssentialDirectoryCreator : INotificationHandler<UmbracoApplicationStarting>
+    public class EssentialDirectoryCreator : INotificationHandler<UmbracoApplicationStartingNotification>
     {
         private readonly IIOHelper _ioHelper;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Runtime
             _globalSettings = globalSettings.Value;
         }
 
-        public void Handle(UmbracoApplicationStarting notification)
+        public void Handle(UmbracoApplicationStartingNotification notification)
         {
             // ensure we have some essential directories
             // every other component can then initialize safely

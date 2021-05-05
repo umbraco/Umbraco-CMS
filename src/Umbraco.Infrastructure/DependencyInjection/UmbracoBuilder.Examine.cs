@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
             builder.Services.AddUnique<BackgroundIndexRebuilder>();
 
-            builder.AddNotificationHandler<UmbracoApplicationStarting, ExamineNotificationHandler>();
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, ExamineNotificationHandler>();
             builder.AddNotificationHandler<ContentCacheRefresherNotification, ExamineNotificationHandler>();
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ExamineNotificationHandler>();
             builder.AddNotificationHandler<MediaCacheRefresherNotification, ExamineNotificationHandler>();

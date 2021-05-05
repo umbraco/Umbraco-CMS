@@ -16,7 +16,7 @@ using Umbraco.Cms.Web.Common.ModelBinders;
 namespace Umbraco.Cms.Web.Common.ModelsBuilder
 {
     /// <summary>
-    /// Handles <see cref="UmbracoApplicationStarting"/> and <see cref="ServerVariablesParsing"/> notifications to initialize MB
+    /// Handles <see cref="UmbracoApplicationStartingNotification"/> and <see cref="ServerVariablesParsing"/> notifications to initialize MB
     /// </summary>
     internal class ModelsBuilderNotificationHandler :
         INotificationHandler<ServerVariablesParsing>,
