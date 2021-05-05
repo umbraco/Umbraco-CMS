@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Infrastructure.WebAssets
 {

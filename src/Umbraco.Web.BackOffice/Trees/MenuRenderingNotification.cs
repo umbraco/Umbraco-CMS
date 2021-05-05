@@ -1,5 +1,5 @@
 using Microsoft.AspNetCore.Http;
-using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Trees;
 
 namespace Umbraco.Cms.Web.BackOffice.Trees

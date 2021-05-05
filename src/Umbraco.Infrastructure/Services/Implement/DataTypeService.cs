@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
@@ -371,7 +372,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     moveInfo.AddRange(_dataTypeRepository.Move(toMove, container));
 
                     scope.Notifications.Publish(new DataTypeMovedNotification(moveEventInfo, evtMsgs).WithStateFrom(movingDataTypeNotification));
-                    
+
                     scope.Complete();
                 }
                 catch (DataOperationException<MoveOperationStatusType> ex)

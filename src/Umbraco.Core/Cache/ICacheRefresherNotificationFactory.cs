@@ -1,4 +1,5 @@
-﻿using Umbraco.Cms.Core.Sync;
+﻿using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Cache
 {

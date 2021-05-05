@@ -1,6 +1,7 @@
 using System;
 using System.Text;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Web.Common.ModelBinders
 {

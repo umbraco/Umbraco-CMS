@@ -4,6 +4,7 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Web.Common.Profiler
 {
