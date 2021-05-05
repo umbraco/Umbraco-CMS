@@ -15,6 +15,7 @@
 function valFormManager(serverValidationManager, $rootScope, $timeout, $location, overlayService, eventsService, $routeParams, navigationService, editorService, localizationService, angularHelper) {
 
     var SHOW_VALIDATION_CLASS_NAME = "show-validation";
+    var SHOW_VALIDATION_Type_CLASS_NAME = "show-validation-type-";
     var SAVING_EVENT_NAME = "formSubmitting";
     var SAVED_EVENT_NAME = "formSubmitted";
 
@@ -43,6 +44,8 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
         };
 
         this.isShowingValidation = () => $scope.showValidation === true;
+
+        this.getValidationMessageType = () => $scope.valMsgType;
 
         this.notify = notify;
 
@@ -94,6 +97,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             var parentFormMgr = scope.parentFormMgr = getAncestorValFormManager(scope, ctrls, 1);
             var subView = ctrls.length > 1 ? ctrls[2] : null;
             var labels = {};
+            var valMsgType = 2;// error
 
             var labelKeys = [
                 "prompt_unsavedChanges",
@@ -109,6 +113,45 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
                 labels.stayButton = values[3];
             });
 
+            var lastValidationMessageType = null;
+            function setValidationMessageType(type) {
+
+                removeValidationMessageType();
+                scope.valMsgType = type;
+
+                // overall a copy of message types from notifications.service:
+                var postfix = "";
+                switch(type) {
+                    case 0:
+                        //save
+                        break;
+                    case 1:
+                        //info
+                        postfix = "info";
+                        break;
+                    case 2:
+                        //error
+                        postfix = "error";
+                        break;
+                    case 3:
+                        //success
+                        postfix = "success";
+                        break;
+                    case 4:
+                        //warning
+                        postfix = "warning";
+                        break;
+                }
+                var cssClass = SHOW_VALIDATION_Type_CLASS_NAME+postfix;
+                element.addClass(cssClass);
+                lastValidationMessageType = cssClass;
+            }
+            function removeValidationMessageType() {
+                if(lastValidationMessageType) {
+                    element.removeClass(lastValidationMessageType);
+                    lastValidationMessageType = null;
+                }
+            }
 
             // watch the list of validation errors to notify the application of any validation changes
             scope.$watch(() => formCtrl.$invalid,
@@ -138,6 +181,8 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             if (serverValidationManager.items.length > 0 || (parentFormMgr && parentFormMgr.isShowingValidation())) {
                 element.addClass(SHOW_VALIDATION_CLASS_NAME);
                 scope.showValidation = true;
+                var parentValMsgType = parentFormMgr ? parentFormMgr.getValidationMessageType() : 2;
+                setValidationMessageType(parentValMsgType || 2);
                 notifySubView();
             }
 
@@ -145,8 +190,16 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
 
             //listen for the forms saving event
             unsubscribe.push(scope.$on(SAVING_EVENT_NAME, function (ev, args) {
+
+                var messageType = 2;//error
+                switch (args.action) {
+                    case "save":
+                        messageType = 4;//warning
+                    break;
+                }
                 element.addClass(SHOW_VALIDATION_CLASS_NAME);
                 scope.showValidation = true;
+                setValidationMessageType(messageType);
                 notifySubView();
                 //set the flag so we can check to see if we should display the error.
                 isSavingNewItem = $routeParams.create;
@@ -156,6 +209,7 @@ function valFormManager(serverValidationManager, $rootScope, $timeout, $location
             unsubscribe.push(scope.$on(SAVED_EVENT_NAME, function (ev, args) {
                 //remove validation class
                 element.removeClass(SHOW_VALIDATION_CLASS_NAME);
+                removeValidationMessageType();
                 scope.showValidation = false;
                 notifySubView();
             }));
