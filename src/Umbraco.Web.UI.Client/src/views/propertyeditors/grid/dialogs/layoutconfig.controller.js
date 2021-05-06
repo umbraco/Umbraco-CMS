@@ -81,7 +81,7 @@ angular.module("umbraco")
     		        var space = ($scope.availableLayoutSpace > 4) ? 4 : $scope.availableLayoutSpace;
     		        section = {
                         grid: space,
-                        rows: []
+                        rows: Utilities.copy($scope.rows)
     		        };
     		        template.sections.push(section);
                 }
@@ -127,20 +127,24 @@ angular.module("umbraco")
     		
             function close() {
                 if ($scope.model.close) {
+                    cleanUpRows();
                     $scope.model.close();
                 }
             }
 
             function submit() {
                 if ($scope.model.submit) {
-
-                    // Delete temporary rows configurated in init.
-                    if ($scope.currentLayout.rows) {
-                        delete $scope.currentLayout.rows;
-                    }
-
+                    cleanUpRows();
                     $scope.model.submit($scope.currentLayout);
                 }
+            }
+
+            function cleanUpRows () {
+                $scope.currentLayout.sections.forEach(section => {
+                    if (section.rows) {
+                        delete section.rows;
+                    }
+                });
             }
 
     		$scope.$watch("currentLayout", function(layout){
