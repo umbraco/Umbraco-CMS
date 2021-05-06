@@ -306,7 +306,7 @@
     <key alias="sendForApproval">Envoyer pour approbation</key>
     <key alias="schedulePublishHelp">Sélectionnez la date et l'heure de publication/dépublication de l'élément de contenu.</key>
     <key alias="createEmpty">Créer nouveau</key>
-    <key alias="createFromClipboard">Copier du clipboard</key>
+    <key alias="createFromClipboard">Copier du presse-papiers</key>
   </area>
   <area alias="blueprints">
     <key alias="createBlueprintFrom">Créer un nouveau Modèle de Contenu à partir de '%0%'</key>
@@ -1532,7 +1532,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     </key>
     <key alias="queryBuilder">Générateur de requêtes</key>
     <key alias="itemsReturned">éléments trouvés, en</key>
-    <key alias="copyToClipboard">copier dans le clipboard</key>
+    <key alias="copyToClipboard">copier dans le presse-papiers</key>
     <key alias="iWant">Je veux</key>
     <key alias="allContent">tout le contenu</key>
     <key alias="contentOfType">le contenu du type "%0%"</key>
@@ -2257,6 +2257,10 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="labelForCopyAllEntries">Copier %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% de %1%</key>
 	<key alias="labelForRemoveAllEntries">Supprimer tous les éléments</key>
+    <key alias="labelForClearClipboard">Vider le presse-papiers</key>
+    <key alias="clipboard">Presse-papiers</key>
+    <key alias="gridEditorCopiedToClipboard">Editeur de Grid copié dans le presse-papiers</key>
+    <key alias="gridRowCopiedToClipboard">Rangée de Grid copiée dans le presse-papiers</key>
   </area>
   <area alias="propertyActions">
     <key alias="tooltipForPropertyActionsMenu">Ouvrir les Property Actions</key>
