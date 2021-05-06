@@ -38,6 +38,7 @@ using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Web.Routing;
 using Umbraco.Core.Collections;
+using Umbraco.Core.Scoping;
 
 namespace Umbraco.Web.Editors
 {
@@ -55,14 +56,19 @@ namespace Umbraco.Web.Editors
     {
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly Lazy<IDictionary<string, ILanguage>> _allLangs;
+        private readonly IScopeProvider _scopeProvider;
 
         public object Domains { get; private set; }
 
-        public ContentController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+        public ContentController(PropertyEditorCollection propertyEditors, IGlobalSettings globalSettings,
+            IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services,
+            AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
+            IScopeProvider scopeProvider)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _propertyEditors = propertyEditors ?? throw new ArgumentNullException(nameof(propertyEditors));
             _allLangs = new Lazy<IDictionary<string, ILanguage>>(() => Services.LocalizationService.GetAllLanguages().ToDictionary(x => x.IsoCode, x => x, StringComparer.InvariantCultureIgnoreCase));
+            _scopeProvider = scopeProvider;
         }
 
         /// <summary>
@@ -97,7 +103,7 @@ namespace Umbraco.Web.Editors
         /// <param name="ids"></param>
         /// <returns></returns>
         [FilterAllowedOutgoingContent(typeof(IEnumerable<ContentItemDisplay>))]
-        public IEnumerable<ContentItemDisplay> GetByIds([FromUri]int[] ids)
+        public IEnumerable<ContentItemDisplay> GetByIds([FromUri] int[] ids)
         {
             var foundContent = Services.ContentService.GetByIds(ids);
             return foundContent.Select(MapToDisplay);
@@ -367,13 +373,17 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public ContentItemDisplay GetEmptyByKey(Guid contentTypeKey, int parentId)
         {
-            var contentType = Services.ContentTypeService.Get(contentTypeKey);
-            if (contentType == null)
+            using (var scope = _scopeProvider.CreateScope())
             {
-                throw new HttpResponseException(HttpStatusCode.NotFound);
-            }
+                var contentType = Services.ContentTypeService.Get(contentTypeKey);
+                if (contentType == null)
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+                scope.Complete();
 
-            return GetEmpty(contentType, parentId);
+                return GetEmpty(contentType, parentId);
+            }
         }
 
         private ContentItemDisplay GetEmpty(IContentType contentType, int parentId)
@@ -390,6 +400,37 @@ namespace Umbraco.Web.Editors
             mapped.ContentApps = mapped.ContentApps.Where(x => x.Alias != "umbListView").ToList();
 
             return mapped;
+        }
+
+        /// <summary>
+        /// Gets a collection of empty content items for all document types.
+        /// </summary>
+        /// <param name="contentTypeKeys"></param>
+        /// <param name="parentId"></param>
+        [OutgoingEditorModelEvent]
+        public IDictionary<Guid, ContentItemDisplay> GetEmptyByKeys([FromUri] Guid[] contentTypeKeys, [FromUri] int parentId)
+        {
+            var result = new Dictionary<Guid, ContentItemDisplay>();
+
+            using (var scope = _scopeProvider.CreateScope())
+            {
+                var contentTypes = Services.ContentTypeService.GetAll(contentTypeKeys).ToList();
+
+                if (contentTypes.Any(contentType => contentType == null))
+                {
+                    throw new HttpResponseException(HttpStatusCode.NotFound);
+                }
+
+                foreach (var contentTypeKey in contentTypeKeys)
+                {
+                    var contentType = contentTypes.First(c => c.Key == contentTypeKey);
+                    result.Add(contentTypeKey, GetEmpty(contentType, parentId));
+                }
+
+                scope.Complete();
+            }
+
+            return result;
         }
 
         [OutgoingEditorModelEvent]
@@ -550,7 +591,7 @@ namespace Umbraco.Web.Editors
         /// <param name="name">The name of the blueprint</param>
         /// <returns></returns>
         [HttpPost]
-        public SimpleNotificationModel CreateBlueprintFromContent([FromUri]int contentId, [FromUri]string name)
+        public SimpleNotificationModel CreateBlueprintFromContent([FromUri] int contentId, [FromUri] string name)
         {
             if (string.IsNullOrWhiteSpace(name))
                 throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
@@ -1432,7 +1473,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private string GetVariantName(string culture, string segment)
         {
-            if(culture.IsNullOrWhiteSpace() && segment.IsNullOrWhiteSpace())
+            if (culture.IsNullOrWhiteSpace() && segment.IsNullOrWhiteSpace())
             {
                 // TODO: Get name for default variant from somewhere?
                 return "Default";
@@ -2436,7 +2477,7 @@ namespace Umbraco.Web.Editors
         // set up public access using role based access
         [EnsureUserPermissionForContent("contentId", ActionProtect.ActionLetter)]
         [HttpPost]
-        public HttpResponseMessage PostPublicAccess(int contentId, [FromUri]string[] groups, [FromUri]string[] usernames, int loginPageId, int errorPageId)
+        public HttpResponseMessage PostPublicAccess(int contentId, [FromUri] string[] groups, [FromUri] string[] usernames, int loginPageId, int errorPageId)
         {
             if ((groups == null || groups.Any() == false) && (usernames == null || usernames.Any() == false))
             {
