@@ -16,15 +16,13 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
 {
     [TestFixture]
-    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
+    [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest, Logger = UmbracoTestOptions.Logger.Console)]
     public class SearchTests : ExamineBaseTest
     {
 
         [Test]
         public void Test_Sort_Order_Sorting()
         {
-            var rebuilder = IndexInitializer.GetContentIndexRebuilder(IndexInitializer.GetMockContentService(), false);
-
             long totalRecs;
             var demoData = new ExamineDemoDataContentService(TestFiles.umbraco_sort);
             var allRecs = demoData.GetLatestContentByXPath("//*[@isDoc]")
@@ -55,14 +53,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
                     ==
                     allRecs);
 
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var index = IndexInitializer.GetUmbracoIndexer(HostingEnvironment, RunningRuntimeState, luceneDir))
-            using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
+            using (GetSynchronousContentIndex(false, out UmbracoContentIndex index, out ContentIndexPopulator contentRebuilder, out _, null, contentService))
             {
                 index.CreateIndex();
-                rebuilder.Populate(index);
+                contentRebuilder.Populate(index);
 
                 var searcher = index.Searcher;
+
+                Assert.Greater(searcher.CreateQuery().All().Execute().TotalItemCount, 0);
 
                 var numberSortedCriteria = searcher.CreateQuery()
                     .ParentId(1148)
@@ -96,24 +94,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
             }
             return true;
         }
-
-        //[Test]
-        //public void Test_Index_Type_With_German_Analyzer()
-        //{
-        //    using (var luceneDir = new RandomIdRamDirectory())
-        //    {
-        //        var indexer = IndexInitializer.GetUmbracoIndexer(luceneDir,
-        //            new GermanAnalyzer());
-        //        indexer.RebuildIndex();
-        //        var searcher = IndexInitializer.GetUmbracoSearcher(luceneDir);
-        //    }
-        //}
-
-        //private readonly TestContentService _contentService = new TestContentService();
-        //private readonly TestMediaService _mediaService = new TestMediaService();
-        //private static UmbracoExamineSearcher _searcher;
-        //private static UmbracoContentIndexer _indexer;
-        //private Lucene.Net.Store.Directory _luceneDir;
 
     }
 }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Examine;
 using Umbraco.Cms.Core.Scoping;
@@ -106,10 +106,14 @@ namespace Umbraco.Cms.Infrastructure.Examine
             if (valueSet.Category == IndexTypes.Content && PublishedValuesOnly)
             {
                 if (!valueSet.Values.TryGetValue(UmbracoExamineFieldNames.PublishedFieldName, out var published))
+                {
                     return ValueSetValidationResult.Failed;
+                }
 
                 if (!published[0].Equals("y"))
+                {
                     return ValueSetValidationResult.Failed;
+                }
 
                 //deal with variants, if there are unpublished variants than we need to remove them from the value set
                 if (valueSet.Values.TryGetValue(UmbracoExamineFieldNames.VariesByCultureFieldName, out var variesByCulture)

@@ -1,9 +1,21 @@
+using System;
+using System.Data;
+using Examine.Lucene.Providers;
+using Examine.Search;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
+using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Persistence.Querying;
+using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Infrastructure.Examine;
+using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Tests.Integration.Testing;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
@@ -23,25 +35,101 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
             services.AddSingleton<IndexInitializer>();
         }
 
-        [OneTimeSetUp]
-        public void InitializeFixture()
+        /// <summary>
+        /// Used to create and manage a testable index
+        /// </summary>
+        /// <param name="publishedValuesOnly"></param>
+        /// <param name="index"></param>
+        /// <param name="contentRebuilder"></param>
+        /// <param name="contentValueSetBuilder"></param>
+        /// <param name="parentId"></param>
+        /// <returns></returns>
+        protected IDisposable GetSynchronousContentIndex(
+            bool publishedValuesOnly,
+            out UmbracoContentIndex index,
+            out ContentIndexPopulator contentRebuilder,
+            out ContentValueSetBuilder contentValueSetBuilder,
+            int? parentId = null,
+            IContentService contentService = null)
         {
+            contentValueSetBuilder = IndexInitializer.GetContentValueSetBuilder(publishedValuesOnly);
 
-            // var logger = new SerilogLogger<object>(new FileInfo(TestHelper.MapPathForTestFiles("~/unit-test.config")));
-            //_profilingLogger = new ProfilingLogger(NullLoggerFactory.Instance.CreateLogger<ProfilingLogger>(), new LogProfiler(NullLogger<LogProfiler>.Instance));
+            ISqlContext sqlContext = Mock.Of<ISqlContext>(x => x.Query<IContent>() == Mock.Of<IQuery<IContent>>());
+            IUmbracoDatabaseFactory dbFactory = Mock.Of<IUmbracoDatabaseFactory>(x => x.SqlContext == sqlContext);
+
+            if (contentService == null)
+            {
+                contentService = IndexInitializer.GetMockContentService();
+            }
+
+            contentRebuilder = IndexInitializer.GetContentIndexRebuilder(contentService, publishedValuesOnly, dbFactory);
+
+            var luceneDir = new RandomIdRAMDirectory();
+
+            ContentValueSetValidator validator;
+
+            // if only published values then we'll change the validator for tests to
+            // ensure we don't support protected nodes and that we
+            // mock the public access service for the special protected node.
+            if (publishedValuesOnly)
+            {
+                var publicAccessServiceMock = new Mock<IPublicAccessService>();
+                publicAccessServiceMock.Setup(x => x.IsProtected(It.IsAny<string>()))
+                    .Returns((string path) =>
+                    {
+                        if (path.EndsWith("," + ExamineDemoDataContentService.ProtectedNode))
+                        {
+                            return Attempt<PublicAccessEntry>.Succeed();
+                        }
+                        return Attempt<PublicAccessEntry>.Fail();
+                    });
+
+                var scopeProviderMock = new Mock<IScopeProvider>();
+                scopeProviderMock.Setup(x => x.CreateScope(
+                        It.IsAny<IsolationLevel>(),
+                        It.IsAny<RepositoryCacheMode>(),
+                        It.IsAny<IEventDispatcher>(),
+                        It.IsAny<bool?>(),
+                        It.IsAny<bool>(),
+                        It.IsAny<bool>()))
+                    .Returns(Mock.Of<IScope>);
+
+                validator = new ContentValueSetValidator(
+                    publishedValuesOnly,
+                    false,
+                    publicAccessServiceMock.Object,
+                    scopeProviderMock.Object,
+                    parentId);
+            }
+            else
+            {
+                validator = new ContentValueSetValidator(publishedValuesOnly, parentId);
+            }
+
+            index = IndexInitializer.GetUmbracoIndexer(
+                HostingEnvironment,
+                RunningRuntimeState,
+                luceneDir,
+                validator: validator);
+
+            IDisposable syncMode = index.WithThreadingMode(IndexThreadingMode.Synchronous);
+
+            return new DisposableWrapper(syncMode, index, luceneDir);
         }
 
-        //private IProfilingLogger _profilingLogger;
-        //protected override IProfilingLogger ProfilingLogger => _profilingLogger;
+        private class DisposableWrapper : IDisposable
+        {
+            private readonly IDisposable[] _disposables;
 
-        ///// <summary>
-        ///// sets up resolvers before resolution is frozen
-        ///// </summary>
-        //protected override void Compose()
-        //{
-        //    base.Compose();
-        //    var requestHandlerSettings = new RequestHandlerSettings();
-        //    Builder.Services.AddUnique<IShortStringHelper>(_ => new DefaultShortStringHelper(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings)));
-        //}
+            public DisposableWrapper(params IDisposable[] disposables) => _disposables = disposables;
+
+            public void Dispose()
+            {
+                foreach (IDisposable d in _disposables)
+                {
+                    d.Dispose();
+                }
+            }
+        }
     }
 }

@@ -2,9 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Examine.Lucene.Providers;
-using Lucene.Net.Index;
-using Lucene.Net.Search;
 using Newtonsoft.Json;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
@@ -24,14 +21,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
     public class IndexTest : ExamineBaseTest
     {
         [Test]
-        public void Events_Ignoring_Node()
+        public void GivenValidationParentNode_WhenContentIndexedUnderDifferentParent_DocumentIsNotIndexed()
         {
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var index = IndexInitializer.GetUmbracoIndexer(HostingEnvironment, RunningRuntimeState, luceneDir,
-                //make parent id 999 so all are ignored
-                validator: new ContentValueSetValidator(false, 999)))
-
-            using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
+            using (GetSynchronousContentIndex(false, out UmbracoContentIndex index, out _, out _, 999))
             {
                 var searcher = index.Searcher;
 
@@ -42,42 +34,34 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
                                           .Elements()
                                           .First();
 
-                var valueSet = node.ConvertToValueSet(IndexTypes.Content);
+                ValueSet valueSet = node.ConvertToValueSet(IndexTypes.Content);
+
+                // Ignored since the path isn't under 999
                 index.IndexItems(new[] { valueSet });
+                Assert.AreEqual(0, searcher.CreateQuery().Id(valueSet.Id).Execute().TotalItemCount);
 
-                var found = searcher.CreateQuery().Id((string)node.Attribute("id")).Execute();
-
-                Assert.AreEqual(0, found.TotalItemCount);
+                // Change so that it's under 999 and verify
+                valueSet.Values["path"] = new List<object> { "-1,999," + valueSet.Id };
+                index.IndexItems(new[] { valueSet });
+                Assert.AreEqual(1, searcher.CreateQuery().Id(valueSet.Id).Execute().TotalItemCount);
             }
-
-
-
         }
 
         [Test]
-        public void Index_Property_Data_With_Value_Indexer()
+        public void GivenIndexingDocument_WhenGridPropertyData_ThenDataIndexedInSegregatedFields()
         {
-            var contentValueSetBuilder = IndexInitializer.GetContentValueSetBuilder(false);
-
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var index = IndexInitializer.GetUmbracoIndexer(
-                HostingEnvironment,
-                RunningRuntimeState,
-                luceneDir,
-                validator: new ContentValueSetValidator(false)))
-
-            using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
+            using (GetSynchronousContentIndex(false, out UmbracoContentIndex index, out _, out ContentValueSetBuilder contentValueSetBuilder, null))
             {
                 index.CreateIndex();
 
-                var contentType = ContentTypeBuilder.CreateBasicContentType();
+                ContentType contentType = ContentTypeBuilder.CreateBasicContentType();
                 contentType.AddPropertyType(new PropertyType(TestHelper.ShortStringHelper, "test", ValueStorageType.Ntext)
                 {
                     Alias = "grid",
                     Name = "Grid",
                     PropertyEditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.Grid
                 });
-                var content = ContentBuilder.CreateBasicContent(contentType);
+                Content content = ContentBuilder.CreateBasicContent(contentType);
                 content.Id = 555;
                 content.Path = "-1,555";
                 var gridVal = new GridValue
@@ -131,13 +115,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
                 var json = JsonConvert.SerializeObject(gridVal);
                 content.Properties["grid"].SetValue(json);
 
-                var valueSet = contentValueSetBuilder.GetValueSets(content);
+                IEnumerable<ValueSet> valueSet = contentValueSetBuilder.GetValueSets(content);
                 index.IndexItems(valueSet);
 
-                var results = index.Searcher.CreateQuery().Id(555).Execute();
+                ISearchResults results = index.Searcher.CreateQuery().Id(555).Execute();
                 Assert.AreEqual(1, results.TotalItemCount);
 
-                var result = results.First();
+                ISearchResult result = results.First();
                 Assert.IsTrue(result.Values.ContainsKey("grid.row1"));
                 Assert.AreEqual("value1", result.AllValues["grid.row1"][0]);
                 Assert.AreEqual("value2", result.AllValues["grid.row1"][1]);
@@ -149,18 +133,11 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
         }
 
         [Test]
-        public void Rebuild_Index()
-        {
-            var contentRebuilder = IndexInitializer.GetContentIndexRebuilder(IndexInitializer.GetMockContentService(), false);
+        public void GivenEmptyIndex_WhenUsingWithContentAndMediaPopulators_ThenIndexPopulated()
+        {            
             var mediaRebuilder = IndexInitializer.GetMediaIndexRebuilder(IndexInitializer.GetMockMediaService());
 
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var index = IndexInitializer.GetUmbracoIndexer(
-                HostingEnvironment,
-                RunningRuntimeState,
-                luceneDir,
-                validator: new ContentValueSetValidator(false)))
-            using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
+            using (GetSynchronousContentIndex(false, out UmbracoContentIndex index, out ContentIndexPopulator contentRebuilder, out _, null))
             {
                 //create the whole thing
                 contentRebuilder.Populate(index);
@@ -172,59 +149,34 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
             }
         }
 
-        ///// <summary>
         /// <summary>
         /// Check that the node signalled as protected in the content service is not present in the index.
         /// </summary>
         [Test]
-        public void Index_Protected_Content_Not_Indexed()
+        public void GivenPublishedContentIndex_WhenProtectedContentIndexed_ThenItIsIgnored()
         {
-            var rebuilder = IndexInitializer.GetContentIndexRebuilder(IndexInitializer.GetMockContentService(), false);
-
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var index = IndexInitializer.GetUmbracoIndexer(HostingEnvironment, RunningRuntimeState, luceneDir))
-            using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
+            using (GetSynchronousContentIndex(true, out UmbracoContentIndex index, out ContentIndexPopulator contentRebuilder, out _, null))
             {
-                var searchContext = ((LuceneSearcher)index.Searcher).GetSearchContext();
+                //create the whole thing
+                contentRebuilder.Populate(index);
 
-                using (var searchRef = searchContext.GetSearcher())
-                {
-                    var searcher = searchRef.IndexSearcher;
+                Assert.Greater(
+                    index.Searcher.CreateQuery().All().Execute().TotalItemCount,
+                    0);
 
-                    //create the whole thing
-                    rebuilder.Populate(index);
-
-                    var protectedQuery = new BooleanQuery();
-                    protectedQuery.Add(
-                        new BooleanClause(
-                            new TermQuery(new Term(ExamineFieldNames.CategoryFieldName, IndexTypes.Content)),
-                            Occur.MUST));
-
-                    protectedQuery.Add(
-                        new BooleanClause(
-                            new TermQuery(new Term(ExamineFieldNames.ItemIdFieldName, ExamineDemoDataContentService.ProtectedNode.ToString())),
-                            Occur.MUST));
-
-                    var collector = TopScoreDocCollector.Create(100, true);
-
-                    searcher.Search(protectedQuery, collector);
-
-                    Assert.AreEqual(0, collector.TotalHits, "Protected node should not be indexed");
-                }
+                Assert.AreEqual(
+                    0,
+                    index.Searcher.CreateQuery().Id(ExamineDemoDataContentService.ProtectedNode.ToString()).Execute().TotalItemCount);
             }
         }
 
         [Test]
-        public void Index_Move_Media_From_Non_Indexable_To_Indexable_ParentID()
+        public void GivenMediaUnderNonIndexableParent_WhenMediaMovedUnderIndexableParent_ThenItIsIncludedInTheIndex()
         {
             // create a validator with
             // publishedValuesOnly false
-            // parentId 1116 (only content under that parent will be indexed)
-            var validator = new ContentValueSetValidator(false, 1116);
-
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var index = IndexInitializer.GetUmbracoIndexer(HostingEnvironment, RunningRuntimeState, luceneDir, validator: validator))
-            using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
+            // parentId 1116 (only content under that parent will be indexed)            
+            using (GetSynchronousContentIndex(false, out UmbracoContentIndex index, out ContentIndexPopulator contentRebuilder, out _, 1116))
             {
                 //get a node from the data repo (this one exists underneath 2222)
                 var node = _mediaService.GetLatestMediaByXpath("//*[string-length(@id)>0 and number(@id)>0]")
@@ -256,16 +208,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
         }
 
         [Test]
-        public void Index_Move_Media_To_Non_Indexable_ParentID()
+        public void GivenMediaUnderIndexableParent_WhenMediaMovedUnderNonIndexableParent_ThenItIsRemovedFromTheIndex()
         {
             // create a validator with
             // publishedValuesOnly false
             // parentId 2222 (only content under that parent will be indexed)
-            var validator = new ContentValueSetValidator(false, 2222);
-
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var index = IndexInitializer.GetUmbracoIndexer(HostingEnvironment, RunningRuntimeState, luceneDir, validator: validator))
-            using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
+            using (GetSynchronousContentIndex(false, out UmbracoContentIndex index, out ContentIndexPopulator contentRebuilder, out _, 2222))
             {
                 var searcher = index.Searcher;
 
@@ -303,17 +251,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
         /// We then call the Examine method to re-index Content and do some comparisons to ensure that it worked correctly.
         /// </summary>
         [Test]
-        public void Index_Reindex_Content()
+        public void GivenEmptyIndex_WhenIndexedWithContentPopulator_ThenTheIndexIsPopulated()
         {
-            var rebuilder = IndexInitializer.GetContentIndexRebuilder(IndexInitializer.GetMockContentService(), false);
-
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var index = IndexInitializer.GetUmbracoIndexer(HostingEnvironment, RunningRuntimeState, luceneDir,
-                validator: new ContentValueSetValidator(false)))
-            using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
+            using (GetSynchronousContentIndex(false, out UmbracoContentIndex index, out ContentIndexPopulator contentRebuilder, out _, null))
             {
                 //create the whole thing
-                rebuilder.Populate(index);
+                contentRebuilder.Populate(index);
 
                 var result = index.Searcher
                     .CreateQuery()
@@ -329,9 +272,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
                 Assert.AreEqual(0, result.TotalItemCount);
 
                 //call our indexing methods
-                rebuilder.Populate(index);
-
-                index.WaitForChanges();
+                contentRebuilder.Populate(index);
 
                 result = index.Searcher
                     .CreateQuery()
@@ -346,25 +287,24 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
         /// This will delete an item from the index and ensure that all children of the node are deleted too!
         /// </summary>
         [Test]
-        public void Index_Delete_Index_Item_Ensure_Heirarchy_Removed()
+        public void GivenPopulatedIndex_WhenDocumentDeleted_ThenItsHierarchyIsAlsoDeleted()
         {
-            var rebuilder = IndexInitializer.GetContentIndexRebuilder(IndexInitializer.GetMockContentService(), false);
-
-            using (var luceneDir = new RandomIdRAMDirectory())
-            using (var index = IndexInitializer.GetUmbracoIndexer(HostingEnvironment, RunningRuntimeState, luceneDir))
-            using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
+            using (GetSynchronousContentIndex(false, out UmbracoContentIndex index, out ContentIndexPopulator contentRebuilder, out _, null))
             {
                 var searcher = index.Searcher;
 
                 //create the whole thing
-                rebuilder.Populate(index);
+                contentRebuilder.Populate(index);
+
+                var results = searcher.CreateQuery().Id(1141).Execute();
+                Assert.AreEqual(1, results.Count());
 
                 //now delete a node that has children
 
                 index.DeleteFromIndex(1140.ToString());
                 //this node had children: 1141 & 1142, let's ensure they are also removed
 
-                var results = searcher.CreateQuery().Id(1141).Execute();
+                results = searcher.CreateQuery().Id(1141).Execute();
                 Assert.AreEqual(0, results.Count());
 
                 results = searcher.CreateQuery().Id(1142).Execute();

@@ -36,7 +36,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
         private readonly IJsonSerializer _jsonSerializer;
         private readonly PropertyEditorCollection _propertyEditors;
         private readonly IScopeProvider _scopeProvider;
-        private readonly IUmbracoDatabaseFactory _umbracoDatabaseFactory;
         private readonly ILoggerFactory _loggerFactory;
 
         public IndexInitializer(
@@ -44,14 +43,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
             IJsonSerializer jsonSerializer,
             PropertyEditorCollection propertyEditors,
             IScopeProvider scopeProvider,
-            IUmbracoDatabaseFactory umbracoDatabaseFactory,
             ILoggerFactory loggerFactory)
         {
             _shortStringHelper = shortStringHelper;
             _jsonSerializer = jsonSerializer;
             _propertyEditors = propertyEditors;
             _scopeProvider = scopeProvider;
-            _umbracoDatabaseFactory = umbracoDatabaseFactory;
             _loggerFactory = loggerFactory;
         }
 
@@ -68,10 +65,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
             return contentValueSetBuilder;
         }
 
-        public ContentIndexPopulator GetContentIndexRebuilder(IContentService contentService, bool publishedValuesOnly)
+        public ContentIndexPopulator GetContentIndexRebuilder(IContentService contentService, bool publishedValuesOnly, IUmbracoDatabaseFactory umbracoDatabaseFactory)
         {
             var contentValueSetBuilder = GetContentValueSetBuilder(publishedValuesOnly);
-            var contentIndexDataSource = new ContentIndexPopulator(publishedValuesOnly, null, contentService, _umbracoDatabaseFactory, contentValueSetBuilder);
+            var contentIndexDataSource = new ContentIndexPopulator(
+                _loggerFactory.CreateLogger<ContentIndexPopulator>(),
+                publishedValuesOnly,
+                null,
+                contentService,
+                umbracoDatabaseFactory,
+                contentValueSetBuilder);
             return contentIndexDataSource;
         }
 
@@ -90,23 +93,25 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
             var allRecs = demoData.GetLatestContentByXPath("//*[@isDoc]")
                 .Root
                 .Elements()
-                .Select(x => Mock.Of<IContent>(
+                .Select((xmlElement, index) => Mock.Of<IContent>(
                     m =>
-                        m.Id == (int)x.Attribute("id") &&
-                        m.ParentId == (int)x.Attribute("parentID") &&
-                        m.Level == (int)x.Attribute("level") &&
+                        m.Id == (int)xmlElement.Attribute("id") &&
+                        // have every second one published and include the special one
+                        m.Published == ((ExamineDemoDataContentService.ProtectedNode == (int)xmlElement.Attribute("id")) || (index % 2 == 0 ? true : false)) &&
+                        m.ParentId == (int)xmlElement.Attribute("parentID") &&
+                        m.Level == (int)xmlElement.Attribute("level") &&
                         m.CreatorId == 0 &&
-                        m.SortOrder == (int)x.Attribute("sortOrder") &&
-                        m.CreateDate == (DateTime)x.Attribute("createDate") &&
-                        m.UpdateDate == (DateTime)x.Attribute("updateDate") &&
-                        m.Name == (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
-                        m.GetCultureName(It.IsAny<string>()) == (string)x.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
-                        m.Path == (string)x.Attribute("path") &&
+                        m.SortOrder == (int)xmlElement.Attribute("sortOrder") &&
+                        m.CreateDate == (DateTime)xmlElement.Attribute("createDate") &&
+                        m.UpdateDate == (DateTime)xmlElement.Attribute("updateDate") &&
+                        m.Name == (string)xmlElement.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                        m.GetCultureName(It.IsAny<string>()) == (string)xmlElement.Attribute(UmbracoExamineFieldNames.NodeNameFieldName) &&
+                        m.Path == (string)xmlElement.Attribute("path") &&
                         m.Properties == new PropertyCollection() &&
                         m.ContentType == Mock.Of<ISimpleContentType>(mt =>
                             mt.Icon == "test" &&
-                            mt.Alias == x.Name.LocalName &&
-                            mt.Id == (int)x.Attribute("nodeType"))))
+                            mt.Alias == xmlElement.Name.LocalName &&
+                            mt.Id == (int)xmlElement.Attribute("nodeType"))))
                 .ToArray();
 
 

@@ -47,6 +47,12 @@ namespace Umbraco.Cms.Infrastructure.Examine
         protected ILocalizationService LanguageService { get; }
 
         /// <summary>
+        /// Explicitly override because we need to do validation differently than the underlying logic
+        /// </summary>
+        /// <param name="values"></param>
+        void IIndex.IndexItems(IEnumerable<ValueSet> values) => PerformIndexItems(values, OnIndexOperationComplete);
+
+        /// <summary>
         /// Special check for invalid paths
         /// </summary>
         /// <param name="values"></param>
@@ -56,45 +62,48 @@ namespace Umbraco.Cms.Infrastructure.Examine
             // We don't want to re-enumerate this list, but we need to split it into 2x enumerables: invalid and valid items.
             // The Invalid items will be deleted, these are items that have invalid paths (i.e. moved to the recycle bin, etc...)
             // Then we'll index the Value group all together.
-            // We return 0 or 1 here so we can order the results and do the invalid first and then the valid.
             var invalidOrValid = values.GroupBy(v =>
             {
-                if (!v.Values.TryGetValue("path", out var paths) || paths.Count <= 0 || paths[0] == null)
-                    return 0;
+                if (!v.Values.TryGetValue("path", out List<object> paths) || paths.Count <= 0 || paths[0] == null)
+                {
+                    return ValueSetValidationResult.Failed;
+                }
 
-                //we know this is an IContentValueSetValidator
-                var validator = (IContentValueSetValidator)ValueSetValidator;
-                var path = paths[0].ToString();
+                ValueSetValidationResult validationResult = ValueSetValidator.Validate(v);
 
-                return (!validator.ValidatePath(path, v.Category)
-                        || !validator.ValidateRecycleBin(path, v.Category)
-                        || !validator.ValidateProtectedContent(path, v.Category))
-                    ? 0
-                    : 1;
+                return validationResult;
             }).ToList();
 
             var hasDeletes = false;
             var hasUpdates = false;
-            foreach (var group in invalidOrValid.OrderBy(x => x.Key))
-            {
-                if (group.Key == 0)
-                {
-                    hasDeletes = true;
-                    //these are the invalid items so we'll delete them
-                    //since the path is not valid we need to delete this item in case it exists in the index already and has now
-                    //been moved to an invalid parent.
 
-                    base.PerformDeleteFromIndex(group.Select(x => x.Id), args => { /*noop*/ });
-                }
-                else
+            // ordering by descending so that Filtered/Failed processes first
+            foreach (IGrouping<ValueSetValidationResult, ValueSet> group in invalidOrValid.OrderByDescending(x => x.Key))
+            {
+                switch (group.Key)
                 {
-                    hasUpdates = true;
-                    //these are the valid ones, so just index them all at once
-                    base.PerformIndexItems(group.ToList(), onComplete);
+                    case ValueSetValidationResult.Valid:
+                        hasUpdates = true;
+
+                        //these are the valid ones, so just index them all at once
+                        base.PerformIndexItems(group.ToList(), onComplete);
+                        break;
+                    case ValueSetValidationResult.Failed:
+                        // don't index anything that is invalid
+                        break;
+                    case ValueSetValidationResult.Filtered:
+                        hasDeletes = true;
+
+                        // these are the invalid/filtered items so we'll delete them
+                        // since the path is not valid we need to delete this item in
+                        // case it exists in the index already and has now
+                        // been moved to an invalid parent.
+                        base.PerformDeleteFromIndex(group.Select(x => x.Id), null);
+                        break;
                 }
             }
 
-            if (hasDeletes && !hasUpdates || !hasDeletes && !hasUpdates)
+            if ((hasDeletes && !hasUpdates) || (!hasDeletes && !hasUpdates))
             {
                 //we need to manually call the completed method
                 onComplete(new IndexOperationEventArgs(this, 0));
