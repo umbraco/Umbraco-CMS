@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Http;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Trees;
 
-namespace Umbraco.Cms.Web.BackOffice.Trees
+namespace Umbraco.Cms.Core.Notifications
 {
     /// <summary>
     /// A notification that allows developers to modify the menu that is being rendered
