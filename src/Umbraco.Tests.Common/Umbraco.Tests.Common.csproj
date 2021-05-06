@@ -6,16 +6,6 @@
       <PackageId>Umbraco.Cms.Tests</PackageId>
       <Title>Umbraco CMS Test Tools</Title>
       <Description>Contains commonly used tools to write tests for Umbraco CMS, such as various builders for content etc.</Description>
-
-      <!-- SourceLink: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element)-->
-      <PublishRepositoryUrl>true</PublishRepositoryUrl>
-
-      <!-- SourceLink: Embed source files that are not tracked by the source control manager in the PDB -->
-      <EmbedUntrackedSources>true</EmbedUntrackedSources>
-
-      <!-- SourceLink: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
-      <IncludeSymbols>true</IncludeSymbols>
-      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
