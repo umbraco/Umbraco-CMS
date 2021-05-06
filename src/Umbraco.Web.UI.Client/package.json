@@ -82,7 +82,7 @@
     "karma-junit-reporter": "2.0.1",
     "karma-spec-reporter": "0.0.32",
     "less": "3.10.3",
-    "lodash": "4.17.19",
+    "lodash": "4.17.21",
     "marked": "^0.7.0",
     "merge-stream": "2.0.0",
     "run-sequence": "2.2.1"
