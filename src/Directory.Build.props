@@ -30,9 +30,10 @@
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
-  <PropertyGroup>
-    <!-- SourceLink: Deterministic -->
-    <!-- https://github.com/clairernovotny/DeterministicBuilds -->
+  <!-- SourceLink: Deterministic -->
+  <!-- https://github.com/clairernovotny/DeterministicBuilds -->
+  <!-- Only for Azure Pipelines CI Build -->
+  <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
 
