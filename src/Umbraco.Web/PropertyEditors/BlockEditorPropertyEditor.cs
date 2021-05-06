@@ -26,6 +26,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly IContentTypeService _contentTypeService;
+        private readonly Lazy<Dictionary<Guid, IContentType>> _contentTypes;
 
         public BlockEditorPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService localizedTextService)
             : base(logger)
@@ -34,6 +35,7 @@ namespace Umbraco.Web.PropertyEditors
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
             _contentTypeService = contentTypeService;
+            _contentTypes = new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
         }
 
         // has to be lazy else circular dep in ctor
@@ -41,7 +43,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, Logger);
+        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, Logger, _contentTypes);
 
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -50,13 +52,14 @@ namespace Umbraco.Web.PropertyEditors
             private readonly ILogger _logger;
             private readonly BlockEditorValues _blockEditorValues;
 
-            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger logger)
+            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger logger, Lazy<Dictionary<Guid, IContentType>> contentTypes)
                 : base(attribute)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
                 _logger = logger;
-                _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService, _logger);
+
+                _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypes, _logger);
                 Validators.Add(new BlockEditorValidator(_blockEditorValues, propertyEditors, dataTypeService, textService, contentTypeService));
                 Validators.Add(new MinMaxValidator(_blockEditorValues, textService));
             }
@@ -106,6 +109,7 @@ namespace Umbraco.Web.PropertyEditors
             public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
+                var valEditors = new Dictionary<int, IDataValueEditor>();
 
                 BlockEditorData blockEditorData;
                 try
@@ -118,7 +122,7 @@ namespace Umbraco.Web.PropertyEditors
                     return string.Empty;
                 }
 
-                if (blockEditorData == null || blockEditorData.BlockValue.ContentData.Count == 0)
+                if (blockEditorData == null)
                     return string.Empty;
 
                 foreach (var row in blockEditorData.BlockValue.ContentData)
@@ -129,10 +133,8 @@ namespace Umbraco.Web.PropertyEditors
                         // - force it to be culture invariant as the block editor can't handle culture variant element properties
                         prop.Value.PropertyType.Variations = ContentVariation.Nothing;
                         var tempProp = new Property(prop.Value.PropertyType);
-
                         tempProp.SetValue(prop.Value.Value);
 
-                        // convert that temp property, and store the converted value
                         var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
                         if (propEditor == null)
                         {
@@ -154,9 +156,15 @@ namespace Umbraco.Web.PropertyEditors
                             continue;
                         }
 
-                        var tempConfig = dataType.Configuration;
-                        var valEditor = propEditor.GetValueEditor(tempConfig);
-                        var convValue = valEditor.ToEditor(tempProp, dataTypeService);
+                        if (!valEditors.ContainsKey(dataType.Id))
+                        {
+                            var tempConfig = dataType.Configuration;
+                            var valEditor = propEditor.GetValueEditor(tempConfig);
+
+                            valEditors.Add(dataType.Id, valEditor);
+                        }
+
+                        var convValue = valEditors[dataType.Id].ToEditor(tempProp, dataTypeService);
 
                         // update the raw value since this is what will get serialized out
                         row.RawPropertyValues[prop.Key] = convValue;
@@ -330,9 +338,9 @@ namespace Umbraco.Web.PropertyEditors
             private readonly BlockEditorDataConverter _dataConverter;
             private readonly ILogger _logger;
 
-            public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService, ILogger logger)
+            public BlockEditorValues(BlockEditorDataConverter dataConverter, Lazy<Dictionary<Guid, IContentType>> contentTypes, ILogger logger)
             {
-                _contentTypes = new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
+                _contentTypes = contentTypes;
                 _dataConverter = dataConverter;
                 _logger = logger;
             }
