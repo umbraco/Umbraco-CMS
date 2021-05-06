@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModel_To_RenderModel()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel(content);
             var view = new RenderModelTestPage();
             ViewDataDictionary<ContentModel> viewData = GetViewDataDictionary<ContentModel>(model);
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModel_ContentType1_To_ContentType1()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var view = new ContentType1TestPage();
             ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
 
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModel_ContentType2_To_ContentType1()
         {
-            var content = new ContentType2(null);
+            var content = new ContentType2(null, Mock.Of<IPublishedValueFallback>());
             var view = new ContentType1TestPage();
 
             ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
@@ -57,7 +57,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModel_ContentType1_To_ContentType2()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel(content);
             var view = new ContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(model);
@@ -68,7 +68,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModel_ContentType1_To_RenderModelOf_ContentType1()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType1TestPage();
             ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModel_ContentType2_To_RenderModelOf_ContentType1()
         {
-            var content = new ContentType2(null);
+            var content = new ContentType2(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType1TestPage();
             ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
@@ -95,7 +95,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModel_ContentType1_To_RenderModelOf_ContentType2()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel(content);
             var view = new RenderModelOfContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(model);
@@ -106,7 +106,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModelOf_ContentType1_To_RenderModel()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelTestPage();
             ViewDataDictionary<ContentModel> viewData = GetViewDataDictionary<ContentModel>(model);
@@ -119,7 +119,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModelOf_ContentType1_To_ContentType1()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel<ContentType1>(content);
             var view = new ContentType1TestPage();
             ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModelOf_ContentType2_To_ContentType1()
         {
-            var content = new ContentType2(null);
+            var content = new ContentType2(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel<ContentType2>(content);
             var view = new ContentType1TestPage();
             var viewData = new ViewDataDictionary(new EmptyModelMetadataProvider(), new ModelStateDictionary())
@@ -148,7 +148,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModelOf_ContentType1_To_ContentType2()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel<ContentType1>(content);
             var view = new ContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(model);
@@ -159,7 +159,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModelOf_ContentType1_To_RenderModelOf_ContentType1()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType1TestPage();
             ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
@@ -173,7 +173,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModelOf_ContentType2_To_RenderModelOf_ContentType1()
         {
-            var content = new ContentType2(null);
+            var content = new ContentType2(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType1TestPage();
             ViewDataDictionary<ContentModel<ContentType1>> viewData = GetViewDataDictionary<ContentModel<ContentType1>>(model);
@@ -187,7 +187,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void RenderModelOf_ContentType1_To_RenderModelOf_ContentType2()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var model = new ContentModel<ContentType1>(content);
             var view = new RenderModelOfContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(model);
@@ -198,7 +198,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void ContentType1_To_RenderModel()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var view = new RenderModelTestPage();
 
             ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
@@ -211,7 +211,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void ContentType1_To_RenderModelOf_ContentType1()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var view = new RenderModelOfContentType1TestPage();
 
             ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
@@ -225,7 +225,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         public void ContentType2_To_RenderModelOf_ContentType1()
         {
             // Same as above but with ContentModel<ContentType2>
-            var content = new ContentType2(null);
+            var content = new ContentType2(null, Mock.Of<IPublishedValueFallback>());
             var view = new RenderModelOfContentType1TestPage();
             ViewDataDictionary<ContentType2> viewData = GetViewDataDictionary<ContentType2>(content);
 
@@ -238,7 +238,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void ContentType1_To_RenderModelOf_ContentType2()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var view = new RenderModelOfContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(content);
 
@@ -248,7 +248,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void ContentType1_To_ContentType1()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var view = new ContentType1TestPage();
             ViewDataDictionary<ContentType1> viewData = GetViewDataDictionary<ContentType1>(content);
 
@@ -260,7 +260,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void ContentType1_To_ContentType2()
         {
-            var content = new ContentType1(null);
+            var content = new ContentType1(null, Mock.Of<IPublishedValueFallback>());
             var view = new ContentType2TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(content);
 
@@ -270,7 +270,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
         [Test]
         public void ContentType2_To_ContentType1()
         {
-            var content = new ContentType2(null);
+            var content = new ContentType2(null, Mock.Of<IPublishedValueFallback>());
             var view = new ContentType1TestPage();
             ViewDataDictionary viewData = GetViewDataDictionary(content);
 
@@ -296,16 +296,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Views
 
         public class ContentType1 : PublishedContentWrapped
         {
-            public ContentType1(IPublishedContent content)
-                : base(content)
+            public ContentType1(IPublishedContent content, IPublishedValueFallback fallback)
+                : base(content, fallback)
             {
             }
         }
 
         public class ContentType2 : ContentType1
         {
-            public ContentType2(IPublishedContent content)
-                : base(content)
+            public ContentType2(IPublishedContent content, IPublishedValueFallback fallback)
+                : base(content, fallback)
             {
             }
         }
