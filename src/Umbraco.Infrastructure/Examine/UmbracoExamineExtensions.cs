@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using Examine;
 using Examine.Search;
 using Umbraco.Cms.Infrastructure.Examine;
@@ -16,8 +17,6 @@ namespace Umbraco.Extensions
         /// </remarks>
         internal static readonly Regex CultureIsoCodeFieldNameMatchExpression = new Regex("^([_\\w]+)_([a-z]{2}-[a-z0-9]{2,4})$", RegexOptions.Compiled);
 
-
-
         //TODO: We need a public method here to just match a field name against CultureIsoCodeFieldNameMatchExpression
 
         /// <summary>
@@ -26,16 +25,21 @@ namespace Umbraco.Extensions
         /// <param name="index"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public static IEnumerable<string> GetCultureFields(this IUmbracoIndex index, string culture)
+        public static async Task<IEnumerable<string>> GetCultureFieldsAsync(this IUmbracoIndex index, string culture)
         {
-            var allFields = index.GetFields();
-            // ReSharper disable once LoopCanBeConvertedToQuery
+            IEnumerable<string> allFields = await index.GetFieldNamesAsync();
+
+            var results = new List<string>();
             foreach (var field in allFields)
             {
                 var match = CultureIsoCodeFieldNameMatchExpression.Match(field);
                 if (match.Success && match.Groups.Count == 3 && culture.InvariantEquals(match.Groups[2].Value))
-                    yield return field;
+                {
+                    results.Add(field);
+                }
             }
+
+            return results;
         }
 
         /// <summary>
@@ -44,23 +48,25 @@ namespace Umbraco.Extensions
         /// <param name="index"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public static IEnumerable<string> GetCultureAndInvariantFields(this IUmbracoIndex index, string culture)
+        public static async Task<IEnumerable<string>> GetCultureAndInvariantFieldsAsync(this IUmbracoIndex index, string culture)
         {
-            var allFields = index.GetFields();
+            IEnumerable<string> allFields = await index.GetFieldNamesAsync();
+            var results = new List<string>();
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var field in allFields)
             {
                 var match = CultureIsoCodeFieldNameMatchExpression.Match(field);
                 if (match.Success && match.Groups.Count == 3 && culture.InvariantEquals(match.Groups[2].Value))
                 {
-                    yield return field; //matches this culture field
+                    results.Add(field); //matches this culture field
                 }
                 else if (!match.Success)
                 {
-                    yield return field; //matches no culture field (invariant)
+                    results.Add(field); //matches no culture field (invariant)
                 }
-
             }
+
+            return results;
         }
 
         public static IBooleanOperation Id(this IQuery query, int id)

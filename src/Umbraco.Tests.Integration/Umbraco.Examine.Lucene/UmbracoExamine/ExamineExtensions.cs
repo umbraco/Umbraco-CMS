@@ -1,11 +1,11 @@
-﻿using Examine;
+using Examine;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Xml.Linq;
 
-namespace Umbraco.Tests.UmbracoExamine
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
 {
     /// <summary>
     /// LEGACY!! Static methods to help query umbraco xml

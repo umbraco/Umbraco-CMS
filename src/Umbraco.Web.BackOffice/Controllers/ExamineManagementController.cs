@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Examine;
+using Examine.Search;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
@@ -42,10 +44,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Get the details for indexers
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<ExamineIndexModel> GetIndexerDetails()
-        {
-            return _examineManager.Indexes.Select(CreateModel).OrderBy(x => x.Name.TrimEnd("Indexer"));
-        }
+        public async Task<IEnumerable<ExamineIndexModel>> GetIndexerDetails()
+            => await Task.WhenAll(_examineManager.Indexes
+                .Select(async index => await CreateModelAsync(index))
+                .OrderBy(async examineIndexModel => (await examineIndexModel).Name.TrimEnd("Indexer")));
 
         /// <summary>
         /// Get the details for searchers
@@ -69,7 +71,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 return msg;
 
             // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
-            var results = searcher.CreateQuery().NativeQuery(query).Execute(maxResults: pageSize * (pageIndex + 1));
+            var results = searcher
+                .CreateQuery()
+                .NativeQuery(query)
+                .Execute(QueryOptions.SkipTake(pageSize * pageIndex, pageSize));
 
             var pagedResults = results.Skip(pageIndex * pageSize);
 
@@ -94,16 +99,20 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
         /// have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
         /// </remarks>
-        public ActionResult<ExamineIndexModel> PostCheckRebuildIndex(string indexName)
+        public async Task<ActionResult<ExamineIndexModel>> PostCheckRebuildIndex(string indexName)
         {
             var validate = ValidateIndex(indexName, out var index);
 
             if (!validate.IsSuccessStatusCode())
+            {
                 return validate;
+            }
 
             validate = ValidatePopulator(index);
             if (!validate.IsSuccessStatusCode())
+            {
                 return validate;
+            }
 
             var cacheKey = "temp_indexing_op_" + indexName;
             var found = _runtimeCache.Get(cacheKey);
@@ -111,7 +120,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //if its still there then it's not done
             return found != null
                 ? null
-                : CreateModel(index);
+                : await CreateModelAsync(index);
         }
 
         /// <summary>
@@ -163,7 +172,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
-        private ExamineIndexModel CreateModel(IIndex index)
+        private async Task<ExamineIndexModel> CreateModelAsync(IIndex index)
         {
             var indexName = index.Name;
 
@@ -173,12 +182,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var properties = new Dictionary<string, object>
             {
-                [nameof(IIndexDiagnostics.DocumentCount)] = indexDiag.DocumentCount,
-                [nameof(IIndexDiagnostics.FieldCount)] = indexDiag.FieldCount,
+                ["DocumentCount"] = await indexDiag.GetDocumentCountAsync(),
+                ["FieldCount"] = (await indexDiag.GetFieldNamesAsync()).Count(),
             };
 
-            foreach (var p in indexDiag.Metadata)
+            foreach (KeyValuePair<string, object> p in indexDiag.Metadata)
+            {
                 properties[p.Key] = p.Value;
+            }
 
             var indexerModel = new ExamineIndexModel
             {
@@ -194,15 +205,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private ActionResult ValidateSearcher(string searcherName, out ISearcher searcher)
         {
             //try to get the searcher from the indexes
-            if (_examineManager.TryGetIndex(searcherName, out var index))
+            if (_examineManager.TryGetIndex(searcherName, out IIndex index))
             {
-                searcher = index.GetSearcher();
+                searcher = index.Searcher;
                 return new OkResult();
             }
 
             //if we didn't find anything try to find it by an explicitly declared searcher
             if (_examineManager.TryGetSearcher(searcherName, out searcher))
+            {
                 return new OkResult();
+            }
 
             var response1 = new BadRequestObjectResult($"No searcher found with name = {searcherName}");
             HttpContext.SetReasonPhrase("Searcher Not Found");

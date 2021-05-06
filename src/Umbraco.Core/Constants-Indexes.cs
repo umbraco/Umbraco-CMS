@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core
 {
     public static partial class Constants
     {
@@ -8,9 +8,9 @@
             public const string ExternalIndexName = ExternalIndexPath + "Index";
             public const string MembersIndexName = MembersIndexPath + "Index";
 
-            public const string InternalIndexPath = "Internal";
-            public const string ExternalIndexPath = "External";
-            public const string MembersIndexPath = "Members";
+            private const string InternalIndexPath = "Internal";
+            private const string ExternalIndexPath = "External";
+            private const string MembersIndexPath = "Members";
         }
     }
 }

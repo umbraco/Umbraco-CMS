@@ -59,7 +59,7 @@
       <PackageReference Include="System.Drawing.Common" Version="5.0.1" />
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
       <PackageReference Include="System.Threading.Tasks.Dataflow" Version="5.0.0" />
-      <PackageReference Include="Examine.Core" Version="2.0.0-alpha.20200128.15" />
+      <PackageReference Include="Examine.Core" Version="2.0.0-beta.127" />
       <PackageReference Include="Umbraco.Code" Version="1.1.1">
         <PrivateAssets>all</PrivateAssets>
       </PackageReference>

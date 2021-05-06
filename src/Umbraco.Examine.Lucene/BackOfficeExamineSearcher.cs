@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using Examine;
+using Examine.Search;
+using Lucene.Net.QueryParsers.Classic;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Mapping;
@@ -103,17 +105,16 @@ namespace Umbraco.Cms.Infrastructure.Examine
             if (!_examineManager.TryGetIndex(indexName, out var index))
                 throw new InvalidOperationException("No index found by name " + indexName);
 
-            var internalSearcher = index.GetSearcher();
-
             if (!BuildQuery(sb, query, searchFrom, fields, type))
             {
                 totalFound = 0;
                 return Enumerable.Empty<ISearchResult>();
             }
 
-            var result = internalSearcher.CreateQuery().NativeQuery(sb.ToString())
-                //only return the number of items specified to read up to the amount of records to fill from 0 -> the number of items on the page requested
-                .Execute(Convert.ToInt32(pageSize * (pageIndex + 1)));
+            var result = index.Searcher
+                .CreateQuery()
+                .NativeQuery(sb.ToString())                
+                .Execute(QueryOptions.SkipTake(Convert.ToInt32(pageSize * pageIndex), pageSize));
 
             totalFound = result.TotalItemCount;
 
@@ -143,7 +144,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 //strip quotes, escape string, the replace again
                 query = query.Trim(Constants.CharArrays.DoubleQuoteSingleQuote);
 
-                query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
+                query = QueryParser.Escape(query);
 
                 //nothing to search
                 if (searchFrom.IsNullOrWhiteSpace() && query.IsNullOrWhiteSpace())
@@ -186,7 +187,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 //update the query with the query term
                 if (trimmed.IsNullOrWhiteSpace() == false)
                 {
-                    query = Lucene.Net.QueryParsers.QueryParser.Escape(query);
+                    query = QueryParser.Escape(query);
 
                     var querywords = query.Split(Constants.CharArrays.Space, StringSplitOptions.RemoveEmptyEntries);
 
@@ -355,6 +356,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
             sb.Append("\\,*");
         }
 
+        // TODO: When/Where is this used?
+
         /// <summary>
         /// Returns a collection of entities for media based on search results
         /// </summary>
@@ -389,6 +392,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
         }
 
+        // TODO: When/Where is this used?
+
         /// <summary>
         /// Returns a collection of entities for media based on search results
         /// </summary>
@@ -396,6 +401,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <returns></returns>
         private IEnumerable<SearchResultEntity> MediaFromSearchResults(IEnumerable<ISearchResult> results)
             => _umbracoMapper.Map<IEnumerable<SearchResultEntity>>(results);
+
+        // TODO: When/Where is this used?
 
         /// <summary>
         /// Returns a collection of entities for content based on search results

@@ -4,20 +4,15 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using Examine;
-using Examine.LuceneEngine;
-using Examine.LuceneEngine.Providers;
-using Lucene.Net.Analysis;
+using Examine.Lucene;
+using Examine.Lucene.Providers;
 using Lucene.Net.Documents;
-using Lucene.Net.Index;
-using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Services;
-using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Infrastructure.Examine
 {
@@ -27,60 +22,23 @@ namespace Umbraco.Cms.Infrastructure.Examine
     /// </summary>
     public abstract class UmbracoExamineIndex : LuceneIndex, IUmbracoIndex, IIndexDiagnostics
     {
-        private readonly ILogger<UmbracoExamineIndex> _logger;
-        private readonly ILoggerFactory _loggerFactory;
-
+        private readonly UmbracoExamineIndexDiagnostics _diagnostics;
         private readonly IRuntimeState _runtimeState;
+        private bool _hasLoggedInitLog = false;
+        private readonly ILogger<UmbracoExamineIndex> _logger;
 
-        // note
-        // wrapping all operations that end up calling base.SafelyProcessQueueItems in a safe call
-        // context because they will fork a thread/task/whatever which should *not* capture our
-        // call context (and the database it can contain)!
-        // TODO: FIX Examine to not flow the ExecutionContext so callers don't need to worry about this!
-
-        /// <summary>
-        /// Create a new <see cref="UmbracoExamineIndex"/>
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="fieldDefinitions"></param>
-        /// <param name="luceneDirectory"></param>
-        /// <param name="defaultAnalyzer"></param>
-        /// <param name="profilingLogger"></param>
-        /// <param name="logger"></param>
-        /// <param name="loggerFactory"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="runtimeState"></param>
-        /// <param name="validator"></param>
-        /// <param name="indexValueTypes"></param>
         protected UmbracoExamineIndex(
-            string name,
-            Directory luceneDirectory,
-            FieldDefinitionCollection fieldDefinitions,
-            Analyzer defaultAnalyzer,
-            IProfilingLogger profilingLogger,
-            ILogger<UmbracoExamineIndex> logger,
             ILoggerFactory loggerFactory,
+            string name,
+            IOptionsSnapshot<LuceneDirectoryIndexOptions> indexOptions,
             IHostingEnvironment hostingEnvironment,
-            IRuntimeState runtimeState,
-            IValueSetValidator validator = null,
-            IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
-            : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, validator, indexValueTypes)
+            IRuntimeState runtimeState)
+            : base(loggerFactory, name, indexOptions)
         {
-            _logger = logger;
-            _loggerFactory = loggerFactory;
             _runtimeState = runtimeState;
-            ProfilingLogger = profilingLogger ?? throw new ArgumentNullException(nameof(profilingLogger));
-
-            //try to set the value of `LuceneIndexFolder` for diagnostic reasons
-            if (luceneDirectory is FSDirectory fsDir)
-                LuceneIndexFolder = fsDir.Directory;
-
-            _diagnostics = new UmbracoExamineIndexDiagnostics(this, _loggerFactory.CreateLogger<UmbracoExamineIndexDiagnostics>(), hostingEnvironment);
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, loggerFactory.CreateLogger<UmbracoExamineIndexDiagnostics>(), hostingEnvironment);
+            _logger = loggerFactory.CreateLogger<UmbracoExamineIndex>();
         }
-
-        private readonly bool _configBased = false;
-
-        protected IProfilingLogger ProfilingLogger { get; }
 
         /// <summary>
         /// When set to true Umbraco will keep the index in sync with Umbraco data automatically
@@ -88,14 +46,6 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public bool EnableDefaultEventHandler { get; set; } = true;
 
         public bool PublishedValuesOnly { get; protected set; } = false;
-
-        /// <inheritdoc />
-        public IEnumerable<string> GetFields()
-        {
-            //we know this is a LuceneSearcher
-            var searcher = (LuceneSearcher)GetSearcher();
-            return searcher.GetAllIndexedFields();
-        }
 
         /// <summary>
         /// override to check if we can actually initialize.
@@ -107,13 +57,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         {
             if (CanInitialize())
             {
-                // Use ExecutionContext.SuppressFlow to prevent the current Execution Context (AsyncLocal) flow to child
-                // tasks executed in the base class so we don't leak Scopes.
-                // TODO: See notes at the top of this class
-                using (ExecutionContext.SuppressFlow())
-                {
-                    base.PerformDeleteFromIndex(itemIds, onComplete);
-                }
+                base.PerformDeleteFromIndex(itemIds, onComplete);
             }
         }
 
@@ -121,13 +65,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         {
             if (CanInitialize())
             {
-                // Use ExecutionContext.SuppressFlow to prevent the current Execution Context (AsyncLocal) flow to child
-                // tasks executed in the base class so we don't leak Scopes.
-                // TODO: See notes at the top of this class
-                using (ExecutionContext.SuppressFlow())
-                {
-                    base.PerformIndexItems(values, onComplete);
-                }
+                base.PerformIndexItems(values, onComplete);
             }
         }
 
@@ -137,19 +75,15 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <returns></returns>
         protected bool CanInitialize()
         {
-            // only affects indexers that are config file based, if an index was created via code then
-            // this has no effect, it is assumed the index would not be created if it could not be initialized
-            return _configBased == false || _runtimeState.Level == RuntimeLevel.Run;
-        }
+            var canInit = _runtimeState.Level == RuntimeLevel.Run;
 
-        /// <summary>
-        /// overridden for logging
-        /// </summary>
-        /// <param name="ex"></param>
-        protected override void OnIndexingError(IndexingErrorEventArgs ex)
-        {
-            _logger.LogError(ex.InnerException, ex.Message);
-            base.OnIndexingError(ex);
+            if (!canInit && !_hasLoggedInitLog)
+            {
+                _hasLoggedInitLog = true;
+                _logger.LogWarning("Runtime state is not " + RuntimeLevel.Run + ", no indexing will occur");
+            }
+
+            return canInit;
         }
 
         /// <summary>
@@ -167,29 +101,14 @@ namespace Umbraco.Cms.Infrastructure.Examine
                     //remove the original value so we can store it the correct way
                     d.RemoveField(f.Key);
 
-                    d.Add(new Field(
+                    d.Add(new StringField(
                         f.Key,
                         f.Value[0].ToString(),
-                        Field.Store.YES,
-                        Field.Index.NO, //don't index this field, we never want to search by it
-                        Field.TermVector.NO));
+                        Field.Store.YES));
                 }
             }
 
             base.OnDocumentWriting(docArgs);
-        }
-
-        /// <summary>
-        /// Overridden for logging.
-        /// </summary>
-        protected override void AddDocument(Document doc, ValueSet valueSet, IndexWriter writer)
-        {
-            _logger.LogDebug("Write lucene doc id:{DocumentId}, category:{DocumentCategory}, type:{DocumentItemType}",
-            valueSet.Id,
-            valueSet.Category,
-            valueSet.ItemType);
-
-            base.AddDocument(doc, valueSet, writer);
         }
 
         protected override void OnTransformingIndexValues(IndexingItemEventArgs e)
@@ -210,15 +129,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
         }
 
-        #region IIndexDiagnostics
-
-        private readonly UmbracoExamineIndexDiagnostics _diagnostics;
-
-        public int DocumentCount => _diagnostics.DocumentCount;
-        public int FieldCount => _diagnostics.FieldCount;
         public Attempt<string> IsHealthy() => _diagnostics.IsHealthy();
         public virtual IReadOnlyDictionary<string, object> Metadata => _diagnostics.Metadata;
-
-        #endregion
     }
 }

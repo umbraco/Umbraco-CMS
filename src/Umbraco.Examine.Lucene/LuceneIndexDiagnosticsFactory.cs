@@ -1,8 +1,8 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using Examine;
-using Examine.LuceneEngine.Providers;
+using Examine.Lucene.Providers;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Hosting;
 
@@ -28,9 +28,13 @@ namespace Umbraco.Cms.Infrastructure.Examine
             if (!(index is IIndexDiagnostics indexDiag))
             {
                 if (index is LuceneIndex luceneIndex)
+                {
                     indexDiag = new LuceneIndexDiagnostics(luceneIndex, _loggerFactory.CreateLogger<LuceneIndexDiagnostics>(), _hostingEnvironment);
+                }
                 else
+                {
                     indexDiag = base.Create(index);
+                }
             }
             return indexDiag;
         }

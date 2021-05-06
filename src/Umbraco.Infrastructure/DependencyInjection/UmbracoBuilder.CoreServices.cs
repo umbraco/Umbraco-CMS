@@ -154,8 +154,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
-            // Register noop versions for examine to be overridden by examine
-            builder.Services.AddUnique<IUmbracoIndexesCreator, NoopUmbracoIndexesCreator>();
             builder.Services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
             builder.Services.AddUnique<UploadAutoFillProperties>();

@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using Examine.Lucene.Directories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -51,7 +52,7 @@ namespace Umbraco.Cms.Tests.Integration.DependencyInjection
 
 #if IS_WINDOWS
             // ensure all lucene indexes are using RAM directory (no file system)
-            builder.Services.AddUnique<ILuceneDirectoryFactory, LuceneRAMDirectoryFactory>();
+            builder.Services.AddUnique<IDirectoryFactory, LuceneRAMDirectoryFactory>();
 #endif
 
             // replace this service so that it can lookup the correct file locations

@@ -4,6 +4,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 using Examine;
+using Examine.Search;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
@@ -41,7 +42,6 @@ namespace Umbraco.Cms.Infrastructure.Search
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<ExamineNotificationHandler> _logger;
-        private readonly IUmbracoIndexesCreator _indexCreator;
         private static bool s_deactivate_handlers;
 
         // the default enlist priority is 100
@@ -54,7 +54,6 @@ namespace Umbraco.Cms.Infrastructure.Search
             IProfilingLogger profilingLogger,
             ILogger<ExamineNotificationHandler> logger,
             IScopeProvider scopeProvider,
-            IUmbracoIndexesCreator indexCreator,
             ServiceContext services,
             IContentValueSetBuilder contentValueSetBuilder,
             IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
@@ -77,7 +76,6 @@ namespace Umbraco.Cms.Infrastructure.Search
             _mainDom = mainDom;
             _profilingLogger = profilingLogger;
             _logger = logger;
-            _indexCreator = indexCreator;
         }
         public void Handle(UmbracoApplicationStarting notification)
         {
@@ -97,12 +95,6 @@ namespace Umbraco.Cms.Infrastructure.Search
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
                 Suspendable.ExamineEvents.SuspendIndexers(_logger);
                 return; //exit, do not continue
-            }
-
-            //create the indexes and register them with the manager
-            foreach (IIndex index in _indexCreator.Create())
-            {
-                _examineManager.AddIndex(index);
             }
 
             _logger.LogDebug("Examine shutdown registered with MainDom");
@@ -476,14 +468,15 @@ namespace Umbraco.Cms.Infrastructure.Search
                 {
                     foreach (var index in _examineManager.Indexes.OfType<IUmbracoIndex>())
                     {
-                        var searcher = index.GetSearcher();
-
                         var page = 0;
                         var total = long.MaxValue;
                         while (page * pageSize < total)
                         {
                             //paging with examine, see https://shazwazza.com/post/paging-with-examine/
-                            var results = searcher.CreateQuery().Field("nodeType", id.ToInvariantString()).Execute(maxResults: pageSize * (page + 1));
+                            var results = index.Searcher
+                                .CreateQuery()
+                                .Field("nodeType", id.ToInvariantString())
+                                .Execute(QueryOptions.SkipTake(page * pageSize, pageSize));
                             total = results.TotalItemCount;
                             var paged = results.Skip(page * pageSize);
 

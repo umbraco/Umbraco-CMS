@@ -1,20 +1,19 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
+using Examine.Lucene.Providers;
 using Examine.Search;
-using Microsoft.Extensions.DependencyInjection;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
-using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Tests.UmbracoExamine
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Examine.Lucene.UmbracoExamine
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
@@ -24,6 +23,8 @@ namespace Umbraco.Tests.UmbracoExamine
         [Test]
         public void Test_Sort_Order_Sorting()
         {
+            var rebuilder = IndexInitializer.GetContentIndexRebuilder(IndexInitializer.GetMockContentService(), false);
+
             long totalRecs;
             var demoData = new ExamineDemoDataContentService(TestFiles.umbraco_sort);
             var allRecs = demoData.GetLatestContentByXPath("//*[@isDoc]")
@@ -54,17 +55,14 @@ namespace Umbraco.Tests.UmbracoExamine
                     ==
                     allRecs);
 
-            var propertyEditors = Factory.GetRequiredService<PropertyEditorCollection>();
-            var rebuilder = IndexInitializer.GetContentIndexRebuilder(propertyEditors, contentService, ScopeProvider, UmbracoDatabaseFactory,true);
-
-            using (var luceneDir = new RandomIdRamDirectory())
-            using (var indexer = IndexInitializer.GetUmbracoIndexer(ProfilingLogger, HostingEnvironment, RuntimeState, luceneDir))
-            using (indexer.ProcessNonAsync())
+            using (var luceneDir = new RandomIdRAMDirectory())
+            using (var index = IndexInitializer.GetUmbracoIndexer(HostingEnvironment, RunningRuntimeState, luceneDir))
+            using (index.WithThreadingMode(IndexThreadingMode.Synchronous))
             {
-                indexer.CreateIndex();
-                rebuilder.Populate(indexer);
+                index.CreateIndex();
+                rebuilder.Populate(index);
 
-                var searcher = indexer.GetSearcher();
+                var searcher = index.Searcher;
 
                 var numberSortedCriteria = searcher.CreateQuery()
                     .ParentId(1148)

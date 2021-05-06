@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Examine;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Composing;
@@ -15,12 +16,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
     public class GenericIndexDiagnostics : IIndexDiagnostics
     {
         private readonly IIndex _index;
-        private static readonly string[] IgnoreProperties = { "Description" };
+        private static readonly string[] s_ignoreProperties = { "Description" };
 
-        public GenericIndexDiagnostics(IIndex index)
-        {
-            _index = index;
-        }
+        public GenericIndexDiagnostics(IIndex index) => _index = index;
 
         public int DocumentCount => -1; //unknown
 
@@ -33,8 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
             try
             {
-                var searcher = _index.GetSearcher();
-                var result = searcher.Search("test");
+                var result = _index.Searcher.Search("test");
                 return Attempt<string>.Succeed(); //if we can search we'll assume it's healthy
             }
             catch (Exception e)
@@ -43,6 +40,10 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
         }
 
+        public Task<long> GetDocumentCountAsync() => Task.FromResult(-1L);
+
+        public Task<IEnumerable<string>> GetFieldNamesAsync() => Task.FromResult(Enumerable.Empty<string>());
+
         public IReadOnlyDictionary<string, object> Metadata
         {
             get
@@ -50,7 +51,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 var result = new Dictionary<string, object>();
 
                 var props = TypeHelper.CachedDiscoverableProperties(_index.GetType(), mustWrite: false)
-                    .Where(x => IgnoreProperties.InvariantContains(x.Name) == false)
+                    .Where(x => s_ignoreProperties.InvariantContains(x.Name) == false)
                     .OrderBy(x => x.Name);
 
                 foreach (var p in props)

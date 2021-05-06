@@ -5,9 +5,7 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -21,8 +19,6 @@ using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
-using Umbraco.Tests.UmbracoExamine;
 
 namespace Umbraco.Tests.PublishedContent
 {
