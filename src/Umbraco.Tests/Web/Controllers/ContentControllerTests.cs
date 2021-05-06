@@ -35,6 +35,7 @@ using Umbraco.Core.Cache;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
+using Umbraco.Core.Scoping;
 using Umbraco.Web.Actions;
 
 namespace Umbraco.Tests.Web.Controllers
@@ -268,7 +269,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
@@ -301,7 +303,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
@@ -342,7 +345,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
@@ -388,7 +392,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
@@ -426,7 +431,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
@@ -470,7 +476,8 @@ namespace Umbraco.Tests.Web.Controllers
                     Factory.GetInstance<AppCaches>(),
                     Factory.GetInstance<IProfilingLogger>(),
                     Factory.GetInstance<IRuntimeState>(),
-                    helper);
+                    helper,
+                    Factory.GetInstance<IScopeProvider>());
 
                 return controller;
             }
