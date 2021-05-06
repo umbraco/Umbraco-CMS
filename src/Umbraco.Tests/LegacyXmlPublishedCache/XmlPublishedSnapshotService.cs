@@ -12,6 +12,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Core.Runtime;
 using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
+using Umbraco.Core.Sync;
 using Umbraco.Web;
 using Umbraco.Web.Cache;
 using Umbraco.Web.PublishedCache;
@@ -28,6 +29,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         private readonly RoutesCache _routesCache;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly PublishedContentTypeCache _contentTypeCache;
+        private readonly ISyncBootStateAccessor _syncBootStateAccessor;
         private readonly IDomainService _domainService;
         private readonly IMemberService _memberService;
         private readonly IMediaService _mediaService;
@@ -54,13 +56,13 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             IGlobalSettings globalSettings,
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
-            MainDom mainDom,
+            MainDom mainDom, ISyncBootStateAccessor syncBootStateAccessor,
             bool testing = false, bool enableRepositoryEvents = true)
             : this(serviceContext, publishedContentTypeFactory, scopeProvider, requestCache,
                 publishedSnapshotAccessor, variationContextAccessor, umbracoContextAccessor,
                 documentRepository, mediaRepository, memberRepository,
                 defaultCultureAccessor,
-                logger, globalSettings, siteDomainHelper, entitySerializer, null, mainDom, testing, enableRepositoryEvents)
+                logger, globalSettings, siteDomainHelper, entitySerializer, null, mainDom, syncBootStateAccessor, testing, enableRepositoryEvents)
         {
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -79,7 +81,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             ISiteDomainHelper siteDomainHelper,
             IEntityXmlSerializer entitySerializer,
             PublishedContentTypeCache contentTypeCache,
-            MainDom mainDom,
+            MainDom mainDom, ISyncBootStateAccessor syncBootStateAccessor,
             bool testing, bool enableRepositoryEvents)
             : base(publishedSnapshotAccessor, variationContextAccessor)
         {
@@ -87,7 +89,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
             _publishedContentTypeFactory = publishedContentTypeFactory;
             _contentTypeCache = contentTypeCache
                 ?? new PublishedContentTypeCache(serviceContext.ContentTypeService, serviceContext.MediaTypeService, serviceContext.MemberTypeService, publishedContentTypeFactory, logger);
-
+            _syncBootStateAccessor = syncBootStateAccessor;
             _xmlStore = new XmlStore(serviceContext.ContentTypeService, serviceContext.ContentService, scopeProvider, _routesCache,
                 _contentTypeCache, publishedSnapshotAccessor, mainDom, testing, enableRepositoryEvents,
                 documentRepository, mediaRepository, memberRepository, globalSettings, entitySerializer);

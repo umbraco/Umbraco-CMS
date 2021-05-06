@@ -82,7 +82,7 @@ namespace Umbraco.Tests.Scoping
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
             var bootstateAccessor = new TestSyncBootStateAccessor(SyncBootState.WarmBoot);
-            return new PublishedSnapshotService(
+            var service = new PublishedSnapshotService(
                 options,
                 null,
                 runtimeStateMock.Object,
@@ -102,6 +102,7 @@ namespace Umbraco.Tests.Scoping
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
                 bootstateAccessor);
             bootstateAccessor.RaiseBooting();
+            return service;
         }
 
         protected UmbracoContext GetUmbracoContextNu(string url, int templateId = 1234, RouteData routeData = null, bool setSingleton = false, IUmbracoSettingsSection umbracoSettings = null, IEnumerable<IUrlProvider> urlProviders = null)

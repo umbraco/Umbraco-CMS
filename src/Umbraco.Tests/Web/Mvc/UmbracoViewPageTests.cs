@@ -13,6 +13,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Services;
 using Umbraco.Core.Strings;
+using Umbraco.Core.Sync;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
@@ -421,13 +422,15 @@ namespace Umbraco.Tests.Web.Mvc
             var scopeProvider = TestObjects.GetScopeProvider(Mock.Of<ILogger>());
             var factory = Mock.Of<IPublishedContentTypeFactory>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
+
+            var bootstateAccessor = new TestSyncBootStateAccessor(SyncBootState.WarmBoot);
             _service = new XmlPublishedSnapshotService(svcCtx, factory, scopeProvider, cache,
                 null, null,
                 umbracoContextAccessor, null, null, null,
                 new TestDefaultCultureAccessor(),
                 Current.Logger, TestObjects.GetGlobalSettings(), new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
-                null, true, false
+                null, bootstateAccessor, true, false
                 ); // no events
 
             var http = GetHttpContextFactory(url, routeData).HttpContext;
@@ -443,7 +446,7 @@ namespace Umbraco.Tests.Web.Mvc
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
                 new TestVariationContextAccessor());
-
+            bootstateAccessor.RaiseBooting();
             //if (setSingleton)
             //{
             //    UmbracoContext.Current = ctx;

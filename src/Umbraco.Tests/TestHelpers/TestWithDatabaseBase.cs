@@ -32,6 +32,7 @@ using Umbraco.Core.Persistence.Repositories;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web.Cache;
+using Umbraco.Core.Sync;
 
 namespace Umbraco.Tests.TestHelpers
 {
@@ -259,6 +260,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var publishedSnapshotAccessor = new UmbracoContextPublishedSnapshotAccessor(Umbraco.Web.Composing.Current.UmbracoContextAccessor);
             var variationContextAccessor = new TestVariationContextAccessor();
+            var bootstateAccessor = new TestSyncBootStateAccessor(SyncBootState.WarmBoot);
             var service = new XmlPublishedSnapshotService(
                 ServiceContext,
                 Factory.GetInstance<IPublishedContentTypeFactory>(),
@@ -271,7 +273,7 @@ namespace Umbraco.Tests.TestHelpers
                 Factory.GetInstance<IGlobalSettings>(), new SiteDomainHelper(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 ContentTypesCache,
-                null, true, Options.PublishedRepositoryEvents);
+                null, bootstateAccessor, true, Options.PublishedRepositoryEvents);
 
             // initialize PublishedCacheService content with an Xml source
             service.XmlStore.GetXmlDocument = () =>
@@ -280,7 +282,7 @@ namespace Umbraco.Tests.TestHelpers
                 doc.LoadXml(GetXmlContent(0));
                 return doc;
             };
-
+            bootstateAccessor.RaiseBooting();
             return service;
         }
 
