@@ -380,9 +380,11 @@ namespace Umbraco.Web.Editors
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
+
+                var contentItem = GetEmpty(contentType, parentId);
                 scope.Complete();
 
-                return GetEmpty(contentType, parentId);
+                return contentItem;
             }
         }
 
