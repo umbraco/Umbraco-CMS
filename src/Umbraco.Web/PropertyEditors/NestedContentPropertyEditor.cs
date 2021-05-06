@@ -35,6 +35,7 @@ namespace Umbraco.Web.PropertyEditors
         private readonly IDataTypeService _dataTypeService;
         private readonly IContentTypeService _contentTypeService;
         private readonly ILocalizedTextService _localizedTextService;
+        private readonly Lazy<Dictionary<string, IContentType>> _contentTypes;
         internal const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
         [Obsolete("Use the constructor specifying all parameters instead")]
@@ -48,6 +49,7 @@ namespace Umbraco.Web.PropertyEditors
             _dataTypeService = dataTypeService;
             _contentTypeService = contentTypeService;
             _localizedTextService = localizedTextService;
+            _contentTypes = new Lazy<Dictionary<string, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Alias));
         }
 
         // has to be lazy else circular dep in ctor
@@ -61,7 +63,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, Logger);
+        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, Logger, _contentTypes);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -70,13 +72,13 @@ namespace Umbraco.Web.PropertyEditors
             private readonly ILogger _logger;
             private readonly NestedContentValues _nestedContentValues;
             
-            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger logger)
+            public NestedContentPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger logger, Lazy<Dictionary<string, IContentType>> contentTypes)
                 : base(attribute)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
                 _logger = logger;
-                _nestedContentValues = new NestedContentValues(contentTypeService);
+                _nestedContentValues = new NestedContentValues(contentTypes);
                 Validators.Add(new NestedContentValidator(_nestedContentValues, propertyEditors, dataTypeService, textService, contentTypeService));
             }
 
@@ -156,6 +158,7 @@ namespace Umbraco.Web.PropertyEditors
             public override object ToEditor(Property property, IDataTypeService dataTypeService, string culture = null, string segment = null)
             {
                 var val = property.GetValue(culture, segment);
+                var valEditors = new Dictionary<int, IDataValueEditor>();
 
                 var rows = _nestedContentValues.GetPropertyValues(val);
 
@@ -184,9 +187,16 @@ namespace Umbraco.Web.PropertyEditors
                                 continue;
                             }
 
-                            var tempConfig = dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
-                            var valEditor = propEditor.GetValueEditor(tempConfig);
-                            var convValue = valEditor.ToEditor(tempProp, dataTypeService);
+                            var dataTypeId = prop.Value.PropertyType.DataTypeId;
+                            if (!valEditors.ContainsKey(dataTypeId))
+                            {
+                                var tempConfig = dataTypeService.GetDataType(dataTypeId).Configuration;
+                                var valEditor = propEditor.GetValueEditor(tempConfig);
+
+                                valEditors.Add(dataTypeId, valEditor);
+                            }
+
+                            var convValue = valEditors[dataTypeId].ToEditor(tempProp, dataTypeService);
 
                             // update the raw value since this is what will get serialized out
                             row.RawPropertyValues[prop.Key] = convValue == null ? null : JToken.FromObject(convValue);
@@ -343,9 +353,9 @@ namespace Umbraco.Web.PropertyEditors
         {
             private readonly Lazy<Dictionary<string, IContentType>> _contentTypes;
 
-            public NestedContentValues(IContentTypeService contentTypeService)
+            public NestedContentValues(Lazy<Dictionary<string, IContentType>> contentTypes)
             {
-                _contentTypes = new Lazy<Dictionary<string, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Alias));
+                _contentTypes = contentTypes;
             }
 
             private IContentType GetElementType(NestedContentRowValue item)
