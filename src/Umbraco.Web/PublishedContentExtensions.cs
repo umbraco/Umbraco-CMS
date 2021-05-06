@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -174,7 +174,7 @@ namespace Umbraco.Web
 
             // else... if we have a property, at least let the converter return its own
             // vision of 'no value' (could be an empty enumerable) - otherwise, default
-            return property == null ? default : property.Value<T>(culture, segment);
+            return property == null ? default : property.Value<T>(culture, segment, fallback, defaultValue);
         }
 
         #endregion
@@ -814,6 +814,64 @@ namespace Umbraco.Web
 
         #endregion
 
+        #region Axes: breadcrumbs
+
+        /// <summary>
+        /// Gets the breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="andSelf">Indicates whether the specified content should be included.</param>
+        /// <returns>
+        /// The breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" />.
+        /// </returns>
+        public static IEnumerable<IPublishedContent> Breadcrumbs(this IPublishedContent content, bool andSelf = true)
+        {
+            return content.AncestorsOrSelf(andSelf, null).Reverse();
+        }
+
+        /// <summary>
+        /// Gets the breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" /> at a level higher or equal to <paramref name="minLevel" />.
+        /// </summary>
+        /// <param name="content">The content.</param>
+        /// <param name="minLevel">The minimum level.</param>
+        /// <param name="andSelf">Indicates whether the specified content should be included.</param>
+        /// <returns>
+        /// The breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" /> at a level higher or equal to <paramref name="minLevel" />.
+        /// </returns>
+        public static IEnumerable<IPublishedContent> Breadcrumbs(this IPublishedContent content, int minLevel, bool andSelf = true)
+        {
+            return content.AncestorsOrSelf(andSelf, n => n.Level >= minLevel).Reverse();
+        }
+
+        /// <summary>
+        /// Gets the breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" /> at a level higher or equal to the specified root content type <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T">The root content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <param name="andSelf">Indicates whether the specified content should be included.</param>
+        /// <returns>
+        /// The breadcrumbs (ancestors and self, top to bottom) for the specified <paramref name="content" /> at a level higher or equal to the specified root content type <typeparamref name="T" />.
+        /// </returns>
+        public static IEnumerable<IPublishedContent> Breadcrumbs<T>(this IPublishedContent content, bool andSelf = true)
+            where T : class, IPublishedContent
+        {
+            static IEnumerable<IPublishedContent> TakeUntil(IEnumerable<IPublishedContent> source, Func<IPublishedContent, bool> predicate)
+            {
+                foreach (var item in source)
+                {
+                    yield return item;
+                    if (predicate(item))
+                    {
+                        yield break;
+                    }
+                }
+            }
+
+            return TakeUntil(content.AncestorsOrSelf(andSelf, null), n => n is T).Reverse();
+        }
+
+        #endregion
+
         #region Axes: descendants, descendants-or-self
 
         /// <summary>
@@ -1271,13 +1329,35 @@ namespace Umbraco.Web
         #region Axes: custom
 
         /// <summary>
-        /// Gets the root content for this content.
+        /// Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" />.
         /// </summary>
         /// <param name="content">The content.</param>
-        /// <returns>The 'site' content ie AncestorOrSelf(1).</returns>
+        /// <returns>
+        /// The root content (ancestor or self at level 1) for the specified <paramref name="content" />.
+        /// </returns>
+        /// <remarks>
+        /// This is the same as calling <see cref="Umbraco.Web.PublishedContentExtensions.AncestorOrSelf(IPublishedContent, int)" /> with <c>maxLevel</c> set to 1.
+        /// </remarks>
         public static IPublishedContent Root(this IPublishedContent content)
         {
             return content.AncestorOrSelf(1);
+        }
+
+        /// <summary>
+        /// Gets the root content (ancestor or self at level 1) for the specified <paramref name="content" /> if it's of the specified content type <typeparamref name="T" />.
+        /// </summary>
+        /// <typeparam name="T">The content type.</typeparam>
+        /// <param name="content">The content.</param>
+        /// <returns>
+        /// The root content (ancestor or self at level 1) for the specified <paramref name="content" /> of content type <typeparamref name="T" />.
+        /// </returns>
+        /// <remarks>
+        /// This is the same as calling <see cref="Umbraco.Web.PublishedContentExtensions.AncestorOrSelf{T}(IPublishedContent, int)" /> with <c>maxLevel</c> set to 1.
+        /// </remarks>
+        public static T Root<T>(this IPublishedContent content)
+            where T : class, IPublishedContent
+        {
+            return content.AncestorOrSelf<T>(1);
         }
 
         #endregion

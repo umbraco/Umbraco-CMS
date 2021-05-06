@@ -463,9 +463,16 @@
 
 .umb-cropper{
     position: relative;
+    width: 100%;
 }
 
-.umb-cropper img, .umb-cropper-gravity img{
+.umb-cropper .crop-container {
+    position: relative;
+    width: 100%;
+    padding-bottom: 9 / 16 * 100%;
+}
+
+.umb-cropper img {
     position: relative;
     max-width: 100%;
     height: auto;
@@ -477,74 +484,71 @@
     max-width: none;
  }
 
- .umb-cropper .overlay, .umb-cropper-gravity .overlay {
-    top: 0;
-    left: 0;
+ .umb-cropper .overlay {
+    position: absolute;
+    top: 0 !important;
+    bottom: 0;
+    left: 0 !important;
+    right: 0;
     cursor: move;
     z-index: @zindexCropperOverlay;
-    position: absolute;
+    border: 1px solid @inputBorder;
+    outline: none;
+
+    &:focus {
+        border-color: @inputBorderFocus;
+    }
 }
 
-.umb-cropper .viewport{
+.umb-cropper .viewport {
+    position: absolute;
     overflow: hidden;
-    position: relative;
-    margin: auto;
-    max-width: 100%;
-    height: auto;
- }
-
-.umb-cropper-gravity .viewport{
-    overflow: hidden;
-    position: relative;
     width: 100%;
     height: 100%;
-}
+    .checkeredBackground();
+    contain: strict;
 
+    > img {
+        position: absolute;
+    }
+ }
 
-.umb-cropper .viewport:after {
-    content: "";
+.umb-cropper .viewport .__mask {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
     z-index: @zindexCropperOverlay - 1;
-    opacity: .75;
-    box-shadow: inset 0 0 0 20px white,inset 0 0 0 21px rgba(0,0,0,.1),inset 0 0 20px 21px rgba(0,0,0,.2);
+    box-shadow: 0 0 0 2000px rgba(255, 255, 255, .8);
+}
+.umb-cropper .viewport .__mask-info {
+    position: absolute;
+    bottom: -20px;
+    height: 20px;
+    right: 0;
+    z-index: @zindexCropperOverlay - 1;
+    font-size: 12px;
+    opacity: 0.7;
+    padding: 0px 6px;
 }
 
-.umb-cropper-gravity .overlay{
-    width: 14px;
-    height: 14px;
-    text-align: center;
-    border-radius: 20px;
-    background: @pinkLight;
-    border: 3px solid @white;
-    opacity: 0.8;
-}
-
-.umb-cropper-gravity .overlay i {
-    font-size: 26px;
-    line-height: 26px;
-    opacity: 0.8 !important;
-}
-
-.umb-cropper .crop-container {
-    text-align: center;
+.umb-cropper .crop-controls-wrapper {
+    display: flex;
+    height: 50px;
+    align-items: center;
+    background-color: #fff;
+    .btn:last-of-type {
+        margin-right: 10px;
+    }
 }
 
 .umb-cropper .crop-slider-wrapper {
-    padding: 10px;
-    border-top: 1px solid @gray-10;
-    margin-top: 10px;
+    flex: auto;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-wrap: wrap;
-
-    @media (min-width: 769px) {
-        padding: 10px 50px 10px 50px;
-    }
 
     i {
         color: @gray-3;
@@ -558,11 +562,20 @@
     }
 
     .crop-slider {
-        padding: 50px 15px 40px 15px;
-        width: 66.6%;
+        width: calc(100% - 100px);
     }
 }
 
+.umb-cropper .crop-controls-wrapper__icon-left {
+    margin-right: 10px;
+
+}
+.umb-cropper .crop-controls-wrapper__icon-right {
+    margin-left: 10px;
+    font-size: 22px;
+}
+
+/*
    .umb-cropper-gravity .viewport, .umb-cropper-gravity, .umb-cropper-imageholder {
         display: inline-block;
         max-width: 100%;
@@ -572,36 +585,113 @@
         float: left;
     }
 
+    .umb-cropper-imageholder umb-image-gravity {
+        display:block;
+    }
+    */
+
+    .umb-crop-thumbnail-container {
+        img {
+            max-width: unset;
+        }
+    }
+
     .cropList {
         display: inline-block;
         position: relative;
         vertical-align: top;
+        flex:0;
     }
 
-    .gravity-container {
-        border: 1px solid @gray-8;
+    .umb-cropper-gravity .gravity-container {
+        border: 1px solid @inputBorder;
+        box-sizing: border-box;
         line-height: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        .checkeredBackground();
+        contain: content;
+
+        &:focus, &:focus-within {
+            border-color: @inputBorderFocus;
+        }
 
         .viewport {
-            max-width: 600px;
-            .checkeredBackground();
+            position: relative;
+            width: 100%;
+            height: 100%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
 
             img {
                 display: block;
-                margin-left: auto;
-                margin-right: auto;
-            }
-
-            img {
-                display: block;
-                margin-left: auto;
-                margin-right: auto;
+                max-width: 100%;
+                max-height: 100%;
             }
 
             &:hover {
                 cursor: pointer;
             }
         }
+    }
+
+    
+    .umb-cropper-gravity img {
+        position: relative;
+        max-width: 100%;
+        height: auto;
+        top: 0;
+        left: 0;
+    }
+    
+    .umb-cropper-gravity .overlayViewport {
+        position: absolute;
+        top:0;
+        bottom:0;
+        left:0;
+        right:0;
+        contain: strict;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    .umb-cropper-gravity .overlay {
+        position: relative;
+        display: block;
+        max-width: 100%;
+        max-height: 100%;
+        cursor: crosshair;
+    }
+    .umb-cropper-gravity .overlay .focalPoint {
+        position: absolute;
+        top: 0;
+        left: 0;
+        cursor: move;
+        z-index: @zindexCropperOverlay;
+
+        width: 14px;
+        height: 14px;
+        // this element should have no width or height as its preventing the jQuery draggable-plugin to go all the way to the sides:
+        margin-left: -10px;
+        margin-top: -10px;
+        margin-right: -10px;
+        margin-bottom: -10px;
+        
+        text-align: center;
+        border-radius: 20px;
+        background: @pinkLight;
+        border: 3px solid @white;
+        opacity: 0.8;
+    }
+
+    .umb-cropper-gravity .overlay .focalPoint i {
+        font-size: 26px;
+        line-height: 26px;
+        opacity: 0.8 !important;
     }
 
     .imagecropper {
@@ -611,24 +701,13 @@
 
         @media (max-width: 768px) {
             flex-direction: column;
-            float: left;
-            max-width: 100%;
         }
-
-        .viewport img {
-            .checkeredBackground();
-        }
+        
     }
 
     .imagecropper .umb-cropper__container {
         position: relative;
-        margin-bottom: 10px;
-        max-width: 100%;
-        border: 1px solid @gray-10;
-
-        @media (min-width: 769px) {
-            width: 600px;
-        }
+        width: 100%;
     }
 
     .imagecropper .umb-cropper__container .button-drawer {
@@ -838,22 +917,25 @@
 //
 // Date/time picker
 // --------------------------------------------------
-.bootstrap-datetimepicker-widget .btn{padding: 0;}
-.bootstrap-datetimepicker-widget .picker-switch .btn{ background: none; border: none;}
-.umb-datepicker .input-append .add-on{cursor: pointer;}
-.umb-datepicker .input-append .on-top {
-    border: 0 none;
+.bootstrap-datetimepicker-widget .btn {padding: 0;}
+.bootstrap-datetimepicker-widget .picker-switch .btn { background: none; border: none;}
+.umb-datepicker .input-append .btn-clear {
+    border: none;
     position: absolute;
     margin-left: -31px;
     margin-top: 1px;
-    display: inline-block;
-    padding: 5px 6px 3px 6px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    height: 30px;
+    padding: 4px 6px;
     font-size: @baseFontSize;
     font-weight: normal;
     line-height: @baseLineHeight;
     text-align: center;
     background-color: @white;
     color: @ui-option-type;
+
     &:hover {
         color: @ui-option-type-hover;
     }

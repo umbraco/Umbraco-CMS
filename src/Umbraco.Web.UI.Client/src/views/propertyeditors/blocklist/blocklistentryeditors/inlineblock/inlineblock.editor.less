@@ -60,8 +60,14 @@
     ng-form.ng-invalid-val-server-match-content > .umb-block-list__block > .umb-block-list__block--content > div > & {
         > button {
             color: @formErrorText;
+            .show-validation-type-warning & {
+                color: @formWarningText;
+            }
             span.caret {
                 border-top-color: @formErrorText;
+                .show-validation-type-warning & {
+                    border-top-color: @formWarningText;
+                }
             }
         }
     }
@@ -84,6 +90,9 @@
                     padding: 2px;
                     line-height: 10px;
                     background-color: @formErrorText;
+                    .show-validation-type-warning & {
+                        background-color: @formWarningText;
+                    }
                     font-weight: 900;
         
                     animation-duration: 1.4s;

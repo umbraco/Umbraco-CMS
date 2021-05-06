@@ -46,6 +46,7 @@ namespace Umbraco.Web.Cache
         public override void Refresh(JsonPayload[] payloads)
         {
             AppCaches.RuntimeCache.ClearOfType<PublicAccessEntry>();
+            AppCaches.RuntimeCache.ClearByKey(CacheKeys.ContentRecycleBinCacheKey);
 
             var idsRemoved = new HashSet<int>();
             var isolatedCache = AppCaches.IsolatedCaches.GetOrCreate<IContent>();
@@ -53,9 +54,9 @@ namespace Umbraco.Web.Cache
             foreach (var payload in payloads.Where(x => x.Id != default))
             {
                 //By INT Id
-                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent>(payload.Id));
+                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, int>(payload.Id));
                 //By GUID Key
-                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent>(payload.Key));
+                isolatedCache.Clear(RepositoryCacheKeys.GetKey<IContent, Guid?>(payload.Key));
 
                 _idkMap.ClearCache(payload.Id);
 

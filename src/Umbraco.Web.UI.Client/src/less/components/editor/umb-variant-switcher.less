@@ -50,6 +50,10 @@ button.umb-variant-switcher__toggle {
             font-weight: bold;
             background-color: @errorBackground;
             color: @errorText;
+            .show-validation-type-warning & {
+                background-color: @warningBackground;
+                color: @warningText;
+            }
 
             animation-duration: 1.4s;
             animation-iteration-count: infinite;
@@ -233,7 +237,10 @@ button.umb-variant-switcher__toggle {
 
 .umb-variant-switcher__item.--error {
     .umb-variant-switcher__name {
-        color: @red;
+        color: @formErrorText;
+        .show-validation-type-warning & {
+            color: @formWarningText;
+        }
         &::after {
             content: '!';
             position: relative;
@@ -250,6 +257,10 @@ button.umb-variant-switcher__toggle {
             font-weight: bold;
             background-color: @errorBackground;
             color: @errorText;
+            .show-validation-type-warning & {
+                background-color: @warningBackground;
+                color: @warningText;
+            }
             
             animation-duration: 1.4s;
             animation-iteration-count: infinite;
