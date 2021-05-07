@@ -23,10 +23,6 @@
     > .umb-block-list__block--actions {
         opacity: 0;
         transition: opacity 120ms;
-
-        .--error {
-            color: @formErrorBorder !important;
-        }
     }
 
     &:hover,
@@ -100,6 +96,12 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
         &:hover {
             color: @ui-action-discreet-type-hover;
         }
+        &.--error {
+            color: @errorBackground;
+            .show-validation-type-warning & {
+                color: @warningBackground;
+            }
+        }
         > .__error-badge {
             position: absolute;
             top: -2px;
@@ -113,7 +115,10 @@ ng-form.ng-invalid-val-server-match-settings > .umb-block-list__block > .umb-blo
             font-weight: bold;
             padding: 2px;
             line-height: 8px;
-            background-color: @red;
+            background-color: @errorBackground;
+            .show-validation-type-warning & {
+                background-color: @warningBackground;
+            }
             display: none;
             font-weight: 900;
         }

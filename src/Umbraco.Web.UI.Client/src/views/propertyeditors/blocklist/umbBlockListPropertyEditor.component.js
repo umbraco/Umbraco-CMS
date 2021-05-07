@@ -55,6 +55,12 @@
         vm.supportCopy = clipboardService.isSupported();
         vm.clipboardItems = [];
         unsubscribe.push(eventsService.on("clipboardService.storageUpdate", updateClipboard));
+        unsubscribe.push($scope.$on("editors.content.splitViewChanged", (event, eventData) => {
+            var compositeId = vm.umbVariantContent.editor.compositeId;
+            if(eventData.editors.some(x => x.compositeId === compositeId)) {
+                updateAllBlockObjects();
+            }
+        }));
 
         vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
         vm.availableBlockTypes = []; // Available block entries of this property editor.
@@ -66,6 +72,7 @@
         });
 
         vm.$onInit = function() {
+
             if (vm.umbProperty && !vm.umbVariantContent) {// if we dont have vm.umbProperty, it means we are in the DocumentTypeEditor.
                 // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
                 // inheritance is (i.e.infinite editing)
@@ -175,6 +182,8 @@
                         // is invalid for some reason or the data structure has changed.
                         invalidLayoutItems.push(entry);
                     }
+                } else {
+                    updateBlockObject(entry.$block);
                 }
             });
 
@@ -195,6 +204,16 @@
 
             $scope.$evalAsync();
 
+        }
+
+        function updateAllBlockObjects() {
+            // Update the blockObjects in our layout.
+            vm.layout.forEach(entry => {
+                // $block must have the data property to be a valid BlockObject, if not its considered as a destroyed blockObject.
+                if (entry.$block) {
+                    updateBlockObject(entry.$block);
+                }
+            });
         }
 
         function getDefaultViewForBlock(block) {
@@ -237,9 +256,6 @@
 
             if (block === null) return null;
 
-            ensureCultureData(block.content);
-            ensureCultureData(block.settings);
-
             block.view = (block.config.view ? block.config.view : getDefaultViewForBlock(block));
             block.showValidation = block.config.view ? true : false;
 
@@ -254,20 +270,51 @@
             block.setParentForm = function (parentForm) {
                 this._parentForm = parentForm;
             };
-            block.activate = activateBlock.bind(null, block);
-            block.edit = function () {
+
+            /** decorator methods, to enable switching out methods without loosing references that would have been made in Block Views codes */
+            block.activate = function() {
+                this._activate();
+            };
+            block.edit = function() {
+                this._edit();
+            };
+            block.editSettings = function() {
+                this._editSettings();
+            };
+            block.requestDelete = function() {
+                this._requestDelete();
+            };
+            block.delete = function() {
+                this._delete();
+            };
+            block.copy = function() {
+                this._copy();
+            };
+            updateBlockObject(block);
+
+            return block;
+        }
+
+        /** As the block object now contains references to this instance of a property editor, we need to ensure that the Block Object contains latest references.
+         * This is a bit hacky but the only way to maintain this reference currently.
+         * Notice this is most relevant for invariant properties on variant documents, specially for the scenario where the scope of the reference we stored is destroyed, therefor we need to ensure we always have references to a current running property editor*/
+        function updateBlockObject(block) {
+
+            ensureCultureData(block.content);
+            ensureCultureData(block.settings);
+
+            block._activate = activateBlock.bind(null, block);
+            block._edit = function () {
                 var blockIndex = vm.layout.indexOf(this.layout);
                 editBlock(this, false, blockIndex, this._parentForm);
             };
-            block.editSettings = function () {
+            block._editSettings = function () {
                 var blockIndex = vm.layout.indexOf(this.layout);
                 editBlock(this, true, blockIndex, this._parentForm);
             };
-            block.requestDelete = requestDeleteBlock.bind(null, block);
-            block.delete = deleteBlock.bind(null, block);
-            block.copy = copyBlock.bind(null, block);
-
-            return block;
+            block._requestDelete = requestDeleteBlock.bind(null, block);
+            block._delete = deleteBlock.bind(null, block);
+            block._copy = copyBlock.bind(null, block);
         }
 
         function addNewBlock(index, contentElementTypeKey) {
