@@ -22,16 +22,16 @@
                 <td class="col-link">
                     <div ng-show="!link.edit">
                         <i class="icon {{link.internalIcon}}" ng-show="link.internalIcon"></i>
-                        <a href="{{link.link}}" target="_blank" ng-show="!link.isInternal">{{link.link}}</a>
-                        <a href="#/content/content/edit/{{link.internal}}" target="_blank" ng-show="link.isInternal" ng-bind="link.internalName"></a>
+                        <a href="{{link.link}}" target="_blank" rel="noopener" ng-show="!link.isInternal">{{link.link}}</a>
+                        <a href="#/content/content/edit/{{link.internal}}" target="_blank" rel="noopener" ng-show="link.isInternal" ng-bind="link.internalName"></a>
                     </div>
                     <div ng-show="link.edit">
                         <div ng-show="!link.isInternal">
-                                <div class="control-wrapper">
-                                    <input type="text" ng-model="link.link" />
-                                </div>
-                                <localize key="or">or</localize> <a href="#" ng-click="switchLinkType($event,link)"><localize key="relatedlinks_chooseInternal">choose internal page</localize></a>
+                            <div class="control-wrapper">
+                                <input type="text" ng-model="link.link" />
                             </div>
+                            <localize key="or">or</localize> <a href="#" ng-click="switchLinkType($event,link)"><localize key="relatedlinks_chooseInternal">choose internal page</localize></a>
+                        </div>
 
                         <div ng-show="link.isInternal">
                             <i class="icon {{link.internalIcon}}" ng-show="link.internalIcon"></i>

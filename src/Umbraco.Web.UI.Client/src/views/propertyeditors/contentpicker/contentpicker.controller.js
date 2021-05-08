@@ -15,7 +15,7 @@
  * @param {any} editorService
  * @param {any} userService
  */
-function contentPickerController($scope, $q, $routeParams, $location, entityResource, editorState, iconHelper, angularHelper, navigationService, localizationService, editorService, userService) {
+function contentPickerController($scope, $q, $routeParams, $location, entityResource, editorState, iconHelper, angularHelper, navigationService, localizationService, editorService, userService, overlayService) {
 
     var vm = {
         labels: {
@@ -116,6 +116,14 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         }
     };
 
+    var removeAllEntriesAction = {
+        labelKey: 'clipboard_labelForRemoveAllEntries',
+        labelTokens: [],
+        icon: 'trash',
+        method: removeAllEntries,
+        isDisabled: true
+    };
+
     if ($scope.model.config) {
         //special case, if the `startNode` is falsy on the server config delete it entirely so the default value is merged in
         if (!$scope.model.config.startNode) {
@@ -128,6 +136,14 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         // that way the minCount/maxCount validation handles the mandatory as well
         if ($scope.model.validation && $scope.model.validation.mandatory && !$scope.model.config.minNumber) {
             $scope.model.config.minNumber = 1;
+        }
+        
+        if ($scope.model.config.multiPicker === true && $scope.umbProperty) {
+            var propertyActions = [
+                removeAllEntriesAction
+            ];
+
+            $scope.umbProperty.setPropertyActions(propertyActions);
         }
     }
 
@@ -275,6 +291,8 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             angularHelper.getCurrentForm($scope).$setDirty();
             $scope.model.value = currIds.join();
         }
+
+        removeAllEntriesAction.isDisabled = currIds.length === 0;
     };
 
     $scope.showNode = function (index) {
@@ -301,10 +319,13 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             currIds.push(itemId);
             $scope.model.value = currIds.join();
         }
+
+        removeAllEntriesAction.isDisabled = false;
     };
 
     $scope.clear = function () {
         $scope.model.value = null;
+        removeAllEntriesAction.isDisabled = true;
     };
 
     $scope.openEditor = function (item) {
@@ -361,6 +382,8 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
         //sync the sortable model
         $scope.sortableModel = valueIds;
+
+        removeAllEntriesAction.isDisabled = valueIds.length === 0;
 
         //load current data if anything selected
         if (valueIds.length > 0) {
@@ -505,6 +528,22 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
         } else {
             $scope.sortableOptions.disabled = true;
         }
+    }
+
+    function removeAllEntries() {
+        localizationService.localizeMany(["content_nestedContentDeleteAllItems", "general_delete"]).then(function (data) {
+            overlayService.confirmDelete({
+                title: data[1],
+                content: data[0],
+                close: function () {
+                    overlayService.close();
+                },
+                submit: function () {
+                    $scope.clear();
+                    overlayService.close();
+                }
+            });
+        });
     }
 
     function init() {

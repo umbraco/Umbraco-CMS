@@ -5,7 +5,7 @@
 @scope
 
 @description
-<strong>Added in Umbraco v. 8.8:</strong> Use this directive to render a color picker.
+<strong>Added in Umbraco v. 8.10:</strong> Use this directive to render a color picker.
 
 <h3>Markup example</h3>
 <pre>
@@ -81,8 +81,8 @@
         let colorPickerInstance = null;
         let labels = {};
 
-        ctrl.$onInit = function() {
-            
+        ctrl.$onInit = function () {
+
             // load the separate css for the editor to avoid it blocking our js loading
             assetsService.loadCss("lib/spectrum/spectrum.css", $scope);
 
@@ -95,7 +95,12 @@
                 // init color picker
                 grabElementAndRun();
             });
+        }
 
+        ctrl.$onChanges = function (changes) {
+            if (colorPickerInstance && changes.ngModel) {
+                colorPickerInstance.spectrum("set", changes.ngModel.currentValue);
+            }
         }
 
         function grabElementAndRun() {
@@ -167,7 +172,7 @@
         // Spectrum events: https://seballot.github.io/spectrum/#events
 
         function setUpCallbacks() {
-            
+
             if (colorPickerInstance) {
 
                 // bind hook for beforeShow

@@ -9,6 +9,12 @@ using Umbraco.Core.Persistence.Querying;
 
 namespace Umbraco.Core.Persistence.SqlSyntax
 {
+    public interface ISqlSyntaxProvider2 : ISqlSyntaxProvider
+    {
+        void ReadLock(IDatabase db, TimeSpan timeout, int lockId);
+        void WriteLock(IDatabase db, TimeSpan timeout, int lockId);
+    }
+
     /// <summary>
     /// Defines an SqlSyntaxProvider
     /// </summary>
@@ -77,7 +83,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         string ConvertIntegerToOrderableString { get; }
         string ConvertDateToOrderableString { get; }
         string ConvertDecimalToOrderableString { get; }
-        
+
         /// <summary>
         /// Returns the default isolation level for the database
         /// </summary>

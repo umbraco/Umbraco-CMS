@@ -62,7 +62,7 @@ namespace Umbraco.Web.Scheduling
                             return true; // repeat
                         }
 
-                        keepAlivePingUrl = keepAlivePingUrl.Replace("{umbracoApplicationUrl}", umbracoAppUrl.TrimEnd('/'));
+                        keepAlivePingUrl = keepAlivePingUrl.Replace("{umbracoApplicationUrl}", umbracoAppUrl.TrimEnd(Constants.CharArrays.ForwardSlash));
                     }
 
                     var request = new HttpRequestMessage(HttpMethod.Get, keepAlivePingUrl);
@@ -70,7 +70,7 @@ namespace Umbraco.Web.Scheduling
                 }
                 catch (Exception ex)
                 {
-                    _logger.Error<KeepAlive>(ex, "Keep alive failed (at '{keepAlivePingUrl}').", keepAlivePingUrl);
+                    _logger.Error<KeepAlive, string>(ex, "Keep alive failed (at '{keepAlivePingUrl}').", keepAlivePingUrl);
                 }
             }
 

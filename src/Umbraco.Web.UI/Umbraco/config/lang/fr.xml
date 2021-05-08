@@ -263,6 +263,7 @@
     <key alias="statistics">Statistiques</key>
     <key alias="titleOptional">Titre (optionnel)</key>
     <key alias="altTextOptional">Texte alternatif (optionnel)</key>
+    <key alias="captionTextOptional">Légende (optionnel)</key>
     <key alias="type">Type</key>
     <key alias="unpublish">Dépublier</key>
     <key alias="unpublished">Dépublié</key>
@@ -276,7 +277,7 @@
     <key alias="childItems" version="7.0">Eléments enfants</key>
     <key alias="target" version="7.0">Cible</key>
     <key alias="scheduledPublishServerTime">Ceci se traduit par l'heure suivante sur le serveur :</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Qu'est-ce que cela signifie?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Qu'est-ce que cela signifie?</a>]]></key>
     <key alias="nestedContentDeleteItem">Etes-vous certain(e) de vouloir supprimer cet élément?</key>
 	<key alias="nestedContentDeleteAllItems">Etes-vous certain(e) de vouloir supprimer tous les éléments?</key>
     <key alias="nestedContentEditorNotSupported">La propriété %0% utilise l'éditeur %1% qui n'est pas supporté par Nested Content.</key>
@@ -334,6 +335,17 @@
     <key alias="createNewMember">Créer un nouveau membre</key>
     <key alias="allMembers">Tous les membres</key>
     <key alias="memberGroupNoProperties">Les groupes de membres n'ont pas de propriétés supplémentaires modifiables.</key>
+  </area>
+  <area alias="contentType">
+    <key alias="copyFailed">Echec de la copie du type de contenu</key>
+    <key alias="moveFailed">Echec du déplacement du type de contenu</key>
+  </area>
+  <area alias="mediaType">
+    <key alias="copyFailed">Echec de la copie du type de media</key>
+    <key alias="moveFailed">Echec du déplacement du type de media</key>
+  </area>
+  <area alias="memberType">
+    <key alias="copyFailed">Echec de la copie du type de membre</key>
   </area>
   <area alias="create">
     <key alias="chooseNode">Où voulez-vous créer le nouveau %0%</key>
@@ -442,7 +454,7 @@
     <key alias="recycleBinDeleting">Les éléments dans la corbeille sont en cours de suppression. Veuillez ne pas fermer cette fenêtre avant que cette opération ne soit terminée.</key>
     <key alias="recycleBinIsEmpty">La corbeille est maintenant vide</key>
     <key alias="recycleBinWarning">Les éléments supprimés de la corbeille seront supprimés définitivement</key>
-    <key alias="regexSearchError"><![CDATA[Le webservice <a target='_blank' href='http://regexlib.com'>regexlib.com</a> rencontre actuellement des problèmes sur lesquels nous n'avons aucun contrôle. Nous sommes sincèrement désolés pour le désagrément.]]></key>
+    <key alias="regexSearchError"><![CDATA[Le webservice <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> rencontre actuellement des problèmes sur lesquels nous n'avons aucun contrôle. Nous sommes sincèrement désolés pour le désagrément.]]></key>
     <key alias="regexSearchHelp">Rechercher une expression régulière à ajouter pour la validation d'un champ de formulaire. Exemple: 'email, 'zip-code', 'URL'.</key>
     <key alias="removeMacro">Supprimer la macro</key>
     <key alias="requiredField">Champ obligatoire</key>
@@ -635,6 +647,7 @@
     <key alias="choose">Choisir</key>
     <key alias="close">Fermer</key>
     <key alias="closewindow">Fermer la fenêtre</key>
+    <key alias="closepane">Fermer le panel</key>
     <key alias="comment">Commenter</key>
     <key alias="confirm">Confirmer</key>
     <key alias="constrain">Conserver</key>
@@ -762,6 +775,7 @@
     <key alias="current">actuel</key>
     <key alias="embed">Intégrer</key>
     <key alias="selected">sélectionné</key>
+    <key alias="avatar">Avatar de</key>
   </area>
   <area alias="colors">
     <key alias="blue">Bleu</key>
@@ -812,7 +826,7 @@
               <p>Pour poursuivre, veuillez éditer le fichier "web.config" (avec Visual Studio ou votre éditeur de texte favori), scroller jusqu'en bas, ajouter le "connection string" pour votre base de données dans la ligne avec la clé "umbracoDbDSN" et sauvegarder le fichier.</p>
               <p>
               Cliquez sur le bouton <strong>Réessayer</strong> lorsque cela est fait.
-              <br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">
+              <br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">
 			              Plus d'informations sur l'édition du fichier web.config ici.</a></p>]]></key>
     <key alias="databaseText"><![CDATA[Pour réaliser cette étape, vous devez d'abord connaître des informations concernant votre serveur de base de données ("connection string").<br />
         Veuillez contacter votre fournisseur de services internet si nécessaire.
@@ -860,7 +874,7 @@
     <key alias="runwayFromScratch">Je veux démarrer "from scratch"</key>
     <key alias="runwayFromScratchText"><![CDATA[
         Votre site est vide pour le moment, ce qui est parfait si vous voulez commencer "from scratch" et créer vos propres types de documents et modèles d'affichage.
-        (<a href="http://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Apprenez comment</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">Apprenez comment</a>)
         Vous pouvez toujours choisir d'installer Runway plus tard. Pour cela, allez dans la section "Développeur" et sélectionnez "Packages".
       ]]></key>
     <key alias="runwayHeader">Vous venez de mettre en place une plateforme Umbraco toute nette. Que voulez-vous faire ensuite ?</key>
@@ -928,7 +942,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="instruction">Connectez-vous ci-dessous</key>
     <key alias="signInWith">Identifiez-vous avec</key>
     <key alias="timeout">La session a expiré</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Mot de passe oublié?</key>
     <key alias="forgottenPasswordInstruction">Un email contenant un lien pour ré-initialiser votre mot de passe sera envoyé à l'adresse spécifiée</key>
     <key alias="requestPasswordResetConfirmation">Un email contenant les instructions de ré-initialisation de votre mot de passe sera envoyée à l'adresse spécifiée si elle correspond à nos informations.</key>
@@ -979,14 +993,14 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 															Une réinitialisation de votre mot de passe a été demandée
 														</h1>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
-															Votre nom d'utilisateur pour vous connecter au back-office Umbraco est : <strong>%0%</strong>
+															Votre nom d'utilisateur pour vous connecter au backoffice Umbraco est : <strong>%0%</strong>
 														</p>
 														<p style='color: #392F54; font-family: sans-serif; font-size: 14px; font-weight: normal; margin: 0 0 15px;'>
 															<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'>
 																<tbody>
 																	<tr>
 																		<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																			<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																			<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																				Cliquez sur ce lien pour réinitialiser votre mot de passe
 																			</a>
 																		</td>
@@ -1105,7 +1119,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 																	<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
 																		<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
 																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>MODIFIER</a> </td> </tr></tbody></table>
+																				<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>MODIFIER</a> </td> </tr></tbody></table>
 																	</td>
 																</tr>
 															</tbody>
@@ -1352,7 +1366,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="tabs">Onglets</key>
     <key alias="contentTypeEnabled">Type de contenu de base activé</key>
     <key alias="contentTypeUses">Ce type de contenu utilise</key>
-    <key alias="asAContentMasterType">en tant que type de contenu de base. Les onglets du type de contenu de base ne sont pas affichés et peuvent seulement être modifiés à partir du type de contenu de base lui-même.</key>
     <key alias="noPropertiesDefinedOnTab">Aucune propriété définie dans cet onglet. Cliquez sur le lien "Ajouter une nouvelle propriété" en-haut pour créer une nouvelle propriété.</key>
     <key alias="createMatchingTemplate">Créer le template correspondant</key>
     <key alias="addIcon">Ajouter une icône</key>
@@ -1370,6 +1383,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="validationFailedMessage">Les erreurs de validation doivent être corrigées avant de pouvoir sauvegarder l'élément</key>
     <key alias="operationFailedHeader">Echec</key>
     <key alias="operationSavedHeader">Sauvegardé</key>
+    <key alias="operationSavedHeaderReloadUser">Sauvegardé. Veuillez rafraîchir votre navigateur pour voir les changements</key>
     <key alias="invalidUserPermissionsText">Permissions utilisateur insuffisantes, l'opération n'a pas pu être complétée</key>
     <key alias="operationCancelledHeader">Annulation</key>
     <key alias="operationCancelledText">L'opération a été annulée par une extension tierce</key>
@@ -1799,10 +1813,12 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="changePassword">Changer le mot de passe</key>
     <key alias="changePhoto">Changer la photo</key>
     <key alias="newPassword">Nouveau mot de passe</key>
+    <key alias="newPasswordFormatLengthTip">Plus que %0% caractère(s) minimum!</key>
+    <key alias="newPasswordFormatNonAlphaTip">Il devrait y avoir au moins %0% caractère(s) spéciaux.</key>
     <key alias="noLockouts">n'a pas été bloqué</key>
     <key alias="noPasswordChange">Le mot de passe n'a pas été modifié</key>
     <key alias="confirmNewPassword">Confirmez votre nouveau mot de passe</key>
-    <key alias="changePasswordDescription">Vous pouvez changer votre mot de passe d'accès au Back Office Umbraco en remplissant le formulaire ci-dessous puis en cliquant sur le bouton "Changer le mot de passe"</key>
+    <key alias="changePasswordDescription">Vous pouvez changer votre mot de passe d'accès au backoffice Umbraco en remplissant le formulaire ci-dessous puis en cliquant sur le bouton "Changer le mot de passe"</key>
     <key alias="contentChannel">Canal de contenu</key>
     <key alias="createAnotherUser">Créer un autre utilisateur</key>
     <key alias="createUserHelp">Créer de nouveaux utilisateurs pour leur donner accès à Umbraco. Lors de la création d'un nouvel utilisateur, un mot de passe est généré que vous pouvez partager avec ce dernier.</key>
@@ -1934,7 +1950,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
 																			<tbody>
 																				<tr>
 																					<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																						<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																						<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																							Cliquez sur ce lien pour accepter l'invitation
 																						</a>
 																					</td>
@@ -2196,6 +2212,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="newPartialView">Partial View</key>
     <key alias="newPartialViewMacro">Macro de Partial View</key>
     <key alias="newMember">Membre</key>
+    <key alias="searchContentTree">Chercher dans l'arborescence de contenu</key>
   </area>
   <area alias="references">
     <key alias="tabName">Références</key>
@@ -2320,7 +2337,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="trainingHeadline">Des heures de vidéos de formation Umbraco ne sont qu'à un clic d'ici</key>
     <key alias="trainingDescription">
         <![CDATA[
-        <p>Vous voulez maîtriser Umbraco? Passez quelques minutes à apprendre certaines des meilleures pratiques en regardant une de ces vidéos à propos de l'utilisation d'Umbraco. Et visitez <a href="http://umbraco.tv" target="_blank">umbraco.tv</a> pour encore plus de vidéos Umbraco</p>
+        <p>Vous voulez maîtriser Umbraco? Passez quelques minutes à apprendre certaines des meilleures pratiques en regardant une de ces vidéos à propos de l'utilisation d'Umbraco. Et visitez <a href="http://umbraco.tv" target="_blank" rel="noopener">umbraco.tv</a> pour encore plus de vidéos Umbraco</p>
     ]]>
     </key>
     <key alias="getStarted">Pour démarrer</key>
@@ -2331,28 +2348,32 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="more">En savoir plus</key>
     <key alias="bulletPointOne">
         <![CDATA[
-            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank">dans la section Documentation</a> de Our Umbraco
+            Lisez-en plus sur la façon de travailler avec les éléments dans la section Settings <a class="btn-link -underline" href="https://our.umbraco.com/documentation/Getting-Started/Backoffice/Sections/" target="_blank" rel="noopener">dans la section Documentation</a> de Our Umbraco
         ]]>
     </key>
     <key alias="bulletPointTwo">
         <![CDATA[
-            Posez une question dans le <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank">Community Forum</a>
+            Posez une question dans le <a class="btn-link -underline" href="https://our.umbraco.com/forum" target="_blank" rel="noopener">Community Forum</a>
         ]]>
     </key>
     <key alias="bulletPointThree">
         <![CDATA[
-            Regardez nos <a class="btn-link -underline" href="https://umbraco.tv" target="_blank">tutoriels vidéos</a> (certains sont gratuits, certains nécessitent un abonnement)
+            Regardez nos <a class="btn-link -underline" href="https://umbraco.tv" target="_blank" rel="noopener">tutoriels vidéos</a> (certains sont gratuits, certains nécessitent un abonnement)
         ]]>
     </key>
     <key alias="bulletPointFour">
         <![CDATA[
-            Découvrez nos <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank">outils d'amélioration de productivité et notre support commercial</a>
+            Découvrez nos <a class="btn-link -underline" href="https://umbraco.com/products/" target="_blank" rel="noopener">outils d'amélioration de productivité et notre support commercial</a>
         ]]>
     </key>
     <key alias="bulletPointFive">
         <![CDATA[
-            Découvrez nos possibilités de <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank">formations et certifications</a>
+            Découvrez nos possibilités de <a class="btn-link -underline" href="https://umbraco.com/training/" target="_blank" rel="noopener">formations et certifications</a>
         ]]>
     </key>
+  </area>
+  <area alias="treeSearch">
+    <key alias="searchResult">élément retrouvé</key>
+    <key alias="searchResults">éléments retrouvés</key>
   </area>
 </language>

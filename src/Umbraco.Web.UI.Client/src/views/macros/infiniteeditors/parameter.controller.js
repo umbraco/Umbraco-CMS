@@ -36,8 +36,7 @@
         }
 
         function submit() {
-            console.log("model", $scope.model);
-
+            
             if ($scope.model && $scope.model.submit && formHelper.submitForm({scope: $scope})) {
                 $scope.model.submit($scope.model);
             }

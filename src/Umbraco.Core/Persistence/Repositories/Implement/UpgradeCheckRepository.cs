@@ -24,6 +24,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
                 return result ?? new UpgradeResult("None", "", "");
             }
+            catch (UnsupportedMediaTypeException)
+            {
+                // this occurs if the server for Our is up but doesn't return a valid result (ex. content type)
+                return new UpgradeResult("None", "", "");
+            }
             catch (HttpRequestException)
             {
                 // this occurs if the server for Our is down or cannot be reached

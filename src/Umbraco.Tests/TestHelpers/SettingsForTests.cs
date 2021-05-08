@@ -23,7 +23,8 @@ namespace Umbraco.Tests.TestHelpers
                     settings.LocalTempStorageLocation == LocalTempStorage.Default &&
                     settings.LocalTempPath == IOHelper.MapPath("~/App_Data/TEMP") &&
                     settings.ReservedPaths == (GlobalSettings.StaticReservedPaths + "~/umbraco") &&
-                    settings.ReservedUrls == GlobalSettings.StaticReservedUrls);
+                    settings.ReservedUrls == GlobalSettings.StaticReservedUrls &&
+                    settings.SqlWriteLockTimeOut == 5000);
             return config;
         }
 
