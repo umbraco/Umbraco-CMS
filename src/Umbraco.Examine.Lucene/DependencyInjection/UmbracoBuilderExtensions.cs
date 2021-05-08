@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Text;
 using Examine;
 using Examine.Lucene.Directories;
 using Microsoft.Extensions.DependencyInjection;
@@ -12,19 +9,30 @@ namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection
 {
     public static class UmbracoBuilderExtensions
     {
-        public static IUmbracoBuilder AddUmbracoIndexes(this IUmbracoBuilder umbracoBuilder)
+        /// <summary>
+        /// Adds the Examine indexes for Umbraco
+        /// </summary>
+        /// <param name="umbracoBuilder"></param>
+        /// <returns></returns>
+        public static IUmbracoBuilder AddExamineIndexes(this IUmbracoBuilder umbracoBuilder)
         {
             IServiceCollection services = umbracoBuilder.Services;
 
+            services.AddSingleton<IBackOfficeExamineSearcher, BackOfficeExamineSearcher>();
+            services.AddSingleton<IIndexDiagnosticsFactory, LuceneIndexDiagnosticsFactory>();
+
+            services.AddExamine();
+
+            // Create the indexes
+            services
+                .AddExamineLuceneIndex<UmbracoContentIndex, ConfigurationEnabledDirectoryFactory>(Constants.UmbracoIndexes.InternalIndexName)
+                .AddExamineLuceneIndex<UmbracoContentIndex, ConfigurationEnabledDirectoryFactory>(Constants.UmbracoIndexes.ExternalIndexName)
+                .AddExamineLuceneIndex<UmbracoMemberIndex, ConfigurationEnabledDirectoryFactory>(Constants.UmbracoIndexes.MembersIndexName)
+                .ConfigureOptions<ConfigureIndexOptions>();
+
             services.AddSingleton<IApplicationRoot, UmbracoApplicationRoot>();
             services.AddSingleton<ILockFactory, UmbracoLockFactory>();
-
-            services
-                .AddExamine()
-                .AddExamineLuceneIndex<UmbracoContentIndex>(Constants.UmbracoIndexes.InternalIndexName)
-                .AddExamineLuceneIndex<UmbracoContentIndex>(Constants.UmbracoIndexes.ExternalIndexName)
-                .AddExamineLuceneIndex<UmbracoMemberIndex>(Constants.UmbracoIndexes.MembersIndexName)
-                .ConfigureOptions<ConfigureIndexOptions>();
+            services.AddSingleton<ConfigurationEnabledDirectoryFactory>();
 
             return umbracoBuilder;
         }

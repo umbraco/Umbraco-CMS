@@ -7,7 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Tests.Common
 {
     /// <summary>
     /// Helper class to not repeat common patterns with Task.
@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core
         public void RunBackgroundTask(Func<Task> fn) => ExecuteBackgroundTask(fn);
 
         // for tests, returning the Task as a public API indicates it can be awaited that is not what we want to do
-        internal Task ExecuteBackgroundTask(Func<Task> fn)
+        public Task ExecuteBackgroundTask(Func<Task> fn)
         {
             // it is also possible to use UnsafeQueueUserWorkItem which does not flow the execution context,
             // however that seems more difficult to use for async operations.
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Core
         public void RunLongRunningBackgroundTask(Func<Task> fn) => ExecuteLongRunningBackgroundTask(fn);
 
         // for tests, returning the Task as a public API indicates it can be awaited that is not what we want to do
-        internal Task ExecuteLongRunningBackgroundTask(Func<Task> fn)
+        public Task ExecuteLongRunningBackgroundTask(Func<Task> fn)
         {
             // it is also possible to use UnsafeQueueUserWorkItem which does not flow the execution context,
             // however that seems more difficult to use for async operations.

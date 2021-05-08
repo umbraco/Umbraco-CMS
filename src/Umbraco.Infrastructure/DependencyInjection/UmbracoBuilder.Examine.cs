@@ -27,7 +27,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddSingleton<IIndexPopulator, PublishedContentIndexPopulator>();
             builder.Services.AddSingleton<IIndexPopulator, MediaIndexPopulator>();
 
-            builder.Services.AddSingleton<IndexRebuilder>();
+            builder.Services.AddSingleton<IIndexRebuilder, ExamineIndexRebuilder>();
+            builder.Services.AddSingleton<IUmbracoIndexingHandler, ExamineUmbracoIndexingHandler>();
             builder.Services.AddUnique<IUmbracoIndexConfig, UmbracoIndexConfig>();
             builder.Services.AddUnique<IIndexDiagnosticsFactory, IndexDiagnosticsFactory>();
             builder.Services.AddUnique<IPublishedContentValueSetBuilder>(factory =>
@@ -48,14 +49,15 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                     false));
             builder.Services.AddUnique<IValueSetBuilder<IMedia>, MediaValueSetBuilder>();
             builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
-            builder.Services.AddUnique<BackgroundIndexRebuilder>();
+            builder.Services.AddUnique<ExamineIndexRebuilder>();
 
-            builder.AddNotificationHandler<UmbracoApplicationStarting, ExamineNotificationHandler>();
-            builder.AddNotificationHandler<ContentCacheRefresherNotification, ExamineNotificationHandler>();
-            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ExamineNotificationHandler>();
-            builder.AddNotificationHandler<MediaCacheRefresherNotification, ExamineNotificationHandler>();
-            builder.AddNotificationHandler<MemberCacheRefresherNotification, ExamineNotificationHandler>();
-            builder.AddNotificationHandler<LanguageCacheRefresherNotification, ExamineNotificationHandler>();
+            builder.AddNotificationHandler<ContentCacheRefresherNotification, UmbracoIndexingNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, UmbracoIndexingNotificationHandler>();
+            builder.AddNotificationHandler<MediaCacheRefresherNotification, UmbracoIndexingNotificationHandler>();
+            builder.AddNotificationHandler<MemberCacheRefresherNotification, UmbracoIndexingNotificationHandler>();
+            builder.AddNotificationHandler<LanguageCacheRefresherNotification, UmbracoIndexingNotificationHandler>();
+
+            builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>();
 
             return builder;
         }

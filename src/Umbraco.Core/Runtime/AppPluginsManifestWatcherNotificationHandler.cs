@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Runtime
     /// <summary>
     /// Starts monitoring AppPlugins directory during debug runs, to restart site when a plugin manifest changes.
     /// </summary>
-    public sealed class AppPluginsManifestWatcherNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStarting>
+    public sealed class AppPluginsManifestWatcherNotificationHandler : INotificationAsyncHandler<UmbracoApplicationStartingNotification>
     {
         private readonly ManifestWatcher _manifestWatcher;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -22,7 +22,7 @@ namespace Umbraco.Cms.Core.Runtime
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
         }
 
-        public Task HandleAsync(UmbracoApplicationStarting notification, CancellationToken cancellationToken)
+        public Task HandleAsync(UmbracoApplicationStartingNotification notification, CancellationToken cancellationToken)
         {
             if (!_hostingEnvironment.IsDebugMode)
             {

@@ -12,8 +12,10 @@ using System.Reflection;
 using System.Threading;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Hosting.Internal;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -140,10 +142,20 @@ namespace Umbraco.Cms.Tests.Integration.Implementations
         }
 
         public override IHostingEnvironment GetHostingEnvironment()
-            => _hostingEnvironment ??= new TestHostingEnvironment(
+        {
+            // This is needed in order to create a unique Application Id
+            var serviceCollection = new ServiceCollection();
+            var builder = Host
+                .CreateDefaultBuilder()
+                .ConfigureServices(services => services.AddDataProtection());
+            var host = builder.Build();
+            
+            return _hostingEnvironment ??= new TestHostingEnvironment(
+                host.Services,
                 GetIOptionsMonitorOfHostingSettings(),
                 GetIOptionsMonitorOfWebRoutingSettings(),
                 _hostEnvironment);
+        }
 
         private IOptionsMonitor<HostingSettings> GetIOptionsMonitorOfHostingSettings()
         {

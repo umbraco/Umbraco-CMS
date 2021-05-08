@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
-namespace Umbraco.Cms.Infrastructure.Search
+namespace Umbraco.Cms.Infrastructure.Examine
 {
     [DataContract(Name = "indexer", Namespace = "")]
     public class ExamineIndexModel

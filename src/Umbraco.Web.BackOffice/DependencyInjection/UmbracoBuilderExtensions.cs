@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Filters;
@@ -48,7 +49,8 @@ namespace Umbraco.Extensions
                 .AddDistributedCache()
                 .AddModelsBuilderDashboard()
                 .AddUnattedInstallCreateUser()
-                .AddExamine();
+                .AddExamine()
+                .AddExamineIndexes();
 
         /// <summary>
         /// Adds Umbraco preview support

@@ -118,10 +118,10 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             }
 
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStarting(State.Level), cancellationToken);
-
             // create & initialize the components
             _components.Initialize();
+
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level), cancellationToken);
         }
 
         private void DoUnattendedUpgrade()
@@ -144,7 +144,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             _components.Terminate();
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStopping(), cancellationToken);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(), cancellationToken);
             StaticApplicationLogging.Initialize(null);
         }
 

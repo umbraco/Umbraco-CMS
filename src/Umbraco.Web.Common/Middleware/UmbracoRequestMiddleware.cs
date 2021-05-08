@@ -121,7 +121,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 try
                 {
                     LazyInitializeBackOfficeServices(context.Request.Path);
-                    await _eventAggregator.PublishAsync(new UmbracoRequestBegin(umbracoContextReference.UmbracoContext));
+                    await _eventAggregator.PublishAsync(new UmbracoRequestBeginNotification(umbracoContextReference.UmbracoContext));
                 }
                 catch (Exception ex)
                 {
@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
                     }
                     finally
                     {
-                        await _eventAggregator.PublishAsync(new UmbracoRequestEnd(umbracoContextReference.UmbracoContext));
+                        await _eventAggregator.PublishAsync(new UmbracoRequestEndNotification(umbracoContextReference.UmbracoContext));
                     }
                 }
             }

@@ -141,11 +141,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
 
             this.AddAllCoreCollectionBuilders();
-            this.AddNotificationHandler<UmbracoApplicationStarting, EssentialDirectoryCreator>();
+            this.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
 
             Services.AddSingleton<ManifestWatcher>();
             Services.AddSingleton<UmbracoRequestPaths>();
-            this.AddNotificationAsyncHandler<UmbracoApplicationStarting, AppPluginsManifestWatcherNotificationHandler>();
+            this.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, AppPluginsManifestWatcherNotificationHandler>();
 
             Services.AddUnique<InstallStatusTracker>();
 
@@ -225,6 +225,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services
                 .AddNotificationHandler<MemberGroupSavedNotification, PublicAccessHandler>()
                 .AddNotificationHandler<MemberGroupDeletedNotification, PublicAccessHandler>();
+
+            Services.AddSingleton<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>();
         }
     }
 }

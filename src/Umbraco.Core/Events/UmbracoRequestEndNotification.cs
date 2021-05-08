@@ -6,14 +6,14 @@ using Umbraco.Cms.Core.Web;
 namespace Umbraco.Cms.Core.Events
 {
     /// <summary>
-    /// Notification raised on each request begin.
+    /// Notification raised on each request end.
     /// </summary>
-    public class UmbracoRequestBegin : INotification
+    public class UmbracoRequestEndNotification : INotification
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoRequestBegin"/> class.
+        /// Initializes a new instance of the <see cref="UmbracoRequestEndNotification"/> class.
         /// </summary>
-        public UmbracoRequestBegin(IUmbracoContext umbracoContext) => UmbracoContext = umbracoContext;
+        public UmbracoRequestEndNotification(IUmbracoContext umbracoContext) => UmbracoContext = umbracoContext;
 
         /// <summary>
         /// Gets the <see cref="IUmbracoContext"/>

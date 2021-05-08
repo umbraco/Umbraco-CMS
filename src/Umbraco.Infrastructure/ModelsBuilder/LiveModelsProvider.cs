@@ -12,8 +12,8 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 {
     // supports LiveAppData - but not PureLive
-    public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStarting>,
-        INotificationHandler<UmbracoRequestEnd>,
+    public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStartingNotification>,
+        INotificationHandler<UmbracoRequestEndNotification>,
         INotificationHandler<ContentTypeCacheRefresherNotification>,
         INotificationHandler<DataTypeCacheRefresherNotification>
     {
@@ -45,9 +45,9 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
         internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
 
         /// <summary>
-        /// Handles the <see cref="UmbracoApplicationStarting"/> notification
+        /// Handles the <see cref="UmbracoApplicationStartingNotification"/> notification
         /// </summary>
-        public void Handle(UmbracoApplicationStarting notification) => Install();
+        public void Handle(UmbracoApplicationStartingNotification notification) => Install();
 
         private void Install()
         {
@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             }
         }
 
-        public void Handle(UmbracoRequestEnd notification)
+        public void Handle(UmbracoRequestEndNotification notification)
         {
             if (IsEnabled && _mainDom.IsMainDom)
             {

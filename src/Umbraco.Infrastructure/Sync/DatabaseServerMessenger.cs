@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
@@ -15,7 +13,6 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Sync
 {
@@ -31,15 +28,17 @@ namespace Umbraco.Cms.Infrastructure.Sync
          */
 
         private readonly IMainDom _mainDom;
+        private readonly CacheRefresherCollection _cacheRefreshers;
+        private readonly IServerRoleAccessor _serverRoleAccessor;
+        private readonly ISyncBootStateAccessor _syncBootStateAccessor;
         private readonly ManualResetEvent _syncIdle;
         private readonly object _locko = new object();
         private readonly IHostingEnvironment _hostingEnvironment;
-
-        private readonly Lazy<string> _distCacheFilePath;
-        private int _lastId = -1;
+        private readonly LastSyncedFileManager _lastSyncedFileManager;
         private DateTime _lastSync;
         private DateTime _lastPruned;
-        private readonly Lazy<bool> _initialized;
+        private int _lastId;
+        private readonly Lazy<SyncBootState?> _initialized;
         private bool _syncing;
         private bool _released;
 
@@ -48,25 +47,30 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// </summary>
         protected DatabaseServerMessenger(
             IMainDom mainDom,
+            CacheRefresherCollection cacheRefreshers,
+            IServerRoleAccessor serverRoleAccessor,
             ILogger<DatabaseServerMessenger> logger,
             bool distributedEnabled,
-            DatabaseServerMessengerCallbacks callbacks,
+            ISyncBootStateAccessor syncBootStateAccessor,
             IHostingEnvironment hostingEnvironment,
             ICacheInstructionService cacheInstructionService,
             IJsonSerializer jsonSerializer,
+            LastSyncedFileManager lastSyncedFileManager,
             IOptions<GlobalSettings> globalSettings)
             : base(distributedEnabled)
         {
             _mainDom = mainDom;
+            _cacheRefreshers = cacheRefreshers;
+            _serverRoleAccessor = serverRoleAccessor;
             _hostingEnvironment = hostingEnvironment;
             Logger = logger;
-            Callbacks = callbacks ?? throw new ArgumentNullException(nameof(callbacks));
+            _syncBootStateAccessor = syncBootStateAccessor;
             CacheInstructionService = cacheInstructionService;
             JsonSerializer = jsonSerializer;
+            _lastSyncedFileManager = lastSyncedFileManager;
             GlobalSettings = globalSettings.Value;
             _lastPruned = _lastSync = DateTime.UtcNow;
             _syncIdle = new ManualResetEvent(true);
-            _distCacheFilePath = new Lazy<string>(() => GetDistCacheFilePath(hostingEnvironment));
 
             // See notes on _localIdentity
             LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
@@ -75,12 +79,8 @@ namespace Umbraco.Cms.Infrastructure.Sync
                 + "/D" + AppDomain.CurrentDomain.Id // eg 22
                 + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
 
-            _initialized = new Lazy<bool>(EnsureInitialized);
+            _initialized = new Lazy<SyncBootState?>(InitializeWithMainDom);
         }
-
-        private string DistCacheFilePath => _distCacheFilePath.Value;
-
-        public DatabaseServerMessengerCallbacks Callbacks { get; }
 
         public GlobalSettings GlobalSettings { get; }
 
@@ -102,12 +102,17 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// </remarks>
         protected string LocalIdentity { get; }
 
+        /// <summary>
+        /// Returns true if initialization was successfull (i.e. Is MainDom)
+        /// </summary>
+        protected bool EnsureInitialized() => _initialized.Value.HasValue;
+
         #region Messenger
 
         // we don't care if there are servers listed or not,
         // if distributed call is enabled we will make the call
         protected override bool RequiresDistributed(ICacheRefresher refresher, MessageType dispatchType)
-            => _initialized.Value && DistributedEnabled;
+            => EnsureInitialized() && DistributedEnabled;
 
         protected override void DeliverRemote(
             ICacheRefresher refresher,
@@ -134,7 +139,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// <summary>
         /// Boots the messenger.
         /// </summary>
-        private bool EnsureInitialized()
+        private SyncBootState? InitializeWithMainDom()
         {
             // weight:10, must release *before* the published snapshot service, because once released
             // the service will *not* be able to properly handle our notifications anymore.
@@ -148,12 +153,12 @@ namespace Umbraco.Cms.Infrastructure.Sync
                         _released = true; // no more syncs
                     }
 
-                    // Wait a max of 5 seconds and then return, so that we don't block
+                    // Wait a max of 3 seconds and then return, so that we don't block
                     // the entire MainDom callbacks chain and prevent the AppDomain from
                     // properly releasing MainDom - a timeout here means that one refresher
                     // is taking too much time processing, however when it's done we will
                     // not update lastId and stop everything.
-                    var idle = _syncIdle.WaitOne(5000);
+                    var idle = _syncIdle.WaitOne(3000);
                     if (idle == false)
                     {
                         Logger.LogWarning("The wait lock timed out, application is shutting down. The current instruction batch will be re-processed.");
@@ -163,17 +168,14 @@ namespace Umbraco.Cms.Infrastructure.Sync
 
             if (registered == false)
             {
-                return false;
+                // return null if we cannot initialize
+                return null;
             }
 
-            ReadLastSynced(); // get _lastId
+            // store the last id on disk
+            _lastId = _lastSyncedFileManager.LastSyncedId;
 
-            if (CacheInstructionService.IsColdBootRequired(_lastId))
-            {
-                _lastId = -1;   // reset _lastId if instructions are missing
-            }
-
-            return Initialize(); // boot
+            return InitializeColdBootState(_lastId);
         }
 
         // <summary>
@@ -183,70 +185,32 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// Callers MUST ensure thread-safety.
         /// </remarks>
-        private bool Initialize()
+        private SyncBootState InitializeColdBootState(int lastId)
         {
             lock (_locko)
             {
                 if (_released)
                 {
-                    return false;
+                    return SyncBootState.Unknown;
                 }
 
-                var coldboot = false;
+                SyncBootState syncState = _syncBootStateAccessor.GetSyncBootState();
 
-                // Never synced before.
-                if (_lastId < 0)
-                {
-                    // We haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
-                    // server and it will need to rebuild it's own caches, e.g. Lucene or the XML cache file.
-                    Logger.LogWarning("No last synced Id found, this generally means this is a new server/install."
-                        + " The server will build its caches and indexes, and then adjust its last synced Id to the latest found in"
-                        + " the database and maintain cache updates based on that Id.");
-
-                    coldboot = true;
-                }
-                else
-                {
-                    // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
-                    // row so we will sum these numbers to get the actual count.
-                    var limit = GlobalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount;
-                    if (CacheInstructionService.IsInstructionCountOverLimit(_lastId, limit, out int count))
-                    {
-                        // Too many instructions, proceed to cold boot.
-                        Logger.LogWarning(
-                            "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
-                            + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
-                            + " to the latest found in the database and maintain cache updates based on that Id.",
-                            count, limit);
-
-                        coldboot = true;
-                    }
-                }
-
-                if (coldboot)
+                if (syncState == SyncBootState.ColdBoot)
                 {
                     // Get the last id in the db and store it.
                     // Note: Do it BEFORE initializing otherwise some instructions might get lost
                     // when doing it before. Some instructions might run twice but this is not an issue.
                     var maxId = CacheInstructionService.GetMaxInstructionId();
 
-                    // If there is a max currently, or if we've never synced.
+                    //if there is a max currently, or if we've never synced
                     if (maxId > 0 || _lastId < 0)
                     {
-                        SaveLastSynced(maxId);
-                    }
-
-                    // Execute initializing callbacks.
-                    if (Callbacks.InitializingCallbacks != null)
-                    {
-                        foreach (Action callback in Callbacks.InitializingCallbacks)
-                        {
-                            callback();
-                        }
+                        _lastSyncedFileManager.SaveLastSyncedId(maxId);
                     }
                 }
 
-                return true;
+                return syncState;
             }
         }
 
@@ -255,7 +219,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// </summary>
         public override void Sync()
         {
-            if (!_initialized.Value)
+            if (!EnsureInitialized())
             {
                 return;
             }
@@ -286,7 +250,14 @@ namespace Umbraco.Cms.Infrastructure.Sync
 
             try
             {
-                CacheInstructionServiceProcessInstructionsResult result = CacheInstructionService.ProcessInstructions(_released, LocalIdentity, _lastPruned, _lastId);
+                ProcessInstructionsResult result = CacheInstructionService.ProcessInstructions(
+                    _cacheRefreshers,
+                    _serverRoleAccessor.CurrentServerRole,
+                    _released,
+                    LocalIdentity,
+                    _lastPruned,
+                    _lastId);
+
                 if (result.InstructionsWerePruned)
                 {
                     _lastPruned = _lastSync;
@@ -294,7 +265,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
 
                 if (result.LastId > 0)
                 {
-                    SaveLastSynced(result.LastId);
+                    _lastSyncedFileManager.SaveLastSyncedId(result.LastId);
                 }
             }
             finally
@@ -307,60 +278,6 @@ namespace Umbraco.Cms.Infrastructure.Sync
 
                 _syncIdle.Set();
             }
-        }
-
-        /// <summary>
-        /// Reads the last-synced id from file into memory.
-        /// </summary>
-        /// <remarks>
-        /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
-        /// </remarks>
-        private void ReadLastSynced()
-        {
-            if (File.Exists(DistCacheFilePath) == false)
-            {
-                return;
-            }
-
-            var content = File.ReadAllText(DistCacheFilePath);
-            if (int.TryParse(content, out var last))
-            {
-                _lastId = last;
-            }
-        }
-
-        /// <summary>
-        /// Updates the in-memory last-synced id and persists it to file.
-        /// </summary>
-        /// <param name="id">The id.</param>
-        /// <remarks>
-        /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
-        /// </remarks>
-        private void SaveLastSynced(int id)
-        {
-            File.WriteAllText(DistCacheFilePath, id.ToString(CultureInfo.InvariantCulture));
-            _lastId = id;
-        }
-
-        private string GetDistCacheFilePath(IHostingEnvironment hostingEnvironment)
-        {
-            var fileName = _hostingEnvironment.ApplicationId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
-
-            var distCacheFilePath = Path.Combine(hostingEnvironment.LocalTempPath, "DistCache", fileName);
-
-            //ensure the folder exists
-            var folder = Path.GetDirectoryName(distCacheFilePath);
-            if (folder == null)
-            {
-                throw new InvalidOperationException("The folder could not be determined for the file " + distCacheFilePath);
-            }
-
-            if (Directory.Exists(folder) == false)
-            {
-                Directory.CreateDirectory(folder);
-            }
-
-            return distCacheFilePath;
         }
 
         #endregion

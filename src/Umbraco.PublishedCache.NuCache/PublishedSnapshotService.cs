@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Changes;
+using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.PublishedCache.DataSource;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 using Umbraco.Extensions;
@@ -29,6 +30,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     internal class PublishedSnapshotService : IPublishedSnapshotService
     {
+        private readonly ISyncBootStateAccessor _syncBootStateAccessor;
         private readonly ServiceContext _serviceContext;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
@@ -39,7 +41,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         private readonly ILogger<PublishedSnapshotService> _logger;
         private readonly ILoggerFactory _loggerFactory;
         private readonly GlobalSettings _globalSettings;
-        private readonly IEntityXmlSerializer _entitySerializer;
         private readonly IPublishedModelFactory _publishedModelFactory;
         private readonly IDefaultCultureAccessor _defaultCultureAccessor;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -73,6 +74,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public PublishedSnapshotService(
             PublishedSnapshotServiceOptions options,
+            ISyncBootStateAccessor syncBootStateAccessor,
             IMainDom mainDom,
             ServiceContext serviceContext,
             IPublishedContentTypeFactory publishedContentTypeFactory,
@@ -84,11 +86,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             INuCacheContentService publishedContentService,
             IDefaultCultureAccessor defaultCultureAccessor,
             IOptions<GlobalSettings> globalSettings,
-            IEntityXmlSerializer entitySerializer,
             IPublishedModelFactory publishedModelFactory,
             IHostingEnvironment hostingEnvironment,
             IOptions<NuCacheSettings> config)
         {
+            _syncBootStateAccessor = syncBootStateAccessor;
             _serviceContext = serviceContext;
             _publishedContentTypeFactory = publishedContentTypeFactory;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
@@ -102,10 +104,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             _globalSettings = globalSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _config = config.Value;
-
-            // we need an Xml serializer here so that the member cache can support XPath,
-            // for members this is done by navigating the serialized-to-xml member
-            _entitySerializer = entitySerializer;
             _publishedModelFactory = publishedModelFactory;
 
             // lock this entire call, we only want a single thread to be accessing the stores at once and within
@@ -249,7 +247,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         }
 
         /// <summary>
-        /// Populates the stores
+        /// Lazily populates the stores only when they are first requested
         /// </summary>
         internal void EnsureCaches() => LazyInitializer.EnsureInitialized(
             ref _isReady,
@@ -263,9 +261,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                     var okContent = false;
                     var okMedia = false;
 
+                    SyncBootState bootState = _syncBootStateAccessor.GetSyncBootState();
+
                     try
                     {
-                        if (_localContentDbExists)
+                        if (bootState != SyncBootState.ColdBoot && _localContentDbExists)
                         {
                             okContent = LockAndLoadContent(() => LoadContentFromLocalDbLocked(true));
                             if (!okContent)
@@ -274,7 +274,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                             }
                         }
 
-                        if (_localMediaDbExists)
+                        if (bootState != SyncBootState.ColdBoot && _localMediaDbExists)
                         {
                             okMedia = LockAndLoadMedia(() => LoadMediaFromLocalDbLocked(true));
                             if (!okMedia)

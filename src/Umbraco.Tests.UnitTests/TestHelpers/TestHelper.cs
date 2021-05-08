@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -70,8 +71,16 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 
             public override IHostingEnvironment GetHostingEnvironment()
             {
+                // This is needed in order to create a unique Application Id
+                var serviceCollection = new ServiceCollection();
+                var builder = Host
+                    .CreateDefaultBuilder()
+                    .ConfigureServices(services => services.AddDataProtection());
+                var host = builder.Build();
+
                 var testPath = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
                 return new AspNetCoreHostingEnvironment(
+                    host.Services,
                     Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings()),
                     Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == new WebRoutingSettings()),
                     Mock.Of<IWebHostEnvironment>(

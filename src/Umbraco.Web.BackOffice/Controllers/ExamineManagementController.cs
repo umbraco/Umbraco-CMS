@@ -10,7 +10,6 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -23,18 +22,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     {
         private readonly IExamineManager _examineManager;
         private readonly ILogger<ExamineManagementController> _logger;
-        private readonly IIOHelper _ioHelper;
         private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
         private readonly IAppPolicyCache _runtimeCache;
-        private readonly IndexRebuilder _indexRebuilder;
+        private readonly IIndexRebuilder _indexRebuilder;
 
-        public ExamineManagementController(IExamineManager examineManager, ILogger<ExamineManagementController> logger, IIOHelper ioHelper, IIndexDiagnosticsFactory indexDiagnosticsFactory,
+        public ExamineManagementController(
+            IExamineManager examineManager,
+            ILogger<ExamineManagementController> logger,
+            IIndexDiagnosticsFactory indexDiagnosticsFactory,
             AppCaches appCaches,
-            IndexRebuilder indexRebuilder)
+            IIndexRebuilder indexRebuilder)
         {
             _examineManager = examineManager;
             _logger = logger;
-            _ioHelper = ioHelper;
             _indexDiagnosticsFactory = indexDiagnosticsFactory;
             _runtimeCache = appCaches.RuntimeCache;
             _indexRebuilder = indexRebuilder;
@@ -154,10 +154,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 _indexRebuilder.RebuildIndex(indexName);
 
-                ////populate it
-                //foreach (var populator in _populators.Where(x => x.IsRegistered(indexName)))
-                //    populator.Populate(index);
-
                 return new OkResult();
             }
             catch (Exception ex)
@@ -196,7 +192,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 Name = indexName,
                 HealthStatus = isHealth.Success ? (isHealth.Result ?? "Healthy") : (isHealth.Result ?? "Unhealthy"),
                 ProviderProperties = properties,
-                CanRebuild = _indexRebuilder.CanRebuild(index)
+                CanRebuild = _indexRebuilder.CanRebuild(index.Name)
             };
 
             return indexerModel;
@@ -224,8 +220,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private ActionResult ValidatePopulator(IIndex index)
         {
-            if (_indexRebuilder.CanRebuild(index))
+            if (_indexRebuilder.CanRebuild(index.Name))
+            {
                 return new OkResult();
+            }
 
             var response = new BadRequestObjectResult($"The index {index.Name} cannot be rebuilt because it does not have an associated {typeof(IIndexPopulator)}");
             HttpContext.SetReasonPhrase("Index cannot be rebuilt");

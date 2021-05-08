@@ -8,6 +8,8 @@ using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Providers;
 using Lucene.Net.Documents;
+using Lucene.Net.Index;
+using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;

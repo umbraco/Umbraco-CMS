@@ -140,7 +140,9 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         /// about our context so we need to proxy.
         /// </remarks>
         private Assembly OnResolvingDefaultAssemblyLoadContext(AssemblyLoadContext assemblyLoadContext, AssemblyName assemblyName)
-            => _currentAssemblyLoadContext?.LoadFromAssemblyName(assemblyName);
+            => assemblyName.Name == RoslynCompiler.GeneratedAssemblyName
+                ? _currentAssemblyLoadContext?.LoadFromAssemblyName(assemblyName)
+                : null;
 
         public IPublishedElement CreateModel(IPublishedElement element)
         {

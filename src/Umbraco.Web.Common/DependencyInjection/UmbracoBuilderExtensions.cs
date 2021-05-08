@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Smidge;
@@ -196,7 +197,7 @@ namespace Umbraco.Extensions
                 options.IgnoredPaths.Remove("/content/");
             });
 
-            builder.AddNotificationHandler<UmbracoApplicationStarting, InitializeWebProfiling>();
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, InitializeWebProfiling>();
             return builder;
         }
 
@@ -269,7 +270,7 @@ namespace Umbraco.Extensions
 
             // AspNetCore specific services
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
-            builder.AddNotificationHandler<UmbracoRequestBegin, AspNetCoreRequestAccessor>();
+            builder.AddNotificationHandler<UmbracoRequestBeginNotification, AspNetCoreRequestAccessor>();
 
             // Password hasher
             builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
@@ -428,7 +429,17 @@ namespace Umbraco.Extensions
             var wrappedHostingSettings = new OptionsMonitorAdapter<HostingSettings>(hostingSettings);
             var wrappedWebRoutingSettings = new OptionsMonitorAdapter<WebRoutingSettings>(webRoutingSettings);
 
-            return new AspNetCoreHostingEnvironment(wrappedHostingSettings, wrappedWebRoutingSettings, webHostEnvironment);
+            // This is needed in order to create a unique Application Id
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddDataProtection();
+            serviceCollection.AddSingleton<IHostEnvironment>(s => webHostEnvironment);
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            return new AspNetCoreHostingEnvironment(
+                serviceProvider,
+                wrappedHostingSettings,
+                wrappedWebRoutingSettings,
+                webHostEnvironment);
         }
 
     }

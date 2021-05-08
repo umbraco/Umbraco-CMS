@@ -102,8 +102,8 @@ namespace Umbraco.Extensions
             builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ServerVariablesParsing, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ModelBindingError, ModelsBuilderNotificationHandler>();
-            builder.AddNotificationHandler<UmbracoApplicationStarting, LiveModelsProvider>();
-            builder.AddNotificationHandler<UmbracoRequestEnd, LiveModelsProvider>();
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, LiveModelsProvider>();
+            builder.AddNotificationHandler<UmbracoRequestEndNotification, LiveModelsProvider>();
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, LiveModelsProvider>();
             builder.AddNotificationHandler<DataTypeCacheRefresherNotification, LiveModelsProvider>();
 

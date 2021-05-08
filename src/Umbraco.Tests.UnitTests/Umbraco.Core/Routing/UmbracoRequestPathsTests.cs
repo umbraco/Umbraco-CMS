@@ -1,5 +1,7 @@
 using System;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
@@ -30,7 +32,19 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             var webRoutingSettings = new WebRoutingSettings();
             var mockedOptionsMonitorOfHostingSettings = Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
             var mockedOptionsMonitorOfWebRoutingSettings = Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == webRoutingSettings);
-            return new AspNetCoreHostingEnvironment(mockedOptionsMonitorOfHostingSettings, mockedOptionsMonitorOfWebRoutingSettings, _hostEnvironment);
+
+            // This is needed in order to create a unique Application Id
+            var serviceCollection = new ServiceCollection();
+            var builder = Host
+                .CreateDefaultBuilder()
+                .ConfigureServices(services => services.AddDataProtection());
+            var host = builder.Build();
+
+            return new AspNetCoreHostingEnvironment(
+                host.Services,
+                mockedOptionsMonitorOfHostingSettings,
+                mockedOptionsMonitorOfWebRoutingSettings,
+                _hostEnvironment);
         }
 
         [TestCase("/favicon.ico", true)]

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
@@ -20,6 +21,7 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
         private string _localTempPath;
 
         public AspNetCoreHostingEnvironment(
+            IServiceProvider serviceProvider,
             IOptionsMonitor<HostingSettings> hostingSettings,
             IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             IWebHostEnvironment webHostEnvironment)
@@ -29,7 +31,16 @@ namespace Umbraco.Cms.Web.Common.AspNetCore
             _webHostEnvironment = webHostEnvironment ?? throw new ArgumentNullException(nameof(webHostEnvironment));
 
             SiteName = webHostEnvironment.ApplicationName;
-            ApplicationId = AppDomain.CurrentDomain.Id.ToString();
+            var appId = serviceProvider.GetApplicationUniqueIdentifier();
+            if (appId == null)
+            {
+                throw new InvalidOperationException("Could not acquire an ApplicationId, ensure DataProtection services and an IHostEnvironment are registered");
+            }
+
+            // Hash this value because it can really be anything. By default this will be the application's path.
+            // TODO: Test on IIS, hopefully this would be equivalent to the IIS unique ID.
+            // This could also contain sensitive information (i.e. like the physical path) which we don't want to expose in logs.
+            ApplicationId = appId.GenerateHash();
             ApplicationPhysicalPath = webHostEnvironment.ContentRootPath;
         }
 

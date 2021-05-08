@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Services
@@ -40,6 +41,12 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="localIdentity">Local identity of the executing AppDomain.</param>
         /// <param name="lastPruned">Date of last prune operation.</param>
         /// <param name="lastId">Id of the latest processed instruction</param>
-        CacheInstructionServiceProcessInstructionsResult ProcessInstructions(bool released, string localIdentity, DateTime lastPruned, int lastId);
+        ProcessInstructionsResult ProcessInstructions(
+            CacheRefresherCollection cacheRefreshers,
+            ServerRole serverRole,
+            bool released,
+            string localIdentity,
+            DateTime lastPruned,
+            int lastId);
     }
 }

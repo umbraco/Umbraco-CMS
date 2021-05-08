@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
@@ -11,8 +12,12 @@ namespace Umbraco.Cms.Tests.Integration.Implementations
 {
     public class TestHostingEnvironment : AspNetCoreHostingEnvironment, Cms.Core.Hosting.IHostingEnvironment
     {
-        public TestHostingEnvironment(IOptionsMonitor<HostingSettings> hostingSettings,IOptionsMonitor<WebRoutingSettings> webRoutingSettings, IWebHostEnvironment webHostEnvironment)
-            : base(hostingSettings,webRoutingSettings, webHostEnvironment)
+        public TestHostingEnvironment(
+            IServiceProvider serviceProvider,
+            IOptionsMonitor<HostingSettings> hostingSettings,
+            IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
+            IWebHostEnvironment webHostEnvironment)
+            : base(serviceProvider, hostingSettings, webRoutingSettings, webHostEnvironment)
         {
         }
 
