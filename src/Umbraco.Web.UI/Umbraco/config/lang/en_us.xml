@@ -1637,6 +1637,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contentAllowed">This content is allowed here</key>
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="clickToInsertMacro">Click to insert macro</key>
     <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
     <key alias="gridLayouts">Grid Layouts</key>
@@ -1663,7 +1664,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="setAsDefault">Set as default</key>
     <key alias="chooseExtra">Choose extra</key>
     <key alias="chooseDefault">Choose default</key>
-    <key alias="areAdded">are added</key>
+      <key alias="areAdded">are added</key>
         <key alias="warning">Warning</key>
         <key alias="youAreDeleting">You are deleting the row configuration</key>
         <key alias="deletingARow">
