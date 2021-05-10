@@ -20,5 +20,14 @@ namespace Umbraco.Core.Dashboards
                 return value;
             }
         }
+
+        /// <summary>
+        /// Gets the base URL for content on the content dashboard when running on Umbraco Cloud.
+        /// </summary>
+        /// <value>The base URL.</value>
+        public string ContentDashboardBaseUrl =>
+            ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ContentDashboardBaseUrl)
+                ? ConfigurationManager.AppSettings[Constants.AppSettings.ContentDashboardBaseUrl]
+                : string.Empty;
     }
 }

@@ -109,11 +109,16 @@ namespace Umbraco.Core
             /// A true or false indicating whether umbraco should force a secure (https) connection to the backoffice.
             /// </summary>
             public const string UseHttps = "Umbraco.Core.UseHttps";
-
+            
             /// <summary>
             /// A true/false value indicating whether the content dashboard should be visible for all user groups.
             /// </summary>
             public const string AllowContentDashboardAccessToAllUsers = "Umbraco.Core.AllowContentDashboardAccessToAllUsers";
+
+            /// <summary>
+            /// The base URL for displaying different content on the content dashboard when running on Umbraco Cloud.
+            /// </summary>
+            public const string ContentDashboardBaseUrl = "Umbraco.Core.ContentDashboardBaseUrl";
 
             /// <summary>
             /// TODO: FILL ME IN

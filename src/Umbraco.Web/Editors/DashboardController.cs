@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Xml.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -32,14 +33,19 @@ namespace Umbraco.Web.Editors
     public class DashboardController : UmbracoApiController
     {
         private readonly IDashboardService _dashboardService;
+        private readonly IContentDashboardSettings _dashboardSettings;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DashboardController"/> with all its dependencies.
         /// </summary>
-        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor, ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger, IRuntimeState runtimeState, IDashboardService dashboardService, UmbracoHelper umbracoHelper)
+        public DashboardController(IGlobalSettings globalSettings, IUmbracoContextAccessor umbracoContextAccessor,
+            ISqlContext sqlContext, ServiceContext services, AppCaches appCaches, IProfilingLogger logger,
+            IRuntimeState runtimeState, IDashboardService dashboardService, UmbracoHelper umbracoHelper,
+            IContentDashboardSettings dashboardSettings)
             : base(globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _dashboardService = dashboardService;
+            _dashboardSettings = dashboardSettings;
         }
 
         //we have just one instance of HttpClient shared for the entire application
@@ -54,8 +60,22 @@ namespace Umbraco.Web.Editors
             var language = user.Language;
             var version = UmbracoVersion.SemanticVersion.ToSemanticString();
             var isAdmin = user.IsAdmin();
+            var onCloud = false;
 
-            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}&admin={4}", section, allowedSections, language, version, isAdmin);
+            // check if the solution is running on Umbraco Cloud
+            var deployConfigPath = AppDomain.CurrentDomain.BaseDirectory + "Config\\UmbracoDeploy.config";
+            if (System.IO.File.Exists(deployConfigPath))
+            {
+                var doc = XDocument.Load(deployConfigPath);
+                var environments = doc.Descendants().FirstOrDefault(p => p.Name.LocalName == "environments" && p.Attribute("id") != null);
+                if (!(environments is null))
+                {
+                    onCloud = true;
+                    baseUrl = _dashboardSettings.ContentDashboardBaseUrl.IsNullOrWhiteSpace() ? baseUrl : _dashboardSettings.ContentDashboardBaseUrl;
+                }
+            }
+
+            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}&admin={4}&cloud={5}", section, allowedSections, language, version, isAdmin, onCloud);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
             var content = AppCaches.RuntimeCache.GetCacheItem<JObject>(key);

@@ -10,5 +10,11 @@
         ///     and the default access rules for that dashboard will be in use.
         /// </value>
         bool AllowContentDashboardAccessToAllUsers { get; }
+
+        /// <summary>
+        /// Gets the base URL for content on the content dashboard when running on Umbraco Cloud.
+        /// </summary>
+        /// <value>The base URL.</value>
+        string ContentDashboardBaseUrl { get; }
     }
 }
