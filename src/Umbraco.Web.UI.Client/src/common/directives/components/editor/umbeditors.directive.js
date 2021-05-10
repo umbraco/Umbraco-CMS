@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorsDirective($timeout, eventsService) {
+    function EditorsDirective($timeout, eventsService, focusLockService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -27,6 +27,9 @@
                     if(isLeftColumnAbove){
                         $(sectionId).removeClass(aboveBackDropCssClass);
                     }
+
+                    // Inert content in the #mainwrapper
+                    focusLockService.addInertAttribute();
                 }
                 
                 $timeout(() => {
@@ -54,6 +57,9 @@
                     }
 
                     isLeftColumnAbove = false;
+
+                    // Remove the inert attribute from the #mainwrapper
+                    focusLockService.removeInertAttribute();
                 }
             }
 
@@ -96,7 +102,6 @@
                     iEditor.inFront = iEditor.level >= ceiling;
                     i++;
                 }
-
             }
 
             evts.push(eventsService.on("appState.editors.open", function (name, args) {

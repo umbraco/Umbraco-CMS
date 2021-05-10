@@ -1,7 +1,9 @@
 <div class="umb-editors">
 
-    <umb-editor-repeater class="umb-editor" 
-                         ng-repeat="model in editors" 
+    <umb-editor-repeater class="umb-editor"
+                         ng-repeat="model in editors"
+                         ng-attr-umb-focus-lock="{{$last || undefined}}"
+                         ng-attr-inert="{{$last ? undefined : true}}"
                          ng-class="{'umb-editor--small': model.size === 'small',
                 'umb-editor--medium': model.size === 'medium',
                 'umb-editor--animating': model.animating,

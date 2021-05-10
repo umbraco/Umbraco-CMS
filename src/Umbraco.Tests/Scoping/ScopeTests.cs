@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Runtime.Remoting.Messaging;
 using System.Threading;
+using System.Threading.Tasks;
 using NUnit.Framework;
 using Umbraco.Core;
 using Umbraco.Core.Persistence;
@@ -22,6 +23,119 @@ namespace Umbraco.Tests.Scoping
             base.SetUp();
 
             Assert.IsNull(ScopeProvider.AmbientScope); // gone
+        }
+
+        [Test]
+        public void GivenUncompletedScopeOnChildThread_WhenTheParentCompletes_TheTransactionIsRolledBack()
+        {
+            ScopeProvider scopeProvider = ScopeProvider;
+
+            Assert.IsNull(ScopeProvider.AmbientScope);
+            IScope mainScope = scopeProvider.CreateScope();
+
+            var t = Task.Run(() =>
+            {
+                IScope nested = scopeProvider.CreateScope();
+                Thread.Sleep(2000);
+                nested.Dispose();
+            });
+
+            Thread.Sleep(1000); // mimic some long running operation that is shorter than the other thread
+            mainScope.Complete();
+            Assert.Throws<InvalidOperationException>(() => mainScope.Dispose());
+
+            Task.WaitAll(t);
+        }
+
+        [Test]
+        public void GivenNonDisposedChildScope_WhenTheParentDisposes_ThenInvalidOperationExceptionThrows()
+        {
+            // this all runs in the same execution context so the AmbientScope reference isn't a copy
+
+            ScopeProvider scopeProvider = ScopeProvider;
+
+            Assert.IsNull(ScopeProvider.AmbientScope);
+            IScope mainScope = scopeProvider.CreateScope();
+
+            IScope nested = scopeProvider.CreateScope(); // not disposing
+
+            InvalidOperationException ex = Assert.Throws<InvalidOperationException>(() => mainScope.Dispose());
+            Console.WriteLine(ex);
+        }
+
+        [Test]
+        public void GivenChildThread_WhenParentDisposedBeforeChild_ParentScopeThrows()
+        {           
+            // The ambient context is NOT thread safe, even though it has locks, etc...
+            // This all just goes to show that concurrent threads with scopes is a no-go.
+            var childWait = new ManualResetEventSlim(false);
+            var parentWait = new ManualResetEventSlim(false);
+
+            ScopeProvider scopeProvider = ScopeProvider;
+
+            Assert.IsNull(ScopeProvider.AmbientScope);
+            IScope mainScope = scopeProvider.CreateScope();
+
+            var t = Task.Run(() =>
+            {
+                Console.WriteLine("Child Task start: " + scopeProvider.AmbientScope.InstanceId);                
+                // This will evict the parent from the ScopeProvider.StaticCallContextObjects
+                // and replace it with the child
+                IScope nested = scopeProvider.CreateScope();
+                childWait.Set();
+                Console.WriteLine("Child Task scope created: " + scopeProvider.AmbientScope.InstanceId);
+                parentWait.Wait(); // wait for the parent thread
+                Console.WriteLine("Child Task before dispose: " + scopeProvider.AmbientScope.InstanceId);
+                // This will evict the child from the ScopeProvider.StaticCallContextObjects
+                // and replace it with the parent
+                nested.Dispose();
+                Console.WriteLine("Child Task after dispose: " + scopeProvider.AmbientScope.InstanceId);
+            });
+            
+            childWait.Wait(); // wait for the child to start and create the scope
+            // This is a confusing thing (this is not the case in netcore), this is NULL because the
+            // parent thread's scope ID was evicted from the ScopeProvider.StaticCallContextObjects
+            // so now the ambient context is null because the GUID in the CallContext doesn't match
+            // the GUID in the ScopeProvider.StaticCallContextObjects.
+            Assert.IsNull(scopeProvider.AmbientScope);
+            // now dispose the main without waiting for the child thread to join
+            // This will throw because at this stage a child scope has been created which means
+            // it is the Ambient (top) scope but here we're trying to dispose the non top scope.
+            Assert.Throws<InvalidOperationException>(() => mainScope.Dispose());
+            parentWait.Set();      // tell child thread to proceed
+            Task.WaitAll(t);        // wait for the child to dispose
+            mainScope.Dispose();    // now it's ok
+            Console.WriteLine("Parent Task disposed: " + scopeProvider.AmbientScope?.InstanceId);
+        }
+
+        [Test]
+        public void GivenChildThread_WhenChildDisposedBeforeParent_OK()
+        {
+            ScopeProvider scopeProvider = ScopeProvider;
+
+            Assert.IsNull(ScopeProvider.AmbientScope);
+            IScope mainScope = scopeProvider.CreateScope();
+
+            // Task.Run will flow the execution context unless ExecutionContext.SuppressFlow() is explicitly called.
+            // This is what occurs in normal async behavior since it is expected to await (and join) the main thread,
+            // but if Task.Run is used as a fire and forget thread without being done correctly then the Scope will
+            // flow to that thread.
+            var t = Task.Run(() =>
+            {
+                Console.WriteLine("Child Task start: " + scopeProvider.AmbientScope.InstanceId);
+                IScope nested = scopeProvider.CreateScope();                
+                Console.WriteLine("Child Task before dispose: " + scopeProvider.AmbientScope.InstanceId);
+                nested.Dispose();
+                Console.WriteLine("Child Task after disposed: " + scopeProvider.AmbientScope.InstanceId);
+            });
+
+            Console.WriteLine("Parent Task waiting: " + scopeProvider.AmbientScope?.InstanceId);
+            Task.WaitAll(t);
+            Console.WriteLine("Parent Task disposing: " + scopeProvider.AmbientScope.InstanceId);
+            mainScope.Dispose();
+            Console.WriteLine("Parent Task disposed: " + scopeProvider.AmbientScope?.InstanceId);
+
+            Assert.Pass();
         }
 
         [Test]

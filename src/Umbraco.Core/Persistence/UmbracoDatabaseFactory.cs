@@ -162,7 +162,7 @@ namespace Umbraco.Core.Persistence
                 // else leave unchanged
             }
 
-            _logger.Debug<UmbracoDatabaseFactory>("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
+            _logger.Debug<UmbracoDatabaseFactory, SqlServerSyntaxProvider.VersionName, DatabaseType, string>("SqlServer {SqlServerVersion}, DatabaseType is {DatabaseType} ({Source}).",
                 versionName, _databaseType, fromSettings ? "settings" : "detected");
         }
 
