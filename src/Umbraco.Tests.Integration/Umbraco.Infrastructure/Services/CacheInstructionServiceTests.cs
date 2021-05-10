@@ -7,6 +7,7 @@ using System.Linq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
@@ -28,6 +29,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
         private CacheRefresherCollection CacheRefreshers => GetRequiredService<CacheRefresherCollection>();
         private IServerRoleAccessor ServerRoleAccessor => GetRequiredService<IServerRoleAccessor>();
+
+        protected override void CustomTestSetup(IUmbracoBuilder builder)
+        {
+            base.CustomTestSetup(builder);
+            builder.AddNuCache();
+        }
 
         [Test]
         public void Confirms_Cold_Boot_Required_When_Instructions_Exist_And_None_Have_Been_Synced()
