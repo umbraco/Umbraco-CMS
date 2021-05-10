@@ -89,7 +89,8 @@ namespace Umbraco.Cms.Core.Composing
 
                         // Can't do Assembly.Load() as in .NET Core it works by default only for assemblies that have been published as part of the app.
                         // https://github.com/dotnet/runtime/issues/13511#issuecomment-537475896
-                        // So now we have to use LoadFrom and with the full path to the DLL on disk
+                        // So now we have to use AssemblyLoadContext.Default.LoadFromAssemblyPath and with the full
+                        // path to the DLL on disk, and ensure it is loaded into the correct context
                         var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(dll);
                         assemblies.Add(assembly);
                     }
