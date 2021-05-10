@@ -9,10 +9,8 @@ using Umbraco.Core.Services;
 using Umbraco.Web.Composing;
 using Umbraco.Web.Features;
 using Umbraco.Web.JavaScript;
-using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.PublishedCache;
-using Umbraco.Web.Services;
 using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web.Editors
@@ -25,48 +23,36 @@ namespace Umbraco.Web.Editors
         private readonly IPublishedSnapshotService _publishedSnapshotService;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly ILocalizationService _localizationService;
-        private readonly IIconService _iconService;
 
-        [Obsolete("Use the constructor that injects IIconService.")]
         public PreviewController(
             UmbracoFeatures features,
             IGlobalSettings globalSettings,
             IPublishedSnapshotService publishedSnapshotService,
             IUmbracoContextAccessor umbracoContextAccessor,
             ILocalizationService localizationService)
-            :this(features,
-                globalSettings,
-                publishedSnapshotService,
-                umbracoContextAccessor,
-                localizationService,
-                Current.IconService)
-        {
-
-        }
-
-        public PreviewController(
-            UmbracoFeatures features,
-            IGlobalSettings globalSettings,
-            IPublishedSnapshotService publishedSnapshotService,
-            IUmbracoContextAccessor umbracoContextAccessor,
-            ILocalizationService localizationService,
-            IIconService iconService)
         {
             _features = features;
             _globalSettings = globalSettings;
             _publishedSnapshotService = publishedSnapshotService;
             _umbracoContextAccessor = umbracoContextAccessor;
             _localizationService = localizationService;
-            _iconService = iconService;
         }
 
         [UmbracoAuthorize(redirectToUmbracoLogin: true)]
         [DisableBrowserCache]
-        public ActionResult Index()
+        public ActionResult Index(int? id = null)
         {
             var availableLanguages = _localizationService.GetAllLanguages();
+            if (id.HasValue)
+            {
+                var content = _umbracoContextAccessor.UmbracoContext.Content.GetById(true, id.Value);
+                if (content is null)
+                    return HttpNotFound();
 
-            var model = new BackOfficePreviewModel(_features, _globalSettings, availableLanguages, _iconService);
+                availableLanguages = availableLanguages.Where(language => content.Cultures.ContainsKey(language.IsoCode));
+            }
+
+            var model = new BackOfficePreviewModel(_features, _globalSettings, availableLanguages);
 
             if (model.PreviewExtendedHeaderView.IsNullOrWhiteSpace() == false)
             {
@@ -79,7 +65,6 @@ namespace Umbraco.Web.Editors
 
             return View(_globalSettings.Path.EnsureEndsWith('/') + "Views/Preview/" + "Index.cshtml", model);
         }
-
         /// <summary>
         /// Returns the JavaScript file for preview
         /// </summary>
@@ -101,11 +86,7 @@ namespace Umbraco.Web.Editors
         [UmbracoAuthorize]
         public ActionResult Frame(int id, string culture)
         {
-            var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
-
-            var previewToken = _publishedSnapshotService.EnterPreview(user, id);
-
-            Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, previewToken));
+            EnterPreview(id);
 
             // use a numeric URL because content may not be in cache and so .Url would fail
             var query = culture.IsNullOrWhiteSpace() ? string.Empty : $"?culture={culture}";
@@ -113,7 +94,16 @@ namespace Umbraco.Web.Editors
 
             return null;
         }
+        public ActionResult EnterPreview(int id)
+        {
+            var user = _umbracoContextAccessor.UmbracoContext.Security.CurrentUser;
 
+            var previewToken = _publishedSnapshotService.EnterPreview(user, id);
+
+            Response.Cookies.Set(new HttpCookie(Constants.Web.PreviewCookieName, previewToken));
+
+            return null;
+        }
         public ActionResult End(string redir = null)
         {
             var previewToken = Request.GetPreviewCookieValue();
@@ -121,6 +111,9 @@ namespace Umbraco.Web.Editors
             service.ExitPreview(previewToken);
 
             System.Web.HttpContext.Current.ExpireCookie(Constants.Web.PreviewCookieName);
+
+            // Expire Client-side cookie that determines whether the user has accepted to be in Preview Mode when visiting the website.
+            System.Web.HttpContext.Current.ExpireCookie(Constants.Web.AcceptPreviewCookieName);
 
             if (Uri.IsWellFormedUriString(redir, UriKind.Relative)
                 && redir.StartsWith("//") == false

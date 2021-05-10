@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function UnpublishController($scope, localizationService) {
+    function UnpublishController($scope, localizationService, contentEditingHelper) {
 
         var vm = this;
        
@@ -37,25 +37,7 @@
             // node has variants
             if (vm.variants.length !== 1) {
                 
-                vm.unpublishableVariants.sort((a, b) => {
-                    if (a.language && b.language) {
-                        if (a.language.name < b.language.name) {
-                            return -1;
-                        }
-                        if (a.language.name > b.language.name) {
-                            return 1;
-                        }
-                    }
-                    if (a.segment && b.segment) {
-                        if (a.segment < b.segment) {
-                            return -1;
-                        }
-                        if (a.segment > b.segment) {
-                            return 1;
-                        }
-                    }
-                    return 0;
-                });
+                vm.unpublishableVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.unpublishableVariants);
 
                 var active = vm.variants.find(v => v.active);
 

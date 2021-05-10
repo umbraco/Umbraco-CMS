@@ -13,6 +13,10 @@ namespace Umbraco.Web.Trees
         protected override TreeNodeCollection GetTreeNodes(string id, FormDataCollection queryStrings)
         {
             var nodes = new TreeNodeCollection();
+
+            // if the request is for folders only then just return
+            if (queryStrings["foldersonly"].IsNullOrWhiteSpace() == false && queryStrings["foldersonly"] == "1") return nodes;
+
             nodes.AddRange(GetTreeNodesFromService(id, queryStrings));
             return nodes;
         }
@@ -30,7 +34,13 @@ namespace Umbraco.Web.Trees
             }
             else
             {
-                //delete member type/group
+                var memberType = Services.MemberTypeService.Get(int.Parse(id));
+                if (memberType != null)
+                {
+                    menu.Items.Add<ActionCopy>(Services.TextService, opensDialog: true);
+                }
+
+                // delete member type/group
                 menu.Items.Add<ActionDelete>(Services.TextService, opensDialog: true);
             }
 

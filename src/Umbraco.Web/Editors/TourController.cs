@@ -10,6 +10,7 @@ using Umbraco.Core.IO;
 using Umbraco.Web.Models;
 using Umbraco.Web.Mvc;
 using Umbraco.Web.Tour;
+using CharArrays = Umbraco.Core.Constants.CharArrays;
 
 namespace Umbraco.Web.Editors
 {
@@ -56,7 +57,7 @@ namespace Umbraco.Web.Editors
             {
                 foreach (var plugin in Directory.EnumerateDirectories(appPlugins))
                 {
-                    var pluginName = Path.GetFileName(plugin.TrimEnd('\\'));
+                    var pluginName = Path.GetFileName(plugin.TrimEnd(CharArrays.Backslash));
                     var pluginFilters = _filters.Where(x => x.PluginName != null && x.PluginName.IsMatch(pluginName))
                         .ToList();
 
@@ -138,7 +139,7 @@ namespace Umbraco.Web.Editors
                         {
                             return false;
                         }
-                        var contentTypes = x.ContentType.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
+                        var contentTypes = x.ContentType.Split(CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries).Select(ct => ct.Trim());
                         return contentTypes.Intersect(doctypeAliasWithCompositions).Any();
                     });
         }

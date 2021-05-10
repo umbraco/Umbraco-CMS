@@ -343,7 +343,7 @@ namespace Umbraco.Tests.Services
             }
 
             // Assert
-            Assert.AreEqual(24, contentService.Count());
+            Assert.AreEqual(25, contentService.Count());
         }
 
         [Test]
@@ -1415,7 +1415,7 @@ namespace Umbraco.Tests.Services
         {
             // Arrange
             var contentService = ServiceContext.ContentService;
-            var content = contentService.GetById(NodeDto.NodeIdSeed + 5);
+            var content = contentService.GetById(NodeDto.NodeIdSeed + 6);
 
             // Act
             var published = contentService.SaveAndPublish(content, userId: Constants.Security.SuperUserId);
@@ -1538,6 +1538,53 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
+        public void Can_Update_Content_Property_Values()
+        {
+            IContentType contentType = MockedContentTypes.CreateSimpleContentType();
+            ServiceContext.ContentTypeService.Save(contentType);
+            IContent content = MockedContent.CreateSimpleContent(contentType, "hello");
+            content.SetValue("title", "title of mine");
+            content.SetValue("bodyText", "hello world");
+            ServiceContext.ContentService.SaveAndPublish(content);
+
+            // re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            content.SetValue("title", "another title of mine");          // Change a value
+            content.SetValue("bodyText", null);                          // Clear a value
+            content.SetValue("author", "new author");                    // Add a value
+            ServiceContext.ContentService.SaveAndPublish(content);
+
+            // re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            Assert.AreEqual("another title of mine", content.GetValue("title"));
+            Assert.IsNull(content.GetValue("bodyText"));
+            Assert.AreEqual("new author", content.GetValue("author"));
+
+            content.SetValue("title", "new title");
+            content.SetValue("bodyText", "new body text");
+            content.SetValue("author", "new author text");
+            ServiceContext.ContentService.Save(content);                // new non-published version
+
+            // re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            content.SetValue("title", null);                            // Clear a value
+            content.SetValue("bodyText", null);                         // Clear a value
+            ServiceContext.ContentService.Save(content);                // saving non-published version
+
+            // re-get
+            content = ServiceContext.ContentService.GetById(content.Id);
+            Assert.IsNull(content.GetValue("title"));                   // Test clearing the value worked with the non-published version
+            Assert.IsNull(content.GetValue("bodyText"));
+            Assert.AreEqual("new author text", content.GetValue("author"));
+
+            // make sure that the published version remained the same
+            var publishedContent = ServiceContext.ContentService.GetVersion(content.PublishedVersionId);
+            Assert.AreEqual("another title of mine", publishedContent.GetValue("title"));
+            Assert.IsNull(publishedContent.GetValue("bodyText"));
+            Assert.AreEqual("new author", publishedContent.GetValue("author"));
+        }
+
+        [Test]
         public void Can_Bulk_Save_Content()
         {
             // Arrange
@@ -1640,7 +1687,7 @@ namespace Umbraco.Tests.Services
 
             Assert.AreNotEqual(-20, content.ParentId);
             Assert.IsFalse(content.Trashed);
-            Assert.AreEqual(3, descendants.Count);
+            Assert.AreEqual(4, descendants.Count);
             Assert.IsFalse(descendants.Any(x => x.Path.StartsWith("-1,-20,")));
             Assert.IsFalse(descendants.Any(x => x.Trashed));
 
@@ -1653,7 +1700,7 @@ namespace Umbraco.Tests.Services
 
             Assert.AreEqual(-20, content.ParentId);
             Assert.IsTrue(content.Trashed);
-            Assert.AreEqual(3, descendants.Count);
+            Assert.AreEqual(4, descendants.Count);
             Assert.IsTrue(descendants.All(x => x.Path.StartsWith("-1,-20,")));
             Assert.True(descendants.All(x => x.Trashed));
 
@@ -1940,7 +1987,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var temp = contentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, contentService.CountChildren(temp.Id));
+            Assert.AreEqual(3, contentService.CountChildren(temp.Id));
 
             // Act
             var copy = contentService.Copy(temp, temp.ParentId, false, true, Constants.Security.SuperUserId);
@@ -1950,7 +1997,7 @@ namespace Umbraco.Tests.Services
             Assert.That(copy, Is.Not.Null);
             Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
             Assert.AreNotSame(content, copy);
-            Assert.AreEqual(2, contentService.CountChildren(copy.Id));
+            Assert.AreEqual(3, contentService.CountChildren(copy.Id));
 
             var child = contentService.GetById(NodeDto.NodeIdSeed + 3);
             var childCopy = contentService.GetPagedChildren(copy.Id, 0, 500, out var total).First();
@@ -1966,7 +2013,7 @@ namespace Umbraco.Tests.Services
             var contentService = ServiceContext.ContentService;
             var temp = contentService.GetById(NodeDto.NodeIdSeed + 2);
             Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(2, contentService.CountChildren(temp.Id));
+            Assert.AreEqual(3, contentService.CountChildren(temp.Id));
 
             // Act
             var copy = contentService.Copy(temp, temp.ParentId, false, false, Constants.Security.SuperUserId);

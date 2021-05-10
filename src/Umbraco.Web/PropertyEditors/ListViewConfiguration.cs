@@ -28,7 +28,7 @@ namespace Umbraco.Web.PropertyEditors
             Layouts = new[]
             {
                 new Layout { Name = "List", Icon = "icon-list", IsSystem = 1, Selected = true, Path = "views/propertyeditors/listview/layouts/list/list.html" },
-                new Layout { Name = "grid", Icon = "icon-thumbnails-small", IsSystem = 1, Selected = true, Path = "views/propertyeditors/listview/layouts/grid/grid.html" }
+                new Layout { Name = "Grid", Icon = "icon-thumbnails-small", IsSystem = 1, Selected = true, Path = "views/propertyeditors/listview/layouts/grid/grid.html" }
             };
 
             IncludeProperties = new []
@@ -68,6 +68,9 @@ namespace Umbraco.Web.PropertyEditors
 
         [ConfigurationField("showContentFirst", "Show Content App First", "boolean", Description = "Enable this to show the content app by default instead of the list view app")]
         public bool ShowContentFirst { get; set; }
+
+        [ConfigurationField("useInfiniteEditor", "Edit in Infinite Editor", "boolean", Description = "Enable this to use infinite editing to edit the content of the list view")]
+        public bool UseInfiniteEditor { get; set; }
 
         public class Property
         {

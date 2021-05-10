@@ -104,7 +104,7 @@ namespace Umbraco.Tests.Services
             var threads = new List<Thread>();
             var exceptions = new List<Exception>();
 
-            Debug.WriteLine("Starting...");
+            Console.WriteLine("Starting...");
 
             var done = TraceLocks();
 
@@ -114,12 +114,12 @@ namespace Umbraco.Tests.Services
                 {
                     try
                     {
-                        Debug.WriteLine("[{0}] Running...", Thread.CurrentThread.ManagedThreadId);
+                        Console.WriteLine("[{0}] Running...", Thread.CurrentThread.ManagedThreadId);
 
                         var name1 = "test-" + Guid.NewGuid();
                         var content1 = contentService.Create(name1, -1, "umbTextpage");
 
-                        Debug.WriteLine("[{0}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
+                        Console.WriteLine("[{0}] Saving content #1.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content1);
 
                         Thread.Sleep(100); //quick pause for maximum overlap!
@@ -127,7 +127,7 @@ namespace Umbraco.Tests.Services
                         var name2 = "test-" + Guid.NewGuid();
                         var content2 = contentService.Create(name2, -1, "umbTextpage");
 
-                        Debug.WriteLine("[{0}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
+                        Console.WriteLine("[{0}] Saving content #2.", Thread.CurrentThread.ManagedThreadId);
                         Save(contentService, content2);
                     }
                     catch (Exception e)
@@ -139,16 +139,16 @@ namespace Umbraco.Tests.Services
             }
 
             // start all threads
-            Debug.WriteLine("Starting threads");
+            Console.WriteLine("Starting threads");
             threads.ForEach(x => x.Start());
 
             // wait for all to complete
-            Debug.WriteLine("Joining threads");
+            Console.WriteLine("Joining threads");
             threads.ForEach(x => x.Join());
 
             done.Set();
 
-            Debug.WriteLine("Checking exceptions");
+            Console.WriteLine("Checking exceptions");
             if (exceptions.Count == 0)
             {
                 //now look up all items, there should be 40!
@@ -172,7 +172,7 @@ namespace Umbraco.Tests.Services
             var threads = new List<Thread>();
             var exceptions = new List<Exception>();
 
-            Debug.WriteLine("Starting...");
+            Console.WriteLine("Starting...");
 
             var done = TraceLocks();
 
@@ -182,18 +182,18 @@ namespace Umbraco.Tests.Services
                 {
                     try
                     {
-                        Debug.WriteLine("[{0}] Running...", Thread.CurrentThread.ManagedThreadId);
+                        Console.WriteLine("[{0}] Running...", Thread.CurrentThread.ManagedThreadId);
 
                         var name1 = "test-" + Guid.NewGuid();
                         var media1 = mediaService.CreateMedia(name1, -1, Constants.Conventions.MediaTypes.Folder);
-                        Debug.WriteLine("[{0}] Saving media #1.", Thread.CurrentThread.ManagedThreadId);
+                        Console.WriteLine("[{0}] Saving media #1.", Thread.CurrentThread.ManagedThreadId);
                         Save(mediaService, media1);
 
                         Thread.Sleep(100); //quick pause for maximum overlap!
 
                         var name2 = "test-" + Guid.NewGuid();
                         var media2 = mediaService.CreateMedia(name2, -1, Constants.Conventions.MediaTypes.Folder);
-                        Debug.WriteLine("[{0}] Saving media #2.", Thread.CurrentThread.ManagedThreadId);
+                        Console.WriteLine("[{0}] Saving media #2.", Thread.CurrentThread.ManagedThreadId);
                         Save(mediaService, media2);
                     }
                     catch (Exception e)
