@@ -240,7 +240,7 @@
     <key alias="recycleBinDeleting">Innholdet i papirkurven blir nå slettet. Vennligst ikke lukk dette vinduet mens denne operasjonen foregår</key>
     <key alias="recycleBinIsEmpty">Papirkurven er nå tom</key>
     <key alias="recycleBinWarning">Når elementer blir slettet fra papirkurven vil de være slettet for alltid</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a> tjenesten opplever for tiden problemer som vi ikke har kontroll over. Vi beklager denne ubeleiligheten.]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> tjenesten opplever for tiden problemer som vi ikke har kontroll over. Vi beklager denne ubeleiligheten.]]></key>
     <key alias="regexSearchHelp">Søk etter et regulært uttrykk for å legge inn validering til et felt. Eksempel: 'email, 'zip-code', 'URL'.</key>
     <key alias="removeMacro">Fjern makro</key>
     <key alias="requiredField">Obligatorisk</key>
@@ -509,7 +509,7 @@
     <key alias="instruction">Logg på nedenfor</key>
     <key alias="signInWith">Logg på med</key>
     <key alias="timeout">Din sesjon er utløpt</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Skrivebord</key>

@@ -638,7 +638,10 @@ namespace Umbraco.Web.Editors
         {
             var path = IOHelper.MapPath(systemDirectory + "/" + virtualPath);
             var dirInfo = new DirectoryInfo(path);
-            return dirInfo.Attributes == FileAttributes.Directory;
+
+            // If you turn off indexing in Windows this will have the attribute:
+            // `FileAttributes.Directory | FileAttributes.NotContentIndexed`
+            return (dirInfo.Attributes & FileAttributes.Directory) != 0;
         }
 
         // this is an internal class for passing stylesheet data from the client to the controller while editing

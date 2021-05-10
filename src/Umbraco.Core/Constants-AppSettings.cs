@@ -111,6 +111,11 @@ namespace Umbraco.Core
             public const string UseHttps = "Umbraco.Core.UseHttps";
 
             /// <summary>
+            /// A true/false value indicating whether the content dashboard should be visible for all user groups.
+            /// </summary>
+            public const string AllowContentDashboardAccessToAllUsers = "Umbraco.Core.AllowContentDashboardAccessToAllUsers";
+
+            /// <summary>
             /// TODO: FILL ME IN
             /// </summary>
             public const string DisableElectionForSingleServer = "Umbraco.Core.DisableElectionForSingleServer";

@@ -111,6 +111,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="System.Text.Encoding.CodePages" Version="4.7.1" />
     <PackageReference Include="Umbraco.SqlServerCE" Version="4.0.0.1" />
   </ItemGroup>
   <ItemGroup>
@@ -347,9 +348,9 @@
         <WebProjectProperties>
           <UseIIS>False</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>8120</DevelopmentServerPort>
+          <DevelopmentServerPort>8130</DevelopmentServerPort>
           <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>http://localhost:8120</IISUrl>
+          <IISUrl>http://localhost:8130</IISUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

@@ -284,7 +284,7 @@
     <key alias="scheduledPublishServerTime">Dies führt zur folgenden Zeit auf dem Server:</key>
     <key alias="scheduledPublishDocumentation">
       <![CDATA[
-    	<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Was bedeutet dies?</a>
+    	<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Was bedeutet dies?</a>
     ]]>
     </key>
     <key alias="nestedContentDeleteItem">Wollen Sie dieses Element wirklich entfernen?</key>
@@ -445,7 +445,7 @@
     <key alias="recycleBinDeleting">Der Papierkorb wird geleert. Bitte warten Sie und schließen Sie das Fenster erst, wenn der Vorgang abgeschlossen ist.</key>
     <key alias="recycleBinIsEmpty">Der Papierkorb ist leer</key>
     <key alias="recycleBinWarning">Wenn Sie den Papierkorb leeren, werden die enthaltenen Elemente endgültig gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.</key>
-    <key alias="regexSearchError">Der Webservice von &lt;a target='_blank' href='http://regexlib.com'&gt;regexlib.com&lt;/a&gt; ist zur Zeit nicht erreichbar. Bitte versuchen Sie es später erneut.</key>
+    <key alias="regexSearchError">Der Webservice von &lt;a target='_blank' rel='noopener' href='http://regexlib.com'&gt;regexlib.com&lt;/a&gt; ist zur Zeit nicht erreichbar. Bitte versuchen Sie es später erneut.</key>
     <key alias="regexSearchHelp">Finden Sie einen vorbereiteten regulären Ausdruck zur Validierung der Werte, die in dieses Feld eingegeben werden - zum Beispiel 'email, 'plz', 'URL' oder ähnlich.</key>
     <key alias="removeMacro">Macro entfernen</key>
     <key alias="requiredField">Pflichtfeld</key>
@@ -927,7 +927,7 @@
     <key alias="instruction">Hier anmelden:</key>
     <key alias="signInWith">Anmelden mit</key>
     <key alias="timeout">Sitzung abgelaufen</key>
-    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="https://umbraco.com" style="text-decoration: none" target="_blank"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
+    <key alias="bottomText">&lt;p style="text-align:right;"&gt;&amp;copy; 2001 - %0% &lt;br /&gt;&lt;a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener"&gt;umbraco.org&lt;/a&gt;&lt;/p&gt; </key>
     <key alias="forgottenPassword">Kennwort vergessen?</key>
     <key alias="forgottenPasswordInstruction">Es wird eine E-Mail mit einem Kennwort-Zurücksetzen-Link an die angegebene Adresse geschickt.</key>
     <key alias="requestPasswordResetConfirmation">Es wird eine E-Mail mit Anweisungen zum Zurücksetzen des Kennwortes an die angegebene Adresse geschickt sofern diese im Datenbestand gefunden wurde.</key>
@@ -986,7 +986,7 @@
 														<tbody>
 															<tr>
 																<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																	<a href='%1%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																	<a href='%1%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																		Klicken Sie hier, um Ihr Kennwort zurück zu setzen
 																	</a>
 																</td>
@@ -1104,7 +1104,7 @@
 															<td align='left' style='font-family: sans-serif; font-size: 14px; vertical-align: top; padding-bottom: 15px;' valign='top'>
 																<table border='0' cellpadding='0' cellspacing='0' style='border-collapse: separate; mso-table-lspace: 0pt; mso-table-rspace: 0pt; width: auto;'><tbody><tr>
 																	<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																		<a href='http://%4%/#/content/content/edit/%5%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>Bearbeiten</a> </td> </tr></tbody></table>
+																		<a href='http://%4%/#/content/content/edit/%5%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; text-transform: capitalize; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>Bearbeiten</a> </td> </tr></tbody></table>
 															</td>
 														</tr>
 													</tbody>
@@ -2005,7 +2005,7 @@
 																	<tbody>
 																		<tr>
 																			<td style='font-family: sans-serif; font-size: 14px; vertical-align: top; border-radius: 5px; text-align: center; background: #35C786;' align='center' bgcolor='#35C786' valign='top'>
-																				<a href='%3%' target='_blank' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
+																				<a href='%3%' target='_blank' rel='noopener' style='color: #FFFFFF; text-decoration: none; -ms-word-break: break-all; word-break: break-all; border-radius: 5px; box-sizing: border-box; cursor: pointer; display: inline-block; font-size: 14px; font-weight: bold; background: #35C786; margin: 0; padding: 12px 30px; border: 1px solid #35c786;'>
 																				Um diese Einladung anzunehmen,<br>klicken Sie diese Schaltfläche
 																				</a>
 																			</td>

@@ -205,7 +205,7 @@
     <key alias="childItems" version="7.0">Elementy dzieci</key>
     <key alias="target" version="7.0">Cel</key>
     <key alias="scheduledPublishServerTime">Oznacza to następującą godzinę na serwerze:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">Co to oznacza?</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">Co to oznacza?</a>]]></key>
     <key alias="nestedContentDeleteItem">Czy na pewno chcesz usunąć ten element?</key>
     <key alias="nestedContentEditorNotSupported">Właściwość %0% używa edytora %1%, który nie jest wspierany przez Nested Content.</key>
     <key alias="addTextBox">Dodaj kolejne pole tekstowe</key>
@@ -321,7 +321,7 @@
     <key alias="recycleBinDeleting">Zawartość kosza jest teraz usuwana. Proszę nie zamykać tego okna do momentu zakończenia procesu.</key>
     <key alias="recycleBinIsEmpty">Zawartość kosza została usunięta</key>
     <key alias="recycleBinWarning">Usunięcie elementów z kosza powoduje ich trwałe i nieodwracalne skasowanie</key>
-    <key alias="regexSearchError"><![CDATA[Serwis <a target='_blank' href='http://regexlib.com'>regexlib.com</a> aktualnie nie jest dostępny, na co nie mamy wpływu. Bardzo przepraszamy za te utrudnienia.]]></key>
+    <key alias="regexSearchError"><![CDATA[Serwis <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> aktualnie nie jest dostępny, na co nie mamy wpływu. Bardzo przepraszamy za te utrudnienia.]]></key>
     <key alias="regexSearchHelp">Przeszukaj dla wyrażeń regularnych, aby dodać regułę sprawdzającą do formularza. Np. 'email' 'URL'</key>
     <key alias="removeMacro">Usuń Makro</key>
     <key alias="requiredField">Pole wymagane</key>
@@ -728,7 +728,7 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="instruction">Zaloguj się poniżej</key>
     <key alias="signInWith">Zaloguj się z</key>
     <key alias="timeout">Sesja wygasła</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">Zapomniałeś hasła?</key>
     <key alias="forgottenPasswordInstruction">E-mail z linkiem do zresetowania hasła zostanie wysłany na podany adres</key>
     <key alias="requestPasswordResetConfirmation">E-mail z instrukcjami do zresetowania hasła zostanie wysłany, jeśli zgadza się z naszą bazą danych</key>
