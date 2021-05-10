@@ -14,8 +14,9 @@
         /// an original <see cref="IPublishedElement"/> instance.
         /// </summary>
         /// <param name="content">The original content.</param>
-        protected PublishedElementModel(IPublishedElement content)
-            : base(content)
+        /// <param name="publishedValueFallback">The published value fallback.</param>
+        protected PublishedElementModel(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
+            : base(content, publishedValueFallback)
         { }
     }
 }

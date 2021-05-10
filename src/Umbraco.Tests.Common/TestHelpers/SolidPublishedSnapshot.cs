@@ -300,7 +300,7 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
     public class ContentType2 : PublishedContentModel
     {
         public ContentType2(IPublishedContent content, IPublishedValueFallback fallback)
-            : base(content)
+            : base(content, fallback)
         {
         }
 
@@ -319,7 +319,7 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
     public class PublishedContentStrong1 : PublishedContentModel
     {
         public PublishedContentStrong1(IPublishedContent content, IPublishedValueFallback fallback)
-            : base(content)
+            : base(content, fallback)
         {
         }
 
@@ -339,7 +339,7 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
     public class PublishedContentStrong2 : PublishedContentModel
     {
         public PublishedContentStrong2(IPublishedContent content, IPublishedValueFallback fallback)
-            : base(content)
+            : base(content, fallback)
         {
         }
 

@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
                 {
                     if (element.ContentType.Alias.InvariantEquals("contentN1"))
                     {
-                        return new TestElementModel(element);
+                        return new TestElementModel(element, Mock.Of<IPublishedValueFallback>());
                     }
 
                     return element;
@@ -236,8 +236,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
 
         public class TestElementModel : PublishedElementModel
         {
-            public TestElementModel(IPublishedElement content)
-                : base(content)
+            public TestElementModel(IPublishedElement content, IPublishedValueFallback fallback)
+                : base(content, fallback)
             {
             }
 

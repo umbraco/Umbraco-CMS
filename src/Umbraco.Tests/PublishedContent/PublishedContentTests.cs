@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Hosting;
@@ -28,7 +29,6 @@ using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Composing;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -248,7 +248,7 @@ namespace Umbraco.Tests.PublishedContent
         internal class Home : PublishedContentModel
         {
             public Home(IPublishedContent content, IPublishedValueFallback fallback)
-                : base(content)
+                : base(content, fallback)
             {}
         }
 
@@ -256,7 +256,7 @@ namespace Umbraco.Tests.PublishedContent
         internal class Anything : PublishedContentModel
         {
             public Anything(IPublishedContent content, IPublishedValueFallback fallback)
-                : base(content)
+                : base(content, fallback)
             { }
         }
 

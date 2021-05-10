@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Common.Published
         public class TestElementModel1 : PublishedElementModel
         {
             public TestElementModel1(IPublishedElement content, IPublishedValueFallback fallback)
-                : base(content)
+                : base(content, fallback)
             {
             }
 
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Tests.Common.Published
         public class TestElementModel2 : PublishedElementModel
         {
             public TestElementModel2(IPublishedElement content, IPublishedValueFallback fallback)
-                : base(content)
+                : base(content, fallback)
             {
             }
 
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Tests.Common.Published
         public class TestContentModel1 : PublishedContentModel
         {
             public TestContentModel1(IPublishedContent content, IPublishedValueFallback fallback)
-                : base(content)
+                : base(content, fallback)
             {
             }
 
@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Tests.Common.Published
         public class TestContentModel2 : PublishedContentModel
         {
             public TestContentModel2(IPublishedContent content, IPublishedValueFallback fallback)
-                : base(content)
+                : base(content, fallback)
             {
             }
 

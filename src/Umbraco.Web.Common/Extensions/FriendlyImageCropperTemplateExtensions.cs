@@ -1,16 +1,25 @@
-﻿using System;
-using System.Globalization;
-using Newtonsoft.Json.Linq;
+﻿using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Web.Common.DependencyInjection;
 
 namespace Umbraco.Extensions
 {
-    public static class ImageCropperTemplateCoreExtensions
+    public static class FriendlyImageCropperTemplateExtensions
     {
+        private static IImageUrlGenerator ImageUrlGenerator { get; } =
+            StaticServiceProvider.Instance.GetRequiredService<IImageUrlGenerator>();
+
+        private static IPublishedValueFallback PublishedValueFallback { get; } =
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedValueFallback>();
+
+        private static IPublishedUrlProvider PublishedUrlProvider { get; } =
+            StaticServiceProvider.Instance.GetRequiredService<IPublishedUrlProvider>();
+
+
         /// <summary>
         /// Gets the underlying image processing service URL by the crop alias (from the "umbracoFile" property alias) on the IPublishedContent item
         /// </summary>
@@ -20,21 +29,13 @@ namespace Umbraco.Extensions
         /// <param name="cropAlias">
         /// The crop alias e.g. thumbnail
         /// </param>
-        /// <param name="imageUrlGenerator">The image url generator.</param>
-        /// <param name="publishedValueFallback">The published value fallback.</param>
-        /// <param name="publishedUrlProvider">The published url provider.</param>
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
         public static string GetCropUrl(
             this IPublishedContent mediaItem,
-            string cropAlias,
-            IImageUrlGenerator imageUrlGenerator,
-            IPublishedValueFallback publishedValueFallback,
-            IPublishedUrlProvider publishedUrlProvider)
-        {
-            return mediaItem.GetCropUrl(imageUrlGenerator, publishedValueFallback, publishedUrlProvider, cropAlias: cropAlias, useCropDimensions: true);
-        }
+            string cropAlias) =>
+            mediaItem.GetCropUrl(cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
 
         /// <summary>
         /// Gets the underlying image processing service URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
@@ -48,22 +49,14 @@ namespace Umbraco.Extensions
         /// <param name="cropAlias">
         /// The crop alias e.g. thumbnail
         /// </param>
-        /// <param name="imageUrlGenerator">The image url generator.</param>
-        /// <param name="publishedValueFallback">The published value fallback.</param>
-        /// <param name="publishedUrlProvider">The published url provider.</param>
         /// <returns>
         /// The URL of the cropped image.
         /// </returns>
         public static string GetCropUrl(
             this IPublishedContent mediaItem,
             string propertyAlias,
-            string cropAlias,
-            IImageUrlGenerator imageUrlGenerator,
-            IPublishedValueFallback publishedValueFallback,
-            IPublishedUrlProvider publishedUrlProvider)
-        {
-            return mediaItem.GetCropUrl( imageUrlGenerator, publishedValueFallback, publishedUrlProvider, propertyAlias: propertyAlias, cropAlias: cropAlias, useCropDimensions: true);
-        }
+            string cropAlias) =>
+            mediaItem.GetCropUrl(propertyAlias, cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
 
         /// <summary>
         /// Gets the underlying image processing service URL from the IPublishedContent item.
@@ -71,9 +64,6 @@ namespace Umbraco.Extensions
         /// <param name="mediaItem">
         /// The IPublishedContent item.
         /// </param>
-        /// <param name="imageUrlGenerator">The image url generator.</param>
-        /// <param name="publishedValueFallback">The published value fallback.</param>
-        /// <param name="publishedUrlProvider">The published url provider.</param>
         /// <param name="width">
         /// The width of the output image.
         /// </param>
@@ -105,7 +95,7 @@ namespace Umbraco.Extensions
         /// Add a serialized date of the last edit of the item to ensure client cache refresh when updated
         /// </param>
         /// <param name="furtherOptions">
-        /// These are any query string parameters (formatted as query strings) that ImageProcessor supports. For example:
+        /// These are any query string parameters (formatted as query strings) that the underlying image processing service supports. For example:
         /// <example>
         /// <![CDATA[
         /// furtherOptions: "&bgcolor=fff"
@@ -122,60 +112,38 @@ namespace Umbraco.Extensions
         /// The URL of the cropped image.
         /// </returns>
         public static string GetCropUrl(
-             this IPublishedContent mediaItem,
-             IImageUrlGenerator imageUrlGenerator,
-             IPublishedValueFallback publishedValueFallback,
-             IPublishedUrlProvider publishedUrlProvider,
-             int? width = null,
-             int? height = null,
-             string propertyAlias = Cms.Core.Constants.Conventions.Media.File,
-             string cropAlias = null,
-             int? quality = null,
-             ImageCropMode? imageCropMode = null,
-             ImageCropAnchor? imageCropAnchor = null,
-             bool preferFocalPoint = false,
-             bool useCropDimensions = false,
-             bool cacheBuster = true,
-             string furtherOptions = null,
-             ImageCropRatioMode? ratioMode = null,
-             bool upScale = true)
-        {
-            if (mediaItem == null) throw new ArgumentNullException("mediaItem");
-
-            var cacheBusterValue = cacheBuster ? mediaItem.UpdateDate.ToFileTimeUtc().ToString(CultureInfo.InvariantCulture) : null;
-
-            if (mediaItem.HasProperty(propertyAlias) == false || mediaItem.HasValue(propertyAlias) == false)
-                return string.Empty;
-
-            var mediaItemUrl = mediaItem.MediaUrl(publishedUrlProvider, propertyAlias: propertyAlias);
-
-            //get the default obj from the value converter
-            var cropperValue = mediaItem.Value(publishedValueFallback, propertyAlias);
-
-            //is it strongly typed?
-            var stronglyTyped = cropperValue as ImageCropperValue;
-            if (stronglyTyped != null)
-            {
-                return GetCropUrl(
-                    mediaItemUrl, imageUrlGenerator, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                    cacheBusterValue, furtherOptions, ratioMode, upScale);
-            }
-
-            //this shouldn't be the case but we'll check
-            var jobj = cropperValue as JObject;
-            if (jobj != null)
-            {
-                stronglyTyped = jobj.ToObject<ImageCropperValue>();
-                return GetCropUrl(
-                    mediaItemUrl, imageUrlGenerator, stronglyTyped, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                    cacheBusterValue, furtherOptions, ratioMode, upScale);
-            }
-
-            //it's a single string
-            return GetCropUrl(
-                mediaItemUrl, imageUrlGenerator, width, height, mediaItemUrl, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions,
-                cacheBusterValue, furtherOptions, ratioMode, upScale);
-        }
+            this IPublishedContent mediaItem,
+            int? width = null,
+            int? height = null,
+            string propertyAlias = Cms.Core.Constants.Conventions.Media.File,
+            string cropAlias = null,
+            int? quality = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
+            bool preferFocalPoint = false,
+            bool useCropDimensions = false,
+            bool cacheBuster = true,
+            string furtherOptions = null,
+            ImageCropRatioMode? ratioMode = null,
+            bool upScale = true)
+            => mediaItem.GetCropUrl(
+                ImageUrlGenerator,
+                PublishedValueFallback,
+                PublishedUrlProvider,
+                width,
+                height,
+                propertyAlias,
+                cropAlias,
+                quality,
+                imageCropMode,
+                imageCropAnchor,
+                preferFocalPoint,
+                useCropDimensions,
+                cacheBuster,
+                furtherOptions,
+                ratioMode,
+                upScale
+            );
 
         /// <summary>
         /// Gets the underlying image processing service URL from the image path.
@@ -232,7 +200,6 @@ namespace Umbraco.Extensions
         /// </returns>
         public static string GetCropUrl(
             this string imageUrl,
-            IImageUrlGenerator imageUrlGenerator,
             int? width = null,
             int? height = null,
             string imageCropperValue = null,
@@ -246,27 +213,28 @@ namespace Umbraco.Extensions
             string furtherOptions = null,
             ImageCropRatioMode? ratioMode = null,
             bool upScale = true)
-        {
-            if (string.IsNullOrEmpty(imageUrl)) return string.Empty;
-
-            ImageCropperValue cropDataSet = null;
-            if (string.IsNullOrEmpty(imageCropperValue) == false && imageCropperValue.DetectIsJson() && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
-            {
-                cropDataSet = imageCropperValue.DeserializeImageCropperValue();
-            }
-            return GetCropUrl(
-                imageUrl, imageUrlGenerator, cropDataSet, width, height, cropAlias, quality, imageCropMode,
-                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
-        }
+            => imageUrl.GetCropUrl(
+                ImageUrlGenerator,
+                width,
+                height,
+                imageCropperValue,
+                cropAlias,
+                quality,
+                imageCropMode,
+                imageCropAnchor,
+                preferFocalPoint,
+                useCropDimensions,
+                cacheBusterValue,
+                furtherOptions,
+                ratioMode,
+                upScale
+                );
 
         /// <summary>
         /// Gets the underlying image processing service URL from the image path.
         /// </summary>
         /// <param name="imageUrl">
         /// The image URL.
-        /// </param>
-        /// <param name="imageUrlGenerator">
-        /// The generator that will process all the options and the image URL to return a full image URLs with all processing options appended
         /// </param>
         /// <param name="cropDataSet"></param>
         /// <param name="width">
@@ -311,11 +279,10 @@ namespace Umbraco.Extensions
         /// If the image should be upscaled to requested dimensions
         /// </param>
         /// <returns>
-        /// The <see cref="string"/>.
+        /// The the URL of the cropped image.
         /// </returns>
         public static string GetCropUrl(
             this string imageUrl,
-            IImageUrlGenerator imageUrlGenerator,
             ImageCropperValue cropDataSet,
             int? width = null,
             int? height = null,
@@ -330,72 +297,21 @@ namespace Umbraco.Extensions
             ImageCropRatioMode? ratioMode = null,
             bool upScale = true,
             string animationProcessMode = null)
-        {
-            if (string.IsNullOrEmpty(imageUrl)) return string.Empty;
-
-            ImageUrlGenerationOptions options;
-
-            if (cropDataSet != null && (imageCropMode == ImageCropMode.Crop || imageCropMode == null))
-            {
-                var crop = cropDataSet.GetCrop(cropAlias);
-
-                // if a crop was specified, but not found, return null
-                if (crop == null && !string.IsNullOrWhiteSpace(cropAlias))
-                    return null;
-
-                options = cropDataSet.GetCropBaseOptions(imageUrl, crop, string.IsNullOrWhiteSpace(cropAlias), preferFocalPoint);
-
-                if (crop != null & useCropDimensions)
-                {
-                    width = crop.Width;
-                    height = crop.Height;
-                }
-
-                // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a width parameter has been passed we can get the crop ratio for the height
-                if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width != null && height == null)
-                {
-                    options.HeightRatio = (decimal)crop.Height / crop.Width;
-                }
-
-                // If a predefined crop has been specified & there are no coordinates & no ratio mode, but a height parameter has been passed we can get the crop ratio for the width
-                if (crop != null && string.IsNullOrEmpty(cropAlias) == false && crop.Coordinates == null && ratioMode == null && width == null && height != null)
-                {
-                    options.WidthRatio = (decimal)crop.Width / crop.Height;
-                }
-            }
-            else
-            {
-                options = new ImageUrlGenerationOptions (imageUrl)
-                {
-                    ImageCropMode = (imageCropMode ?? ImageCropMode.Pad),
-                    ImageCropAnchor = imageCropAnchor
-                };
-            }
-
-            options.Quality = quality;
-            options.Width = ratioMode != null && ratioMode.Value == ImageCropRatioMode.Width ? null : width;
-            options.Height = ratioMode != null && ratioMode.Value == ImageCropRatioMode.Height ? null : height;
-            options.AnimationProcessMode = animationProcessMode;
-
-            if (ratioMode == ImageCropRatioMode.Width && height != null)
-            {
-                // if only height specified then assume a square
-                if (width == null) width = height;
-                options.WidthRatio = (decimal)width / (decimal)height;
-            }
-
-            if (ratioMode == ImageCropRatioMode.Height && width != null)
-            {
-                // if only width specified then assume a square
-                if (height == null) height = width;
-                options.HeightRatio = (decimal)height / (decimal)width;
-            }
-
-            options.UpScale = upScale;
-            options.FurtherOptions = furtherOptions;
-            options.CacheBusterValue = cacheBusterValue;
-
-            return imageUrlGenerator.GetImageUrl(options);
-        }
+            => imageUrl.GetCropUrl(
+                ImageUrlGenerator,
+                cropDataSet,
+                width,
+                height,
+                cropAlias,
+                quality, imageCropMode,
+                imageCropAnchor,
+                preferFocalPoint,
+                useCropDimensions,
+                cacheBusterValue,
+                furtherOptions,
+                ratioMode,
+                upScale,
+                animationProcessMode
+            );
     }
 }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net472</TargetFramework>
@@ -36,11 +36,11 @@
 
     <ItemGroup>
       <PackageReference Include="Examine.Lucene" Version="2.0.0-alpha.20200128.15" />
-        <PackageReference Include="Microsoft.SourceLink.GitHub">
-            <Version>1.0.0</Version>
-            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-            <PrivateAssets>all</PrivateAssets>
-        </PackageReference>
+      <PackageReference Include="Microsoft.SourceLink.GitHub">
+          <Version>1.0.0</Version>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+          <PrivateAssets>all</PrivateAssets>
+      </PackageReference>
       <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
       <PackageReference Include="NPoco" Version="4.0.2" />
         <PackageReference Include="SecurityCodeScan">

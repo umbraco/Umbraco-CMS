@@ -10,15 +10,18 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     public abstract class PublishedElementWrapped : IPublishedElement
     {
         private readonly IPublishedElement _content;
+        private readonly IPublishedValueFallback _publishedValueFallback;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PublishedElementWrapped"/> class
         /// with an <c>IPublishedElement</c> instance to wrap.
         /// </summary>
         /// <param name="content">The content to wrap.</param>
-        protected PublishedElementWrapped(IPublishedElement content)
+        /// <param name="publishedValueFallback">The published value fallback.</param>
+        protected PublishedElementWrapped(IPublishedElement content, IPublishedValueFallback publishedValueFallback)
         {
             _content = content;
+            _publishedValueFallback = publishedValueFallback;
         }
 
         /// <summary>

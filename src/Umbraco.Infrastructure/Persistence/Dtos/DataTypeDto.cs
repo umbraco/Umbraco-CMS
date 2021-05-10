@@ -1,4 +1,4 @@
-﻿using NPoco;
+using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
     [TableName(Cms.Core.Constants.DatabaseSchema.Tables.DataType)]
     [PrimaryKey("nodeId", AutoIncrement = false)]
     [ExplicitColumns]
-    internal class DataTypeDto
+    public class DataTypeDto
     {
         [Column("nodeId")]
         [PrimaryKeyColumn(AutoIncrement = false)]

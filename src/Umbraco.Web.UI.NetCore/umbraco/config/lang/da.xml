@@ -1896,8 +1896,7 @@ Mange hilsner fra Umbraco robotten
     <key alias="addThis">Tilføj %0%</key>
     <key alias="propertyEditorNotSupported">Feltet %0% bruger editor %1% som ikke er supporteret for blokke.</key>
   </area>
-  </area>
-    <area alias="contentTemplatesDashboard">
+  <area alias="contentTemplatesDashboard">
         <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>
         <key alias="whatDescription">Indholdsskabeloner er foruddefineret indhold der kan vælges når der oprettes nye indholdselementer.</key>
         <key alias="createHeadline">Hvordan opretter jeg en Indholdsskabelon?</key>
