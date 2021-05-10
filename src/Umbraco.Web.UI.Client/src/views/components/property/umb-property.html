@@ -1,7 +1,7 @@
 <div class="umb-property">
     <ng-form name="propertyForm">
         <div class="control-group umb-control-group"
-             ng-class="{hidelabel:vm.property.hideLabel, 'umb-control-group__listview': vm.property.alias === '_umb_containerView'}">
+             ng-class="{'hidelabel':vm.property.hideLabel, '--label-on-top':vm.property.labelOnTop, 'umb-control-group__listview': vm.property.alias === '_umb_containerView'}">
 
             <val-property-msg></val-property-msg>
 
@@ -22,7 +22,7 @@
 
                     </label>
 
-                    <umb-property-actions actions="vm.propertyActions"></umb-property-actions>
+                    <umb-property-actions ng-if="!vm.showInherit" actions="vm.propertyActions"></umb-property-actions>
 
                     <small class="control-description" ng-if="vm.property.description" ng-bind-html="vm.property.description | preserveNewLineInHtml"></small>
                 </div>

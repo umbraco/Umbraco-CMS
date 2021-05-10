@@ -27,7 +27,7 @@ namespace Umbraco.Web.HealthCheck
                     }
                     catch (Exception ex)
                     {
-                        Logger.Error<HealthCheckResults>(ex, "Error running scheduled health check: {HealthCheckName}", t.Name);
+                        Logger.Error<HealthCheckResults, string>(ex, "Error running scheduled health check: {HealthCheckName}", t.Name);
                         var message = $"Health check failed with exception: {ex.Message}. See logs for details.";
                         return new List<HealthCheckStatus>
                         {
@@ -62,16 +62,16 @@ namespace Umbraco.Web.HealthCheck
                 var checkIsSuccess = result.Value.All(x => x.ResultType == StatusResultType.Success);
                 if (checkIsSuccess)
                 {
-                    Logger.Info<HealthCheckResults>("Checks for '{HealthCheckName}' all completed successfully.", checkName);
+                    Logger.Info<HealthCheckResults, string>("Checks for '{HealthCheckName}' all completed successfully.", checkName);
                 }
                 else
                 {
-                    Logger.Warn<HealthCheckResults>("Checks for '{HealthCheckName}' completed with errors.", checkName);
+                    Logger.Warn<HealthCheckResults, string>("Checks for '{HealthCheckName}' completed with errors.", checkName);
                 }
 
                 foreach (var checkResult in checkResults)
                 {
-                    Logger.Info<HealthCheckResults>("Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'", checkName, checkResult.ResultType, checkResult.Message);
+                    Logger.Info<HealthCheckResults, string, StatusResultType, string>("Result for {HealthCheckName}: {HealthCheckResult}, Message: '{HealthCheckMessage}'", checkName, checkResult.ResultType, checkResult.Message);
                 }
             }
         }

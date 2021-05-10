@@ -34,7 +34,7 @@ namespace Umbraco.Web.Trees
 
             //this will load in a custom UI instead of the dashboard for the root node
             root.RoutePath = $"{Constants.Applications.Settings}/{Constants.Trees.Languages}/overview";
-            root.Icon = "icon-globe";
+            root.Icon = Constants.Icons.Language;
             root.HasChildren = false;
             root.MenuUrl = null;
 

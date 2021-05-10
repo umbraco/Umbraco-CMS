@@ -102,10 +102,11 @@ That said, the Umbraco development team likes to follow the hints that ReSharper
 
 The Core Contributors team consists of one member of Umbraco HQ, [Sebastiaan](https://github.com/nul800sebastiaan), who gets assistance from the following community members who have comitted to volunteering their free time:
 
-- [Anders Bjerner](https://github.com/abjerner)
-- [Emma Burstow](https://github.com/emmaburstow)
-- [Poornima Nayar](https://github.com/poornimanayar)
-- [Kenn Jacobsen](https://twitter.com/KennJacobsen_DK)
+- [Nathan Woulfe](https://github.com/nathanwoulfe)
+- [Joe Glombek](https://github.com/glombek)
+- [Laura Weatherhead](https://github.com/lssweatherhead)
+- [Michael Latouche](https://github.com/mikecp)
+- [Owain Williams](https://github.com/OwainWilliams)
 
 
 These wonderful people aim to provide you with a first reply to your PR, review and test out your changes and on occasions, they might ask more questions. If they are happy with your work, they'll let Umbraco HQ know by approving the PR. Hq will have final sign-off and will check the work again before it is merged. 

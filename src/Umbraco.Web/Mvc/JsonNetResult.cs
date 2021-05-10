@@ -22,9 +22,18 @@ namespace Umbraco.Web.Mvc
         public JsonSerializerSettings SerializerSettings { get; set; }
         public Formatting Formatting { get; set; }
 
+        /// <summary>
+        /// Default, unchanged JsonSerializerSettings
+        /// </summary>
+        public static readonly JsonSerializerSettings DefaultJsonSerializerSettings = new JsonSerializerSettings();
+
         public JsonNetResult()
         {
             SerializerSettings = new JsonSerializerSettings();
+        }
+        public JsonNetResult(JsonSerializerSettings jsonSerializerSettings)
+        {
+            SerializerSettings = jsonSerializerSettings;
         }
 
         public override void ExecuteResult(ControllerContext context)

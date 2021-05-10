@@ -15,6 +15,7 @@ function treeSearchBox(localizationService, searchService, $q) {
             datatypeKey: "@",
             hideSearchCallback: "=",
             searchCallback: "=",
+            inputId: "@",
             autoFocus: "="
         },
         restrict: "E",    // restrict to an element

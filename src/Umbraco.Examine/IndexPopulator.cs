@@ -13,9 +13,16 @@ namespace Umbraco.Examine
     {
         public override bool IsRegistered(IIndex index)
         {
-            if (base.IsRegistered(index)) return true;
-            return index is TIndex;
+            if (base.IsRegistered(index))
+                return true;
+
+            if (!(index is TIndex casted))
+                return false;
+
+            return IsRegistered(casted);
         }
+
+        public virtual bool IsRegistered(TIndex index) => true;
     }
 
     public abstract class IndexPopulator : IIndexPopulator

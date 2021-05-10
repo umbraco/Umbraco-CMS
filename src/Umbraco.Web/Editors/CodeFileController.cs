@@ -23,6 +23,7 @@ using Umbraco.Web.WebApi.Filters;
 using Umbraco.Web.Trees;
 using Stylesheet = Umbraco.Core.Models.Stylesheet;
 using StylesheetRule = Umbraco.Web.Models.ContentEditing.StylesheetRule;
+using CharArrays = Umbraco.Core.Constants.CharArrays;
 
 namespace Umbraco.Web.Editors
 {
@@ -277,7 +278,7 @@ namespace Umbraco.Web.Editors
 
             if (id != Core.Constants.System.RootString)
             {
-                codeFileDisplay.VirtualPath += id.TrimStart("/").EnsureEndsWith("/");
+                codeFileDisplay.VirtualPath += id.TrimStart(CharArrays.ForwardSlash).EnsureEndsWith("/");
                 //if it's not new then it will have a path, otherwise it won't
                 codeFileDisplay.Path = Url.GetTreePathFromFilePath(id);
             }
@@ -473,7 +474,7 @@ namespace Umbraco.Web.Editors
                 data.Content = StylesheetHelper.ReplaceRule(data.Content, rule.Name, null);
             }
 
-            data.Content = data.Content.TrimEnd('\n', '\r');
+            data.Content = data.Content.TrimEnd(CharArrays.LineFeedCarriageReturn);
 
             // now add all the posted rules
             if (data.Rules != null && data.Rules.Any())
@@ -637,7 +638,10 @@ namespace Umbraco.Web.Editors
         {
             var path = IOHelper.MapPath(systemDirectory + "/" + virtualPath);
             var dirInfo = new DirectoryInfo(path);
-            return dirInfo.Attributes == FileAttributes.Directory;
+
+            // If you turn off indexing in Windows this will have the attribute:
+            // `FileAttributes.Directory | FileAttributes.NotContentIndexed`
+            return (dirInfo.Attributes & FileAttributes.Directory) != 0;
         }
 
         // this is an internal class for passing stylesheet data from the client to the controller while editing
