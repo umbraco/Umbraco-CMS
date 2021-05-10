@@ -35,16 +35,8 @@ namespace Umbraco.Cms.Infrastructure.Sync
                 ref _syncBootState,
                 ref _syncBootStateReady,
                 ref _syncBootStateLock,
-                () =>
-                {
-                    var lastId = _lastSyncedFileManager.LastSyncedId;
-                    if (_cacheInstructionService.IsColdBootRequired(lastId))
-                    {
-                        return SyncBootState.ColdBoot;
-                    }
-                    return InitializeColdBootState(lastId);
-                });
-        
+                () => InitializeColdBootState(_lastSyncedFileManager.LastSyncedId));
+
         private SyncBootState InitializeColdBootState(int lastId)
         {
             var coldboot = false;
@@ -54,27 +46,35 @@ namespace Umbraco.Cms.Infrastructure.Sync
             {
                 // We haven't synced - in this case we aren't going to sync the whole thing, we will assume this is a new
                 // server and it will need to rebuild it's own caches, e.g. Lucene or the XML cache file.
-                _logger.LogWarning("No last synced Id found, this generally means this is a new server/install."
-                    + " The server will build its caches and indexes, and then adjust its last synced Id to the latest found in"
-                    + " the database and maintain cache updates based on that Id.");
+                _logger.LogWarning("No last synced Id found, this generally means this is a new server/install. "
+                    + "A cold boot will be triggered.");
 
                 coldboot = true;
             }
             else
             {
-                // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
-                // row so we will sum these numbers to get the actual count.
-                var limit = _globalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount;
-                if (_cacheInstructionService.IsInstructionCountOverLimit(lastId, limit, out int count))
+                if (_cacheInstructionService.IsColdBootRequired(lastId))
                 {
-                    // Too many instructions, proceed to cold boot.
-                    _logger.LogWarning(
-                        "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
-                        + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
-                        + " to the latest found in the database and maintain cache updates based on that Id.",
-                        count, limit);
+                    _logger.LogWarning("Last synced Id found {LastSyncedId} but was not found in the database. This generally means this server/install "
+                    + " has been idle for too long and the instructions in the database have been pruned. A cold boot will be triggered.", lastId);
 
                     coldboot = true;
+                }
+                else
+                {
+                    // Check for how many instructions there are to process, each row contains a count of the number of instructions contained in each
+                    // row so we will sum these numbers to get the actual count.
+                    var limit = _globalSettings.DatabaseServerMessenger.MaxProcessingInstructionCount;
+                    if (_cacheInstructionService.IsInstructionCountOverLimit(lastId, limit, out int count))
+                    {
+                        // Too many instructions, proceed to cold boot.
+                        _logger.LogWarning(
+                            "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount}). "
+                            + "A cold boot will be triggered.",
+                            count, limit);
+
+                        coldboot = true;
+                    }
                 }
             }
 

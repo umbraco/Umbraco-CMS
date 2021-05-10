@@ -51,22 +51,19 @@ namespace Umbraco.Extensions
         public static IEnumerable<string> GetCultureAndInvariantFields(this IUmbracoIndex index, string culture)
         {
             IEnumerable<string> allFields = index.GetFieldNames();
-            var results = new List<string>();
-            // ReSharper disable once LoopCanBeConvertedToQuery
+
             foreach (var field in allFields)
             {
                 var match = CultureIsoCodeFieldNameMatchExpression.Match(field);
                 if (match.Success && match.Groups.Count == 3 && culture.InvariantEquals(match.Groups[2].Value))
                 {
-                    results.Add(field); //matches this culture field
+                    yield return field; //matches this culture field
                 }
                 else if (!match.Success)
                 {
-                    results.Add(field); //matches no culture field (invariant)
+                    yield return field; //matches no culture field (invariant)
                 }
             }
-
-            return results;
         }
 
         public static IBooleanOperation Id(this IQuery query, int id)

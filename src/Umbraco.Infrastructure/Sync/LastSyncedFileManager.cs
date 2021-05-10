@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Globalization;
 using System.IO;
 using System.Threading;
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// <returns></returns>
         public string DistCacheFilePath => LazyInitializer.EnsureInitialized(ref _distCacheFile, () =>
          {
-             var fileName = _hostingEnvironment.ApplicationId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
+             var fileName = (Environment.MachineName + _hostingEnvironment.ApplicationId).GenerateHash() + "-lastsynced.txt";
 
              var distCacheFilePath = Path.Combine(_hostingEnvironment.LocalTempPath, "DistCache", fileName);
 

@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
             _syncIdle = new ManualResetEvent(true);
 
             // See notes on _localIdentity
-            LocalIdentity = NetworkHelper.MachineName // eg DOMAIN\SERVER
+            LocalIdentity = Environment.MachineName // eg DOMAIN\SERVER
                 + "/" + hostingEnvironment.ApplicationId // eg /LM/S3SVC/11/ROOT
                 + " [P" + Process.GetCurrentProcess().Id // eg 1234
                 + "/D" + AppDomain.CurrentDomain.Id // eg 22
