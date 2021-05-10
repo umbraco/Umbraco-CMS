@@ -30,7 +30,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 {
     internal class PublishedSnapshotService : IPublishedSnapshotService
     {
+        private readonly PublishedSnapshotServiceOptions _options;
         private readonly ISyncBootStateAccessor _syncBootStateAccessor;
+        private readonly IMainDom _mainDom;
         private readonly ServiceContext _serviceContext;
         private readonly IPublishedContentTypeFactory _publishedContentTypeFactory;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
@@ -50,9 +52,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         private bool _isReadSet;
         private object _isReadyLock;
 
-        private readonly ContentStore _contentStore;
-        private readonly ContentStore _mediaStore;
-        private readonly SnapDictionary<int, Domain> _domainStore;
+        private ContentStore _contentStore;
+        private ContentStore _mediaStore;
+        private SnapDictionary<int, Domain> _domainStore;
         private readonly object _storesLock = new object();
         private readonly object _elementsLock = new object();
 
@@ -90,7 +92,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             IHostingEnvironment hostingEnvironment,
             IOptions<NuCacheSettings> config)
         {
+            _options = options;
             _syncBootStateAccessor = syncBootStateAccessor;
+            _mainDom = mainDom;
             _serviceContext = serviceContext;
             _publishedContentTypeFactory = publishedContentTypeFactory;
             _publishedSnapshotAccessor = publishedSnapshotAccessor;
@@ -105,36 +109,6 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             _hostingEnvironment = hostingEnvironment;
             _config = config.Value;
             _publishedModelFactory = publishedModelFactory;
-
-            // lock this entire call, we only want a single thread to be accessing the stores at once and within
-            // the call below to mainDom.Register, a callback may occur on a threadpool thread to MainDomRelease
-            // at the same time as we are trying to write to the stores. MainDomRelease also locks on _storesLock so
-            // it will not be able to close the stores until we are done populating (if the store is empty)
-            lock (_storesLock)
-            {
-                if (!options.IgnoreLocalDb)
-                {
-                    mainDom.Register(MainDomRegister, MainDomRelease);
-
-                    // stores are created with a db so they can write to it, but they do not read from it,
-                    // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
-                    // figure out whether it can read the databases or it should populate them from sql
-
-                    _logger.LogInformation("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDbExists);
-                    _contentStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory, _localContentDb);
-                    _logger.LogInformation("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDbExists);
-                    _mediaStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory, _localMediaDb);
-                }
-                else
-                {
-                    _logger.LogInformation("Creating the content store (local db ignored)");
-                    _contentStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory);
-                    _logger.LogInformation("Creating the media store (local db ignored)");
-                    _mediaStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory);
-                }
-
-                _domainStore = new SnapDictionary<int, Domain>();
-            }
         }
 
         protected PublishedSnapshot CurrentPublishedSnapshot => (PublishedSnapshot)_publishedSnapshotAccessor.PublishedSnapshot;
@@ -255,9 +229,35 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             ref _isReadyLock,
             () =>
             {
-                // even though we are ready locked here we want to ensure that the stores lock is also locked
+                // lock this entire call, we only want a single thread to be accessing the stores at once and within
+                // the call below to mainDom.Register, a callback may occur on a threadpool thread to MainDomRelease
+                // at the same time as we are trying to write to the stores. MainDomRelease also locks on _storesLock so
+                // it will not be able to close the stores until we are done populating (if the store is empty)
                 lock (_storesLock)
                 {
+                    if (!_options.IgnoreLocalDb)
+                    {
+                        _mainDom.Register(MainDomRegister, MainDomRelease);
+
+                        // stores are created with a db so they can write to it, but they do not read from it,
+                        // stores need to be populated, happens in OnResolutionFrozen which uses _localDbExists to
+                        // figure out whether it can read the databases or it should populate them from sql
+
+                        _logger.LogInformation("Creating the content store, localContentDbExists? {LocalContentDbExists}", _localContentDbExists);
+                        _contentStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory, _localContentDb);
+                        _logger.LogInformation("Creating the media store, localMediaDbExists? {LocalMediaDbExists}", _localMediaDbExists);
+                        _mediaStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory, _localMediaDb);
+                    }
+                    else
+                    {
+                        _logger.LogInformation("Creating the content store (local db ignored)");
+                        _contentStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory);
+                        _logger.LogInformation("Creating the media store (local db ignored)");
+                        _mediaStore = new ContentStore(_publishedSnapshotAccessor, _variationContextAccessor, _loggerFactory.CreateLogger("ContentStore"), _loggerFactory, _publishedModelFactory);
+                    }
+
+                    _domainStore = new SnapDictionary<int, Domain>();
+
                     var okContent = false;
                     var okMedia = false;
 
