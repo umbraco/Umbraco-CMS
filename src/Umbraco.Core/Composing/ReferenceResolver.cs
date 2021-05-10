@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.Loader;
 using System.Security;
 using Microsoft.Extensions.Logging;
 
@@ -89,7 +90,7 @@ namespace Umbraco.Cms.Core.Composing
                         // Can't do Assembly.Load() as in .NET Core it works by default only for assemblies that have been published as part of the app.
                         // https://github.com/dotnet/runtime/issues/13511#issuecomment-537475896
                         // So now we have to use LoadFrom and with the full path to the DLL on disk
-                        var assembly = Assembly.LoadFrom(dll);
+                        var assembly = AssemblyLoadContext.Default.LoadFromAssemblyPath(dll);
                         assemblies.Add(assembly);
                     }
                 }
