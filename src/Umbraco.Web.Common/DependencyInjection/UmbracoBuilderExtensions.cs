@@ -316,9 +316,6 @@ namespace Umbraco.Extensions
 
             builder.AddHttpClients();
 
-            // TODO: Does this belong in web components??
-            builder.AddNuCache();
-
             return builder;
         }
 

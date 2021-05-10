@@ -116,13 +116,29 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // NOTE: These aren't used within this object but are made available internally to improve the IdKey lookup performance
         // when nucache is enabled.
         // TODO: Does this need to be here?
-        internal int GetDocumentId(Guid udi) => GetId(_contentStore, udi);
+        internal int GetDocumentId(Guid udi)
+        {
+            EnsureCaches();
+            return GetId(_contentStore, udi);
+        }
 
-        internal int GetMediaId(Guid udi) => GetId(_mediaStore, udi);
+        internal int GetMediaId(Guid udi)
+        {
+            EnsureCaches();
+            return GetId(_mediaStore, udi);
+        }
 
-        internal Guid GetDocumentUid(int id) => GetUid(_contentStore, id);
+        internal Guid GetDocumentUid(int id)
+        {
+            EnsureCaches();
+            return GetUid(_contentStore, id);
+        }
 
-        internal Guid GetMediaUid(int id) => GetUid(_mediaStore, id);
+        internal Guid GetMediaUid(int id)
+        {
+            EnsureCaches();
+            return GetUid(_mediaStore, id);
+        }
 
         private int GetId(ContentStore store, Guid uid) => store.LiveSnapshot.Get(uid)?.Id ?? 0;
 

@@ -46,6 +46,7 @@ namespace Umbraco.Extensions
                 .AddWebServer()
                 .AddPreviewSupport()
                 .AddHostedServices()
+                .AddNuCache()
                 .AddDistributedCache()
                 .AddModelsBuilderDashboard()
                 .AddUnattedInstallCreateUser()
