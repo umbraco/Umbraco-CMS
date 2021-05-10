@@ -291,6 +291,7 @@
     <Compile Include="Security\BackOfficeExternalLoginProviderErrorMiddlware.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderErrors.cs" />
     <Compile Include="Security\BackOfficeExternalLoginProviderOptions.cs" />
+    <Compile Include="Security\ClaimsIdentityExtensions.cs" />
     <Compile Include="Security\SignOutAuditEventArgs.cs" />
     <Compile Include="Security\UserInviteEventArgs.cs" />
     <Compile Include="Services\DashboardService.cs" />
