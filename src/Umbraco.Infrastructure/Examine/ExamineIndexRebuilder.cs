@@ -113,26 +113,36 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 Thread.Sleep(delay);
             }
 
-            if (!Monitor.TryEnter(_rebuildLocker))
+            try
             {
-                _logger.LogWarning("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
-            }
-            else
-            {
-                if (!_examineManager.TryGetIndex(indexName, out IIndex index))
+                if (!Monitor.TryEnter(_rebuildLocker))
                 {
-                    throw new InvalidOperationException($"No index found with name {indexName}");
+                    _logger.LogWarning("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
                 }
-
-                index.CreateIndex(); // clear the index
-                foreach (IIndexPopulator populator in _populators)
+                else
                 {
-                    if (cancellationToken.IsCancellationRequested)
+                    if (!_examineManager.TryGetIndex(indexName, out IIndex index))
                     {
-                        return;
+                        throw new InvalidOperationException($"No index found with name {indexName}");
                     }
 
-                    populator.Populate(index);
+                    index.CreateIndex(); // clear the index
+                    foreach (IIndexPopulator populator in _populators)
+                    {
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
+                        populator.Populate(index);
+                    }
+                }
+            }
+            finally
+            {
+                if (Monitor.IsEntered(_rebuildLocker))
+                {
+                    Monitor.Exit(_rebuildLocker);
                 }
             }
         }
@@ -144,42 +154,52 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 Thread.Sleep(delay);
             }
 
-            if (!Monitor.TryEnter(_rebuildLocker))
+            try
             {
-                _logger.LogWarning($"Call was made to {nameof(RebuildIndexes)} but the task runner for rebuilding is already running");
-            }
-            else
-            {
-                IIndex[] indexes = (onlyEmptyIndexes
-                  ? _examineManager.Indexes.Where(x => !x.IndexExists())
-                  : _examineManager.Indexes).ToArray();
-
-                if (indexes.Length == 0)
+                if (!Monitor.TryEnter(_rebuildLocker))
                 {
-                    return;
+                    _logger.LogWarning($"Call was made to {nameof(RebuildIndexes)} but the task runner for rebuilding is already running");
                 }
-
-                foreach (IIndex index in indexes)
+                else
                 {
-                    index.CreateIndex(); // clear the index
-                }
+                    IIndex[] indexes = (onlyEmptyIndexes
+                      ? _examineManager.Indexes.Where(x => !x.IndexExists())
+                      : _examineManager.Indexes).ToArray();
 
-                // run each populator over the indexes
-                foreach (IIndexPopulator populator in _populators)
-                {
-                    if (cancellationToken.IsCancellationRequested)
+                    if (indexes.Length == 0)
                     {
                         return;
                     }
 
-                    try
+                    foreach (IIndex index in indexes)
                     {
-                        populator.Populate(indexes);
+                        index.CreateIndex(); // clear the index
                     }
-                    catch (Exception e)
+
+                    // run each populator over the indexes
+                    foreach (IIndexPopulator populator in _populators)
                     {
-                        _logger.LogError(e, "Index populating failed for populator {Populator}", populator.GetType());
+                        if (cancellationToken.IsCancellationRequested)
+                        {
+                            return;
+                        }
+
+                        try
+                        {
+                            populator.Populate(indexes);
+                        }
+                        catch (Exception e)
+                        {
+                            _logger.LogError(e, "Index populating failed for populator {Populator}", populator.GetType());
+                        }
                     }
+                }
+            }
+            finally
+            {
+                if (Monitor.IsEntered(_rebuildLocker))
+                {
+                    Monitor.Exit(_rebuildLocker);
                 }
             }
         }

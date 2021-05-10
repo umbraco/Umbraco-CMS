@@ -35,9 +35,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
             return isHealthy ? Attempt<string>.Succeed() : Attempt.Fail(indexError.Message);
         }
 
-        public Task<long> GetDocumentCountAsync() => Index.GetDocumentCountAsync();
+        public long GetDocumentCount() => Index.GetDocumentCount();
 
-        public Task<IEnumerable<string>> GetFieldNamesAsync() => Index.GetFieldNamesAsync();
+        public IEnumerable<string> GetFieldNames() => Index.GetFieldNames();
 
         public virtual IReadOnlyDictionary<string, object> Metadata
         {

@@ -40,9 +40,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
         }
 
-        public Task<long> GetDocumentCountAsync() => Task.FromResult(-1L);
+        public long GetDocumentCount() => -1L;
 
-        public Task<IEnumerable<string>> GetFieldNamesAsync() => Task.FromResult(Enumerable.Empty<string>());
+        public IEnumerable<string> GetFieldNames() => Enumerable.Empty<string>();
 
         public IReadOnlyDictionary<string, object> Metadata
         {

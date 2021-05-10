@@ -280,7 +280,7 @@ namespace Umbraco.Cms.Infrastructure
             {
                 // Only search the specified culture
                 var fields =
-                    umbIndex.GetCultureAndInvariantFieldsAsync(culture).Result
+                    umbIndex.GetCultureAndInvariantFields(culture)
                         .ToArray(); // Get all index fields suffixed with the culture name supplied
                 queryExecutor = query.ManagedQuery(term, fields);
             }

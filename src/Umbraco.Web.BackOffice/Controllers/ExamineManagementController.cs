@@ -44,10 +44,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Get the details for indexers
         /// </summary>
         /// <returns></returns>
-        public async Task<IEnumerable<ExamineIndexModel>> GetIndexerDetails()
-            => await Task.WhenAll(_examineManager.Indexes
-                .Select(async index => await CreateModelAsync(index))
-                .OrderBy(async examineIndexModel => (await examineIndexModel).Name.TrimEnd("Indexer")));
+        public IEnumerable<ExamineIndexModel> GetIndexerDetails()
+            => _examineManager.Indexes
+                .Select(index => CreateModel(index))
+                .OrderBy(examineIndexModel => examineIndexModel.Name.TrimEnd("Indexer"));
 
         /// <summary>
         /// Get the details for searchers
@@ -99,7 +99,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// This is kind of rudimentary since there's no way we can know that the index has rebuilt, we
         /// have a listener for the index op complete so we'll just check if that key is no longer there in the runtime cache
         /// </remarks>
-        public async Task<ActionResult<ExamineIndexModel>> PostCheckRebuildIndex(string indexName)
+        public ActionResult<ExamineIndexModel> PostCheckRebuildIndex(string indexName)
         {
             var validate = ValidateIndex(indexName, out var index);
 
@@ -120,7 +120,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //if its still there then it's not done
             return found != null
                 ? null
-                : await CreateModelAsync(index);
+                : CreateModel(index);
         }
 
         /// <summary>
@@ -168,7 +168,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             }
         }
 
-        private async Task<ExamineIndexModel> CreateModelAsync(IIndex index)
+        private ExamineIndexModel CreateModel(IIndex index)
         {
             var indexName = index.Name;
 
@@ -178,8 +178,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var properties = new Dictionary<string, object>
             {
-                ["DocumentCount"] = await indexDiag.GetDocumentCountAsync(),
-                ["FieldCount"] = (await indexDiag.GetFieldNamesAsync()).Count(),
+                ["DocumentCount"] = indexDiag.GetDocumentCount(),
+                ["FieldCount"] = indexDiag.GetFieldNames().Count(),
             };
 
             foreach (KeyValuePair<string, object> p in indexDiag.Metadata)

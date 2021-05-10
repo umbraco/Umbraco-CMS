@@ -50,8 +50,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             var dirInfo = new DirectoryInfo(
                 Path.Combine(
                     _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData),
-                    "ExamineIndexes",
-                    indexName));
+                    "ExamineIndexes"));
 
             if (!dirInfo.Exists)
             {

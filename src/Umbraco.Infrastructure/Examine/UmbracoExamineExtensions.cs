@@ -25,9 +25,9 @@ namespace Umbraco.Extensions
         /// <param name="index"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<string>> GetCultureFieldsAsync(this IUmbracoIndex index, string culture)
+        public static IEnumerable<string> GetCultureFields(this IUmbracoIndex index, string culture)
         {
-            IEnumerable<string> allFields = await index.GetFieldNamesAsync();
+            IEnumerable<string> allFields = index.GetFieldNames();
 
             var results = new List<string>();
             foreach (var field in allFields)
@@ -48,9 +48,9 @@ namespace Umbraco.Extensions
         /// <param name="index"></param>
         /// <param name="culture"></param>
         /// <returns></returns>
-        public static async Task<IEnumerable<string>> GetCultureAndInvariantFieldsAsync(this IUmbracoIndex index, string culture)
+        public static IEnumerable<string> GetCultureAndInvariantFields(this IUmbracoIndex index, string culture)
         {
-            IEnumerable<string> allFields = await index.GetFieldNamesAsync();
+            IEnumerable<string> allFields = index.GetFieldNames();
             var results = new List<string>();
             // ReSharper disable once LoopCanBeConvertedToQuery
             foreach (var field in allFields)
