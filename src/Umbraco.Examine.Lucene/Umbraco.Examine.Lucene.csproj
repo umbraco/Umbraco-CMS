@@ -6,13 +6,6 @@
     <Title>Umbraco.Examine.Lucene</Title>    
     <!-- But we still need to have PackageId for the depdents to know the actual name of the package. -->
     <PackageId>Umbraco.Cms.Examine.Lucene</PackageId>
-    <!-- SourceLink: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element)-->
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-    <!-- SourceLink: Embed source files that are not tracked by the source control manager in the PDB -->
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    <!-- SourceLink: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
-    <IncludeSymbols>true</IncludeSymbols>
-    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
     <DebugSymbols>true</DebugSymbols>

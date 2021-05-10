@@ -17,5 +17,25 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/umbraco/umbraco-cms</RepositoryUrl>
   </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- SourceLink: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element)-->
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+
+    <!-- SourceLink: Embed source files that are not tracked by the source control manager in the PDB -->
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+
+    <!-- SourceLink: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
+  <!-- SourceLink: Deterministic -->
+  <!-- https://github.com/clairernovotny/DeterministicBuilds -->
+  <!-- Only for Azure Pipelines CI Build -->
+  <PropertyGroup Condition="'$(TF_BUILD)' == 'true'">
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+  </PropertyGroup>
+
 </Project>
 

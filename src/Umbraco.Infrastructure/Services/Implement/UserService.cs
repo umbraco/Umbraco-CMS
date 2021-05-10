@@ -24,22 +24,24 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// </summary>
     internal class UserService : RepositoryService, IUserService
     {
+        private readonly IRuntimeState _runtimeState;
         private readonly IUserRepository _userRepository;
         private readonly IUserGroupRepository _userGroupRepository;
         private readonly GlobalSettings _globalSettings;
-        private readonly bool _isUpgrading;
         private readonly ILogger<UserService> _logger;
 
         public UserService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory, IRuntimeState runtimeState,
             IUserRepository userRepository, IUserGroupRepository userGroupRepository, IOptions<GlobalSettings> globalSettings)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
+            _runtimeState = runtimeState;
             _userRepository = userRepository;
             _userGroupRepository = userGroupRepository;
             _globalSettings = globalSettings.Value;
-            _isUpgrading = runtimeState.Level == RuntimeLevel.Install || runtimeState.Level == RuntimeLevel.Upgrade;
             _logger = loggerFactory.CreateLogger<UserService>();
         }
+
+        private bool IsUpgrading => _runtimeState.Level == RuntimeLevel.Install || _runtimeState.Level == RuntimeLevel.Upgrade;
 
         #region Implementation of IMembershipUserService
 
@@ -205,7 +207,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     // currently kinda accepting anything on upgrade, but that won't deal with all cases
                     // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
                     // be better BUT requires that the app restarts after the upgrade!
-                    if (_isUpgrading)
+                    if (IsUpgrading)
                     {
                         //NOTE: this will not be cached
                         return _userRepository.GetByUsername(username, includeSecurityData: false);
@@ -305,7 +307,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 catch (DbException ex)
                 {
                     // if we are upgrading and an exception occurs, log and swallow it
-                    if (_isUpgrading == false) throw;
+                    if (IsUpgrading == false) throw;
 
                     _logger.LogWarning(ex, "An error occurred attempting to save a user instance during upgrade, normally this warning can be ignored");
 
@@ -681,7 +683,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                     // currently kinda accepting anything on upgrade, but that won't deal with all cases
                     // so we need to do it differently, see the custom UmbracoPocoDataBuilder which should
                     // be better BUT requires that the app restarts after the upgrade!
-                    if (_isUpgrading)
+                    if (IsUpgrading)
                     {
                         //NOTE: this will not be cached
                         return _userRepository.Get(id, includeSecurityData: false);

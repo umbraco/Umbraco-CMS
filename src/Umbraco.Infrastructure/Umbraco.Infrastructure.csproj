@@ -6,16 +6,6 @@
         <PackageId>Umbraco.Cms.Infrastructure</PackageId>
         <Title>Umbraco CMS Infrastructure</Title>
         <Description>Contains the infrastructure assembly needed to run Umbraco Cms. This package only contains the assembly, and can be used for package development. Use the template in the Umbraco.Templates package to setup Umbraco</Description>
-
-        <!-- SourceLink: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element)-->
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-
-        <!-- SourceLink: Embed source files that are not tracked by the source control manager in the PDB -->
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-
-        <!-- SourceLink: Build symbol package (.snupkg) to distribute the PDB containing Source Link -->
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     </PropertyGroup>
 
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -55,8 +45,8 @@
       <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />
       <PackageReference Include="Serilog.Sinks.File" Version="4.1.0" />
       <PackageReference Include="Serilog.Sinks.Map" Version="1.0.2" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="1.0.3" />
       <PackageReference Include="System.Data.SqlClient" Version="4.8.2" />
-      <PackageReference Include="System.Drawing.Common" Version="5.0.1" />
       <PackageReference Include="System.IO.FileSystem.AccessControl" Version="5.0.0" />
       <PackageReference Include="System.Threading.Tasks.Dataflow" Version="5.0.0" />
       <PackageReference Include="Examine.Core" Version="2.0.0-beta.136" />
