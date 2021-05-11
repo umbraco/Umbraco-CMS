@@ -30,6 +30,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Templates;
@@ -196,7 +197,7 @@ namespace Umbraco.Extensions
                 options.IgnoredPaths.Remove("/content/");
             });
 
-            builder.AddNotificationHandler<UmbracoApplicationStarting, InitializeWebProfiling>();
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, InitializeWebProfiling>();
             return builder;
         }
 
@@ -269,7 +270,7 @@ namespace Umbraco.Extensions
 
             // AspNetCore specific services
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
-            builder.AddNotificationHandler<UmbracoRequestBegin, AspNetCoreRequestAccessor>();
+            builder.AddNotificationHandler<UmbracoRequestBeginNotification, AspNetCoreRequestAccessor>();
 
             // Password hasher
             builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();

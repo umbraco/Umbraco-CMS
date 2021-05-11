@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Core.Events
 {

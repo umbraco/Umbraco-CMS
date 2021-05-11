@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Extensions;
 using Umbraco.Cms.Core.Sync;
 

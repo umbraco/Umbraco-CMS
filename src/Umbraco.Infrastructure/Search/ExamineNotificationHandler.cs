@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -21,7 +22,7 @@ using Umbraco.Extensions;
 namespace Umbraco.Cms.Infrastructure.Search
 {
     public sealed class ExamineNotificationHandler :
-        INotificationHandler<UmbracoApplicationStarting>,
+        INotificationHandler<UmbracoApplicationStartingNotification>,
         INotificationHandler<ContentCacheRefresherNotification>,
         INotificationHandler<ContentTypeCacheRefresherNotification>,
         INotificationHandler<MediaCacheRefresherNotification>,
@@ -79,7 +80,7 @@ namespace Umbraco.Cms.Infrastructure.Search
             _logger = logger;
             _indexCreator = indexCreator;
         }
-        public void Handle(UmbracoApplicationStarting notification)
+        public void Handle(UmbracoApplicationStartingNotification notification)
         {
             //let's deal with shutting down Examine with MainDom
             var examineShutdownRegistered = _mainDom.Register(release: () =>
