@@ -3,6 +3,7 @@ using Umbraco.Core;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Core.Services;
 using Umbraco.Web.PublishedCache;
@@ -56,6 +57,11 @@ namespace Umbraco.Web.Cache
             foreach (var payload in payloads)
             {
                 _idkMap.ClearCache(payload.Id);
+
+                if (dataTypeCache.Success)
+                {
+                    dataTypeCache.Result.Clear(RepositoryCacheKeys.GetKey<IDataType, int>(payload.Id));
+                }
             }
 
             // TODO: not sure I like these?
