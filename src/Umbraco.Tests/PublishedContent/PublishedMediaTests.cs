@@ -4,10 +4,9 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.DependencyInjection;
+using Examine;
 using NUnit.Framework;
-using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
-using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.PublishedContent;
@@ -21,8 +20,8 @@ using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.Testing;
 using Umbraco.Tests.UmbracoExamine;
+
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -93,6 +92,7 @@ namespace Umbraco.Tests.PublishedContent
                         Name = "Rich Text",
                         DataTypeId = -87 //tiny mce
                     });
+            var existing = ServiceContext.MediaTypeService.GetAll();
             ServiceContext.MediaTypeService.Save(mType);
             var media = MockedMedia.CreateMediaImage(mType, -1);
             media.Properties["content"].SetValue("<div>This is some content</div>");

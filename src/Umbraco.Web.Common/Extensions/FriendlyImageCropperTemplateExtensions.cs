@@ -5,6 +5,7 @@ using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Web.Common.DependencyInjection;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Extensions
 {
@@ -36,6 +37,13 @@ namespace Umbraco.Extensions
             this IPublishedContent mediaItem,
             string cropAlias) =>
             mediaItem.GetCropUrl(cropAlias, ImageUrlGenerator, PublishedValueFallback, PublishedUrlProvider);
+
+
+        public static string GetCropUrl(
+            this IPublishedContent mediaItem,
+            string cropAlias,
+            ImageCropperValue imageCropperValue)
+            => mediaItem.GetCropUrl(cropAlias, ImageUrlGenerator, imageCropperValue);
 
         /// <summary>
         /// Gets the underlying image processing service URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
@@ -313,5 +321,12 @@ namespace Umbraco.Extensions
                 upScale,
                 animationProcessMode
             );
+
+
+        public static string GetLocalCropUrl(
+            this MediaWithCrops mediaWithCrops,
+            string alias,
+            string cacheBusterValue = null)
+            => mediaWithCrops.GetLocalCropUrl(alias, ImageUrlGenerator,  cacheBusterValue);
     }
 }

@@ -16,7 +16,6 @@ using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 {
@@ -182,7 +181,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         public void Cannot_Save_Media_With_Empty_Name()
         {
             // Arrange
-            MediaType mediaType = MediaTypeBuilder.CreateVideoMediaType();
+            MediaType mediaType = MediaTypeBuilder.CreateNewMediaType();
             MediaTypeService.Save(mediaType);
             IMedia media = MediaService.CreateMedia(string.Empty, -1, "video");
 

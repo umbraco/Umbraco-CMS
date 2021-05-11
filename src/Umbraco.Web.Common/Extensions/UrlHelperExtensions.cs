@@ -2,11 +2,15 @@
 using System.Globalization;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Web;
+using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Web.Common.Controllers;
 
@@ -199,5 +203,31 @@ namespace Umbraco.Extensions
             var version = umbracoVersion.SemanticVersion.ToSemanticString();
             return $"{version}.{runtimeMinifier.CacheBuster}".GenerateHash();
         }
+
+        public static IHtmlContent GetCropUrl(this IUrlHelper urlHelper,
+            ImageCropperValue imageCropperValue,
+            string cropAlias,
+            int? width = null,
+            int? height = null,
+            int? quality = null,
+            ImageCropMode? imageCropMode = null,
+            ImageCropAnchor? imageCropAnchor = null,
+            bool preferFocalPoint = false,
+            bool useCropDimensions = true,
+            string cacheBusterValue = null,
+            string furtherOptions = null,
+            ImageCropRatioMode? ratioMode = null,
+            bool upScale = true,
+            bool htmlEncode = true)
+        {
+            if (imageCropperValue == null) return HtmlString.Empty;
+
+            var imageUrl = imageCropperValue.Src;
+            var url = imageUrl.GetCropUrl(imageCropperValue, width, height, cropAlias, quality, imageCropMode,
+                imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode,
+                upScale);
+            return htmlEncode ? new HtmlString(HttpUtility.HtmlEncode(url)) : new HtmlString(url);
+        }
+
     }
 }

@@ -15,7 +15,6 @@ using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -252,7 +251,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 Assert.That(dataTypeDefinitions, Is.Not.Null);
                 Assert.That(dataTypeDefinitions.Any(), Is.True);
                 Assert.That(dataTypeDefinitions.Any(x => x == null), Is.False);
-                Assert.That(dataTypeDefinitions.Length, Is.EqualTo(29));
+                Assert.That(dataTypeDefinitions.Length, Is.EqualTo(37));
             }
         }
 

@@ -6,6 +6,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Extensions
 {
@@ -34,6 +35,11 @@ namespace Umbraco.Extensions
             IPublishedUrlProvider publishedUrlProvider)
         {
             return mediaItem.GetCropUrl(imageUrlGenerator, publishedValueFallback, publishedUrlProvider, cropAlias: cropAlias, useCropDimensions: true);
+        }
+
+        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, IImageUrlGenerator imageUrlGenerator, ImageCropperValue imageCropperValue)
+        {
+            return mediaItem.Url().GetCropUrl(imageUrlGenerator, imageCropperValue, cropAlias: cropAlias, useCropDimensions: true);
         }
 
         /// <summary>
@@ -396,6 +402,12 @@ namespace Umbraco.Extensions
             options.CacheBusterValue = cacheBusterValue;
 
             return imageUrlGenerator.GetImageUrl(options);
+        }
+
+        public static string GetLocalCropUrl(this MediaWithCrops mediaWithCrops, string alias, IImageUrlGenerator imageUrlGenerator, string cacheBusterValue)
+        {
+            return mediaWithCrops.LocalCrops.Src + mediaWithCrops.LocalCrops.GetCropUrl(alias, imageUrlGenerator, cacheBusterValue: cacheBusterValue);
+
         }
     }
 }

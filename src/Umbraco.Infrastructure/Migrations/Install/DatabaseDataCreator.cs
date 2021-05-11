@@ -115,7 +115,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             InsertDataTypeNodeDto(Cms.Core.Constants.DataTypes.LabelDateTime, 37, Cms.Core.Constants.DataTypes.Guids.LabelDateTime, "Label (datetime)");
             InsertDataTypeNodeDto(Cms.Core.Constants.DataTypes.LabelTime, 38, Cms.Core.Constants.DataTypes.Guids.LabelTime, "Label (time)");
             InsertDataTypeNodeDto(Cms.Core.Constants.DataTypes.LabelDecimal, 39, Cms.Core.Constants.DataTypes.Guids.LabelDecimal, "Label (decimal)");
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = Cms.Core.Constants.DataTypes.Upload, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.Upload}", SortOrder = 34, UniqueId = Cms.Core.Constants.DataTypes.Guids.UploadGuid, Text = "Upload", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = Cms.Core.Constants.DataTypes.Upload, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.Upload}", SortOrder = 34, UniqueId = Cms.Core.Constants.DataTypes.Guids.UploadGuid, Text = "Upload File", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = Cms.Core.Constants.DataTypes.UploadVideo, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.UploadVideo}", SortOrder = 35, UniqueId = Cms.Core.Constants.DataTypes.Guids.UploadVideoGuid, Text = "Upload Video", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = Cms.Core.Constants.DataTypes.UploadAudio, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.UploadAudio}", SortOrder = 36, UniqueId = Cms.Core.Constants.DataTypes.Guids.UploadAudioGuid, Text = "Upload Audio", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = Cms.Core.Constants.DataTypes.UploadArticle, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.UploadArticle}", SortOrder = 37, UniqueId = Cms.Core.Constants.DataTypes.Guids.UploadArticleGuid, Text = "Upload Article", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = Cms.Core.Constants.DataTypes.UploadVectorGraphics, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.UploadVectorGraphics}", SortOrder = 38, UniqueId = Cms.Core.Constants.DataTypes.Guids.UploadVectorGraphicsGuid, Text = "Upload Vector Graphics", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = Cms.Core.Constants.DataTypes.Textarea, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.Textarea}", SortOrder = 33, UniqueId = Cms.Core.Constants.DataTypes.Guids.TextareaGuid, Text = "Textarea", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = Cms.Core.Constants.DataTypes.Textbox, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.Textbox}", SortOrder = 32, UniqueId = Cms.Core.Constants.DataTypes.Guids.TextstringGuid, Text = "Textstring", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = Cms.Core.Constants.DataTypes.RichtextEditor, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.RichtextEditor}", SortOrder = 4, UniqueId = Cms.Core.Constants.DataTypes.Guids.RichtextEditorGuid, Text = "Richtext editor", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
@@ -134,6 +138,12 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1031, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1031", SortOrder = 2, UniqueId = new Guid("f38bd2d7-65d0-48e6-95dc-87ce06ec2d3d"), Text = Cms.Core.Constants.Conventions.MediaTypes.Folder, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1032, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1032", SortOrder = 2, UniqueId = new Guid("cc07b313-0843-4aa8-bbda-871c8da728c8"), Text = Cms.Core.Constants.Conventions.MediaTypes.Image, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1033, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1033", SortOrder = 2, UniqueId = new Guid("4c52d8ab-54e6-40cd-999c-7a5f24903e4d"), Text = Cms.Core.Constants.Conventions.MediaTypes.File, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now });
+
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1034, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1034", SortOrder = 2, UniqueId = new Guid("f6c515bb-653c-4bdc-821c-987729ebe327"), Text = Cms.Core.Constants.Conventions.MediaTypes.Video, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1035, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1035", SortOrder = 2, UniqueId = new Guid("a5ddeee0-8fd8-4cee-a658-6f1fcdb00de3"), Text = Cms.Core.Constants.Conventions.MediaTypes.Audio, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1036, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1036", SortOrder = 2, UniqueId = new Guid("a43e3414-9599-4230-a7d3-943a21b20122"), Text = Cms.Core.Constants.Conventions.MediaTypes.Article, NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1037, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1037", SortOrder = 2, UniqueId = new Guid("c4b1efcf-a9d5-41c4-9621-e9d273b52a9c"), Text = "Vector Graphics (SVG)", NodeObjectType = Cms.Core.Constants.ObjectTypes.MediaType, CreateDate = DateTime.Now });
+
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = Cms.Core.Constants.DataTypes.Tags, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.Tags}", SortOrder = 2, UniqueId = new Guid("b6b73142-b9c1-4bf8-a16d-e1c23320b549"), Text = "Tags", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = Cms.Core.Constants.DataTypes.ImageCropper, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = $"-1,{Cms.Core.Constants.DataTypes.ImageCropper}", SortOrder = 2, UniqueId = new Guid("1df9f033-e6d4-451f-b8d2-e0cbc50a836f"), Text = "Image Cropper", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1044, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1044", SortOrder = 0, UniqueId = new Guid("d59be02f-1df9-4228-aa1e-01917d806cda"), Text = Cms.Core.Constants.Conventions.MemberTypes.DefaultAlias, NodeObjectType = Cms.Core.Constants.ObjectTypes.MemberType, CreateDate = DateTime.Now });
@@ -142,8 +152,14 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1046, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1046", SortOrder = 2, UniqueId = new Guid("FD1E0DA5-5606-4862-B679-5D0CF3A52A59"), Text = "Content Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1047, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1047", SortOrder = 2, UniqueId = new Guid("1EA2E01F-EBD8-4CE1-8D71-6B1149E63548"), Text = "Member Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1048, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1048", SortOrder = 2, UniqueId = new Guid("135D60E0-64D9-49ED-AB08-893C9BA44AE5"), Text = "Media Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1049, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1049", SortOrder = 2, UniqueId = new Guid("9DBBCBBB-2327-434A-B355-AF1B84E5010A"), Text = "Multiple Media Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1050, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1050", SortOrder = 2, UniqueId = new Guid("B4E3535A-1753-47E2-8568-602CF8CFEE6F"), Text = "Multi URL Picker", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1049, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1049", SortOrder = 2, UniqueId = new Guid("9DBBCBBB-2327-434A-B355-AF1B84E5010A"), Text = "Multiple Media Picker (old)", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1050, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1050", SortOrder = 2, UniqueId = new Guid("B4E3535A-1753-47E2-8568-602CF8CFEE6F"), Text = "Multi URL Picker (old)", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1051, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1051", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.MediaPicker3Guid, Text = "Media Picker 3", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1052, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1052", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.MediaPicker3MultipleGuid, Text = "Multiple Media Picker 3", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1053, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1053", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.MediaPicker3SingleImageGuid, Text = "Image Media Picker 3", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.Node, "id", false, new NodeDto { NodeId = 1054, Trashed = false, ParentId = -1, UserId = -1, Level = 1, Path = "-1,1054", SortOrder = 2, UniqueId = Cms.Core.Constants.DataTypes.Guids.MediaPicker3MultipleImagesGuid, Text = "Multiple Image Media Picker 3", NodeObjectType = Cms.Core.Constants.ObjectTypes.DataType, CreateDate = DateTime.Now });
+
         }
 
         private void CreateLockData()
@@ -168,6 +184,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 532, NodeId = 1031, Alias = Cms.Core.Constants.Conventions.MediaTypes.Folder, Icon = Cms.Core.Constants.Icons.MediaFolder, Thumbnail = Cms.Core.Constants.Icons.MediaFolder, IsContainer = false, AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 533, NodeId = 1032, Alias = Cms.Core.Constants.Conventions.MediaTypes.Image, Icon = Cms.Core.Constants.Icons.MediaImage, Thumbnail = Cms.Core.Constants.Icons.MediaImage, AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 534, NodeId = 1033, Alias = Cms.Core.Constants.Conventions.MediaTypes.File, Icon = Cms.Core.Constants.Icons.MediaFile, Thumbnail = Cms.Core.Constants.Icons.MediaFile, AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 540, NodeId = 1034, Alias = Cms.Core.Constants.Conventions.MediaTypes.Video, Icon = Cms.Core.Constants.Icons.MediaVideo, Thumbnail = Cms.Core.Constants.Icons.MediaVideo, AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 541, NodeId = 1035, Alias = Cms.Core.Constants.Conventions.MediaTypes.Audio, Icon = Cms.Core.Constants.Icons.MediaAudio, Thumbnail = Cms.Core.Constants.Icons.MediaAudio, AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 542, NodeId = 1036, Alias = Cms.Core.Constants.Conventions.MediaTypes.Article, Icon = Cms.Core.Constants.Icons.MediaArticle, Thumbnail = Cms.Core.Constants.Icons.MediaArticle, AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 543, NodeId = 1037, Alias = Cms.Core.Constants.Conventions.MediaTypes.VectorGraphics, Icon = Cms.Core.Constants.Icons.MediaVectorGraphics, Thumbnail = Cms.Core.Constants.Icons.MediaVectorGraphics, AllowAtRoot = true, Variations = (byte) ContentVariation.Nothing });
+
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentType, "pk", false, new ContentTypeDto { PrimaryKey = 531, NodeId = 1044, Alias = Cms.Core.Constants.Conventions.MemberTypes.DefaultAlias, Icon = Cms.Core.Constants.Icons.Member, Thumbnail = Cms.Core.Constants.Icons.Member, Variations = (byte) ContentVariation.Nothing });
         }
 
@@ -215,20 +236,41 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         {
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 3, ContentTypeNodeId = 1032, Text = "Image", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Image) });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 4, ContentTypeNodeId = 1033, Text = "File", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.File) });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 52, ContentTypeNodeId = 1034, Text = "Video", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Video) });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 53, ContentTypeNodeId = 1035, Text = "Audio", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Audio) });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 54, ContentTypeNodeId = 1036, Text = "Article", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Article) });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 55, ContentTypeNodeId = 1037, Text = "Vector Graphics", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.VectorGraphics) });
             //membership property group
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyTypeGroup, "id", false, new PropertyTypeGroupDto { Id = 11, ContentTypeNodeId = 1044, Text = "Membership", SortOrder = 1, UniqueId = new Guid(Cms.Core.Constants.PropertyTypeGroups.Membership) });
         }
 
         private void CreatePropertyTypeData()
         {
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 6, UniqueId = 6.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.ImageCropper, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Cms.Core.Constants.Conventions.Media.File, Name = "Upload image", SortOrder = 0, Mandatory = true, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 6, UniqueId = 6.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.ImageCropper, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Cms.Core.Constants.Conventions.Media.File, Name = "Image", SortOrder = 0, Mandatory = true, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 7, UniqueId = 7.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelInt, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Cms.Core.Constants.Conventions.Media.Width, Name = "Width", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in pixels", Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 8, UniqueId = 8.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelInt, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Cms.Core.Constants.Conventions.Media.Height, Name = "Height", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in pixels", Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 9, UniqueId = 9.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelBigint, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Cms.Core.Constants.Conventions.Media.Bytes, Name = "Size", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in bytes", Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 10, UniqueId = 10.ToGuid(), DataTypeId = -92, ContentTypeId = 1032, PropertyTypeGroupId = 3, Alias = Cms.Core.Constants.Conventions.Media.Extension, Name = "Type", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
-            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 24, UniqueId = 24.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.Upload, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Cms.Core.Constants.Conventions.Media.File, Name = "Upload file", SortOrder = 0, Mandatory = true, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 24, UniqueId = 24.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.Upload, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Cms.Core.Constants.Conventions.Media.File, Name = "File", SortOrder = 0, Mandatory = true, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 25, UniqueId = 25.ToGuid(), DataTypeId = -92, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Cms.Core.Constants.Conventions.Media.Extension, Name = "Type", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 26, UniqueId = 26.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelBigint, ContentTypeId = 1033, PropertyTypeGroupId = 4, Alias = Cms.Core.Constants.Conventions.Media.Bytes, Name = "Size", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in bytes", Variations = (byte) ContentVariation.Nothing });
+
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 40, UniqueId = 40.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.UploadVideo, ContentTypeId = 1034, PropertyTypeGroupId = 52, Alias = Cms.Core.Constants.Conventions.Media.File, Name = "Video", SortOrder = 0, Mandatory = true, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 41, UniqueId = 41.ToGuid(), DataTypeId = -92, ContentTypeId = 1034, PropertyTypeGroupId = 52, Alias = Cms.Core.Constants.Conventions.Media.Extension, Name = "Type", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 42, UniqueId = 42.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelBigint, ContentTypeId = 1034, PropertyTypeGroupId = 52, Alias = Cms.Core.Constants.Conventions.Media.Bytes, Name = "Size", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in bytes", Variations = (byte) ContentVariation.Nothing });
+
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 43, UniqueId = 43.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.UploadAudio, ContentTypeId = 1035, PropertyTypeGroupId = 53, Alias = Cms.Core.Constants.Conventions.Media.File, Name = "Audio", SortOrder = 0, Mandatory = true, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 44, UniqueId = 44.ToGuid(), DataTypeId = -92, ContentTypeId = 1035, PropertyTypeGroupId = 53, Alias = Cms.Core.Constants.Conventions.Media.Extension, Name = "Type", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 45, UniqueId = 45.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelBigint, ContentTypeId = 1035, PropertyTypeGroupId = 53, Alias = Cms.Core.Constants.Conventions.Media.Bytes, Name = "Size", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in bytes", Variations = (byte) ContentVariation.Nothing });
+
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 46, UniqueId = 46.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.UploadArticle, ContentTypeId = 1036, PropertyTypeGroupId = 54, Alias = Cms.Core.Constants.Conventions.Media.File, Name = "Article", SortOrder = 0, Mandatory = true, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 47, UniqueId = 47.ToGuid(), DataTypeId = -92, ContentTypeId = 1036, PropertyTypeGroupId = 54, Alias = Cms.Core.Constants.Conventions.Media.Extension, Name = "Type", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 48, UniqueId = 48.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelBigint, ContentTypeId = 1036, PropertyTypeGroupId = 54, Alias = Cms.Core.Constants.Conventions.Media.Bytes, Name = "Size", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in bytes", Variations = (byte) ContentVariation.Nothing });
+
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 49, UniqueId = 49.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.UploadVectorGraphics, ContentTypeId = 1037, PropertyTypeGroupId = 55, Alias = Cms.Core.Constants.Conventions.Media.File, Name = "Vector Graphics", SortOrder = 0, Mandatory = true, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 50, UniqueId = 50.ToGuid(), DataTypeId = -92, ContentTypeId = 1037, PropertyTypeGroupId = 55, Alias = Cms.Core.Constants.Conventions.Media.Extension, Name = "Type", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 51, UniqueId = 51.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelBigint, ContentTypeId = 1037, PropertyTypeGroupId = 55, Alias = Cms.Core.Constants.Conventions.Media.Bytes, Name = "Size", SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = "in bytes", Variations = (byte) ContentVariation.Nothing });
+
             //membership property types
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 28, UniqueId = 28.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.Textarea, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Cms.Core.Constants.Conventions.Member.Comments, Name = Cms.Core.Constants.Conventions.Member.CommentsLabel, SortOrder = 0, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.PropertyType, "id", false, new PropertyTypeDto { Id = 29, UniqueId = 29.ToGuid(), DataTypeId = Cms.Core.Constants.DataTypes.LabelInt, ContentTypeId = 1044, PropertyTypeGroupId = 11, Alias = Cms.Core.Constants.Conventions.Member.FailedPasswordAttempts, Name = Cms.Core.Constants.Conventions.Member.FailedPasswordAttemptsLabel, SortOrder = 1, Mandatory = false, ValidationRegExp = null, Description = null, Variations = (byte) ContentVariation.Nothing });
@@ -249,6 +291,10 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentChildType, "Id", false, new ContentTypeAllowedContentTypeDto { Id = 1031, AllowedId = 1031 });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentChildType, "Id", false, new ContentTypeAllowedContentTypeDto { Id = 1031, AllowedId = 1032 });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentChildType, "Id", false, new ContentTypeAllowedContentTypeDto { Id = 1031, AllowedId = 1033 });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentChildType, "Id", false, new ContentTypeAllowedContentTypeDto { Id = 1031, AllowedId = 1034 });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentChildType, "Id", false, new ContentTypeAllowedContentTypeDto { Id = 1031, AllowedId = 1035 });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentChildType, "Id", false, new ContentTypeAllowedContentTypeDto { Id = 1031, AllowedId = 1036 });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.ContentChildType, "Id", false, new ContentTypeAllowedContentTypeDto { Id = 1031, AllowedId = 1037 });
         }
 
         private void CreateDataTypeData()
@@ -312,6 +358,64 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1049, EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker, DbType = "Ntext",
                 Configuration = "{\"multiPicker\":1}" });
             _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1050, EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.MultiUrlPicker, DbType = "Ntext" });
+
+
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto
+            {
+                NodeId = Cms.Core.Constants.DataTypes.UploadVideo,
+                EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.UploadField,
+                DbType = "Nvarchar",
+                Configuration = "{\"fileExtensions\":[{\"id\":0, \"value\":\"mp4\"}, {\"id\":1, \"value\":\"webm\"}, {\"id\":2, \"value\":\"ogv\"}]}"
+            });
+
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto
+            {
+                NodeId = Cms.Core.Constants.DataTypes.UploadAudio,
+                EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.UploadField,
+                DbType = "Nvarchar",
+                Configuration = "{\"fileExtensions\":[{\"id\":0, \"value\":\"mp3\"}, {\"id\":1, \"value\":\"weba\"}, {\"id\":2, \"value\":\"oga\"}, {\"id\":3, \"value\":\"opus\"}]}"
+            });
+
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto
+            {
+                NodeId = Cms.Core.Constants.DataTypes.UploadArticle,
+                EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.UploadField,
+                DbType = "Nvarchar",
+                Configuration = "{\"fileExtensions\":[{\"id\":0, \"value\":\"pdf\"}, {\"id\":1, \"value\":\"docx\"}, {\"id\":2, \"value\":\"doc\"}]}"
+            });
+
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto
+            {
+                NodeId = Cms.Core.Constants.DataTypes.UploadVectorGraphics,
+                EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.UploadField,
+                DbType = "Nvarchar",
+                Configuration = "{\"fileExtensions\":[{\"id\":0, \"value\":\"svg\"}]}"
+            });
+
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto {
+                NodeId = 1051,
+                EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker3,
+                DbType = "Ntext",
+                Configuration = "{\"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}"
+            });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto {
+                NodeId = 1052,
+                EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker3,
+                DbType = "Ntext",
+                Configuration = "{\"multiple\": true}"
+            });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto {
+                NodeId = 1053,
+                EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker3,
+                DbType = "Ntext",
+                Configuration = "{\"filter\":\"" + Cms.Core.Constants.Conventions.MediaTypes.Image + "\", \"multiple\": false, \"validationLimit\":{\"min\":0,\"max\":1}}"
+            });
+            _database.Insert(Cms.Core.Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto {
+                NodeId = 1054,
+                EditorAlias = Cms.Core.Constants.PropertyEditors.Aliases.MediaPicker3,
+                DbType = "Ntext",
+                Configuration = "{\"filter\":\"" + Cms.Core.Constants.Conventions.MediaTypes.Image + "\", \"multiple\": true}"
+            });
         }
 
         private void CreateRelationTypeData()

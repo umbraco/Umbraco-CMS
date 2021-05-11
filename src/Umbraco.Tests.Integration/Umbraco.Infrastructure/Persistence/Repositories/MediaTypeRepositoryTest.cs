@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence;
@@ -15,7 +16,6 @@ using Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repositories
 {
@@ -42,7 +42,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var container2 = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah2", ParentId = container1.Id };
                 containerRepository.Save(container2);
 
-                var contentType = (IMediaType)MediaTypeBuilder.CreateVideoMediaType();
+                IMediaType contentType =
+                    MediaTypeBuilder.CreateNewMediaType();
                 contentType.ParentId = container2.Id;
                 repository.Save(contentType);
 
@@ -119,7 +120,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                MediaType contentType = MediaTypeBuilder.CreateVideoMediaType();
+                MediaType contentType =
+                    MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
                 contentType.ParentId = container.Id;
                 repository.Save(contentType);
 
@@ -139,7 +141,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var container = new EntityContainer(Constants.ObjectTypes.MediaType) { Name = "blah" };
                 containerRepository.Save(container);
 
-                IMediaType contentType = MediaTypeBuilder.CreateVideoMediaType();
+                IMediaType contentType =
+                    MediaTypeBuilder.CreateSimpleMediaType("test", "Test", propertyGroupName: "testGroup");
                 contentType.ParentId = container.Id;
                 repository.Save(contentType);
 
@@ -165,7 +168,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 MediaTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                MediaType contentType = MediaTypeBuilder.CreateVideoMediaType();
+                MediaType contentType = MediaTypeBuilder.CreateNewMediaType();
                 repository.Save(contentType);
 
                 IMediaType fetched = repository.Get(contentType.Id);
@@ -189,7 +192,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 MediaTypeRepository repository = CreateRepository(provider);
 
-                MediaType videoMediaType = MediaTypeBuilder.CreateVideoMediaType();
+                MediaType videoMediaType = MediaTypeBuilder.CreateNewMediaType();
                 repository.Save(videoMediaType);
 
                 // Act
@@ -226,7 +229,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 MediaTypeRepository repository = CreateRepository(provider);
 
                 // Act
-                MediaType mediaType = MediaTypeBuilder.CreateVideoMediaType();
+                MediaType mediaType = MediaTypeBuilder.CreateNewMediaType();
                 repository.Save(mediaType);
 
                 IMediaType contentType2 = repository.Get(mediaType.Id);
@@ -352,7 +355,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 MediaTypeRepository repository = CreateRepository(provider);
 
-                MediaType mediaType = MediaTypeBuilder.CreateVideoMediaType();
+                MediaType mediaType = MediaTypeBuilder.CreateNewMediaType();
                 repository.Save(mediaType);
 
                 // Act
@@ -378,7 +381,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
             {
                 MediaTypeRepository repository = CreateRepository(provider);
 
-                MediaType mediaType = MediaTypeBuilder.CreateVideoMediaType();
+                MediaType mediaType = MediaTypeBuilder.CreateNewMediaType();
+
                 repository.Save(mediaType);
 
                 // Act
