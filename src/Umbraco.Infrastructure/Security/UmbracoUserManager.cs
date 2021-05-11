@@ -75,11 +75,9 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>True if the session is valid, else false</returns>
         public virtual async Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
         {
-            var userSessionStore = Store as IUserSessionStore<TUser>;
-
             // if this is not set, for backwards compat (which would be super rare), we'll just approve it
             // TODO: This should be removed after members supports this
-            if (userSessionStore == null)
+            if (Store is not IUserSessionStore<TUser> userSessionStore)
             {
                 return true;
             }
@@ -221,8 +219,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var lockoutStore = Store as IUserLockoutStore<TUser>;
-            if (lockoutStore == null)
+            if (Store is not IUserLockoutStore<TUser> lockoutStore)
             {
                 throw new NotSupportedException("The current user store does not implement " + typeof(IUserLockoutStore<>));
             }
@@ -241,5 +238,23 @@ namespace Umbraco.Cms.Core.Security
             return result;
         }
 
+        /// <inheritdoc/>
+        public async Task<bool> ValidateCredentialsAsync(string username, string password)
+        {
+            TUser user = await FindByNameAsync(username);
+            if (user == null)
+            {
+                return false;
+            }
+
+            if (Store is not IUserPasswordStore<TUser> userPasswordStore)
+            {
+                throw new NotSupportedException("The current user store does not implement " + typeof(IUserPasswordStore<>));
+            }
+
+            var hash = await userPasswordStore.GetPasswordHashAsync(user, new CancellationToken());
+
+            return await VerifyPasswordAsync(userPasswordStore, user, password) == PasswordVerificationResult.Success;
+        }
     }
 }
