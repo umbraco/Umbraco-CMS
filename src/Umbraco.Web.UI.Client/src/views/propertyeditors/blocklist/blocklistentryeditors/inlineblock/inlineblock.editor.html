@@ -8,6 +8,7 @@
         <i class="icon {{block.content.icon}}" aria-hidden="true"></i>
         <span class="name">{{block.label}}</span>
     </button>
+
     <div class="blockelement-inlineblock-editor__inner" ng-class="{'--singleGroup':block.content.variants[0].tabs.length === 1}" ng-if="block.active === true">
         <umb-element-editor-content model="block.content"></umb-element-editor-content>
     </div>
