@@ -789,7 +789,31 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (_imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
+                        var mediaTypes = _mediaTypeService.GetAll();
+                        // Look up MediaTypes
+                        foreach (var mediaTypeItem in mediaTypes)
+                        {
+                            var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
+                            if (fileProperty != null) {
+                                var dataTypeKey = fileProperty.DataTypeKey;
+                                var dataType = _dataTypeService.GetDataType(dataTypeKey);
+
+                                if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig) {
+                                    var fileExtensions = fileExtensionsConfig.FileExtensions;
+                                    if (fileExtensions != null)
+                                    {
+                                        if (fileExtensions.Where(x => x.Value == ext).Count() != 0)
+                                        {
+                                            mediaType = mediaTypeItem.Alias;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // If media type is still File then let's check if it's an image.
+                        if (mediaType == Constants.Conventions.MediaTypes.File && _imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }

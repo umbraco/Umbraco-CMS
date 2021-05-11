@@ -3,10 +3,10 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Tests.Common.Builders.Extensions;
 using Umbraco.Cms.Tests.Common.Builders.Interfaces;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Common.Builders
 {
@@ -252,6 +252,34 @@ namespace Umbraco.Cms.Tests.Common.Builders
         {
             get => _propertyTypeIdsIncrementingFrom;
             set => _propertyTypeIdsIncrementingFrom = value;
+        }
+
+        public static MediaType CreateNewMediaType()
+        {
+            var builder = new MediaTypeBuilder();
+            IMediaType mediaType = builder
+                .WithAlias("newMediaType")
+                .WithName("New Media Type")
+                .AddPropertyGroup()
+                    .WithName("Media")
+                    .WithSortOrder(1)
+                    .AddPropertyType()
+                        .WithAlias("title")
+                        .WithName("Title")
+                        .WithSortOrder(1)
+                    .Done()
+                    .AddPropertyType()
+                        .WithAlias("videoFile")
+                        .WithName("Video file")
+                        .WithSortOrder(1)
+                    .Done()
+                .Done()
+                .Build();
+
+            // Ensure that nothing is marked as dirty
+            mediaType.ResetDirtyProperties(false);
+
+            return (MediaType)mediaType;
         }
     }
 }

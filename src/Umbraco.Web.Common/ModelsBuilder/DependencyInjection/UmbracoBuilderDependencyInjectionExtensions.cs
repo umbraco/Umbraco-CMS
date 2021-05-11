@@ -9,7 +9,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.PublishedContent;
-using Umbraco.Cms.Core.Services.Notifications;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Cms.Infrastructure.WebAssets;
@@ -100,8 +100,8 @@ namespace Umbraco.Extensions
             // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
             // would automatically just register for all implemented INotificationHandler{T}?
             builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
-            builder.AddNotificationHandler<ServerVariablesParsing, ModelsBuilderNotificationHandler>();
-            builder.AddNotificationHandler<ModelBindingError, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
+            builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<UmbracoApplicationStartingNotification, LiveModelsProvider>();
             builder.AddNotificationHandler<UmbracoRequestEndNotification, LiveModelsProvider>();
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, LiveModelsProvider>();

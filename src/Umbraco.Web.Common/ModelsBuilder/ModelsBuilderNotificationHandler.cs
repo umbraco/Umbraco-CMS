@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services.Notifications;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.WebAssets;
@@ -16,11 +16,11 @@ using Umbraco.Cms.Web.Common.ModelBinders;
 namespace Umbraco.Cms.Web.Common.ModelsBuilder
 {
     /// <summary>
-    /// Handles <see cref="UmbracoApplicationStartingNotification"/> and <see cref="ServerVariablesParsing"/> notifications to initialize MB
+    /// Handles <see cref="UmbracoApplicationStartingNotification"/> and <see cref="ServerVariablesParsingNotification"/> notifications to initialize MB
     /// </summary>
     internal class ModelsBuilderNotificationHandler :
-        INotificationHandler<ServerVariablesParsing>,
-        INotificationHandler<ModelBindingError>,
+        INotificationHandler<ServerVariablesParsingNotification>,
+        INotificationHandler<ModelBindingErrorNotification>,
         INotificationHandler<TemplateSavingNotification>
     {
         private readonly ModelsBuilderSettings _config;
@@ -38,9 +38,9 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         }
 
         /// <summary>
-        /// Handles the <see cref="ServerVariablesParsing"/> notification to add custom urls and MB mode
+        /// Handles the <see cref="ServerVariablesParsingNotification"/> notification to add custom urls and MB mode
         /// </summary>
-        public void Handle(ServerVariablesParsing notification)
+        public void Handle(ServerVariablesParsingNotification notification)
         {
             IDictionary<string, object> serverVars = notification.ServerVariables;
 
@@ -137,7 +137,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         /// <summary>
         /// Handles when a model binding error occurs
         /// </summary>
-        public void Handle(ModelBindingError notification)
+        public void Handle(ModelBindingErrorNotification notification)
         {
             ModelsBuilderAssemblyAttribute sourceAttr = notification.SourceType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
             ModelsBuilderAssemblyAttribute modelAttr = notification.ModelType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();

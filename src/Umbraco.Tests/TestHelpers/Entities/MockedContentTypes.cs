@@ -365,13 +365,13 @@ namespace Umbraco.Tests.TestHelpers.Entities
             return contentType;
         }
 
-        public static MediaType CreateVideoMediaType()
+        public static MediaType CreateNewMediaType()
         {
             var mediaType = new MediaType(ShortStringHelper, -1)
                                 {
-                                    Alias = "video",
-                                    Name = "Video",
-                                    Description = "ContentType used for videos",
+                                    Alias = "newMediaType",
+                                    Name = "New Media Type",
+                                    Description = "ContentType used for a new format",
                                     Icon = ".sprTreeDoc3",
                                     Thumbnail = "doc.png",
                                     SortOrder = 1,

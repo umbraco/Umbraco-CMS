@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Infrastructure.WebAssets
 {
@@ -26,7 +27,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
             var vars = Resources.ServerVariables;
 
             // Raise event for developers to add custom variables
-            await _eventAggregator.PublishAsync(new ServerVariablesParsing(items));
+            await _eventAggregator.PublishAsync(new ServerVariablesParsingNotification(items));
 
             var json = JObject.FromObject(items);
             return vars.Replace(Token, json.ToString());

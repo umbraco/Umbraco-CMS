@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
@@ -9,6 +8,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -35,11 +35,21 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
 
         public MemberManager CreateSut()
         {
-            var scopeProvider = new Mock<IScopeProvider>().Object;
+            IScopeProvider scopeProvider = new Mock<IScopeProvider>().Object;
             _mockMemberService = new Mock<IMemberService>();
+
+            var mapDefinitions = new List<IMapDefinition>()
+            {
+                new IdentityMapDefinition(
+                    Mock.Of<ILocalizedTextService>(),
+                    Mock.Of<IEntityService>(),
+                    Options.Create(new GlobalSettings()),
+                    AppCaches.Disabled),
+            };
+
             _fakeMemberStore = new MemberUserStore(
                 _mockMemberService.Object,
-                new UmbracoMapper(new MapDefinitionCollection(new List<IMapDefinition>()), scopeProvider),
+                new UmbracoMapper(new MapDefinitionCollection(mapDefinitions), scopeProvider),
                 scopeProvider,
                 new IdentityErrorDescriber(),
                 Mock.Of<IPublishedSnapshotAccessor>());
@@ -131,25 +141,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
         {
             //arrange
             MemberManager sut = CreateSut();
-            var fakeUser = new MemberIdentityUser(777)
-            {
-                UserName = "testUser",
-                Email = "test@test.com",
-                Name = "Test",
-                MemberTypeAlias = "Anything",
-                PasswordConfig = "testConfig"
-            };
+            MemberIdentityUser fakeUser = CreateValidUser();
 
-            var builder = new MemberTypeBuilder();
-            MemberType memberType = builder.BuildSimpleMemberType();
+            IMember fakeMember = CreateMember(fakeUser);
 
-            IMember fakeMember = new Member(memberType)
-            {
-                Id = 777
-            };
-
-            _mockMemberService.Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(fakeMember);
-            _mockMemberService.Setup(x => x.Save(fakeMember, false));
+            MockMemberServiceForCreateMember(fakeMember);
 
             //act
             IdentityResult identityResult = await sut.CreateAsync(fakeUser);
@@ -157,6 +153,100 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Security
             //assert
             Assert.IsTrue(identityResult.Succeeded);
             Assert.IsTrue(!identityResult.Errors.Any());
+        }
+
+        [Test]
+        public async Task GivenAUserExists_AndTheCorrectCredentialsAreProvided_ThenACheckOfCredentialsShouldSucceed()
+        {
+            //arrange
+            var password = "password";
+            MemberManager sut = CreateSut();
+
+            MemberIdentityUser fakeUser = CreateValidUser();
+
+            IMember fakeMember = CreateMember(fakeUser);
+
+            MockMemberServiceForCreateMember(fakeMember);
+
+            _mockMemberService.Setup(x => x.GetByUsername(It.Is<string>(y => y == fakeUser.UserName))).Returns(fakeMember);
+
+            _mockPasswordHasher.Setup(x => x.VerifyHashedPassword(It.IsAny<MemberIdentityUser>(), It.IsAny<string>(), It.IsAny<string>())).Returns(PasswordVerificationResult.Success);
+
+            //act
+            await sut.CreateAsync(fakeUser);
+            var result = await sut.ValidateCredentialsAsync(fakeUser.UserName, password);
+
+            //assert
+            Assert.IsTrue(result);
+        }
+
+        [Test]
+        public async Task GivenAUserExists_AndIncorrectCredentialsAreProvided_ThenACheckOfCredentialsShouldFail()
+        {
+            //arrange
+            var password = "password";
+            MemberManager sut = CreateSut();
+
+            MemberIdentityUser fakeUser = CreateValidUser();
+
+            IMember fakeMember = CreateMember(fakeUser);
+
+            MockMemberServiceForCreateMember(fakeMember);
+
+            _mockMemberService.Setup(x => x.GetByUsername(It.Is<string>(y => y == fakeUser.UserName))).Returns(fakeMember);
+
+            _mockPasswordHasher.Setup(x => x.VerifyHashedPassword(It.IsAny<MemberIdentityUser>(), It.IsAny<string>(), It.IsAny<string>())).Returns(PasswordVerificationResult.Failed);
+
+            //act
+            await sut.CreateAsync(fakeUser);
+            var result = await sut.ValidateCredentialsAsync(fakeUser.UserName, password);
+
+            //assert
+            Assert.IsFalse(result);
+        }
+
+        [Test]
+        public async Task GivenAUserDoesExists_AndCredentialsAreProvided_ThenACheckOfCredentialsShouldFail()
+        {
+            //arrange
+            var password = "password";
+            MemberManager sut = CreateSut();
+
+            _mockMemberService.Setup(x => x.GetByUsername(It.Is<string>(y => y == "testUser"))).Returns((IMember)null);
+
+            //act
+            var result = await sut.ValidateCredentialsAsync("testUser", password);
+
+            //assert
+            Assert.IsFalse(result);
+        }
+
+        private static MemberIdentityUser CreateValidUser() =>
+            new MemberIdentityUser(777)
+            {
+                UserName = "testUser",
+                Email = "test@test.com",
+                Name = "Test",
+                MemberTypeAlias = "Anything",
+                PasswordConfig = "testConfig",
+                PasswordHash = "hashedPassword"
+            };
+
+        private static IMember CreateMember(MemberIdentityUser fakeUser)
+        {
+            var builder = new MemberTypeBuilder();
+            MemberType memberType = builder.BuildSimpleMemberType();
+            return new Member(memberType)
+            {
+                Id = 777,
+                Username = fakeUser.UserName,
+            };
+        }
+
+        private void MockMemberServiceForCreateMember(IMember fakeMember)
+        {
+            _mockMemberService.Setup(x => x.CreateMember(It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>(), It.IsAny<string>())).Returns(fakeMember);
+            _mockMemberService.Setup(x => x.Save(fakeMember, false));
         }
     }
 }

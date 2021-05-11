@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.ContentType;
 
         [Column("pk")]
-        [PrimaryKeyColumn(IdentitySeed = 535)]
+        [PrimaryKeyColumn(IdentitySeed = 700)]
         public int PrimaryKey { get; set; }
 
         [Column("nodeId")]

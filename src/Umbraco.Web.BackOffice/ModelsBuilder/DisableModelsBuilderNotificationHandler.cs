@@ -1,5 +1,6 @@
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
 {
