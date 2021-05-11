@@ -13,7 +13,7 @@
     angular
         .module("umbraco")
         .component("umbMediaPicker3PropertyEditor", {
-            templateUrl: "views/propertyeditors/MediaPicker3/umb-media-picker3-property-editor.html",
+            templateUrl: "views/propertyeditors/mediapicker3/umb-media-picker3-property-editor.html",
             controller: MediaPicker3Controller,
             controllerAs: "vm",
             bindings: {
