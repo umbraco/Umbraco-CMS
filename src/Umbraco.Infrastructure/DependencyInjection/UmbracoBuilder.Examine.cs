@@ -52,11 +52,11 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IValueSetBuilder<IMember>, MemberValueSetBuilder>();
             builder.Services.AddUnique<ExamineIndexRebuilder>();
 
-            builder.AddNotificationHandler<ContentCacheRefresherNotification, UmbracoIndexingNotificationHandler>();
-            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, UmbracoIndexingNotificationHandler>();
-            builder.AddNotificationHandler<MediaCacheRefresherNotification, UmbracoIndexingNotificationHandler>();
-            builder.AddNotificationHandler<MemberCacheRefresherNotification, UmbracoIndexingNotificationHandler>();
-            builder.AddNotificationHandler<LanguageCacheRefresherNotification, UmbracoIndexingNotificationHandler>();
+            builder.AddNotificationHandler<ContentCacheRefresherNotification, ContentIndexingNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, ContentTypeIndexingNotificationHandler>();
+            builder.AddNotificationHandler<MediaCacheRefresherNotification, MediaIndexingNotificationHandler>();
+            builder.AddNotificationHandler<MemberCacheRefresherNotification, MemberIndexingNotificationHandler>();
+            builder.AddNotificationHandler<LanguageCacheRefresherNotification, LanguageIndexingNotificationHandler>();
 
             builder.AddNotificationHandler<UmbracoRequestBeginNotification, RebuildOnStartupHandler>();
 

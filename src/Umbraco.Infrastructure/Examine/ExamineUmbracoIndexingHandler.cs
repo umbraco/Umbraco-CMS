@@ -71,7 +71,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             //let's deal with shutting down Examine with MainDom
             var examineShutdownRegistered = _mainDom.Register(release: () =>
             {
-                using (_profilingLogger.TraceDuration<UmbracoIndexingNotificationHandler>("Examine shutting down"))
+                using (_profilingLogger.TraceDuration<ExamineUmbracoIndexingHandler>("Examine shutting down"))
                 {
                     _examineManager.Dispose();
                 }

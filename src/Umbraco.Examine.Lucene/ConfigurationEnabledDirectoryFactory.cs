@@ -66,7 +66,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 Type factoryType = _typeFinder.GetTypeByName(configuredDirectoryFactory);
                 if (factoryType == null)
                 {
-                    throw new NullReferenceException("No directory type found for value: " + configuredDirectoryFactory);
+                    throw new InvalidOperationException("No directory type found for value: " + configuredDirectoryFactory);
                 }
 
                 var directoryFactory = (IDirectoryFactory)ActivatorUtilities.CreateInstance(_services, factoryType);
