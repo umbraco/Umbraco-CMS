@@ -38,6 +38,7 @@ using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.Mappers;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -71,16 +72,8 @@ namespace Umbraco.Cms.Tests.UnitTests.TestHelpers
 
             public override IHostingEnvironment GetHostingEnvironment()
             {
-                // This is needed in order to create a unique Application Id
-                var serviceCollection = new ServiceCollection();
-                var builder = Host
-                    .CreateDefaultBuilder()
-                    .ConfigureServices(services => services.AddDataProtection());
-                var host = builder.Build();
-
                 var testPath = TestContext.CurrentContext.TestDirectory.Split("bin")[0];
-                return new AspNetCoreHostingEnvironment(
-                    host.Services,
+                return new TestHostingEnvironment(
                     Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == new HostingSettings()),
                     Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == new WebRoutingSettings()),
                     Mock.Of<IWebHostEnvironment>(

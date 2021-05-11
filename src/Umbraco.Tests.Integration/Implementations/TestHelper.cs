@@ -33,6 +33,7 @@ using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Tests.Common;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Extensions;
 using File = System.IO.File;
@@ -142,20 +143,10 @@ namespace Umbraco.Cms.Tests.Integration.Implementations
         }
 
         public override IHostingEnvironment GetHostingEnvironment()
-        {
-            // This is needed in order to create a unique Application Id
-            var serviceCollection = new ServiceCollection();
-            var builder = Host
-                .CreateDefaultBuilder()
-                .ConfigureServices(services => services.AddDataProtection());
-            var host = builder.Build();
-            
-            return _hostingEnvironment ??= new TestHostingEnvironment(
-                host.Services,
+            => _hostingEnvironment ??= new TestHostingEnvironment(
                 GetIOptionsMonitorOfHostingSettings(),
                 GetIOptionsMonitorOfWebRoutingSettings(),
                 _hostEnvironment);
-        }
 
         private IOptionsMonitor<HostingSettings> GetIOptionsMonitorOfHostingSettings()
         {

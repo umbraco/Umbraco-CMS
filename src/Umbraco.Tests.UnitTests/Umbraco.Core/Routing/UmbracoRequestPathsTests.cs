@@ -7,6 +7,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
@@ -25,23 +26,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
             _globalSettings = new GlobalSettings();
         }
 
-        private AspNetCoreHostingEnvironment CreateHostingEnvironment(string virtualPath = "")
+        private IHostingEnvironment CreateHostingEnvironment(string virtualPath = "")
         {
-
             var hostingSettings = new HostingSettings { ApplicationVirtualPath = virtualPath };
             var webRoutingSettings = new WebRoutingSettings();
             var mockedOptionsMonitorOfHostingSettings = Mock.Of<IOptionsMonitor<HostingSettings>>(x => x.CurrentValue == hostingSettings);
             var mockedOptionsMonitorOfWebRoutingSettings = Mock.Of<IOptionsMonitor<WebRoutingSettings>>(x => x.CurrentValue == webRoutingSettings);
 
-            // This is needed in order to create a unique Application Id
-            var serviceCollection = new ServiceCollection();
-            var builder = Host
-                .CreateDefaultBuilder()
-                .ConfigureServices(services => services.AddDataProtection());
-            var host = builder.Build();
-
-            return new AspNetCoreHostingEnvironment(
-                host.Services,
+            return new TestHostingEnvironment(
                 mockedOptionsMonitorOfHostingSettings,
                 mockedOptionsMonitorOfWebRoutingSettings,
                 _hostEnvironment);

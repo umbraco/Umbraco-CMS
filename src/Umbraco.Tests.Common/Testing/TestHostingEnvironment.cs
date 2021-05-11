@@ -1,25 +1,27 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
-using System;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using IHostingEnvironment = Umbraco.Cms.Core.Hosting.IHostingEnvironment;
 
-namespace Umbraco.Cms.Tests.Integration.Implementations
+namespace Umbraco.Cms.Tests.Common.Testing
 {
-    public class TestHostingEnvironment : AspNetCoreHostingEnvironment, Cms.Core.Hosting.IHostingEnvironment
+    public class TestHostingEnvironment : AspNetCoreHostingEnvironment, IHostingEnvironment
     {
         public TestHostingEnvironment(
-            IServiceProvider serviceProvider,
             IOptionsMonitor<HostingSettings> hostingSettings,
             IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             IWebHostEnvironment webHostEnvironment)
-            : base(serviceProvider, hostingSettings, webRoutingSettings, webHostEnvironment)
+            : base(null, hostingSettings, webRoutingSettings, webHostEnvironment)
         {
         }
+
+        // override
+        string IHostingEnvironment.ApplicationId { get; } = "TestApplication";
+
 
         /// <summary>
         /// Gets a value indicating whether we are hosted.
