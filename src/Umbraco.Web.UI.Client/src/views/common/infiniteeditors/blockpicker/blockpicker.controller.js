@@ -17,7 +17,6 @@ angular.module("umbraco")
                     "alias": "empty",
                     "name": data[0],
                     "icon": "icon-add",
-                    "active": true,
                     "view": ""
                 },
                 {
@@ -28,10 +27,16 @@ angular.module("umbraco")
                     "disabled": vm.model.clipboardItems.length === 0
                 }];
 
-                vm.activeTab = vm.navigation[0];
+                if (vm.model.openClipboard === true) {
+                    vm.activeTab = vm.navigation[1];
+                } else {
+                    vm.activeTab = vm.navigation[0];
+                }
+
+                vm.activeTab.active = true;
             }
         );
-        
+
         vm.onNavigationChanged = function (tab) {
             vm.activeTab.active = false;
             vm.activeTab = tab;

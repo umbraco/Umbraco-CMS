@@ -704,7 +704,32 @@ namespace Umbraco.Web.Editors
 
                     if (result.FormData["contentTypeAlias"] == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
+                        var mediaTypes = Services.MediaTypeService.GetAll();
+                        // Look up MediaTypes
+                        foreach (var mediaTypeItem in mediaTypes)
+                        {
+                            var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
+                            if (fileProperty != null) {
+                                var dataTypeKey = fileProperty.DataTypeKey;
+                                var dataType = Services.DataTypeService.GetDataType(dataTypeKey);
+
+                                if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig) {
+                                    var fileExtensions = fileExtensionsConfig.FileExtensions;
+                                    if (fileExtensions != null)
+                                    {
+                                        if (fileExtensions.Where(x => x.Value == ext).Count() != 0)
+                                        {
+                                            mediaType = mediaTypeItem.Alias;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+
+                        // If media type is still File then let's check if it's an image.
+                        if (mediaType == Constants.Conventions.MediaTypes.File && Current.Configs.Settings().Content.ImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }

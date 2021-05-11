@@ -2118,6 +2118,15 @@ namespace Umbraco.Core.Services.Implement
             return OperationResult.Succeed(evtMsgs);
         }
 
+        public bool RecycleBinSmells()
+        {
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
+            {
+                scope.ReadLock(Constants.Locks.ContentTree);
+                return _documentRepository.RecycleBinSmells();
+            }
+        }
+
         #endregion
 
         #region Others
