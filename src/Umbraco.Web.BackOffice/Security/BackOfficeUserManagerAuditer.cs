@@ -1,6 +1,7 @@
 using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Security;
 using Umbraco.Extensions;

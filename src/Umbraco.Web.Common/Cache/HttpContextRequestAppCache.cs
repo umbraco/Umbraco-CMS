@@ -6,6 +6,7 @@ using System.Threading;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Features;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Cache
@@ -15,7 +16,7 @@ namespace Umbraco.Cms.Core.Cache
     /// </summary>
     /// <remarks>
     /// <para>The HttpContext is not thread safe and no part of it is which means we need to include our own thread
-    /// safety mechanisms. This relies on notifications: <see cref="UmbracoRequestBegin"/> and <see cref="UmbracoRequestEnd"/>
+    /// safety mechanisms. This relies on notifications: <see cref="UmbracoRequestBeginNotification"/> and <see cref="UmbracoRequestEndNotification"/>
     /// in order to facilitate the correct locking and releasing allocations.
     /// </para>
     /// </remarks>

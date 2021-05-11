@@ -2,8 +2,8 @@
 // See LICENSE for more details.
 
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Notifications;
 
 namespace Umbraco.Cms.Core.Events
 {

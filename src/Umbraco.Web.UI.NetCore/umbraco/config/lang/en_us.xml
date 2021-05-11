@@ -374,6 +374,7 @@
   <area alias="mediaType">
      <key alias="copyFailed">Failed to copy media type</key>
      <key alias="moveFailed">Failed to move media type</key>
+     <key alias="autoPickMediaType">Auto pick</key>
   </area>
   <area alias="memberType">
      <key alias="copyFailed">Failed to copy member type</key>
@@ -1372,6 +1373,17 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="pickedTrashedItem">You have picked a media item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked media items currently deleted or in the recycle bin</key>
     <key alias="trashed">Trashed</key>
+    <key alias="openMedia">Open in Media Library</key>
+    <key alias="changeMedia">Change Media Item</key>
+    <key alias="resetMediaCrop">Reset media crop</key>
+    <key alias="editMediaEntryLabel">Edit %0% on %1%</key>
+    <key alias="confirmCancelMediaEntryCreationHeadline">Discard creation?</key>
+    <key alias="confirmCancelMediaEntryCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
+    <key alias="confirmCancelMediaEntryHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
+    <key alias="confirmRemoveMediaEntryMessage">Remove?</key>
+    <key alias="confirmRemoveAllMediaEntryMessage">Remove all medias?</key>
+    <key alias="tabClipboard">Clipboard</key>
+    <key alias="notAllowed">Not allowed</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">enter external link</key>
@@ -2427,6 +2439,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copy %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% from %1%</key>
+    <key alias="labelForArrayOfItems">Collection of %0%</key>
     <key alias="labelForRemoveAllEntries">Remove all items</key>
     <key alias="labelForClearClipboard">Clear clipboard</key>
   </area>

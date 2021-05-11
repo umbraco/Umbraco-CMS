@@ -13,6 +13,7 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
@@ -121,7 +122,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 try
                 {
                     LazyInitializeBackOfficeServices(context.Request.Path);
-                    await _eventAggregator.PublishAsync(new UmbracoRequestBegin(umbracoContextReference.UmbracoContext));
+                    await _eventAggregator.PublishAsync(new UmbracoRequestBeginNotification(umbracoContextReference.UmbracoContext));
                 }
                 catch (Exception ex)
                 {
@@ -137,7 +138,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
                     }
                     finally
                     {
-                        await _eventAggregator.PublishAsync(new UmbracoRequestEnd(umbracoContextReference.UmbracoContext));
+                        await _eventAggregator.PublishAsync(new UmbracoRequestEndNotification(umbracoContextReference.UmbracoContext));
                     }
                 }
             }

@@ -27,12 +27,12 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Web;
@@ -141,11 +141,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
 
             this.AddAllCoreCollectionBuilders();
-            this.AddNotificationHandler<UmbracoApplicationStarting, EssentialDirectoryCreator>();
+            this.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
 
             Services.AddSingleton<ManifestWatcher>();
             Services.AddSingleton<UmbracoRequestPaths>();
-            this.AddNotificationAsyncHandler<UmbracoApplicationStarting, AppPluginsManifestWatcherNotificationHandler>();
+            this.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, AppPluginsManifestWatcherNotificationHandler>();
 
             Services.AddUnique<InstallStatusTracker>();
 

@@ -5,7 +5,8 @@ using Microsoft.Extensions.Logging;
 using NPoco;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Infrastructure.Migrations.Events;
+using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Infrastructure.Migrations.Notifications;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseModelDefinitions;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -319,7 +320,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         #region Notifications
 
         /// <summary>
-        /// Publishes the <see cref="DatabaseSchemaCreatingNotification"/> notification.
+        /// Publishes the <see cref="Notifications.DatabaseSchemaCreatingNotification"/> notification.
         /// </summary>
         /// <param name="notification">Cancelable notification marking the creation having begun.</param>
         internal virtual void FireBeforeCreation(DatabaseSchemaCreatingNotification notification) =>

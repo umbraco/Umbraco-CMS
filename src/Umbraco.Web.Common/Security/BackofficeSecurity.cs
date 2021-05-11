@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models.Membership;
@@ -23,8 +24,6 @@ namespace Umbraco.Cms.Web.Common.Security
             _httpContextAccessor = httpContextAccessor;
         }
 
-
-
         /// <inheritdoc />
         public IUser CurrentUser
         {
@@ -39,7 +38,7 @@ namespace Umbraco.Cms.Web.Common.Security
                         //Check again
                         if (_currentUser == null)
                         {
-                            var id = GetUserId();
+                            Attempt<int> id = GetUserId();
                             _currentUser = id ? _userService.GetUserById(id.Result) : null;
                         }
                     }
@@ -52,22 +51,18 @@ namespace Umbraco.Cms.Web.Common.Security
         /// <inheritdoc />
         public Attempt<int> GetUserId()
         {
-            var identity = _httpContextAccessor.HttpContext?.GetCurrentIdentity();
+            ClaimsIdentity identity = _httpContextAccessor.HttpContext?.GetCurrentIdentity();
             return identity == null ? Attempt.Fail<int>() : Attempt.Succeed(identity.GetId());
         }
 
         /// <inheritdoc />
         public bool IsAuthenticated()
         {
-            var httpContext = _httpContextAccessor.HttpContext;
+            HttpContext httpContext = _httpContextAccessor.HttpContext;
             return httpContext?.User != null && httpContext.User.Identity.IsAuthenticated && httpContext.GetCurrentIdentity() != null;
         }
 
         /// <inheritdoc />
-        public bool UserHasSectionAccess(string section, IUser user)
-        {
-            return user.HasSectionAccess(section);
-        }
-
+        public bool UserHasSectionAccess(string section, IUser user) => user.HasSectionAccess(section);
     }
 }

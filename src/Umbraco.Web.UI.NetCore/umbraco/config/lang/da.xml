@@ -343,6 +343,7 @@
   <area alias="mediaType">
      <key alias="copyFailed">Kopiering af medietypen fejlede</key>
      <key alias="moveFailed">Flytning af medietypen fejlede</key>
+     <key alias="autoPickMediaType">Auto vælg</key>
   </area>
   <area alias="memberType">
      <key alias="copyFailed">Kopiering af medlemstypen fejlede</key>
@@ -1101,6 +1102,17 @@ Mange hilsner fra Umbraco robotten
     <key alias="pickedTrashedItem">Du har valgt et medie som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt medier som er slettede eller lagt i papirkurven</key>
     <key alias="trashed">Slettet</key>
+    <key alias="openMedia">Åben i mediebiblioteket</key>
+    <key alias="changeMedia">Skift medie</key>
+    <key alias="resetMediaCrop">Nulstil medie beskæring</key>
+    <key alias="editMediaEntryLabel">Rediger %0% på %1%</key>
+    <key alias="confirmCancelMediaEntryCreationHeadline">Annuller indsættelse?</key>
+    <key alias="confirmCancelMediaEntryCreationMessage"><![CDATA[Er du sikker på at du vil annullere indsættelsen?]]></key>
+    <key alias="confirmCancelMediaEntryHasChanges">Du har foretaget ændringer til bruge af dette media. Er du sikker på at du vil annullere?</key>
+    <key alias="confirmRemoveMediaEntryMessage">Fjern?</key>
+    <key alias="confirmRemoveAllMediaEntryMessage">Fjern brugen af alle medier?</key>
+    <key alias="tabClipboard">Udklipsholder</key>
+    <key alias="notAllowed">Ikke tilladt</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>
@@ -1846,6 +1858,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Kopier %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% fra %1%</key>
+    <key alias="labelForArrayOfItems">Samling af %0%</key>
     <key alias="labelForRemoveAllEntries">Fjern alle elementer</key>
     <key alias="labelForClearClipboard">Ryd udklipsholder</key>
   </area>
