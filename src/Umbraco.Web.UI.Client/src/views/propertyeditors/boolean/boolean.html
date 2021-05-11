@@ -1,6 +1,6 @@
 <div class="umb-property-editor umb-boolean" ng-controller="Umbraco.PropertyEditors.BooleanController">
     <umb-toggle
-        input-id="{{model.alias}}"
+        input-id="property-{{model.alias}}"
         checked="renderModel.value"
         on-click="toggle()"
         show-labels="{{model.config.showLabels}}"
