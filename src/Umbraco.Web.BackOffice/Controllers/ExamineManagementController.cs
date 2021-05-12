@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Examine;
 using Examine.Search;
+using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
@@ -63,18 +64,32 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public ActionResult<SearchResults> GetSearchResults(string searcherName, string query, int pageIndex = 0, int pageSize = 20)
         {
+            query = query.Trim();
+
             if (query.IsNullOrWhiteSpace())
+            {
                 return SearchResults.Empty();
+            }
 
             var msg = ValidateSearcher(searcherName, out var searcher);
             if (!msg.IsSuccessStatusCode())
                 return msg;
 
+            ISearchResults results;
+
             // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
-            var results = searcher
-                .CreateQuery()
-                .NativeQuery(query)
-                .Execute(QueryOptions.SkipTake(pageSize * pageIndex, pageSize));
+            try
+            {
+                results = searcher
+                        .CreateQuery()
+                        .NativeQuery(query)
+                        .Execute(QueryOptions.SkipTake(pageSize * pageIndex, pageSize));
+            }
+            catch (ParseException)
+            {
+                // will occur if the query parser cannot parse this (i.e. starts with a *)
+                return SearchResults.Empty();
+            }
 
             var pagedResults = results.Skip(pageIndex * pageSize);
 
