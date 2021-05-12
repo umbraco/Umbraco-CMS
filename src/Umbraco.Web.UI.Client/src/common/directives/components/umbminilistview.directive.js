@@ -58,6 +58,9 @@
                 
                 entityResource.getPagedChildren(miniListView.node.id, scope.entityType, miniListView.pagination)
                     .then(function (data) {
+                        if (!data.items) {
+                            data.items = [];
+                        }
                         if (scope.onItemsLoaded) {
                             scope.onItemsLoaded({items: data.items});
                         }
