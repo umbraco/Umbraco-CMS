@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
 
                 using (var request = new HttpRequestMessage(HttpMethod.Post, "installs/"))
                 {
-                    var postData = new TelemetryReportData { Id = telemetrySiteIdentifier, Version = _umbracoVersion.SemanticVersion.ToSemanticString() };
+                    var postData = new TelemetryReportData { Id = telemetrySiteIdentifier, Version = _umbracoVersion.SemanticVersion.ToSemanticStringWithoutBuild() };
                     request.Content = new StringContent(JsonConvert.SerializeObject(postData), Encoding.UTF8, "application/json"); //CONTENT-TYPE header
 
                     // Set a low timeout - no need to use a larger default timeout for this POST request
