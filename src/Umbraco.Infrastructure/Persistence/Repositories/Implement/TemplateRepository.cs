@@ -442,15 +442,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public Stream GetFileContentStream(string filepath)
         {
-            IFileSystem fs = GetFileSystem(filepath);
-            if (fs.FileExists(filepath) == false)
+            IFileSystem fileSystem = GetFileSystem(filepath);
+            if (fileSystem.FileExists(filepath) == false)
             {
                 return null;
             }
 
             try
             {
-                return GetFileSystem(filepath).OpenFile(filepath);
+                return fileSystem.OpenFile(filepath);
             }
             catch
             {
@@ -462,14 +462,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public long GetFileSize(string filename)
         {
-            if (GetFileSystem(filename).FileExists(filename) == false)
+            IFileSystem fileSystem = GetFileSystem(filename);
+            if (fileSystem.FileExists(filename) == false)
             {
                 return -1;
             }
 
             try
             {
-                return GetFileSystem(filename).GetSize(filename);
+                return fileSystem.GetSize(filename);
             }
             catch
             {
