@@ -39,39 +39,38 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             _viewHelper = new ViewHelper(_viewsFileSystem);
         }
 
-        protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy()
-        {
-            return new FullDataSetRepositoryCachePolicy<ITemplate, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
-        }
+        protected override IRepositoryCachePolicy<ITemplate, int> CreateCachePolicy() =>
+            new FullDataSetRepositoryCachePolicy<ITemplate, int>(GlobalIsolatedCache, ScopeAccessor, GetEntityId, /*expires:*/ false);
 
         #region Overrides of RepositoryBase<int,ITemplate>
 
-        protected override ITemplate PerformGet(int id)
-        {
+        protected override ITemplate PerformGet(int id) =>
             //use the underlying GetAll which will force cache all templates
-            return base.GetMany().FirstOrDefault(x => x.Id == id);
-        }
+            base.GetMany().FirstOrDefault(x => x.Id == id);
 
         protected override IEnumerable<ITemplate> PerformGetAll(params int[] ids)
         {
-            var sql = GetBaseQuery(false);
+            Sql<ISqlContext> sql = GetBaseQuery(false);
 
             if (ids.Any())
             {
-                sql.Where("umbracoNode.id in (@ids)", new { ids = ids });
+                sql.Where("umbracoNode.id in (@ids)", new { ids });
             }
             else
             {
                 sql.Where<NodeDto>(x => x.NodeObjectType == NodeObjectTypeId);
             }
 
-            var dtos = Database.Fetch<TemplateDto>(sql);
+            List<TemplateDto> dtos = Database.Fetch<TemplateDto>(sql);
 
-            if (dtos.Count == 0) return Enumerable.Empty<ITemplate>();
+            if (dtos.Count == 0)
+            {
+                return Enumerable.Empty<ITemplate>();
+            }
 
             //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
-            var childIds = (ids.Any()
+            IUmbracoEntity[] childIds = (ids.Any()
                 ? GetAxisDefinitions(dtos.ToArray())
                 : dtos.Select(x => new EntitySlim
                 {
@@ -85,17 +84,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override IEnumerable<ITemplate> PerformGetByQuery(IQuery<ITemplate> query)
         {
-            var sqlClause = GetBaseQuery(false);
+            Sql<ISqlContext> sqlClause = GetBaseQuery(false);
             var translator = new SqlTranslator<ITemplate>(sqlClause, query);
-            var sql = translator.Translate();
+            Sql<ISqlContext> sql = translator.Translate();
 
-            var dtos = Database.Fetch<TemplateDto>(sql);
+            List<TemplateDto> dtos = Database.Fetch<TemplateDto>(sql);
 
-            if (dtos.Count == 0) return Enumerable.Empty<ITemplate>();
+            if (dtos.Count == 0)
+            {
+                return Enumerable.Empty<ITemplate>();
+            }
 
             //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
-            var childIds = GetAxisDefinitions(dtos.ToArray()).ToArray();
+            IUmbracoEntity[] childIds = GetAxisDefinitions(dtos.ToArray()).ToArray();
 
             return dtos.Select(d => MapFromDto(d, childIds));
         }
@@ -106,7 +108,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override Sql<ISqlContext> GetBaseQuery(bool isCount)
         {
-            var sql = SqlContext.Sql();
+            Sql<ISqlContext> sql = SqlContext.Sql();
 
             sql = isCount
                 ? sql.SelectCount()
@@ -121,10 +123,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return sql;
         }
 
-        protected override string GetBaseWhereClause()
-        {
-            return Cms.Core.Constants.DatabaseSchema.Tables.Node + ".id = @id";
-        }
+        protected override string GetBaseWhereClause() => Cms.Core.Constants.DatabaseSchema.Tables.Node + ".id = @id";
 
         protected override IEnumerable<string> GetDeleteClauses()
         {
@@ -150,15 +149,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             var template = (Template)entity;
             template.AddingEntity();
 
-            var dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, template.Id);
+            TemplateDto dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, template.Id);
 
             //Create the (base) node data - umbracoNode
-            var nodeDto = dto.NodeDto;
+            NodeDto nodeDto = dto.NodeDto;
             nodeDto.Path = "-1," + dto.NodeDto.NodeId;
-            var o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
+            int o = Database.IsNew<NodeDto>(nodeDto) ? Convert.ToInt32(Database.Insert(nodeDto)) : Database.Update(nodeDto);
 
             //Update with new correct path
-            var parent = Get(template.MasterTemplateId.Value);
+            ITemplate parent = Get(template.MasterTemplateId.Value);
             if (parent != null)
             {
                 nodeDto.Path = string.Concat(parent.Path, ",", nodeDto.NodeId);
@@ -184,7 +183,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // ensure that from now on, content is lazy-loaded
             if (template.GetFileContent == null)
+            {
                 template.GetFileContent = file => GetFileContent((Template) file, false);
+            }
         }
 
         protected override void PersistUpdatedItem(ITemplate entity)
@@ -192,11 +193,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             EnsureValidAlias(entity);
 
             //store the changed alias if there is one for use with updating files later
-            var originalAlias = entity.Alias;
+            string originalAlias = entity.Alias;
             if (entity.IsPropertyDirty("Alias"))
             {
                 //we need to check what it currently is before saving and remove that file
-                var current = Get(entity.Id);
+                ITemplate current = Get(entity.Id);
                 originalAlias = current.Alias;
             }
 
@@ -204,7 +205,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             if (entity.IsPropertyDirty("MasterTemplateId"))
             {
-                var parent = Get(template.MasterTemplateId.Value);
+                ITemplate parent = Get(template.MasterTemplateId.Value);
                 if (parent != null)
                 {
                     entity.Path = string.Concat(parent.Path, ",", entity.Id);
@@ -218,17 +219,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
 
             //Get TemplateDto from db to get the Primary key of the entity
-            var templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new { Id = entity.Id });
+            TemplateDto templateDto = Database.SingleOrDefault<TemplateDto>("WHERE nodeId = @Id", new { entity.Id });
+
             //Save updated entity to db
-
             template.UpdateDate = DateTime.Now;
-            var dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, templateDto.PrimaryKey);
-
+            TemplateDto dto = TemplateFactory.BuildDto(template, NodeObjectTypeId, templateDto.PrimaryKey);
             Database.Update(dto.NodeDto);
             Database.Update(dto);
 
             //re-update if this is a master template, since it could have changed!
-            var axisDefs = GetAxisDefinitions(dto);
+            IEnumerable<IUmbracoEntity> axisDefs = GetAxisDefinitions(dto);
             template.IsMasterTemplate = axisDefs.Any(x => x.ParentId == dto.NodeId);
 
             //now do the file work
@@ -238,15 +238,16 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
             // ensure that from now on, content is lazy-loaded
             if (template.GetFileContent == null)
+            {
                 template.GetFileContent = file => GetFileContent((Template) file, false);
+            }
         }
 
         private void SaveFile(Template template, string originalAlias = null)
         {
             string content;
 
-            var templateOnDisk = template as TemplateOnDisk;
-            if (templateOnDisk != null && templateOnDisk.IsOnDisk)
+            if (template is TemplateOnDisk templateOnDisk && templateOnDisk.IsOnDisk)
             {
                 // if "template on disk" load content from disk
                 content = _viewHelper.GetFileContents(template);
@@ -266,7 +267,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         protected override void PersistDeletedItem(ITemplate entity)
         {
-            var deletes = GetDeleteClauses().ToArray();
+            string[] deletes = GetDeleteClauses().ToArray();
 
             var descendants = GetDescendants(entity.Id).ToList();
 
@@ -274,21 +275,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             descendants.Reverse();
 
             //delete the hierarchy
-            foreach (var descendant in descendants)
+            foreach (ITemplate descendant in descendants)
             {
-                foreach (var delete in deletes)
+                foreach (string delete in deletes)
                 {
                     Database.Execute(delete, new { id = GetEntityId(descendant) });
                 }
             }
 
             //now we can delete this one
-            foreach (var delete in deletes)
+            foreach (string delete in deletes)
             {
                 Database.Execute(delete, new { id = GetEntityId(entity) });
             }
 
-            var viewName = string.Concat(entity.Alias, ".cshtml");
+            string viewName = string.Concat(entity.Alias, ".cshtml");
             _viewsFileSystem.DeleteFile(viewName);
 
             entity.DeleteDate = DateTime.Now;
@@ -300,7 +301,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             //look up the simple template definitions that have a master template assigned, this is used
             // later to populate the template item's properties
-            var childIdsSql = SqlContext.Sql()
+            Sql<ISqlContext> childIdsSql = SqlContext.Sql()
                 .Select("nodeId,alias,parentID")
                 .From<TemplateDto>()
                 .InnerJoin<NodeDto>()
@@ -309,7 +310,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                 .Where("umbracoNode." + SqlContext.SqlSyntax.GetQuotedColumnName("id") + " IN (@parentIds) OR umbracoNode.parentID IN (@childIds)",
                     new {parentIds = templates.Select(x => x.NodeDto.ParentId), childIds = templates.Select(x => x.NodeId)});
 
-            var childIds = Database.Fetch<dynamic>(childIdsSql)
+            IEnumerable<EntitySlim> childIds = Database.Fetch<dynamic>(childIdsSql)
                 .Select(x => new EntitySlim
                 {
                     Id = x.nodeId,
@@ -330,11 +331,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         private ITemplate MapFromDto(TemplateDto dto, IUmbracoEntity[] axisDefinitions)
         {
 
-            var template = TemplateFactory.BuildEntity(_shortStringHelper, dto, axisDefinitions, file => GetFileContent((Template) file, false));
+            Template template = TemplateFactory.BuildEntity(_shortStringHelper, dto, axisDefinitions, file => GetFileContent((Template) file, false));
 
             if (dto.NodeDto.ParentId > 0)
             {
-                var masterTemplate = axisDefinitions.FirstOrDefault(x => x.Id == dto.NodeDto.ParentId);
+                IUmbracoEntity masterTemplate = axisDefinitions.FirstOrDefault(x => x.Id == dto.NodeDto.ParentId);
                 if (masterTemplate != null)
                 {
                     template.MasterTemplateAlias = masterTemplate.Name;
@@ -354,7 +355,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private void SetVirtualPath(ITemplate template)
         {
-            var path = template.OriginalPath;
+            string path = template.OriginalPath;
             if (string.IsNullOrWhiteSpace(path))
             {
                 // we need to discover the path
@@ -382,16 +383,21 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private string GetFileContent(ITemplate template, bool init)
         {
-            var path = template.OriginalPath;
+            string path = template.OriginalPath;
             if (string.IsNullOrWhiteSpace(path))
             {
                 // we need to discover the path
                 path = string.Concat(template.Alias, ".cshtml");
                 if (_viewsFileSystem.FileExists(path))
+                {
                     return GetFileContent(template, _viewsFileSystem, path, init);
+                }
+
                 path = string.Concat(template.Alias, ".vbhtml");
                 if (_viewsFileSystem.FileExists(path))
+                {
                     return GetFileContent(template, _viewsFileSystem, path, init);
+                }
             }
             else
             {
@@ -427,7 +433,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private string GetFileContent(IFileSystem fs, string filename)
         {
-            using (var stream = fs.OpenFile(filename))
+            using (Stream stream = fs.OpenFile(filename))
             using (var reader = new StreamReader(stream, Encoding.UTF8, true))
             {
                 return reader.ReadToEnd();
@@ -436,8 +442,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         public Stream GetFileContentStream(string filepath)
         {
-            var fs = GetFileSystem(filepath);
-            if (fs.FileExists(filepath) == false) return null;
+            IFileSystem fs = GetFileSystem(filepath);
+            if (fs.FileExists(filepath) == false)
+            {
+                return null;
+            }
 
             try
             {
@@ -449,9 +458,28 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             }
         }
 
+        public void SetFileContent(string filepath, Stream content) => GetFileSystem(filepath).AddFile(filepath, content, true);
+
+        public long GetFileSize(string filename)
+        {
+            if (GetFileSystem(filename).FileExists(filename) == false)
+            {
+                return -1;
+            }
+
+            try
+            {
+                return GetFileSystem(filename).GetSize(filename);
+            }
+            catch
+            {
+                return -1; // deal with race conds
+            }
+        }
+
         private IFileSystem GetFileSystem(string filepath)
         {
-            var ext = Path.GetExtension(filepath);
+            string ext = Path.GetExtension(filepath);
             IFileSystem fs;
             switch (ext)
             {
@@ -467,17 +495,17 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         #region Implementation of ITemplateRepository
 
-        public ITemplate Get(string alias)
-        {
-            return GetAll(alias).FirstOrDefault();
-        }
+        public ITemplate Get(string alias) => GetAll(alias).FirstOrDefault();
 
         public IEnumerable<ITemplate> GetAll(params string[] aliases)
         {
             //We must call the base (normal) GetAll method
             // which is cached. This is a specialized method and unfortunately with the params[] it
             // overlaps with the normal GetAll method.
-            if (aliases.Any() == false) return base.GetMany();
+            if (aliases.Any() == false)
+            {
+                return base.GetMany();
+            }
 
             //return from base.GetAll, this is all cached
             return base.GetMany().Where(x => aliases.InvariantContains(x.Alias));
@@ -486,33 +514,43 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         public IEnumerable<ITemplate> GetChildren(int masterTemplateId)
         {
             //return from base.GetAll, this is all cached
-            var all = base.GetMany().ToArray();
+            ITemplate[] all = base.GetMany().ToArray();
 
-            if (masterTemplateId <= 0) return all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
+            if (masterTemplateId <= 0)
+            {
+                return all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace());
+            }
 
-            var parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
-            if (parent == null) return Enumerable.Empty<ITemplate>();
+            ITemplate parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
+            if (parent == null)
+            {
+                return Enumerable.Empty<ITemplate>();
+            }
 
-            var children = all.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
+            IEnumerable<ITemplate> children = all.Where(x => x.MasterTemplateAlias.InvariantEquals(parent.Alias));
             return children;
         }
 
         public IEnumerable<ITemplate> GetDescendants(int masterTemplateId)
         {
             //return from base.GetAll, this is all cached
-            var all = base.GetMany().ToArray();
+            ITemplate[] all = base.GetMany().ToArray();
             var descendants = new List<ITemplate>();
             if (masterTemplateId > 0)
             {
-                var parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
-                if (parent == null) return Enumerable.Empty<ITemplate>();
+                ITemplate parent = all.FirstOrDefault(x => x.Id == masterTemplateId);
+                if (parent == null)
+                {
+                    return Enumerable.Empty<ITemplate>();
+                }
+
                 //recursively add all children with a level
                 AddChildren(all, descendants, parent.Alias);
             }
             else
             {
                 descendants.AddRange(all.Where(x => x.MasterTemplateAlias.IsNullOrWhiteSpace()));
-                foreach (var parent in descendants)
+                foreach (ITemplate parent in descendants)
                 {
                     //recursively add all children with a level
                     AddChildren(all, descendants, parent.Alias);
@@ -525,11 +563,15 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private void AddChildren(ITemplate[] all, List<ITemplate> descendants, string masterAlias)
         {
-            var c = all.Where(x => x.MasterTemplateAlias.InvariantEquals(masterAlias)).ToArray();
+            ITemplate[] c = all.Where(x => x.MasterTemplateAlias.InvariantEquals(masterAlias)).ToArray();
             descendants.AddRange(c);
-            if (c.Any() == false) return;
+            if (c.Any() == false)
+            {
+                return;
+            }
+
             //recurse through all children
-            foreach (var child in c)
+            foreach (ITemplate child in c)
             {
                 AddChildren(all, descendants, child.Alias);
             }
@@ -547,7 +589,9 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             template.Alias = template.Alias.ToCleanString(_shortStringHelper, CleanStringType.UnderscoreAlias);
 
             if (template.Alias.Length > 100)
+            {
                 template.Alias = template.Alias.Substring(0, 95);
+            }
 
             if (AliasAlreadExists(template))
             {
@@ -557,8 +601,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
 
         private bool AliasAlreadExists(ITemplate template)
         {
-            var sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
-            var count = Database.ExecuteScalar<int>(sql);
+            Sql<ISqlContext> sql = GetBaseQuery(true).Where<TemplateDto>(x => x.Alias.InvariantEquals(template.Alias) && x.NodeId != template.Id);
+            int count = Database.ExecuteScalar<int>(sql);
             return count > 0;
         }
 
@@ -566,7 +610,10 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             // TODO: This is ported from the old data layer... pretty crap way of doing this but it works for now.
             if (AliasAlreadExists(template))
+            {
                 return template.Alias + attempts;
+            }
+
             attempts++;
             return EnsureUniqueAlias(template, attempts);
         }

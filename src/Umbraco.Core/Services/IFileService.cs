@@ -25,6 +25,48 @@ namespace Umbraco.Cms.Core.Services
         Attempt<IPartialView> SavePartialViewMacro(IPartialView partialView, int userId = Constants.Security.SuperUserId);
 
         /// <summary>
+        /// Gets the content of a partial view as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the partial view.</param>
+        /// <returns>The content of the partial view.</returns>
+        Stream GetPartialViewFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a partial view.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the partial view.</param>
+        /// <param name="content">The content of the partial view.</param>
+        void SetPartialViewFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the size of a partial view.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the partial view.</param>
+        /// <returns>The size of the partial view.</returns>
+        long GetPartialViewFileSize(string filepath);
+
+        /// <summary>
+        /// Gets the content of a macro partial view as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the macro partial view.</param>
+        /// <returns>The content of the macro partial view.</returns>
+        Stream GetPartialViewMacroFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a macro partial view.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the macro partial view.</param>
+        /// <param name="content">The content of the macro partial view.</param>
+        void SetPartialViewMacroFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the size of a macro partial view.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the macro partial view.</param>
+        /// <returns>The size of the macro partial view.</returns>
+        long GetPartialViewMacroFileSize(string filepath);
+
+        /// <summary>
         /// Gets a list of all <see cref="IStylesheet"/> objects
         /// </summary>
         /// <returns>An enumerable list of <see cref="IStylesheet"/> objects</returns>
@@ -50,6 +92,40 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="path">Name incl. extension of the Stylesheet to delete</param>
         /// <param name="userId">Optional id of the user deleting the stylesheet</param>
         void DeleteStylesheet(string path, int userId = Constants.Security.SuperUserId);
+
+        /// <summary>
+        /// Creates a folder for style sheets
+        /// </summary>
+        /// <param name="folderPath"></param>
+        /// <returns></returns>
+        void CreateStyleSheetFolder(string folderPath);
+
+        /// <summary>
+        /// Deletes a folder for style sheets
+        /// </summary>
+        /// <param name="folderPath"></param>
+        void DeleteStyleSheetFolder(string folderPath);
+
+        /// <summary>
+        /// Gets the content of a stylesheet as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the stylesheet.</param>
+        /// <returns>The content of the stylesheet.</returns>
+        Stream GetStylesheetFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a stylesheet.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the stylesheet.</param>
+        /// <param name="content">The content of the stylesheet.</param>
+        void SetStylesheetFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the size of a stylesheet.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the stylesheet.</param>
+        /// <returns>The size of the stylesheet.</returns>
+        long GetStylesheetFileSize(string filepath);
 
         /// <summary>
         /// Gets a <see cref="IScript"/> object by its name
@@ -86,17 +162,25 @@ namespace Umbraco.Cms.Core.Services
         void DeleteScriptFolder(string folderPath);
 
         /// <summary>
-        /// Creates a folder for style sheets
+        /// Gets the content of a script file as a stream.
         /// </summary>
-        /// <param name="folderPath"></param>
-        /// <returns></returns>
-        void CreateStyleSheetFolder(string folderPath);
+        /// <param name="filepath">The filesystem path to the script.</param>
+        /// <returns>The content of the script file.</returns>
+        Stream GetScriptFileContentStream(string filepath);
 
         /// <summary>
-        /// Deletes a folder for style sheets
+        /// Sets the content of a script file.
         /// </summary>
-        /// <param name="folderPath"></param>
-        void DeleteStyleSheetFolder(string folderPath);
+        /// <param name="filepath">The filesystem path to the script.</param>
+        /// <param name="content">The content of the script file.</param>
+        void SetScriptFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the size of a script file.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the script file.</param>
+        /// <returns>The size of the script file.</returns>
+        long GetScriptFileSize(string filepath);
 
         /// <summary>
         /// Gets a list of all <see cref="ITemplate"/> objects
@@ -171,6 +255,27 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="templates">List of <see cref="Template"/> to save</param>
         /// <param name="userId">Optional id of the user</param>
         void SaveTemplate(IEnumerable<ITemplate> templates, int userId = Constants.Security.SuperUserId);
+
+        /// <summary>
+        /// Gets the content of a template as a stream.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the template.</param>
+        /// <returns>The content of the template.</returns>
+        Stream GetTemplateFileContentStream(string filepath);
+
+        /// <summary>
+        /// Sets the content of a template.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the template.</param>
+        /// <param name="content">The content of the template.</param>
+        void SetTemplateFileContent(string filepath, Stream content);
+
+        /// <summary>
+        /// Gets the size of a template.
+        /// </summary>
+        /// <param name="filepath">The filesystem path to the template.</param>
+        /// <returns>The size of the template.</returns>
+        long GetTemplateFileSize(string filepath);
 
         /// <summary>
         /// Gets the content of a macro partial view snippet as a string
