@@ -44,6 +44,10 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.MediaPicker3.CropC
             }
         };
 
+        $scope.isEmpty = function (crop) {
+            return !crop.label && !crop.alias && !crop.width && !crop.height;
+        };
+
         $scope.useForAlias = function (crop) {
             if (crop.alias == null || crop.alias === "") {
                 crop.alias = (crop.label || "").toCamelCase();
