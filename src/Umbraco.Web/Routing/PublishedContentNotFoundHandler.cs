@@ -42,7 +42,7 @@ namespace Umbraco.Web.Routing
             response.Write("</h2>");
             if (string.IsNullOrWhiteSpace(_message) == false)
                 response.Write("<p>" + _message + "</p>");
-            response.Write("<p>This page can be replaced with a custom 404. Check the documentation for \"custom 404\".</p>");
+            response.Write("<p>This page can be replaced with a custom 404. Check the documentation for <a href=\"https://our.umbraco.com/Documentation/Tutorials/Custom-Error-Pages/#404-errors\" target=\"_blank\">Custom 404 Error Pages</a>.</p>");
             response.Write("<p style=\"border-top: 1px solid #ccc; padding-top: 10px\"><small>This page is intentionally left ugly ;-)</small></p>");
             response.Write("</body></html>");
         }
