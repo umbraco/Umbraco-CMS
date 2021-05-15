@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -20,6 +20,7 @@
 
   <ItemGroup>
     <Folder Include="App_Plugins" />
+    <Folder Include="umbraco\models\" />
     <Folder Include="Views" />
     <Folder Include="wwwroot\Media" />
   </ItemGroup>
@@ -28,7 +29,6 @@
     <Compile Remove="umbraco\Data\**" />
     <Compile Remove="umbraco\logs\**" />
     <Compile Remove="umbraco\MediaCache\**" />
-    <Compile Remove="umbraco\models\**" />
     <Compile Remove="wwwroot\Umbraco\**" />
     <Compile Remove="App_Data\**" />
   </ItemGroup>
@@ -56,11 +56,14 @@
       <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </None>
+    <None Include="umbraco\**\*.*">
+      <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </None>
     <None Remove="App_Data\**" />
     <None Remove="umbraco\Data\**" />
     <None Remove="umbraco\logs\**" />
     <None Remove="umbraco\MediaCache\**" />
-    <None Remove="umbraco\models\**" />
     <None Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
     <None Remove="scripts\aaa\fc75309db05f41609a9e1adb8cf0998c.tmp" />
   </ItemGroup>

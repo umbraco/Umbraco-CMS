@@ -50,6 +50,9 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private readonly ApplicationPartManager _applicationPartManager;
         private static readonly Regex s_usingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
         private static readonly Regex s_aattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
+        private readonly Lazy<string> _pureLiveDirectory;
+
+
 
         public PureLiveModelFactory(
             Lazy<UmbracoServices> umbracoServices,
@@ -77,17 +80,18 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                 return;
             }
 
-            var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
-            if (!Directory.Exists(modelsDirectory))
+            _pureLiveDirectory = new Lazy<string>(PureLiveDirectoryAbsolute);
+
+            if (!Directory.Exists(_pureLiveDirectory.Value))
             {
-                Directory.CreateDirectory(modelsDirectory);
+                Directory.CreateDirectory(_pureLiveDirectory.Value);
             }
 
             // BEWARE! if the watcher is not properly released then for some reason the
             // BuildManager will start confusing types - using a 'registered object' here
             // though we should probably plug into Umbraco's MainDom - which is internal
             _hostingLifetime.RegisterObject(this);
-            _watcher = new FileSystemWatcher(modelsDirectory);
+            _watcher = new FileSystemWatcher(_pureLiveDirectory.Value);
             _watcher.Changed += WatcherOnChanged;
             _watcher.EnableRaisingEvents = true;
 
@@ -218,15 +222,14 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                 _hasModels = false;
                 _pendingRebuild = true;
 
-                var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
-                if (!Directory.Exists(modelsDirectory))
+                if (!Directory.Exists(_pureLiveDirectory.Value))
                 {
-                    Directory.CreateDirectory(modelsDirectory);
+                    Directory.CreateDirectory(_pureLiveDirectory.Value);
                 }
 
                 // clear stuff
-                var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
-                var dllPathFile = Path.Combine(modelsDirectory, "all.dll.path");
+                var modelsHashFile = Path.Combine(_pureLiveDirectory.Value, "models.hash");
+                var dllPathFile = Path.Combine(_pureLiveDirectory.Value, "all.dll.path");
 
                 if (File.Exists(dllPathFile))
                 {
@@ -340,6 +343,10 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             }
         }
 
+
+        public string PureLiveDirectoryAbsolute() => _hostingEnvironment.MapPathContentRoot("~/App_Data/Temp/PureLive");
+
+
         // This is NOT thread safe but it is only called from within a lock
         private Assembly ReloadAssembly(string pathToAssembly)
         {
@@ -389,18 +396,18 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         // This is NOT thread safe but it is only called from within a lock
         private Assembly GetModelsAssembly(bool forceRebuild)
         {
-            var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
-            if (!Directory.Exists(modelsDirectory))
+
+            if (!Directory.Exists(_pureLiveDirectory.Value))
             {
-                Directory.CreateDirectory(modelsDirectory);
+                Directory.CreateDirectory(_pureLiveDirectory.Value);
             }
 
             IList<TypeModel> typeModels = UmbracoServices.GetAllTypes();
             var currentHash = TypeModelHasher.Hash(typeModels);
-            var modelsHashFile = Path.Combine(modelsDirectory, "models.hash");
-            var modelsSrcFile = Path.Combine(modelsDirectory, "models.generated.cs");
-            var projFile = Path.Combine(modelsDirectory, "all.generated.cs");
-            var dllPathFile = Path.Combine(modelsDirectory, "all.dll.path");
+            var modelsHashFile = Path.Combine(_pureLiveDirectory.Value, "models.hash");
+            var modelsSrcFile = Path.Combine(_pureLiveDirectory.Value, "models.generated.cs");
+            var projFile = Path.Combine(_pureLiveDirectory.Value, "all.generated.cs");
+            var dllPathFile = Path.Combine(_pureLiveDirectory.Value, "all.dll.path");
 
             // caching the generated models speeds up booting
             // currentHash hashes both the types & the user's partials
@@ -569,7 +576,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
         private string GetOutputAssemblyPath(string currentHash)
         {
-            var dirInfo = new DirectoryInfo(Path.Combine(_config.ModelsDirectoryAbsolute(_hostingEnvironment), "Compiled"));
+            var dirInfo = new DirectoryInfo(Path.Combine(_pureLiveDirectory.Value, "Compiled"));
             if (!dirInfo.Exists)
             {
                 Directory.CreateDirectory(dirInfo.FullName);
@@ -578,6 +585,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             return Path.Combine(dirInfo.FullName, $"generated.cs{currentHash}.dll");
         }
 
+      
         private void ClearOnFailingToCompile(string dllPathFile, string modelsHashFile, string projFile)
         {
             _logger.LogDebug("Failed to compile.");
@@ -666,13 +674,13 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
         private string GenerateModelsCode(IList<TypeModel> typeModels)
         {
-            var modelsDirectory = _config.ModelsDirectoryAbsolute(_hostingEnvironment);
-            if (!Directory.Exists(modelsDirectory))
+          
+            if (!Directory.Exists(_pureLiveDirectory.Value))
             {
-                Directory.CreateDirectory(modelsDirectory);
+                Directory.CreateDirectory(_pureLiveDirectory.Value);
             }
 
-            foreach (var file in Directory.GetFiles(modelsDirectory, "*.generated.cs"))
+            foreach (var file in Directory.GetFiles(_pureLiveDirectory.Value, "*.generated.cs"))
             {
                 File.Delete(file);
             }
@@ -685,6 +693,8 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
             return code;
         }
+
+   
 
         private static string GenerateModelsProj(IDictionary<string, string> files)
         {
