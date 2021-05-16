@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <Folder Include="App_Plugins" />
-    <Folder Include="umbraco\models\" />
     <Folder Include="Views" />
     <Folder Include="wwwroot\Media" />
   </ItemGroup>
@@ -66,6 +65,7 @@
     <None Remove="umbraco\MediaCache\**" />
     <None Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
     <None Remove="scripts\aaa\fc75309db05f41609a9e1adb8cf0998c.tmp" />
+    <None Remove="umbraco\models\**" />
   </ItemGroup>
 
   <!-- We don't want to include the generated files, they will throw a lot of errors -->
