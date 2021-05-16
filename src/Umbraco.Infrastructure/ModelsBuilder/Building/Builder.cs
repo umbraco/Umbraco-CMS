@@ -93,12 +93,12 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
         {
             TypeModel.MapModelTypes(_typeModels, ModelsNamespace);
 
-            var pureLive = Config.ModelsMode == ModelsMode.PureLive;
+            var isRuntimeMode = Config.ModelsMode == ModelsMode.Runtime;
 
             // for the first two of these two tests,
-            //  always throw, even in purelive: cannot happen unless ppl start fidling with attributes to rename
+            //  always throw, even in runtime mode: cannot happen unless ppl start fidling with attributes to rename
             //  things, and then they should pay attention to the generation error log - there's no magic here
-            // for the last one, don't throw in purelive, see comment
+            // for the last one, don't throw in runtime mode, see comment
 
             // ensure we have no duplicates type names
             foreach (var xx in _typeModels.GroupBy(x => x.ClrName).Where(x => x.Count() > 1))
@@ -118,12 +118,12 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             {
                 foreach (var xx in typeModel.Properties.Where(x => x.ClrName == typeModel.ClrName))
                 {
-                    if (!pureLive)
+                    if (!isRuntimeMode)
                         throw new InvalidOperationException($"The model class for content type with alias \"{typeModel.Alias}\" is named \"{xx.ClrName}\"."
                             + $" CSharp does not support using the same name for the property with alias \"{xx.Alias}\"."
                             + " Consider using an attribute to assign a different name to the property.");
 
-                    // for purelive, will we generate a commented out properties with an error message,
+                    // in runtime mode we generate commented out properties with an error message,
                     // instead of throwing, because then it kills the sites and ppl don't understand why
                     xx.AddError($"The class {typeModel.ClrName} cannot implement this property, because"
                         + $" CSharp does not support naming the property with alias \"{xx.Alias}\" with the same name as content type with alias \"{typeModel.Alias}\"."

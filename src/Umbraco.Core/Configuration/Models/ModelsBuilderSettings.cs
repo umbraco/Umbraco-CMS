@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the models mode.
         /// </summary>
-        public ModelsMode ModelsMode { get; set; } = ModelsMode.PureLive;
+        public ModelsMode ModelsMode { get; set; } = ModelsMode.Runtime;
 
         /// <summary>
         /// Gets or sets a value for models namespace.

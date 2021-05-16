@@ -29,7 +29,7 @@ namespace Umbraco.Extensions
         /// Sets a flag to reset the ModelsBuilder models if the <see cref="IPublishedModelFactory"/> is <see cref="ILivePublishedModelFactory"/>
         /// </summary>
         /// <remarks>
-        /// This does not recompile the pure live models, only sets a flag to tell models builder to recompile when they are requested.
+        /// This does not recompile the runtime models, only sets a flag to tell models builder to recompile when they are requested.
         /// </remarks>
         internal static void WithSafeLiveFactoryReset(this IPublishedModelFactory factory, Action action)
         {

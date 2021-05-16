@@ -25,14 +25,14 @@ using File = System.IO.File;
 
 namespace Umbraco.Cms.Web.Common.ModelsBuilder
 {
-    internal class PureLiveModelFactory : ILivePublishedModelFactory, IRegisteredObject
+    internal class RuntimeModelFactory : ILivePublishedModelFactory, IRegisteredObject
     {
         private Infos _infos = new Infos { ModelInfos = null, ModelTypeMap = new Dictionary<string, Type>() };
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
         private volatile bool _hasModels; // volatile 'cos reading outside lock
         private bool _pendingRebuild;
         private readonly IProfilingLogger _profilingLogger;
-        private readonly ILogger<PureLiveModelFactory> _logger;
+        private readonly ILogger<RuntimeModelFactory> _logger;
         private readonly FileSystemWatcher _watcher;
         private int _ver;
         private int _skipver;
@@ -51,10 +51,10 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private static readonly Regex s_usingRegex = new Regex("^using(.*);", RegexOptions.Compiled | RegexOptions.Multiline);
         private static readonly Regex s_aattrRegex = new Regex("^\\[assembly:(.*)\\]", RegexOptions.Compiled | RegexOptions.Multiline);
 
-        public PureLiveModelFactory(
+        public RuntimeModelFactory(
             Lazy<UmbracoServices> umbracoServices,
             IProfilingLogger profilingLogger,
-            ILogger<PureLiveModelFactory> logger,
+            ILogger<RuntimeModelFactory> logger,
             IOptions<ModelsBuilderSettings> config,
             IHostingEnvironment hostingEnvironment,
             IApplicationShutdownRegistry hostingLifetime,
@@ -130,7 +130,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         }
 
         /// <inheritdoc />
-        public bool Enabled => _config.ModelsMode == ModelsMode.PureLive;
+        public bool Enabled => _config.ModelsMode == ModelsMode.Runtime;
 
         /// <summary>
         /// Handle the event when a reference cannot be resolved from the default context and return our custom MB assembly reference if we have one
@@ -286,7 +286,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                 // we don't have models,
                 // either they haven't been loaded from the cache yet
                 // or they have been reseted and are pending a rebuild
-                using (_profilingLogger.DebugDuration<PureLiveModelFactory>("Get models.", "Got models."))
+                using (_profilingLogger.DebugDuration<RuntimeModelFactory>("Get models.", "Got models."))
                 {
                     try
                     {
@@ -311,7 +311,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                         {
                             _logger.LogError(e, "Failed to build models.");
                             _logger.LogWarning("Running without models."); // be explicit
-                            _errors.Report("Failed to build PureLive models.", e);
+                            _errors.Report("Failed to build Runtime models.", e);
                         }
                         finally
                         {
@@ -444,7 +444,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                         assembly = ReloadAssembly(dllPath);
 
                         ModelsBuilderAssemblyAttribute attr = assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
-                        if (attr != null && attr.PureLive && attr.SourceHash == currentHash)
+                        if (attr != null && attr.IsLive && attr.SourceHash == currentHash)
                         {
                             // if we were to resume at that revision, then _ver would keep increasing
                             // and that is probably a bad idea - so, we'll always rebuild starting at
@@ -512,7 +512,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             //  AssemblyVersion is so that we have a different version for each rebuild
             var ver = _ver == _skipver ? ++_ver : _ver;
             _ver++;
-            string mbAssemblyDirective = $@"[assembly:ModelsBuilderAssembly(PureLive = true, SourceHash = ""{currentHash}"")]
+            string mbAssemblyDirective = $@"[assembly:ModelsBuilderAssembly(IsLive = true, SourceHash = ""{currentHash}"")]
 [assembly:System.Reflection.AssemblyVersion(""0.0.0.{ver}"")]";
             code = code.Replace("//ASSATTR", mbAssemblyDirective);
             File.WriteAllText(modelsSrcFile, code);
@@ -755,7 +755,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
 
             //if (_building && OurFiles.Contains(changed))
             //{
-            //    //_logger.LogInformation<PureLiveModelFactory>("Ignoring files self-changes.");
+            //    //_logger.LogInformation<RuntimeModelFactory>("Ignoring files self-changes.");
             //    return;
             //}
 

@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
         {
             var types = new List<TypeModel>();
 
-            // TODO: this will require 3 rather large SQL queries on startup in PureLive. I know that these will be cached after lookup but it will slow
+            // TODO: this will require 3 rather large SQL queries on startup in Runtime mode. I know that these will be cached after lookup but it will slow
             // down startup time ... BUT these queries are also used in NuCache on startup so we can't really avoid them. Maybe one day we can
             // load all of these in in one query and still have them cached per service, and/or somehow improve the perf of these since they are used on startup
             // in more than one place.

@@ -485,7 +485,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // be processed as soon as we are configured and the messenger processes instructions.
 
         // note: notifications for content type and data type changes should be invoked with the
-        // pure live model factory, if any, locked and refreshed - see ContentTypeCacheRefresher and
+        // RuntimeModelFactory, if any, locked and refreshed - see ContentTypeCacheRefresher and
         // DataTypeCacheRefresher
 
         public void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
@@ -705,9 +705,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
             if (_publishedModelFactory.IsLiveFactoryEnabled())
             {
-                // In the case of Pure Live - we actually need to refresh all of the content and the media
+                // In the case of runtime generated models - we actually need to refresh all of the content and the media
                 // see https://github.com/umbraco/Umbraco-CMS/issues/5671
-                // The underlying issue is that in Pure Live the ILivePublishedModelFactory will re-compile all of the classes/models
+                // The underlying issue is that in Runtime mode the ILivePublishedModelFactory will re-compile all of the classes/models
                 // into a new DLL for the application which includes both content types and media types.
                 // Since the models in the cache are based on these actual classes, all of the objects in the cache need to be updated
                 // to use the newest version of the class.
@@ -715,7 +715,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
                 // NOTE: Ideally this can be run on background threads here which would prevent blocking the UI
                 // as is the case when saving a content type. Intially one would think that it won't be any different
                 // between running this here or in another background thread immediately after with regards to how the
-                // UI will respond because we already know between calling `WithSafeLiveFactoryReset` to reset the PureLive models
+                // UI will respond because we already know between calling `WithSafeLiveFactoryReset` to reset the generated models
                 // and this code here, that many front-end requests could be attempted to be processed. If that is the case, those pages are going to get a
                 // model binding error and our ModelBindingExceptionFilter is going to to its magic to reload those pages so the end user is none the wiser.
                 // So whether or not this executes 'here' or on a background thread immediately wouldn't seem to make any difference except that we can return

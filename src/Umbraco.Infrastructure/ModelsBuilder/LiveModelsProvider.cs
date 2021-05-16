@@ -11,7 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 {
-    // supports LiveCode - but not PureLive
+    // supports LiveCode mode but not Runtime mode
     public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStartingNotification>,
         INotificationHandler<UmbracoRequestEndNotification>,
         INotificationHandler<ContentTypeCacheRefresherNotification>,
@@ -41,8 +41,8 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             _mainDom = mainDom;
         }
 
-        // we do not manage pure live here
-        internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
+        // we do not manage runtime models here
+        internal bool IsEnabled => _config.ModelsMode.IsLiveNotRuntime();
 
         /// <summary>
         /// Handles the <see cref="UmbracoApplicationStartingNotification"/> notification

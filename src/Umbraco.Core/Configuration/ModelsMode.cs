@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Configuration
         /// When: a content type change occurs.
         /// </summary>
         /// <remarks>The app does not restart. Models are available in views exclusively.</remarks>
-        PureLive,
+        Runtime,
 
         /// <summary>
         /// Generate models as *.cs files.
