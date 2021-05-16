@@ -344,7 +344,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         }
 
 
-        public string PureLiveDirectoryAbsolute() => _hostingEnvironment.MapPathContentRoot("~/App_Data/Temp/PureLive");
+        public string PureLiveDirectoryAbsolute() => _hostingEnvironment.MapPathContentRoot("~/umbraco/Data/TEMP/PureLive");
 
 
         // This is NOT thread safe but it is only called from within a lock
