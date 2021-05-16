@@ -2,7 +2,6 @@ using System;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
@@ -12,7 +11,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 {
-    // supports LiveAppData - but not PureLive
+    // supports LiveCode - but not PureLive
     public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStartingNotification>,
         INotificationHandler<UmbracoRequestEndNotification>,
         INotificationHandler<ContentTypeCacheRefresherNotification>,
@@ -74,6 +73,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             }
 
             _logger.LogDebug("Requested to generate models.");
+
             Interlocked.Exchange(ref s_req, 1);
         }
 

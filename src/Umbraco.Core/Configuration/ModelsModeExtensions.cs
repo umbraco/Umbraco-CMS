@@ -11,18 +11,18 @@ namespace Umbraco.Extensions
         /// Gets a value indicating whether the mode is LiveAnything or PureLive.
         /// </summary>
         public static bool IsLive(this ModelsMode modelsMode)
-            => modelsMode == ModelsMode.PureLive || modelsMode == ModelsMode.LiveAppData;
+            => modelsMode == ModelsMode.PureLive || modelsMode == ModelsMode.LiveCode;
 
         /// <summary>
         /// Gets a value indicating whether the mode is LiveAnything but not PureLive.
         /// </summary>
         public static bool IsLiveNotPure(this ModelsMode modelsMode)
-            => modelsMode == ModelsMode.LiveAppData;
+            => modelsMode == ModelsMode.LiveCode;
 
         /// <summary>
         /// Gets a value indicating whether the mode supports explicit generation (as opposed to pure live).
         /// </summary>
         public static bool SupportsExplicitGeneration(this ModelsMode modelsMode)
-            => modelsMode == ModelsMode.AppData || modelsMode == ModelsMode.LiveAppData;
+            => modelsMode == ModelsMode.Code || modelsMode == ModelsMode.LiveCode;
     }
 }

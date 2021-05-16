@@ -21,19 +21,19 @@ namespace Umbraco.Cms.Core.Configuration
         PureLive,
 
         /// <summary>
-        /// Generate models in AppData.
+        /// Generate models as *.cs files.
         /// When: generation is triggered.
         /// </summary>
         /// <remarks>Generation can be triggered from the dashboard. The app does not restart.
         /// Models are not compiled and thus are not available to the project.</remarks>
-        AppData,
+        Code,
 
         /// <summary>
-        /// Generate models in AppData.
+        /// Generate models as *.cs files.
         /// When: a content type change occurs, or generation is triggered.
         /// </summary>
         /// <remarks>Generation can be triggered from the dashboard. The app does not restart.
         /// Models are not compiled and thus are not available to the project.</remarks>
-        LiveAppData
+        LiveCode
     }
 }
