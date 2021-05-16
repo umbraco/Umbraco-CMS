@@ -102,7 +102,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         private UmbracoServices UmbracoServices => _umbracoServices.Value;
 
         /// <summary>
-        /// Gets the currently loaded pure live models assembly
+        /// Gets the currently loaded Live models assembly
         /// </summary>
         /// <remarks>
         /// Can be null
@@ -508,7 +508,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             // generate code, save
             var code = GenerateModelsCode(typeModels);
             // add extra attributes,
-            //  PureLiveAssembly helps identifying Assemblies that contain PureLive models
+            //  IsLive=true helps identifying Assemblies that contain live models
             //  AssemblyVersion is so that we have a different version for each rebuild
             var ver = _ver == _skipver ? ++_ver : _ver;
             _ver++;

@@ -161,10 +161,10 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             }
 
             // both are ModelsBuilder types
-            var pureSource = sourceAttr.PureLive;
-            var pureModel = modelAttr.PureLive;
+            var pureSource = sourceAttr.IsLive;
+            var pureModel = modelAttr.IsLive;
 
-            if (sourceAttr.PureLive || modelAttr.PureLive)
+            if (sourceAttr.IsLive || modelAttr.IsLive)
             {
                 if (pureSource == false || pureModel == false)
                 {
