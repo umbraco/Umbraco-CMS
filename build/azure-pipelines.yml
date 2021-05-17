@@ -333,11 +333,18 @@ stages:
 
                         $version = $ubuild.GetUmbracoVersion()
 
-                        if ($(Umbraco.IsReleaseBuild) -ne "true"){
+                        $isTag = [regex]::IsMatch($Env:BUILD_SOURCEBRANCH, "^(refs\/tags\/)");
+
+                        if ($isTag){
+                          $continuous = $version.Semver
+                          Write-Host "##vso[build.addbuildtag]Release build"
+                        }
+                        else
+                        {
                             if ($version.Comment -ne "")
                             {
                               # 8.0.0-beta003.1234
-                              $continuous = "$($version.Semver)"
+                              $continuous = "$($version.Semver).$(Build.BuildNumber)"
                             }
                             else
                             {
@@ -367,11 +374,7 @@ stages:
 
                             $a | ConvertTo-Json -depth 32| set-content $templatePath
                             Write-Host "##vso[build.addbuildtag]Continuous build"
-                          }
-                          else
-                          {
-                            $continuous = $version.Semver
-                            Write-Host "##vso[build.addbuildtag]Release build"
+
                           }
 
 
