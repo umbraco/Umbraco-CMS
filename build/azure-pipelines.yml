@@ -341,7 +341,7 @@ stages:
                         }
                         else
                         {
-                            $continuous = "$($version.Semver).$(Date:yyyyMMdd).$(Rev:rrrr)"
+                            $continuous = "$(version.Semver).$(Build.BuildId)"
                             $ubuild.SetUmbracoVersion($continuous)
 
                             #Update the version in templates also
