@@ -370,7 +370,7 @@ stages:
                           }
 
 
-                        Write-Host "##vso[build.updatebuildnumber]$(continuous).$(Build.BuildId)"
+                        Write-Host "##vso[build.updatebuildnumber]$continuous.$Build.BuildId"
 
                         Write-Host "Building: $continuous"
                 - task: PowerShell@1
