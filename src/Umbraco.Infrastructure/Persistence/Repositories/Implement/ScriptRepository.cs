@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;

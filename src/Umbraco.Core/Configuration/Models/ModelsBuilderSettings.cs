@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         /// <remarks>
         /// Models become out-of-date when data types or content types are updated. When this
-        /// setting is activated the ~/App_Data/Models/ood.txt file is then created. When models are
+        /// setting is activated the ~/umbraco/models/PureLive/ood.txt file is then created. When models are
         /// generated through the dashboard, the files is cleared. Default value is <c>false</c>.
         /// </remarks>
         public bool FlagOutOfDateModels
@@ -51,8 +51,9 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the models directory.
         /// </summary>
-        /// <remarks>Default is ~/App_Data/Models but that can be changed.</remarks>
+        /// <remarks>Default is ~/umbraco/models but that can be changed.</remarks>
         public string ModelsDirectory { get; set; } = DefaultModelsDirectory;
+
 
         /// <summary>
         /// Gets or sets a value indicating whether to accept an unsafe value for ModelsDirectory.

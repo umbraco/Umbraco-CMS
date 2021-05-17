@@ -1,10 +1,9 @@
 using System.Collections.Generic;
-using System.IO;
 using Umbraco.Cms.Core.Models;
 
 namespace Umbraco.Cms.Core.Persistence.Repositories
 {
-    public interface ITemplateRepository : IReadWriteQueryRepository<int, ITemplate>
+    public interface ITemplateRepository : IReadWriteQueryRepository<int, ITemplate>, IFileRepository
     {
         ITemplate Get(string alias);
 
@@ -13,12 +12,5 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         IEnumerable<ITemplate> GetChildren(int masterTemplateId);
 
         IEnumerable<ITemplate> GetDescendants(int masterTemplateId);
-
-        /// <summary>
-        /// Gets the content of a template as a stream.
-        /// </summary>
-        /// <param name="filepath">The filesystem path to the template.</param>
-        /// <returns>The content of the template.</returns>
-        Stream GetFileContentStream(string filepath);
     }
 }

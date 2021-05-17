@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -28,7 +28,6 @@
     <Compile Remove="umbraco\Data\**" />
     <Compile Remove="umbraco\logs\**" />
     <Compile Remove="umbraco\MediaCache\**" />
-    <Compile Remove="umbraco\models\**" />
     <Compile Remove="wwwroot\Umbraco\**" />
     <Compile Remove="App_Data\**" />
   </ItemGroup>
@@ -38,7 +37,6 @@
     <EmbeddedResource Remove="umbraco\Data\**" />
     <EmbeddedResource Remove="umbraco\logs\**" />
     <EmbeddedResource Remove="umbraco\MediaCache\**" />
-    <EmbeddedResource Remove="umbraco\models\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -46,7 +44,6 @@
     <Content Remove="umbraco\Data\**" />
     <Content Remove="umbraco\logs\**" />
     <Content Remove="umbraco\MediaCache\**" />
-    <Content Remove="umbraco\models\**" />
     <Content Remove="wwwroot\Web.config" />
   </ItemGroup>
 
@@ -64,9 +61,9 @@
     <None Remove="umbraco\Data\**" />
     <None Remove="umbraco\logs\**" />
     <None Remove="umbraco\MediaCache\**" />
-    <None Remove="umbraco\models\**" />
     <None Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
     <None Remove="scripts\aaa\fc75309db05f41609a9e1adb8cf0998c.tmp" />
+    <None Remove="umbraco\models\**" />
   </ItemGroup>
 
   <!-- We don't want to include the generated files, they will throw a lot of errors -->
