@@ -1,3 +1,4 @@
+name: $(TeamProject)_$(Build.DefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
 variables:
     buildConfiguration: Release
     SA_PASSWORD: UmbracoIntegration123!
@@ -321,8 +322,7 @@ stages:
                       restoreSolution: '*\src\umbraco.sln'
                       feedsToUse: config
                 - task: PowerShell@1
-                  displayName: Update Version
-                  condition: 'eq(variables[''Umbraco.IsReleaseBuild''], ''false'')'
+                  displayName: Update Version and Artifact Name
                   inputs:
                       scriptType: inlineScript
                       inlineScript: >
@@ -333,40 +333,46 @@ stages:
 
                         $version = $ubuild.GetUmbracoVersion()
 
-                        if ($version.Comment -ne "")
-                        {
-                          # 8.0.0-beta.33.1234
-                          $continuous = "$($version.Semver).$(Build.BuildNumber)"
-                        }
-                        else
-                        {
-                          # 8.0.0-alpha.1234
-                          $continuous = "$($version.Release)-alpha.$(Build.BuildNumber)"
-                        }
-                        $ubuild.SetUmbracoVersion($continuous)
+                        if ($(Umbraco.IsReleaseBuild) -eq "false"){
+                            if ($version.Comment -ne "")
+                            {
+                              # 8.0.0-beta003.1234
+                              $continuous = "$($version.Semver).$(Build.BuildNumber)"
+                            }
+                            else
+                            {
+                              # 8.0.0-nightly.1234
+                              $continuous = "$($version.Release)-nightly.$(Build.BuildNumber)"
+                            }
+                            $ubuild.SetUmbracoVersion($continuous)
+
+                            #Update the version in templates also
+
+                            $templatePath =
+                            'build/templates/UmbracoProject/.template.config/template.json'
+
+                            $a = Get-Content $templatePath -raw | ConvertFrom-Json
+
+                            $a.symbols.version.defaultValue = $continuous
+
+                            $a | ConvertTo-Json -depth 32| set-content $templatePath
 
 
-                        #Update the version in templates also
+                            $templatePath =
+                            'build/templates/UmbracoPackage/.template.config/template.json'
 
-                        $templatePath =
-                        'build/templates/UmbracoProject/.template.config/template.json'
+                            $a = Get-Content $templatePath -raw | ConvertFrom-Json
 
-                        $a = Get-Content $templatePath -raw | ConvertFrom-Json
+                            $a.symbols.version.defaultValue = $continuous
 
-                        $a.symbols.version.defaultValue = $continuous
+                            $a | ConvertTo-Json -depth 32| set-content $templatePath
+                          }
+                          else
+                          {
+                            $continuous = $version
+                          }
 
-                        $a | ConvertTo-Json -depth 32| set-content $templatePath
-
-
-                        $templatePath =
-                        'build/templates/UmbracoPackage/.template.config/template.json'
-
-                        $a = Get-Content $templatePath -raw | ConvertFrom-Json
-
-                        $a.symbols.version.defaultValue = $continuous
-
-                        $a | ConvertTo-Json -depth 32| set-content $templatePath
-
+                        Write-Host "##vso[build.updatebuildnumber]$continuous"
 
                         Write-Host "Building: $continuous"
                 - task: PowerShell@1
