@@ -342,7 +342,8 @@ stages:
                         }
                         else
                         {
-                            $continuous = "$($version.Semver).nightly$(Build.BuildId)"
+                            $date = (Get-Date).ToString("yyyy:MM:dd")
+                            $continuous = "$($version.release).preview$date"
                             $ubuild.SetUmbracoVersion($continuous)
 
                             #Update the version in templates also
