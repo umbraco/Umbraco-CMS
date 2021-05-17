@@ -337,11 +337,11 @@ stages:
 
                         if ($isTag){
                           $continuous = $version.Semver
-                          Write-Host "##vso[build.addbuildtag]Release build"
-                        }
+                              Write-Host "##vso[build.addbuildtag]Release build"
+                          }
                         else
                         {
-                            $continuous = "$($(version.Semver)-($Build.BuildId))"
+                            $continuous = "$($version.Semver).$(Build.BuildId)"
                             $ubuild.SetUmbracoVersion($continuous)
 
                             #Update the version in templates also
