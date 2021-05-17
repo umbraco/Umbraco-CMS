@@ -337,12 +337,12 @@ stages:
                             if ($version.Comment -ne "")
                             {
                               # 8.0.0-beta003.1234
-                              $continuous = "$($version.Semver).$(Build.BuildNumber)"
+                              $continuous = "$($version.Semver)"
                             }
                             else
                             {
                               # 8.0.0-nightly.1234
-                              $continuous = "$($version.Release)-nightly.$(Build.BuildNumber)"
+                              $continuous = "$($version.Release)-nightly"
                             }
                             $ubuild.SetUmbracoVersion($continuous)
 
@@ -375,7 +375,7 @@ stages:
                           }
 
 
-                        Write-Host "##vso[build.updatereleasename]Umbraco.$continuous"
+                        Write-Host "##vso[build.updatebuildnumber]$continuous"
 
                         Write-Host "Building: $continuous"
                 - task: PowerShell@1
