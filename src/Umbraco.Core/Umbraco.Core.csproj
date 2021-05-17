@@ -159,6 +159,7 @@
     <Compile Include="Models\IconModel.cs" />
     <Compile Include="Models\InstallLog.cs" />
     <Compile Include="Models\IReadOnlyContentBase.cs" />
+    <Compile Include="Models\MediaWithCrops.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeExtensions.cs" />
     <Compile Include="Models\ReadOnlyContentBaseAdapter.cs" />
     <Compile Include="Models\RelationTypeExtensions.cs" />

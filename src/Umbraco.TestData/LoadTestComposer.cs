@@ -17,10 +17,13 @@ namespace Umbraco.TestData
 
             composition.Register(typeof(LoadTestController), Lifetime.Request);
 
-            composition.Register(factory => new PublishedSnapshotServiceOptions
+            if (ConfigurationManager.AppSettings["Umbraco.TestData.IgnoreLocalDb"] == "true")
             {
-                IgnoreLocalDb = true
-            });
+                composition.Register(factory => new PublishedSnapshotServiceOptions
+                {
+                    IgnoreLocalDb = true
+                });
+            }   
         }
     }
 }

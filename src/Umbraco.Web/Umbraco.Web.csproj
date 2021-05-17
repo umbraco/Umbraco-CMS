@@ -63,7 +63,7 @@
   <ItemGroup>
     <PackageReference Include="ClientDependency" Version="1.9.9" />
     <PackageReference Include="CSharpTest.Net.Collections" Version="14.906.1403.1082" />
-    <PackageReference Include="Examine" Version="1.1.0" />
+    <PackageReference Include="Examine" Version="1.2.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
       <Version>2.7.0.100</Version>
@@ -260,9 +260,17 @@
     <Compile Include="PropertyEditors\BlockListConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\BlockListPropertyEditor.cs" />
     <Compile Include="Compose\NestedContentPropertyComposer.cs" />
+    <Compile Include="PropertyEditors\IFileExtensionConfigItem.cs" />
+    <Compile Include="PropertyEditors\FileExtensionConfigItem.cs" />
+    <Compile Include="PropertyEditors\IFileExtensionConfig.cs" />
     <Compile Include="PropertyEditors\EyeDropperColorPickerConfigurationEditor.cs" />
     <Compile Include="PropertyEditors\EyeDropperColorPickerPropertyEditor.cs" />
     <Compile Include="PropertyEditors\ComplexEditorValidator.cs" />
+    <Compile Include="PropertyEditors\FileUploadConfiguration.cs" />
+    <Compile Include="PropertyEditors\FileUploadConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3Configuration.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3ConfigurationEditor.cs" />
+    <Compile Include="PropertyEditors\MediaPicker3PropertyEditor.cs" />
     <Compile Include="PropertyEditors\ParameterEditors\MultipleMediaPickerParameterEditor.cs" />
     <Compile Include="PropertyEditors\RichTextEditorPastedImages.cs" />
     <Compile Include="PublishedCache\NuCache\DataSource\ContentCacheDataSerializationResult.cs" />
@@ -284,6 +292,7 @@
     <Compile Include="PublishedCache\NuCache\DataSource\MsgPackContentNestedDataSerializerFactory.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheSerializerComponent.cs" />
     <Compile Include="PublishedCache\NuCache\NuCacheSerializerComposer.cs" />
+    <Compile Include="PropertyEditors\ValueConverters\MediaPickerWithCropsValueConverter.cs" />
     <Compile Include="PublishedCache\NuCache\PublishedSnapshotServiceOptions.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenObj.cs" />
     <Compile Include="PublishedCache\NuCache\Snap\GenRef.cs" />

@@ -343,6 +343,7 @@
   <area alias="mediaType">
      <key alias="copyFailed">Kopiering af medietypen fejlede</key>
      <key alias="moveFailed">Flytning af medietypen fejlede</key>
+     <key alias="autoPickMediaType">Auto vælg</key>
   </area>
   <area alias="memberType">
      <key alias="copyFailed">Kopiering af medlemstypen fejlede</key>
@@ -804,12 +805,12 @@
     <key alias="showShortcuts">Vis genveje</key>
     <key alias="toggleListView">Brug listevisning</key>
     <key alias="toggleAllowAsRoot">Tillad på rodniveau</key>
-    <key alias="commentLine">Comment/Uncomment lines</key>
-    <key alias="removeLine">Remove line</key>
-    <key alias="copyLineUp">Copy Lines Up</key>
-    <key alias="copyLineDown">Copy Lines Down</key>
-    <key alias="moveLineUp">Move Lines Up</key>
-    <key alias="moveLineDown">Move Lines Down</key>
+    <key alias="commentLine">Lommentér/Udkommentér linjer</key>
+    <key alias="removeLine">Slet linje</key>
+    <key alias="copyLineUp">Kopiér linjer op</key>
+    <key alias="copyLineDown">Kopiér linjer ned</key>
+    <key alias="moveLineUp">Flyt linjer op</key>
+    <key alias="moveLineDown">Flyt linjer ned</key>
     <key alias="generalHeader">Generelt</key>
     <key alias="editorHeader">Editor</key>
     <key alias="toggleAllowCultureVariants">Skift tillad sprogvarianter</key>
@@ -1100,6 +1101,17 @@ Mange hilsner fra Umbraco robotten
     <key alias="pickedTrashedItem">Du har valgt et medie som er slettet eller lagt i papirkurven</key>
     <key alias="pickedTrashedItems">Du har valgt medier som er slettede eller lagt i papirkurven</key>
     <key alias="trashed">Slettet</key>
+    <key alias="openMedia">Åben i mediebiblioteket</key>
+    <key alias="changeMedia">Skift medie</key>
+    <key alias="resetMediaCrop">Nulstil medie beskæring</key>
+    <key alias="editMediaEntryLabel">Rediger %0% på %1%</key>
+    <key alias="confirmCancelMediaEntryCreationHeadline">Annuller indsættelse?</key>
+    <key alias="confirmCancelMediaEntryCreationMessage"><![CDATA[Er du sikker på at du vil annullere indsættelsen?]]></key>
+    <key alias="confirmCancelMediaEntryHasChanges">Du har foretaget ændringer til bruge af dette media. Er du sikker på at du vil annullere?</key>
+    <key alias="confirmRemoveMediaEntryMessage">Fjern?</key>
+    <key alias="confirmRemoveAllMediaEntryMessage">Fjern brugen af alle medier?</key>
+    <key alias="tabClipboard">Udklipsholder</key>
+    <key alias="notAllowed">Ikke tilladt</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">indtast eksternt link</key>
@@ -1845,6 +1857,7 @@ Mange hilsner fra Umbraco robotten
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Kopier %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% fra %1%</key>
+    <key alias="labelForArrayOfItems">Samling af %0%</key>
     <key alias="labelForRemoveAllEntries">Fjern alle elementer</key>
     <key alias="labelForClearClipboard">Ryd udklipsholder</key>
   </area>
@@ -1891,7 +1904,10 @@ Mange hilsner fra Umbraco robotten
     <key alias="confirmCancelBlockCreationMessage"><![CDATA[Er du sikker på at du vil annullere oprettelsen.]]></key>
     <key alias="elementTypeDoesNotExistHeadline">Error!</key>
     <key alias="elementTypeDoesNotExistDescription">The ElementType of this block does not exist anymore</key>
+    <key alias="addBlock">Tilføj indhold</key>
+    <key alias="addThis">Tilføj %0%</key>
     <key alias="propertyEditorNotSupported">Feltet %0% bruger editor %1% som ikke er supporteret for blokke.</key>
+  </area>
   </area>
     <area alias="contentTemplatesDashboard">
         <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>

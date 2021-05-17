@@ -45,23 +45,17 @@
         }
     }
 
-    .umb-block-list__block.--active & {
-        border-color: @gray-8;
-        box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.05);
-
-        > button {
-            > .caret {
-                transform: rotate(0deg);
-            }
-        }
-    }
-
-    
     ng-form.ng-invalid-val-server-match-content > .umb-block-list__block > .umb-block-list__block--content > div > & {
         > button {
             color: @formErrorText;
+            .show-validation-type-warning & {
+                color: @formWarningText;
+            }
             span.caret {
                 border-top-color: @formErrorText;
+                .show-validation-type-warning & {
+                    border-top-color: @formWarningText;
+                }
             }
         }
     }
@@ -84,6 +78,9 @@
                     padding: 2px;
                     line-height: 10px;
                     background-color: @formErrorText;
+                    .show-validation-type-warning & {
+                        background-color: @formWarningText;
+                    }
                     font-weight: 900;
         
                     animation-duration: 1.4s;
@@ -104,6 +101,22 @@
     }
 }
 
+.umb-block-list__block.--active {
+    border-color: @gray-8;
+    box-shadow: 0 0 2px 0px rgba(0, 0, 0, 0.05);
+
+    > .umb-block-list__block--content {
+        > .umb-block-list__block--view  {
+            > .blockelement-inlineblock-editor {
+                > button {
+                    > .caret {
+                        transform: rotate(0deg);
+                    }
+                }
+            }
+        }
+    }
+}
 
 .blockelement-inlineblock-editor__inner {
     border-top: 1px solid @gray-8;
