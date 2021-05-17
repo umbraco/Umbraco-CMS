@@ -341,16 +341,7 @@ stages:
                         }
                         else
                         {
-                            if ($version.Comment -ne "")
-                            {
-                              # 8.0.0-beta003.1234
-                              $continuous = "$($version.Semver).$(Build.BuildNumber)"
-                            }
-                            else
-                            {
-                              # 8.0.0-nightly.1234
-                              $continuous = "$($version.Release)-nightly"
-                            }
+                            $continuous = "$($version.Semver).$(Date:yyyyMMdd).$(Rev:rrrr)"
                             $ubuild.SetUmbracoVersion($continuous)
 
                             #Update the version in templates also
