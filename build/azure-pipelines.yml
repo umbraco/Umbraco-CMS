@@ -333,11 +333,16 @@ stages:
 
                         $version = $ubuild.GetUmbracoVersion()
 
-                        if ($Build.ResourceTrigger -eq "ResourceTrigger"){
+
+                        $isRelease =  [regex]::matches($Build.SourceBranch,"v\d+\/\d+.\d+.*")
+                        Write-Host "Is release: $isRelease"
+                        Write-Host "Source Branch: $Build.SourceBranch"
+                        if ($isRelease){
                           $continuous = $version.Semver
-                              Write-Host "##vso[build.addbuildtag]Release build"
-                          }
+                          Write-Host "##vso[build.addbuildtag]Release build"
+                        }
                         else
+                        {
                         {
                             $continuous = "$($version.Semver).$(Build.BuildId)"
                             $ubuild.SetUmbracoVersion($continuous)
