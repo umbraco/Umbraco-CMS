@@ -37,7 +37,6 @@
     <EmbeddedResource Remove="umbraco\Data\**" />
     <EmbeddedResource Remove="umbraco\logs\**" />
     <EmbeddedResource Remove="umbraco\MediaCache\**" />
-    <EmbeddedResource Remove="umbraco\models\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -45,7 +44,6 @@
     <Content Remove="umbraco\Data\**" />
     <Content Remove="umbraco\logs\**" />
     <Content Remove="umbraco\MediaCache\**" />
-    <Content Remove="umbraco\models\**" />
     <Content Remove="wwwroot\Web.config" />
   </ItemGroup>
 

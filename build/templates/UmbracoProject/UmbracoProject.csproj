@@ -18,16 +18,13 @@
         <Compile Remove="umbraco\Data\**" />
         <Compile Remove="umbraco\logs\**" />
         <Compile Remove="umbraco\MediaCache\**" />
-        <Compile Remove="umbraco\models\**" />
     </ItemGroup>
     <ItemGroup>
         <EmbeddedResource Remove="umbraco\Data\**" />
         <EmbeddedResource Remove="umbraco\logs\**" />
         <EmbeddedResource Remove="umbraco\MediaCache\**" />
-        <EmbeddedResource Remove="umbraco\models\**" />
     </ItemGroup>
     <ItemGroup>
-        <None Remove="umbraco\models\**" />
         <None Remove="umbraco\Data\**" />
         <None Remove="umbraco\logs\**" />
         <None Remove="umbraco\MediaCache\**" />
@@ -44,7 +41,6 @@
         <Content Remove="umbraco\Data\**" />
         <Content Remove="umbraco\logs\**" />
         <Content Remove="umbraco\MediaCache\**" />
-        <Content Remove="umbraco\models\**" />
     </ItemGroup>
 
     <!--Set this to true ModelsBuilder mode is not PureLive -->
