@@ -333,7 +333,7 @@ stages:
 
                         $version = $ubuild.GetUmbracoVersion()
 
-                        if ($(Umbraco.IsReleaseBuild) -eq "false"){
+                        if ($(Umbraco.IsReleaseBuild) -ne "false"){
                             if ($version.Comment -ne "")
                             {
                               # 8.0.0-beta003.1234
@@ -369,7 +369,7 @@ stages:
                           }
                           else
                           {
-                            $continuous = $version
+                            $continuous = $version.Semver
                           }
 
                         Write-Host "##vso[build.updatebuildnumber]$continuous"
