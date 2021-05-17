@@ -343,7 +343,6 @@ stages:
                         }
                         else
                         {
-                        {
                             $continuous = "$($version.Semver).$(Build.BuildId)"
                             $ubuild.SetUmbracoVersion($continuous)
 
