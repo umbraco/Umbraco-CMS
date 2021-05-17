@@ -375,7 +375,7 @@ stages:
                           }
 
 
-                        Write-Host "##vso[build.updatebuildnumber]Umbraco.$continuous"
+                        Write-Host "##vso[build.updatereleasename]Umbraco.$continuous"
 
                         Write-Host "Building: $continuous"
                 - task: PowerShell@1
