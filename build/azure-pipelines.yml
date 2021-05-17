@@ -342,7 +342,7 @@ stages:
                         }
                         else
                         {
-                            $continuous = "$($version.Semver).$(Build.BuildId)"
+                            $continuous = "$($version.Semver).nightly$(Build.BuildId)"
                             $ubuild.SetUmbracoVersion($continuous)
 
                             #Update the version in templates also
@@ -370,7 +370,7 @@ stages:
                           }
 
 
-                        Write-Host "##vso[build.updatebuildnumber]$continuous"
+                        Write-Host "##vso[build.updatebuildnumber]$(continuous).$(Build.BuildId)"
 
                         Write-Host "Building: $continuous"
                 - task: PowerShell@1
