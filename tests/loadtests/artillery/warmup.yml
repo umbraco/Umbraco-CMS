@@ -1,0 +1,12 @@
+config:
+  phases:
+    - duration: 1
+      arrivalRate: 1
+scenarios:
+  - name: "Warmup"
+    flow:
+      - loop:
+        - get:
+            url: "/"
+        - think: 2
+        count: 5

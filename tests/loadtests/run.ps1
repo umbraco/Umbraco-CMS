@@ -50,16 +50,17 @@ $ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $RunCount +
 
 Foreach ($app in $Config.apps)
 {
-    # Stop all IIS Sites
-    Get-IISSite | Stop-IISSite -Name {$_.Name}  -ErrorAction SilentlyContinue -Confirm:$false
-
-    # Reset iis (stops all w3wp processes)
-    & iisreset /restart
+    # TODO: Ideally we'd start with fresh DBs and do the install as part of an artillery run
 
     $ProcessName = $app.processName
 
     if ($app.iisSiteName)
     {
+        # Reset iis (stops all w3wp processes)
+        & iisreset /restart
+
+        # Stop all IIS Sites
+        Get-IISSite | Stop-IISSite -Name {$_.Name}  -ErrorAction SilentlyContinue -Confirm:$false
 
         # This would be required if we don't stop all sites in order to get the correct IIS process Id
         # for perf counters. But since we are stopping them all, then the process name will always
@@ -150,8 +151,18 @@ Foreach ($app in $Config.apps)
         $Env:DEBUG = ""
     }
 
-    # TODO: It's possible to recycle an apppool with powershell:
-    # https://docs.microsoft.com/en-us/powershell/module/iisadministration/get-iisservermanager?view=windowsserver2019-ps#example-3--use-the-servermanager-object-to-get-application-pool-objects-and-recycle-an-application-pool-
+    # First run the warmup without counters so IIS is started
+    Write-Host "Site warmup..."
+    $Artillery | & artillery run "$PSScriptRoot\artillery\warmup.yml" --target $($app.baseUrl)
+
+    if ($app.iisSiteName)
+    {
+        # Recycle the app pool
+        # https://docs.microsoft.com/en-us/powershell/module/iisadministration/get-iisservermanager?view=windowsserver2019-ps#example-3--use-the-servermanager-object-to-get-application-pool-objects-and-recycle-an-application-pool-
+        $SM = Get-IISServerManager
+        Write-Host "Recycle app pool..."
+        $SM.ApplicationPools["UmbracoCms.8.7.3"].Recycle()
+    }
 
     # Run the artillery load testing
     foreach ( $a in $Artillery )
