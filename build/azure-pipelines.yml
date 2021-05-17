@@ -336,7 +336,7 @@ stages:
                         $isRelease = [regex]::matches($env:BUILD_SOURCEBRANCH,"v\d+\/\d+.\d+.*")
 
 
-                        if ($isRelease){
+                        if ($isRelease.Count -gt 0){
                           $continuous = $version.Semver
                           Write-Host "##vso[build.addbuildtag]Release build"
                         }
