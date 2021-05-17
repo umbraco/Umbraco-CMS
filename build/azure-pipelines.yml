@@ -366,11 +366,14 @@ stages:
                             $a.symbols.version.defaultValue = $continuous
 
                             $a | ConvertTo-Json -depth 32| set-content $templatePath
+                            Write-Host "##vso[build.addbuildtag]Continuous build"
                           }
                           else
                           {
                             $continuous = $version.Semver
+                            Write-Host "##vso[build.addbuildtag]Release build"
                           }
+
 
                         Write-Host "##vso[build.updatebuildnumber]$continuous"
 
