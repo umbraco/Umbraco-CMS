@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using Examine;
 using Examine.Lucene.Directories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -20,6 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         private readonly ITypeFinder _typeFinder;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ILockFactory _lockFactory;
+        private readonly IApplicationRoot _applicationRoot;
         private readonly IndexCreatorSettings _settings;
 
         public ConfigurationEnabledDirectoryFactory(
@@ -27,12 +29,14 @@ namespace Umbraco.Cms.Infrastructure.Examine
             ITypeFinder typeFinder,
             IHostingEnvironment hostingEnvironment,
             ILockFactory lockFactory,
-            IOptions<IndexCreatorSettings> settings)
+            IOptions<IndexCreatorSettings> settings,
+            IApplicationRoot applicationRoot)
         {
             _services = services;
             _typeFinder = typeFinder;
             _hostingEnvironment = hostingEnvironment;
             _lockFactory = lockFactory;
+            _applicationRoot = applicationRoot;
             _settings = settings.Value;
         }
 
@@ -47,10 +51,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <returns></returns>
         public virtual Lucene.Net.Store.Directory CreateFileSystemLuceneDirectory(string indexName)
         {
-            var dirInfo = new DirectoryInfo(
-                Path.Combine(
-                    _hostingEnvironment.MapPathContentRoot(Constants.SystemDirectories.TempData),
-                    "ExamineIndexes"));
+            var dirInfo = _applicationRoot.ApplicationRoot;
 
             if (!dirInfo.Exists)
             {
