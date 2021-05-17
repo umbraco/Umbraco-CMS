@@ -333,7 +333,7 @@ stages:
 
                         $version = $ubuild.GetUmbracoVersion()
 
-                        if ($(Build.ResourceTrigger) -eq "ResourceTrigger"){
+                        if ("$(Build.ResourceTrigger)" -eq "ResourceTrigger"){
                           $continuous = $version.Semver
                               Write-Host "##vso[build.addbuildtag]Release build"
                           }
