@@ -333,7 +333,7 @@ stages:
 
                         $version = $ubuild.GetUmbracoVersion()
 
-                        if ($(Umbraco.IsReleaseBuild) -ne "false"){
+                        if ($(Umbraco.IsReleaseBuild) -eq "true"){
                             if ($version.Comment -ne "")
                             {
                               # 8.0.0-beta003.1234
