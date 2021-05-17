@@ -333,9 +333,7 @@ stages:
 
                         $version = $ubuild.GetUmbracoVersion()
 
-                        $isTag = [regex]::IsMatch($Env:BUILD_SOURCEBRANCH, "^(refs\/tags\/)");
-
-                        if ($isTag){
+                        if ($(Build.ResourceTrigger) -eq "ResourceTrigger"){
                           $continuous = $version.Semver
                               Write-Host "##vso[build.addbuildtag]Release build"
                           }
