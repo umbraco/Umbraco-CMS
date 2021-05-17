@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -129,7 +130,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         public ProcessInstructionsResult ProcessInstructions(
             CacheRefresherCollection cacheRefreshers,
             ServerRole serverRole,
-            bool released,
+            CancellationToken cancellationToken,
             string localIdentity,
             DateTime lastPruned,
             int lastId)
@@ -137,10 +138,10 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (_profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, released, localIdentity, ref lastId);
+                var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
                 // Check for pruning throttling.
-                if (released || (DateTime.UtcNow - lastPruned) <= _globalSettings.DatabaseServerMessenger.TimeBetweenPruneOperations)
+                if (cancellationToken.IsCancellationRequested || (DateTime.UtcNow - lastPruned) <= _globalSettings.DatabaseServerMessenger.TimeBetweenPruneOperations)
                 {
                     scope.Complete();
                     return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
@@ -171,7 +172,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// </remarks>
         /// <returns>Number of instructions processed.</returns>
-        private int ProcessDatabaseInstructions(CacheRefresherCollection cacheRefreshers, bool released, string localIdentity, ref int lastId)
+        private int ProcessDatabaseInstructions(CacheRefresherCollection cacheRefreshers, CancellationToken cancellationToken, string localIdentity, ref int lastId)
         {
             // NOTE:
             // We 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
@@ -204,7 +205,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 // If this flag gets set it means we're shutting down! In this case, we need to exit asap and cannot
                 // continue processing anything otherwise we'll hold up the app domain shutdown.
-                if (released)
+                if (cancellationToken.IsCancellationRequested)
                 {
                     break;
                 }
@@ -226,7 +227,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions);
 
                 // Process as per-normal.
-                var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, released, ref lastId);
+                var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);
 
                 // If they couldn't be all processed (i.e. we're shutting down) then exit.
                 if (success == false)
@@ -299,13 +300,13 @@ namespace Umbraco.Cms.Core.Services.Implement
             IReadOnlyCollection<RefreshInstruction> instructionBatch,
             CacheInstruction instruction,
             HashSet<RefreshInstruction> processed,
-            bool released,
+            CancellationToken cancellationToken,
             ref int lastId)
         {
             // Execute remote instructions & update lastId.
             try
             {
-                var result = NotifyRefreshers(cacheRefreshers, instructionBatch, processed, released);
+                var result = NotifyRefreshers(cacheRefreshers, instructionBatch, processed, cancellationToken);
                 if (result)
                 {
                     // If all instructions were processed, set the last id.
@@ -339,12 +340,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             CacheRefresherCollection cacheRefreshers,
             IEnumerable<RefreshInstruction> instructions,
             HashSet<RefreshInstruction> processed,
-            bool released)
+            CancellationToken cancellationToken)
         {
             foreach (RefreshInstruction instruction in instructions)
             {
                 // Check if the app is shutting down, we need to exit if this happens.
-                if (released)
+                if (cancellationToken.IsCancellationRequested)
                 {
                     return false;
                 }

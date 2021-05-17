@@ -37,10 +37,10 @@ namespace Umbraco.Cms.Infrastructure.Sync
         private readonly LastSyncedFileManager _lastSyncedFileManager;
         private DateTime _lastSync;
         private DateTime _lastPruned;
-        private int _lastId;
         private readonly Lazy<SyncBootState?> _initialized;
         private bool _syncing;
-        private bool _released;
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly CancellationToken _cancellationToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DatabaseServerMessenger"/> class.
@@ -59,6 +59,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
             IOptions<GlobalSettings> globalSettings)
             : base(distributedEnabled)
         {
+            _cancellationToken = _cancellationTokenSource.Token;
             _mainDom = mainDom;
             _cacheRefreshers = cacheRefreshers;
             _serverRoleAccessor = serverRoleAccessor;
@@ -150,7 +151,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
                 {
                     lock (_locko)
                     {
-                        _released = true; // no more syncs
+                        _cancellationTokenSource.Cancel(); // no more syncs
                     }
 
                     // Wait a max of 3 seconds and then return, so that we don't block
@@ -172,10 +173,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
                 return null;
             }
 
-            // store the last id on disk
-            _lastId = _lastSyncedFileManager.LastSyncedId;
-
-            return InitializeColdBootState(_lastId);
+            return InitializeColdBootState();
         }
 
         // <summary>
@@ -185,11 +183,11 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// Callers MUST ensure thread-safety.
         /// </remarks>
-        private SyncBootState InitializeColdBootState(int lastId)
+        private SyncBootState InitializeColdBootState()
         {
             lock (_locko)
             {
-                if (_released)
+                if (_cancellationToken.IsCancellationRequested)
                 {
                     return SyncBootState.Unknown;
                 }
@@ -203,8 +201,8 @@ namespace Umbraco.Cms.Infrastructure.Sync
                     // when doing it before. Some instructions might run twice but this is not an issue.
                     var maxId = CacheInstructionService.GetMaxInstructionId();
 
-                    //if there is a max currently, or if we've never synced
-                    if (maxId > 0 || _lastId < 0)
+                    // if there is a max currently, or if we've never synced
+                    if (maxId > 0 || _lastSyncedFileManager.LastSyncedId < 0)
                     {
                         _lastSyncedFileManager.SaveLastSyncedId(maxId);
                     }
@@ -232,7 +230,7 @@ namespace Umbraco.Cms.Infrastructure.Sync
                 }
 
                 // Don't continue if we are released
-                if (_released)
+                if (_cancellationToken.IsCancellationRequested)
                 {
                     return;
                 }
@@ -253,10 +251,10 @@ namespace Umbraco.Cms.Infrastructure.Sync
                 ProcessInstructionsResult result = CacheInstructionService.ProcessInstructions(
                     _cacheRefreshers,
                     _serverRoleAccessor.CurrentServerRole,
-                    _released,
+                    _cancellationToken,
                     LocalIdentity,
                     _lastPruned,
-                    _lastId);
+                    _lastSyncedFileManager.LastSyncedId);
 
                 if (result.InstructionsWerePruned)
                 {

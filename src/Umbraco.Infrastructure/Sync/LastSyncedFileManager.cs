@@ -22,17 +22,22 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// Persists the last-synced id to file.
         /// </summary>
         /// <param name="id">The id.</param>
-        /// <remarks>
-        /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
-        /// </remarks>
         public void SaveLastSyncedId(int id)
         {
-            File.WriteAllText(DistCacheFilePath, id.ToString(CultureInfo.InvariantCulture));
-            _lastId = id;
+            lock (_lastIdLock)
+            {
+                if (!_lastIdReady)
+                {
+                    throw new InvalidOperationException("Cannot save the last synced id before it is read");
+                }
+
+                File.WriteAllText(DistCacheFilePath, id.ToString(CultureInfo.InvariantCulture));
+                _lastId = id;
+            }
         }
 
         /// <summary>
-        /// Reads the last-synced id from file (once).
+        /// Returns the last-synced id.
         /// </summary>
         public int LastSyncedId => LazyInitializer.EnsureInitialized(
                 ref _lastId,
@@ -40,6 +45,8 @@ namespace Umbraco.Cms.Infrastructure.Sync
                 ref _lastIdLock,
                 () =>
                 {
+                    // On first load, read from file, else it will return the in-memory _lastId value
+
                     var distCacheFilePath = DistCacheFilePath;
 
                     if (File.Exists(distCacheFilePath))

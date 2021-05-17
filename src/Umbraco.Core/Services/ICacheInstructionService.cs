@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Sync;
 
@@ -44,7 +45,7 @@ namespace Umbraco.Cms.Core.Services
         ProcessInstructionsResult ProcessInstructions(
             CacheRefresherCollection cacheRefreshers,
             ServerRole serverRole,
-            bool released,
+            CancellationToken cancellationToken,
             string localIdentity,
             DateTime lastPruned,
             int lastId);
