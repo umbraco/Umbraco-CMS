@@ -343,7 +343,7 @@ stages:
                         else
                         {
                             $date = (Get-Date).ToString("yyyyMMdd")
-                            $continuous = "$($version.release)-preview$date"
+                            $continuous = "$($version.release)-preview$date.$(Build.BuildId)"
                             $ubuild.SetUmbracoVersion($continuous)
 
                             #Update the version in templates also
