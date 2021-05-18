@@ -5,12 +5,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
-using Examine.LuceneEngine;
-using Lucene.Net.Analysis;
-using Lucene.Net.Store;
+using Examine.Lucene;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Hosting;
-using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Infrastructure.Examine
@@ -21,49 +19,38 @@ namespace Umbraco.Cms.Infrastructure.Examine
     public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex, IDisposable
     {
         private readonly ILogger<UmbracoContentIndex> _logger;
-        protected ILocalizationService LanguageService { get; }
 
-        #region Constructors
-
-        /// <summary>
-        /// Create an index at runtime
-        /// </summary>
-        /// <param name="name"></param>
-        /// <param name="fieldDefinitions"></param>
-        /// <param name="luceneDirectory"></param>
-        /// <param name="defaultAnalyzer"></param>
-        /// <param name="profilingLogger"></param>
-        /// <param name="logger"></param>
-        /// <param name="loggerFactory"></param>
-        /// <param name="hostingEnvironment"></param>
-        /// <param name="runtimeState"></param>
-        /// <param name="languageService"></param>
-        /// <param name="validator"></param>
-        /// <param name="indexValueTypes"></param>
         public UmbracoContentIndex(
-            string name,
-            Directory luceneDirectory,
-            FieldDefinitionCollection fieldDefinitions,
-            Analyzer defaultAnalyzer,
-            IProfilingLogger profilingLogger,
-            ILogger<UmbracoContentIndex> logger,
             ILoggerFactory loggerFactory,
+            string name,
+            IOptionsSnapshot<LuceneDirectoryIndexOptions> indexOptions,
             IHostingEnvironment hostingEnvironment,
             IRuntimeState runtimeState,
-            ILocalizationService languageService,
-            IContentValueSetValidator validator,
-            IReadOnlyDictionary<string, IFieldValueTypeFactory> indexValueTypes = null)
-            : base(name, luceneDirectory, fieldDefinitions, defaultAnalyzer, profilingLogger, logger, loggerFactory ,hostingEnvironment, runtimeState, validator, indexValueTypes)
+            ILocalizationService languageService = null)
+            : base(loggerFactory, name, indexOptions, hostingEnvironment, runtimeState)
         {
-            if (validator == null) throw new ArgumentNullException(nameof(validator));
-            _logger = logger;
-            LanguageService = languageService ?? throw new ArgumentNullException(nameof(languageService));
+            LanguageService = languageService;
+            _logger = loggerFactory.CreateLogger<UmbracoContentIndex>();
 
-            if (validator is IContentValueSetValidator contentValueSetValidator)
+            LuceneDirectoryIndexOptions namedOptions = indexOptions.Get(name);
+            if (namedOptions == null)
+            {
+                throw new InvalidOperationException($"No named {typeof(LuceneDirectoryIndexOptions)} options with name {name}");
+            }
+
+            if (namedOptions.Validator is IContentValueSetValidator contentValueSetValidator)
+            {
                 PublishedValuesOnly = contentValueSetValidator.PublishedValuesOnly;
+            }
         }
 
-        #endregion
+        protected ILocalizationService LanguageService { get; }
+
+        /// <summary>
+        /// Explicitly override because we need to do validation differently than the underlying logic
+        /// </summary>
+        /// <param name="values"></param>
+        void IIndex.IndexItems(IEnumerable<ValueSet> values) => PerformIndexItems(values, OnIndexOperationComplete);
 
         /// <summary>
         /// Special check for invalid paths
@@ -75,45 +62,48 @@ namespace Umbraco.Cms.Infrastructure.Examine
             // We don't want to re-enumerate this list, but we need to split it into 2x enumerables: invalid and valid items.
             // The Invalid items will be deleted, these are items that have invalid paths (i.e. moved to the recycle bin, etc...)
             // Then we'll index the Value group all together.
-            // We return 0 or 1 here so we can order the results and do the invalid first and then the valid.
             var invalidOrValid = values.GroupBy(v =>
             {
-                if (!v.Values.TryGetValue("path", out var paths) || paths.Count <= 0 || paths[0] == null)
-                    return 0;
+                if (!v.Values.TryGetValue("path", out List<object> paths) || paths.Count <= 0 || paths[0] == null)
+                {
+                    return ValueSetValidationResult.Failed;
+                }
 
-                //we know this is an IContentValueSetValidator
-                var validator = (IContentValueSetValidator)ValueSetValidator;
-                var path = paths[0].ToString();
+                ValueSetValidationResult validationResult = ValueSetValidator.Validate(v);
 
-                return (!validator.ValidatePath(path, v.Category)
-                        || !validator.ValidateRecycleBin(path, v.Category)
-                        || !validator.ValidateProtectedContent(path, v.Category))
-                    ? 0
-                    : 1;
+                return validationResult;
             }).ToList();
 
             var hasDeletes = false;
             var hasUpdates = false;
-            foreach (var group in invalidOrValid.OrderBy(x => x.Key))
-            {
-                if (group.Key == 0)
-                {
-                    hasDeletes = true;
-                    //these are the invalid items so we'll delete them
-                    //since the path is not valid we need to delete this item in case it exists in the index already and has now
-                    //been moved to an invalid parent.
 
-                    base.PerformDeleteFromIndex(group.Select(x => x.Id), args => { /*noop*/ });
-                }
-                else
+            // ordering by descending so that Filtered/Failed processes first
+            foreach (IGrouping<ValueSetValidationResult, ValueSet> group in invalidOrValid.OrderByDescending(x => x.Key))
+            {
+                switch (group.Key)
                 {
-                    hasUpdates = true;
-                    //these are the valid ones, so just index them all at once
-                    base.PerformIndexItems(group.ToList(), onComplete);
+                    case ValueSetValidationResult.Valid:
+                        hasUpdates = true;
+
+                        //these are the valid ones, so just index them all at once
+                        base.PerformIndexItems(group.ToList(), onComplete);
+                        break;
+                    case ValueSetValidationResult.Failed:
+                        // don't index anything that is invalid
+                        break;
+                    case ValueSetValidationResult.Filtered:
+                        hasDeletes = true;
+
+                        // these are the invalid/filtered items so we'll delete them
+                        // since the path is not valid we need to delete this item in
+                        // case it exists in the index already and has now
+                        // been moved to an invalid parent.
+                        base.PerformDeleteFromIndex(group.Select(x => x.Id), null);
+                        break;
                 }
             }
 
-            if (hasDeletes && !hasUpdates || !hasDeletes && !hasUpdates)
+            if ((hasDeletes && !hasUpdates) || (!hasDeletes && !hasUpdates))
             {
                 //we need to manually call the completed method
                 onComplete(new IndexOperationEventArgs(this, 0));
@@ -133,21 +123,27 @@ namespace Umbraco.Cms.Infrastructure.Examine
         protected override void PerformDeleteFromIndex(IEnumerable<string> itemIds, Action<IndexOperationEventArgs> onComplete)
         {
             var idsAsList = itemIds.ToList();
-            foreach (var nodeId in idsAsList)
+
+            for (int i = 0; i < idsAsList.Count; i++)
             {
+                string nodeId = idsAsList[i];
+
                 //find all descendants based on path
                 var descendantPath = $@"\-1\,*{nodeId}\,*";
                 var rawQuery = $"{UmbracoExamineFieldNames.IndexPathFieldName}:{descendantPath}";
-                var searcher = GetSearcher();
-                var c = searcher.CreateQuery();
+                var c = Searcher.CreateQuery();
                 var filtered = c.NativeQuery(rawQuery);
                 var results = filtered.Execute();
 
                 _logger.
                     LogDebug("DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
-                //need to queue a delete item for each one found
-                QueueIndexOperation(results.Select(r => new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete)));
+                var toRemove = results.Select(x => x.Id).ToList();
+                // delete those descendants (ensure base. is used here so we aren't calling ourselves!)
+                base.PerformDeleteFromIndex(toRemove, null);
+
+                // remove any ids from our list that were part of the descendants
+                idsAsList.RemoveAll(x => toRemove.Contains(x));
             }
 
             base.PerformDeleteFromIndex(idsAsList, onComplete);

@@ -119,10 +119,10 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             }
 
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level), cancellationToken);
-
             // create & initialize the components
             _components.Initialize();
+
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level), cancellationToken);
         }
 
         private void DoUnattendedUpgrade()

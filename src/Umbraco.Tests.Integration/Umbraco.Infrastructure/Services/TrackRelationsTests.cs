@@ -1,10 +1,12 @@
 using System.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
@@ -21,6 +23,12 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private IMediaService MediaService => GetRequiredService<IMediaService>();
 
         private IRelationService RelationService => GetRequiredService<IRelationService>();
+
+        protected override void CustomTestSetup(IUmbracoBuilder builder)
+        {
+            base.CustomTestSetup(builder);
+            builder.AddNuCache();
+        }
 
         [Test]
         public void Automatically_Track_Relations()

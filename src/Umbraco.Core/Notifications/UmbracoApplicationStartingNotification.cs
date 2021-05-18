@@ -3,7 +3,10 @@
 
 namespace Umbraco.Cms.Core.Notifications
 {
-
+    /// <summary>
+    /// Notification that occurs at the very end of the Umbraco boot
+    /// process and after all <see cref="IComponent"/> initialize.
+    /// </summary>
     public class UmbracoApplicationStartingNotification : INotification
     {
         /// <summary>

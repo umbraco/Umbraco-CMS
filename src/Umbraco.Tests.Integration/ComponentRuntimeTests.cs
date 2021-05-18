@@ -10,6 +10,7 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Tests.Integration
 {
@@ -18,7 +19,11 @@ namespace Umbraco.Cms.Tests.Integration
     public class ComponentRuntimeTests : UmbracoIntegrationTest
     {
         // ensure composers are added
-        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddComposers();
+        protected override void CustomTestSetup(IUmbracoBuilder builder)
+        {
+            builder.AddNuCache();
+            builder.AddComposers();
+        }
 
         /// <summary>
         /// This will boot up umbraco with components enabled to show they initialize and shutdown

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
@@ -35,8 +35,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
         {
             while (!stoppingToken.IsCancellationRequested)
             {
-                var workItem =
-                    await TaskQueue.DequeueAsync(stoppingToken);
+                Func<CancellationToken, Task> workItem = await TaskQueue.DequeueAsync(stoppingToken);
 
                 try
                 {
