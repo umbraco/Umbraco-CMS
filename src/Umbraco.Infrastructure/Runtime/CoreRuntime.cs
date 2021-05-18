@@ -66,10 +66,12 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         /// Gets the state of the Umbraco runtime.
         /// </summary>
         public IRuntimeState State { get; }
+        public CancellationToken CancellationToken { get; private set; }
 
         /// <inheritdoc/>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            CancellationToken = cancellationToken;
             StaticApplicationLogging.Initialize(_loggerFactory);
 
             AppDomain.CurrentDomain.UnhandledException += (_, args) =>

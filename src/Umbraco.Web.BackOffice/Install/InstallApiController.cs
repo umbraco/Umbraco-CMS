@@ -6,18 +6,20 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.Install.Models;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
+using Umbraco.Cms.Web.BackOffice.Security;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Filters;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.Common.Install
+namespace Umbraco.Cms.Web.BackOffice.Install
 {
     [UmbracoApiController]
     [AngularJsonOnlyConfiguration]
@@ -27,20 +29,31 @@ namespace Umbraco.Cms.Web.Common.Install
     {
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly InstallStatusTracker _installStatusTracker;
-        private readonly IUmbracoApplicationLifetime _umbracoApplicationLifetime;
+        private readonly IRuntime _runtime;
+        private readonly IBackOfficeUserManager _backOfficeUserManager;
+        private readonly IBackOfficeSignInManager _backOfficeSignInManager;
         private readonly InstallStepCollection _installSteps;
         private readonly ILogger<InstallApiController> _logger;
         private readonly IProfilingLogger _proflog;
 
-        public InstallApiController(DatabaseBuilder databaseBuilder, IProfilingLogger proflog, ILogger<InstallApiController> logger,
-            InstallHelper installHelper, InstallStepCollection installSteps, InstallStatusTracker installStatusTracker,
-            IUmbracoApplicationLifetime umbracoApplicationLifetime)
+        public InstallApiController(
+            DatabaseBuilder databaseBuilder,
+            IProfilingLogger proflog,
+            ILogger<InstallApiController> logger,
+            InstallHelper installHelper,
+            InstallStepCollection installSteps,
+            InstallStatusTracker installStatusTracker,
+            IRuntime runtime,
+            IBackOfficeUserManager backOfficeUserManager,
+            IBackOfficeSignInManager backOfficeSignInManager)
         {
             _databaseBuilder = databaseBuilder ?? throw new ArgumentNullException(nameof(databaseBuilder));
             _proflog = proflog ?? throw new ArgumentNullException(nameof(proflog));
             _installSteps = installSteps;
             _installStatusTracker = installStatusTracker;
-            _umbracoApplicationLifetime = umbracoApplicationLifetime;
+            _runtime = runtime;
+            _backOfficeUserManager = backOfficeUserManager;
+            _backOfficeSignInManager = backOfficeSignInManager;
             InstallHelper = installHelper;
             _logger = logger;
         }
@@ -86,7 +99,13 @@ namespace Umbraco.Cms.Web.Common.Install
         [HttpPost]
         public async Task<ActionResult> CompleteInstall()
         {
-            _umbracoApplicationLifetime.Restart();
+
+            await _runtime.StopAsync(_runtime.CancellationToken);
+            await _runtime.StartAsync(_runtime.CancellationToken);
+
+            var identityUser = await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
+            _backOfficeSignInManager.SignInAsync(identityUser, false);
+
             return NoContent();
         }
 

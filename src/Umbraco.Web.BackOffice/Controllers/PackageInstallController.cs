@@ -317,6 +317,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             model.IsRestarting = true;
 
+
             return model;
         }
 

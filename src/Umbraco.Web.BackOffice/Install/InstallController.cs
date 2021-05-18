@@ -13,10 +13,10 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Install;
-using Umbraco.Extensions;
 using Umbraco.Cms.Web.Common.Filters;
+using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.Common.Install
+namespace Umbraco.Cms.Web.BackOffice.Install
 {
 
     /// <summary>

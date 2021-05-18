@@ -1,3 +1,4 @@
+using System.Threading;
 using Microsoft.Extensions.Hosting;
 
 namespace Umbraco.Cms.Core.Services
@@ -11,5 +12,7 @@ namespace Umbraco.Cms.Core.Services
         /// Gets the runtime state.
         /// </summary>
         IRuntimeState State { get; }
+
+        CancellationToken CancellationToken { get; }
     }
 }

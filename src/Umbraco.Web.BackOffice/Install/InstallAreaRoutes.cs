@@ -7,7 +7,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.Common.Install
+namespace Umbraco.Cms.Web.BackOffice.Install
 {
 
     public class InstallAreaRoutes : IAreaRoutes
