@@ -17,6 +17,9 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         bool IsPropertyValid(IProperty property, string culture = "*", string segment = "*");
 
+        /// <summary>
+        /// Validates a property value.
+        /// </summary>
         IEnumerable<ValidationResult> ValidatePropertyValue(
             IDataEditor editor,
             IDataType dataType,
@@ -26,7 +29,10 @@ namespace Umbraco.Cms.Core.Services
             string isRequiredMessage,
             string validationRegExpMessage);
 
-        public IEnumerable<ValidationResult> ValidatePropertyValue(
+        /// <summary>
+        /// Validates a property value.
+        /// </summary>
+        IEnumerable<ValidationResult> ValidatePropertyValue(
             IPropertyType propertyType,
             object postedValue);
     }

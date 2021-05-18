@@ -32,8 +32,6 @@ namespace Umbraco.Cms.Core.Manifest
 
         private readonly IAppPolicyCache _cache;
         private readonly ILogger<ManifestParser> _logger;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;
         private readonly ManifestValueValidatorCollection _validators;
         private readonly ManifestFilterCollection _filters;
 
@@ -47,16 +45,13 @@ namespace Umbraco.Cms.Core.Manifest
             ManifestValueValidatorCollection validators,
             ManifestFilterCollection filters,
             ILogger<ManifestParser> logger,
-            ILoggerFactory loggerFactory,
             IIOHelper ioHelper,
             IHostingEnvironment hostingEnvironment,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             IJsonSerializer jsonSerializer,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IDataValueEditorFactory dataValueEditorFactory)
-            : this(appCaches, validators, filters, "~/App_Plugins", logger, loggerFactory, ioHelper, hostingEnvironment, dataTypeService, localizationService)
+            : this(appCaches, validators, filters, "~/App_Plugins", logger, ioHelper, hostingEnvironment)
         {
             _jsonSerializer = jsonSerializer;
             _localizedTextService = localizedTextService;
@@ -67,12 +62,10 @@ namespace Umbraco.Cms.Core.Manifest
         /// <summary>
         /// Initializes a new instance of the <see cref="ManifestParser"/> class.
         /// </summary>
-        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger<ManifestParser> logger, ILoggerFactory loggerFactory, IIOHelper ioHelper, IHostingEnvironment hostingEnvironment, IDataTypeService dataTypeService, ILocalizationService localizationService)
+        private ManifestParser(AppCaches appCaches, ManifestValueValidatorCollection validators, ManifestFilterCollection filters, string path, ILogger<ManifestParser> logger,  IIOHelper ioHelper, IHostingEnvironment hostingEnvironment)
         {
             if (appCaches == null) throw new ArgumentNullException(nameof(appCaches));
             _cache = appCaches.RuntimeCache;
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
             _validators = validators ?? throw new ArgumentNullException(nameof(validators));
             _filters = filters ?? throw new ArgumentNullException(nameof(filters));
             if (path == null) throw new ArgumentNullException(nameof(path));
@@ -82,8 +75,6 @@ namespace Umbraco.Cms.Core.Manifest
             _hostingEnvironment = hostingEnvironment;
 
             Path = path;
-
-
         }
 
         public string Path
