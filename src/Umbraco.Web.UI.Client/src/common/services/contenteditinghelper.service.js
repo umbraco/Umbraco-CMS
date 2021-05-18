@@ -813,17 +813,18 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          */
         getSortedVariantsAndSegments: function (variantsAndSegments) {
             const sortedVariants = variantsAndSegments.filter(variant => !variant.segment).sort(this.sortVariants);
-            let segments = variantsAndSegments.filter(variant => variant.segment);
+            let variantsWithSegments = variantsAndSegments.filter(variant => variant.segment);
             let sortedAvailableVariants = [];
 
             sortedVariants.forEach((variant) => {
-                const matchedSegments = segments.filter(segment => segment.language && variant.language && segment.language.culture !== variant.language.culture);
-                const sortedMatchedSegments = matchedSegments.sort(this.sortVariants);
+                const sortedMatchedSegments = variantsWithSegments.filter(segment => segment.language && variant.language && segment.language.culture === variant.language.culture).sort(this.sortVariants);
+                // remove variants for this culture
+                variantsWithSegments = variantsWithSegments.filter(segment => !segment.language || segment.language && variant.language && segment.language.culture !== variant.language.culture);
                 sortedAvailableVariants = [...sortedAvailableVariants, ...[variant], ...sortedMatchedSegments];
             })
 
-            // if we have segments without a parent language variant we need to add the remaining segments to the array
-            sortedAvailableVariants = [...sortedAvailableVariants, ...segments.sort(this.sortVariants)];
+            // if we have segments without a parent language variant we need to add the remaining variantsWithSegments to the array
+            sortedAvailableVariants = [...sortedAvailableVariants, ...variantsWithSegments.sort(this.sortVariants)];
 
             return sortedAvailableVariants;
         }
