@@ -189,13 +189,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         }
 
         [Test]
-        public void Processes_No_Instructions_When_Released()
+        public void Processes_No_Instructions_When_CancellationToken_is_Cancelled()
         {
             var sut = (CacheInstructionService)GetRequiredService<ICacheInstructionService>();
 
             CreateAndDeliveryMultipleInstructions(sut);
 
-            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, CancellationToken, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), -1);
+            var cancellationTokenSource = new CancellationTokenSource();
+            cancellationTokenSource.Cancel();
+
+            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, cancellationTokenSource.Token, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), -1);
 
             Assert.Multiple(() =>
             {
