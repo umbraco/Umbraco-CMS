@@ -42,7 +42,17 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest
             };
             _ioHelper = TestHelper.IOHelper;
             NullLoggerFactory loggerFactory = NullLoggerFactory.Instance;
-            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  loggerFactory.CreateLogger<ManifestParser>(), loggerFactory, _ioHelper, TestHelper.GetHostingEnvironment(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new JsonNetSerializer(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>());
+            _parser = new ManifestParser(
+                AppCaches.Disabled,
+                new ManifestValueValidatorCollection(validators),
+                new ManifestFilterCollection(Array.Empty<IManifestFilter>()),
+                loggerFactory.CreateLogger<ManifestParser>(),
+                _ioHelper,
+                TestHelper.GetHostingEnvironment(),
+                new JsonNetSerializer(),
+                Mock.Of<ILocalizedTextService>(),
+                Mock.Of<IShortStringHelper>(),
+                Mock.Of<IDataValueEditorFactory>());
         }
 
         [Test]

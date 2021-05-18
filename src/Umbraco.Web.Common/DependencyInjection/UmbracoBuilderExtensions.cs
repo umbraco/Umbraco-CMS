@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Smidge;
@@ -316,9 +317,6 @@ namespace Umbraco.Extensions
 
             builder.AddHttpClients();
 
-            // TODO: Does this belong in web components??
-            builder.AddNuCache();
-
             return builder;
         }
 
@@ -429,7 +427,17 @@ namespace Umbraco.Extensions
             var wrappedHostingSettings = new OptionsMonitorAdapter<HostingSettings>(hostingSettings);
             var wrappedWebRoutingSettings = new OptionsMonitorAdapter<WebRoutingSettings>(webRoutingSettings);
 
-            return new AspNetCoreHostingEnvironment(wrappedHostingSettings, wrappedWebRoutingSettings, webHostEnvironment);
+            // This is needed in order to create a unique Application Id
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddDataProtection();
+            serviceCollection.AddSingleton<IHostEnvironment>(s => webHostEnvironment);
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            return new AspNetCoreHostingEnvironment(
+                serviceProvider,
+                wrappedHostingSettings,
+                wrappedWebRoutingSettings,
+                webHostEnvironment);
         }
 
     }

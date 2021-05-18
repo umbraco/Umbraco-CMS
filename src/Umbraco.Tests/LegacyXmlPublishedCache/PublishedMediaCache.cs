@@ -138,7 +138,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                         // TODO: Need to fix examine in LB scenarios!
                         Current.Logger.LogError(ex, "Could not load data from Examine index for media");
                     }
-                    else if (ex is AlreadyClosedException)
+                    else if (ex is ObjectDisposedException)
                     {
                         //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
                         //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.
@@ -254,7 +254,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                 // the manager will return the singleton without throwing initialization errors, however if examine isn't configured correctly a null
                 // reference error will occur because the examine settings are null.
             }
-            catch (AlreadyClosedException)
+            catch (ObjectDisposedException)
             {
                 //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
                 //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.
@@ -306,7 +306,7 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
                         // TODO: Need to fix examine in LB scenarios!
                         Current.Logger.LogError(ex, "Could not load data from Examine index for media");
                     }
-                    else if (ex is AlreadyClosedException)
+                    else if (ex is ObjectDisposedException)
                     {
                         //If the app domain is shutting down and the site is under heavy load the index reader will be closed and it really cannot
                         //be re-opened since the app domain is shutting down. In this case we have no option but to try to load the data from the db.

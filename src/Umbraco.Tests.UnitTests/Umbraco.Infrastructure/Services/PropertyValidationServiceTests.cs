@@ -5,6 +5,8 @@ using System.Threading;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -39,7 +41,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
                 x => x.Type == EditorType.PropertyValue
                      && x.Alias == Constants.PropertyEditors.Aliases.TextBox);
             Mock.Get(dataEditor).Setup(x => x.GetValueEditor(It.IsAny<object>()))
-                .Returns(new CustomTextOnlyValueEditor(Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"),   textService.Object, Mock.Of<IShortStringHelper>(), new JsonNetSerializer()));
+                .Returns(new CustomTextOnlyValueEditor(new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"),   textService.Object, Mock.Of<IShortStringHelper>(), new JsonNetSerializer(), Mock.Of<IIOHelper>()));
 
             var propEditors = new PropertyEditorCollection(new DataEditorCollection(new[] { dataEditor }));
 
@@ -171,13 +173,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Services
             private readonly ILocalizedTextService _textService;
 
             public CustomTextOnlyValueEditor(
-                IDataTypeService dataTypeService,
-                ILocalizationService localizationService,
                 DataEditorAttribute attribute,
                 ILocalizedTextService textService,
                 IShortStringHelper shortStringHelper,
-                IJsonSerializer jsonSerializer)
-                : base(dataTypeService, localizationService, attribute, textService, shortStringHelper, jsonSerializer) => _textService = textService;
+                IJsonSerializer jsonSerializer,
+                IIOHelper ioHelper)
+                : base(attribute, textService, shortStringHelper, jsonSerializer, ioHelper) => _textService = textService;
 
             public override IValueRequiredValidator RequiredValidator => new RequiredValidator(_textService);
 

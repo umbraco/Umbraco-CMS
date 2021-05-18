@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                dbProviderFactoryCreator,
                databaseSchemaCreatorFactory);
 
-            MainDomKey = MainDomKeyPrefix + "-" + (NetworkHelper.MachineName + MainDom.GetMainDomId(_hostingEnvironment)).GenerateHash<SHA1>();
+            MainDomKey = MainDomKeyPrefix + "-" + (Environment.MachineName + MainDom.GetMainDomId(_hostingEnvironment)).GenerateHash<SHA1>();
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)

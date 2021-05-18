@@ -506,18 +506,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         private Dictionary<string, object> GetApplicationState()
         {
+            var version = _runtimeState.SemanticVersion.ToSemanticStringWithoutBuild();
             var app = new Dictionary<string, object>
             {
                 // add versions - see UmbracoVersion for details & differences
 
                 // the complete application version (eg "8.1.2-alpha.25")
-                { "version", _umbracoVersion.SemanticVersion.ToSemanticString() },
+                { "version", version },
 
                 // the assembly version (eg "8.0.0")
                 { "assemblyVersion", _umbracoVersion.AssemblyVersion.ToString() }
             };
 
-            var version = _runtimeState.SemanticVersion.ToSemanticString();
+
 
             //the value is the hash of the version, cdf version and the configured state
             app.Add("cacheBuster", $"{version}.{_runtimeState.Level}.{_runtimeMinifier.CacheBuster}".GenerateHash());

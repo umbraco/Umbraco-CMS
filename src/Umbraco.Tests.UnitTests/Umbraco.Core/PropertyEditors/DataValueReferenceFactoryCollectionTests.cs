@@ -8,6 +8,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -25,17 +26,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
     [TestFixture]
     public class DataValueReferenceFactoryCollectionTests
     {
-        private IDataTypeService DataTypeService { get; } = Mock.Of<IDataTypeService>();
-
+        private IDataValueEditorFactory DataValueEditorFactory { get; } = Mock.Of<IDataValueEditorFactory>(
+            x=>x.Create<MediaPickerPropertyEditor.MediaPickerPropertyValueEditor>(It.IsAny<DataEditorAttribute>())
+                == new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>(), Mock.Of<IIOHelper>(), new DataEditorAttribute("a", "a", "a")));
         private IIOHelper IOHelper { get; } = Mock.Of<IIOHelper>();
 
-        private ILocalizedTextService LocalizedTextService { get; } = Mock.Of<ILocalizedTextService>();
-
-        private ILocalizationService LocalizationService { get; } = Mock.Of<ILocalizationService>();
-
         private IShortStringHelper ShortStringHelper { get; } = Mock.Of<IShortStringHelper>();
-
-        private IJsonSerializer JsonSerializer { get; } = new JsonNetSerializer();
 
         [Test]
         public void GetAllReferences_All_Variants_With_IDataValueReferenceFactory()
@@ -44,13 +40,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 
             // label does not implement IDataValueReference
             var labelEditor = new LabelPropertyEditor(
-                NullLoggerFactory.Instance,
-                IOHelper,
-                DataTypeService,
-                LocalizedTextService,
-                LocalizationService,
-                ShortStringHelper,
-                JsonSerializer);
+                DataValueEditorFactory,
+                IOHelper);
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(labelEditor.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
@@ -115,13 +106,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 
             // mediaPicker does implement IDataValueReference
             var mediaPicker = new MediaPickerPropertyEditor(
-                NullLoggerFactory.Instance,
-                DataTypeService,
-                LocalizationService,
-                IOHelper,
-                ShortStringHelper,
-                LocalizedTextService,
-                JsonSerializer);
+                DataValueEditorFactory,
+                IOHelper);
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(mediaPicker.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
@@ -186,13 +172,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
 
             // mediaPicker does implement IDataValueReference
             var mediaPicker = new MediaPickerPropertyEditor(
-                NullLoggerFactory.Instance,
-                DataTypeService,
-                LocalizationService,
-                IOHelper,
-                ShortStringHelper,
-                LocalizedTextService,
-                JsonSerializer);
+                DataValueEditorFactory,
+                IOHelper);
             var propertyEditors = new PropertyEditorCollection(new DataEditorCollection(mediaPicker.Yield()));
             var trackedUdi1 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
             var trackedUdi2 = Udi.Create(Constants.UdiEntityType.Media, Guid.NewGuid()).ToString();
