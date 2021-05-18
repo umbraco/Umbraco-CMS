@@ -100,8 +100,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
         public async Task<ActionResult> CompleteInstall()
         {
 
-            await _runtime.StopAsync(_runtime.CancellationToken);
-            await _runtime.StartAsync(_runtime.CancellationToken);
+            await _runtime.RestartAsync();
 
             var identityUser = await _backOfficeUserManager.FindByIdAsync(Core.Constants.Security.SuperUserIdAsString);
             _backOfficeSignInManager.SignInAsync(identityUser, false);

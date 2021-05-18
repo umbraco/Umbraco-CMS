@@ -1,4 +1,5 @@
 using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
 namespace Umbraco.Cms.Core.Services
@@ -13,6 +14,6 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         IRuntimeState State { get; }
 
-        CancellationToken CancellationToken { get; }
+        Task RestartAsync();
     }
 }

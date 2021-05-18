@@ -31,6 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IUmbracoVersion _umbracoVersion;
+        private CancellationToken _cancellationToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
@@ -66,12 +67,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         /// Gets the state of the Umbraco runtime.
         /// </summary>
         public IRuntimeState State { get; }
-        public CancellationToken CancellationToken { get; private set; }
+        public async Task RestartAsync()
+        {
+            await StopAsync(_cancellationToken);
+            await StartAsync(_cancellationToken);
+        }
 
         /// <inheritdoc/>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
-            CancellationToken = cancellationToken;
+            _cancellationToken = cancellationToken;
             StaticApplicationLogging.Initialize(_loggerFactory);
 
             AppDomain.CurrentDomain.UnhandledException += (_, args) =>
