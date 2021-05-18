@@ -25,14 +25,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
         public EmailAddressPropertyEditor(
-            ILoggerFactory loggerFactory,
-            IIOHelper ioHelper,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper)
+            : base(dataValueEditorFactory)
         {
             _ioHelper = ioHelper;
         }

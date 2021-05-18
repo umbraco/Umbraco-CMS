@@ -25,5 +25,9 @@ namespace Umbraco.Cms.Core.Services
             string validationRegExp,
             string isRequiredMessage,
             string validationRegExpMessage);
+
+        public IEnumerable<ValidationResult> ValidatePropertyValue(
+            IPropertyType propertyType,
+            object postedValue);
     }
 }

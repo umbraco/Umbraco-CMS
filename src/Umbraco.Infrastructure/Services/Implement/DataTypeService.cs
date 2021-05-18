@@ -22,6 +22,7 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// </summary>
     public class DataTypeService : RepositoryService, IDataTypeService
     {
+        private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly IDataTypeRepository _dataTypeRepository;
         private readonly IDataTypeContainerRepository _dataTypeContainerRepository;
         private readonly IContentTypeRepository _contentTypeRepository;
@@ -33,7 +34,9 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IJsonSerializer _jsonSerializer;
 
-        public DataTypeService(IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
+        public DataTypeService(
+            IDataValueEditorFactory dataValueEditorFactory,
+            IScopeProvider provider, ILoggerFactory loggerFactory, IEventMessagesFactory eventMessagesFactory,
             IDataTypeRepository dataTypeRepository, IDataTypeContainerRepository dataTypeContainerRepository,
             IAuditRepository auditRepository, IEntityRepository entityRepository, IContentTypeRepository contentTypeRepository,
             IIOHelper ioHelper, ILocalizedTextService localizedTextService, ILocalizationService localizationService,
@@ -41,6 +44,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             IJsonSerializer jsonSerializer)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
+            _dataValueEditorFactory = dataValueEditorFactory;
             _dataTypeRepository = dataTypeRepository;
             _dataTypeContainerRepository = dataTypeContainerRepository;
             _auditRepository = auditRepository;
@@ -340,7 +344,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 .Where(x => x.Editor is MissingPropertyEditor);
             foreach (var dataType in dataTypesWithMissingEditors)
             {
-                dataType.Editor = new LabelPropertyEditor(LoggerFactory, _ioHelper, this, _localizedTextService, _localizationService, _shortStringHelper, _jsonSerializer);
+                dataType.Editor = new LabelPropertyEditor(_dataValueEditorFactory, _ioHelper);
             }
         }
 

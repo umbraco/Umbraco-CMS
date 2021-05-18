@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
@@ -19,13 +20,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class IntegerPropertyEditor : DataEditor
     {
         public IntegerPropertyEditor(
-            ILoggerFactory loggerFactory,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            IShortStringHelper shortStringHelper,
-            ILocalizedTextService localizedTextService,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory)
+            : base(dataValueEditorFactory)
         { }
 
         /// <inheritdoc />

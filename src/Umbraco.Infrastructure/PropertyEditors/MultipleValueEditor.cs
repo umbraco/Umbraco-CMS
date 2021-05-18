@@ -6,6 +6,8 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
@@ -22,20 +24,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </remarks>
     public class MultipleValueEditor : DataValueEditor
     {
-        private readonly ILogger<MultipleValueEditor> _logger;
-
         public MultipleValueEditor(
-            ILogger<MultipleValueEditor> logger,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
             DataEditorAttribute attribute
             )
-            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
+            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
-            _logger = logger;
         }
 
         /// <summary>

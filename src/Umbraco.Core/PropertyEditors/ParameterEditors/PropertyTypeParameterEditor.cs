@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -13,13 +14,8 @@ namespace Umbraco.Cms.Core.PropertyEditors.ParameterEditors
     public class PropertyTypeParameterEditor : DataEditor
     {
         public PropertyTypeParameterEditor(
-            ILoggerFactory loggerFactory,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory)
+            : base(dataValueEditorFactory)
         {
             // configure
             DefaultConfiguration.Add("multiple", "0");

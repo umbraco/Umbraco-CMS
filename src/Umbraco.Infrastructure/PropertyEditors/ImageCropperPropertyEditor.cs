@@ -49,18 +49,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
         public ImageCropperPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
             ILoggerFactory loggerFactory,
             MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
             IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper,
-            ILocalizedTextService localizedTextService,
             UploadAutoFillProperties uploadAutoFillProperties,
-            IJsonSerializer jsonSerializer,
             IContentService contentService)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            : base(dataValueEditorFactory)
         {
             _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
@@ -86,7 +83,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, LoggerFactory.CreateLogger<ImageCropperPropertyValueEditor>(), _mediaFileManager, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _contentSettings, JsonSerializer);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<ImageCropperPropertyValueEditor>(Attribute);
 
         /// <summary>
         /// Creates the corresponding preValue editor.

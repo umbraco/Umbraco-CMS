@@ -20,6 +20,7 @@ using Umbraco.Cms.Core.ContentApps;
 using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
@@ -468,7 +469,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.BackOffice.Controllers
             IDataEditor dataEditor = Mock.Of<IDataEditor>(
                 x => x.Type == EditorType.PropertyValue
                      && x.Alias == Constants.PropertyEditors.Aliases.Label);
-            Mock.Get(dataEditor).Setup(x => x.GetValueEditor()).Returns(new TextOnlyValueEditor(Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"), textService.Object, Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>()));
+            Mock.Get(dataEditor).Setup(x => x.GetValueEditor()).Returns(new TextOnlyValueEditor( new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"), textService.Object, Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>(), Mock.Of<IIOHelper>()));
 
             var propertyEditorCollection = new PropertyEditorCollection(new DataEditorCollection(new[] { dataEditor }));
 

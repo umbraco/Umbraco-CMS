@@ -34,12 +34,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(
                 new VoidEditor(
-                    Mock.Of<ILoggerFactory>(),
-                    dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(),
-                    Mock.Of<ILocalizedTextService>(),
-                    Mock.Of<IShortStringHelper>(),
-                    new JsonNetSerializer()), serializer)
+                    Mock.Of<IDataValueEditorFactory>()), serializer)
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -120,12 +115,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(
                 new VoidEditor(
-                    Mock.Of<ILoggerFactory>(),
-                    dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(),
-                    Mock.Of<ILocalizedTextService>(),
-                    Mock.Of<IShortStringHelper>(),
-                    new JsonNetSerializer()), serializer)
+                    Mock.Of<IDataValueEditorFactory>()), serializer)
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 

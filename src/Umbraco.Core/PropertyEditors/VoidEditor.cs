@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -26,13 +27,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// it is appended to the alias. Eg if the suffix is "Foo" the alias is "Umbraco.Void.Foo".</remarks>
         public VoidEditor(
             string aliasSuffix,
-            ILoggerFactory loggerFactory,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory)
+            : base(dataValueEditorFactory)
         {
             Alias = "Umbraco.Void";
             if (string.IsNullOrWhiteSpace(aliasSuffix)) return;
@@ -44,8 +40,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         /// <param name="loggerFactory">A logger factory.</param>
         /// <remarks>The alias of the editor is "Umbraco.Void".</remarks>
-        public VoidEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService,  ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer)
-            : this(null, loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+        public VoidEditor(
+            IDataValueEditorFactory dataValueEditorFactory)
+            : this(null, dataValueEditorFactory)
         { }
     }
 }

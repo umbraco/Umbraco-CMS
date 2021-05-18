@@ -21,34 +21,22 @@ namespace Umbraco.Cms.Core.PropertyEditors
         Group = Constants.PropertyEditors.Groups.Common)]
     public class TextboxPropertyEditor : DataEditor
     {
-        private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
-        private readonly IShortStringHelper _shortStringHelper;
-        private readonly ILocalizedTextService _localizedTextService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TextboxPropertyEditor"/> class.
         /// </summary>
         public TextboxPropertyEditor(
-            ILoggerFactory loggerFactory,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper,
-            ILocalizedTextService localizedTextService,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper)
+            : base(dataValueEditorFactory)
         {
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
             _ioHelper = ioHelper;
-            _shortStringHelper = shortStringHelper;
-            _localizedTextService = localizedTextService;
         }
 
         /// <inheritdoc/>
-        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(DataTypeService, LocalizationService, Attribute, LocalizedTextService, ShortStringHelper, JsonSerializer);
+        protected override IDataValueEditor CreateValueEditor() =>
+            DataValueEditorFactory.Create<TextOnlyValueEditor>(Attribute);
 
         /// <inheritdoc/>
         protected override IConfigurationEditor CreateConfigurationEditor() => new TextboxConfigurationEditor(_ioHelper);

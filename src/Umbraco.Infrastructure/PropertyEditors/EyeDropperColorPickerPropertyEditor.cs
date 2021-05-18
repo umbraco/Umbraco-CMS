@@ -17,22 +17,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly IIOHelper _ioHelper;
 
         public EyeDropperColorPickerPropertyEditor(
-            ILoggerFactory loggerFactory,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer,
+            IDataValueEditorFactory dataValueEditorFactory,
             IIOHelper ioHelper,
             EditorType type = EditorType.PropertyValue)
-            : base(
-                loggerFactory,
-                dataTypeService,
-                localizationService,
-                localizedTextService,
-                shortStringHelper,
-                jsonSerializer,
-                type)
+            : base(dataValueEditorFactory, type)
         {
             _ioHelper = ioHelper;
         }

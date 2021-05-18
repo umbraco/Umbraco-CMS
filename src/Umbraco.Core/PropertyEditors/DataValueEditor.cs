@@ -6,6 +6,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
@@ -25,15 +27,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IJsonSerializer _jsonSerializer;
-        protected IDataTypeService DataTypeService { get; }
-        protected ILocalizationService LocalizationService { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
         public DataValueEditor(
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer) // for tests, and manifest
@@ -43,19 +41,16 @@ namespace Umbraco.Cms.Core.PropertyEditors
             _jsonSerializer = jsonSerializer;
             ValueType = ValueTypes.String;
             Validators = new List<IValueValidator>();
-            DataTypeService = dataTypeService;
-            LocalizationService = localizationService;
         }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="DataValueEditor"/> class.
         /// </summary>
         public DataValueEditor(
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
             DataEditorAttribute attribute)
         {
             if (attribute == null) throw new ArgumentNullException(nameof(attribute));
@@ -67,12 +62,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
             if (string.IsNullOrWhiteSpace(view))
                 throw new ArgumentException("The attribute does not specify a view.", nameof(attribute));
 
+            if (view.StartsWith("~/"))
+            {
+                view = ioHelper.ResolveRelativeOrVirtualUrl(view);
+            }
+
             View = view;
             ValueType = attribute.ValueType;
             HideLabel = attribute.HideLabel;
-
-            DataTypeService = dataTypeService;
-            LocalizationService = localizationService;
         }
 
         /// <summary>
@@ -302,8 +299,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Converts a property to Xml fragments.
         /// </summary>
-        public IEnumerable<XElement> ConvertDbToXml(IProperty property, IDataTypeService dataTypeService,
-            ILocalizationService localizationService, bool published)
+        public IEnumerable<XElement> ConvertDbToXml(IProperty property, bool published)
         {
             published &= property.PropertyType.SupportsPublishing;
 
@@ -321,7 +317,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 if (pvalue.Segment != null)
                     xElement.Add(new XAttribute("segment", pvalue.Segment));
 
-                var xValue = ConvertDbToXml(property.PropertyType, value, dataTypeService);
+                var xValue = ConvertDbToXml(property.PropertyType, value);
                 xElement.Add(xValue);
 
                 yield return xElement;
@@ -337,12 +333,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <para>Returns an XText or XCData instance which must be wrapped in a element.</para>
         /// <para>If the value is empty we will not return as CDATA since that will just take up more space in the file.</para>
         /// </remarks>
-        public XNode ConvertDbToXml(IPropertyType propertyType, object value, IDataTypeService dataTypeService)
+        public XNode ConvertDbToXml(IPropertyType propertyType, object value)
         {
             //check for null or empty value, we don't want to return CDATA if that is the case
             if (value == null || value.ToString().IsNullOrWhiteSpace())
             {
-                return new XText(ConvertDbToString(propertyType, value, dataTypeService));
+                return new XText(ConvertDbToString(propertyType, value));
             }
 
             switch (ValueTypes.ToStorageType(ValueType))
@@ -350,11 +346,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 case ValueStorageType.Date:
                 case ValueStorageType.Integer:
                 case ValueStorageType.Decimal:
-                    return new XText(ConvertDbToString(propertyType, value, dataTypeService));
+                    return new XText(ConvertDbToString(propertyType, value));
                 case ValueStorageType.Nvarchar:
                 case ValueStorageType.Ntext:
                     //put text in cdata
-                    return new XCData(ConvertDbToString(propertyType, value, dataTypeService));
+                    return new XCData(ConvertDbToString(propertyType, value));
                 default:
                     throw new ArgumentOutOfRangeException();
             }
@@ -363,7 +359,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Converts a property value to a string.
         /// </summary>
-        public virtual string ConvertDbToString(IPropertyType propertyType, object value, IDataTypeService dataTypeService)
+        public virtual string ConvertDbToString(IPropertyType propertyType, object value)
         {
             if (value == null)
                 return string.Empty;

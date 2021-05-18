@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -582,18 +583,15 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Models
             IIOHelper ioHelper = Mock.Of<IIOHelper>();
             IDataTypeService dataTypeService = Mock.Of<IDataTypeService>();
             ILocalizedTextService localizedTextService = Mock.Of<ILocalizedTextService>();
-            ILocalizationService localizationService = Mock.Of<ILocalizationService>();
-            IShortStringHelper shortStringHelper = Mock.Of<IShortStringHelper>();
-            IJsonSerializer jsonSerializer = Mock.Of<IJsonSerializer>();
+
+            var attribute = new DataEditorAttribute("a", "a", "a");
+            IDataValueEditorFactory dataValueEditorFactory = Mock.Of<IDataValueEditorFactory>(x
+                => x.Create<TextOnlyValueEditor>(It.IsAny<DataEditorAttribute>()) == new TextOnlyValueEditor(attribute, localizedTextService, Mock.Of<IShortStringHelper>(), new JsonNetSerializer(), Mock.Of<IIOHelper>()));
+
 
             var textBoxEditor = new TextboxPropertyEditor(
-                NullLoggerFactory.Instance,
-                dataTypeService,
-                localizationService,
-                ioHelper,
-                shortStringHelper,
-                localizedTextService,
-                jsonSerializer);
+                dataValueEditorFactory,
+                ioHelper);
 
             var serializer = new ConfigurationEditorJsonSerializer();
 

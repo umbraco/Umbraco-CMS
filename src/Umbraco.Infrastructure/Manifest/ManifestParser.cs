@@ -21,12 +21,13 @@ namespace Umbraco.Cms.Core.Manifest
     /// </summary>
     public class ManifestParser : IManifestParser
     {
-        private readonly ILoggerFactory _loggerFactory;
+
         private readonly IIOHelper _ioHelper;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IJsonSerializer _jsonSerializer;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
         private readonly IAppPolicyCache _cache;
@@ -53,13 +54,14 @@ namespace Umbraco.Cms.Core.Manifest
             ILocalizationService localizationService,
             IJsonSerializer jsonSerializer,
             ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper)
+            IShortStringHelper shortStringHelper,
+            IDataValueEditorFactory dataValueEditorFactory)
             : this(appCaches, validators, filters, "~/App_Plugins", logger, loggerFactory, ioHelper, hostingEnvironment, dataTypeService, localizationService)
         {
-            _loggerFactory = loggerFactory;
             _jsonSerializer = jsonSerializer;
             _localizedTextService = localizedTextService;
             _shortStringHelper = shortStringHelper;
+            _dataValueEditorFactory = dataValueEditorFactory;
         }
 
         /// <summary>
@@ -76,7 +78,6 @@ namespace Umbraco.Cms.Core.Manifest
             if (path == null) throw new ArgumentNullException(nameof(path));
             if (string.IsNullOrWhiteSpace(path)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(path));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _loggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
             _ioHelper = ioHelper;
             _hostingEnvironment = hostingEnvironment;
 
@@ -197,7 +198,7 @@ namespace Umbraco.Cms.Core.Manifest
             if (string.IsNullOrWhiteSpace(text)) throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(text));
 
             var manifest = JsonConvert.DeserializeObject<PackageManifest>(text,
-                new DataEditorConverter(_loggerFactory, _ioHelper, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper, _jsonSerializer),
+                new DataEditorConverter(_dataValueEditorFactory, _ioHelper, _localizedTextService, _shortStringHelper, _jsonSerializer),
                 new ValueValidatorConverter(_validators),
                 new DashboardAccessRuleConverter());
 
