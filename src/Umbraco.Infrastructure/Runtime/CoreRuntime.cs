@@ -67,6 +67,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         /// Gets the state of the Umbraco runtime.
         /// </summary>
         public IRuntimeState State { get; }
+
+        /// <inheritdoc/>
         public async Task RestartAsync()
         {
             await StopAsync(_cancellationToken);

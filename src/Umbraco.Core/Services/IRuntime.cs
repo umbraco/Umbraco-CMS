@@ -14,6 +14,9 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         IRuntimeState State { get; }
 
+        /// <summary>
+        /// Stops and Starts the runtime using the original cancellation token.
+        /// </summary>
         Task RestartAsync();
     }
 }
