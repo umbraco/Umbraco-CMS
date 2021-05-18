@@ -8,7 +8,9 @@
  * 
  */
  
-function DashboardController($scope, $routeParams, dashboardResource, localizationService) {
+function DashboardController($scope, $routeParams, $location, dashboardResource, localizationService) {
+
+    const DASHBOARD_QUERY_PARAM = 'dashboard';
 
     $scope.page = {};
     $scope.page.nameLocked = true;
@@ -20,13 +22,8 @@ function DashboardController($scope, $routeParams, dashboardResource, localizati
     });
     
     dashboardResource.getDashboard($routeParams.section).then(function(tabs){
-        $scope.dashboard.tabs = tabs;
-        
-        // set first tab to active
-        if($scope.dashboard.tabs && $scope.dashboard.tabs.length > 0) {
-            $scope.dashboard.tabs[0].active = true;
-        }
-
+        $scope.dashboard.tabs = tabs;        
+        initActiveTab();
         $scope.page.loading = false;
     });
 
@@ -34,8 +31,28 @@ function DashboardController($scope, $routeParams, dashboardResource, localizati
         $scope.dashboard.tabs.forEach(function(tab) {
             tab.active = false;
         });
+
         tab.active = true;
+
+        $location.search(DASHBOARD_QUERY_PARAM, tab.alias);
     };
+
+    function initActiveTab () {
+        if (!$scope.dashboard.tabs) {
+            return;
+        }
+
+        // check the query param for a dashboard alias
+        const dashboardAlias = $location.search()[DASHBOARD_QUERY_PARAM];
+        const dashboardIndex = $scope.dashboard.tabs.findIndex(tab => tab.alias === dashboardAlias);
+        // set the first dashboard to active if there is no query param of we can't find a matching dashboard for the alias
+        const activeIndex = dashboardIndex !== -1 ? dashboardIndex : 0;
+
+        const tab = $scope.dashboard.tabs[activeIndex];
+        
+        tab.active = true;
+        $location.search(DASHBOARD_QUERY_PARAM, tab.alias);
+    }
 
 }
 
