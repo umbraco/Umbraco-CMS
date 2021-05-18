@@ -1,4 +1,6 @@
 ﻿using System;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Serialization;
@@ -15,13 +17,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
     internal class DateValueEditor : DataValueEditor
     {
         public DateValueEditor(
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
             DataEditorAttribute attribute)
-            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
+            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             Validators.Add(new DateTimeValidator());
         }

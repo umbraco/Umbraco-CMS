@@ -7,6 +7,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -30,30 +31,34 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         private readonly ManifestValueValidatorCollection _validators;
         private readonly IIOHelper _ioHelper;
+        private readonly ILocalizedTextService _localizedTextService;
 
         public TagsPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
             ManifestValueValidatorCollection validators,
-            ILoggerFactory loggerFactory,
             IIOHelper ioHelper,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            ILocalizedTextService localizedTextService)
+            : base(dataValueEditorFactory)
         {
             _validators = validators;
             _ioHelper = ioHelper;
+            _localizedTextService = localizedTextService;
         }
 
-        protected override IDataValueEditor CreateValueEditor() => new TagPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer, Attribute);
+        protected override IDataValueEditor CreateValueEditor() =>
+            DataValueEditorFactory.Create<TagPropertyValueEditor>(Attribute);
 
-        protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators, _ioHelper, LocalizedTextService);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new TagConfigurationEditor(_validators, _ioHelper, _localizedTextService);
 
         internal class TagPropertyValueEditor : DataValueEditor
         {
-            public TagPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer, DataEditorAttribute attribute)
-                : base(dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer, attribute)
+            public TagPropertyValueEditor(
+                ILocalizedTextService localizedTextService,
+                IShortStringHelper shortStringHelper,
+                IJsonSerializer jsonSerializer,
+                IIOHelper ioHelper,
+                DataEditorAttribute attribute)
+                : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             { }
 
             /// <inheritdoc />

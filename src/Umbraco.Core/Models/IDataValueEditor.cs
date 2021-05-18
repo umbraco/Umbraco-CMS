@@ -3,7 +3,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.PropertyEditors;
-using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Core.Models
 {
@@ -69,21 +68,18 @@ namespace Umbraco.Cms.Core.Models
         /// Used for serializing an <see cref="IContent"/> item for packaging
         /// </summary>
         /// <param name="property"></param>
-        /// <param name="dataTypeService"></param>
-        /// <param name="localizationService"></param>
         /// <param name="published"></param>
         /// <returns></returns>
-        IEnumerable<XElement> ConvertDbToXml(IProperty property, IDataTypeService dataTypeService, ILocalizationService localizationService, bool published);
+        IEnumerable<XElement> ConvertDbToXml(IProperty property, bool published);
 
         /// <summary>
         /// Used for serializing an <see cref="IContent"/> item for packaging
         /// </summary>
         /// <param name="propertyType"></param>
         /// <param name="value"></param>
-        /// <param name="dataTypeService"></param>
         /// <returns></returns>
-        XNode ConvertDbToXml(IPropertyType propertyType, object value, IDataTypeService dataTypeService);
+        XNode ConvertDbToXml(IPropertyType propertyType, object value);
 
-        string ConvertDbToString(IPropertyType propertyType, object value, IDataTypeService dataTypeService);
+        string ConvertDbToString(IPropertyType propertyType, object value);
     }
 }

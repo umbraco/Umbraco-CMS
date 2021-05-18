@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
@@ -40,19 +41,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public GridPropertyEditor(
-            ILoggerFactory loggerFactory,
+            IDataValueEditorFactory dataValueEditorFactory,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
             HtmlImageSourceParser imageSourceParser,
             RichTextEditorPastedImages pastedImages,
             HtmlLocalLinkParser localLinkParser,
             IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper,
-            IImageUrlGenerator imageUrlGenerator,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            IImageUrlGenerator imageUrlGenerator)
+            : base(dataValueEditorFactory)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _ioHelper = ioHelper;
@@ -68,7 +64,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Overridden to ensure that the value is validated
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new GridPropertyValueEditor(Attribute, _backOfficeSecurityAccessor, DataTypeService, LocalizationService, LocalizedTextService, _imageSourceParser, _pastedImages, _localLinkParser, ShortStringHelper, _imageUrlGenerator, JsonSerializer);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<GridPropertyValueEditor>(Attribute);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new GridConfigurationEditor(_ioHelper);
 
@@ -82,24 +78,25 @@ namespace Umbraco.Cms.Core.PropertyEditors
             private readonly IImageUrlGenerator _imageUrlGenerator;
 
             public GridPropertyValueEditor(
+                IDataValueEditorFactory dataValueEditorFactory,
                 DataEditorAttribute attribute,
                 IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-                IDataTypeService dataTypeService,
-                ILocalizationService localizationService,
                 ILocalizedTextService localizedTextService,
                 HtmlImageSourceParser imageSourceParser,
                 RichTextEditorPastedImages pastedImages,
-                HtmlLocalLinkParser localLinkParser,
                 IShortStringHelper shortStringHelper,
                 IImageUrlGenerator imageUrlGenerator,
-                IJsonSerializer jsonSerializer)
-                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
+                IJsonSerializer jsonSerializer,
+                IIOHelper ioHelper)
+                : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             {
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
                 _imageSourceParser = imageSourceParser;
                 _pastedImages = pastedImages;
-                _richTextPropertyValueEditor = new RichTextPropertyEditor.RichTextPropertyValueEditor(attribute, backOfficeSecurityAccessor, dataTypeService, localizationService, localizedTextService, shortStringHelper, imageSourceParser, localLinkParser, pastedImages, imageUrlGenerator, jsonSerializer);
-                _mediaPickerPropertyValueEditor = new MediaPickerPropertyEditor.MediaPickerPropertyValueEditor(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute);
+                _richTextPropertyValueEditor =
+                    dataValueEditorFactory.Create<RichTextPropertyEditor.RichTextPropertyValueEditor>(attribute);
+                _mediaPickerPropertyValueEditor =
+                    dataValueEditorFactory.Create<MediaPickerPropertyEditor.MediaPickerPropertyValueEditor>(attribute);
                 _imageUrlGenerator = imageUrlGenerator;
             }
 

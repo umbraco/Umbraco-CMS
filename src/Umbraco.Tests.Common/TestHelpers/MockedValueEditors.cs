@@ -2,6 +2,8 @@
 // See LICENSE for more details.
 
 using Moq;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
@@ -16,11 +18,10 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
             var valueType = ValueTypes.IsValue(name) ? name : ValueTypes.String;
 
             return new DataValueEditor(
-                Mock.Of<IDataTypeService>(),
-                Mock.Of<ILocalizationService>(),
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IShortStringHelper>(),
                 new JsonNetSerializer(),
+                Mock.Of<IIOHelper>(),
                 new DataEditorAttribute(name, name, name)
                 {
                     ValueType = valueType

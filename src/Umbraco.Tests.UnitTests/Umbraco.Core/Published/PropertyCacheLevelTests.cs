@@ -35,16 +35,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             });
 
             var configurationEditorJsonSerializer = new ConfigurationEditorJsonSerializer();
-            var jsonSerializer = new JsonNetSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(
                 new VoidEditor(
-                    NullLoggerFactory.Instance,
-                    dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(),
-                    Mock.Of<ILocalizedTextService>(),
-                    Mock.Of<IShortStringHelper>(),
-                    jsonSerializer), configurationEditorJsonSerializer)
+                    Mock.Of<IDataValueEditorFactory>()), configurationEditorJsonSerializer)
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -133,12 +127,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(
                 new VoidEditor(
-                    NullLoggerFactory.Instance,
-                    dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(),
-                    Mock.Of<ILocalizedTextService>(),
-                    Mock.Of<IShortStringHelper>(),
-                    new JsonNetSerializer()), new ConfigurationEditorJsonSerializer())
+                    Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer())
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
@@ -218,13 +207,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Published
             var dataTypeServiceMock = new Mock<IDataTypeService>();
             var dataType = new DataType(
                     new VoidEditor(
-                        NullLoggerFactory.Instance,
-                        dataTypeServiceMock.Object,
-                        Mock.Of<ILocalizationService>(),
-                        Mock.Of<ILocalizedTextService>(),
-                        Mock.Of<IShortStringHelper>(),
-                        new JsonNetSerializer()),
-                    new ConfigurationEditorJsonSerializer())
+                        Mock.Of<IDataValueEditorFactory>()), new ConfigurationEditorJsonSerializer())
                 { Id = 1 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 

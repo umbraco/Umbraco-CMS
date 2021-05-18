@@ -27,20 +27,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Initializes a new instance of the <see cref="ListViewPropertyEditor"/> class.
         /// </summary>
         public ListViewPropertyEditor(
-            ILoggerFactory loggerFactory,
-            IIOHelper iioHelper,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : base(
-                loggerFactory,
-                dataTypeService,
-                localizationService,
-                localizedTextService,
-                shortStringHelper,
-                jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper iioHelper)
+            : base(dataValueEditorFactory)
         {
             _iioHelper = iioHelper;
         }

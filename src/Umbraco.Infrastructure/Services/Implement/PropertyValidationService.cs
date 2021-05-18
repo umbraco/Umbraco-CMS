@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             _textService = textService;
         }
 
+        /// <inheritdoc />
         public IEnumerable<ValidationResult> ValidatePropertyValue(
            IPropertyType propertyType,
            object postedValue)
@@ -35,6 +36,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return ValidatePropertyValue(editor, dataType, postedValue, propertyType.Mandatory, propertyType.ValidationRegExp, propertyType.MandatoryMessage, propertyType.ValidationRegExpMessage);
         }
 
+        /// <inheritdoc />
         public IEnumerable<ValidationResult> ValidatePropertyValue(
             IDataEditor editor,
             IDataType dataType,

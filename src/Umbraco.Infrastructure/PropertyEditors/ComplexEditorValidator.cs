@@ -18,11 +18,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
     /// </summary>
     public abstract class ComplexEditorValidator : IValueValidator
     {
-        private readonly PropertyValidationService _propertyValidationService;
+        private readonly IPropertyValidationService _propertyValidationService;
 
-        public ComplexEditorValidator(PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService)
+        public ComplexEditorValidator(IPropertyValidationService propertyValidationService)
         {
-            _propertyValidationService = new PropertyValidationService(propertyEditors, dataTypeService, textService);
+            _propertyValidationService = propertyValidationService;
         }
 
         /// <summary>

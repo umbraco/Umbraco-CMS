@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -24,24 +25,13 @@ namespace Umbraco.Cms.Core.PropertyEditors
         Group = Constants.PropertyEditors.Groups.Pickers)]
     public class ContentPickerPropertyEditor : DataEditor
     {
-        private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;
-        private readonly ILocalizedTextService _localizedTextService;
         private readonly IIOHelper _ioHelper;
 
         public ContentPickerPropertyEditor(
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            ILoggerFactory loggerFactory,
-            IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService,localizationService,localizedTextService, shortStringHelper, jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper)
+            : base(dataValueEditorFactory)
         {
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
-            _localizedTextService = localizedTextService;
             _ioHelper = ioHelper;
         }
 
@@ -50,12 +40,17 @@ namespace Umbraco.Cms.Core.PropertyEditors
             return new ContentPickerConfigurationEditor(_ioHelper);
         }
 
-        protected override IDataValueEditor CreateValueEditor() => new ContentPickerPropertyValueEditor(_dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, JsonSerializer, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<ContentPickerPropertyValueEditor>(Attribute);
 
         internal class ContentPickerPropertyValueEditor  : DataValueEditor, IDataValueReference
         {
-            public ContentPickerPropertyValueEditor(IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer, DataEditorAttribute attribute)
-                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
+            public ContentPickerPropertyValueEditor(
+                ILocalizedTextService localizedTextService,
+                IShortStringHelper shortStringHelper,
+                IJsonSerializer jsonSerializer,
+                IIOHelper ioHelper,
+                DataEditorAttribute attribute)
+                : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             {
             }
 

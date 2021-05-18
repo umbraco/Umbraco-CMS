@@ -3,9 +3,11 @@
 
 using System;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -26,22 +28,24 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
         private readonly MediaFileManager _mediaFileManager;
         private readonly ContentSettings _contentSettings;
+        private readonly IDataTypeService _dataTypeService;
 
         public ImageCropperPropertyValueEditor(
             DataEditorAttribute attribute,
             ILogger<ImageCropperPropertyValueEditor> logger,
             MediaFileManager mediaFileSystem,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
-            ContentSettings contentSettings,
-            IJsonSerializer jsonSerializer)
-            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
+            IOptions<ContentSettings> contentSettings,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            IDataTypeService dataTypeService)
+            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _contentSettings = contentSettings.Value;
+            _dataTypeService = dataTypeService;
         }
 
         /// <summary>
@@ -63,7 +67,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 value = new ImageCropperValue { Src = val.ToString() };
             }
 
-            var dataType = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            var dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
             if (dataType?.Configuration != null)
                 value.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
 
@@ -177,7 +181,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         }
 
 
-        public override string ConvertDbToString(IPropertyType propertyType,  object value, IDataTypeService dataTypeService)
+        public override string ConvertDbToString(IPropertyType propertyType,  object value)
         {
             if (value == null || string.IsNullOrEmpty(value.ToString()))
                 return null;
@@ -188,7 +192,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 return val;
 
             // more magic here ;-(
-            var configuration = DataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
+            var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
             var crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
             return JsonConvert.SerializeObject(new

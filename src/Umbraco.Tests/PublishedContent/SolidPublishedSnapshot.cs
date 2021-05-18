@@ -416,8 +416,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), serializer)
+            var dataType = new DataType(new VoidEditor(Mock.Of<IDataValueEditorFactory>()), serializer)
                 { Id = 666 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 
