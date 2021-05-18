@@ -22,11 +22,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
     [TestFixture]
     public class PreviewRoutesTests
     {
-        [TestCase(RuntimeLevel.Install)]
         [TestCase(RuntimeLevel.BootFailed)]
         [TestCase(RuntimeLevel.Unknown)]
         [TestCase(RuntimeLevel.Boot)]
-        [TestCase(RuntimeLevel.Upgrade)]
         public void RuntimeState_No_Routes(RuntimeLevel level)
         {
             PreviewRoutes routes = GetRoutes(level);
@@ -36,10 +34,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
             Assert.AreEqual(0, endpoints.DataSources.Count);
         }
 
-        [Test]
-        public void RuntimeState_Run()
+        [TestCase(RuntimeLevel.Run)]
+        [TestCase(RuntimeLevel.Upgrade)]
+        [TestCase(RuntimeLevel.Install)]
+        public void RuntimeState_All_Routes(RuntimeLevel level)
         {
-            PreviewRoutes routes = GetRoutes(RuntimeLevel.Run);
+            PreviewRoutes routes = GetRoutes(level);
             var endpoints = new TestRouteBuilder();
             routes.CreateRoutes(endpoints);
 
