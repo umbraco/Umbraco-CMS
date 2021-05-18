@@ -616,12 +616,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="str">Refers to itself</param>
         /// <returns>The hashed string</returns>
-        public static string GenerateHash(this string str)
-        {
-            return CryptoConfig.AllowOnlyFipsAlgorithms
-                ? str.ToSHA1()
-                : str.ToMd5();
-        }
+        public static string GenerateHash(this string str) => str.ToSHA1();
 
         /// <summary>
         /// Generate a hash of a string based on the specified hash algorithm.
@@ -632,30 +627,14 @@ namespace Umbraco.Extensions
         /// The hashed string.
         /// </returns>
         public static string GenerateHash<T>(this string str)
-            where T : HashAlgorithm
-        {
-            return str.GenerateHash(typeof(T).FullName);
-        }
-
-        /// <summary>
-        /// Converts the string to MD5
-        /// </summary>
-        /// <param name="stringToConvert">Refers to itself</param>
-        /// <returns>The MD5 hashed string</returns>
-        public static string ToMd5(this string stringToConvert)
-        {
-            return stringToConvert.GenerateHash("MD5");
-        }
+            where T : HashAlgorithm => str.GenerateHash(typeof(T).FullName);
 
         /// <summary>
         /// Converts the string to SHA1
         /// </summary>
         /// <param name="stringToConvert">refers to itself</param>
         /// <returns>The SHA1 hashed string</returns>
-        public static string ToSHA1(this string stringToConvert)
-        {
-            return stringToConvert.GenerateHash("SHA1");
-        }
+        public static string ToSHA1(this string stringToConvert) => stringToConvert.GenerateHash("SHA1");
 
         /// <summary>Generate a hash of a string based on the hashType passed in
         /// </summary>

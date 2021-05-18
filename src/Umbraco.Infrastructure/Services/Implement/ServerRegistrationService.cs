@@ -154,7 +154,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <summary>
         /// Gets the local server identity.
         /// </summary>
-        private string GetCurrentServerIdentity() => NetworkHelper.MachineName // eg DOMAIN\SERVER
+        private string GetCurrentServerIdentity() => Environment.MachineName // eg DOMAIN\SERVER
                                                + "/" + _hostingEnvironment.ApplicationId; // eg /LM/S3SVC/11/ROOT;
     }
 }

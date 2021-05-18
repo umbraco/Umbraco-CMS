@@ -316,7 +316,7 @@ namespace Umbraco.Cms.Core.Composing
         /// <returns></returns>
         private string GetFileBasePath()
         {
-            var fileBasePath = Path.Combine(_localTempPath.FullName, "TypesCache", "umbraco-types." + NetworkHelper.FileSafeMachineName);
+            var fileBasePath = Path.Combine(_localTempPath.FullName, "TypesCache", "umbraco-types." + EnvironmentHelper.FileSafeMachineName);
 
             // ensure that the folder exists
             var directory = Path.GetDirectoryName(fileBasePath);

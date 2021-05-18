@@ -1,4 +1,4 @@
-﻿using Examine;
+using Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine
 {
@@ -9,8 +9,11 @@ namespace Umbraco.Cms.Infrastructure.Examine
     {
         public virtual IIndexDiagnostics Create(IIndex index)
         {
-            if (!(index is IIndexDiagnostics indexDiag))
+            if (index is not IIndexDiagnostics indexDiag)
+            {
                 indexDiag = new GenericIndexDiagnostics(index);
+            }
+
             return indexDiag;
         }
     }

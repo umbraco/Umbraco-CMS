@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Examine;
 
 namespace Umbraco.Cms.Infrastructure.Examine
@@ -6,7 +6,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
     /// <summary>
     /// A Marker interface for defining an Umbraco indexer
     /// </summary>
-    public interface IUmbracoIndex : IIndex
+    public interface IUmbracoIndex : IIndex, IIndexStats
     {
         /// <summary>
         /// When set to true Umbraco will keep the index in sync with Umbraco data automatically
@@ -22,11 +22,5 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// * non-published Variants
         /// </remarks>
         bool PublishedValuesOnly { get; }
-
-        /// <summary>
-        /// Returns a list of all indexed fields
-        /// </summary>
-        /// <returns></returns>
-        IEnumerable<string> GetFields();
     }
 }

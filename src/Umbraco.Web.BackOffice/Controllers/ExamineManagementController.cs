@@ -1,14 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Examine;
+using Examine.Search;
+using Lucene.Net.QueryParsers.Classic;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
@@ -21,18 +23,19 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     {
         private readonly IExamineManager _examineManager;
         private readonly ILogger<ExamineManagementController> _logger;
-        private readonly IIOHelper _ioHelper;
         private readonly IIndexDiagnosticsFactory _indexDiagnosticsFactory;
         private readonly IAppPolicyCache _runtimeCache;
-        private readonly IndexRebuilder _indexRebuilder;
+        private readonly IIndexRebuilder _indexRebuilder;
 
-        public ExamineManagementController(IExamineManager examineManager, ILogger<ExamineManagementController> logger, IIOHelper ioHelper, IIndexDiagnosticsFactory indexDiagnosticsFactory,
+        public ExamineManagementController(
+            IExamineManager examineManager,
+            ILogger<ExamineManagementController> logger,
+            IIndexDiagnosticsFactory indexDiagnosticsFactory,
             AppCaches appCaches,
-            IndexRebuilder indexRebuilder)
+            IIndexRebuilder indexRebuilder)
         {
             _examineManager = examineManager;
             _logger = logger;
-            _ioHelper = ioHelper;
             _indexDiagnosticsFactory = indexDiagnosticsFactory;
             _runtimeCache = appCaches.RuntimeCache;
             _indexRebuilder = indexRebuilder;
@@ -43,9 +46,9 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// </summary>
         /// <returns></returns>
         public IEnumerable<ExamineIndexModel> GetIndexerDetails()
-        {
-            return _examineManager.Indexes.Select(CreateModel).OrderBy(x => x.Name.TrimEnd("Indexer"));
-        }
+            => _examineManager.Indexes
+                .Select(index => CreateModel(index))
+                .OrderBy(examineIndexModel => examineIndexModel.Name.TrimEnd("Indexer"));
 
         /// <summary>
         /// Get the details for searchers
@@ -61,15 +64,32 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         public ActionResult<SearchResults> GetSearchResults(string searcherName, string query, int pageIndex = 0, int pageSize = 20)
         {
+            query = query.Trim();
+
             if (query.IsNullOrWhiteSpace())
+            {
                 return SearchResults.Empty();
+            }
 
             var msg = ValidateSearcher(searcherName, out var searcher);
             if (!msg.IsSuccessStatusCode())
                 return msg;
 
+            ISearchResults results;
+
             // NativeQuery will work for a single word/phrase too (but depends on the implementation) the lucene one will work.
-            var results = searcher.CreateQuery().NativeQuery(query).Execute(maxResults: pageSize * (pageIndex + 1));
+            try
+            {
+                results = searcher
+                        .CreateQuery()
+                        .NativeQuery(query)
+                        .Execute(QueryOptions.SkipTake(pageSize * pageIndex, pageSize));
+            }
+            catch (ParseException)
+            {
+                // will occur if the query parser cannot parse this (i.e. starts with a *)
+                return SearchResults.Empty();
+            }
 
             var pagedResults = results.Skip(pageIndex * pageSize);
 
@@ -99,11 +119,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             var validate = ValidateIndex(indexName, out var index);
 
             if (!validate.IsSuccessStatusCode())
+            {
                 return validate;
+            }
 
             validate = ValidatePopulator(index);
             if (!validate.IsSuccessStatusCode())
+            {
                 return validate;
+            }
 
             var cacheKey = "temp_indexing_op_" + indexName;
             var found = _runtimeCache.Get(cacheKey);
@@ -145,10 +169,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 _indexRebuilder.RebuildIndex(indexName);
 
-                ////populate it
-                //foreach (var populator in _populators.Where(x => x.IsRegistered(indexName)))
-                //    populator.Populate(index);
-
                 return new OkResult();
             }
             catch (Exception ex)
@@ -173,19 +193,21 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var properties = new Dictionary<string, object>
             {
-                [nameof(IIndexDiagnostics.DocumentCount)] = indexDiag.DocumentCount,
-                [nameof(IIndexDiagnostics.FieldCount)] = indexDiag.FieldCount,
+                ["DocumentCount"] = indexDiag.GetDocumentCount(),
+                ["FieldCount"] = indexDiag.GetFieldNames().Count(),
             };
 
-            foreach (var p in indexDiag.Metadata)
+            foreach (KeyValuePair<string, object> p in indexDiag.Metadata)
+            {
                 properties[p.Key] = p.Value;
+            }
 
             var indexerModel = new ExamineIndexModel
             {
                 Name = indexName,
                 HealthStatus = isHealth.Success ? (isHealth.Result ?? "Healthy") : (isHealth.Result ?? "Unhealthy"),
                 ProviderProperties = properties,
-                CanRebuild = _indexRebuilder.CanRebuild(index)
+                CanRebuild = _indexRebuilder.CanRebuild(index.Name)
             };
 
             return indexerModel;
@@ -194,15 +216,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private ActionResult ValidateSearcher(string searcherName, out ISearcher searcher)
         {
             //try to get the searcher from the indexes
-            if (_examineManager.TryGetIndex(searcherName, out var index))
+            if (_examineManager.TryGetIndex(searcherName, out IIndex index))
             {
-                searcher = index.GetSearcher();
+                searcher = index.Searcher;
                 return new OkResult();
             }
 
             //if we didn't find anything try to find it by an explicitly declared searcher
             if (_examineManager.TryGetSearcher(searcherName, out searcher))
+            {
                 return new OkResult();
+            }
 
             var response1 = new BadRequestObjectResult($"No searcher found with name = {searcherName}");
             HttpContext.SetReasonPhrase("Searcher Not Found");
@@ -211,8 +235,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private ActionResult ValidatePopulator(IIndex index)
         {
-            if (_indexRebuilder.CanRebuild(index))
+            if (_indexRebuilder.CanRebuild(index.Name))
+            {
                 return new OkResult();
+            }
 
             var response = new BadRequestObjectResult($"The index {index.Name} cannot be rebuilt because it does not have an associated {typeof(IIndexPopulator)}");
             HttpContext.SetReasonPhrase("Index cannot be rebuilt");

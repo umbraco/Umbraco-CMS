@@ -20,7 +20,6 @@ using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers.Entities;
-using Umbraco.Tests.UmbracoExamine;
 
 
 namespace Umbraco.Tests.PublishedContent
