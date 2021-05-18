@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
@@ -27,6 +28,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
         private const string LocalIdentity = "localIdentity";
         private const string AlternateIdentity = "alternateIdentity";
 
+        private CancellationToken CancellationToken => new CancellationToken();
         private CacheRefresherCollection CacheRefreshers => GetRequiredService<CacheRefresherCollection>();
         private IServerRoleAccessor ServerRoleAccessor => GetRequiredService<IServerRoleAccessor>();
 
@@ -162,7 +164,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             // Create three instruction records, each with two instructions.  First two records are for a different identity.
             CreateAndDeliveryMultipleInstructions(sut);
 
-            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), -1);
+            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, CancellationToken, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), -1);
 
             Assert.Multiple(() =>
             {
@@ -181,7 +183,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             CreateAndDeliveryMultipleInstructions(sut);
 
-            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, false, LocalIdentity, DateTime.UtcNow.AddHours(-1), -1);
+            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, CancellationToken, LocalIdentity, DateTime.UtcNow.AddHours(-1), -1);
 
             Assert.IsTrue(result.InstructionsWerePruned);
         }
@@ -193,7 +195,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             CreateAndDeliveryMultipleInstructions(sut);
 
-            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, true, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), -1);
+            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, CancellationToken, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), -1);
 
             Assert.Multiple(() =>
             {
@@ -214,7 +216,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             var lastId = -1;
             // Run once
-            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, CancellationToken, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
 
             Assert.Multiple(() =>
             {
@@ -228,7 +230,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
 
             // The instructions has now been processed and shouldn't be processed on the next call...
             // Run again.
-            ProcessInstructionsResult secondResult = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+            ProcessInstructionsResult secondResult = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, CancellationToken, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
             Assert.Multiple(() =>
             {
                 Assert.AreEqual(0, secondResult.LastId);                          // No instructions was processed so LastId is 0, this is consistent with behavior from V8
@@ -244,7 +246,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             CreateAndDeliveryMultipleInstructions(sut);
 
             var lastId = -1;
-            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, CancellationToken, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
 
             Assert.AreEqual(3, result.LastId); // Make sure LastId is 3, the rest is tested in other test.
             lastId = result.LastId;
@@ -253,7 +255,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             List<RefreshInstruction> instructions = CreateInstructions();
             sut.DeliverInstructions(instructions, AlternateIdentity);
 
-            ProcessInstructionsResult secondResult = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+            ProcessInstructionsResult secondResult = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, CancellationToken, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
 
             Assert.Multiple(() =>
             {
@@ -270,7 +272,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             CreateAndDeliveryMultipleInstructions(sut);
 
             var lastId = -1;
-            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+            ProcessInstructionsResult result = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, CancellationToken, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
 
             Assert.AreEqual(3, result.LastId); // Make sure LastId is 3, the rest is tested in other test.
             lastId = result.LastId;
@@ -279,7 +281,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             List<RefreshInstruction> instructions = CreateInstructions();
             sut.DeliverInstructions(instructions, LocalIdentity);
 
-            ProcessInstructionsResult secondResult = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, false, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
+            ProcessInstructionsResult secondResult = sut.ProcessInstructions(CacheRefreshers, ServerRoleAccessor.CurrentServerRole, CancellationToken, LocalIdentity, DateTime.UtcNow.AddSeconds(-1), lastId);
 
             Assert.Multiple(() =>
             {
