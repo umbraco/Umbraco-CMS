@@ -775,10 +775,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          */
         sortVariants: function (a, b) {
             const statesOrder = {'PublishedPendingChanges':1, 'Published': 1, 'Draft': 2, 'NotCreated': 3};
-            const compareDefault = (a,b) => (!a.language.isDefault ? 1 : -1) - (!b.language.isDefault ? 1 : -1);
+            const compareDefault = (a,b) => (a.language && a.language.isDefault ? -1 : 1) - (b.language && b.language.isDefault ? -1 : 1);
 
             // Make sure mandatory variants goes on top, unless they are published, cause then they already goes to the top and then we want to mix them with other published variants.
-            const compareMandatory = (a,b) => (a.state === 'PublishedPendingChanges' || a.state === 'Published') ? 0 : (!a.language.isMandatory ? 1 : -1) - (!b.language.isMandatory ? 1 : -1);
+            const compareMandatory = (a,b) => (a.state === 'PublishedPendingChanges' || a.state === 'Published') ? 0 : (a.language && a.language.isMandatory ? -1 : 1) - (b.language && b.language.isMandatory ? -1 : 1);
             const compareState = (a, b) => (statesOrder[a.state] || 99) - (statesOrder[b.state] || 99);
             const compareName = (a, b) => a.displayName.localeCompare(b.displayName);
 
@@ -799,17 +799,18 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          */
         getSortedVariantsAndSegments: function (variantsAndSegments) {
             const sortedVariants = variantsAndSegments.filter(variant => !variant.segment).sort(this.sortVariants);
-            let segments = variantsAndSegments.filter(variant => variant.segment);
+            let variantsWithSegments = variantsAndSegments.filter(variant => variant.segment);
             let sortedAvailableVariants = [];
 
             sortedVariants.forEach((variant) => {
-                const sortedMatchedSegments = segments.filter(segment => segment.language.culture === variant.language.culture).sort(this.sortVariants);
-                segments = segments.filter(segment => segment.language.culture !== variant.language.culture);
+                const sortedMatchedSegments = variantsWithSegments.filter(segment => segment.language && variant.language && segment.language.culture === variant.language.culture).sort(this.sortVariants);
+                // remove variants for this culture
+                variantsWithSegments = variantsWithSegments.filter(segment => !segment.language || segment.language && variant.language && segment.language.culture !== variant.language.culture);
                 sortedAvailableVariants = [...sortedAvailableVariants, ...[variant], ...sortedMatchedSegments];
             })
 
-            // if we have segments without a parent language variant we need to add the remaining segments to the array
-            sortedAvailableVariants = [...sortedAvailableVariants, ...segments.sort(this.sortVariants)];
+            // if we have segments without a parent language variant we need to add the remaining variantsWithSegments to the array
+            sortedAvailableVariants = [...sortedAvailableVariants, ...variantsWithSegments.sort(this.sortVariants)];
 
             return sortedAvailableVariants;
         }
