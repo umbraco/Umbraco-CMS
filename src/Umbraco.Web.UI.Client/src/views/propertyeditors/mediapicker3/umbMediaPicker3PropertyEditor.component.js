@@ -40,8 +40,13 @@
 
         vm.loading = true;
 
+        vm.activeMediaEntry = null;
         vm.supportCopy = clipboardService.isSupported();
 
+        vm.addMediaAt = addMediaAt;
+        vm.editMedia = editMedia;
+        vm.removeMedia = removeMedia;
+        vm.copyMedia = copyMedia;
 
         vm.labels = {};
 
@@ -121,7 +126,6 @@
             }
         }
 
-        vm.addMediaAt = addMediaAt;
         function addMediaAt(createIndex, $event) {
             var mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
@@ -164,7 +168,7 @@
                 }
             }
 
-            if(vm.model.config.filter) {
+            if (vm.model.config.filter) {
                 mediaPicker.filter = vm.model.config.filter;
             }
 
@@ -182,6 +186,7 @@
 
         // To be used by infinite editor. (defined here cause we need configuration from property editor)
         function changeMediaFor(mediaEntry, onSuccess) {
+
             var mediaPicker = {
                 startNodeId: vm.model.config.startNodeId,
                 startNodeIsVirtual: vm.model.config.startNodeIsVirtual,
@@ -199,16 +204,16 @@
                     mediaEntry.focalPoint = null;
                     updateMediaEntryData(mediaEntry);
 
-                    if(onSuccess) {
+                    if (onSuccess) {
                         onSuccess();
                     }
                 },
                 close: function () {
                     editorService.close();
                 }
-            }
+            };
 
-            if(vm.model.config.filter) {
+            if (vm.model.config.filter) {
                 mediaPicker.filter = vm.model.config.filter;
             }
 
@@ -238,26 +243,23 @@
                 }
             });
             mediaEntry.crops = newCrops;
-
         }
 
-        vm.removeMedia = removeMedia;
         function removeMedia(media) {
             var index = vm.model.value.indexOf(media);
-            if(index !== -1) {
+            if (index !== -1) {
                 vm.model.value.splice(index, 1);
             }
         }
+
         function deleteAllMedias() {
             vm.model.value = [];
         }
 
-        vm.activeMediaEntry = null;
         function setActiveMedia(mediaEntryOrNull) {
             vm.activeMediaEntry = mediaEntryOrNull;
         }
-
-        vm.editMedia = editMedia;
+        
         function editMedia(mediaEntry, options, $event) {
 
             if($event)
@@ -304,13 +306,13 @@
             editorService.open(mediaEditorModel);
         }
 
-        var getDocumentNameAndIcon = function() {
+        var getDocumentNameAndIcon = function () {
             // get node name
             var contentNodeName = "?";
             var contentNodeIcon = null;
-            if(vm.umbVariantContent) {
+            if (vm.umbVariantContent) {
                 contentNodeName = vm.umbVariantContent.editor.content.name;
-                if(vm.umbVariantContentEditors) {
+                if (vm.umbVariantContentEditors) {
                     contentNodeIcon = vm.umbVariantContentEditors.content.icon.split(" ")[0];
                 } else if (vm.umbElementEditorContent) {
                     contentNodeIcon = vm.umbElementEditorContent.model.documentType.icon.split(" ")[0];
@@ -324,9 +326,9 @@
                 name: contentNodeName,
                 icon: contentNodeIcon
             }
-        }
+        };
 
-        var requestCopyAllMedias = function() {
+        var requestCopyAllMedias = function () {
             var mediaKeys = vm.model.value.map(x => x.mediaKey)
             entityResource.getByIds(mediaKeys, "Media").then(function (entities) {
 
@@ -338,18 +340,18 @@
 
                 var documentInfo = getDocumentNameAndIcon();
 
-                localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, documentInfo.name]).then(function(localizedLabel) {
+                localizationService.localize("clipboard_labelForArrayOfItemsFrom", [vm.model.label, documentInfo.name]).then(function (localizedLabel) {
                     clipboardService.copyArray(clipboardService.TYPES.MEDIA, aliases, vm.model.value, localizedLabel, documentInfo.icon || "icon-thumbnail-list", vm.model.id);
                 });
             });
-        }
+        };
 
-        vm.copyMedia = copyMedia;
         function copyMedia(mediaEntry) {
             entityResource.getById(mediaEntry.mediaKey, "Media").then(function (mediaEntity) {
                 clipboardService.copy(clipboardService.TYPES.MEDIA, mediaEntity.metaData.ContentTypeAlias, mediaEntry, mediaEntity.name, mediaEntity.icon, mediaEntry.key);
             });
         }
+
         function requestPasteFromClipboard(createIndex, pasteEntry, pasteType) {
 
             if (pasteEntry === undefined) {
@@ -362,9 +364,7 @@
             updateMediaEntryData(pasteEntry);
             vm.model.value.splice(createIndex, 0, pasteEntry);
 
-
             return true;
-
         }
 
         function requestRemoveAllMedia() {
@@ -383,7 +383,6 @@
             });
         }
 
-
         vm.sortableOptions = {
             cursor: "grabbing",
             handle: "umb-media-card",
@@ -396,7 +395,6 @@
                 setDirty();
             }
         };
-
 
         function onAmountOfMediaChanged() {
 

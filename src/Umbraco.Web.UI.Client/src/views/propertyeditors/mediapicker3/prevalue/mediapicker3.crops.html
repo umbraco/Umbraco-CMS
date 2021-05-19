@@ -20,7 +20,7 @@
                 </div>
             </div>
         </div>
-        <div ui-sortable="sortableOptions" class="umb-table-body" ng-model="model.value">
+        <div class="umb-table-body" ui-sortable="sortableOptions" ng-model="model.value">
 
             <div class="umb-table-row" ng-repeat="crop in model.value">
 
@@ -32,7 +32,6 @@
                     <button type="button" class="btn-reset umb-outline umb-outline--surrounding" ng-click="edit(crop, $event)"><localize key="general_edit">Edit</localize></button>
                     <button type="button" class="btn-reset umb-outline umb-outline--surrounding" ng-click="remove(crop, $event)"><localize key="general_remove">Remove</localize></button>
                 </div>
-
 
                 <div ng-if="crop.editMode === true" class="umb-table-cell not-fixed">
                     <input type="text"
@@ -83,6 +82,7 @@
                 </div>
                 <div ng-if="crop.editMode === true" class="umb-table-cell">
                     <button type="button" class="btn-reset umb-outline umb-outline--surrounding" ng-click="setChanges(crop, $event)"><localize key="general_submit">Submit</localize></button>
+                    <button type="button" class="btn-reset umb-outline umb-outline--surrounding" ng-click="remove(crop, $event)" ng-if="isEmpty(crop)"><localize key="general_cancel">Cancel</localize></button>
                 </div>
 
             </div>
