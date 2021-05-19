@@ -39,7 +39,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NuSpecs", "NuSpecs", "{227C
 	ProjectSection(SolutionItems) = preProject
 		..\build\NuSpecs\UmbracoCms.nuspec = ..\build\NuSpecs\UmbracoCms.nuspec
 		..\build\NuSpecs\UmbracoCms.SqlCe.nuspec = ..\build\NuSpecs\UmbracoCms.SqlCe.nuspec
-		..\build\NuSpecs\UmbracoCms.Examine.Lucene.nuspec = ..\build\NuSpecs\UmbracoCms.Examine.Lucene.nuspec
 		..\build\NuSpecs\UmbracoCms.StaticAssets.nuspec = ..\build\NuSpecs\UmbracoCms.StaticAssets.nuspec
 	EndProjectSection
 EndProject
