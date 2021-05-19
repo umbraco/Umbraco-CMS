@@ -54,6 +54,8 @@ Similarly, if your contribution is copied or adapted from somewhere else, make s
 
 If you're not sure, leave a note on your contribution and we will be happy to guide you.
 
+When your contribution has been accepted, it will be MIT licensed from that time onwards. 
+
 ### What can I start with?
 
 Unsure where to begin contributing to Umbraco? You can start by looking through [these `Up for grabs` issues](https://github.com/umbraco/Umbraco-CMS/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3Acommunity%2Fup-for-grabs+)
