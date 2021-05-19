@@ -54,7 +54,7 @@ Similarly, if your contribution is copied or adapted from somewhere else, make s
 
 If you're not sure, leave a note on your contribution and we will be happy to guide you.
 
-When your contribution has been accepted, it will be MIT licensed from that time onwards. 
+When your contribution has been accepted, it will be [MIT licensed](https://github.com/umbraco/Umbraco-CMS/blob/v8/contrib/LICENSE.md) from that time onwards. 
 
 ### What can I start with?
 
