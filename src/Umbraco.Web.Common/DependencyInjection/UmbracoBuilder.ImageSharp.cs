@@ -44,7 +44,6 @@ namespace Umbraco.Extensions
                 options.OnPrepareResponseAsync = _ => Task.CompletedTask;
             })
                 .SetRequestParser<QueryCollectionRequestParser>()
-                .SetMemoryAllocator(provider => ArrayPoolMemoryAllocator.CreateWithMinimalPooling())
                 .Configure<PhysicalFileSystemCacheOptions>(options =>
                 {
                     options.CacheFolder = imagingSettings.Cache.CacheFolder;

@@ -62,20 +62,16 @@
     <None Remove="umbraco\logs\**" />
     <None Remove="umbraco\MediaCache\**" />
     <None Include="umbraco\UmbracoWebsite\NoNodes.cshtml" />
-    <None Remove="scripts\aaa\fc75309db05f41609a9e1adb8cf0998c.tmp" />
-    <None Remove="umbraco\models\**" />
   </ItemGroup>
 
   <!-- We don't want to include the generated files, they will throw a lot of errors -->
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.3" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="5.0.6" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <!-- TODO: remove the reference to System.Configuration.ConfigurationManager when Examine/lucene dont need it-->
-    <PackageReference Include="System.Configuration.ConfigurationManager" Version="5.0.0" />
     <PackageReference Include="Umbraco.Code" Version="1.1.1">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
