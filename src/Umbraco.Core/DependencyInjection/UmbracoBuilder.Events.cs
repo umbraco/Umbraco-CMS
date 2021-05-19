@@ -1,6 +1,7 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
@@ -72,5 +73,10 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             return services;
         }
+
+        public static bool IsNotificationHandlerRegistered<TNotification>(this IUmbracoBuilder builder)
+            where TNotification : INotification => builder.Services
+            .Any(x => x.ServiceType == typeof(INotificationHandler<TNotification>) ||
+                      x.ServiceType == typeof(INotificationAsyncHandler<TNotification>));
     }
 }
