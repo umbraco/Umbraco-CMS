@@ -16,6 +16,7 @@ This project and everyone participating in it, is governed by the [our Code of C
 
 [Contributing code changes](#contributing-code-changes)
   * [Guidelines for contributions we welcome](#guidelines-for-contributions-we-welcome)
+    * [Ownership and copyright](#ownership-and-copyright)
   * [What can I start with?](#what-can-i-start-with)
   * [How do I begin?](#how-do-i-begin)
   * [Pull requests](#pull-requests)
