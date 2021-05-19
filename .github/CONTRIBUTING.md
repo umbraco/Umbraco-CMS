@@ -44,6 +44,15 @@ We have [documented what we consider small and large changes](CONTRIBUTION_GUIDE
 
 Remember, it is always worth working on an issue from the `Up for grabs` list or even asking for some feedback before you send us a PR. This way, your PR will not be closed as unwanted.
 
+#### Ownership and copyright
+
+It is your responsibility to make sure that you're allowed to share the code you're providing us.   
+For example, you should have permission from your employer or customer to share code.  
+
+Similarly, if your contribution is copied or adapted from somewhere else, make sure that the license allows you to reuse that for a contribution to Umbraco-CMS. 
+
+If you're not sure, leave a note on your contribution and we will be happy to guide you.
+
 ### What can I start with?
 
 Unsure where to begin contributing to Umbraco? You can start by looking through [these `Up for grabs` issues](https://github.com/umbraco/Umbraco-CMS/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3Acommunity%2Fup-for-grabs+)
