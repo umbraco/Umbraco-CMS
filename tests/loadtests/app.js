@@ -3,8 +3,8 @@ const dbContext = require("./databaseContext");
 const csvReports = require("./csvReports");
 const throughputReports = require("./throughputReports");
 
-async function pushReports(container, umbVersion, machineSpec) {
-    await pushPerformanceReports(container, umbVersion, machineSpec);
+async function pushReports(container, umbVersion, machineSpec, perfReportType) {
+    await pushPerformanceReports(container, umbVersion, machineSpec, perfReportType);
     await pushThroughputReports(container, umbVersion, machineSpec);
 }
 
@@ -30,9 +30,9 @@ async function pushThroughputReports(container, umbVersion, machineSpec) {
     }
 }
 
-async function pushPerformanceReports(container, umbVersion, machineSpec) {
+async function pushPerformanceReports(container, umbVersion, machineSpec, perfReportType) {
 
-    const reports = await csvReports.createReports();
+    const reports = await csvReports.createReports(perfReportType);
 
     for (let i = 0; i < reports.length; i++) {
         const report = reports[i];
@@ -64,7 +64,8 @@ async function showReport(container, machineSpec) {
             AVG(c.report['gen 2 heap size']) Gen2,
             AVG(c.report['gen 1 heap size']) Gen1,
             AVG(c.report['gen 0 heap size']) Gen0,
-            AVG(c.report['working set']) WorkingSet
+            AVG(c.report['working set']) WorkingSet,
+            AVG(c.report['% processor time']) ProcessorTime
         FROM c
         WHERE c.testingSource = '${machineSpec}' AND c.testType = 'perf'
         GROUP BY c.umbVersion, c.file`,
@@ -119,6 +120,9 @@ async function main() {
     if (myArgs.length < 6) {
         throw "Missing argument for cosmosdb containerId";
     }
+    if (myArgs.length < 7) {
+        throw "Missing argument for perf counter report type";
+    }
 
     const umbVersion = myArgs[0];
     const machineSpec = myArgs[1];
@@ -126,6 +130,7 @@ async function main() {
     const key = myArgs[3];
     const databaseId = myArgs[4];
     const containerId = myArgs[5];
+    const perfReportType = myArgs[6];
 
     const client = new CosmosClient({ endpoint, key });
 
@@ -136,7 +141,7 @@ async function main() {
     const partitionKey = { kind: "Hash", paths: ["/testingSource"] };
     await dbContext.create(client, databaseId, containerId, partitionKey);
 
-    await pushReports(container, umbVersion, machineSpec);
+    await pushReports(container, umbVersion, machineSpec, perfReportType);
     await showReport(container, machineSpec);
 }
 

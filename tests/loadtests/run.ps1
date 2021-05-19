@@ -15,6 +15,128 @@
 	$Rate = 1
 )
 
+
+function Start-CounterCollection {
+
+    # Start counters collection, which will either be by Windows counters
+    # for .NET Framework, else it will be dotnet-counters for dotnet core
+    # apps. Both will collect the same statistics.
+
+    # good posts on Private Bytes vs Working Set
+    #   https://stackoverflow.com/a/1986486/694494
+    #   https://michaelscodingspot.com/performance-counters/
+
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $CounterType,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $ProcessName,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $ServerName,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $ReportName
+    )
+
+    if ($CounterType -eq "windows") {
+        return Start-WindowsCounters -ProcessName $ProcessName -ServerName $ServerName -ReportName $ReportName
+    }
+    elseif ($CounterType -eq "dotnet") {
+        return Start-DotNetCounters -ProcessName $ProcessName -ReportName $ReportName
+    }
+    else {
+        throw "Counter type not supported"
+    }
+}
+
+function Start-WindowsCounters {
+
+    # Collect windows counters for .NET Framework apps.
+    # Unfortunately this doesn't work in PS7, only PS6 for Windows.
+    # Export-Counter not available in PS7!? :( https://stackoverflow.com/questions/64950228/export-counter-missing-from-powershell-7-1
+
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $ProcessName,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $ServerName,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $ReportName
+    )
+
+    $Counters = @(
+        "\\$($ServerName)\Process($($ProcessName))\% Processor Time",
+        # We won't use Private Bytes because this is not compat with dotnet-counters
+        #"\\$($ServerName)\Process($($ProcessName))\Private Bytes",
+        "\\$($ServerName)\Process($($ProcessName))\Working Set",
+        # In theory this is the same as the dotnet-counter value for gc-heap-size which
+        # is "Total heap size reported by the GC (MB)"
+        # See https://docs.microsoft.com/en-us/dotnet/standard/garbage-collection/performance#to-determine-how-much-memory-the-managed-heap-is-committing
+        # Which states to not use Bytes In All Heaps as a way to determine what managed bytes are committed
+        # and this metric to be used instead. We'll track both.
+        "\\$($ServerName)\.NET CLR Memory($($ProcessName))\# Total committed bytes",
+        # We don't care too much about this one much:
+        # See https://docs.microsoft.com/en-us/previous-versions/x2tyfybc(v=vs.110)?redirectedfrom=MSDN
+        # Gen 0 displays the maximum bytes that can be allocated in generation 0; it does not indicate the current number of bytes allocated in generation 0.
+        # "\\$($ServerName)\.NET CLR Memory($($ProcessName))\Gen 0 heap size",
+        "\\$($ServerName)\.NET CLR Memory($($ProcessName))\Gen 1 heap size",
+        "\\$($ServerName)\.NET CLR Memory($($ProcessName))\Gen 2 heap size",
+        "\\$($ServerName)\.NET CLR Memory($($ProcessName))\Large Object Heap size",
+        # Includes the sum of all managed heaps – Gen 1 + Gen 2 + LOH. This represents the allocated managed memory size.
+        # NOTE: Some sites say its Gen0,1,2,LOH and that is untrue - it is only 1,2,LOH
+        "\\$($ServerName)\.NET CLR Memory($($ProcessName))\# Bytes in all Heaps")
+
+    # script to stream counter data that will be used on the Start-Job background job
+    # will collect in 1 second intervals
+    $GetCountersScript = {
+        Get-Counter -Counter $args[0] -ComputerName $args[1] -Continuous | Export-Counter -path "$($args[2])" -FileFormat csv -Force
+    }
+
+    # start the counter collection on a background task, since we specified continuous this will keep going till we stop the task
+    $Job = Start-Job $GetCountersScript -Name "MyCounters" -ArgumentList $Counters,$($ServerName),"$PSScriptRoot\output\$ReportName.csv"
+    $Job | Receive-Job -Keep
+
+    return $Job
+}
+
+function Start-DotNetCounters {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $ProcessName,
+
+        [Parameter(Mandatory=$true)]
+        [string]
+        $ReportName
+    )
+
+    # NOTE: Not including Gen0 (see notes above, it's not really relevant for comparison)
+    $Counters = "System.Runtime[cpu-usage,working-set,gen-1-size,gen-2-size,loh-size,gc-heap-size]"
+
+    # We need to use Start-Process and cannot use Start-Job because the exe file doesn't handle console
+    # redirects properly. See https://github.com/dotnet/diagnostics/issues/451#issuecomment-842741702
+    $Job = Start-Process -FilePath "dotnet-counters" -PassThru -Verb RunAs -ArgumentList "collect","--name",$($ProcessName),"--refresh-interval","1","--format","csv","--output","$PSScriptRoot\output\$ReportName.csv","--counters",$($Counters)
+
+    Write-Verbose "Process Start Info: $($Job.StartInfo.Arguments)"
+
+    return $Job
+}
+
+Add-Type -AssemblyName Microsoft.VisualBasic
+Add-Type -AssemblyName System.Windows.Forms
+
+
 # Set environment variables for artillery to use:
 # TODO: Cypress generates this information so either use what cypress generates or use the code that it uses
 
@@ -50,17 +172,24 @@ $ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $RunCount +
 
 Foreach ($app in $Config.apps)
 {
+
+    # Stop all IIS Sites
+    Get-IISSite | Stop-IISSite -Name {$_.Name}  -ErrorAction SilentlyContinue -Confirm:$false
+
     # TODO: Ideally we'd start with fresh DBs and do the install as part of an artillery run
+    # This is actually going to be quite important to have correct metrics, else there's a few risks:
+    # There will be a lot of content in each of these DBs the more they are run, therefore possibly
+    # slowing things down. If there's instructions in the DB, then background tasks will processs those
+    # instructions which will skew metrics because there will be more going on than just what is in the metrics.
+    # TODO: We need to also disable all auto health checks on all sites since that is another background task that runs.
+    # TODO: There is probably also other background tasks we should disable.
 
     $ProcessName = $app.processName
 
     if ($app.iisSiteName)
     {
-        # Reset iis (stops all w3wp processes)
+        # Reset iis (stops all w3wp processes) and since sites are stopped above they wont respawn
         & iisreset /restart
-
-        # Stop all IIS Sites
-        Get-IISSite | Stop-IISSite -Name {$_.Name}  -ErrorAction SilentlyContinue -Confirm:$false
 
         # This would be required if we don't stop all sites in order to get the correct IIS process Id
         # for perf counters. But since we are stopping them all, then the process name will always
@@ -103,33 +232,6 @@ Foreach ($app in $Config.apps)
     $Env:U_USERNAME = $app.username
     $Env:U_PASS = $app.password
 
-    # good posts on Private Bytes vs Working Set
-    #   https://stackoverflow.com/a/1986486/694494
-    #   https://michaelscodingspot.com/performance-counters/
-    # Export-Counter not available in PS7!? :( https://stackoverflow.com/questions/64950228/export-counter-missing-from-powershell-7-1
-    # Perhaps we can use PS for NET Framework projects and then dotnet-counters global tool for NET Core projects?
-    # https://docs.microsoft.com/en-us/dotnet/core/diagnostics/dotnet-counters
-    # Just so long as the values are consistent which I believe they will be
-
-    # Start counters
-    $Counters = @(
-        "\\$($ServerName)\Process($($ProcessName))\% Processor Time",
-        # We won't use Private Bytes because this is not compat with dotnet-counters
-        #"\\$($ServerName)\Process($($ProcessName))\Private Bytes",
-        "\\$($ServerName)\Process($($ProcessName))\Working Set",
-        # We don't care too much about this one, it normally is just small/consistent Gen1+ is the important ones
-        "\\$($ServerName)\.NET CLR Memory($($ProcessName))\Gen 0 heap size",
-        "\\$($ServerName)\.NET CLR Memory($($ProcessName))\Gen 1 heap size",
-        "\\$($ServerName)\.NET CLR Memory($($ProcessName))\Gen 2 heap size",
-        "\\$($ServerName)\.NET CLR Memory($($ProcessName))\Large Object Heap size",
-        # Includes the sum of all managed heaps – Gen 0 + Gen 1 + Gen 2 + LOH. This represents the allocated managed memory size.
-        "\\$($ServerName)\.NET CLR Memory($($ProcessName))\# Bytes in all Heaps")
-
-    # script to stream counter data that will be used on the Start-Job background job
-    $GetCountersScript = {
-        Get-Counter -Counter $args[0] -ComputerName $args[1] -Continuous | Export-Counter -path "$($args[2])" -FileFormat csv -Force
-    }
-
     ## Clear our output first
     if (Test-Path "$PSScriptRoot\output"){
         Remove-Item "$PSScriptRoot\output\" -Force -Recurse
@@ -168,13 +270,14 @@ Foreach ($app in $Config.apps)
     foreach ( $a in $Artillery )
     {
         # TODO: Ideally we would force a GC Collect here. BUT that's not really possible when running from a remote machine.
-        # It is possible on the same machine by using something like this https://github.com/cklutz/EtwForceGC, https://stackoverflow.com/a/26033289
+        # It is possible on the same machine by using something like this
+        # https://github.com/cklutz/EtwForceGC,
+        # https://stackoverflow.com/a/26033289
         # So potentially, we may want to host a custom endpoint when we automate the installation of Umbraco to be able to be called
         # to just call GC.Collect on that machine.
 
         # start the counter collection on a background task, since we specified continuous this will keep going till we stop the task
-        $Job = Start-Job $GetCountersScript -Name "MyCounters" -ArgumentList $Counters,$($ServerName),"$PSScriptRoot\output\$a.csv"
-        $Job | Receive-Job -Keep
+        $Job = Start-CounterCollection -CounterType $app.counterCollection -ProcessName $ProcessName -ServerName $ServerName -ReportName $a
 
         try {
             # Execute artillery
@@ -194,15 +297,31 @@ Foreach ($app in $Config.apps)
             }
         }
         finally {
-            Write-Verbose "Stopping counters"
-            $Job | Receive-Job -Keep # see if there are any errors
-            $Batch = Get-Job -Name "MyCounters"
-            $Batch | Stop-Job
-            $Batch | Remove-Job
+            Write-Host "Stopping counters"
+
+            # If it's the dotnet-counters then the $Job will be a .net Process so we can check for
+            # one of it's properties
+            if ($Job.CloseMainWindow) {
+
+                # TODO: This is SO HORRIBLE :( but there's nothing we can do because the
+                # dotnet team did not make this scriptable. I've looked at the code and can't see
+                # a way to terminate a process forcing the console app too exit correctly, only with a 'Q'
+                # command.
+                # See https://github.com/dotnet/diagnostics/issues/451#issuecomment-843650234
+                Write-Host "Sending exist command"
+                [Microsoft.VisualBasic.Interaction]::AppActivate($($Job.Id))
+                [System.Windows.Forms.SendKeys]::SendWait("Q")
+                Write-Host "Exited"
+            }
+            else {
+                $Job | Receive-Job -Keep # see if there are any errors
+                $Batch = Get-Job -Name "MyCounters"
+                $Batch | Stop-Job
+                $Batch | Remove-Job
+            }
         }
     }
 
     # Run the node app to push our reports
-    & node .\app.js $($app.umbracoVersion) $SpecName $CosmosDbEndpoint $CosmosDbKey $CosmosDbDatabaseId $CosmosDbContainerId
-
+    & node .\app.js $($app.umbracoVersion) $SpecName $CosmosDbEndpoint $CosmosDbKey $CosmosDbDatabaseId $CosmosDbContainerId $($app.counterCollection)
 }

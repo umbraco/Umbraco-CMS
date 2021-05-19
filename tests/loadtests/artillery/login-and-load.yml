@@ -28,8 +28,6 @@ scenarios:
     - get:
         url: "{{ backOfficeApiPath }}/Section/GetSections"
     - get:
-        url: "{{ backOfficeApiPath }}/Content/AllowsCultureVariation"
-    - get:
         url: "{{ backOfficeApiPath }}/CurrentUser/GetUserTours"
     - get:
         url: "{{ backOfficeApiPath }}/Language/GetAllLanguages"
