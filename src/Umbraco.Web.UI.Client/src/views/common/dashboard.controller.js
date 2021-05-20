@@ -22,8 +22,12 @@ function DashboardController($scope, $routeParams, $location, dashboardResource,
     });
     
     dashboardResource.getDashboard($routeParams.section).then(function(tabs){
-        $scope.dashboard.tabs = tabs;        
-        initActiveTab();
+        $scope.dashboard.tabs = tabs;
+
+        if ($scope.dashboard.tabs && $scope.dashboard.tabs.length > 0) {
+            initActiveTab();
+        }
+
         $scope.page.loading = false;
     });
 
@@ -38,10 +42,6 @@ function DashboardController($scope, $routeParams, $location, dashboardResource,
     };
 
     function initActiveTab () {
-        if (!$scope.dashboard.tabs) {
-            return;
-        }
-
         // check the query param for a dashboard alias
         const dashboardAlias = $location.search()[DASHBOARD_QUERY_PARAM];
         const dashboardIndex = $scope.dashboard.tabs.findIndex(tab => tab.alias === dashboardAlias);
