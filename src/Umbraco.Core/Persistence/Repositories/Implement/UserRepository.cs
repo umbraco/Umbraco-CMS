@@ -427,6 +427,7 @@ ORDER BY colName";
         {
             var list = new List<string>
             {
+                "DELETE FROM umbracoUserLogin WHERE userId = @id",
                 "DELETE FROM umbracoUser2UserGroup WHERE userId = @id",
                 "DELETE FROM umbracoUser2NodeNotify WHERE userId = @id",
                 "DELETE FROM umbracoUserStartNode WHERE userId = @id",
