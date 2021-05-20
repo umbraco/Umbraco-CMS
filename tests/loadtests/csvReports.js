@@ -3,7 +3,7 @@ const fs = require('fs');
 const io = require("./io");
 
 function isNumeric(str) {
-    if (typeof str != "string") {
+    if (typeof str !== "string") {
         return false // we only process strings!
     }
 
@@ -13,8 +13,8 @@ function isNumeric(str) {
         return false;
     }
     let parsedNumber = parseFloat(str);
-    if (!isNaN(parsedNumber)) {
-        // ...and ensure strings of whitespace fail)
+    if (isNaN(parsedNumber)) {
+        // ...and ensure strings of whitespace fail
         return false;
     }
     if (parsedNumber <= 0) {
@@ -209,16 +209,23 @@ async function createReports(perfReportType) {
 
                         // We have to convert anything that is MB to B so that its consistent
                         // with the windows counters.
+                        let metricValue = 0;
                         if (key.indexOf("(MB)") !== -1) {
-                            averages[value.header] = (value.sum * (1024 * 1024)) / value.count;
+                            metricValue = (value.sum * (1024 * 1024)) / value.count;
                         }
                         else {
-                            averages[value.header] = value.sum / value.count;
+                            metricValue = value.sum / value.count;
+                        }
+
+                        // This will be NaN if there is no metric (i.e. 0)
+                        // so don't include it.
+                        if (!isNaN(metricValue)) {
+                            averages[value.header] = metricValue;
                         }
 
                         // if this metric is used to calc bytes in all heaps
                         if (value.managedMem) {
-                            // bytes in all heaps is the sum of all 4 other metrics
+                            // bytes in all heaps is the sum of 3 other metrics
                             // so sum the averages of each
                             averages[bytesInAllHeapsHeader] += averages[value.header]
                         }

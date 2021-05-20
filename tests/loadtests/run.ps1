@@ -238,6 +238,7 @@ Foreach ($app in $Config.apps)
         "login-and-load.yml",
         "create-doctype.yml",
         "create-content.yml",
+        "update-content.yml",
         "delete-content.yml"
     )
 

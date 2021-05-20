@@ -12,7 +12,9 @@ module.exports = {
     configureParentId,
     deleteUntilNoneLeft,
     storeContentId,
-    configureContentIdToDelete
+    configureContentIdToDelete,
+    configureContentIdToUpdate,
+    updateUntilNoneLeft
 }
 
 /** Stores the INT content ids */
@@ -45,6 +47,7 @@ function storeContentId(requestParams, response, context, ee, next) {
     next();
 }
 
+/** Used to configure the INT id for content to delete */
 function configureContentIdToDelete(requestParams, context, ee, next) {
     // get all created INT ids and store them into an array in the context
     if (!context.vars.contentIdsToDelete) {
@@ -81,6 +84,31 @@ function configureParentId(requestParams, context, ee, next) {
 
         context.vars.parentId = context.vars.jsonResponse.id;
     }
+
+    next();
+}
+
+/** Used for the update loop until nothing is left */
+function updateUntilNoneLeft(context, next) {
+    return next(context.vars.contentIdsToUpdate.length > 0);
+}
+
+/** Used to configure the INT id for content to delete, and the content type alias */
+function configureContentIdToUpdate(requestParams, context, ee, next) {
+    // get all created INT ids and store them into an array in the context
+    if (!context.vars.contentIdsToUpdate) {
+        const tempData = tempDataStorage.getTempData();
+        if (tempData.ids && tempData.ids["content"]) {
+            context.vars.contentIdsToUpdate = tempData.ids["content"];
+        }
+        else {
+            console.log("no temp data ids!");
+            context.vars.contentIdsToUpdate = [];
+        }
+    }
+
+    // store the next content id to update and remove it from the context
+    context.vars.contentIdToUpdate = context.vars.contentIdsToUpdate.pop();
 
     next();
 }
