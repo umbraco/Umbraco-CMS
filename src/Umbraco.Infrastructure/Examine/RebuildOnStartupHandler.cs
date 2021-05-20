@@ -1,7 +1,9 @@
 using System;
 using System.Threading;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Infrastructure.Examine
@@ -17,6 +19,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
     {
         private readonly ISyncBootStateAccessor _syncBootStateAccessor;
         private readonly ExamineIndexRebuilder _backgroundIndexRebuilder;
+        private readonly IRuntimeState _runtimeState;
 
         // These must be static because notification handlers are transient.
         // this does unfortunatley mean that one RebuildOnStartupHandler instance
@@ -30,10 +33,12 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         public RebuildOnStartupHandler(
             ISyncBootStateAccessor syncBootStateAccessor,
-            ExamineIndexRebuilder backgroundIndexRebuilder)
+            ExamineIndexRebuilder backgroundIndexRebuilder,
+            IRuntimeState runtimeState)
         {
             _syncBootStateAccessor = syncBootStateAccessor;
             _backgroundIndexRebuilder = backgroundIndexRebuilder;
+            _runtimeState = runtimeState;
         }
 
         /// <summary>
@@ -41,7 +46,13 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// </summary>
         /// <param name="notification"></param>
         public void Handle(UmbracoRequestBeginNotification notification)
-            => LazyInitializer.EnsureInitialized(
+        {
+            if (_runtimeState.Level < RuntimeLevel.Run)
+            {
+                return;
+            }
+
+            LazyInitializer.EnsureInitialized(
                 ref _isReady,
                 ref _isReadSet,
                 ref _isReadyLock,
@@ -56,5 +67,6 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
                     return true;
                 });
+        }
     }
 }

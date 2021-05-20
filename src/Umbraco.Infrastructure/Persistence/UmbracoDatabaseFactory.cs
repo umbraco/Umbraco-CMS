@@ -112,27 +112,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence
             Configure(settings.ConnectionString, settings.ProviderName);
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UmbracoDatabaseFactory"/>.
-        /// </summary>
-        /// <remarks>Used in tests.</remarks>
-        public UmbracoDatabaseFactory(ILogger<UmbracoDatabaseFactory> logger, ILoggerFactory loggerFactory, string connectionString, string providerName, Lazy<IMapperCollection> mappers, IDbProviderFactoryCreator dbProviderFactoryCreator, DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory)
-        {
-            _mappers = mappers ?? throw new ArgumentNullException(nameof(mappers));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _loggerFactory = loggerFactory;
-            _dbProviderFactoryCreator = dbProviderFactoryCreator ?? throw new ArgumentNullException(nameof(dbProviderFactoryCreator));
-            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory ?? throw new ArgumentNullException(nameof(databaseSchemaCreatorFactory));
-
-            if (string.IsNullOrWhiteSpace(connectionString) || string.IsNullOrWhiteSpace(providerName))
-            {
-                logger.LogDebug("Missing connection string or provider name, defer configuration.");
-                return; // not configured
-            }
-
-            Configure(connectionString, providerName);
-        }
-
         #endregion
 
         /// <inheritdoc />
