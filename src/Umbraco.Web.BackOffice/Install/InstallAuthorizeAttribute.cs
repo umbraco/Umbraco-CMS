@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Services;
 
-namespace Umbraco.Cms.Web.Common.Install
+namespace Umbraco.Cms.Web.BackOffice.Install
 {
     /// <summary>
     /// Ensures authorization occurs for the installer if it has already completed.

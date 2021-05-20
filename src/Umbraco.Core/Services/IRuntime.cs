@@ -1,3 +1,5 @@
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.Extensions.Hosting;
 
 namespace Umbraco.Cms.Core.Services
@@ -11,5 +13,10 @@ namespace Umbraco.Cms.Core.Services
         /// Gets the runtime state.
         /// </summary>
         IRuntimeState State { get; }
+
+        /// <summary>
+        /// Stops and Starts the runtime using the original cancellation token.
+        /// </summary>
+        Task RestartAsync();
     }
 }

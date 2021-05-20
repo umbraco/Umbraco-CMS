@@ -12,7 +12,7 @@ using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Web.Common.Install
+namespace Umbraco.Cms.Web.BackOffice.Install
 {
     public class CreateUnattendedUserNotificationHandler : INotificationAsyncHandler<UnattendedInstallNotification>
     {

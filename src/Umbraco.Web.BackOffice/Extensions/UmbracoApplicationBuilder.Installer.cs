@@ -1,7 +1,7 @@
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
+using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.Common.ApplicationBuilder;
-using Umbraco.Cms.Web.Common.Install;
 
 namespace Umbraco.Extensions
 {

@@ -9,7 +9,7 @@ using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Web.Common.Install;
+using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Extensions;
 using static Umbraco.Cms.Core.Constants.Web.Routing;
 using Constants = Umbraco.Cms.Core.Constants;

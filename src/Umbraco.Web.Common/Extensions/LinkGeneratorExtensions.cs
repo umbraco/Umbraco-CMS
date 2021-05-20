@@ -10,7 +10,6 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Web.Mvc;
 using Umbraco.Cms.Web.Common.Controllers;
-using Umbraco.Cms.Web.Common.Install;
 
 namespace Umbraco.Extensions
 {
@@ -38,21 +37,6 @@ namespace Umbraco.Extensions
 
             return linkGenerator.GetPathByAction("Default", ControllerExtensions.GetControllerName(backOfficeControllerType), values: new { area = Cms.Core.Constants.Web.Mvc.BackOfficeApiArea });
         }
-
-        /// <summary>
-        /// Returns the URL for the installer
-        /// </summary>
-        public static string GetInstallerUrl(this LinkGenerator linkGenerator)
-            => linkGenerator.GetPathByAction(nameof(InstallController.Index), ControllerExtensions.GetControllerName<InstallController>(), new { area = Cms.Core.Constants.Web.Mvc.InstallArea });
-
-        /// <summary>
-        /// Returns the URL for the installer api
-        /// </summary>
-        public static string GetInstallerApiUrl(this LinkGenerator linkGenerator)
-            => linkGenerator.GetPathByAction(
-                nameof(InstallApiController.GetSetup),
-                ControllerExtensions.GetControllerName<InstallApiController>(),
-                new { area = Cms.Core.Constants.Web.Mvc.InstallArea }).TrimEnd(nameof(InstallApiController.GetSetup));
 
         /// <summary>
         /// Return the Url for a Web Api service
