@@ -1,5 +1,6 @@
 const umbracoFlow = require("./umbracoDataFlow");
 const _ = require('lodash');
+const tempDataStorage = require("./tempData");
 
 // Export methods for Artillery to be able to use
 module.exports = {
@@ -7,7 +8,38 @@ module.exports = {
     afterResponse: umbracoFlow.afterResponse,
     beforeScenario: umbracoFlow.beforeScenario,
     afterScenario: umbracoFlow.afterScenario,
-    configureDocType
+    configureDocType,
+    storeDocTypeId
+}
+
+/** Stores the INT doc type ids */
+function storeDocTypeId(requestParams, response, context, ee, next) {
+    if (!context.vars.jsonResponse) {
+        throw "jsonResponse was not found in the context";
+    }
+    if ((typeof context.vars.jsonResponse) !== 'object') {
+        throw "jsonResponse is not of type 'object'";
+    }
+
+    const tempData = tempDataStorage.getTempData();
+    if (!tempData.ids) {
+        tempData.ids = {};
+    }
+
+    let ids = [];
+    if (tempData.ids["docTypes"]) {
+        ids = tempData.ids["docTypes"];
+    }
+    else {
+        tempData.ids["docTypes"] = ids;
+    }
+
+    ids.push(context.vars.jsonResponse.id);
+
+    // update/persist this value to temp storage
+    tempDataStorage.saveTempData({ ids: tempData.ids });
+
+    next();
 }
 
 function configureDocType(requestParams, context, ee, next) {

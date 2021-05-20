@@ -27,11 +27,21 @@ function getCookieValueFromResponse(cookieName, response) {
     return found || null;
 }
 
-function setCookieIfMissing(context, cookieDictionary) {
+function setCookieIfMissing(context, requestParams, cookieDictionary) {
+
+    // Hack!
+    // This is not required if you specify ANY default cookie value in config, but if you
+    // don't and this is disabled then setting a cookie won't work
+    // See https://github.com/artilleryio/artillery/issues/1035
+    if (!context._enableCookieJar) {
+        writeDebug(context, "context._enableCookieJar is disabled, it is being enabled");
+        context._enableCookieJar = true;
+        requestParams.cookieJar = context._jar;
+    }
 
     // Undocumented - this is a tough-cookie obj instance: https://github.com/salesforce/tough-cookie
     // seen here: https://gitter.im/shoreditch-ops/artillery?at=581bb2912d4796175f3ed473
-    let cookieJar = context._jar._jar; // same as requestParams.jar._jar._jar
+    let cookieJar = context._jar; // same as requestParams.cookieJar
     let cookies = cookieJar.getCookiesSync(context.vars.target);
 
     _.forEach(cookieDictionary, function (value, key) {
@@ -117,7 +127,7 @@ function beforeRequest(requestParams, context, ee, next) {
 
     // set any missing cookies if we have them stored if it's not the login request
     if (!isLogin) {
-        setCookieIfMissing(context, {
+        setCookieIfMissing(context, requestParams, {
             "X-UMB-XSRF-TOKEN": tempData.umbXsrf,
             "UMB-XSRF-V": tempData.umbXsrfV,
             "UMB_UCONTEXT": tempData.umbAuthCookie
@@ -132,13 +142,13 @@ function afterResponse(requestParams, response, context, ee, next) {
 
     if (response.statusCode != 200) {
         // Kill the process if we don't have a 200 code
-        const msg = "Non 200 status code returned: " + response.request.uri.path;
+        const msg = "Non 200 status code returned: " + response.statusCode;
         writeError(msg);
         writeError(response);
         throw msg;
     }
 
-    writeDebug(context, `${response.request.uri.path}: ${response.statusCode}`);
+    writeDebug(context, `Status Code: ${response.statusCode}`);
 
     // If we have a jsonResponse var in the response it means we've flagged
     // the response to be captured

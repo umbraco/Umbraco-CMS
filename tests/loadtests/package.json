@@ -3,12 +3,14 @@
   "version": "1.0.0",
   "description": "contains templates for running Artillery (https://artillery.io/docs/getting-started/#running-the-test) for load testing",
   "main": "umbraco-flow.js",
-  "dependencies": {},
+  "dependencies": {
+    "yargs": "^17.0.1"
+  },
   "devDependencies": {
     "@azure/cosmos": "^3.10.3",
     "artillery": "^1.6.1",
     "csv-parser": "^3.0.0",
-    "lodash": "^4.17.20",
+    "lodash": "^4.17.21",
     "node-powershell": "^4.0.0",
     "perfmon": "^0.2.0",
     "tough-cookie": "^4.0.0",

@@ -1,0 +1,27 @@
+# variables can be set by env vars: https://artillery.io/docs/guides/guides/test-script-reference.html#Using-dynamic-values-in-config
+
+config:
+  defaults:
+    cookie:
+      UMB_UCONTEXT: ""
+  variables:
+    backOfficeApiPath: "/umbraco/backoffice/UmbracoApi"
+  processor: "./content.js"
+  phases:
+    - duration: 1
+      arrivalRate: 1
+scenarios:
+  - name: "Delete content"
+    beforeScenario: "beforeScenario"
+    afterScenario: "afterScenario"
+    beforeRequest: "beforeRequest"
+    afterResponse: "afterResponse"
+    flow:
+    - loop:
+      - post:
+          url: "{{ backOfficeApiPath }}/Content/DeleteById"
+          qs:
+            id: "{{ contentIdToDelete }}"
+          beforeRequest: "configureContentIdToDelete"
+      whileTrue: "deleteUntilNoneLeft"
+

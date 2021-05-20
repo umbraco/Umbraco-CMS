@@ -1,14 +1,16 @@
+const yargs = require('yargs/yargs')
+const { hideBin } = require('yargs/helpers')
 const CosmosClient = require("@azure/cosmos").CosmosClient;
 const dbContext = require("./databaseContext");
 const csvReports = require("./csvReports");
 const throughputReports = require("./throughputReports");
 
-async function pushReports(container, umbVersion, machineSpec, perfReportType) {
-    await pushPerformanceReports(container, umbVersion, machineSpec, perfReportType);
-    await pushThroughputReports(container, umbVersion, machineSpec);
+async function pushReports(container, umbVersion, specName, perfReportType) {
+    await pushPerformanceReports(container, umbVersion, specName, perfReportType);
+    await pushThroughputReports(container, umbVersion, specName);
 }
 
-async function pushThroughputReports(container, umbVersion, machineSpec) {
+async function pushThroughputReports(container, umbVersion, specName) {
     const reports = throughputReports.createReports();
 
     for (let i = 0; i < reports.length; i++) {
@@ -16,7 +18,7 @@ async function pushThroughputReports(container, umbVersion, machineSpec) {
 
         const newItem = {
             id: report.fileId,
-            testingSource: machineSpec,
+            testingSource: specName,
             umbVersion: umbVersion,
             file: report.file,
             fileDate: report.fileDate,
@@ -30,7 +32,7 @@ async function pushThroughputReports(container, umbVersion, machineSpec) {
     }
 }
 
-async function pushPerformanceReports(container, umbVersion, machineSpec, perfReportType) {
+async function pushPerformanceReports(container, umbVersion, specName, perfReportType) {
 
     const reports = await csvReports.createReports(perfReportType);
 
@@ -39,7 +41,7 @@ async function pushPerformanceReports(container, umbVersion, machineSpec, perfRe
 
         const newItem = {
             id: report.fileId,
-            testingSource: machineSpec,
+            testingSource: specName,
             umbVersion: umbVersion,
             file: report.file,
             fileDate: report.fileDate,
@@ -53,7 +55,7 @@ async function pushPerformanceReports(container, umbVersion, machineSpec, perfRe
     }
 }
 
-async function showReport(container, machineSpec) {
+async function showReport(container, specName) {
 
     const queries = [
         `SELECT
@@ -65,9 +67,10 @@ async function showReport(container, machineSpec) {
             AVG(c.report['gen 1 heap size']) Gen1,
             AVG(c.report['gen 0 heap size']) Gen0,
             AVG(c.report['working set']) WorkingSet,
+            AVG(c.report['# total committed bytes']) TotalCommittedBytes,
             AVG(c.report['% processor time']) ProcessorTime
         FROM c
-        WHERE c.testingSource = '${machineSpec}' AND c.testType = 'perf'
+        WHERE c.testingSource = '${specName}' AND c.testType = 'perf'
         GROUP BY c.umbVersion, c.file`,
 
         `SELECT
@@ -77,7 +80,7 @@ async function showReport(container, machineSpec) {
             AVG(c.report.latency.p99) P99,
             AVG(c.report.latency.p95) P95
         FROM c
-        WHERE c.testingSource = '${machineSpec}' AND c.testType = 'throughput'
+        WHERE c.testingSource = '${specName}' AND c.testType = 'throughput'
         GROUP BY c.umbVersion, c.file`
     ];
 
@@ -101,48 +104,39 @@ async function showReport(container, machineSpec) {
 }
 
 async function main() {
-    const myArgs = process.argv.slice(2);
-    if (myArgs.length < 1) {
-        throw "Missing argument for the Umbraco version";
-    }
-    if (myArgs.length < 2) {
-        throw "Missing argument for the test runner machine spec";
-    }
-    if (myArgs.length < 3) {
-        throw "Missing argument for cosmosdb endpoint";
-    }
-    if (myArgs.length < 4) {
-        throw "Missing argument for cosmosdb key";
-    }
-    if (myArgs.length < 5) {
-        throw "Missing argument for cosmosdb databaseId";
-    }
-    if (myArgs.length < 6) {
-        throw "Missing argument for cosmosdb containerId";
-    }
-    if (myArgs.length < 7) {
-        throw "Missing argument for perf counter report type";
-    }
 
-    const umbVersion = myArgs[0];
-    const machineSpec = myArgs[1];
-    const endpoint = myArgs[2];
-    const key = myArgs[3];
-    const databaseId = myArgs[4];
-    const containerId = myArgs[5];
-    const perfReportType = myArgs[6];
+    const argv = yargs(hideBin(process.argv)).argv
 
-    const client = new CosmosClient({ endpoint, key });
+    if (argv.cosmosEndpoint && argv.cosmosKey && argv.cosmosDatabaseId && argv.cosmosContainerId && argv.specName) {
 
-    const database = client.database(databaseId);
-    const container = database.container(containerId);
+        const client = new CosmosClient({
+            "endpoint": argv.cosmosEndpoint,
+            "key": argv.cosmosKey
+        });
+        const database = client.database(argv.cosmosDatabaseId);
+        const container = database.container(argv.cosmosContainerId);
 
-    // Make sure Tasks database is already setup. If not, create it.
-    const partitionKey = { kind: "Hash", paths: ["/testingSource"] };
-    await dbContext.create(client, databaseId, containerId, partitionKey);
+        if (argv.sendReport) {
+            if (argv.umbVersion && argv.perfReportType) {
+                // Make sure Tasks database is already setup. If not, create it.
+                const partitionKey = { kind: "Hash", paths: ["/testingSource"] };
+                await dbContext.create(client, argv.cosmosDatabaseId, argv.cosmosContainerId, partitionKey);
 
-    await pushReports(container, umbVersion, machineSpec, perfReportType);
-    await showReport(container, machineSpec);
+                await pushReports(container, argv.umbVersion, argv.specName, argv.perfReportType);
+            }
+            else {
+                throw "Missing required reporting arguments";
+            }
+        }
+
+        if (argv.showReport) {
+            await showReport(container, argv.specName);
+        }
+
+    }
+    else {
+        throw "Missing required cosmos arguments";
+    }
 }
 
 main();

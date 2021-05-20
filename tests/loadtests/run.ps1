@@ -79,6 +79,9 @@ function Start-WindowsCounters {
         "\\$($ServerName)\Process($($ProcessName))\% Processor Time",
         # We won't use Private Bytes because this is not compat with dotnet-counters
         #"\\$($ServerName)\Process($($ProcessName))\Private Bytes",
+        # Working set docs are here https://docs.microsoft.com/en-us/windows/win32/memory/working-set
+        # Also, https://docs.microsoft.com/en-us/aspnet/core/performance/memory?view=aspnetcore-5.0
+        # "The working set shown is the same value Task Manager displays."
         "\\$($ServerName)\Process($($ProcessName))\Working Set",
         # In theory this is the same as the dotnet-counter value for gc-heap-size which
         # is "Total heap size reported by the GC (MB)"
@@ -172,10 +175,6 @@ $ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $RunCount +
 
 Foreach ($app in $Config.apps)
 {
-
-    # Stop all IIS Sites
-    Get-IISSite | Stop-IISSite -Name {$_.Name}  -ErrorAction SilentlyContinue -Confirm:$false
-
     # TODO: Ideally we'd start with fresh DBs and do the install as part of an artillery run
     # This is actually going to be quite important to have correct metrics, else there's a few risks:
     # There will be a lot of content in each of these DBs the more they are run, therefore possibly
@@ -183,45 +182,41 @@ Foreach ($app in $Config.apps)
     # instructions which will skew metrics because there will be more going on than just what is in the metrics.
     # TODO: We need to also disable all auto health checks on all sites since that is another background task that runs.
     # TODO: There is probably also other background tasks we should disable.
+    # TODO: What about ModelsBuilder? Enabled/Disabled? PureLive will cause quite an overhead.
 
-    $ProcessName = $app.processName
+    # Reset iis (stops all w3wp processes)
+    & iisreset /restart
 
-    if ($app.iisSiteName)
-    {
-        # Reset iis (stops all w3wp processes) and since sites are stopped above they wont respawn
-        & iisreset /restart
+    # Stop all IIS Sites since restarting iis can put all sites back into a start phase
+    Get-IISSite | Stop-IISSite -Name {$_.Name} -ErrorAction SilentlyContinue -Confirm:$false
 
-        # This would be required if we don't stop all sites in order to get the correct IIS process Id
-        # for perf counters. But since we are stopping them all, then the process name will always
-        # just be w3wp.
+    # This would be required if we don't stop all sites in order to get the correct IIS process Id
+    # for perf counters. But since we are stopping them all, then the process name will always
+    # just be w3wp.
 
-        ## get iis site by binding info
-        #$siteBinding = $app.baseUrl.Split("://", [System.StringSplitOptions]::RemoveEmptyEntries)[1]
+    ## get iis site by binding info
+    #$siteBinding = $app.baseUrl.Split("://", [System.StringSplitOptions]::RemoveEmptyEntries)[1]
 
-        #Write-Host "Looking up site by binding $siteBinding"
+    #Write-Host "Looking up site by binding $siteBinding"
 
-        #$iisSite = Get-IISSite | Where-Object {$_.Bindings[0].bindingInformation -Match "$siteBinding$" }
-        #if (!$iisSite -or $iisSite.Count -ne 1){
-        #    throw "Could not find IIS site with binding $siteBinding"
-        #}
+    #$iisSite = Get-IISSite | Where-Object {$_.Bindings[0].bindingInformation -Match "$siteBinding$" }
+    #if (!$iisSite -or $iisSite.Count -ne 1){
+    #    throw "Could not find IIS site with binding $siteBinding"
+    #}
 
-        #Write-Host "IIS Site ID = $iisSite.Id"
+    #Write-Host "IIS Site ID = $iisSite.Id"
 
-        ## find the w3wp counter process for the site id
-        #$counterProcess = $w3wpCounterProcesses | Where-Object { (Get-WebAppDomain -ProcessId $_.CookedValue).siteId -eq $iisSite.Id }
-        ## then we need to get the w3wp part (it will be like "\\teamcanada3\process(w3wp#3)\id process")
-        #$ProcessName = ($counterProcess.Path | Select-String -Pattern 'process\((.*?)\)').Matches[0].Groups[1].Value
+    ## find the w3wp counter process for the site id
+    #$counterProcess = $w3wpCounterProcesses | Where-Object { (Get-WebAppDomain -ProcessId $_.CookedValue).siteId -eq $iisSite.Id }
+    ## then we need to get the w3wp part (it will be like "\\teamcanada3\process(w3wp#3)\id process")
+    #$ProcessName = ($counterProcess.Path | Select-String -Pattern 'process\((.*?)\)').Matches[0].Groups[1].Value
 
-        $ProcessName = "w3wp"
+    $ProcessName = "w3wp"
 
-        Write-Host "IIS Process name = $($ProcessName)"
+    Write-Host "IIS Process name = $($ProcessName)"
 
-        Write-Host "Starting Site $($app.iisSiteName)"
-        Start-IISSite -Name $app.iisSiteName
-    }
-    elseif (!$ProcessName) {
-        throw "Configuration can only be iis or process name based"
-    }
+    Write-Host "Starting Site $($app.iisSiteName)"
+    Start-IISSite -Name $app.iisSiteName
 
     if(!$?)
     {
@@ -242,7 +237,8 @@ Foreach ($app in $Config.apps)
         "warmup.yml",
         "login-and-load.yml",
         "create-doctype.yml",
-        "create-content.yml"
+        "create-content.yml",
+        "delete-content.yml"
     )
 
     # set special artillery debug switches
@@ -279,6 +275,14 @@ Foreach ($app in $Config.apps)
         # start the counter collection on a background task, since we specified continuous this will keep going till we stop the task
         $Job = Start-CounterCollection -CounterType $app.counterCollection -ProcessName $ProcessName -ServerName $ServerName -ReportName $a
 
+        if(!$?)
+        {
+            exit 1
+        }
+
+        # Short pause while they initialize
+        Start-Sleep -Seconds 1
+
         try {
             # Execute artillery
             # TODO: We can adjust the phase duration time from here: https://webkul.com/blog/artillery-execute-script/
@@ -308,10 +312,19 @@ Foreach ($app in $Config.apps)
                 # a way to terminate a process forcing the console app too exit correctly, only with a 'Q'
                 # command.
                 # See https://github.com/dotnet/diagnostics/issues/451#issuecomment-843650234
-                Write-Host "Sending exist command"
+                Write-Host "Sending exit command"
                 [Microsoft.VisualBasic.Interaction]::AppActivate($($Job.Id))
                 [System.Windows.Forms.SendKeys]::SendWait("Q")
-                Write-Host "Exited"
+                Start-Sleep -Seconds 3
+
+                if ($Job.ExitCode -ne 0) {
+                    Write-Host "Could not Stop dotnet-counters, metrics will not be stored"
+
+                    # we need to kill it if it didn't exit
+                    $Job.Close();
+                    $Job.Kill();
+                }
+
             }
             else {
                 $Job | Receive-Job -Keep # see if there are any errors
@@ -322,6 +335,18 @@ Foreach ($app in $Config.apps)
         }
     }
 
+    Stop-IISSite -Name $app.iisSiteName -ErrorAction SilentlyContinue -Confirm:$false
+
     # Run the node app to push our reports
-    & node .\app.js $($app.umbracoVersion) $SpecName $CosmosDbEndpoint $CosmosDbKey $CosmosDbDatabaseId $CosmosDbContainerId $($app.counterCollection)
+    & node .\app.js --send-report --umb-version $($app.umbracoVersion) --spec-name $SpecName --cosmos-endpoint $CosmosDbEndpoint --cosmos-key $CosmosDbKey --cosmos-database-id $CosmosDbDatabaseId --cosmos-container-id $CosmosDbContainerId --perf-report-type $($app.counterCollection)
+
+    if(!$?)
+    {
+        exit 1
+    }
+
+    # Short pause before switching to the next app
+    Start-Sleep -Seconds 5
 }
+
+& node .\app.js --show-report --spec-name $SpecName --cosmos-endpoint $CosmosDbEndpoint --cosmos-key $CosmosDbKey --cosmos-database-id $CosmosDbDatabaseId --cosmos-container-id $CosmosDbContainerId
