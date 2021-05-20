@@ -18,8 +18,8 @@
 
 
     <ItemGroup>
-      <PackageReference Include="HtmlAgilityPack" Version="1.11.31" />
-      <PackageReference Include="MailKit" Version="2.10.1" />
+      <PackageReference Include="HtmlAgilityPack" Version="1.11.33" />
+      <PackageReference Include="MailKit" Version="2.12.0" />
       <PackageReference Include="Markdown" Version="2.2.1" />
       <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.8.0" />
       <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
@@ -27,19 +27,19 @@
       <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="5.0.0" />
       <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="5.0.1" />
       <PackageReference Include="Microsoft.Extensions.Http" Version="5.0.0" />
-      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.3" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="5.0.6" />
       <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" />
       <PackageReference Include="MiniProfiler.Shared" Version="4.2.22" />
       <PackageReference Include="ncrontab" Version="3.3.1" />
-      <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.1" />
       <PackageReference Include="NPoco" Version="4.0.2" />
       <PackageReference Include="Serilog" Version="2.10.0" />
       <PackageReference Include="Serilog.Enrichers.Process" Version="2.0.1" />
       <PackageReference Include="Serilog.Enrichers.Thread" Version="3.1.0" />
-      <PackageReference Include="Serilog.Extensions.Hosting" Version="3.1.0" />
+      <PackageReference Include="Serilog.Extensions.Hosting" Version="4.1.2" />
       <PackageReference Include="Serilog.Filters.Expressions" Version="2.1.0" />
       <PackageReference Include="Serilog.Formatting.Compact" Version="1.1.0" />
-      <PackageReference Include="Serilog.Formatting.Compact.Reader" Version="1.0.3" />
+      <PackageReference Include="Serilog.Formatting.Compact.Reader" Version="1.0.5" />
       <PackageReference Include="Serilog.Settings.AppSettings" Version="2.2.2" />
       <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
       <PackageReference Include="Serilog.Sinks.Async" Version="1.4.0" />

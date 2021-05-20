@@ -97,9 +97,6 @@
     <PackageReference Include="MiniProfiler" Version="4.2.22" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="NPoco" Version="4.0.2" />
-    <PackageReference Include="MiniProfiler" Version="4.0.138" />
-    <PackageReference Include="Newtonsoft.Json" Version="12.0.1" />
-    <PackageReference Include="NPoco" Version="3.9.4" />
     <PackageReference Include="SecurityCodeScan">
       <Version>3.5.4</Version>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
