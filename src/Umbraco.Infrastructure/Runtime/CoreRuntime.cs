@@ -100,6 +100,9 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             AppDomain.CurrentDomain.SetData("DataDirectory", _hostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 
+            // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
+            AcquireMainDom();
+
             DoUnattendedInstall();
             DetermineRuntimeLevel();
 
@@ -114,8 +117,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(StartAsync)}");
             }
 
-            // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-            AcquireMainDom();
+
 
             // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
             if (State.Reason == RuntimeLevelReason.UpgradeMigrations && State.Level == RuntimeLevel.Run)
