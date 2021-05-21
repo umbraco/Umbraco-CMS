@@ -97,7 +97,6 @@ namespace Umbraco.Web.Routing
                     v = c.Value<string>(propertyAlias);
                 }
                 if (string.IsNullOrWhiteSpace(v)) return false;
-                var replace = "," + v.Replace(" ", "") + ",";
                 v = CleanValue(v);
                 if (v.InvariantContains(a1) || v.InvariantContains(a2)) return true;
 
