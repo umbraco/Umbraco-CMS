@@ -6,6 +6,7 @@ using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
 using Umbraco.Web.PublishedCache;
+using System.Globalization;
 
 namespace Umbraco.Web.Routing
 {
@@ -38,7 +39,7 @@ namespace Umbraco.Web.Routing
             {
                 node = FindContentByAlias(frequest.UmbracoContext.Content,
                     frequest.HasDomain ? frequest.Domain.ContentId : 0,
-                    frequest.Culture.Name,
+                    frequest.Culture,
                     frequest.Uri.GetAbsolutePathDecoded());
 
                 if (node != null)
@@ -51,7 +52,7 @@ namespace Umbraco.Web.Routing
             return node != null;
         }
 
-        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, string culture, string alias)
+        private static IPublishedContent FindContentByAlias(IPublishedContentCache cache, int rootNodeId, CultureInfo culture, string alias)
         {
             if (alias == null) throw new ArgumentNullException(nameof(alias));
 
@@ -68,6 +69,11 @@ namespace Umbraco.Web.Routing
             var test2 = ",/" + test1; // test2 is ",/alias,"
             test1 = "," + test1; // test1 is ",alias,"
 
+            string CleanValue(string v)
+            {
+                return "," + v.Replace(" ", "") + ",";
+            }
+
             bool IsMatch(IPublishedContent c, string a1, string a2)
             {
                 // this basically implements the original XPath query ;-(
@@ -83,15 +89,24 @@ namespace Umbraco.Web.Routing
                 string v;
                 if (varies)
                 {
-                    if (!c.HasCulture(culture)) return false;
-                    v = c.Value<string>(propertyAlias, culture);
+                    if (!c.HasCulture(culture.Name)) return false;
+                    v = c.Value<string>(propertyAlias, culture.Name);
                 }
                 else
                 {
                     v = c.Value<string>(propertyAlias);
                 }
                 if (string.IsNullOrWhiteSpace(v)) return false;
-                v = "," + v.Replace(" ", "") + ",";
+                var replace = "," + v.Replace(" ", "") + ",";
+                v = CleanValue(v);
+                if (v.InvariantContains(a1) || v.InvariantContains(a2)) return true;
+
+                // added support for culture variation
+                // this basically appends the current culture in umbracoUrlAlias value
+                // e.g {culture}/{umbracoUrlAlias}
+                var propAliases = c.Value<string>(propertyAlias, culture.Name).Split(',').Select(x => $"{culture.TwoLetterISOLanguageName}/{x}");
+                v = string.Join(",", propAliases);
+                v = CleanValue(v);
                 return v.InvariantContains(a1) || v.InvariantContains(a2);
             }
 
