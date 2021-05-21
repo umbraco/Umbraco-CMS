@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Sections;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Tour;
 using Umbraco.Cms.Core.Trees;
+using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.DependencyInjection
@@ -269,5 +270,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// </summary>
         public static SearchableTreeCollectionBuilder SearchableTrees(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<SearchableTreeCollectionBuilder>();
+
+        /// <summary>
+        /// Gets the back office custom assets collection builder
+        /// </summary>
+        public static CustomBackOfficeAssetsCollectionBuilder BackOfficeAssets(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<CustomBackOfficeAssetsCollectionBuilder>();
     }
 }

@@ -27,6 +27,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IManifestParser _parser;
         private readonly GlobalSettings _globalSettings;
+        private readonly CustomBackOfficeAssetsCollection _customBackOfficeAssetsCollection;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly PropertyEditorCollection _propertyEditorCollection;
 
@@ -35,13 +36,15 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
             IManifestParser parser,
             PropertyEditorCollection propertyEditorCollection,
             IHostingEnvironment hostingEnvironment,
-            IOptions<GlobalSettings> globalSettings)
+            IOptions<GlobalSettings> globalSettings,
+            CustomBackOfficeAssetsCollection customBackOfficeAssetsCollection)
         {
             _runtimeMinifier = runtimeMinifier;
             _parser = parser;
             _propertyEditorCollection = propertyEditorCollection;
             _hostingEnvironment = hostingEnvironment;
             _globalSettings = globalSettings.Value;
+            _customBackOfficeAssetsCollection = customBackOfficeAssetsCollection;
         }
 
         public void CreateBundles()
@@ -74,17 +77,21 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
                 .GroupBy(x => x.AssetType)
                 .ToDictionary(x => x.Key, x => x.Select(c => c.FilePath));
 
+            var customAssets = _customBackOfficeAssetsCollection.GroupBy(x => x.DependencyType).ToDictionary(x => x.Key, x => x.Select(c => c.FilePath));
+
+            var jsAssets = (customAssets.TryGetValue(AssetType.Javascript, out var customScripts) ? customScripts : Enumerable.Empty<string>())
+                .Union(propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>());
             _runtimeMinifier.CreateJsBundle(
                 UmbracoExtensionsJsBundleName, true,
                 FormatPaths(
-                    GetScriptsForBackOfficeExtensions(
-                        propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>())));
+                    GetScriptsForBackOfficeExtensions(jsAssets)));
 
+            var cssAssets = (customAssets.TryGetValue(AssetType.Css, out var customStyles) ? customStyles : Enumerable.Empty<string>())
+                .Union(propertyEditorAssets.TryGetValue(AssetType.Css, out var styles) ? styles : Enumerable.Empty<string>());
             _runtimeMinifier.CreateCssBundle(
                 UmbracoCssBundleName, true,
                 FormatPaths(
-                    GetStylesheetsForBackOffice(
-                        propertyEditorAssets.TryGetValue(AssetType.Css, out var styles) ? styles : Enumerable.Empty<string>())));
+                    GetStylesheetsForBackOffice(cssAssets)));
         }
 
         /// <summary>
