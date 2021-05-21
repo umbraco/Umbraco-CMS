@@ -1095,9 +1095,9 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
       ]]></key>
     <key alias="sectionName">Nazwa Sekcji</key>
     <key alias="sectionMandatory">Sekcja jest wymagana</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Jeśli wymagana, szablon dziecka musi zawierać definicję <code>@section</code>, w przeciwnym przypadku wystąpi błąd.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Konstruktor zapytań</key>
     <key alias="itemsReturned">Element zwrócony, w</key>
     <key alias="iWant">Chcę</key>

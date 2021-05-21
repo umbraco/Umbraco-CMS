@@ -1527,9 +1527,9 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
       ]]></key>
     <key alias="sectionName">Nom de la section</key>
     <key alias="sectionMandatory">La section est obligatoire</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Si obligatoire, le modèle enfant doit contenir une définition <code>@section</code>, sinon une erreur est affichée.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Générateur de requêtes</key>
     <key alias="itemsReturned">éléments trouvés, en</key>
     <key alias="copyToClipboard">copier dans le clipboard</key>

@@ -1113,9 +1113,9 @@
       ]]></key>
     <key alias="sectionName">Nombre de sección</key>
     <key alias="sectionMandatory">Sección es obligatoria</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
             Si está marcada como obligatoria, la plantilla hija debe contener una definición de <code>@section</code> o se mostrará un error.
-        </key>
+    ]]></key>
     <key alias="queryBuilder">Constructor de consultas</key>
     <key alias="itemsReturned">elementos devueltos, en</key>
     <key alias="iWant">Quiero</key>

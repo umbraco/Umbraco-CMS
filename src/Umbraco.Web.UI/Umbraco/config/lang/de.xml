@@ -1557,10 +1557,10 @@
     </key>
     <key alias="sectionName">Bereichsname</key>
     <key alias="sectionMandatory">Bereich ist notwendig</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Wenn notwendig, dann muss die untergeordnete Vorlage eine <code>@section</code> Definition gleichen Namens enthalten,
       anderfalls tritt ein Fehler auf.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Abfrage-Generator</key>
     <key alias="itemsReturned">zurückgegebene Elemente, in</key>
     <key alias="iWant">Ich möchte</key>

@@ -1490,9 +1490,9 @@
       ]]></key>
     <key alias="sectionName">Название секции</key>
     <key alias="sectionMandatory">Секция обязательна</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Если секция помечена как обязательная, то дочерний шаблон должен обязательно содержать ее определение <code>@section</code>, в противном случае генерируется ошибка.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Генератор запросов</key>
     <key alias="itemsReturned">элементов в результате, за</key>
     <key alias="iWant">Мне нужны</key>

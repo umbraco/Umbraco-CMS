@@ -1622,9 +1622,9 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     </key>
     <key alias="sectionName">Bölüm Adı</key>
     <key alias="sectionMandatory">Bölüm zorunludur</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Zorunlu ise, alt şablon bir <code>@section</code> tanımı içermelidir, aksi takdirde bir hata gösterilir.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Sorgu oluşturucu</key>
     <key alias="itemsReturned">öğe iade edildi,</key>
     <key alias="copyToClipboard">panoya kopyala</key>
