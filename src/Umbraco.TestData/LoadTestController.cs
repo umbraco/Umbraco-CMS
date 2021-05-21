@@ -13,6 +13,9 @@ using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
+using System.IO;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
 
 // see https://github.com/Shazwazza/UmbracoScripts/tree/master/src/LoadTesting
 
@@ -20,10 +23,14 @@ namespace Umbraco.TestData
 {
     public class LoadTestController : Controller
     {
-        public LoadTestController(ServiceContext serviceContext, IShortStringHelper shortStringHelper)
+        public LoadTestController(
+            ServiceContext serviceContext,
+            IShortStringHelper shortStringHelper,
+            IHostingEnvironment hostingEnvironment)
         {
             _serviceContext = serviceContext;
             _shortStringHelper = shortStringHelper;
+            _hostingEnvironment = hostingEnvironment;
         }
 
         private static readonly Random _random = new Random();
@@ -101,6 +108,7 @@ namespace Umbraco.TestData
 " + FootHtml;
         private readonly ServiceContext _serviceContext;
         private readonly IShortStringHelper _shortStringHelper;
+        private readonly IHostingEnvironment _hostingEnvironment;
 
         private ActionResult ContentHtml(string s)
         {
@@ -264,6 +272,15 @@ namespace Umbraco.TestData
             System.Web.HttpContext.Current.User = null;
             Thread.CurrentPrincipal = null;
             HttpRuntime.UnloadAppDomain();
+        }
+
+        public ActionResult ColdBootRestart()
+        {
+            Directory.Delete(_hostingEnvironment.MapPathContentRoot(Path.Combine(Constants.SystemDirectories.TempData,"DistCache")), true);
+
+            DoRestart();
+
+            return Content("Cold Boot Restarted.");
         }
 
         public ActionResult Restart()

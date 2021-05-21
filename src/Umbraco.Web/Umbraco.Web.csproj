@@ -71,6 +71,7 @@
     <PackageReference Include="HtmlSanitizer">
       <Version>5.0.376</Version>
     </PackageReference>
+    <PackageReference Include="Examine" Version="1.2.0" />
     <PackageReference Include="HtmlAgilityPack" Version="1.8.14" />
     <PackageReference Include="ImageProcessor">
       <Version>2.9.1</Version>

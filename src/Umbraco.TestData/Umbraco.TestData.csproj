@@ -42,6 +42,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="LoadTestComponent.cs" />
+    <Compile Include="LoadTestComposer.cs" />
     <Compile Include="LoadTestController.cs" />
     <Compile Include="SegmentTestController.cs" />
     <Compile Include="UmbracoTestDataController.cs" />
@@ -58,6 +60,10 @@
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj">
       <Project>{3ae7bf57-966b-45a5-910a-954d7c554441}</Project>
       <Name>Umbraco.Infrastructure</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj">
+      <Project>{f6de8da0-07cc-4ef2-8a59-2bc81dbb3830}</Project>
+      <Name>Umbraco.PublishedCache.NuCache</Name>
     </ProjectReference>
     <ProjectReference Include="..\Umbraco.Web\Umbraco.Web.csproj">
       <Project>{651e1350-91b6-44b7-bd60-7207006d7003}</Project>

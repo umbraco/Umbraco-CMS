@@ -86,6 +86,7 @@
       <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
     <PackageReference Include="Castle.Core" Version="4.3.1" />
+    <PackageReference Include="Examine" Version="1.2.0" />
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.11.31</Version>
     </PackageReference>

@@ -118,7 +118,8 @@ function MainController($scope, $location, appState, treeService, notificationsS
                         message: "Click to download",
                         sticky: true,
                         type: "info",
-                        url: update.url
+                        url: update.url,
+                        target: "_blank"
                     };
                     notificationsService.add(notification);
                 }
