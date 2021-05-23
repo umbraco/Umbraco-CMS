@@ -16,7 +16,7 @@
 
                     <div ng-class="{'flex': showAnchor}">
 
-                        <umb-control-group label="@defaultdialogs_urlLinkPicker" class="umb-linkpicker__url" alias="urlLinkPicker">
+                        <umb-control-group label="@defaultdialogs_urlLinkPicker" class="umb-linkpicker__url" ng-class="{'umb-linkpicker__url--w-100': !showAnchor}" alias="urlLinkPicker">
                             <input type="text"
                                     style="margin-right: 10px;"
                                     localize="placeholder"
