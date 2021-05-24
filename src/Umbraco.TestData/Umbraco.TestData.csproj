@@ -41,8 +41,11 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ContentTypeUtilityController.cs" />
     <Compile Include="LoadTestController.cs" />
+    <Compile Include="RestarterController.cs" />
     <Compile Include="SegmentTestController.cs" />
+    <Compile Include="TemplateUtilityController.cs" />
     <Compile Include="UmbracoTestDataController.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

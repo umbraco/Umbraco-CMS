@@ -1,0 +1,26 @@
+config:
+  processor: "./booting.js"
+  http:
+    # Long timeout for boot
+    timeout: 240
+  phases:
+    - duration: 1
+      arrivalRate: 1
+scenarios:
+  - name: "Coldboot"
+    flow:
+      - get:
+          url: "/umbraco/surface/Restarter/ColdBoot"
+      - loop:
+        - get:
+            url: "/"
+            afterResponse: "storeStatusCode"
+        whileTrue: "continueUntil200" # keep going until its a 200 response
+      # Run it twice
+      - get:
+          url: "/umbraco/surface/Restarter/ColdBoot"
+      - loop:
+        - get:
+            url: "/"
+            afterResponse: "storeStatusCode"
+        whileTrue: "continueUntil200" # keep going until its a 200 response

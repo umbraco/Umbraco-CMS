@@ -1,9 +1,14 @@
 config:
+  processor: "./umbracoDataFlow.js"
+  http:
+    # 60 second http timeout for warmup
+    timeout: 60
   phases:
     - duration: 1
       arrivalRate: 1
 scenarios:
   - name: "Warmup"
+    afterResponse: "afterResponse"
     flow:
       - loop:
         - get:

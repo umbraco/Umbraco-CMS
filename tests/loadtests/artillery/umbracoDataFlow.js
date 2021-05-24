@@ -10,12 +10,40 @@ module.exports = {
     beforeScenario,
     afterScenario,
     writeDebug,
-    writeError
+    writeError,
+    configureNewGuid,
+    reportLatency
 }
 
+// TODO: If we don't re-use this thing we should just make it specific to doc types instead of generically like this
 const guidTypes = {
-    "docTypes": /__NEW_DT_GUID__/g,
-    "content": /__NEW_C_GUID__/g,
+    "docTypes": /__NEW_DT_GUID__/g
+}
+
+
+/** Reports custom latency statistics */
+// TODO: This doesn't work with the latest artillery version but it's cool to see an example of
+// how you can get your own custom statistics into artillery.
+function reportLatency(req, res, context, events, next) {
+    // See https://github.com/artilleryio/artillery/issues/801
+
+    // events.emit('customStat', { stat: `waitTime for ${req.name || req.url}`, value: res.timingPhases.wait });
+    // events.emit('customStat', { stat: `dnsTime for ${req.name || req.url}`, value: res.timingPhases.dns });
+    // events.emit('customStat', { stat: `tcpTime for ${req.name || req.url}`, value: res.timingPhases.tcp });
+    // events.emit('customStat', { stat: `firstByteTime for ${req.name || req.url}`, value: res.timingPhases.firstByte });
+    // events.emit('customStat', { stat: `downloadTime for ${req.name || req.url}`, value: res.timingPhases.download });
+    // events.emit('customStat', { stat: `totalTime for ${req.name || req.url}`, value: res.timingPhases.total });
+
+    // This was a test and it works
+    // events.emit('customStat', { stat: `blah blah`, value: 123 });
+
+    return next();
+}
+
+/** Adds the newGuid to the context vars as a new GUID */
+function configureNewGuid(requestParams, context, ee, next) {
+    context.vars.newGuid = uuidv4();
+    return next();
 }
 
 function getCookieValueFromResponse(cookieName, response) {
@@ -66,28 +94,40 @@ function replaceAndStoreGuid(requestParams, tempData) {
         if (!tempData.guids) {
             tempData.guids = {};
         }
-        _.forEach(guidTypes, function (value, key) {
+        _.forEach(guidTypes, function (guidRegex, guidTypeName) {
             let guid = uuidv4();
+            let guidUsed = false;
+
             if (requestParams.body) {
-                requestParams.body = requestParams.body.replace(value, guid);
+                requestParams.body = requestParams.body.replace(guidRegex, guid);
+                guidUsed = requestParams.body.indexOf(guid) >= 0;
             }
+
             if (requestParams.formData) {
                 _.forEach(requestParams.formData, function (part, partKey) {
-                    requestParams.formData[partKey] = part.replace(value, guid);
+
+                    let replaced = part.replace(guidRegex, guid);
+                    requestParams.formData[partKey] = replaced;
+                    guidUsed = replaced.indexOf(guid) >= 0;
+                    if (guidUsed) {
+                        console.log(requestParams.formData[partKey]);
+                    }
                 });
             }
 
-            let guids = [];
-            if (tempData.guids[key]) {
-                guids = tempData.guids[key];
-            }
-            else {
-                tempData.guids[key] = guids;
-            }
-            guids.push(guid);
+            if (guidUsed) {
+                let guids = [];
+                if (tempData.guids[guidTypeName]) {
+                    guids = tempData.guids[guidTypeName];
+                }
+                else {
+                    tempData.guids[guidTypeName] = guids;
+                }
+                guids.push(guid);
 
-            // update/persist this value to temp storage
-            tempDataStorage.saveTempData({ guids: tempData.guids });
+                // update/persist this value to temp storage
+                tempDataStorage.saveTempData({ guids: tempData.guids });
+            }
         });
     }
 }
@@ -140,9 +180,10 @@ function beforeRequest(requestParams, context, ee, next) {
 /** Called when artillery receives a response to capture the cookies/xsrf */
 function afterResponse(requestParams, response, context, ee, next) {
 
-    if (response.statusCode != 200) {
+    let acceptedStatusCode = context.acceptedStatusCode || 200;
+    if (response.statusCode != acceptedStatusCode) {
         // Kill the process if we don't have a 200 code
-        const msg = "Non 200 status code returned: " + response.statusCode;
+        const msg = `Non ${acceptedStatusCode} status code returned: ${response.statusCode}`;
         writeError(msg);
         writeError(response);
         throw msg;
@@ -186,7 +227,7 @@ function afterResponse(requestParams, response, context, ee, next) {
 }
 
 function beforeScenario(context, ee, next) {
-    // will occur after each scenario PER user, so this isn't for the entire scenario operation!
+    // will occur before each scenario PER user, so this isn't for the entire scenario operation!
     return next();
 }
 

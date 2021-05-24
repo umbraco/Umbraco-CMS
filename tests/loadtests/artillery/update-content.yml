@@ -1,0 +1,32 @@
+# variables can be set by env vars: https://artillery.io/docs/guides/guides/test-script-reference.html#Using-dynamic-values-in-config
+
+config:
+  defaults:
+    cookie:
+      UMB_UCONTEXT: ""
+  variables:
+    backOfficeApiPath: "/umbraco/backoffice/UmbracoApi"
+  processor: "./content.js"
+  http:
+    # 15 second http timeout (which is very high!)
+    timeout: 15
+  phases:
+    - duration: 1
+      arrivalRate: 1
+scenarios:
+  - name: "Update content"
+    beforeScenario: "configureContentIdsToUpdate"
+    beforeRequest: "beforeRequest"
+    afterResponse: "afterResponse"
+    flow:
+    - loop:
+      - post:
+          url: "{{ backOfficeApiPath }}/Content/PostSave"
+          beforeRequest:
+            - "configureNewGuid"
+            - "configureContentIdToUpdate"
+          formData:
+            contentItem: '{"id":{{ contentIdToUpdate }},"contentTypeAlias":"{{ contentTypeAlias }}","parentId":-1,"action":"Publish","variants":[{"name":"benchmarkTest{{ newGuid }}","properties":[{"id":0,"alias":"email","value":"test@example.com"},{"id":0,"alias":"description","value":"Spicy jalapeno bacon ipsum dolor amet kevin cow leberkas spare ribs turducken short ribs chislic fatback pork loin. Drumstick chicken chislic pig swine. Beef turducken pork loin boudin pork belly fatback cow shankle tail chislic jowl. Chuck tail rump, turkey beef ribeye shoulder jerky jowl capicola."},{"id":0,"alias":"publishedDate","value":"2021-05-18 12:00:00"}],"culture":null,"segment":null,"publish":true,"save":true,"releaseDate":null,"expireDate":null}],"expireDate":null,"releaseDate":null,"templateAlias":"{{ contentTypeAlias }}"}'
+      # Update as many as we've created per user
+      # The ID that is updated is random based on the content created
+      count: 10

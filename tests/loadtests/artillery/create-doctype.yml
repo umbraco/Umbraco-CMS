@@ -7,6 +7,9 @@ config:
   variables:
     backOfficeApiPath: "/umbraco/backoffice/UmbracoApi"
   processor: "./contentTypes.js"
+  http:
+    # 15 second http timeout (which is very high!)
+    timeout: 15
   phases:
     - duration: 1
       arrivalRate: 1

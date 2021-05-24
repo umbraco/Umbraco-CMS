@@ -7,6 +7,9 @@ config:
   variables:
     backOfficeApiPath: "/umbraco/backoffice/UmbracoApi"
   processor: "./content.js"
+  http:
+    # 15 second http timeout (which is very high!)
+    timeout: 15
   phases:
     - duration: 1
       arrivalRate: 1
@@ -17,32 +20,36 @@ scenarios:
     beforeRequest: "beforeRequest"
     afterResponse: "afterResponse"
     flow:
-    - post:
-        # Create a root node
-        url: "{{ backOfficeApiPath }}/Content/PostSave"
-        beforeRequest: "configureContentTypeAlias"
-        afterResponse: "storeContentId"
-        formData:
-          contentItem: '{"id":0,"contentTypeAlias":"{{ contentTypeAlias }}","parentId":-1,"action":"publishNew","variants":[{"name":"benchmarkTest__NEW_C_GUID__","properties":[{"id":0,"alias":"email","value":"test@example.com"},{"id":0,"alias":"description","value":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at orci in massa dignissim maximus at nec turpis. Fusce fringilla, turpis tempus egestas tempor, est leo lobortis purus, in vestibulum mauris urna quis risus. Integer vel dui vel turpis congue molestie. Vestibulum vitae maximus justo, vel semper erat. Vivamus fermentum commodo pulvinar. Integer quis aliquet risus, in congue sapien. Mauris non dignissim elit."},{"id":0,"alias":"publishedDate","value":"2021-03-22 12:00:00"}],"culture":null,"segment":null,"publish":true,"save":true,"releaseDate":null,"expireDate":null}],"expireDate":null,"releaseDate":null,"templateAlias":"{{ contentTypeAlias }}"}'
-        capture:
-          - regexp: \)]}',(.+)
-            flags: s
-            group: 1
-            # Capture the angular json response to be processed by afterResponse
-            as: jsonResponse
-    - loop:
       - post:
-          # Create child nodes
+          # Create a root node
           url: "{{ backOfficeApiPath }}/Content/PostSave"
-          beforeRequest: "configureParentId"
+          beforeRequest:
+            - "configureNewGuid"
+            - "configureContentTypeAlias"
           afterResponse: "storeContentId"
           formData:
-            contentItem: '{"id":0,"contentTypeAlias":"{{ contentTypeAlias }}","parentId": {{ parentId }},"action":"publishNew","variants":[{"name":"benchmarkTest__NEW_C_GUID__","properties":[{"id":0,"alias":"email","value":"test@example.com"},{"id":0,"alias":"description","value":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at orci in massa dignissim maximus at nec turpis. Fusce fringilla, turpis tempus egestas tempor, est leo lobortis purus, in vestibulum mauris urna quis risus. Integer vel dui vel turpis congue molestie. Vestibulum vitae maximus justo, vel semper erat. Vivamus fermentum commodo pulvinar. Integer quis aliquet risus, in congue sapien. Mauris non dignissim elit."},{"id":0,"alias":"publishedDate","value":"2021-03-22 12:00:00"}],"culture":null,"segment":null,"publish":true,"save":true,"releaseDate":null,"expireDate":null}],"expireDate":null,"releaseDate":null,"templateAlias":"{{ contentTypeAlias }}"}'
+            contentItem: '{"id":0,"contentTypeAlias":"{{ contentTypeAlias }}","parentId":-1,"action":"publishNew","variants":[{"name":"benchmarkTest{{ newGuid }}","properties":[{"id":0,"alias":"email","value":"test@example.com"},{"id":0,"alias":"description","value":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at orci in massa dignissim maximus at nec turpis. Fusce fringilla, turpis tempus egestas tempor, est leo lobortis purus, in vestibulum mauris urna quis risus. Integer vel dui vel turpis congue molestie. Vestibulum vitae maximus justo, vel semper erat. Vivamus fermentum commodo pulvinar. Integer quis aliquet risus, in congue sapien. Mauris non dignissim elit."},{"id":0,"alias":"publishedDate","value":"2021-03-22 12:00:00"}],"culture":null,"segment":null,"publish":true,"save":true,"releaseDate":null,"expireDate":null}],"expireDate":null,"releaseDate":null,"templateAlias":"{{ contentTypeAlias }}"}'
           capture:
             - regexp: \)]}',(.+)
               flags: s
               group: 1
               # Capture the angular json response to be processed by afterResponse
               as: jsonResponse
-      count: 10
+      - loop:
+        - post:
+            # Create child nodes
+            url: "{{ backOfficeApiPath }}/Content/PostSave"
+            beforeRequest:
+              - "configureNewGuid"
+              - "configureParentId"
+            afterResponse: "storeContentId"
+            formData:
+              contentItem: '{"id":0,"contentTypeAlias":"{{ contentTypeAlias }}","parentId": {{ parentId }},"action":"publishNew","variants":[{"name":"benchmarkTest{{ newGuid }}","properties":[{"id":0,"alias":"email","value":"test@example.com"},{"id":0,"alias":"description","value":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at orci in massa dignissim maximus at nec turpis. Fusce fringilla, turpis tempus egestas tempor, est leo lobortis purus, in vestibulum mauris urna quis risus. Integer vel dui vel turpis congue molestie. Vestibulum vitae maximus justo, vel semper erat. Vivamus fermentum commodo pulvinar. Integer quis aliquet risus, in congue sapien. Mauris non dignissim elit."},{"id":0,"alias":"publishedDate","value":"2021-03-22 12:00:00"}],"culture":null,"segment":null,"publish":true,"save":true,"releaseDate":null,"expireDate":null}],"expireDate":null,"releaseDate":null,"templateAlias":"{{ contentTypeAlias }}"}'
+            capture:
+              - regexp: \)]}',(.+)
+                flags: s
+                group: 1
+                # Capture the angular json response to be processed by afterResponse
+                as: jsonResponse
+        count: 10
 

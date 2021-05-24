@@ -1,0 +1,13 @@
+config:
+  phases:
+    # ramps up the arrival rate of virtual users from A to X over Y seconds
+    - duration: 10
+      arrivalRate: 80
+      rampTo: 100
+scenarios:
+  - name: "FrontEnd"
+    flow:
+      - loop:
+          - get:
+              url: "/"
+        count: 250

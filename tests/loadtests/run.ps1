@@ -2,17 +2,21 @@
     # Something unique for the specific testing hardware/specs used for this test.
     # Used for logging to the reporting data store.
     # Example: "TEAMCANADA3-CG21"
-	[Parameter(Mandatory=$true)]
-	[string]
-	$SpecName,
+    [Parameter(Mandatory = $true)]
+    [string]
+    $SpecName,
 
-    [Parameter(Mandatory=$false)]
-	[int]
-	$RunCount = 1,
+    # The duration of virtual user arrivals, see https://artillery.io/docs/guides/guides/test-script-reference.html#Load-Phases
+    # Setting to 1, will just mean 1 round of virtual user arrivals (if Rate is 1 then it's just 1 run per scenario)
+    # This is seconds
+    [Parameter(Mandatory = $false)]
+    [int]
+    $Duration = 1,
 
-    [Parameter(Mandatory=$false)]
-	[int]
-	$Rate = 1
+    # The rate of virtual user arrivals, see https://artillery.io/docs/guides/guides/test-script-reference.html#Load-Phases
+    [Parameter(Mandatory = $false)]
+    [int]
+    $Rate = 1
 )
 
 
@@ -27,19 +31,19 @@ function Start-CounterCollection {
     #   https://michaelscodingspot.com/performance-counters/
 
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $CounterType,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ProcessName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ServerName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ReportName
     )
@@ -62,15 +66,15 @@ function Start-WindowsCounters {
     # Export-Counter not available in PS7!? :( https://stackoverflow.com/questions/64950228/export-counter-missing-from-powershell-7-1
 
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ProcessName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ServerName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ReportName
     )
@@ -107,7 +111,7 @@ function Start-WindowsCounters {
     }
 
     # start the counter collection on a background task, since we specified continuous this will keep going till we stop the task
-    $Job = Start-Job $GetCountersScript -Name "MyCounters" -ArgumentList $Counters,$($ServerName),"$PSScriptRoot\output\$ReportName.csv"
+    $Job = Start-Job $GetCountersScript -Name "MyCounters" -ArgumentList $Counters, $($ServerName), "$PSScriptRoot\output\$ReportName.csv"
     $Job | Receive-Job -Keep
 
     return $Job
@@ -115,11 +119,11 @@ function Start-WindowsCounters {
 
 function Start-DotNetCounters {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ProcessName,
 
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ReportName
     )
@@ -129,7 +133,7 @@ function Start-DotNetCounters {
 
     # We need to use Start-Process and cannot use Start-Job because the exe file doesn't handle console
     # redirects properly. See https://github.com/dotnet/diagnostics/issues/451#issuecomment-842741702
-    $Job = Start-Process -FilePath "dotnet-counters" -PassThru -Verb RunAs -ArgumentList "collect","--name",$($ProcessName),"--refresh-interval","1","--format","csv","--output","$PSScriptRoot\output\$ReportName.csv","--counters",$($Counters)
+    $Job = Start-Process -FilePath "dotnet-counters" -PassThru -Verb RunAs -ArgumentList "collect", "--name", $($ProcessName), "--refresh-interval", "1", "--format", "csv", "--output", "$PSScriptRoot\output\$ReportName.csv", "--counters", $($Counters)
 
     Write-Verbose "Process Start Info: $($Job.StartInfo.Arguments)"
 
@@ -164,7 +168,7 @@ $CosmosDbKey = $Config.cosmos.key
 $CosmosDbDatabaseId = $Config.cosmos.databaseId
 $CosmosDbContainerId = $Config.cosmos.containerId
 
-$ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $RunCount + ', ""arrivalRate"": ' + $Rate + '}]}}'
+$ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $Duration + ', ""arrivalRate"": ' + $Rate + '}]}}'
 
 ## Get the w3wp processes
 ## The process id for counters is like w3wp#4, but the number is just an incremented number
@@ -173,8 +177,7 @@ $ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $RunCount +
 ## Then we need to use these process id to query for the corresponding app domain
 #$w3wpCounterProcesses = (Get-Counter -Counter "\Process(w3wp*)\ID Process").CounterSamples
 
-Foreach ($app in $Config.apps)
-{
+Foreach ($app in $Config.apps) {
     # TODO: Ideally we'd start with fresh DBs and do the install as part of an artillery run
     # This is actually going to be quite important to have correct metrics, else there's a few risks:
     # There will be a lot of content in each of these DBs the more they are run, therefore possibly
@@ -188,7 +191,7 @@ Foreach ($app in $Config.apps)
     & iisreset /restart
 
     # Stop all IIS Sites since restarting iis can put all sites back into a start phase
-    Get-IISSite | Stop-IISSite -Name {$_.Name} -ErrorAction SilentlyContinue -Confirm:$false
+    Get-IISSite | Stop-IISSite -Name { $_.Name } -ErrorAction SilentlyContinue -Confirm:$false
 
     # This would be required if we don't stop all sites in order to get the correct IIS process Id
     # for perf counters. But since we are stopping them all, then the process name will always
@@ -218,8 +221,16 @@ Foreach ($app in $Config.apps)
     Write-Host "Starting Site $($app.iisSiteName)"
     Start-IISSite -Name $app.iisSiteName
 
-    if(!$?)
-    {
+    if (!$?) {
+        exit 1
+    }
+
+    # Recycle the app pool
+    $SM = Get-IISServerManager
+    Write-Host "Recycle app pool..."
+    $SM.ApplicationPools[$($app.iisSiteName)].Recycle()
+
+    if (!$?) {
         exit 1
     }
 
@@ -228,18 +239,23 @@ Foreach ($app in $Config.apps)
     $Env:U_PASS = $app.password
 
     ## Clear our output first
-    if (Test-Path "$PSScriptRoot\output"){
+    if (Test-Path "$PSScriptRoot\output") {
         Remove-Item "$PSScriptRoot\output\" -Force -Recurse
     }
     New-Item -Path "$PSScriptRoot\" -Name "output" -ItemType "directory" | Out-Null
 
+    # The list of the load tests to run for reporting, these MUST
+    # be in order because tests rely on previous data.
     $Artillery = @(
-        "warmup.yml",
-        "login-and-load.yml",
-        "create-doctype.yml",
-        "create-content.yml",
-        "update-content.yml",
-        "delete-content.yml"
+        @{ script = "warmup.yml"; useOverrides = $true; collectCounters = $true },
+        @{ script = "coldboot.yml"; useOverrides = $false; collectCounters = $false },
+        @{ script = "warmboot.yml"; useOverrides = $false; collectCounters = $false },
+        @{ script = "login-and-load.yml"; useOverrides = $true; collectCounters = $true },
+        @{ script = "create-doctype.yml"; useOverrides = $true; collectCounters = $true },
+        @{ script = "create-content.yml"; useOverrides = $true; collectCounters = $true },
+        @{ script = "update-content.yml"; useOverrides = $true; collectCounters = $true },
+        @{ script = "delete-content.yml"; useOverrides = $true; collectCounters = $true },
+        @{ script = "front-end.yml"; useOverrides = $false; collectCounters = $true }
     )
 
     # set special artillery debug switches
@@ -252,33 +268,25 @@ Foreach ($app in $Config.apps)
 
     # First run the warmup without counters so IIS is started
     Write-Host "Site warmup..."
-    $Artillery | & artillery run "$PSScriptRoot\artillery\warmup.yml" --target $($app.baseUrl)
+    & artillery run "$PSScriptRoot\artillery\warmup.yml" --target $($app.baseUrl) --quiet
 
-    if ($app.iisSiteName)
-    {
-        # Recycle the app pool
-        # https://docs.microsoft.com/en-us/powershell/module/iisadministration/get-iisservermanager?view=windowsserver2019-ps#example-3--use-the-servermanager-object-to-get-application-pool-objects-and-recycle-an-application-pool-
-        $SM = Get-IISServerManager
-        Write-Host "Recycle app pool..."
-        $SM.ApplicationPools["UmbracoCms.8.7.3"].Recycle()
-    }
+    # Then run the cleanup without counters or reporting
+    Write-Host "Site cleanup..."
+    & artillery run "$PSScriptRoot\artillery\cleanup.yml" --target $($app.baseUrl) --quiet
 
     # Run the artillery load testing
-    foreach ( $a in $Artillery )
-    {
-        # TODO: Ideally we would force a GC Collect here. BUT that's not really possible when running from a remote machine.
-        # It is possible on the same machine by using something like this
-        # https://github.com/cklutz/EtwForceGC,
-        # https://stackoverflow.com/a/26033289
-        # So potentially, we may want to host a custom endpoint when we automate the installation of Umbraco to be able to be called
-        # to just call GC.Collect on that machine.
+    foreach ( $art in $Artillery ) {
+        # Before each tests, GC collect what is there so the mem collection is slightly more accurate
+        Write-Host "GC Collect..."
+        & artillery run "$PSScriptRoot\artillery\gc.yml" --target $($app.baseUrl) --quiet
 
-        # start the counter collection on a background task, since we specified continuous this will keep going till we stop the task
-        $Job = Start-CounterCollection -CounterType $app.counterCollection -ProcessName $ProcessName -ServerName $ServerName -ReportName $a
+        if ($art.collectCounters) {
+            # start the counter collection on a background task, since we specified continuous this will keep going till we stop the task
+            $Job = Start-CounterCollection -CounterType $app.counterCollection -ProcessName $ProcessName -ServerName $ServerName -ReportName $($art.script)
 
-        if(!$?)
-        {
-            exit 1
+            if (!$?) {
+                exit 1
+            }
         }
 
         # Short pause while they initialize
@@ -289,49 +297,58 @@ Foreach ($app in $Config.apps)
             # TODO: We can adjust the phase duration time from here: https://webkul.com/blog/artillery-execute-script/
             # like: artillery run –overrides ‘{“config”: {“phases”: [{“duration”: 10, “arrivalRate”: 1}]}}’ test. yaml
 
-            $Artillery | & artillery run "$PSScriptRoot\artillery\$a" --output "$PSScriptRoot\output\$a.json" --target $($app.baseUrl) --overrides $ArtilleryOverrides
+            Write-Host "Running...$($art.script)"
 
-            if($?)
-            {
-                & artillery report --output "$PSScriptRoot\output\$a.html" "$PSScriptRoot\output\$a.json"
+            if ($art.useOverrides) {
+                & artillery run "$PSScriptRoot\artillery\$($art.script)" --output "$PSScriptRoot\output\$($art.script).json" --target $($app.baseUrl) --overrides $ArtilleryOverrides
             }
-            else
-            {
+            else {
+                & artillery run "$PSScriptRoot\artillery\$($art.script)" --output "$PSScriptRoot\output\$($art.script).json" --target $($app.baseUrl)
+            }
+
+
+            if ($?) {
+                & artillery report --output "$PSScriptRoot\output\$($art.script).html" "$PSScriptRoot\output\$($art.script).json"
+            }
+            else {
                 Write-Error "Artillery request failed. Exiting process."
                 exit 1
             }
         }
         finally {
-            Write-Host "Stopping counters"
 
-            # If it's the dotnet-counters then the $Job will be a .net Process so we can check for
-            # one of it's properties
-            if ($Job.CloseMainWindow) {
+            if ($art.collectCounters) {
+                Write-Host "Stopping counters"
 
-                # TODO: This is SO HORRIBLE :( but there's nothing we can do because the
-                # dotnet team did not make this scriptable. I've looked at the code and can't see
-                # a way to terminate a process forcing the console app too exit correctly, only with a 'Q'
-                # command.
-                # See https://github.com/dotnet/diagnostics/issues/451#issuecomment-843650234
-                Write-Host "Sending exit command"
-                [Microsoft.VisualBasic.Interaction]::AppActivate($($Job.Id))
-                [System.Windows.Forms.SendKeys]::SendWait("Q")
-                Start-Sleep -Seconds 3
+                # If it's the dotnet-counters then the $Job will be a .net Process so we can check for
+                # one of it's properties
+                if ($Job.CloseMainWindow) {
 
-                if ($Job.ExitCode -ne 0) {
-                    Write-Host "Could not Stop dotnet-counters, metrics will not be stored"
+                    # TODO: This is SO HORRIBLE :( but there's nothing we can do because the
+                    # dotnet team did not make this scriptable. I've looked at the code and can't see
+                    # a way to terminate a process forcing the console app too exit correctly, only with a 'Q'
+                    # command.
+                    # See https://github.com/dotnet/diagnostics/issues/451#issuecomment-843650234
+                    Write-Host "Sending exit command"
+                    [Microsoft.VisualBasic.Interaction]::AppActivate($($Job.Id))
+                    [System.Windows.Forms.SendKeys]::SendWait("Q")
+                    Start-Sleep -Seconds 3
 
-                    # we need to kill it if it didn't exit
-                    $Job.Close();
-                    $Job.Kill();
+                    if ($Job.ExitCode -ne 0) {
+                        Write-Host "Could not Stop dotnet-counters, metrics will not be stored"
+
+                        # we need to kill it if it didn't exit
+                        $Job.Close();
+                        $Job.Kill();
+                    }
+
                 }
-
-            }
-            else {
-                $Job | Receive-Job -Keep # see if there are any errors
-                $Batch = Get-Job -Name "MyCounters"
-                $Batch | Stop-Job
-                $Batch | Remove-Job
+                else {
+                    $Job | Receive-Job -Keep # see if there are any errors
+                    $Batch = Get-Job -Name "MyCounters"
+                    $Batch | Stop-Job
+                    $Batch | Remove-Job
+                }
             }
         }
     }
@@ -341,8 +358,7 @@ Foreach ($app in $Config.apps)
     # Run the node app to push our reports
     & node .\app.js --send-report --umb-version $($app.umbracoVersion) --spec-name $SpecName --cosmos-endpoint $CosmosDbEndpoint --cosmos-key $CosmosDbKey --cosmos-database-id $CosmosDbDatabaseId --cosmos-container-id $CosmosDbContainerId --perf-report-type $($app.counterCollection)
 
-    if(!$?)
-    {
+    if (!$?) {
         exit 1
     }
 

@@ -1,0 +1,15 @@
+# Runs some data cleanup for stuff that is created by the tests
+
+config:
+  processor: "./umbracoDataFlow.js"
+  phases:
+    - duration: 1
+      arrivalRate: 1
+scenarios:
+  - name: "Cleanup"
+    afterResponse: "afterResponse"
+    flow:
+      - get:
+          url: "/umbraco/surface/ContentTypeUtility/DeleteContentTypes?alias=benchmarkTest*"
+      - get:
+          url: "/umbraco/surface/TemplateUtility/DeleteTemplates?alias=benchmarkTest*"

@@ -7,15 +7,19 @@ config:
   variables:
     backOfficeApiPath: "/umbraco/backoffice/UmbracoApi"
   processor: "./content.js"
+  http:
+    # 15 second http timeout (which is very high!)
+    timeout: 15
   phases:
     - duration: 1
       arrivalRate: 1
 scenarios:
   - name: "Delete content"
-    beforeScenario: "beforeScenario"
-    afterScenario: "afterScenario"
+    beforeScenario: "configureContentIdsToDelete"
     beforeRequest: "beforeRequest"
-    afterResponse: "afterResponse"
+    afterResponse:
+      - "checkDeleteResponse" # Must run first to check the response code
+      - "afterResponse"
     flow:
     - loop:
       - post:

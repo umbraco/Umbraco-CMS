@@ -1,0 +1,13 @@
+# Force GC collect (blocking)
+
+config:
+  processor: "./umbracoDataFlow.js"
+  phases:
+    - duration: 1
+      arrivalRate: 1
+scenarios:
+  - name: "GCCollect"
+    afterResponse: "afterResponse"
+    flow:
+      - get:
+          url: "/umbraco/surface/Restarter/GCCollect"
