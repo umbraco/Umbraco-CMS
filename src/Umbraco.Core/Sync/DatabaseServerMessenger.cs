@@ -111,17 +111,11 @@ namespace Umbraco.Core.Sync
 
         #region Sync
 
-        /// <summary>
-        /// Boots the messenger.
-        /// </summary>
-        /// <remarks>
-        /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
-        /// Callers MUST ensure thread-safety.
-        /// </remarks>
+        [Obsolete("This is no longer used and will be removed in future versions")]
         protected void Boot()
         {
-            var bootState = GetSyncBootState();
-            Booting?.Invoke(this, bootState);
+            // if called, just forces the boot logic
+            _ = GetSyncBootState();
         }
 
         private SyncBootState BootInternal()
@@ -545,8 +539,6 @@ namespace Umbraco.Core.Sync
             + "/D" + AppDomain.CurrentDomain.Id // eg 22
             + "] " + Guid.NewGuid().ToString("N").ToUpper(); // make it truly unique
 
-        public event EventHandler<SyncBootState> Booting;
-
         private string GetDistCacheFilePath(IGlobalSettings globalSettings)
         {
             var fileName = HttpRuntime.AppDomainAppId.ReplaceNonAlphanumericChars(string.Empty) + "-lastsynced.txt";
@@ -565,7 +557,7 @@ namespace Umbraco.Core.Sync
 
         #endregion
 
-        public SyncBootState GetSyncBootState() => _getSyncBootState.Value;
+        public virtual SyncBootState GetSyncBootState() => _getSyncBootState.Value;
 
         #region Notify refreshers
 

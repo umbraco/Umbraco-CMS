@@ -59,14 +59,18 @@ namespace Umbraco.Web.Compose
             if (_registrar != null || _messenger != null)
             {
                 UmbracoModule.RouteAttempt += RegisterBackgroundTasksOnce;
-            }   
-
-            // must come last, as it references some _variables
-            _messenger?.Startup();
+                UmbracoModule.EndRequest += UmbracoModule_EndRequest;
+            }
         }
 
         public void Terminate()
         { }
+
+        private void UmbracoModule_EndRequest(object sender, UmbracoRequestEventArgs e)
+        {
+            // will clear the batch - will remain in HttpContext though - that's ok
+            _messenger?.FlushBatch();
+        }
 
         /// <summary>
         /// Handle when a request is made
