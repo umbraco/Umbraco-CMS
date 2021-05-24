@@ -56,6 +56,8 @@ namespace Umbraco.Web.Search
                     // double check lock, we must only do this once
                     if (!_initialized)
                     {
+                        _initialized = true;
+
                         if (!_mainDom.IsMainDom) return;
 
                         var bootState = _syncBootStateAccessor.GetSyncBootState();
@@ -63,7 +65,8 @@ namespace Umbraco.Web.Search
                         _examineManager.ConfigureIndexes(_mainDom, _logger);
 
                         // if it's a cold boot, rebuild all indexes including non-empty ones
-                        _indexRebuilder.RebuildIndexes(bootState != SyncBootState.ColdBoot, 0);
+                        // delay one minute since a cold boot also triggers nucache rebuilds
+                        _indexRebuilder.RebuildIndexes(bootState != SyncBootState.ColdBoot, 60000);
                     }
                 }
             }
