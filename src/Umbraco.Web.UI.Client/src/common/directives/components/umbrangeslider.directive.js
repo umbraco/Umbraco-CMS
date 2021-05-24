@@ -52,7 +52,7 @@ For extra details about options and events take a look here: https://refreshless
 @param {callback} onSlide (<code>callback</code>): onSlide gets triggered when the handle is being dragged.
 @param {callback} onSet (<code>callback</code>): onSet will trigger every time a slider stops changing.
 @param {callback} onChange (<code>callback</code>): onChange fires when a user stops sliding, or when a slider value is changed by 'tap'.
-@param {callback} onDrag (<code>callback</code>): onDrag fires when a handle is being dragged, while ignoring other updates to the slider values.
+@param {callback} onDrag (<code>callback</code>): onDrag fires when a connect element between handles is being dragged, while ignoring other updates to the slider values.
 @param {callback} onStart (<code>callback</code>): onStart fires when a handle is clicked (mousedown, or the equivalent touch events).
 @param {callback} onEnd (<code>callback</code>): onEnd fires when a handle is released (mouseup etc), or when a slide is canceled due to other reasons.
 **/
