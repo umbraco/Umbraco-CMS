@@ -12,10 +12,5 @@ namespace Umbraco.Core.Sync
         /// </summary>
         /// <returns></returns>
         SyncBootState GetSyncBootState();
-
-        /// <summary>
-        /// Raised when the boot state is known
-        /// </summary>
-        event EventHandler<SyncBootState> Booting; // TODO: This should be removed in netcore
     }
 }

@@ -29,26 +29,10 @@ namespace Umbraco.Web.Search
             _indexRebuilder = indexRebuilder;
             _mainDom = mainDom;
             _syncBootStateAccessor = syncBootStateAccessor;
-
-            // must add the handler in the ctor because it will be too late in Initialize
-            // TODO: All of this boot synchronization for cold boot logic needs should be fixed in netcore
-            _syncBootStateAccessor.Booting += _syncBootStateAccessor_Booting;
-        }
-
-        /// <summary>
-        /// Once the boot state is known we can see if we require rebuilds
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void _syncBootStateAccessor_Booting(object sender, SyncBootState e)
-        {
-            UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
         }
 
         private void UmbracoModule_RouteAttempt(object sender, RoutableAttemptEventArgs e)
         {
-            UmbracoModule.RouteAttempt -= UmbracoModule_RouteAttempt;
-
             if (!_initialized)
             {
                 lock (_locker)
@@ -57,6 +41,8 @@ namespace Umbraco.Web.Search
                     if (!_initialized)
                     {
                         _initialized = true;
+
+                        UmbracoModule.RouteAttempt -= UmbracoModule_RouteAttempt;
 
                         if (!_mainDom.IsMainDom) return;
 
@@ -74,12 +60,12 @@ namespace Umbraco.Web.Search
         }
 
         public void Initialize()
-        {   
+        {
+            UmbracoModule.RouteAttempt += UmbracoModule_RouteAttempt;
         }
 
         public void Terminate()
         {
-            _syncBootStateAccessor.Booting -= _syncBootStateAccessor_Booting;
         }
     }
 }
