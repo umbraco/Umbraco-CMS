@@ -138,6 +138,7 @@
     <Compile Include="Compose\BackOfficeUserAuditEventsComposer.cs" />
     <Compile Include="Compose\BlockEditorComponent.cs" />
     <Compile Include="Compose\BlockEditorComposer.cs" />
+    <Compile Include="Compose\DatabaseServerRegistrarAndMessengerComposer.cs" />
     <Compile Include="Compose\NestedContentPropertyComponent.cs" />
     <Compile Include="Compose\NotificationsComposer.cs" />
     <Compile Include="Compose\PublicAccessComposer.cs" />
@@ -1166,9 +1167,7 @@
     <Compile Include="PublishedCache\IPublishedMediaCache.cs" />
     <Compile Include="PublishedContentExtensions.cs" />
     <Compile Include="ExamineExtensions.cs" />
-    <Compile Include="FormlessPage.cs">
-      <SubType>ASPXCodeBehind</SubType>
-    </Compile>
+    <Compile Include="FormlessPage.cs" />
     <Compile Include="HtmlHelperRenderExtensions.cs" />
     <Compile Include="Scheduling\SchedulerComponent.cs" />
     <Compile Include="ModelStateExtensions.cs" />

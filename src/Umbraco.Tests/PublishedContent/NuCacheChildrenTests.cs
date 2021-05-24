@@ -159,7 +159,7 @@ namespace Umbraco.Tests.PublishedContent
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
                 new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }),
-                new TestSyncBootStateAccessor(SyncBootState.HasSyncState),
+                new TestSyncBootStateAccessor(SyncBootState.WarmBoot),
                 _contentNestedDataSerializerFactory);
 
             // invariant is the current default

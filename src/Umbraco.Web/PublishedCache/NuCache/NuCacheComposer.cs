@@ -13,6 +13,9 @@ namespace Umbraco.Web.PublishedCache.NuCache
         {
             base.Compose(composition);
 
+            //Overriden on Run state in DatabaseServerRegistrarAndMessengerComposer
+            composition.Register<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>(Lifetime.Singleton);
+
             var serializer = ConfigurationManager.AppSettings[NuCacheSerializerComponent.Nucache_Serializer_Key];
             if (serializer != "MsgPack")
             {
