@@ -16,7 +16,12 @@
     # The rate of virtual user arrivals, see https://artillery.io/docs/guides/guides/test-script-reference.html#Load-Phases
     [Parameter(Mandatory = $false)]
     [int]
-    $Rate = 1
+    $Rate = 1,
+
+    # The IIS server name, will use the current machine name by default
+    [Parameter(Mandatory = $false)]
+    [string]
+    $ServerName
 )
 
 
@@ -161,7 +166,9 @@ $Env:U_SCRIPTROOT = $PSScriptRoot
 $ConfigFile = "$PSScriptRoot\config.json"
 $Config = Get-Content $ConfigFile | ConvertFrom-Json
 
-$ServerName = $Config.serverName
+if (!$ServerName) {
+    $ServerName = $env:computername
+}
 
 $CosmosDbEndpoint = $Config.cosmos.endpoint
 $CosmosDbKey = $Config.cosmos.key

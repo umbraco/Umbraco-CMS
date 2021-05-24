@@ -1,0 +1,26 @@
+{
+    "cosmos": {
+        "endpoint": "https://your-cosmos-db-service.documents.azure.com:443/",
+        "key": "YourCosmosDbServiceKey",
+        "databaseId": "YourCosmosDbDatabaseId",
+        "containerId": "YourCosmosDbContainerId"
+    },
+    "apps":[
+        {
+            "baseUrl": "http://UmbracoCms.900.local",
+            "username": "test@test.com",
+            "password": "testtesttest",
+            "iisSiteName": "UmbracoCms.9.0.0",
+            "umbracoVersion": "9.0.0-beta3",
+            "counterCollection": "dotnet"
+        },
+        {
+            "baseUrl": "http://UmbracoCms.8140.local",
+            "username": "test@test.com",
+            "password": "testtesttest",
+            "iisSiteName": "UmbracoCms.8.13.0",
+            "umbracoVersion": "8.13.0",
+            "counterCollection": "windows"
+        }
+    ]
+}
