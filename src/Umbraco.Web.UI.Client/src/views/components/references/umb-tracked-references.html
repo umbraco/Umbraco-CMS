@@ -12,10 +12,6 @@
 <!-- Media Tracking (With Items) -->
 <div ng-if="vm.loading === false">
 
-    <div class="abstract umb-alert umb-alert--warning" ng-show="vm.showWarning">
-        {{vm.warningText}}
-    </div>
-
     <!-- Content -->
     <div ng-if="vm.hasContentReferences">
         <umb-tracked-references-table items="vm.contentReferences.items"

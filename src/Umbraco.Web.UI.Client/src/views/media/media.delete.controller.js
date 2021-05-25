@@ -2,19 +2,14 @@
  * @ngdoc controller
  * @name Umbraco.Editors.ContentDeleteController
  * @function
- * 
+ *
  * @description
  * The controller for deleting content
  */
 function MediaDeleteController($scope, mediaResource, treeService, navigationService, editorState, $location, overlayService,localizationService) {
 
     $scope.checkingReferences = true;
-
-    $scope.warningText = "The item or one of the underlying items is being used.";
-
-    localizationService.localize("references_deleteWarning").then(function(value) {
-        $scope.warningText = value;
-    });
+    $scope.warningText = null;
 
     $scope.performDelete = function() {
 
@@ -34,7 +29,7 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
             treeService.removeNode($scope.currentNode);
 
             if (rootNode) {
-                //ensure the recycle bin has child nodes now            
+                //ensure the recycle bin has child nodes now
                 var recycleBin = treeService.getDescendantNode(rootNode, -21);
                 if (recycleBin) {
                     recycleBin.hasChildren = true;
@@ -44,7 +39,7 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
                     }
                 }
             }
-            
+
             //if the current edited item is the same one as we're deleting, we need to navigate elsewhere
             if (editorState.current && editorState.current.id == $scope.currentNode.id) {
 
@@ -76,6 +71,17 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
     $scope.close = function() {
         navigationService.hideDialog();
     };
+
+    $scope.checkingReferencesComplete = () => {
+        $scope.checkingReferences = false;
+    };
+
+    $scope.onReferencesWarning = () => {
+        localizationService.localize("references_deleteWarning").then((value) => {
+            $scope.warningText = value;
+        });
+    };
+
 }
 
 angular.module("umbraco").controller("Umbraco.Editors.Media.DeleteController", MediaDeleteController);
