@@ -12,4 +12,9 @@
             ng-click="pickGroup()">
         <localize key="general_add">Add</localize>
     </button>
+
+    <ng-form name="modelValueForm">
+        <input type="hidden" name="modelValue" ng-model="model.value" />
+    </ng-form>
+
 </div>

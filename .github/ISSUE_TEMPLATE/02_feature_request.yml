@@ -1,0 +1,33 @@
+---
+name: 📮 Feature Request
+description: Open a feature request, if you want to propose a new feature.
+labels: type/feature
+body:
+- type: dropdown
+  id: version
+  attributes:
+    label: Umbraco version
+    description: Which major Umbraco version are you proposing a feature for?
+    options:
+      - v8
+      - v9
+  validations:
+    required: true
+- type: textarea
+  id: summary
+  attributes:
+    label: Description
+    description: Write a brief desciption of your proposed new feature.
+  validations:
+    required: true
+- type: textarea
+  attributes:
+    label: How can you help?
+    id: help
+    description: Umbraco''s core team has limited available time, but maybe you can help?
+    placeholder: >
+      If we can not work on your suggestion, please don't take it personally. Most likely, it's either:
+
+      - We think your idea is valid, but we can't find the time to work on it.
+      
+      - Your idea might be better suited as a package, if it's not suitable for the majority of users.

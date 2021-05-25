@@ -6,9 +6,9 @@
         <div class="fileinput-button umb-upload-button-big" ng-hide="vm.files.length > 0">
             <i class="icon icon-page-up" aria-hidden="true"></i>
             <p><localize key="media_clickToUpload">Click to upload</localize></p>
-            <umb-single-file-upload></umb-single-file-upload>
+            <umb-single-file-upload accept-file-ext="vm.acceptFileExt"></umb-single-file-upload>
         </div>
-        
+
         <div ng-if="vm.files.length > 0">
             <div ng-if="!vm.hideSelection">
 

@@ -29,7 +29,7 @@ namespace Umbraco.Core.Models.Entities
         /// <inheritdoc />
         public virtual bool IsPropertyDirty(string propertyName)
         {
-            return _currentChanges != null && _currentChanges.Any(x => x.Key == propertyName);
+            return _currentChanges != null && _currentChanges.ContainsKey(propertyName);
         }
 
         /// <inheritdoc />
@@ -61,7 +61,7 @@ namespace Umbraco.Core.Models.Entities
         /// <inheritdoc />
         public virtual bool WasPropertyDirty(string propertyName)
         {
-            return _savedChanges != null && _savedChanges.Any(x => x.Key == propertyName);
+            return _savedChanges != null && _savedChanges.ContainsKey(propertyName);
         }
 
         /// <inheritdoc />

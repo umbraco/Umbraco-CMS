@@ -331,7 +331,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         protected override void PersistUpdatedItem(IMember entity)
-        {   
+        {
             // update
             entity.UpdatingEntity();
 
@@ -534,7 +534,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             var sqlSelectTemplateVersion = SqlContext.Templates.Get("Umbraco.Core.MemberRepository.SetLastLogin2", s => s
                .Select<ContentVersionDto>(x => x.Id)
-               .From<ContentVersionDto>()               
+               .From<ContentVersionDto>()
                .InnerJoin<NodeDto>().On<NodeDto, ContentVersionDto>((l, r) => l.NodeId == r.NodeId)
                .InnerJoin<MemberDto>().On<MemberDto, NodeDto>((l, r) => l.NodeId == r.NodeId)
                .Where<NodeDto>(x => x.NodeObjectType == SqlTemplate.Arg<Guid>("nodeObjectType"))
@@ -606,7 +606,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
-                    var cached = IsolatedCache.GetCacheItem<IMember>(RepositoryCacheKeys.GetKey<IMember>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IMember>(RepositoryCacheKeys.GetKey<IMember, int>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.ContentVersionDto.Id)
                     {
                         content[i] = (Member) cached;

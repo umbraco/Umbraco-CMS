@@ -40,7 +40,9 @@
 
             function getDomNodes(){
                 infiniteEditorsWrapper = document.querySelector('.umb-editors');
-                infiniteEditors = Array.from(infiniteEditorsWrapper.querySelectorAll('.umb-editor'));
+                if(infiniteEditorsWrapper) {
+                    infiniteEditors = Array.from(infiniteEditorsWrapper.querySelectorAll('.umb-editor') || []);
+                }
             }
 
             function getFocusableElements(targetElm) {
@@ -84,22 +86,24 @@
                 var defaultFocusedElement = getAutoFocusElement(focusableElements);
                 var lastKnownElement;
 
-                // If an inifite editor is being closed then we reset the focus to the element that triggered the the overlay
+                // If an infinite editor is being closed then we reset the focus to the element that triggered the the overlay
                 if(closingEditor){
-                    var lastItemIndex = $rootScope.lastKnownFocusableElements.length - 1;
-                    var editorInfo = infiniteEditors[0].querySelector('.editor-info');
 
                     // If there is only one editor open, search for the "editor-info" inside it and set focus on it
                     // This is relevant when a property editor has been selected and the editor where we selected it from
                     // is closed taking us back to the first layer
                     // Otherwise set it to the last element in the lastKnownFocusedElements array
-                    if(infiniteEditors.length === 1 && editorInfo !== null){
-                        lastKnownElement = editorInfo;
+                    if(infiniteEditors && infiniteEditors.length === 1){
+                        var editorInfo = infiniteEditors[0].querySelector('.editor-info');
+                        if(infiniteEditors && infiniteEditors.length === 1 && editorInfo !== null) {
+                            lastKnownElement = editorInfo;
 
-                        // Clear the array
-                        clearLastKnownFocusedElements();
+                            // Clear the array
+                            clearLastKnownFocusedElements();
+                        }
                     }
                     else {
+                        var lastItemIndex = $rootScope.lastKnownFocusableElements.length - 1;
                         lastKnownElement = $rootScope.lastKnownFocusableElements[lastItemIndex];
 
                         // Remove the last item from the array so we always set the correct lastKnowFocus for each layer
@@ -149,20 +153,24 @@
             }
 
             function cleanupEventHandlers() {
-                var activeEditor = infiniteEditors[infiniteEditors.length - 1];
-                var inactiveEditors = infiniteEditors.filter(editor => editor !== activeEditor);
+                //if we're in infinite editing mode
+                if(infiniteEditors.length > 0) {
+                    var activeEditor = infiniteEditors[infiniteEditors.length - 1];
+                    var inactiveEditors = infiniteEditors.filter(editor => editor !== activeEditor);
 
-                if(inactiveEditors.length > 0) {
-                    for (var index = 0; index < inactiveEditors.length; index++) {
-                        var inactiveEditor = inactiveEditors[index];
+                    if(inactiveEditors.length > 0) {
+                        for (var index = 0; index < inactiveEditors.length; index++) {
+                            var inactiveEditor = inactiveEditors[index];
 
-                        // Remove event handlers from inactive editors
-                        inactiveEditor.removeEventListener('keydown', handleKeydown);
+                            // Remove event handlers from inactive editors
+                            inactiveEditor.removeEventListener('keydown', handleKeydown);
+                        }
                     }
-                }
-                else {
-                    // Remove event handlers from the active editor
-                    activeEditor.removeEventListener('keydown', handleKeydown);
+                    else {
+                        // Why is this one only begin called if there is no other infinite editors, wouldn't it make sense always to clean this up?
+                        // Remove event handlers from the active editor
+                        activeEditor.removeEventListener('keydown', handleKeydown);
+                    }
                 }
             }
 
@@ -173,10 +181,7 @@
                     // Fetch the DOM nodes we need
                     getDomNodes();
 
-                    // Cleanup event handlers if we're in infinite editing mode
-                    if(infiniteEditors.length > 0){
-                        cleanupEventHandlers();
-                    }
+                    cleanupEventHandlers();
 
                     getFocusableElements(targetElm);
 
@@ -204,17 +209,19 @@
                 // Make sure to disconnect the observer so we potentially don't end up with having many active ones
                 disconnectObserver = true;
 
-                // Pass the correct editor in order to find the focusable elements
-                var newTarget = infiniteEditors[infiniteEditors.length - 2];
+                if(infiniteEditors && infiniteEditors.length > 1) {
+                    // Pass the correct editor in order to find the focusable elements
+                    var newTarget = infiniteEditors[infiniteEditors.length - 2];
 
-                if(infiniteEditors.length > 1){
-                    // Setting closing till true will let us re-apply the last known focus to then opened layer that then becomes
-                    // active
-                    closingEditor = true;
+                    if(infiniteEditors.length > 1) {
+                        // Setting closing till true will let us re-apply the last known focus to then opened layer that then becomes
+                        // active
+                        closingEditor = true;
 
-                    onInit(newTarget);
+                        onInit(newTarget);
 
-                    return;
+                        return;
+                    }
                 }
 
                 // Clear lastKnownFocusableElements
