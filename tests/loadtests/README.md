@@ -51,6 +51,8 @@ It is important that the data source is filtered on the `SpecName` that you want
 
 ## Future
 
+### Host
+
 The ideal setup would be:
 
 * A load test host would be started from a docker image
@@ -64,6 +66,12 @@ Alternatively - an easier and quicker solution is:
 * Configure Azure SQL DBs for each version.
 * We would need to manually setup an IIS and DB for each new version we want to add for testing - but this doesn't take too long.
 * When we want to re-run the script, we can boot the VM and execute the script.
+
+### Tests
+
+We need to keep adding more scenarios. Each scenario added may take some work if it relies on previously created data from another scenario. This is supported in this framework but something to keep in mind when creating new ones.
+
+Currently this is only testing the CMS with the Starter Kit installed which is very little data. Ideally we'd run tests against versions with the SK and also when there is tons of data/content/media in the DB.
 
 ## How it works
 
