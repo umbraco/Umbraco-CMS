@@ -16,6 +16,7 @@ This application consists of:
 
 * Windows 10/Server OS
 * Windows Powershell 6 (because we need to collection windows performance counters, Powershell 7 doesn't support the reporting requirements)
+* Execution must run with a UI context (i.e. cannot be automated in the background - see below under Known Issues)
 * IIS configured for each CMS version
 * MSSQL configured for each version - ideally hosted on a different server
 * The Starter Kit installed for each version - and nothing else - the data sets between versions must be consistent
@@ -88,3 +89,9 @@ The current scenarios and order is:
   * update content - makes requests to update content based on the created content.
   * delete content - makes requests to delete content based on the created content.
   * front-end - performs throughput tests on the homepage to determine maximum requests per second throughput and latency.
+
+## Known issues
+
+`dotnet-counters` doesn't allow for automation currently due to it's requirement for console in "Q" key for closing and collecting the figures. See https://github.com/dotnet/diagnostics/issues/451#issuecomment-843650234. Due to this problem, when the script is run, it needs to be run in the context of a human and once it starts running, no window/UI interaction can be done so that the script hack to set active windows and send a "Q" key to the dotnet-counters process works.
+
+Cold boot + Warm boot metrics are currently not calculated correctly for netcore. This is because when netcore restarts, IIS behaves differently than net framework and as such it will result in several 302 errors for a few seconds during restart which skews all figures. For reporting currently, netcore is excluded for Cold/Warm boot scenarios.
