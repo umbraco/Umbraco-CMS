@@ -13,12 +13,12 @@ namespace Umbraco.Web.PropertyEditors
     [DataEditor(
         Constants.PropertyEditors.Aliases.MediaPicker,
         EditorType.PropertyValue | EditorType.MacroParameter,
-        "Media Picker",
+        "Media Picker (Deprecated)",
         "mediapicker",
         ValueType = ValueTypes.Text,
         Group = Constants.PropertyEditors.Groups.Media,
         Icon = Constants.Icons.MediaImage,
-        IsDeprecated = false)]
+        IsDeprecated = true)]
     public class MediaPickerPropertyEditor : DataEditor
     {
 
