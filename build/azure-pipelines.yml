@@ -366,14 +366,9 @@ stages:
                             $a.symbols.version.defaultValue = $continuous
 
                             $a | ConvertTo-Json -depth 32| set-content $templatePath
-
-                            if($env:BUILD_SOURCEBRANCH -ne "PullRequest"){
-                                Write-Host "##vso[build.addbuildtag]Continuous build"
-                            }
+                            Write-Host "##vso[build.addbuildtag]Continuous build"
 
                           }
-
-
 
 
                         Write-Host "##vso[build.updatebuildnumber]$continuous.$(Build.BuildId)"
