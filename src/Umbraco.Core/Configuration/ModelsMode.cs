@@ -18,7 +18,7 @@ namespace Umbraco.Cms.Core.Configuration
         /// When: a content type change occurs.
         /// </summary>
         /// <remarks>The app does not restart. Models are available in views exclusively.</remarks>
-        Runtime,
+        InMemoryAuto,
 
         /// <summary>
         /// Generate models as *.cs files.
@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Core.Configuration
         /// </summary>
         /// <remarks>Generation can be triggered from the dashboard. The app does not restart.
         /// Models are not compiled and thus are not available to the project.</remarks>
-        Code,
+        SourceCodeManual,
 
         /// <summary>
         /// Generate models as *.cs files.
@@ -34,6 +34,6 @@ namespace Umbraco.Cms.Core.Configuration
         /// </summary>
         /// <remarks>Generation can be triggered from the dashboard. The app does not restart.
         /// Models are not compiled and thus are not available to the project.</remarks>
-        LiveCode
+        SourceCodeAuto
     }
 }

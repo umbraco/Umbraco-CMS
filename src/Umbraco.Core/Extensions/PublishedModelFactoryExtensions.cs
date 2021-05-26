@@ -16,7 +16,7 @@ namespace Umbraco.Extensions
         /// </summary>
         public static bool IsLiveFactoryEnabled(this IPublishedModelFactory factory)
         {
-            if (factory is ILivePublishedModelFactory liveFactory)
+            if (factory is IAutoPublishedModelFactory liveFactory)
             {
                 return liveFactory.Enabled;
             }
@@ -26,14 +26,14 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Sets a flag to reset the ModelsBuilder models if the <see cref="IPublishedModelFactory"/> is <see cref="ILivePublishedModelFactory"/>
+        /// Sets a flag to reset the ModelsBuilder models if the <see cref="IPublishedModelFactory"/> is <see cref="IAutoPublishedModelFactory"/>
         /// </summary>
         /// <remarks>
-        /// This does not recompile the runtime models, only sets a flag to tell models builder to recompile when they are requested.
+        /// This does not recompile the InMemory models, only sets a flag to tell models builder to recompile when they are requested.
         /// </remarks>
         internal static void WithSafeLiveFactoryReset(this IPublishedModelFactory factory, Action action)
         {
-            if (factory is ILivePublishedModelFactory liveFactory)
+            if (factory is IAutoPublishedModelFactory liveFactory)
             {
                 lock (liveFactory.SyncRoot)
                 {

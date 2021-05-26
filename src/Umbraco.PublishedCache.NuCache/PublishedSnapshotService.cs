@@ -501,7 +501,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // be processed as soon as we are configured and the messenger processes instructions.
 
         // note: notifications for content type and data type changes should be invoked with the
-        // RuntimeModelFactory, if any, locked and refreshed - see ContentTypeCacheRefresher and
+        // InMemoryModelFactory, if any, locked and refreshed - see ContentTypeCacheRefresher and
         // DataTypeCacheRefresher
 
         public void Notify(ContentCacheRefresher.JsonPayload[] payloads, out bool draftChanged, out bool publishedChanged)
@@ -721,15 +721,15 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
             if (_publishedModelFactory.IsLiveFactoryEnabled())
             {
-                // In the case of runtime generated models - we actually need to refresh all of the content and the media
+                // In the case of ModelsMode.InMemoryAuto generated models - we actually need to refresh all of the content and the media
                 // see https://github.com/umbraco/Umbraco-CMS/issues/5671
-                // The underlying issue is that in Runtime mode the ILivePublishedModelFactory will re-compile all of the classes/models
+                // The underlying issue is that in ModelsMode.InMemoryAuto mode the IAutoPublishedModelFactory will re-compile all of the classes/models
                 // into a new DLL for the application which includes both content types and media types.
                 // Since the models in the cache are based on these actual classes, all of the objects in the cache need to be updated
                 // to use the newest version of the class.
 
                 // NOTE: Ideally this can be run on background threads here which would prevent blocking the UI
-                // as is the case when saving a content type. Intially one would think that it won't be any different
+                // as is the case when saving a content type. Initially one would think that it won't be any different
                 // between running this here or in another background thread immediately after with regards to how the
                 // UI will respond because we already know between calling `WithSafeLiveFactoryReset` to reset the generated models
                 // and this code here, that many front-end requests could be attempted to be processed. If that is the case, those pages are going to get a

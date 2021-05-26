@@ -161,17 +161,17 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             }
 
             // both are ModelsBuilder types
-            var pureSource = sourceAttr.IsLive;
-            var pureModel = modelAttr.IsLive;
+            var pureSource = sourceAttr.IsInMemory;
+            var pureModel = modelAttr.IsInMemory;
 
-            if (sourceAttr.IsLive || modelAttr.IsLive)
+            if (sourceAttr.IsInMemory || modelAttr.IsInMemory)
             {
                 if (pureSource == false || pureModel == false)
                 {
                     // only one is pure - report, but better not restart (loops?)
                     notification.Message.Append(pureSource
-                        ? " The content model is runtime generated, but the view model is not."
-                        : " The view model is runtime generated, but the content model is not.");
+                        ? " The content model is in memory generated, but the view model is not."
+                        : " The view model is in memory generated, but the content model is not.");
                     notification.Message.Append(" The application is in an unstable state and should be restarted.");
                 }
                 else
@@ -180,7 +180,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                     // if same version... makes no sense... and better not restart (loops?)
                     Version sourceVersion = notification.SourceType.Assembly.GetName().Version;
                     Version modelVersion = notification.ModelType.Assembly.GetName().Version;
-                    notification.Message.Append(" Both view and content models are runtime generated, with ");
+                    notification.Message.Append(" Both view and content models are in memory generated, with ");
                     notification.Message.Append(sourceVersion == modelVersion
                         ? "same version. The application is in an unstable state and should be restarted."
                         : "different versions. The application is in an unstable state and should be restarted.");

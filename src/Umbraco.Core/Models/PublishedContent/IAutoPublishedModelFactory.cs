@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Models.PublishedContent
     /// <summary>
     /// Provides a live published model creation service.
     /// </summary>
-    public interface ILivePublishedModelFactory : IPublishedModelFactory
+    public interface IAutoPublishedModelFactory : IPublishedModelFactory
     {
         /// <summary>
         /// Gets an object that can be used to synchronize access to the factory.

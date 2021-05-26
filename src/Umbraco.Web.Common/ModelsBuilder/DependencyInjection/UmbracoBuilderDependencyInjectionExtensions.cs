@@ -31,7 +31,7 @@ using Umbraco.Cms.Web.Common.ModelsBuilder;
  *
  * The way that RazorReferenceManager works is by resolving references from the ApplicationPartsManager - either by
  * an application part that is specifically an ICompilationReferencesProvider or an AssemblyPart. So to fulfill this
- * requirement, we add the MB assembly to the assembly parts manager within the RuntimeModelFactory when the assembly
+ * requirement, we add the MB assembly to the assembly parts manager within the InMemoryModelFactory when the assembly
  * is (re)generated. But due to the above restrictions, when re-generating, this will have no effect since the references
  * have already been resolved with the LazyInitializer in the RazorReferenceManager. There is a known public API
  * where you can add reference paths to the runtime razor compiler via it's IOptions: MvcRazorRuntimeCompilationOptions
@@ -95,35 +95,34 @@ namespace Umbraco.Extensions
 
             builder.Services.Add(umbServices);
 
-            builder.AddRuntimeModelsRazorEngine();
+            builder.AddInMemoryModelsRazorEngine();
 
             // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
             // would automatically just register for all implemented INotificationHandler{T}?
             builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderNotificationHandler>();
-            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, LiveModelsProvider>();
-            builder.AddNotificationHandler<UmbracoRequestEndNotification, LiveModelsProvider>();
-            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, LiveModelsProvider>();
-            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, LiveModelsProvider>();
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<UmbracoRequestEndNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
 
             builder.Services.AddSingleton<ModelsGenerator>();
-            builder.Services.AddSingleton<LiveModelsProvider>();
             builder.Services.AddSingleton<OutOfDateModelsStatus>();
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
             builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
             builder.Services.AddSingleton<ModelsGenerationError>();
 
-            builder.Services.AddSingleton<RuntimeModelFactory>();
+            builder.Services.AddSingleton<InMemoryModelFactory>();
 
             // This is what the community MB would replace, all of the above services are fine to be registered
             // even if the community MB is in place.
             builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
             {
                 ModelsBuilderSettings config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
-                if (config.ModelsMode == ModelsMode.Runtime)
+                if (config.ModelsMode == ModelsMode.InMemoryAuto)
                 {
-                    return factory.GetRequiredService<RuntimeModelFactory>();
+                    return factory.GetRequiredService<InMemoryModelFactory>();
                 }
                 else
                 {
@@ -140,7 +139,7 @@ namespace Umbraco.Extensions
             return builder;
         }
 
-        private static IUmbracoBuilder AddRuntimeModelsRazorEngine(this IUmbracoBuilder builder)
+        private static IUmbracoBuilder AddInMemoryModelsRazorEngine(this IUmbracoBuilder builder)
         {
             // See notes in RefreshingRazorViewEngine for information on what this is doing.
 
@@ -160,7 +159,7 @@ namespace Umbraco.Extensions
                             // is produced, if we don't re-create the container then it will just return the same instance.
                             ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
                             return recreatedServices.GetRequiredService<IRazorViewEngine>();
-                        }, s.GetRequiredService<RuntimeModelFactory>()));
+                        }, s.GetRequiredService<InMemoryModelFactory>()));
 
             return builder;
         }

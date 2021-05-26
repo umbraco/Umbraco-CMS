@@ -9,10 +9,10 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
     public sealed class ModelsBuilderAssemblyAttribute : Attribute
     {
         /// <summary>
-        /// Gets or sets a value indicating whether the assembly is a Live assembly.
+        /// Gets or sets a value indicating whether the assembly is a InMemory assembly.
         /// </summary>
-        /// <remarks>A Models Builder assembly can be either Live or a normal Dll.</remarks>
-        public bool IsLive { get; set; }
+        /// <remarks>A Models Builder assembly can be either InMemory or a normal Dll.</remarks>
+        public bool IsInMemory { get; set; }
 
         /// <summary>
         /// Gets or sets a hash value representing the state of the custom source code files

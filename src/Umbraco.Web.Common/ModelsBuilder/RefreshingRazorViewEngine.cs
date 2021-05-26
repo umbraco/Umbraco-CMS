@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
  *
  * The way that RazorReferenceManager works is by resolving references from the ApplicationPartsManager - either by
  * an application part that is specifically an ICompilationReferencesProvider or an AssemblyPart. So to fulfill this
- * requirement, we add the MB assembly to the assembly parts manager within the RuntimeModelFactory when the assembly
+ * requirement, we add the MB assembly to the assembly parts manager within the InMemoryModelFactory when the assembly
  * is (re)generated. But due to the above restrictions, when re-generating, this will have no effect since the references
  * have already been resolved with the LazyInitializer in the RazorReferenceManager.
  *
@@ -73,7 +73,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
     {
         private IRazorViewEngine _current;
         private bool _disposedValue;
-        private readonly RuntimeModelFactory _runtimeModelFactory;
+        private readonly InMemoryModelFactory _inMemoryModelFactory;
         private readonly Func<IRazorViewEngine> _defaultRazorViewEngineFactory;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
 
@@ -83,19 +83,19 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         /// <param name="defaultRazorViewEngineFactory">
         /// A factory method used to re-construct the default aspnetcore <see cref="RazorViewEngine"/>
         /// </param>
-        /// <param name="runtimeModelFactory">The <see cref="RuntimeModelFactory"/></param>
-        public RefreshingRazorViewEngine(Func<IRazorViewEngine> defaultRazorViewEngineFactory, RuntimeModelFactory runtimeModelFactory)
+        /// <param name="inMemoryModelFactory">The <see cref="InMemoryModelFactory"/></param>
+        public RefreshingRazorViewEngine(Func<IRazorViewEngine> defaultRazorViewEngineFactory, InMemoryModelFactory inMemoryModelFactory)
         {
-            _runtimeModelFactory = runtimeModelFactory;
+            _inMemoryModelFactory = inMemoryModelFactory;
             _defaultRazorViewEngineFactory = defaultRazorViewEngineFactory;
             _current = _defaultRazorViewEngineFactory();
-            _runtimeModelFactory.ModelsChanged += RuntimeModelFactory_ModelsChanged;
+            _inMemoryModelFactory.ModelsChanged += InMemoryModelFactoryModelsChanged;
         }
 
         /// <summary>
         /// When the models change, re-construct the razor stack
         /// </summary>
-        private void RuntimeModelFactory_ModelsChanged(object sender, EventArgs e)
+        private void InMemoryModelFactoryModelsChanged(object sender, EventArgs e)
         {
             _locker.EnterWriteLock();
             try

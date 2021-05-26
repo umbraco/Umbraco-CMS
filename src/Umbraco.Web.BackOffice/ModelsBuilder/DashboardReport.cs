@@ -48,13 +48,13 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
                 case ModelsMode.Nothing:
                     sb.Append("Strongly typed models are not generated. All content and cache will operate from instance of IPublishedContent only.");
                     break;
-                case ModelsMode.Runtime:
+                case ModelsMode.InMemoryAuto:
                     sb.Append("Strongly typed models are re-generated on startup and anytime schema changes (i.e. Content Type) are made. No recompilation necessary but the generated models are not available to code outside of Razor.");
                     break;
-                case ModelsMode.Code:
+                case ModelsMode.SourceCodeManual:
                     sb.Append("Strongly typed models are generated on demand. Recompilation is necessary and models are available to all CSharp code.");
                     break;
-                case ModelsMode.LiveCode:
+                case ModelsMode.SourceCodeAuto:
                     sb.Append("Strong typed models are generated on demand and anytime schema changes (i.e. Content Type) are made. Recompilation is necessary and models are available to all CSharp code.");
                     break;
             }

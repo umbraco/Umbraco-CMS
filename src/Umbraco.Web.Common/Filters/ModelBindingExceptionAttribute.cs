@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.Common.ModelBinders;
@@ -17,7 +18,7 @@ namespace Umbraco.Cms.Web.Common.Filters
     /// In which case it returns a redirect to the same page after 1 sec if not in debug mode.
     /// </summary>
     /// <remarks>
-    /// This is only enabled when using Runtime mode
+    /// This is only enabled when using <see cref="ModelsMode.InMemoryAuto"/> mode
     /// </remarks>
     public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
     {
