@@ -8,6 +8,7 @@ namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
     /// Represents a media picker property editor.
+    /// Marked as Deprecated as best to use the NEW Media Picker aka MediaPicker3
     /// </summary>
     [DataEditor(
         Constants.PropertyEditors.Aliases.MediaPicker,
@@ -16,7 +17,8 @@ namespace Umbraco.Web.PropertyEditors
         "mediapicker",
         ValueType = ValueTypes.Text,
         Group = Constants.PropertyEditors.Groups.Media,
-        Icon = Constants.Icons.MediaImage)]
+        Icon = Constants.Icons.MediaImage,
+        IsDeprecated = true)]
     public class MediaPickerPropertyEditor : DataEditor
     {
 
