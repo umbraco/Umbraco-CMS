@@ -3,8 +3,6 @@
 
     <ng-form name="rteForm">
         <div class="umb-rte-editor-con">
-            <pre>{{model.value}}</pre>
-
             <input type="text" id="{{model.alias}}" ng-focus="focus()" name="modelValue" ng-model="model.value" style="position:absolute;top:0;width:0;height:0;" />
             <div disable-hotkeys id="{{textAreaHtmlId}}" class="umb-rte-editor" ng-style="{ width: containerWidth, height: containerHeight, overflow: containerOverflow}"></div>
         </div>
