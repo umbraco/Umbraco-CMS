@@ -10,7 +10,6 @@ using System;
 using System.Linq;
 using System.Net;
 using System.Text;
-using System.Xml.Linq;
 using Umbraco.Core.Cache;
 using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
@@ -18,6 +17,7 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Services;
 using Umbraco.Core.Dashboards;
+using Umbraco.Core.IO;
 using Umbraco.Core.Models;
 using Umbraco.Web.Services;
 
@@ -60,22 +60,16 @@ namespace Umbraco.Web.Editors
             var language = user.Language;
             var version = UmbracoVersion.SemanticVersion.ToSemanticString();
             var isAdmin = user.IsAdmin();
-            var onCloud = false;
+            var hosting = HostingOptions.Unknown.ToString().ToLower();
 
-            // check if the solution is running on Umbraco Cloud
-            var deployConfigPath = AppDomain.CurrentDomain.BaseDirectory + "Config\\UmbracoDeploy.config";
-            if (System.IO.File.Exists(deployConfigPath))
+            // check if the site is running on Umbraco Cloud
+            if (IOHelper.IsOnCloud)
             {
-                var doc = XDocument.Load(deployConfigPath);
-                var environments = doc.Descendants().FirstOrDefault(p => p.Name.LocalName == "environments" && p.Attribute("id") != null);
-                if (!(environments is null))
-                {
-                    onCloud = true;
-                    baseUrl = _dashboardSettings.ContentDashboardBaseUrl.IsNullOrWhiteSpace() ? baseUrl : _dashboardSettings.ContentDashboardBaseUrl;
-                }
+                hosting = HostingOptions.Cloud.ToString().ToLower();
+                baseUrl = _dashboardSettings.ContentDashboardBaseUrl.IsNullOrWhiteSpace() ? baseUrl : _dashboardSettings.ContentDashboardBaseUrl;
             }
 
-            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}&admin={4}&cloud={5}", section, allowedSections, language, version, isAdmin, onCloud);
+            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}&admin={4}&hosting={5}", section, allowedSections, language, version, isAdmin, hosting);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
             var content = AppCaches.RuntimeCache.GetCacheItem<JObject>(key);
