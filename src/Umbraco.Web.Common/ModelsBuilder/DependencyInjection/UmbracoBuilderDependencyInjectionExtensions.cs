@@ -31,7 +31,7 @@ using Umbraco.Cms.Web.Common.ModelsBuilder;
  *
  * The way that RazorReferenceManager works is by resolving references from the ApplicationPartsManager - either by
  * an application part that is specifically an ICompilationReferencesProvider or an AssemblyPart. So to fulfill this
- * requirement, we add the MB assembly to the assembly parts manager within the PureLiveModelFactory when the assembly
+ * requirement, we add the MB assembly to the assembly parts manager within the InMemoryModelFactory when the assembly
  * is (re)generated. But due to the above restrictions, when re-generating, this will have no effect since the references
  * have already been resolved with the LazyInitializer in the RazorReferenceManager. There is a known public API
  * where you can add reference paths to the runtime razor compiler via it's IOptions: MvcRazorRuntimeCompilationOptions
@@ -69,7 +69,7 @@ using Umbraco.Cms.Web.Common.ModelsBuilder;
  *   with razor defaults before ours are added.
  * - We replace the default implementation of IRazorViewEngine with our own. This is a wrapping service that wraps the default RazorViewEngine instance.
  *   The ctor for this service takes in a Factory method to re-construct the default RazorViewEngine and all of it's dependency graph.
- * - When the PureLive models change, the Factory is invoked and the default razor services are all re-created, thus clearing their caches and the newly
+ * - When the models change, the Factory is invoked and the default razor services are all re-created, thus clearing their caches and the newly
  *   created instance is wrapped. The RazorViewEngine is the only service that needs to be replaced and wrapped for this to work because it's dependency
  *   graph includes all of the above mentioned services, all the way up to the RazorProjectEngine and it's LazyMetadataReferenceFeature.
  */
@@ -95,35 +95,34 @@ namespace Umbraco.Extensions
 
             builder.Services.Add(umbServices);
 
-            builder.AddPureLiveRazorEngine();
+            builder.AddInMemoryModelsRazorEngine();
 
             // TODO: I feel like we could just do builder.AddNotificationHandler<ModelsBuilderNotificationHandler>() and it
             // would automatically just register for all implemented INotificationHandler{T}?
             builder.AddNotificationHandler<TemplateSavingNotification, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ServerVariablesParsingNotification, ModelsBuilderNotificationHandler>();
             builder.AddNotificationHandler<ModelBindingErrorNotification, ModelsBuilderNotificationHandler>();
-            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, LiveModelsProvider>();
-            builder.AddNotificationHandler<UmbracoRequestEndNotification, LiveModelsProvider>();
-            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, LiveModelsProvider>();
-            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, LiveModelsProvider>();
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<UmbracoRequestEndNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
+            builder.AddNotificationHandler<DataTypeCacheRefresherNotification, AutoModelsNotificationHandler>();
 
             builder.Services.AddSingleton<ModelsGenerator>();
-            builder.Services.AddSingleton<LiveModelsProvider>();
             builder.Services.AddSingleton<OutOfDateModelsStatus>();
             builder.AddNotificationHandler<ContentTypeCacheRefresherNotification, OutOfDateModelsStatus>();
             builder.AddNotificationHandler<DataTypeCacheRefresherNotification, OutOfDateModelsStatus>();
             builder.Services.AddSingleton<ModelsGenerationError>();
 
-            builder.Services.AddSingleton<PureLiveModelFactory>();
+            builder.Services.AddSingleton<InMemoryModelFactory>();
 
             // This is what the community MB would replace, all of the above services are fine to be registered
             // even if the community MB is in place.
             builder.Services.AddSingleton<IPublishedModelFactory>(factory =>
             {
                 ModelsBuilderSettings config = factory.GetRequiredService<IOptions<ModelsBuilderSettings>>().Value;
-                if (config.ModelsMode == ModelsMode.PureLive)
+                if (config.ModelsMode == ModelsMode.InMemoryAuto)
                 {
-                    return factory.GetRequiredService<PureLiveModelFactory>();
+                    return factory.GetRequiredService<InMemoryModelFactory>();
                 }
                 else
                 {
@@ -140,7 +139,7 @@ namespace Umbraco.Extensions
             return builder;
         }
 
-        private static IUmbracoBuilder AddPureLiveRazorEngine(this IUmbracoBuilder builder)
+        private static IUmbracoBuilder AddInMemoryModelsRazorEngine(this IUmbracoBuilder builder)
         {
             // See notes in RefreshingRazorViewEngine for information on what this is doing.
 
@@ -160,7 +159,7 @@ namespace Umbraco.Extensions
                             // is produced, if we don't re-create the container then it will just return the same instance.
                             ServiceProvider recreatedServices = initialCollection.BuildServiceProvider();
                             return recreatedServices.GetRequiredService<IRazorViewEngine>();
-                        }, s.GetRequiredService<PureLiveModelFactory>()));
+                        }, s.GetRequiredService<InMemoryModelFactory>()));
 
             return builder;
         }

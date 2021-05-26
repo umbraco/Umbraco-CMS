@@ -50,6 +50,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelsBuilder
                 if (!_config.ModelsMode.SupportsExplicitGeneration())
                 {
                     var result2 = new BuildResult { Success = false, Message = "Models generation is not enabled." };
+
                     return Ok(result2);
                 }
 

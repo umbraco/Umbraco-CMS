@@ -2,34 +2,39 @@ using System;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
-using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.ModelsBuilder.Building;
 using Umbraco.Extensions;
+using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder
 {
-    // supports LiveAppData - but not PureLive
-    public sealed class LiveModelsProvider : INotificationHandler<UmbracoApplicationStartingNotification>,
+    /// <summary>
+    /// Notification handlers used by <see cref="ModelsMode.SourceCodeAuto"/>.
+    /// </summary>
+    /// <remarks>
+    /// supports <see cref="ModelsMode.SourceCodeAuto"/> mode but not <see cref="ModelsMode.InMemoryAuto"/> mode.
+    /// </remarks>
+    public sealed class AutoModelsNotificationHandler : INotificationHandler<UmbracoApplicationStartingNotification>,
         INotificationHandler<UmbracoRequestEndNotification>,
         INotificationHandler<ContentTypeCacheRefresherNotification>,
         INotificationHandler<DataTypeCacheRefresherNotification>
     {
         private static int s_req;
-        private readonly ILogger<LiveModelsProvider> _logger;
+        private readonly ILogger<AutoModelsNotificationHandler> _logger;
         private readonly ModelsBuilderSettings _config;
         private readonly ModelsGenerator _modelGenerator;
         private readonly ModelsGenerationError _mbErrors;
         private readonly IMainDom _mainDom;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="LiveModelsProvider"/> class.
+        /// Initializes a new instance of the <see cref="AutoModelsNotificationHandler"/> class.
         /// </summary>
-        public LiveModelsProvider(
-            ILogger<LiveModelsProvider> logger,
+        public AutoModelsNotificationHandler(
+            ILogger<AutoModelsNotificationHandler> logger,
             IOptions<ModelsBuilderSettings> config,
             ModelsGenerator modelGenerator,
             ModelsGenerationError mbErrors,
@@ -42,8 +47,8 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             _mainDom = mainDom;
         }
 
-        // we do not manage pure live here
-        internal bool IsEnabled => _config.ModelsMode.IsLiveNotPure();
+        // we do not manage InMemory models here
+        internal bool IsEnabled => _config.ModelsMode.IsAutoNotInMemory();
 
         /// <summary>
         /// Handles the <see cref="UmbracoApplicationStartingNotification"/> notification
@@ -74,6 +79,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder
             }
 
             _logger.LogDebug("Requested to generate models.");
+
             Interlocked.Exchange(ref s_req, 1);
         }
 

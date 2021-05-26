@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for the models mode.
         /// </summary>
-        public ModelsMode ModelsMode { get; set; } = ModelsMode.PureLive;
+        public ModelsMode ModelsMode { get; set; } = ModelsMode.InMemoryAuto;
 
         /// <summary>
         /// Gets or sets a value for models namespace.
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
 
             set
             {
-                if (!ModelsMode.IsLive())
+                if (!ModelsMode.IsAuto())
                 {
                     _flagOutOfDateModels = false;
                 }
