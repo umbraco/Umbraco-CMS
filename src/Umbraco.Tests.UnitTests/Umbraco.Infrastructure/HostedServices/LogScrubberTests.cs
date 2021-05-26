@@ -76,7 +76,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
             var mockScope = new Mock<IScope>();
             var mockScopeProvider = new Mock<IScopeProvider>();
             mockScopeProvider
-                .Setup(x => x.CreateScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IEventDispatcher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
+                .Setup(x => x.CreateScope(It.IsAny<IsolationLevel>(), It.IsAny<RepositoryCacheMode>(), It.IsAny<IEventDispatcher>(), It.IsAny<IScopedNotificationPublisher>(), It.IsAny<bool?>(), It.IsAny<bool>(), It.IsAny<bool>()))
                 .Returns(mockScope.Object);
             var mockLogger = new Mock<ILogger<LogScrubber>>();
             var mockProfilingLogger = new Mock<IProfilingLogger>();

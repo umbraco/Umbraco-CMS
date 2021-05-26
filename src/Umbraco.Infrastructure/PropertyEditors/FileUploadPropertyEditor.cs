@@ -33,32 +33,30 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly MediaFileManager _mediaFileManager;
         private readonly ContentSettings _contentSettings;
         private readonly UploadAutoFillProperties _uploadAutoFillProperties;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IContentService _contentService;
+        private readonly IIOHelper _ioHelper;
 
         public FileUploadPropertyEditor(
-            ILoggerFactory loggerFactory,
+            IDataValueEditorFactory dataValueEditorFactory,
             MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
             UploadAutoFillProperties uploadAutoFillProperties,
-            IJsonSerializer jsonSerializer,
-            IContentService contentService)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            IContentService contentService,
+            IIOHelper ioHelper)
+            : base(dataValueEditorFactory)
         {
             _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
             _contentSettings = contentSettings.Value;
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
             _localizedTextService = localizedTextService;
             _uploadAutoFillProperties = uploadAutoFillProperties;
             _contentService = contentService;
+            _ioHelper = ioHelper;
         }
+        /// <inheritdoc />
+        protected override IConfigurationEditor CreateConfigurationEditor() => new FileUploadConfigurationEditor(_ioHelper);
+
 
         /// <summary>
         /// Creates the corresponding property value editor.
@@ -66,7 +64,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <returns>The corresponding property value editor.</returns>
         protected override IDataValueEditor CreateValueEditor()
         {
-            var editor = new FileUploadPropertyValueEditor(Attribute, _mediaFileManager, _dataTypeService, _localizationService, _localizedTextService, ShortStringHelper, Options.Create(_contentSettings), JsonSerializer);
+            var editor = DataValueEditorFactory.Create<FileUploadPropertyValueEditor>(Attribute);
             editor.Validators.Add(new UploadFileTypeValidator(_localizedTextService, Options.Create(_contentSettings)));
             return editor;
         }

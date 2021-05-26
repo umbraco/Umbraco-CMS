@@ -189,6 +189,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
             Services.AddUnique<IEmailSender, NotImplementedEmailSender>();
 
+            Services.AddUnique<IDataValueEditorFactory, DataValueEditorFactory>();
+
             // register distributed cache
             Services.AddUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(), f.GetRequiredService<CacheRefresherCollection>()));
             Services.AddUnique<ICacheRefresherNotificationFactory, CacheRefresherNotificationFactory>();
@@ -225,6 +227,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services
                 .AddNotificationHandler<MemberGroupSavedNotification, PublicAccessHandler>()
                 .AddNotificationHandler<MemberGroupDeletedNotification, PublicAccessHandler>();
+
+            Services.AddSingleton<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>();
         }
     }
 }

@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Examine;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -27,6 +28,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         private readonly bool _publishedValuesOnly;
         private readonly int? _parentId;
+        private readonly ILogger<ContentIndexPopulator> _logger;
 
         /// <summary>
         /// Default constructor to lookup all content data
@@ -34,20 +36,30 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <param name="contentService"></param>
         /// <param name="sqlContext"></param>
         /// <param name="contentValueSetBuilder"></param>
-        public ContentIndexPopulator(IContentService contentService, IUmbracoDatabaseFactory umbracoDatabaseFactory, IContentValueSetBuilder contentValueSetBuilder)
-            : this(false, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder)
+        public ContentIndexPopulator(
+            ILogger<ContentIndexPopulator> logger,
+            IContentService contentService,
+            IUmbracoDatabaseFactory umbracoDatabaseFactory,
+            IContentValueSetBuilder contentValueSetBuilder)
+            : this(logger, false, null, contentService, umbracoDatabaseFactory, contentValueSetBuilder)
         {
         }
 
         /// <summary>
         /// Optional constructor allowing specifying custom query parameters
         /// </summary>
-        public ContentIndexPopulator(bool publishedValuesOnly, int? parentId, IContentService contentService, IUmbracoDatabaseFactory umbracoDatabaseFactory, IValueSetBuilder<IContent> contentValueSetBuilder)
+        public ContentIndexPopulator(
+            ILogger<ContentIndexPopulator> logger,
+            bool publishedValuesOnly,
+            int? parentId,
+            IContentService contentService,
+            IUmbracoDatabaseFactory umbracoDatabaseFactory,
+            IValueSetBuilder<IContent> contentValueSetBuilder)
         {
-            if (umbracoDatabaseFactory == null) throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
             _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
-            _umbracoDatabaseFactory = umbracoDatabaseFactory;
+            _umbracoDatabaseFactory = umbracoDatabaseFactory ?? throw new ArgumentNullException(nameof(umbracoDatabaseFactory));
             _contentValueSetBuilder = contentValueSetBuilder ?? throw new ArgumentNullException(nameof(contentValueSetBuilder));
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _publishedValuesOnly = publishedValuesOnly;
             _parentId = parentId;
         }
@@ -60,7 +72,11 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
         {
-            if (indexes.Count == 0) return;
+            if (indexes.Count == 0)
+            {
+                _logger.LogDebug($"{nameof(PopulateIndexes)} called with no indexes to populate. Typically means no index is registered with this populator.");
+                return;
+            }
 
             const int pageSize = 10000;
             var pageIndex = 0;
@@ -144,9 +160,10 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
                     var valueSets = _contentValueSetBuilder.GetValueSets(indexableContent.ToArray()).ToList();
 
-                    // ReSharper disable once PossibleMultipleEnumeration
-                    foreach (var index in indexes)
+                    foreach (IIndex index in indexes)
+                    {
                         index.IndexItems(valueSets);
+                    }
                 }
 
                 pageIndex++;

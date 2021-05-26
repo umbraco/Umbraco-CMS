@@ -3,6 +3,7 @@
 
 using System;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -25,16 +26,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly IIOHelper _ioHelper;
 
         public BlockListPropertyEditor(
-            ILoggerFactory loggerFactory,
+            IDataValueEditorFactory dataValueEditorFactory,
             Lazy<PropertyEditorCollection> propertyEditors,
-            IDataTypeService dataTypeService,
-            IContentTypeService contentTypeService,
-            ILocalizedTextService localizedTextService,
-            IIOHelper ioHelper,
-            ILocalizationService localizationService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, propertyEditors, dataTypeService, contentTypeService, localizedTextService, localizationService, shortStringHelper, jsonSerializer)
+            IIOHelper ioHelper)
+            : base(dataValueEditorFactory, propertyEditors)
         {
             _ioHelper = ioHelper;
         }

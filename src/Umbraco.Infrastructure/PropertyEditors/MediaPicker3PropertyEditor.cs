@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -26,22 +27,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly IIOHelper _ioHelper;
 
         public MediaPicker3PropertyEditor(
-            ILoggerFactory loggerFactory,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer,
+            IDataValueEditorFactory dataValueEditorFactory,
             IIOHelper ioHelper,
             EditorType type = EditorType.PropertyValue)
-            : base(
-                loggerFactory,
-                dataTypeService,
-                localizationService,
-                localizedTextService,
-                shortStringHelper,
-                jsonSerializer,
-                type)
+            : base(dataValueEditorFactory, type)
         {
             _ioHelper = ioHelper;
         }
@@ -49,20 +38,19 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new MediaPicker3ConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => new MediaPicker3PropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper,JsonSerializer,Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MediaPicker3PropertyValueEditor>(Attribute);
 
         internal class MediaPicker3PropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly IJsonSerializer _jsonSerializer;
 
             public MediaPicker3PropertyValueEditor(
-                IDataTypeService dataTypeService,
-                ILocalizationService localizationService,
                 ILocalizedTextService localizedTextService,
                 IShortStringHelper shortStringHelper,
                 IJsonSerializer jsonSerializer,
+                IIOHelper ioHelper,
                 DataEditorAttribute attribute)
-                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
+                : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             {
                 _jsonSerializer = jsonSerializer;
             }

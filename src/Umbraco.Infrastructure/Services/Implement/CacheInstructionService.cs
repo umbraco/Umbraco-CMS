@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
@@ -22,8 +23,6 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// </summary>
     public class CacheInstructionService : RepositoryService, ICacheInstructionService
     {
-        private readonly IServerRoleAccessor _serverRoleAccessor;
-        private readonly CacheRefresherCollection _cacheRefreshers;
         private readonly ICacheInstructionRepository _cacheInstructionRepository;
         private readonly IProfilingLogger _profilingLogger;
         private readonly ILogger<CacheInstructionService> _logger;
@@ -36,16 +35,12 @@ namespace Umbraco.Cms.Core.Services.Implement
             IScopeProvider provider,
             ILoggerFactory loggerFactory,
             IEventMessagesFactory eventMessagesFactory,
-            IServerRoleAccessor serverRoleAccessor,
-            CacheRefresherCollection cacheRefreshers,
             ICacheInstructionRepository cacheInstructionRepository,
             IProfilingLogger profilingLogger,
             ILogger<CacheInstructionService> logger,
             IOptions<GlobalSettings> globalSettings)
             : base(provider, loggerFactory, eventMessagesFactory)
         {
-            _serverRoleAccessor = serverRoleAccessor;
-            _cacheRefreshers = cacheRefreshers;
             _cacheInstructionRepository = cacheInstructionRepository;
             _profilingLogger = profilingLogger;
             _logger = logger;
@@ -57,7 +52,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             using (IScope scope = ScopeProvider.CreateScope(autoComplete: true))
             {
-                if (lastId == 0)
+                if (lastId <= 0)
                 {
                     var count = _cacheInstructionRepository.CountAll();
 
@@ -79,7 +74,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 return false;
             }
         }
-
         /// <inheritdoc/>
         public bool IsInstructionCountOverLimit(int lastId, int limit, out int count)
         {
@@ -133,22 +127,28 @@ namespace Umbraco.Cms.Core.Services.Implement
             new CacheInstruction(0, DateTime.UtcNow, JsonConvert.SerializeObject(instructions, Formatting.None), localIdentity, instructions.Sum(x => x.JsonIdCount));
 
         /// <inheritdoc/>
-        public CacheInstructionServiceProcessInstructionsResult ProcessInstructions(bool released, string localIdentity, DateTime lastPruned, int lastId)
+        public ProcessInstructionsResult ProcessInstructions(
+            CacheRefresherCollection cacheRefreshers,
+            ServerRole serverRole,
+            CancellationToken cancellationToken,
+            string localIdentity,
+            DateTime lastPruned,
+            int lastId)
         {
             using (_profilingLogger.DebugDuration<CacheInstructionService>("Syncing from database..."))
             using (IScope scope = ScopeProvider.CreateScope())
             {
-                var numberOfInstructionsProcessed = ProcessDatabaseInstructions(released, localIdentity, ref lastId);
+                var numberOfInstructionsProcessed = ProcessDatabaseInstructions(cacheRefreshers, cancellationToken, localIdentity, ref lastId);
 
                 // Check for pruning throttling.
-                if (released || (DateTime.UtcNow - lastPruned) <= _globalSettings.DatabaseServerMessenger.TimeBetweenPruneOperations)
+                if (cancellationToken.IsCancellationRequested || (DateTime.UtcNow - lastPruned) <= _globalSettings.DatabaseServerMessenger.TimeBetweenPruneOperations)
                 {
                     scope.Complete();
-                    return CacheInstructionServiceProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                    return ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
                 }
 
                 var instructionsWerePruned = false;
-                switch (_serverRoleAccessor.CurrentServerRole)
+                switch (serverRole)
                 {
                     case ServerRole.Single:
                     case ServerRole.Master:
@@ -160,8 +160,8 @@ namespace Umbraco.Cms.Core.Services.Implement
                 scope.Complete();
 
                 return instructionsWerePruned
-                    ? CacheInstructionServiceProcessInstructionsResult.AsCompletedAndPruned(numberOfInstructionsProcessed, lastId)
-                    : CacheInstructionServiceProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
+                    ? ProcessInstructionsResult.AsCompletedAndPruned(numberOfInstructionsProcessed, lastId)
+                    : ProcessInstructionsResult.AsCompleted(numberOfInstructionsProcessed, lastId);
             }
         }
 
@@ -172,7 +172,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// Thread safety: this is NOT thread safe. Because it is NOT meant to run multi-threaded.
         /// </remarks>
         /// <returns>Number of instructions processed.</returns>
-        private int ProcessDatabaseInstructions(bool released, string localIdentity, ref int lastId)
+        private int ProcessDatabaseInstructions(CacheRefresherCollection cacheRefreshers, CancellationToken cancellationToken, string localIdentity, ref int lastId)
         {
             // NOTE:
             // We 'could' recurse to ensure that no remaining instructions are pending in the table before proceeding but I don't think that
@@ -205,7 +205,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             {
                 // If this flag gets set it means we're shutting down! In this case, we need to exit asap and cannot
                 // continue processing anything otherwise we'll hold up the app domain shutdown.
-                if (released)
+                if (cancellationToken.IsCancellationRequested)
                 {
                     break;
                 }
@@ -227,7 +227,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 List<RefreshInstruction> instructionBatch = GetAllInstructions(jsonInstructions);
 
                 // Process as per-normal.
-                var success = ProcessDatabaseInstructions(instructionBatch, instruction, processed, released, ref lastId);
+                var success = ProcessDatabaseInstructions(cacheRefreshers, instructionBatch, instruction, processed, cancellationToken, ref lastId);
 
                 // If they couldn't be all processed (i.e. we're shutting down) then exit.
                 if (success == false)
@@ -295,12 +295,18 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// </param>
         /// Returns true if all instructions in the batch were processed, otherwise false if they could not be due to the app being shut down
         /// </returns>
-        private bool ProcessDatabaseInstructions(IReadOnlyCollection<RefreshInstruction> instructionBatch, CacheInstruction instruction, HashSet<RefreshInstruction> processed, bool released, ref int lastId)
+        private bool ProcessDatabaseInstructions(
+            CacheRefresherCollection cacheRefreshers,
+            IReadOnlyCollection<RefreshInstruction> instructionBatch,
+            CacheInstruction instruction,
+            HashSet<RefreshInstruction> processed,
+            CancellationToken cancellationToken,
+            ref int lastId)
         {
             // Execute remote instructions & update lastId.
             try
             {
-                var result = NotifyRefreshers(instructionBatch, processed, released);
+                var result = NotifyRefreshers(cacheRefreshers, instructionBatch, processed, cancellationToken);
                 if (result)
                 {
                     // If all instructions were processed, set the last id.
@@ -330,12 +336,16 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <returns>
         /// Returns true if all instructions were processed, otherwise false if the processing was interrupted (i.e. by app shutdown).
         /// </returns>
-        private bool NotifyRefreshers(IEnumerable<RefreshInstruction> instructions, HashSet<RefreshInstruction> processed, bool released)
+        private bool NotifyRefreshers(
+            CacheRefresherCollection cacheRefreshers,
+            IEnumerable<RefreshInstruction> instructions,
+            HashSet<RefreshInstruction> processed,
+            CancellationToken cancellationToken)
         {
             foreach (RefreshInstruction instruction in instructions)
             {
                 // Check if the app is shutting down, we need to exit if this happens.
-                if (released)
+                if (cancellationToken.IsCancellationRequested)
                 {
                     return false;
                 }
@@ -349,22 +359,22 @@ namespace Umbraco.Cms.Core.Services.Implement
                 switch (instruction.RefreshType)
                 {
                     case RefreshMethodType.RefreshAll:
-                        RefreshAll(instruction.RefresherId);
+                        RefreshAll(cacheRefreshers, instruction.RefresherId);
                         break;
                     case RefreshMethodType.RefreshByGuid:
-                        RefreshByGuid(instruction.RefresherId, instruction.GuidId);
+                        RefreshByGuid(cacheRefreshers, instruction.RefresherId, instruction.GuidId);
                         break;
                     case RefreshMethodType.RefreshById:
-                        RefreshById(instruction.RefresherId, instruction.IntId);
+                        RefreshById(cacheRefreshers, instruction.RefresherId, instruction.IntId);
                         break;
                     case RefreshMethodType.RefreshByIds:
-                        RefreshByIds(instruction.RefresherId, instruction.JsonIds);
+                        RefreshByIds(cacheRefreshers, instruction.RefresherId, instruction.JsonIds);
                         break;
                     case RefreshMethodType.RefreshByJson:
-                        RefreshByJson(instruction.RefresherId, instruction.JsonPayload);
+                        RefreshByJson(cacheRefreshers, instruction.RefresherId, instruction.JsonPayload);
                         break;
                     case RefreshMethodType.RemoveById:
-                        RemoveById(instruction.RefresherId, instruction.IntId);
+                        RemoveById(cacheRefreshers, instruction.RefresherId, instruction.IntId);
                         break;
                 }
 
@@ -374,48 +384,48 @@ namespace Umbraco.Cms.Core.Services.Implement
             return true;
         }
 
-        private void RefreshAll(Guid uniqueIdentifier)
+        private void RefreshAll(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier)
         {
-            ICacheRefresher refresher = GetRefresher(uniqueIdentifier);
+            ICacheRefresher refresher = GetRefresher(cacheRefreshers, uniqueIdentifier);
             refresher.RefreshAll();
         }
 
-        private void RefreshByGuid(Guid uniqueIdentifier, Guid id)
+        private void RefreshByGuid(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, Guid id)
         {
-            ICacheRefresher refresher = GetRefresher(uniqueIdentifier);
+            ICacheRefresher refresher = GetRefresher(cacheRefreshers, uniqueIdentifier);
             refresher.Refresh(id);
         }
 
-        private void RefreshById(Guid uniqueIdentifier, int id)
+        private void RefreshById(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, int id)
         {
-            ICacheRefresher refresher = GetRefresher(uniqueIdentifier);
+            ICacheRefresher refresher = GetRefresher(cacheRefreshers, uniqueIdentifier);
             refresher.Refresh(id);
         }
 
-        private void RefreshByIds(Guid uniqueIdentifier, string jsonIds)
+        private void RefreshByIds(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string jsonIds)
         {
-            ICacheRefresher refresher = GetRefresher(uniqueIdentifier);
+            ICacheRefresher refresher = GetRefresher(cacheRefreshers, uniqueIdentifier);
             foreach (var id in JsonConvert.DeserializeObject<int[]>(jsonIds))
             {
                 refresher.Refresh(id);
             }
         }
 
-        private void RefreshByJson(Guid uniqueIdentifier, string jsonPayload)
+        private void RefreshByJson(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, string jsonPayload)
         {
-            IJsonCacheRefresher refresher = GetJsonRefresher(uniqueIdentifier);
+            IJsonCacheRefresher refresher = GetJsonRefresher(cacheRefreshers, uniqueIdentifier);
             refresher.Refresh(jsonPayload);
         }
 
-        private void RemoveById(Guid uniqueIdentifier, int id)
+        private void RemoveById(CacheRefresherCollection cacheRefreshers, Guid uniqueIdentifier, int id)
         {
-            ICacheRefresher refresher = GetRefresher(uniqueIdentifier);
+            ICacheRefresher refresher = GetRefresher(cacheRefreshers, uniqueIdentifier);
             refresher.Remove(id);
         }
 
-        private ICacheRefresher GetRefresher(Guid id)
+        private ICacheRefresher GetRefresher(CacheRefresherCollection cacheRefreshers, Guid id)
         {
-            ICacheRefresher refresher = _cacheRefreshers[id];
+            ICacheRefresher refresher = cacheRefreshers[id];
             if (refresher == null)
             {
                 throw new InvalidOperationException("Cache refresher with ID \"" + id + "\" does not exist.");
@@ -424,7 +434,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             return refresher;
         }
 
-        private IJsonCacheRefresher GetJsonRefresher(Guid id) => GetJsonRefresher(GetRefresher(id));
+        private IJsonCacheRefresher GetJsonRefresher(CacheRefresherCollection cacheRefreshers, Guid id) => GetJsonRefresher(GetRefresher(cacheRefreshers, id));
 
         private static IJsonCacheRefresher GetJsonRefresher(ICacheRefresher refresher)
         {

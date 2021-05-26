@@ -433,13 +433,6 @@
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
 
-    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Examine.Lucene.nuspec" `
-        -Properties BuildTmp="$($this.BuildTemp)" `
-        -Version "$($this.Version.Semver.ToString())" `
-        -Verbosity detailed  `
-        -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.examine.lucene.log"
-    if (-not $?) { throw "Failed to pack Nuget UmbracoCms.Lucene.nuspec"}
-
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.SqlCe.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `

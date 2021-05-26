@@ -27,15 +27,18 @@ namespace Umbraco.Cms.Infrastructure.Sync
         /// </summary>
         public BatchedDatabaseServerMessenger(
             IMainDom mainDom,
+            CacheRefresherCollection cacheRefreshers,
+            IServerRoleAccessor serverRoleAccessor,
             ILogger<BatchedDatabaseServerMessenger> logger,
-            DatabaseServerMessengerCallbacks callbacks,
+            ISyncBootStateAccessor syncBootStateAccessor,
             IHostingEnvironment hostingEnvironment,
             ICacheInstructionService cacheInstructionService,
             IJsonSerializer jsonSerializer,
             IRequestCache requestCache,
             IRequestAccessor requestAccessor,
+            LastSyncedFileManager lastSyncedFileManager,
             IOptions<GlobalSettings> globalSettings)
-            : base(mainDom, logger, true, callbacks, hostingEnvironment, cacheInstructionService, jsonSerializer, globalSettings)
+            : base(mainDom, cacheRefreshers, serverRoleAccessor, logger, true, syncBootStateAccessor, hostingEnvironment, cacheInstructionService, jsonSerializer, lastSyncedFileManager, globalSettings)
         {
             _requestCache = requestCache;
             _requestAccessor = requestAccessor;

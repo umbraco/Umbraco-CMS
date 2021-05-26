@@ -2,7 +2,6 @@ using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Infrastructure.Examine;
-using Umbraco.Cms.Infrastructure.Search;
 
 namespace Umbraco.Cms.Infrastructure
 {
@@ -81,7 +80,7 @@ namespace Umbraco.Cms.Infrastructure
                 s_suspended = true;
             }
 
-            public static void ResumeIndexers(IndexRebuilder indexRebuilder, ILogger logger, BackgroundIndexRebuilder backgroundIndexRebuilder)
+            public static void ResumeIndexers(ExamineIndexRebuilder backgroundIndexRebuilder)
             {
                 s_suspended = false;
 

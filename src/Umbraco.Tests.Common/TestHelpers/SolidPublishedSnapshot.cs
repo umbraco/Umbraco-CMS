@@ -358,12 +358,7 @@ namespace Umbraco.Cms.Tests.Common.TestHelpers
 
             var dataType = new DataType(
                 new VoidEditor(
-                    Mock.Of<ILoggerFactory>(),
-                    dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(),
-                    Mock.Of<ILocalizedTextService>(),
-                    Mock.Of<IShortStringHelper>(),
-                    jsonSerializer),
+                    Mock.Of<IDataValueEditorFactory>()),
                 configurationEditorJsonSerializer)
                 {
                     Id = 666

@@ -6,6 +6,21 @@ namespace Umbraco.Cms.Core.Hosting
     {
         string SiteName { get; }
 
+        /// <summary>
+        /// The unique application ID for this Umbraco website.
+        /// </summary>
+        /// <remarks>
+        /// <para>
+        /// The returned value will be the same consistent value for an Umbraco website on a specific server and will the same
+        /// between restarts of that Umbraco website/application on that specific server.
+        /// </para>
+        /// <para>
+        /// The value of this does not necesarily distinguish between unique workers/servers for this Umbraco application.
+        /// Usage of this must take into account that the same <see cref="ApplicationId"/> may be returned for the same
+        /// Umbraco website hosted on different servers. Similarly the usage of this must take into account that a different
+        /// <see cref="ApplicationId"/> may be returned for the same Umbraco website hosted on different servers.
+        /// </para>
+        /// </remarks>
         string ApplicationId { get; }
 
         /// <summary>

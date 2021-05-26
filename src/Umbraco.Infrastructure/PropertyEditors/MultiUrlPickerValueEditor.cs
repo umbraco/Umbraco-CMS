@@ -7,6 +7,8 @@ using System.Linq;
 using System.Runtime.Serialization;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Editors;
@@ -25,7 +27,6 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         private readonly IEntityService _entityService;
         private readonly ILogger<MultiUrlPickerValueEditor> _logger;
-        private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
 
@@ -33,20 +34,17 @@ namespace Umbraco.Cms.Core.PropertyEditors
             IEntityService entityService,
             IPublishedSnapshotAccessor publishedSnapshotAccessor,
             ILogger<MultiUrlPickerValueEditor> logger,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             DataEditorAttribute attribute,
-            IUmbracoContextAccessor umbracoContextAccessor,
             IPublishedUrlProvider publishedUrlProvider,
-            IJsonSerializer jsonSerializer)
-            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper)
+            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
             _publishedUrlProvider = publishedUrlProvider;
         }
 

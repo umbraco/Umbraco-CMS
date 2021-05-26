@@ -22,6 +22,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class DataTypeDefinitionRepositoryTest : UmbracoIntegrationTest
     {
+        private IDataValueEditorFactory DataValueEditorFactory => GetRequiredService<IDataValueEditorFactory>();
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
         private ILocalizedTextService LocalizedTextService => GetRequiredService<ILocalizedTextService>();
@@ -43,9 +44,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             using (ScopeProvider.CreateScope())
             {
-                IDataType dataType1 = new DataType(new RadioButtonsPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer) { Name = "dt1" };
+                IDataType dataType1 = new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer) { Name = "dt1" };
                 DataTypeRepository.Save(dataType1);
-                IDataType dataType2 = new DataType(new RadioButtonsPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer) { Name = "dt2" };
+                IDataType dataType2 = new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer) { Name = "dt2" };
                 DataTypeRepository.Save(dataType2);
 
                 IContentType ct = new ContentType(ShortStringHelper, -1)
@@ -107,14 +108,14 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var container2 = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah2", ParentId = container1.Id };
                 DataTypeContainerRepository.Save(container2);
 
-                var dataType = (IDataType)new DataType(new RadioButtonsPropertyEditor(LoggerFactory,  IOHelper, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer, container2.Id)
+                var dataType = (IDataType)new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory,  IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer, container2.Id)
                 {
                     Name = "dt1"
                 };
                 DataTypeRepository.Save(dataType);
 
                 // create a
-                var dataType2 = (IDataType)new DataType(new RadioButtonsPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer, dataType.Id)
+                var dataType2 = (IDataType)new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper,  LocalizedTextService), ConfigurationEditorJsonSerializer, dataType.Id)
                 {
                     Name = "dt2"
                 };
@@ -173,7 +174,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 DataTypeContainerRepository.Save(container);
 
-                var dataTypeDefinition = new DataType(new RadioButtonsPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer, container.Id) { Name = "test" };
+                var dataTypeDefinition = new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer, container.Id) { Name = "test" };
                 DataTypeRepository.Save(dataTypeDefinition);
 
                 Assert.AreEqual(container.Id, dataTypeDefinition.ParentId);
@@ -188,7 +189,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var container = new EntityContainer(Constants.ObjectTypes.DataType) { Name = "blah" };
                 DataTypeContainerRepository.Save(container);
 
-                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer, container.Id) { Name = "test" };
+                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer, container.Id) { Name = "test" };
                 DataTypeRepository.Save(dataType);
 
                 // Act
@@ -208,7 +209,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             using (ScopeProvider.CreateScope())
             {
-                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer) { Name = "test" };
+                IDataType dataType = new DataType(new RadioButtonsPropertyEditor(DataValueEditorFactory, IOHelper, LocalizedTextService), ConfigurationEditorJsonSerializer) { Name = "test" };
 
                 DataTypeRepository.Save(dataType);
 
@@ -306,7 +307,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             using (ScopeProvider.CreateScope())
             {
-                var dataTypeDefinition = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer)
+                var dataTypeDefinition = new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
@@ -341,7 +342,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             using (ScopeProvider.CreateScope())
             {
-                var dataTypeDefinition = new DataType(new IntegerPropertyEditor(LoggerFactory, DataTypeService, LocalizationService, ShortStringHelper, LocalizedTextService, JsonSerializer), ConfigurationEditorJsonSerializer)
+                var dataTypeDefinition = new DataType(new IntegerPropertyEditor(DataValueEditorFactory), ConfigurationEditorJsonSerializer)
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",
@@ -352,7 +353,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 // Act
                 IDataType definition = DataTypeRepository.Get(dataTypeDefinition.Id);
                 definition.Name = "AgeDataType Updated";
-                definition.Editor = new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper, JsonSerializer); // change
+                definition.Editor = new LabelPropertyEditor(DataValueEditorFactory, IOHelper); // change
                 DataTypeRepository.Save(definition);
 
                 IDataType definitionUpdated = DataTypeRepository.Get(dataTypeDefinition.Id);
@@ -369,7 +370,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
         {
             using (ScopeProvider.CreateScope())
             {
-                var dataTypeDefinition = new DataType(new LabelPropertyEditor(LoggerFactory, IOHelper, DataTypeService, LocalizedTextService, LocalizationService, ShortStringHelper, JsonSerializer), ConfigurationEditorJsonSerializer)
+                var dataTypeDefinition = new DataType(new LabelPropertyEditor(DataValueEditorFactory, IOHelper), ConfigurationEditorJsonSerializer)
                 {
                     DatabaseType = ValueStorageType.Integer,
                     Name = "AgeDataType",

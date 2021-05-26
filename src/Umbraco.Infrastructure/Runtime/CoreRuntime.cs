@@ -31,6 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IUmbracoVersion _umbracoVersion;
+        private CancellationToken _cancellationToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
@@ -68,8 +69,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         public IRuntimeState State { get; }
 
         /// <inheritdoc/>
+        public async Task RestartAsync()
+        {
+            await StopAsync(_cancellationToken);
+            await StartAsync(_cancellationToken);
+        }
+
+        /// <inheritdoc/>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            _cancellationToken = cancellationToken;
             StaticApplicationLogging.Initialize(_loggerFactory);
 
             AppDomain.CurrentDomain.UnhandledException += (_, args) =>
@@ -91,6 +100,9 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             AppDomain.CurrentDomain.SetData("DataDirectory", _hostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 
+            // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
+            AcquireMainDom();
+
             DoUnattendedInstall();
             DetermineRuntimeLevel();
 
@@ -105,8 +117,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(StartAsync)}");
             }
 
-            // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-            AcquireMainDom();
+
 
             // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
             if (State.Reason == RuntimeLevelReason.UpgradeMigrations && State.Level == RuntimeLevel.Run)
@@ -119,10 +130,10 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             }
 
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level), cancellationToken);
-
             // create & initialize the components
             _components.Initialize();
+
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level), cancellationToken);
         }
 
         private void DoUnattendedUpgrade()

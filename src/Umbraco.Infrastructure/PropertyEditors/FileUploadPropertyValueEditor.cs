@@ -5,6 +5,7 @@ using System;
 using System.IO;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
@@ -25,13 +26,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
         public FileUploadPropertyValueEditor(
             DataEditorAttribute attribute,
             MediaFileManager mediaFileManager,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IOptions<ContentSettings> contentSettings,
-            IJsonSerializer jsonSerializer)
-            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper)
+            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));

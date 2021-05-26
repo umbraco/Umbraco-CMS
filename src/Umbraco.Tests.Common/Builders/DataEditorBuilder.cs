@@ -44,12 +44,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             IDataValueEditor explicitValueEditor = _explicitValueEditorBuilder.Build();
 
             return new DataEditor(
-                NullLoggerFactory.Instance,
-                Mock.Of<IDataTypeService>(),
-                Mock.Of<ILocalizationService>(),
-                Mock.Of<ILocalizedTextService>(),
-                Mock.Of<IShortStringHelper>(),
-                Mock.Of<IJsonSerializer>())
+                Mock.Of<IDataValueEditorFactory>())
             {
                 DefaultConfiguration = defaultConfiguration,
                 ExplicitConfigurationEditor = explicitConfigurationEditor,

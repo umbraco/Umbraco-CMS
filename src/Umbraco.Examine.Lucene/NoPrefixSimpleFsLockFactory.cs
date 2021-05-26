@@ -6,6 +6,7 @@ using Lucene.Net.Store;
 
 namespace Umbraco.Cms.Infrastructure.Examine
 {
+
     /// <summary>
     /// A custom <see cref="SimpleFSLockFactory"/> that ensures a prefixless lock prefix
     /// </summary>

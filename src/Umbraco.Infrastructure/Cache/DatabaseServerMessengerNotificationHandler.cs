@@ -38,19 +38,19 @@ namespace Umbraco.Cms.Core.Cache
         /// <inheritdoc/>
         public void Handle(UmbracoApplicationStartingNotification notification)
         {
+            if (_runtimeState.Level < RuntimeLevel.Run)
+            {
+                return;
+            }
+
             if (_databaseFactory.CanConnect == false)
 			{
 				_logger.LogWarning("Cannot connect to the database, distributed calls will not be enabled for this server.");
-			}
-            else if (_runtimeState.Level != RuntimeLevel.Run)
-            {
-                _logger.LogWarning("Distributed calls are not available outside the Run runtime level");
+                return;
             }
-			else
-            {
-                // Sync on startup, this will run through the messenger's initialization sequence
-                _messenger?.Sync();
-            }
+
+            // Sync on startup, this will run through the messenger's initialization sequence
+            _messenger?.Sync();
         }
 
         /// <summary>

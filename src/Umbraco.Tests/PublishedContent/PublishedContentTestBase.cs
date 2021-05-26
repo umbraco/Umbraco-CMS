@@ -57,18 +57,13 @@ namespace Umbraco.Tests.PublishedContent
             var localLinkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
             var dataTypeService = new TestObjects.TestDataTypeService(
                 new DataType(new RichTextPropertyEditor(
-                    loggerFactory,
+                        DataValueEditorFactory,
                     Mock.Of<IBackOfficeSecurityAccessor>(),
-                    Mock.Of<IDataTypeService>(),
-                    Mock.Of<ILocalizationService>(),
-                    imageSourceParser,
+                        imageSourceParser,
                     localLinkParser,
                     pastedImages,
-                    ShortStringHelper,
-                    IOHelper,
-                    LocalizedTextService,
-                    Mock.Of<IImageUrlGenerator>(),
-                    new JsonNetSerializer()),
+                        IOHelper,
+                        Mock.Of<IImageUrlGenerator>()),
                     serializer) { Id = 1 });
 
 

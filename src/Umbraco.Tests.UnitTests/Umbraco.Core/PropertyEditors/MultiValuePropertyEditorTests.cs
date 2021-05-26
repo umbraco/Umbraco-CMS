@@ -7,9 +7,12 @@ using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Serialization;
@@ -30,8 +33,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void DropDownMultipleValueEditor_Format_Data_For_Cache()
         {
+            var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
             var serializer = new ConfigurationEditorJsonSerializer();
-            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>(), new JsonNetSerializer()), serializer)
+            var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(dataValueEditorFactoryMock.Object, Mock.Of<ILocalizedTextService>(),Mock.Of<IIOHelper>());
+            var dataType = new DataType(checkBoxListPropertyEditor, serializer)
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -50,12 +55,18 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(dataType);
 
+            //TODO use builders instead of this mess
+            var multipleValueEditor = new MultipleValueEditor(Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>(), Mock.Of<IIOHelper>(), new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"));
+            dataValueEditorFactoryMock
+                .Setup(x => x.Create<MultipleValueEditor>(It.IsAny<DataEditorAttribute>()))
+                .Returns(multipleValueEditor);
+
             var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), dataType));
             prop.SetValue("Value 1,Value 2,Value 3");
 
             IDataValueEditor valueEditor = dataType.Editor.GetValueEditor();
             ((DataValueEditor)valueEditor).Configuration = dataType.Configuration;
-            var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeServiceMock.Object);
+            var result = valueEditor.ConvertDbToString(prop.PropertyType, prop.GetValue());
 
             Assert.AreEqual("Value 1,Value 2,Value 3", result);
         }
@@ -63,8 +74,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
         [Test]
         public void DropDownValueEditor_Format_Data_For_Cache()
         {
+            var dataValueEditorFactoryMock = new Mock<IDataValueEditorFactory>();
+
             var serializer = new ConfigurationEditorJsonSerializer();
-            var dataType = new DataType(new CheckBoxListPropertyEditor(NullLoggerFactory.Instance, Mock.Of<ILocalizedTextService>(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IIOHelper>(), Mock.Of<ILocalizedTextService>(), new JsonNetSerializer()), serializer)
+            var checkBoxListPropertyEditor = new CheckBoxListPropertyEditor(dataValueEditorFactoryMock.Object, Mock.Of<ILocalizedTextService>(),Mock.Of<IIOHelper>());
+            var dataType = new DataType(checkBoxListPropertyEditor, serializer)
             {
                 Configuration = new ValueListConfiguration
                 {
@@ -83,10 +97,16 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 .Setup(x => x.GetDataType(It.IsAny<int>()))
                 .Returns(dataType);
 
+            //TODO use builders instead of this mess
+            var multipleValueEditor = new MultipleValueEditor(Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), Mock.Of<IJsonSerializer>(), Mock.Of<IIOHelper>(), new DataEditorAttribute(Constants.PropertyEditors.Aliases.TextBox, "Test Textbox", "textbox"));
+            dataValueEditorFactoryMock
+                .Setup(x => x.Create<MultipleValueEditor>(It.IsAny<DataEditorAttribute>()))
+                .Returns(multipleValueEditor);
+
             var prop = new Property(1, new PropertyType(Mock.Of<IShortStringHelper>(), dataType));
             prop.SetValue("Value 2");
 
-            var result = dataType.Editor.GetValueEditor().ConvertDbToString(prop.PropertyType, prop.GetValue(), dataTypeServiceMock.Object);
+            var result = dataType.Editor.GetValueEditor().ConvertDbToString(prop.PropertyType, prop.GetValue());
 
             Assert.AreEqual("Value 2", result);
         }

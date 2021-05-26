@@ -90,7 +90,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),  Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), serializer) { Id = 1 });
+                new DataType(new VoidEditor(DataValueEditorFactory), serializer) { Id = 1 });
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var caches = new SolidPublishedSnapshot();

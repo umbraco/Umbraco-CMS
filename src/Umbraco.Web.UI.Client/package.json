@@ -42,12 +42,12 @@
     "lazyload-js": "1.0.0",
     "moment": "2.22.2",
     "ng-file-upload": "12.2.13",
-    "nouislider": "14.6.3",
+    "nouislider": "14.6.4",
     "npm": "^6.14.7",
-    "spectrum-colorpicker2": "2.0.3",
+    "spectrum-colorpicker2": "2.0.8",
     "tinymce": "4.9.11",
     "typeahead.js": "0.11.1",
-    "underscore": "1.9.1",
+    "underscore": "1.12.1",
     "wicg-inert": "^3.0.2"
   },
   "devDependencies": {
@@ -83,7 +83,7 @@
     "karma-junit-reporter": "2.0.1",
     "karma-spec-reporter": "0.0.32",
     "less": "3.10.3",
-    "lodash": "4.17.19",
+    "lodash": "4.17.21",
     "marked": "^0.7.0",
     "merge-stream": "2.0.0",
     "run-sequence": "2.2.1"

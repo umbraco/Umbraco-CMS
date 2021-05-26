@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Notifications;
@@ -44,7 +45,7 @@ namespace Umbraco.Cms.Web.Common.Profiler
         /// <inheritdoc/>
         public void Handle(UmbracoApplicationStartingNotification notification)
         {
-            if (_profile)
+            if (_profile && notification.RuntimeLevel == RuntimeLevel.Run)
             {
                 // Stop the profiling of the booting process
                 _profiler.StopBoot();

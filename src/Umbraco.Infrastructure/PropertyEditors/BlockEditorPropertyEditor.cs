@@ -7,6 +7,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Blocks;
 using Umbraco.Cms.Core.Models.Editors;
@@ -24,26 +26,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
     {
         public const string ContentTypeKeyPropertyKey = "contentTypeKey";
         public const string UdiPropertyKey = "udi";
-        private readonly ILocalizedTextService _localizedTextService;
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly IContentTypeService _contentTypeService;
 
         public BlockEditorPropertyEditor(
-            ILoggerFactory loggerFactory,
-            Lazy<PropertyEditorCollection> propertyEditors,
-            IDataTypeService dataTypeService,
-            IContentTypeService contentTypeService,
-            ILocalizedTextService localizedTextService,
-            ILocalizationService localizationService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService,localizationService,localizedTextService, shortStringHelper, jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory,
+            Lazy<PropertyEditorCollection> propertyEditors)
+            : base(dataValueEditorFactory)
         {
-            _localizedTextService = localizedTextService;
             _propertyEditors = propertyEditors;
-            _dataTypeService = dataTypeService;
-            _contentTypeService = contentTypeService;
         }
 
         // has to be lazy else circular dep in ctor
@@ -51,7 +41,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, LoggerFactory.CreateLogger<BlockEditorPropertyValueEditor>(), LocalizationService,ShortStringHelper, JsonSerializer);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<BlockEditorPropertyValueEditor>(Attribute);
 
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -60,14 +50,24 @@ namespace Umbraco.Cms.Core.PropertyEditors
             private readonly ILogger<BlockEditorPropertyValueEditor> _logger;
             private readonly BlockEditorValues _blockEditorValues;
 
-            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger<BlockEditorPropertyValueEditor> logger, ILocalizationService localizationService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer)
-                : base(dataTypeService, localizationService, textService, shortStringHelper, jsonSerializer, attribute)
+            public BlockEditorPropertyValueEditor(
+                DataEditorAttribute attribute,
+                PropertyEditorCollection propertyEditors,
+                IDataTypeService dataTypeService,
+                IContentTypeService contentTypeService,
+                ILocalizedTextService textService,
+                ILogger<BlockEditorPropertyValueEditor> logger,
+                IShortStringHelper shortStringHelper,
+                IJsonSerializer jsonSerializer,
+                IIOHelper ioHelper,
+                IPropertyValidationService propertyValidationService)
+                : base(textService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
                 _logger = logger;
                 _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService, _logger);
-                Validators.Add(new BlockEditorValidator(_blockEditorValues, propertyEditors, dataTypeService, textService, contentTypeService));
+                Validators.Add(new BlockEditorValidator(propertyValidationService, _blockEditorValues,contentTypeService));
                 Validators.Add(new MinMaxValidator(_blockEditorValues, textService));
             }
 
@@ -285,8 +285,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
             private readonly BlockEditorValues _blockEditorValues;
             private readonly IContentTypeService _contentTypeService;
 
-            public BlockEditorValidator(BlockEditorValues blockEditorValues, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService, IContentTypeService contentTypeService)
-                : base(propertyEditors, dataTypeService, textService)
+            public BlockEditorValidator(IPropertyValidationService propertyValidationService, BlockEditorValues blockEditorValues, IContentTypeService contentTypeService)
+                : base(propertyValidationService)
             {
                 _blockEditorValues = blockEditorValues;
                 _contentTypeService = contentTypeService;

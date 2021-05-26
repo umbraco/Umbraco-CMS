@@ -2,7 +2,7 @@
 // See LICENSE for more details.
 
 using Examine;
-using Examine.LuceneEngine.Providers;
+using Examine.Lucene.Providers;
 using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Tests.Integration.Testing
@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             {
                 if (index is LuceneIndex luceneIndex)
                 {
-                    luceneIndex.ProcessNonAsync();
+                    luceneIndex.WithThreadingMode(IndexThreadingMode.Synchronous);
                 }
             }
         }

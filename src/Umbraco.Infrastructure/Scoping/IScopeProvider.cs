@@ -19,6 +19,7 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="isolationLevel">The transaction isolation level.</param>
         /// <param name="repositoryCacheMode">The repositories cache mode.</param>
         /// <param name="eventDispatcher">An optional events dispatcher.</param>
+        /// <param name="scopedNotificationPublisher">An optional notification publisher.</param>
         /// <param name="scopeFileSystems">A value indicating whether to scope the filesystems.</param>
         /// <param name="callContext">A value indicating whether this scope should always be registered in the call context.</param>
         /// <param name="autoComplete">A value indicating whether this scope is auto-completed.</param>
@@ -35,6 +36,7 @@ namespace Umbraco.Cms.Core.Scoping
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
+            IScopedNotificationPublisher scopedNotificationPublisher = null,
             bool? scopeFileSystems = null,
             bool callContext = false,
             bool autoComplete = false);
@@ -46,6 +48,7 @@ namespace Umbraco.Cms.Core.Scoping
         /// <param name="isolationLevel">The transaction isolation level.</param>
         /// <param name="repositoryCacheMode">The repositories cache mode.</param>
         /// <param name="eventDispatcher">An optional events dispatcher.</param>
+        /// <param name="scopedNotificationPublisher">An option notification publisher.</param>
         /// <param name="scopeFileSystems">A value indicating whether to scope the filesystems.</param>
         /// <remarks>
         /// <para>A detached scope is not ambient and has no parent.</para>
@@ -56,6 +59,7 @@ namespace Umbraco.Cms.Core.Scoping
             IsolationLevel isolationLevel = IsolationLevel.Unspecified,
             RepositoryCacheMode repositoryCacheMode = RepositoryCacheMode.Unspecified,
             IEventDispatcher eventDispatcher = null,
+            IScopedNotificationPublisher scopedNotificationPublisher = null,
             bool? scopeFileSystems = null);
 
         /// <summary>

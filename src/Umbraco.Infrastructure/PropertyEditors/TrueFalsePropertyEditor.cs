@@ -28,14 +28,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Initializes a new instance of the <see cref="TrueFalsePropertyEditor"/> class.
         /// </summary>
         public TrueFalsePropertyEditor(
-            ILoggerFactory loggerFactory,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper,
-            ILocalizedTextService localizedTextService,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper)
+            : base(dataValueEditorFactory)
         {
             _ioHelper = ioHelper;
         }

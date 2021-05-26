@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using System.Xml.XPath;
 using Examine;
 using Examine.Search;
@@ -260,7 +261,7 @@ namespace Umbraco.Cms.Infrastructure
                     $"No index found by name {indexName} or is not of type {typeof(IUmbracoIndex)}");
             }
 
-            var query = umbIndex.GetSearcher().CreateQuery(IndexTypes.Content);
+            var query = umbIndex.Searcher.CreateQuery(IndexTypes.Content);
 
             IQueryExecutor queryExecutor;
             if (culture == "*")
@@ -286,7 +287,7 @@ namespace Umbraco.Cms.Infrastructure
 
             var results = skip == 0 && take == 0
                 ? queryExecutor.Execute()
-                : queryExecutor.Execute(skip + take);
+                : queryExecutor.Execute(QueryOptions.SkipTake(skip, take));
 
             totalRecords = results.TotalItemCount;
 
@@ -316,7 +317,7 @@ namespace Umbraco.Cms.Infrastructure
 
             var results = skip == 0 && take == 0
                 ? query.Execute()
-                : query.Execute(skip + take);
+                : query.Execute(QueryOptions.SkipTake(skip, take));
 
             totalRecords = results.TotalItemCount;
 

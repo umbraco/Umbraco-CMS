@@ -1,8 +1,10 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
-using Examine.LuceneEngine.Providers;
+using System.Threading.Tasks;
+using Examine.Lucene.Providers;
 using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core;
@@ -25,43 +27,17 @@ namespace Umbraco.Cms.Infrastructure.Examine
         public LuceneIndex Index { get; }
         public ILogger<LuceneIndexDiagnostics> Logger { get; }
 
-        public int DocumentCount
-        {
-            get
-            {
-                try
-                {
-                    return Index.GetIndexDocumentCount();
-                }
-                catch (AlreadyClosedException)
-                {
-                    Logger.LogWarning("Cannot get GetIndexDocumentCount, the writer is already closed");
-                    return 0;
-                }
-            }
-        }
-
-        public int FieldCount
-        {
-            get
-            {
-                try
-                {
-                    return Index.GetIndexFieldCount();
-                }
-                catch (AlreadyClosedException)
-                {
-                    Logger.LogWarning("Cannot get GetIndexFieldCount, the writer is already closed");
-                    return 0;
-                }
-            }
-        }
+       
 
         public Attempt<string> IsHealthy()
         {
             var isHealthy = Index.IsHealthy(out var indexError);
             return isHealthy ? Attempt<string>.Succeed() : Attempt.Fail(indexError.Message);
         }
+
+        public long GetDocumentCount() => Index.GetDocumentCount();
+
+        public IEnumerable<string> GetFieldNames() => Index.GetFieldNames();
 
         public virtual IReadOnlyDictionary<string, object> Metadata
         {

@@ -62,6 +62,7 @@ namespace Umbraco.Tests.TestHelpers
 
         internal ScopeProvider ScopeProvider => Current.ScopeProvider as ScopeProvider;
         internal IUmbracoDatabaseFactory UmbracoDatabaseFactory => Factory.GetRequiredService<IUmbracoDatabaseFactory>();
+        internal IDataValueEditorFactory DataValueEditorFactory => Factory.GetRequiredService<IDataValueEditorFactory>();
 
         protected ISqlContext SqlContext => Factory.GetRequiredService<ISqlContext>();
 

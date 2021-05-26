@@ -1576,6 +1576,7 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="contentAllowed">Ce contenu est autorisé ici</key>
     <key alias="clickToEmbed">Cliquez pour intégrer</key>
     <key alias="clickToInsertImage">Cliquez pour insérer une image</key>
+    <key alias="clickToInsertMacro">Cliquez pour insérer une macro</key>
     <key alias="placeholderImageCaption">Légende de l'image...</key>
     <key alias="placeholderWriteHere">Ecrivez ici...</key>
     <key alias="gridLayouts">Mises en pages de la Grid</key>
