@@ -1394,7 +1394,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 }
             }
 
-            function syncContent(setDirty) {
+            function syncContent() {
+
+                if(args.model.value === args.editor.getContent()) {
+                    return;
+                }
 
                 //stop watching before we update the value
                 stopWatch();
@@ -1403,11 +1407,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                     //make the form dirty manually so that the track changes works, setting our model doesn't trigger
                     // the angular bits because tinymce replaces the textarea.
-                    if (setDirty === true && args.currentForm) {
+                    if (args.currentForm) {
                         args.currentForm.$setDirty();
                     }
                     // With complex validation we need to set a input field to dirty, not the form. but we will keep the old code for backwards compatibility.
-                    if (setDirty === true && args.currentFormInput) {
+                    if (args.currentFormInput) {
                         args.currentFormInput.$setDirty();
                     }
                 });
@@ -1500,12 +1504,15 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             });
 
             args.editor.on('Change', function (e) {
-                syncContent(true);
+                syncContent();
+            });
+            args.editor.on('Keyup', function (e) {
+                syncContent();
             });
 
             //when we leave the editor (maybe)
             args.editor.on('blur', function (e) {
-                syncContent(false);
+                syncContent();
             });
 
             args.editor.on('ObjectResized', function (e) {
@@ -1514,11 +1521,11 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 var path = srcAttr.split("?")[0];
                 $(e.target).attr("data-mce-src", path + qs);
 
-                syncContent(true);
+                syncContent();
             });
 
             args.editor.on('Dirty', function (e) {
-            	syncContent(true); // Set model.value to the RTE's content
+            	syncContent(); // Set model.value to the RTE's content
             });
 
             let self = this;
