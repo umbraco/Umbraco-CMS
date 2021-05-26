@@ -2,7 +2,7 @@
 {
     public enum HostingOptions
     {
-        Unknown,
+        OnPremises,
         Cloud
     }
 }

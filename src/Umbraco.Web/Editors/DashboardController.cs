@@ -60,7 +60,7 @@ namespace Umbraco.Web.Editors
             var language = user.Language;
             var version = UmbracoVersion.SemanticVersion.ToSemanticString();
             var isAdmin = user.IsAdmin();
-            var hosting = HostingOptions.Unknown.ToString().ToLower();
+            var hosting = HostingOptions.OnPremises.ToString().ToLower();
 
             // check if the site is running on Umbraco Cloud
             if (IOHelper.IsOnCloud)
