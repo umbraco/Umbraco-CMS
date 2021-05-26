@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function EditorsDirective($timeout, eventsService) {
+    function EditorsDirective($timeout, eventsService, focusLockService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -27,6 +27,9 @@
                     if(isLeftColumnAbove){
                         $(sectionId).removeClass(aboveBackDropCssClass);
                     }
+
+                    // Inert content in the #mainwrapper
+                    focusLockService.addInertAttribute();
                 }
                 
                 $timeout(() => {
@@ -54,6 +57,9 @@
                     }
 
                     isLeftColumnAbove = false;
+
+                    // Remove the inert attribute from the #mainwrapper
+                    focusLockService.removeInertAttribute();
                 }
             }
 
@@ -96,7 +102,6 @@
                     iEditor.inFront = iEditor.level >= ceiling;
                     i++;
                 }
-
             }
 
             evts.push(eventsService.on("appState.editors.open", function (name, args) {
@@ -135,11 +140,11 @@
     }
 
     // This directive allows for us to run a custom $compile for the view within the repeater which allows
-    // us to maintain a $scope hierarchy with the rendered view based on the $scope that initiated the 
+    // us to maintain a $scope hierarchy with the rendered view based on the $scope that initiated the
     // infinite editing. The retain the $scope hiearchy a special $parentScope property is passed in to the model.
     function EditorRepeaterDirective($http, $templateCache, $compile, angularHelper) {
-        function link(scope, el, attr, ctrl) {
-            
+        function link(scope, el) {
+
             var editor = scope && scope.$parent ? scope.$parent.model : null;
             if (!editor) {
                 return;

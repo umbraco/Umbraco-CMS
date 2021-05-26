@@ -2083,32 +2083,6 @@ namespace Umbraco.Tests.Services
         }
 
         [Test]
-        public void Copy_Recursive_Preserves_Sort_Order()
-        {
-            // Arrange
-            var contentService = ServiceContext.ContentService;
-            var temp = contentService.GetById(NodeDto.NodeIdSeed + 2);
-            Assert.AreEqual("Home", temp.Name);
-            Assert.AreEqual(3, contentService.CountChildren(temp.Id));
-            var reversedChildren = contentService.GetPagedChildren(temp.Id, 0, 10, out var total1).Reverse().ToArray();
-            contentService.Sort(reversedChildren);
-
-            // Act
-            var copy = contentService.Copy(temp, temp.ParentId, false, true, Constants.Security.SuperUserId);
-            var content = contentService.GetById(NodeDto.NodeIdSeed + 2);
-
-            // Assert
-            Assert.That(copy, Is.Not.Null);
-            Assert.That(copy.Id, Is.Not.EqualTo(content.Id));
-            Assert.AreNotSame(content, copy);
-            Assert.AreEqual(3, contentService.CountChildren(copy.Id));
-
-            var copiedChildren = contentService.GetPagedChildren(copy.Id, 0, 10, out var total2).OrderBy(c => c.SortOrder).ToArray();
-            Assert.AreEqual(reversedChildren.First().Name, copiedChildren.First().Name);
-            Assert.AreEqual(reversedChildren.Last().Name, copiedChildren.Last().Name);
-        }
-
-        [Test]
         public void Can_Rollback_Version_On_Content()
         {
             // Arrange
