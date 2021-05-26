@@ -47,7 +47,7 @@ namespace Umbraco.ModelsBuilder.Embedded.Compose
         {
             var assemblyNames = new[]
             {
-                "Umbraco.ModelsBuider",
+                "Umbraco.ModelsBuilder",
                 "ModelsBuilder.Umbraco"
             };
 
