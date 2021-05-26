@@ -48,8 +48,6 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 });
             }
             else if (value[0]) {
-                //notificationsService.error("Validation", value[0]);
-                console.log({type:messageType, header:"Validation", message:value[0]})
                 notificationsService.showNotification({type:messageType, header:"Validation", message:value[0]})
             }
         }
