@@ -349,9 +349,6 @@ namespace Umbraco.Core.Migrations.Install
             //New UDI pickers with newer Ids
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1046, EditorAlias = Constants.PropertyEditors.Aliases.ContentPicker, DbType = "Nvarchar" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1047, EditorAlias = Constants.PropertyEditors.Aliases.MemberPicker, DbType = "Nvarchar" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1048, EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker, DbType = "Ntext" });
-            _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1049, EditorAlias = Constants.PropertyEditors.Aliases.MediaPicker, DbType = "Ntext",
-                Configuration = "{\"multiPicker\":1}" });
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto { NodeId = 1050, EditorAlias = Constants.PropertyEditors.Aliases.MultiUrlPicker, DbType = "Ntext" });
 
             _database.Insert(Constants.DatabaseSchema.Tables.DataType, "pk", false, new DataTypeDto
