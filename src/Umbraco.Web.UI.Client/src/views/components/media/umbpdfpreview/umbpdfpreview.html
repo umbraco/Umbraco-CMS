@@ -1,1 +1,13 @@
-<umb-pdf-viewer src="vm.source"></umb-pdf-viewer>
+<div class="umb-pdf-preview" ng-controller="umbPDFPreviewController as controller">
+  <umb-pdf-viewer 
+    ng-if="vm.clientSide" 
+    ng-init="previewUrl = controller.getClientSideUrl(vm.clientSideData)" 
+    src="previewUrl">
+  </umb-pdf-viewer>
+
+  <umb-pdf-viewer 
+    ng-if="!vm.clientSide" 
+    src="vm.source">
+  </umb-pdf-viewer>
+
+</div>

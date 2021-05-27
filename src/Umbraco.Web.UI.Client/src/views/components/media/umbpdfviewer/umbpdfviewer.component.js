@@ -107,6 +107,7 @@
           vm.pdf = pdf;
           vm.totalPages = pdf.numPages;
           renderPage(vm.pageNumber);
+          $scope.$applyAsync();
         });
       } catch (e) {
         console.log('error', e);
