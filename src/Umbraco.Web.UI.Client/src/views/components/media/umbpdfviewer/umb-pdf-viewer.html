@@ -1,13 +1,13 @@
 <div class="umb-pdf-viewer">
-  <canvas class="pdf-canvas"></canvas>
-  
+  <canvas class="umb-pdf-viewer--pdf-canvas"></canvas>
+
   <div class="umb-pdf-viewer__toolbar">
-    <button type="button" ng-click="vm.prevPage()">Prev Page</button>
+    <button type="button" class="btn btn-reset" ng-click="vm.prevPage()">Prev Page</button>
     <div>
       <span>{{ vm.pageNumber }}</span>
       <span>/</span>
       <span>{{ vm.totalPages }}</span>
     </div>
-    <button type="button" ng-click="vm.nextPage()">Next Page</button>
+    <button type="button" class="btn btn-reset" ng-click="vm.nextPage()">Next Page</button>
   </div>
 </div>

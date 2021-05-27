@@ -18,6 +18,8 @@
 
     const vm = this;
     const element = $element[0];
+    const pdfViewerElement = element.querySelector('.umb-pdf-viewer');
+    const canvas = element.querySelector('.umb-pdf-viewer--pdf-canvas');
     var currentPage = null;
     var pageLoading = false;
     var pageRendering = false;
@@ -99,12 +101,19 @@
 
     function render() {
         pageRendering = true;
-        const desiredWidth = element.parentElement.clientWidth;
+
         const viewport = currentPage.getViewport({ scale: 1 });
+        const maxWidth = element.parentElement.clientWidth;
+        const maxHeight = document.documentElement.clientHeight - 172;
+
+        const pdfAspect = viewport.width / viewport.height;
+        const maxAspect = maxWidth / maxHeight;
+
+        const desiredWidth = Math.min(maxWidth, maxWidth*(pdfAspect / maxAspect));
+
         const scale = desiredWidth / viewport.width;
         const scaledViewport = currentPage.getViewport({ scale });
 
-        const canvas = element.querySelector('.pdf-canvas');
         const context = canvas.getContext('2d');
         canvas.height = scaledViewport.height;
         canvas.width = scaledViewport.width;
