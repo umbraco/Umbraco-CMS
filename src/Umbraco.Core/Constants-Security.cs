@@ -25,7 +25,7 @@ namespace Umbraco.Core
             /// <summary>
             /// The name of the 'unknown' user.
             /// </summary>
-            public const string UnknownUserName = "SYTEM";
+            public const string UnknownUserName = "SYSTEM";
 
             public const string AdminGroupAlias = "admin";
             public const string EditorGroupAlias = "editor";

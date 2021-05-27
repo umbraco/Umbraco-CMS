@@ -1,6 +1,6 @@
 //this controller simply tells the dialogs service to open a memberPicker window
 //with a specified callback, this callback will receive an object with a selection on it
-function memberPickerController($scope, entityResource, iconHelper, angularHelper, editorService){
+function memberPickerController($scope, entityResource, iconHelper, editorService){
 
     function trim(str, chr) {
         var rgxtrim = (!chr) ? new RegExp('^\\s+|\\s+$', 'g') : new RegExp('^' + chr + '+|' + chr + '+$', 'g');
@@ -27,10 +27,15 @@ function memberPickerController($scope, entityResource, iconHelper, angularHelpe
             } else {
                 $scope.clear();
                 $scope.add(data);
-            }
-            angularHelper.getCurrentForm($scope).$setDirty();
+            }            
         }
     };
+
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
+    }
 
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options
@@ -60,6 +65,7 @@ function memberPickerController($scope, entityResource, iconHelper, angularHelpe
 
     $scope.remove = function (index) {
         $scope.renderModel.splice(index, 1);
+        setDirty();
     };
 
     $scope.add = function (item) {
@@ -76,7 +82,8 @@ function memberPickerController($scope, entityResource, iconHelper, angularHelpe
 
         if (currIds.indexOf(itemId) < 0) {
             item.icon = iconHelper.convertFromLegacyIcon(item.icon);
-            $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon});
+            $scope.renderModel.push({ name: item.name, id: item.id, udi: item.udi, icon: item.icon });
+            setDirty();
         }
     };
 
