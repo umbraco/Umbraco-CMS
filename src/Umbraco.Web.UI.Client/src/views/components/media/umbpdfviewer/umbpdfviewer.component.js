@@ -12,17 +12,19 @@
       }
     });
 
-  UmbPDFViewerController.$inject = ['$scope', '$element', 'assetsService'];
+  UmbPDFViewerController.$inject = ['$scope', '$element', 'assetsService', 'windowResizeListener'];
 
-  function UmbPDFViewerController($scope, $element, assetsService) {
+  function UmbPDFViewerController($scope, $element, assetsService, windowResizeListener) {
 
     const vm = this;
     const element = $element[0];
+    var currentPage = null;
+    var pageLoading = false;
+    var pageRendering = false;
 
     vm.pdf = null;
     vm.pageNumber = 1;
     vm.totalPages = 0;
-    vm.pageRendering = false;
     vm.pageNumberPending = null;
 
     vm.$onInit = onInit;
@@ -47,7 +49,7 @@
       }
 
       vm.pageNumber = vm.pageNumber + 1;
-      queueRenderPage(vm.pageNumber);
+      queuePage(vm.pageNumber);
     }
 
     function prevPage() {
@@ -56,25 +58,54 @@
       }
 
       vm.pageNumber = vm.pageNumber - 1;
-      queueRenderPage(vm.pageNumber);
+      queuePage(vm.pageNumber);
     }
 
-    function queueRenderPage (pageNumber) {
-      if (vm.pageRendering) {
+    function queuePage (pageNumber) {
+      if (pageLoading || pageRendering) {
         vm.pageNumberPending = pageNumber;
       } else {
-        renderPage(pageNumber);
+        loadPage(pageNumber);
       }
     }
 
-    function renderPage(pageNumber) {
-      vm.pageRendering = true;
+    function loadPage(pageNumber) {
+      pageLoading = true;
 
       vm.pdf.getPage(pageNumber).then(function(page) {
+        pageLoading = false;
+        currentPage = page;
+        render();
+      });
+    }
+
+    function loadDocument () {
+      try {
+        const loadingTask = pdfjsLib.getDocument({url: vm.src });
+
+        loadingTask.promise.then((pdf) => {
+          vm.pdf = pdf;
+          vm.totalPages = pdf.numPages;
+          loadPage(vm.pageNumber);
+          $scope.$applyAsync();
+        });
+      } catch (e) {
+        console.log('error', e);
+      }
+    }
+
+    function onResize() {
+        if(currentPage && pageRendering === false) {
+            render();
+        }
+    }
+
+    function render() {
+        pageRendering = true;
         const desiredWidth = element.parentElement.clientWidth;
-        const viewport = page.getViewport({ scale: 1 });
+        const viewport = currentPage.getViewport({ scale: 1 });
         const scale = desiredWidth / viewport.width;
-        const scaledViewport = page.getViewport({ scale });
+        const scaledViewport = currentPage.getViewport({ scale });
 
         const canvas = element.querySelector('.pdf-canvas');
         const context = canvas.getContext('2d');
@@ -86,33 +117,24 @@
           viewport: scaledViewport
         };
 
-        const renderTask = page.render(renderContext);
+        const renderTask = currentPage.render(renderContext);
 
         renderTask.promise.then(function() {
-          vm.pageRendering = false;
+          pageRendering = false;
 
           if (vm.pageNumberPending !== null) {
-            renderPage(vm.pageNumberPending);
+            loadPage(vm.pageNumberPending);
             vm.pageNumberPending = null;
           }
         });
-      });
     }
 
-    function loadDocument () {
-      try {
-        const loadingTask = pdfjsLib.getDocument({url: vm.src });
+    windowResizeListener.register(onResize);
 
-        loadingTask.promise.then((pdf) => {
-          vm.pdf = pdf;
-          vm.totalPages = pdf.numPages;
-          renderPage(vm.pageNumber);
-          $scope.$applyAsync();
-        });
-      } catch (e) {
-        console.log('error', e);
-      }
-    }
+    //ensure to unregister from all events and kill jquery plugins
+    $scope.$on('$destroy', function () {
+        windowResizeListener.unregister(onResize);
+    });
   }
 
 })();
