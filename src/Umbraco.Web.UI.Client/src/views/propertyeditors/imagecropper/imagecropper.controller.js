@@ -1,6 +1,6 @@
 angular.module('umbraco')
     .controller("Umbraco.PropertyEditors.ImageCropperController",
-        function ($scope, fileManager, $timeout) {
+        function ($scope, fileManager, $timeout, mediaHelper) {
 
             var config = Utilities.copy($scope.model.config);
 
@@ -18,6 +18,8 @@ angular.module('umbraco')
             //declare a special method which will be called whenever the value has changed from the server
             $scope.model.onValueChanged = onValueChanged;
 
+            var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
+            $scope.acceptFileExt = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
             /**
              * Called when the umgImageGravity component updates the focal point value
              * @param {any} left
@@ -31,7 +33,7 @@ angular.module('umbraco')
                 };
 
                 //set form to dirty to track changes
-                $scope.imageCropperForm.$setDirty();
+                setDirty();
             }
 
             /**
@@ -67,7 +69,13 @@ angular.module('umbraco')
             function onFileSelected(value, files) {
                 setModelValueWithSrc(value);
                 //set form to dirty to track changes
-                $scope.imageCropperForm.$setDirty();
+                setDirty();
+            }
+
+            function setDirty() {
+                if ($scope.imageCropperForm) {
+                    $scope.imageCropperForm.modelValue.$setDirty();
+                }                
             }
 
             function imageLoaded(isCroppable, hasDimensions) {
@@ -84,7 +92,7 @@ angular.module('umbraco')
                 if (files && files[0]) {
                     $scope.imageSrc = files[0].fileSrc;
                     //set form to dirty to track changes
-                    $scope.imageCropperForm.$setDirty();
+                    setDirty();
                 }
             }
 
@@ -138,13 +146,13 @@ angular.module('umbraco')
                     $scope.currentPoint = null;
 
                     //set form to dirty to track changes
-                    $scope.imageCropperForm.$setDirty();
+                    setDirty();
                 }
                 else {
                     // we have a crop open already - close the crop (this will discard any changes made)
                     close();
 
-                    // the crop editor needs a digest cycle to close down properly, otherwise its state 
+                    // the crop editor needs a digest cycle to close down properly, otherwise its state
                     // is reused for the new crop... and that's really bad
                     $timeout(function () {
                         crop(targetCrop);
@@ -168,7 +176,7 @@ angular.module('umbraco')
                 $scope.close();
 
                 //set form to dirty to track changes
-                $scope.imageCropperForm.$setDirty();
+                setDirty();
             };
 
             function reset() {
@@ -201,7 +209,7 @@ angular.module('umbraco')
                 }
 
                 //set form to dirty to track changes
-                $scope.imageCropperForm.$setDirty();
+                setDirty();
             };
 
             function isCustomCrop(crop) {

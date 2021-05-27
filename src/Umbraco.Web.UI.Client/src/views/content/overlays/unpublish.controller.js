@@ -4,12 +4,18 @@
     function UnpublishController($scope, localizationService, contentEditingHelper) {
 
         var vm = this;
+
         var autoSelectedVariants = [];
+
+        vm.id = $scope.content.id;
+
+        vm.warningText = null;
 
         vm.changeSelection = changeSelection;
 
         function onInit() {
 
+            $scope.model.hideSubmitButton = true;
             vm.variants = $scope.model.variants;
             vm.unpublishableVariants = vm.variants.filter(publishedVariantFilter)
 
@@ -26,7 +32,7 @@
 
             // node has variants
             if (vm.variants.length !== 1) {
-                
+
                 vm.unpublishableVariants = contentEditingHelper.getSortedVariantsAndSegments(vm.unpublishableVariants);
 
                 var active = vm.variants.find(v => v.active);
@@ -39,7 +45,7 @@
                 // autoselect other variants if needed
                 changeSelection(active);
             }
-            
+
         }
 
         function changeSelection(selectedVariant) {
@@ -66,7 +72,7 @@
             // that was automatically selected so it goes back to the state before the mandatory language was selected.
             // We also want to enable all checkboxes again
             if (!selectedVariant.save && selectedVariant.segment == null && selectedVariant.language && selectedVariant.language.isMandatory) {
-                
+
                 vm.variants.forEach(variant => {
 
                     // check if variant was auto selected, then deselect
@@ -107,6 +113,17 @@
                 variant.save = variant.disabled = false;
             });
         });
+
+        vm.checkingReferencesComplete = () => {
+            $scope.model.hideSubmitButton = false;
+        };
+
+        vm.onReferencesWarning = () => {
+            $scope.model.submitButtonStyle = "danger";
+            localizationService.localize("references_unpublishWarning").then((value) => {
+                vm.warningText = value;
+            });
+        };
 
         onInit();
 
