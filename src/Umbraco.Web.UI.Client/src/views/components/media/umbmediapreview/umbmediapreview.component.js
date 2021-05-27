@@ -11,7 +11,7 @@
                 extension: "<",
                 source: "<",
                 name: "<",
-                clientSide: "<"
+                clientSide: "<?"
             }
         });
 
@@ -19,15 +19,8 @@
 
         var vm = this;
 
-
         vm.$onInit = function() {
             vm.previewView = mediaPreview.getMediaPreview(vm.extension);
-            console.log("vm.previewView:", vm.previewView);
-        }
-
-
-        vm.$onDestroy = function () {
-
         }
 
     }
