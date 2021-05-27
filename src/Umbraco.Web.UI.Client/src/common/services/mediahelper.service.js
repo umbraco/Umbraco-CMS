@@ -304,11 +304,6 @@ function mediaHelper(umbRequestHelper, $log) {
                 return imagePath;
             }
 
-            // Check if file is a svg
-            if (this.getFileExtension(imagePath) === "svg") {
-                return imagePath;
-            }
-
             // If the path is not an image we cannot get a thumb
             if (!this.detectIfImageByExtension(imagePath)) {
                 return null;
