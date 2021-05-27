@@ -12,14 +12,14 @@
             bindings: {
                 id: "<",
                 hideNoResult: "<?",
-                warningText: "<?",
-                loading : "=?"
+                onWarning: "&?",
+                onLoadingComplete : "&?"
             }
         });
 
     function UmbTrackedReferencesController($q, trackedReferencesResource, localizationService) {
 
-      
+
         var vm = this;
 
         vm.contentReferencesTitle = "Used in documents";
@@ -60,17 +60,16 @@
 
         function onInit() {
 
-            this.loading = this.loading || true;
+            this.loading = true;
             this.hideNoResult = this.hideNoResult || false;
-            this.warningText = this.warningText || '';
-
-            vm.showWarning = false;
-            vm.hasWarningText = this.warningText !== '';
 
             $q.all([loadContentRelations(), loadMediaRelations(), loadMemberRelations()]).then(function () {
-                
+
                 if (vm.hasContentReferences && vm.hasMediaReferences && vm.hasMemberReferences) {
                     vm.loading = false;
+                    if(vm.onLoadingComplete) {
+                        vm.onLoadingComplete();
+                    }
                 } else {
                     var descendantsPromises = [];
 
@@ -88,12 +87,15 @@
 
                     $q.all(descendantsPromises).then(function() {
                         vm.loading = false;
+                        if(vm.onLoadingComplete) {
+                            vm.onLoadingComplete();
+                        }
                     });
 
                 }
             });
 
-           
+
         }
 
         function changeContentPageNumber(pageNumber) {
@@ -139,7 +141,7 @@
             return trackedReferencesResource.getPagedReferences(vm.id, vm.memberOptions)
                 .then(function (data) {
                     vm.memberReferences = data;
-                   
+
                     if (data.items.length > 0) {
                         vm.hasMemberReferences = data.items.length > 0;
                         activateWarning();
@@ -181,8 +183,8 @@
         }
 
         function activateWarning() {
-            if (vm.hasWarningText && !vm.showWarning) {
-                vm.showWarning = true;
+            if (vm.onWarning) {
+                vm.onWarning();
             }
         }
     }

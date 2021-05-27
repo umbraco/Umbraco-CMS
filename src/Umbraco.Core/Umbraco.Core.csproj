@@ -156,6 +156,7 @@
     <Compile Include="Models\Identity\IExternalLogin.cs" />
     <Compile Include="Models\IconModel.cs" />
     <Compile Include="Models\InstallLog.cs" />
+    <Compile Include="Models\MediaWithCrops.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeExtensions.cs" />
     <Compile Include="Models\RelationTypeExtensions.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />

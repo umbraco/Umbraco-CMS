@@ -1,7 +1,7 @@
 //used for the media picker dialog
 angular.module("umbraco")
     .controller("Umbraco.Editors.MediaPickerController",
-        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage, notificationsService) {
+        function ($scope, $timeout, mediaResource, entityResource, userService, mediaHelper, mediaTypeHelper, eventsService, treeService, localStorageService, localizationService, editorService, umbSessionStorage, notificationsService, clipboardService) {
 
             var vm = this;
 
@@ -19,6 +19,8 @@ angular.module("umbraco")
             vm.enterSubmitFolder = enterSubmitFolder;
             vm.focalPointChanged = focalPointChanged;
             vm.changePagination = changePagination;
+            vm.onNavigationChanged = onNavigationChanged;
+            vm.clickClearClipboard = clickClearClipboard;
 
             vm.clickHandler = clickHandler;
             vm.clickItemName = clickItemName;
@@ -27,7 +29,10 @@ angular.module("umbraco")
             vm.selectLayout = selectLayout;
             vm.showMediaList = false;
 
+            vm.navigation = [];
+
             var dialogOptions = $scope.model;
+            vm.clipboardItems = dialogOptions.clipboardItems;
 
             $scope.disableFolderSelect = (dialogOptions.disableFolderSelect && dialogOptions.disableFolderSelect !== "0") ? true : false;
             $scope.disableFocalPoint = (dialogOptions.disableFocalPoint && dialogOptions.disableFocalPoint !== "0") ? true : false;
@@ -100,10 +105,32 @@ angular.module("umbraco")
 
             function setTitle() {
                 if (!$scope.model.title) {
-                    localizationService.localize("defaultdialogs_selectMedia")
+                    localizationService.localizeMany(["defaultdialogs_selectMedia", "mediaPicker_tabClipboard"])
                         .then(function (data) {
-                            $scope.model.title = data;
+                            $scope.model.title = data[0];
+
+
+                            vm.navigation = [{
+                                "alias": "empty",
+                                "name": data[0],
+                                "icon": "icon-umb-media",
+                                "active": true,
+                                "view": ""
+                            }];
+
+                            if(vm.clipboardItems) {
+                                vm.navigation.push({
+                                    "alias": "clipboard",
+                                    "name": data[1],
+                                    "icon": "icon-paste-in",
+                                    "view": "",
+                                    "disabled": vm.clipboardItems.length === 0
+                                });
+                            }
+
+                            vm.activeTab = vm.navigation[0];
                         });
+
                 }
             }
 
@@ -149,7 +176,7 @@ angular.module("umbraco")
                             .then(function (node) {
                                 $scope.target = node;
                                 // Moving directly to existing node's folder
-                                gotoFolder({ id: node.parentId }).then(function() {
+                                gotoFolder({ id: node.parentId }).then(function () {
                                     selectMedia(node);
                                     $scope.target.url = mediaHelper.resolveFileFromEntity(node);
                                     $scope.target.thumbnail = mediaHelper.resolveFileFromEntity(node, true);
@@ -169,10 +196,10 @@ angular.module("umbraco")
 
             function upload(v) {
                 var fileSelect = $(".umb-file-dropzone .file-select");
-                if (fileSelect.length === 0){
+                if (fileSelect.length === 0) {
                     localizationService.localize('media_uploadNotAllowed').then(function (message) { notificationsService.warning(message); });
                 }
-                else{
+                else {
                     fileSelect.trigger("click");
                 }
             }
@@ -395,6 +422,19 @@ angular.module("umbraco")
                 });
             };
 
+            function onNavigationChanged(tab) {
+                vm.activeTab.active = false;
+                vm.activeTab = tab;
+                vm.activeTab.active = true;
+            };
+
+            function clickClearClipboard() {
+                vm.onNavigationChanged(vm.navigation[0]);
+                vm.navigation[1].disabled = true;
+                vm.clipboardItems = [];
+                dialogOptions.clickClearClipboard();
+            };
+
             var debounceSearchMedia = _.debounce(function () {
                 $scope.$apply(function () {
                     if (vm.searchOptions.filter) {
@@ -504,13 +544,7 @@ angular.module("umbraco")
                     var allowedTypes = dialogOptions.filter ? dialogOptions.filter.split(",") : null;
 
                     for (var i = 0; i < data.length; i++) {
-                        if (data[i].metaData.MediaPath !== null) {
-                            data[i].thumbnail = mediaHelper.resolveFileFromEntity(data[i], true);
-                            data[i].image = mediaHelper.resolveFileFromEntity(data[i], false);
-                        }
-                        if (data[i].metaData.UpdateDate !== null){
-                            data[i].updateDate = data[i].metaData.UpdateDate;
-                        }
+                        setDefaultData(data[i]);
                         data[i].filtered = allowedTypes && allowedTypes.indexOf(data[i].metaData.ContentTypeAlias) < 0;
                     }
 
@@ -521,6 +555,16 @@ angular.module("umbraco")
                     preSelectMedia();
                     vm.loading = false;
                 });
+            }
+
+            function setDefaultData(item) {
+                if (item.metaData.MediaPath !== null) {
+                    item.thumbnail = mediaHelper.resolveFileFromEntity(item, true);
+                    item.image = mediaHelper.resolveFileFromEntity(item, false);
+                }
+                if (item.metaData.UpdateDate !== null) {
+                    item.updateDate = item.metaData.UpdateDate;
+                }
             }
 
             function preSelectMedia() {
