@@ -4,20 +4,26 @@
     angular
         .module("umbraco")
         .component("umbMediaPreview", {
-            templateUrl: "views/components/media/umbmediapreview/umb-media-preview.html",
+            template: "<div ng-include='vm.previewView'></div>",
             controller: UmbMediaPreviewController,
             controllerAs: "vm",
             bindings: {
-                blockConfigModel: "<"
+                extension: "<",
+                source: "<",
+                name: "<",
+                clientSide: "<"
             }
         });
 
-    function UmbMediaPreviewController() {
+    function UmbMediaPreviewController(mediaPreview) {
 
         var vm = this;
 
 
-
+        vm.$onInit = function() {
+            vm.previewView = mediaPreview.getMediaPreview(vm.extension);
+            console.log("vm.previewView:", vm.previewView);
+        }
 
 
         vm.$onDestroy = function () {

@@ -1,0 +1,8 @@
+<div class="gravity-container">
+    <div class="viewport">
+        <img ng-if="vm.clientSide" ng-src="{{vm.source}}" style="max-width: 100%; max-height: 100%" alt="{{vm.name}}" />
+        <a ng-if="!vm.clientSide" href="#" ng-href="{{vm.source}}" target="_blank" rel="noopener">
+            <img ng-src="{{vm.source}}" style="max-width: 100%; max-height: 100%" alt="{{vm.name}}" />
+        </a>
+    </div>
+</div>
