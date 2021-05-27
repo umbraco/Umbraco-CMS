@@ -67,15 +67,15 @@
                                 on-image-loaded="vm.onImageLoaded(isCroppable, hasDimensions)">
                             </umb-image-gravity>
 
-                            <umb-file-icon
-                                class="umb-media-entry-editor__imageholder"
+                            <umb-media-preview
                                 ng-if="vm.loading === false && !vm.imageSrc"
+                                class="umb-media-entry-editor__imageholder"
                                 ng-class="{'trashed': vm.media.trashed}"
-                                extension="{{vm.media.extension}}"
-                                icon="{{vm.media.icon}}"
-                                size="s"
-                                text="{{vm.media.name}}">
-                            </umb-file-icon>
+                                extension="vm.fileExtension"
+                                source="vm.fileSrc"
+                                icon="vm.media.icon"
+                                name="vm.media.name">
+                            </umb-media-preview>
 
                             <div class="umb-media-entry-editor__imageholder-actions">
                                 <button class="btn btn-link" aria-hidden="true" ng-click="vm.repickMedia()"><i class="icon-wrong"></i> <localize key="mediaPicker_changeMedia">Replace media</localize></button>
