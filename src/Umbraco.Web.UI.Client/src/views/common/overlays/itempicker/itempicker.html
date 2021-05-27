@@ -1,14 +1,14 @@
 <div ng-controller="Umbraco.Overlays.ItemPickerOverlay" class="umb-itempicker">
 
-    <umb-search-filter
-        ng-if="model.filter !== false"
-        model="filter.searchTerm"
-        label-key="placeholders_filter"
-        text="Type to filter..."
-        css-class="w-100"
-        auto-focus="true"
-        style="margin-bottom: 15px;">
-    </umb-search-filter>
+    <div class="mb3" ng-if="model.filter !== false">
+        <umb-search-filter
+            model="filter.searchTerm"
+            label-key="placeholders_filter"
+            text="Type to filter..."
+            css-class="w-100"
+            auto-focus="true">
+        </umb-search-filter>
+    </div>
 
     <div class="umb-overlay__section-header" ng-if="(model.pasteItems | filter:filter.searchTerm).length > 0">
         <h5><localize key="content_createFromClipboard">Paste from clipboard</localize></h5>
