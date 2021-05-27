@@ -21,6 +21,7 @@
 
     vm.pdf = null;
     vm.pageNumber = 1;
+    vm.totalPages = 0;
     vm.pageRendering = false;
     vm.pageNumberPending = null;
 
@@ -41,7 +42,7 @@
     }
 
     function nextPage () {
-      if (vm.pageNumber >= vm.pdf.numPages) {
+      if (vm.pageNumber >= vm.totalPages) {
         return;
       }
 
@@ -70,7 +71,7 @@
       vm.pageRendering = true;
 
       vm.pdf.getPage(pageNumber).then(function(page) {
-        const desiredWidth = 500;
+        const desiredWidth = element.parentElement.clientWidth;
         const viewport = page.getViewport({ scale: 1 });
         const scale = desiredWidth / viewport.width;
         const scaledViewport = page.getViewport({ scale });
@@ -82,7 +83,7 @@
 
         const renderContext = {
           canvasContext: context,
-          viewport: viewport
+          viewport: scaledViewport
         };
 
         const renderTask = page.render(renderContext);
@@ -104,6 +105,7 @@
 
         loadingTask.promise.then((pdf) => {
           vm.pdf = pdf;
+          vm.totalPages = pdf.numPages;
           renderPage(vm.pageNumber);
         });
       } catch (e) {
