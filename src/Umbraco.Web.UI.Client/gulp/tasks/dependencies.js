@@ -252,6 +252,14 @@ function dependencies() {
                 "./node_modules/wicg-inert/dist/inert.min.js.map"
             ],
             "base": "./node_modules/wicg-inert"
+        },
+        {
+            "name": "pdfjs-dist",
+            "src": [
+                "./node_modules/pdfjs-dist/build/pdf.min.js",
+                "./node_modules/pdfjs-dist/build/pdf.worker.min.js"
+            ],
+            "base": "./node_modules/pdfjs-dist"
         }
     ];
 

@@ -13,10 +13,9 @@
             <div ng-if="!vm.hideSelection">
 
                 <div class="umb-fileupload clearfix" ng-repeat="file in vm.files">
-
                     <umb-media-preview extension="file.extension" source="file.fileSrc" name="file.fileName" client-side="file.isClientSide"></umb-media-preview>
-
                 </div>
+                
                 <div>
                     <button type="button" class="btn btn-link btn-crop-delete" aria-hidden="true" ng-click="vm.clear()"><i class="icon-delete red"></i> <localize key="content_uploadClear">Remove file</localize></button>
                     <button type="button" class="sr-only" ng-if="file.isImage" ng-click="vm.clear()"><localize key="content_uploadClearImageContext">Click here to remove the image from the media item</localize></button>
