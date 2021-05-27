@@ -14,6 +14,7 @@ function mediaPreview() {
         service.registerPreview(["svg"], "views/components/media/umbimagepreview/umb-image-preview.html");
         service.registerPreview(["pdf"], "views/components/media/umbpdfpreview/umbpdfpreview.html");
         service.registerPreview(["mp4", "mov", "webm", "ogv"], "views/components/media/umbvideopreview/umb-video-preview.html");
+        service.registerPreview(["mp3", "weba", "oga", "opus"], "views/components/media/umbaudiopreview/umb-audio-preview.html");
     }
 
     var service = {
