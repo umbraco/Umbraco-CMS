@@ -1,5 +1,5 @@
 //inject umbracos assetsServce and dialog service
-function MarkdownEditorController($scope, $element, assetsService, editorService, angularHelper, $timeout) {
+function MarkdownEditorController($scope, $element, assetsService, editorService, $timeout) {
 
     //tell the assets service to load the markdown.editor libs from the markdown editors
     //plugin folder
@@ -41,6 +41,12 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
         editorService.linkPicker(linkPicker);
     }
 
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
+    }
+
     assetsService
         .load([
             "lib/markdown/markdown.converter.js",
@@ -78,7 +84,7 @@ function MarkdownEditorController($scope, $element, assetsService, editorService
                         if ($scope.model.value !== $("textarea", $element).val()) {
                             if ($scope.markdownEditorInitComplete) {
                                 //only set dirty after init load to avoid "unsaved" dialogue when we don't want it
-                                angularHelper.getCurrentForm($scope).$setDirty();
+                                setDirty();
                             } else {
                                 $scope.markdownEditorInitComplete = true;
                             }

@@ -1,0 +1,96 @@
+<div ng-controller="Umbraco.PropertyEditors.MediaPicker3.CropConfigurationController as vm" class="umb-property-editor umb-mediapicker3-crops">
+
+    <div class="umb-table">
+        <div class="umb-table-head">
+            <div class="umb-table-row">
+                <div class="umb-table-cell not-fixed">
+                    <localize key="general_label">Label</localize>
+                </div>
+                <div class="umb-table-cell">
+                    <localize key="general_alias">Alias</localize>
+                </div>
+                <div class="umb-table-cell">
+                    <localize key="general_width">Width</localize>
+                </div>
+                <div class="umb-table-cell">
+                    <localize key="general_height">Height</localize>
+                </div>
+                <div class="umb-table-cell">
+                    <localize key="general_actions">Actions</localize>
+                </div>
+            </div>
+        </div>
+        <div class="umb-table-body" ui-sortable="sortableOptions" ng-model="model.value">
+
+            <div class="umb-table-row" ng-repeat="crop in model.value">
+
+                <div ng-if="crop.editMode !== true" class="umb-table-cell not-fixed">{{crop.label}}</div>
+                <div ng-if="crop.editMode !== true" class="umb-table-cell">{{crop.alias}}</div>
+                <div ng-if="crop.editMode !== true" class="umb-table-cell">{{crop.width}}px</div>
+                <div ng-if="crop.editMode !== true" class="umb-table-cell">{{crop.height}}px</div>
+                <div ng-if="crop.editMode !== true" class="umb-table-cell">
+                    <button type="button" class="btn-reset umb-outline umb-outline--surrounding" ng-click="edit(crop, $event)"><localize key="general_edit">Edit</localize></button>
+                    <button type="button" class="btn-reset umb-outline umb-outline--surrounding" ng-click="remove(crop, $event)"><localize key="general_remove">Remove</localize></button>
+                </div>
+
+                <div ng-if="crop.editMode === true" class="umb-table-cell not-fixed">
+                    <input type="text"
+                        ng-model="crop.label"
+                        localize="placeholder"
+                        placeholder="@general_label"
+                        required
+                        focus-when="{{crop.editMode === true}}"
+                        ng-keydown="focusNextField($event)"
+                        ng-blur="useForAlias(crop)"
+                        overlay-submit-on-enter="false"/>
+                </div>
+
+                <div ng-if="crop.editMode === true" class="umb-table-cell">
+                    <input type="text"
+                        ng-model="crop.alias"
+                        localize="placeholder"
+                        placeholder="@general_alias"
+                        valid-when="{{!crop.hasAliasError}}"
+                        required
+                        ng-keydown="focusNextField($event)"
+                        ng-blur="validateAlias(crop)"
+                        ng-change="validateAlias(crop)" />
+                </div>
+
+                <div ng-if="crop.editMode === true" class="umb-table-cell">
+                    <input type="number"
+                        ng-model="crop.width"
+                        localize="placeholder"
+                        placeholder="@general_width"
+                        required
+                        min="0"
+                        pattern="[0-9]*"
+                        ng-keydown="focusNextField($event)"
+                        ng-change="validateWidth(crop)" />
+                </div>
+
+                <div ng-if="crop.editMode === true" class="umb-table-cell">
+                    <input type="number"
+                        ng-model="crop.height"
+                        localize="placeholder"
+                        placeholder="@general_height"
+                        required
+                        min="0"
+                        pattern="[0-9]*"
+                        ng-keydown="confirmChanges(crop, $event)"
+                        ng-change="validateHeight(crop)" />
+                </div>
+                <div ng-if="crop.editMode === true" class="umb-table-cell">
+                    <button type="button" class="btn-reset umb-outline umb-outline--surrounding" ng-click="setChanges(crop, $event)"><localize key="general_submit">Submit</localize></button>
+                    <button type="button" class="btn-reset umb-outline umb-outline--surrounding" ng-click="remove(crop, $event)" ng-if="isEmpty(crop)"><localize key="general_cancel">Cancel</localize></button>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <button type="button" class="btn-reset umb-mediapicker3-crops__add umb-outline" ng-click="addNewCrop($event)" aria-hidden="false">
+		<localize key="general_add" class="ng-isolate-scope">Add</localize>
+	</button>
+
+</div>

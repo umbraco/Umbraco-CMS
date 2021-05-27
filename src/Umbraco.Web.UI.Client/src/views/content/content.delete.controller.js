@@ -6,7 +6,7 @@
  * @description
  * The controller for deleting content
  */
-function ContentDeleteController($scope, $timeout, contentResource, treeService, navigationService, editorState, $location, overlayService, languageResource) {
+function ContentDeleteController($scope, $timeout, contentResource, treeService, navigationService, editorState, $location, overlayService, languageResource, localizationService) {
 
     /**
      * Used to toggle UI elements during delete operations
@@ -16,6 +16,14 @@ function ContentDeleteController($scope, $timeout, contentResource, treeService,
         $scope.currentNode.loading = isDeleting;
         $scope.busy = isDeleting;
     }
+
+    $scope.checkingReferences = true;
+
+    $scope.warningText = "The item or one of the underlying items is being used.";
+
+    localizationService.localize("references_deleteWarning").then(function (value) {
+        $scope.warningText = value;
+    });
     
     $scope.performDelete = function() {
 

@@ -442,6 +442,19 @@ namespace Umbraco.Tests.Composing
             AssertCollection(col, typeof(Resolved2), typeof(Resolved1));
         }
 
+        [Test]
+        public void WeightedBuilderSetWeight()
+        {
+            var builder = _composition.WithCollectionBuilder<TestCollectionBuilderWeighted>()
+                .Add<Resolved1>()
+                .Add<Resolved2>();
+            builder.SetWeight<Resolved1>(10);
+
+            var factory = _composition.CreateFactory();
+            var col = builder.CreateCollection(factory);
+            AssertCollection(col, typeof(Resolved1), typeof(Resolved2));
+        }
+
         #region Assertions
 
         private static void AssertCollection(IEnumerable<Resolved> col, params Type[] expected)

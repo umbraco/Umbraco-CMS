@@ -1,7 +1,7 @@
 //this controller simply tells the dialogs service to open a mediaPicker window
 //with a specified callback, this callback will receive an object with a selection on it
 angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerController",
-    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, angularHelper, overlayService) {
+    function ($scope, entityResource, mediaHelper, $timeout, userService, localizationService, editorService, overlayService, clipboardService) {
 
         var vm = this;
 
@@ -10,8 +10,12 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
 
         vm.add = add;
         vm.remove = remove;
+        vm.copyItem = copyItem;
         vm.editItem = editItem;
         vm.showAdd = showAdd;
+
+        vm.mediaItems = [];
+        let selectedIds = [];
 
         //check the pre-values for multi-picker
         var multiPicker = $scope.model.config.multiPicker && $scope.model.config.multiPicker !== '0' ? true : false;
@@ -22,9 +26,6 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         $scope.allowAddMedia = false;
 
         function setupViewModel() {
-            $scope.mediaItems = [];
-            $scope.ids = [];
-
             $scope.isMultiPicker = multiPicker;
 
             if ($scope.model.value) {
@@ -53,7 +54,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         // it's prone to someone "fixing" it at some point without knowing the effects. Rather use toString()
                         // compares and be completely sure it works.
                         var found = medias.find(m => m.udi.toString() === id.toString() || m.id.toString() === id.toString());
-                        
+
                         var mediaItem = found ||
                         {
                             name: vm.labels.deletedItem,
@@ -67,45 +68,50 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         return mediaItem;
                     });
 
-                    medias.forEach(media => {
-                        if (!media.extension && media.id && media.metaData) {
-                            media.extension = mediaHelper.getFileExtension(media.metaData.MediaPath);
-                        }
-
-                        // if there is no thumbnail, try getting one if the media is not a placeholder item
-                        if (!media.thumbnail && media.id && media.metaData) {
-                            media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
-                        }
-
-                        $scope.mediaItems.push(media);
-
-                        if ($scope.model.config.idType === "udi") {
-                            $scope.ids.push(media.udi);
-                        } else {
-                            $scope.ids.push(media.id);
-                        }
-                    });
+                    medias.forEach(media => appendMedia(media));
 
                     sync();
                 });
             }
         }
 
+        function appendMedia(media) {
+            if (!media.extension && media.id && media.metaData) {
+                media.extension = mediaHelper.getFileExtension(media.metaData.MediaPath);
+            }
+
+            // if there is no thumbnail, try getting one if the media is not a placeholder item
+            if (!media.thumbnail && media.id && media.metaData) {
+                media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
+            }
+
+            vm.mediaItems.push(media);
+
+            if ($scope.model.config.idType === "udi") {
+                selectedIds.push(media.udi);
+            } else {
+                selectedIds.push(media.id);
+            }
+        }
+
         function sync() {
-            $scope.model.value = $scope.ids.join();
-            removeAllEntriesAction.isDisabled = $scope.ids.length === 0;
+            $scope.model.value = selectedIds.join();
+            removeAllEntriesAction.isDisabled = selectedIds.length === 0;
+            copyAllEntriesAction.isDisabled = removeAllEntriesAction.isDisabled;
         }
 
         function setDirty() {
-            angularHelper.getCurrentForm($scope).$setDirty();
+            if (vm.modelValueForm) {
+                vm.modelValueForm.modelValue.$setDirty();
+            }
         }
 
         function reloadUpdatedMediaItems(updatedMediaNodes) {
-            // because the images can be edited through the media picker we need to 
+            // because the images can be edited through the media picker we need to
             // reload. We only reload the images that is already picked but has been updated.
-            // We have to get the entities from the server because the media 
+            // We have to get the entities from the server because the media
             // can be edited without being selected
-            $scope.mediaItems.forEach(media => {
+            vm.mediaItems.forEach(media => {
                 if (updatedMediaNodes.indexOf(media.udi) !== -1) {
                     media.loading = true;
                     entityResource.getById(media.udi, "Media")
@@ -127,7 +133,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             ];
 
             localizationService.localizeMany(labelKeys)
-                .then(function(data) {
+                .then(function (data) {
                     vm.labels.deletedItem = data[0];
                     vm.labels.trashed = data[1];
 
@@ -141,7 +147,7 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                             else {
                                 $scope.model.config.startNodeId = userData.startMediaIds.length !== 1 ? -1 : userData.startMediaIds[0];
                                 $scope.model.config.startNodeIsVirtual = userData.startMediaIds.length !== 1;
-                            }  
+                            }
                         }
 
                         // only allow users to add and edit media if they have access to the media section
@@ -155,10 +161,54 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
         }
 
         function remove(index) {
-            $scope.mediaItems.splice(index, 1);
-            $scope.ids.splice(index, 1);
+            vm.mediaItems.splice(index, 1);
+            selectedIds.splice(index, 1);
             sync();
             setDirty();
+        }
+
+        function copyAllEntries() {
+            if($scope.mediaItems.length > 0) {
+
+                // gather aliases
+                var aliases = $scope.mediaItems.map(mediaEntity => mediaEntity.metaData.ContentTypeAlias);
+
+                // remove duplicate aliases
+                aliases = aliases.filter((item, index) => aliases.indexOf(item) === index);
+
+                var data = $scope.mediaItems.map(mediaEntity => { return {"mediaKey": mediaEntity.key }});
+
+                localizationService.localize("clipboard_labelForArrayOfItems", [$scope.model.label]).then(function(localizedLabel) {
+                    clipboardService.copyArray(clipboardService.TYPES.MEDIA, aliases, data, localizedLabel, "icon-thumbnail-list", $scope.model.id);
+                });
+            }
+        }
+
+        function copyItem(mediaItem) {
+
+            var mediaEntry = {};
+            mediaEntry.mediaKey = mediaItem.key;
+
+            clipboardService.copy(clipboardService.TYPES.MEDIA, mediaItem.metaData.ContentTypeAlias, mediaEntry, mediaItem.name, mediaItem.icon, mediaItem.udi);
+        }
+
+        function pasteFromClipboard(pasteEntry, pasteType) {
+
+            if (pasteEntry === undefined) {
+                return;
+            }
+
+            pasteEntry = clipboardService.parseContentForPaste(pasteEntry, pasteType);
+
+            entityResource.getById(pasteEntry.mediaKey, "Media").then(function (mediaEntity) {
+
+                if(disableFolderSelect === true && mediaEntity.metaData.ContentTypeAlias === "Folder") {
+                    return;
+                }
+
+                appendMedia(mediaEntity);
+                sync();
+            });
         }
 
         function editItem(item) {
@@ -172,9 +222,9 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     if (model && model.mediaNode) {
                         entityResource.getById(model.mediaNode.id, "Media")
                             .then(function (mediaEntity) {
-                                // if an image is selecting more than once 
+                                // if an image is selecting more than once
                                 // we need to update all the media items
-                                $scope.mediaItems.forEach(media => {
+                                vm.mediaItems.forEach(media => {
                                     if (media.id === model.mediaNode.id) {
                                         angular.extend(media, mediaEntity);
                                         media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
@@ -198,6 +248,22 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                 multiPicker: multiPicker,
                 onlyImages: onlyImages,
                 disableFolderSelect: disableFolderSelect,
+                clickPasteItem: function(item, mouseEvent) {
+                    if (Array.isArray(item.data)) {
+                        var indexIncrementor = 0;
+                        item.data.forEach(function (entry) {
+                            if (pasteFromClipboard(entry, item.type)) {
+                                indexIncrementor++;
+                            }
+                        });
+                    } else {
+                        pasteFromClipboard(item.data, item.type);
+                    }
+                    if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+                        editorService.close();
+                    }
+                    setDirty();
+                },
                 submit: function (model) {
 
                     editorService.close();
@@ -208,13 +274,13 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                             media.thumbnail = mediaHelper.resolveFileFromEntity(media, true);
                         }
 
-                        $scope.mediaItems.push(media);
+                        vm.mediaItems.push(media);
 
                         if ($scope.model.config.idType === "udi") {
-                            $scope.ids.push(media.udi);
+                            selectedIds.push(media.udi);
                         }
                         else {
-                            $scope.ids.push(media.id);
+                            selectedIds.push(media.id);
                         }
 
                     });
@@ -228,6 +294,21 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                     reloadUpdatedMediaItems(model.updatedMediaNodes);
                 }
             }
+
+
+            var allowedTypes = null;
+            if(onlyImages) {
+                allowedTypes = ["Image"]; // Media Type Image Alias.
+            }
+
+            mediaPicker.clickClearClipboard = function ($event) {
+                clipboardService.clearEntriesOfType(clipboardService.TYPES.Media, allowedTypes);
+            };
+
+            mediaPicker.clipboardItems = clipboardService.retriveEntriesOfType(clipboardService.TYPES.MEDIA, allowedTypes);
+            mediaPicker.clipboardItems.sort( (a, b) => {
+                return b.date - a.date
+            });
 
             editorService.mediaPicker(mediaPicker);
         }
@@ -250,14 +331,22 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
                         overlayService.close();
                     },
                     submit: function () {
-                        $scope.mediaItems.length = 0;// AngularJS way to empty the array.
-                        $scope.ids.length = 0;// AngularJS way to empty the array.
+                        vm.mediaItems.length = 0;// AngularJS way to empty the array.
+                        selectedIds.length = 0;// AngularJS way to empty the array.
                         sync();
                         setDirty();
                         overlayService.close();
                     }
                 });
             });
+        }
+
+        var copyAllEntriesAction = {
+            labelKey: 'clipboard_labelForCopyAllEntries',
+            labelTokens: ['Media'],
+            icon: "documents",
+            method: copyAllEntries,
+            isDisabled: true
         }
 
         var removeAllEntriesAction = {
@@ -267,9 +356,10 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             method: removeAllEntries,
             isDisabled: true
         };
-        
+
         if (multiPicker === true) {
             var propertyActions = [
+                copyAllEntriesAction,
                 removeAllEntriesAction
             ];
 
@@ -287,12 +377,12 @@ angular.module('umbraco').controller("Umbraco.PropertyEditors.MediaPickerControl
             cancel: ".unsortable",
             update: function () {
                 setDirty();
-                $timeout(function() {
+                $timeout(function () {
                     // TODO: Instead of doing this with a timeout would be better to use a watch like we do in the
                     // content picker. Then we don't have to worry about setting ids, render models, models, we just set one and let the
                     // watch do all the rest.
-                    $scope.ids = $scope.mediaItems.map(media => $scope.model.config.idType === "udi" ? media.udi : media.id);
-                    
+                    selectedIds = vm.mediaItems.map(media => $scope.model.config.idType === "udi" ? media.udi : media.id);
+
                     sync();
                 });
             }

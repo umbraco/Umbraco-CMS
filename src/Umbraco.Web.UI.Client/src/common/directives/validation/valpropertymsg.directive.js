@@ -177,8 +177,9 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                     watcher = scope.$watchCollection(
                         () => formCtrl,
                         function (updatedFormController) {
-                            var ngModels = [];
-                            collectAllNgModelControllersRecursively(updatedFormController.$getControls(), ngModels);
+                            let childControls = updatedFormController.$getControls();
+                            let ngModels = [];
+                            collectAllNgModelControllersRecursively(childControls, ngModels);
                             ngModels.forEach(x => {
                                 if (!x.$validators.serverValidityResetter) {
                                     x.$validators.serverValidityResetter = resetServerValidityValidator(x);
@@ -201,7 +202,7 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                 hasError = false;
                 formCtrl.$setValidity('valPropertyMsg', true);
                 scope.errorMsg = "";
-                
+
             }
 
             // This deals with client side validation changes and is executed anytime validators change on the containing 
@@ -264,6 +265,8 @@ function valPropertyMsg(serverValidationManager, localizationService, angularHel
                     //listen for form validation changes.
                     //The alternative is to add a watch to formCtrl.$invalid but that would lead to many more watches then
                     // subscribing to this single watch.
+                    // TODO: Really? Since valFormManager is watching a countof all errors which is more overhead than watching formCtrl.$invalid
+                    // and there's a TODO there that it should just watch formCtrl.$invalid
                     valFormManager.onValidationStatusChanged(function (evt, args) {
                         checkValidationStatus();
                     });
