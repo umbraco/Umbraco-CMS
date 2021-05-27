@@ -30,6 +30,8 @@
     vm.$onInit = onInit;
     vm.nextPage = nextPage;
     vm.prevPage = prevPage;
+    vm.updatePage = updatePage;
+    vm.handleKeypress = handleKeypress;
 
     function onInit() {
 
@@ -55,6 +57,19 @@
       }
 
       vm.pageNumber = vm.pageNumber - 1;
+      queuePage(vm.pageNumber);
+    }
+
+    function updatePage () {
+
+      if (vm.pageNumber < 1) {
+        vm.pageNumber = 1;
+      }
+
+      if (vm.pageNumber > vm.totalPages) {
+        vm.pageNumber = vm.totalPages;
+      }
+
       queuePage(vm.pageNumber);
     }
 
@@ -124,6 +139,17 @@
             vm.pageNumberPending = null;
           }
         });
+    }
+
+    function handleKeypress (event) {
+      // enter
+      if (event.keyCode === 13) {
+        event.stopPropagation();
+        event.preventDefault();
+
+        updatePage();
+        return;
+      }
     }
 
     windowResizeListener.register(onResize);
