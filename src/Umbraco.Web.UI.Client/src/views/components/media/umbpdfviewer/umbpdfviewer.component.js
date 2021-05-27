@@ -33,12 +33,9 @@
 
     function onInit() {
 
-      assetsService.load(['lib/pdfjs-dist/build/pdf.min.js', 'lib/pdfjs-dist/build/pdf.worker.min.js'], $scope)
+      assetsService.load(['lib/pdfjs-dist/build/pdf.min.js'], $scope)
         .then(function () {
-
-          // TODO: figure out how this works and implement
-          // pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
-
+          pdfjsLib.GlobalWorkerOptions.workerSrc = `${Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath}/lib/pdfjs-dist/build/pdf.worker.min.js`;
           loadDocument();
         });
     }
