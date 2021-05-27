@@ -24,10 +24,7 @@ function dateTimePickerController($scope, angularHelper, dateHelper, validationM
         };
 
         // map the user config
-        Utilities.extend(config, $scope.model.config);
-
-        // map back to the model
-        $scope.model.config = config;
+        $scope.model.config = Utilities.extend(config, $scope.model.config);;
         
         // ensure the format doesn't get overwritten with an empty string
         if ($scope.model.config.format === "" || $scope.model.config.format === undefined || $scope.model.config.format === null) {
