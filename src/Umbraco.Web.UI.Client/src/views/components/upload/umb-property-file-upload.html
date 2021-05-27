@@ -14,7 +14,7 @@
 
                 <div class="umb-fileupload clearfix" ng-repeat="file in vm.files">
 
-                    <umb-media-preview extension="file.extension" source="file.fileSrc" name="file.fileName" client-side="file.isClientSide"></umb-media-preview>
+                    <umb-media-preview extension="file.extension" source="file.fileSrc" name="file.fileName" client-side="file.isClientSide" client-side-data="file.fileData"></umb-media-preview>
 
                 </div>
                 <div class="umb-property-file-upload--actions">

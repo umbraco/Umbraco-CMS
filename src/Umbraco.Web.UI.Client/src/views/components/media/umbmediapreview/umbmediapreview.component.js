@@ -11,7 +11,8 @@
                 extension: "<",
                 source: "<",
                 name: "<",
-                clientSide: "<?"
+                clientSide: "<?",
+                clientSideData: "<?"
             }
         });
 

@@ -222,7 +222,8 @@
                     isImage: isImage,
                     extension: extension,
                     fileName: files[i].name,
-                    isClientSide: true
+                    isClientSide: true,
+                    fileData: files[i]
                 };
 
                 // Save the file object to the files collection
@@ -231,6 +232,7 @@
                 //special check for a comma in the name
                 newVal += files[i].name.split(',').join('-') + ",";
 
+                // TODO: I would love to remove this part. But I'm affright it would be breaking if removed. Its not used by File upload anymore as each preview handles the client-side data on their own.
                 if (isImage || extension === "svg") {
 
                     var deferred = $q.defer();

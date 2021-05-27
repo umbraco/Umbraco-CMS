@@ -11,7 +11,9 @@ function mediaPreview() {
 
     function init(service) {
         service.registerPreview(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes.split(","), "views/components/media/umbimagepreview/umb-image-preview.html");
+        service.registerPreview(["svg"], "views/components/media/umbimagepreview/umb-image-preview.html");
         service.registerPreview(["pdf"], "views/components/media/umbpdfpreview/umbpdfpreview.html");
+        service.registerPreview(["mp4", "mov", "webm", "ogv"], "views/components/media/umbvideopreview/umb-video-preview.html");
     }
 
     var service = {
