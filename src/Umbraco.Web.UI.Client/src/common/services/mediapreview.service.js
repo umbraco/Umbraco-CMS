@@ -5,12 +5,12 @@
 **/
 function mediaPreview() {
 
-    var DEFAULT_FILE_PREVIEW = "views/components/media/umbfilepreview/umbfilepreview.html";
+    var DEFAULT_FILE_PREVIEW = "views/components/media/umbfilepreview/umb-file-preview.html";
 
     var _mediaPreviews = [];
 
     function init(service) {
-        service.registerPreview(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes.split(","), "views/components/media/umbimagepreview/umbimagepreview.html");
+        service.registerPreview(Umbraco.Sys.ServerVariables.umbracoSettings.imageFileTypes.split(","), "views/components/media/umbimagepreview/umb-image-preview.html");
     }
 
     var service = {

@@ -4,7 +4,7 @@
     angular
         .module("umbraco")
         .component("umbMediaPreview", {
-            template: "<div ng-include='vm.previewView'></div>",
+            template: "<div ng-include='vm.previewView' class='umb-media-preview'></div>",
             controller: UmbMediaPreviewController,
             controllerAs: "vm",
             bindings: {

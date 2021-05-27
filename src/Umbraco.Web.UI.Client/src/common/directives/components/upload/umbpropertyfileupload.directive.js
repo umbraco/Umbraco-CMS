@@ -117,11 +117,10 @@
                 vm.files = _.map(files, function (file) {
                     var f = {
                         fileName: file,
+                        fileSrc: file,
                         isImage: mediaHelper.detectIfImageByExtension(file),
                         extension: getExtension(file)
                     };
-
-                    f.fileSrc = getThumbnail(f);
 
                     return f;
                 });
@@ -188,21 +187,6 @@
                 }
 
             }
-        }
-
-        function getThumbnail(file) {
-
-            if (file.extension === 'svg') {
-                return file.fileName;
-            }
-
-            if (!file.isImage) {
-                return null;
-            }
-
-            var thumbnailUrl = mediaHelper.getThumbnailFromPath(file.fileName);
-
-            return thumbnailUrl;
         }
 
         function getExtension(fileName) {

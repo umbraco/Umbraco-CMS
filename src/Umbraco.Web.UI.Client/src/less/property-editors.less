@@ -819,11 +819,15 @@
 .umb-fileupload {
     display: flex;
     flex-direction: column;
+    padding: 20px;
+    border: 1px solid @inputBorder;
+    box-sizing: border-box;
+    width: 100%;
+    .umb-property-editor--limit-width();
 }
 
 .umb-fileupload .preview {
   border-radius: 5px;
-  border: 1px solid @gray-6;
   padding: 3px;
   background: @gray-9;
   float: left;
