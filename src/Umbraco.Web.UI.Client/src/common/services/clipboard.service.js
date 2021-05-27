@@ -17,6 +17,7 @@ function clipboardService($window, notificationsService, eventsService, localSto
     TYPES.ELEMENT_TYPE = "elementType";
     TYPES.BLOCK = "block";
     TYPES.RAW = "raw";
+    TYPES.MEDIA = "media";
 
     var clearPropertyResolvers = {};
     var pastePropertyResolvers = {};
@@ -69,6 +70,9 @@ function clipboardService($window, notificationsService, eventsService, localSto
         for (var p = 0; p < data.length; p++) {
             propMethod(data[p], TYPES.RAW);
         }
+    }
+    clipboardTypeResolvers[TYPES.MEDIA] = function(data, propMethod) {
+        // no resolving needed for this type currently.
     }
 
     var STORAGE_KEY = "umbClipboardService";
@@ -147,6 +151,8 @@ function clipboardService($window, notificationsService, eventsService, localSto
         return entry.type === type
         &&
         (
+            allowedAliases === null
+            ||
             (entry.alias && allowedAliases.filter(allowedAlias => allowedAlias === entry.alias).length > 0)
             ||
             (entry.aliases && entry.aliases.filter(entryAlias => allowedAliases.filter(allowedAlias => allowedAlias === entryAlias).length > 0).length === entry.aliases.length)

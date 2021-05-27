@@ -73,5 +73,10 @@ namespace Umbraco.Core.Persistence.Repositories
         /// </summary>
         /// <param name="permission"></param>
         void AddOrUpdatePermissions(ContentPermissionSet permission);
+
+        /// <summary>
+        /// Returns true if there is any content in the recycle bin
+        /// </summary>
+        bool RecycleBinSmells();
     }
 }

@@ -21,7 +21,7 @@ namespace Umbraco.Web.Cache
             _legacyMemberRefresher = new LegacyMemberCacheRefresher(this, appCaches);
         }
 
-        public class JsonPayload 
+        public class JsonPayload
         {
             [JsonConstructor]
             public JsonPayload(int id, string username)
@@ -87,11 +87,11 @@ namespace Umbraco.Web.Cache
                 _idkMap.ClearCache(p.Id);
                 if (memberCache)
                 {
-                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember>(p.Id));
-                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember>(p.Username));
-                }   
+                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember, int>(p.Id));
+                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember, string>(p.Username));
+                }
             }
-            
+
         }
 
         #endregion

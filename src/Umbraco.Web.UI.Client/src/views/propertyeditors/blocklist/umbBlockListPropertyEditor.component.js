@@ -28,7 +28,7 @@
             }
         });
 
-    function BlockListController($scope, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper) {
+    function BlockListController($scope, $timeout, editorService, clipboardService, localizationService, overlayService, blockEditorService, udiService, serverValidationManager, angularHelper, eventsService) {
 
         var unsubscribe = [];
         var modelObject;
@@ -53,6 +53,14 @@
         };
 
         vm.supportCopy = clipboardService.isSupported();
+        vm.clipboardItems = [];
+        unsubscribe.push(eventsService.on("clipboardService.storageUpdate", updateClipboard));
+        unsubscribe.push($scope.$on("editors.content.splitViewChanged", (event, eventData) => {
+            var compositeId = vm.umbVariantContent.editor.compositeId;
+            if(eventData.editors.some(x => x.compositeId === compositeId)) {
+                updateAllBlockObjects();
+            }
+        }));
 
         vm.layout = []; // The layout object specific to this Block Editor, will be a direct reference from Property Model.
         vm.availableBlockTypes = []; // Available block entries of this property editor.
@@ -64,6 +72,7 @@
         });
 
         vm.$onInit = function() {
+
             if (vm.umbProperty && !vm.umbVariantContent) {// if we dont have vm.umbProperty, it means we are in the DocumentTypeEditor.
                 // not found, then fallback to searching the scope chain, this may be needed when DOM inheritance isn't maintained but scope
                 // inheritance is (i.e.infinite editing)
@@ -173,6 +182,8 @@
                         // is invalid for some reason or the data structure has changed.
                         invalidLayoutItems.push(entry);
                     }
+                } else {
+                    updateBlockObject(entry.$block);
                 }
             });
 
@@ -187,10 +198,22 @@
             vm.availableContentTypesAliases = modelObject.getAvailableAliasesForBlockContent();
             vm.availableBlockTypes = modelObject.getAvailableBlocksForBlockPicker();
 
+            updateClipboard(true);
+
             vm.loading = false;
 
             $scope.$evalAsync();
 
+        }
+
+        function updateAllBlockObjects() {
+            // Update the blockObjects in our layout.
+            vm.layout.forEach(entry => {
+                // $block must have the data property to be a valid BlockObject, if not its considered as a destroyed blockObject.
+                if (entry.$block) {
+                    updateBlockObject(entry.$block);
+                }
+            });
         }
 
         function getDefaultViewForBlock(block) {
@@ -233,9 +256,6 @@
 
             if (block === null) return null;
 
-            ensureCultureData(block.content);
-            ensureCultureData(block.settings);
-
             block.view = (block.config.view ? block.config.view : getDefaultViewForBlock(block));
             block.showValidation = block.config.view ? true : false;
 
@@ -250,20 +270,51 @@
             block.setParentForm = function (parentForm) {
                 this._parentForm = parentForm;
             };
-            block.activate = activateBlock.bind(null, block);
-            block.edit = function () {
+
+            /** decorator methods, to enable switching out methods without loosing references that would have been made in Block Views codes */
+            block.activate = function() {
+                this._activate();
+            };
+            block.edit = function() {
+                this._edit();
+            };
+            block.editSettings = function() {
+                this._editSettings();
+            };
+            block.requestDelete = function() {
+                this._requestDelete();
+            };
+            block.delete = function() {
+                this._delete();
+            };
+            block.copy = function() {
+                this._copy();
+            };
+            updateBlockObject(block);
+
+            return block;
+        }
+
+        /** As the block object now contains references to this instance of a property editor, we need to ensure that the Block Object contains latest references.
+         * This is a bit hacky but the only way to maintain this reference currently.
+         * Notice this is most relevant for invariant properties on variant documents, specially for the scenario where the scope of the reference we stored is destroyed, therefor we need to ensure we always have references to a current running property editor*/
+        function updateBlockObject(block) {
+
+            ensureCultureData(block.content);
+            ensureCultureData(block.settings);
+
+            block._activate = activateBlock.bind(null, block);
+            block._edit = function () {
                 var blockIndex = vm.layout.indexOf(this.layout);
                 editBlock(this, false, blockIndex, this._parentForm);
             };
-            block.editSettings = function () {
+            block._editSettings = function () {
                 var blockIndex = vm.layout.indexOf(this.layout);
                 editBlock(this, true, blockIndex, this._parentForm);
             };
-            block.requestDelete = requestDeleteBlock.bind(null, block);
-            block.delete = deleteBlock.bind(null, block);
-            block.copy = copyBlock.bind(null, block);
-
-            return block;
+            block._requestDelete = requestDeleteBlock.bind(null, block);
+            block._delete = deleteBlock.bind(null, block);
+            block._copy = copyBlock.bind(null, block);
         }
 
         function addNewBlock(index, contentElementTypeKey) {
@@ -406,9 +457,34 @@
             editorService.open(blockEditorModel);
         }
 
-        vm.showCreateDialog = showCreateDialog;
+        vm.requestShowCreate = requestShowCreate;
+        function requestShowCreate(createIndex, mouseEvent) {
 
-        function showCreateDialog(createIndex, $event) {
+            if (vm.blockTypePicker) {
+                return;
+            }
+
+            if (vm.availableBlockTypes.length === 1) {
+                var wasAdded = false;
+                var blockType = vm.availableBlockTypes[0];
+
+                wasAdded = addNewBlock(createIndex, blockType.blockConfigModel.contentElementTypeKey);
+
+                if(wasAdded && !(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
+                    userFlowWhenBlockWasCreated(createIndex);
+                }
+            } else {
+                showCreateDialog(createIndex);
+            }
+
+        }
+        vm.requestShowClipboard = requestShowClipboard;
+        function requestShowClipboard(createIndex, mouseEvent) {
+            showCreateDialog(createIndex, true);
+        }
+
+        vm.showCreateDialog = showCreateDialog;
+        function showCreateDialog(createIndex, openClipboard) {
 
             if (vm.blockTypePicker) {
                 return;
@@ -424,6 +500,7 @@
                 $parentForm: vm.propertyForm, // pass in a $parentForm, this maintains the FormController hierarchy with the infinite editing view (if it contains a form)
                 availableItems: vm.availableBlockTypes,
                 title: vm.labels.grid_addElement,
+                openClipboard: openClipboard,
                 orderBy: "$index",
                 view: "views/common/infiniteeditors/blockpicker/blockpicker.html",
                 size: (amountOfAvailableTypes > 8 ? "medium" : "small"),
@@ -444,19 +521,15 @@
                     }
                 },
                 submit: function(blockPickerModel, mouseEvent) {
-                    var added = false;
+                    var wasAdded = false;
                     if (blockPickerModel && blockPickerModel.selectedItem) {
-                        added = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
+                        wasAdded = addNewBlock(createIndex, blockPickerModel.selectedItem.blockConfigModel.contentElementTypeKey);
                     }
 
                     if(!(mouseEvent.ctrlKey || mouseEvent.metaKey)) {
                         editorService.close();
-                        if (added && vm.layout.length > createIndex) {
-                            if (inlineEditing === true) {
-                                activateBlock(vm.layout[createIndex].$block);
-                            } else if (inlineEditing === false && vm.layout[createIndex].$block.hideContentInOverlay !== true) {
-                                editBlock(vm.layout[createIndex].$block, false, createIndex, blockPickerModel.$parentForm, {createFlow: true});
-                            }
+                        if (wasAdded) {
+                            userFlowWhenBlockWasCreated(createIndex);
                         }
                     }
                 },
@@ -475,7 +548,28 @@
                 clipboardService.clearEntriesOfType(clipboardService.TYPES.BLOCK, vm.availableContentTypesAliases);
             };
 
-            blockPickerModel.clipboardItems = [];
+            blockPickerModel.clipboardItems = vm.clipboardItems;
+
+            // open block picker overlay
+            editorService.open(blockPickerModel);
+
+        };
+        function userFlowWhenBlockWasCreated(createIndex) {
+            if (vm.layout.length > createIndex) {
+                var blockObject = vm.layout[createIndex].$block;
+                if (inlineEditing === true) {
+                    blockObject.activate();
+                } else if (inlineEditing === false && blockObject.hideContentInOverlay !== true) {
+                    blockObject.edit();
+                }
+            }
+        }
+
+        function updateClipboard(firstTime) {
+
+            var oldAmount = vm.clipboardItems.length;
+
+            vm.clipboardItems = [];
 
             var entriesForPaste = clipboardService.retriveEntriesOfType(clipboardService.TYPES.ELEMENT_TYPE, vm.availableContentTypesAliases);
             entriesForPaste.forEach(function (entry) {
@@ -511,19 +605,33 @@
                 if(Array.isArray(entry.data) === false) {
                     pasteEntry.blockConfigModel = modelObject.getBlockConfiguration(entry.data.data.contentTypeKey);
                 }
-                blockPickerModel.clipboardItems.push(pasteEntry);
+                vm.clipboardItems.push(pasteEntry);
             });
 
-            blockPickerModel.clipboardItems.sort( (a, b) => {
+            vm.clipboardItems.sort( (a, b) => {
                 return b.date - a.date
             });
 
-            // open block picker overlay
-            editorService.open(blockPickerModel);
+            if(firstTime !== true && vm.clipboardItems.length > oldAmount) {
+                jumpClipboard();
+            }
+        }
 
-        };
+        var jumpClipboardTimeout;
+        function jumpClipboard() {
 
-        var requestCopyAllBlocks = function () {
+            if(jumpClipboardTimeout) {
+                return;
+            }
+
+            vm.jumpClipboardButton = true;
+            jumpClipboardTimeout = $timeout(() => {
+                vm.jumpClipboardButton = false;
+                jumpClipboardTimeout = null;
+            }, 2000);
+        }
+
+        function requestCopyAllBlocks() {
 
             var aliases = [];
 

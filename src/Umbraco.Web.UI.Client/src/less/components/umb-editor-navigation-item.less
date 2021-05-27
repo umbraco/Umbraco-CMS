@@ -86,6 +86,16 @@
                 }
             }
         }
+
+        .show-validation.show-validation-type-warning &.-has-error {
+            color: @yellow-d2;
+            &:hover {
+                color: @yellow-d2 !important;
+            }
+            &::before {
+                background-color: @yellow-d2;
+            }
+        }
     }
 
     &__action:active,
@@ -122,14 +132,6 @@
         line-height: 16px;
         display: block;
 
-        &.-type-alert {
-            background-color: @red;
-        }
-
-        &.-type-warning {
-            background-color: @yellow-d2;
-        }
-
         &:empty {
             height: 12px;
             min-width: 12px;
@@ -137,6 +139,11 @@
         &.--error-badge {
             display: none;
             font-weight: 900;
+            background-color: @red;
+
+            .show-validation-type-warning & {
+                background-color: @yellow-d2;
+            }
         }
     }
 

@@ -16,6 +16,7 @@ This project and everyone participating in it, is governed by the [our Code of C
 
 [Contributing code changes](#contributing-code-changes)
   * [Guidelines for contributions we welcome](#guidelines-for-contributions-we-welcome)
+    * [Ownership and copyright](#ownership-and-copyright)
   * [What can I start with?](#what-can-i-start-with)
   * [How do I begin?](#how-do-i-begin)
   * [Pull requests](#pull-requests)
@@ -43,6 +44,17 @@ Not all changes are wanted, so on occasion we might close a PR without merging i
 We have [documented what we consider small and large changes](CONTRIBUTION_GUIDELINES.md). Make sure to talk to us before making large changes, so we can ensure that you don't put all your hard work into something we would not be able to merge.
 
 Remember, it is always worth working on an issue from the `Up for grabs` list or even asking for some feedback before you send us a PR. This way, your PR will not be closed as unwanted.
+
+#### Ownership and copyright
+
+It is your responsibility to make sure that you're allowed to share the code you're providing us.   
+For example, you should have permission from your employer or customer to share code.  
+
+Similarly, if your contribution is copied or adapted from somewhere else, make sure that the license allows you to reuse that for a contribution to Umbraco-CMS. 
+
+If you're not sure, leave a note on your contribution and we will be happy to guide you.
+
+When your contribution has been accepted, it will be [MIT licensed](https://github.com/umbraco/Umbraco-CMS/blob/v8/contrib/LICENSE.md) from that time onwards. 
 
 ### What can I start with?
 

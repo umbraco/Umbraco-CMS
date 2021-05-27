@@ -3,13 +3,15 @@
 
         <umb-editor-header
             name="model.title"
+            navigation="vm.navigation"
+            on-select-navigation-item="vm.onNavigationChanged(item)"
             name-locked="true"
             hide-alias="true"
             hide-icon="true"
             hide-description="true">
         </umb-editor-header>
 
-        <umb-editor-container>
+        <umb-editor-container ng-if="vm.activeTab.alias === 'empty'">
 
             <form id="fileupload" method="POST" enctype="multipart/form-data" umb-image-upload="options">
 
@@ -19,21 +21,20 @@
 
                         <div class="umb-mediapicker-upload">
                             <div class="form-search">
-                                <umb-search-filter
-                                    input-id="datatype-search"
-                                    model="vm.searchOptions.filter"
-                                    label-key="placeholders_search"
-                                    text="Type to search"
-                                    on-change="vm.changeSearch()"
-                                    css-class="w-100"
-                                    auto-focus="true">
+                                <umb-search-filter input-id="datatype-search"
+                                                    model="vm.searchOptions.filter"
+                                                    label-key="placeholders_search"
+                                                    text="Type to search"
+                                                    on-change="vm.changeSearch()"
+                                                    css-class="w-100"
+                                                    auto-focus="true">
                                 </umb-search-filter>
 
                                 <div class="form-search__toggle">
                                     <umb-checkbox model="filterOptions.excludeSubFolders"
-                                                  on-change="vm.toggle()"
-                                                  text="Include subfolders in search"
-                                                  label-key="general_excludeFromSubFolders">
+                                                    on-change="vm.toggle()"
+                                                    text="Include subfolders in search"
+                                                    label-key="general_excludeFromSubFolders">
                                     </umb-checkbox>
                                 </div>
                             </div>
@@ -49,20 +50,20 @@
                         </div>
                     </div>
                     <div class="row umb-control-group" ng-show="vm.searchOptions.filter && images.length > 0 && !vm.loading && !activeDrag">
-                        <div style="margin-left:auto;text-align:right" >
+                        <div style="margin-left:auto;text-align:right">
                             <umb-layout-selector ng-show="vm.layout.layouts"
-                                                 layouts="vm.layout.layouts"
-                                                 active-layout="vm.layout.activeLayout"
-                                                 on-layout-select="vm.selectLayout(layout)">
+                                                    layouts="vm.layout.layouts"
+                                                    active-layout="vm.layout.activeLayout"
+                                                    on-layout-select="vm.selectLayout(layout)">
                             </umb-layout-selector>
                         </div>
                     </div>
                     <div class="row umb-control-group" ng-show="!vm.searchOptions.filter">
                         <div class="pull-right">
                             <umb-layout-selector ng-show="vm.layout.layouts"
-                                                 layouts="vm.layout.layouts"
-                                                 active-layout="vm.layout.activeLayout"
-                                                 on-layout-select="vm.selectLayout(layout)">
+                                                    layouts="vm.layout.layouts"
+                                                    active-layout="vm.layout.activeLayout"
+                                                    on-layout-select="vm.selectLayout(layout)">
                             </umb-layout-selector>
                         </div>
 
@@ -86,31 +87,29 @@
                                 </button>
 
                                 <input type="text"
-                                       class="umb-breadcrumbs__add-ancestor"
-                                       ng-show="model.showFolderInput"
-                                       ng-model="model.newFolderName"
-                                       ng-keydown="enterSubmitFolder($event)"
-                                       ng-blur="vm.submitFolder()"
-                                focus-when="{{model.showFolderInput}}" />
+                                        class="umb-breadcrumbs__add-ancestor"
+                                        ng-show="model.showFolderInput"
+                                        ng-model="model.newFolderName"
+                                        ng-keydown="enterSubmitFolder($event)"
+                                        ng-blur="vm.submitFolder()"
+                                        focus-when="{{model.showFolderInput}}" />
                             </li>
                         </ul>
                         <umb-loader ng-if="model.creatingFolder"></umb-loader>
                     </div>
 
-                    <umb-file-dropzone
-                                       ng-if="vm.acceptedMediatypes.length > 0 && !vm.loading && !lockedFolder"
-                                       accepted-mediatypes="vm.acceptedMediatypes"
-                                       parent-id="{{currentFolder.id}}"
-                                       files-uploaded="vm.onUploadComplete"
-                                       files-queued="vm.onFilesQueue"
-                                       accept="{{vm.acceptedFileTypes}}"
-                                       max-file-size="{{vm.maxFileSize}}"
-                                       hide-dropzone="{{ !activeDrag && (images.length > 0 || vm.searchOptions.filter !== '') }}"
-                                       compact="{{ images.length > 0 }}">
+                    <umb-file-dropzone ng-if="vm.acceptedMediatypes.length > 0 && !vm.loading && !lockedFolder"
+                                        accepted-mediatypes="vm.acceptedMediatypes"
+                                        parent-id="{{currentFolder.id}}"
+                                        files-uploaded="vm.onUploadComplete"
+                                        files-queued="vm.onFilesQueue"
+                                        accept="{{vm.acceptedFileTypes}}"
+                                        max-file-size="{{vm.maxFileSize}}"
+                                        hide-dropzone="{{ !activeDrag && (images.length > 0 || vm.searchOptions.filter !== '') }}"
+                                        compact="{{ images.length > 0 }}">
                     </umb-file-dropzone>
 
-                    <umb-media-grid
-                                    ng-if="!vm.loading"
+                    <umb-media-grid ng-if="!vm.loading"
                                     items="images"
                                     on-click="vm.clickHandler"
                                     on-click-name="vm.clickItemName"
@@ -127,13 +126,11 @@
                     </umb-media-grid>
 
 
-                    <umb-load-indicator
-                                        ng-if="vm.loading">
+                    <umb-load-indicator ng-if="vm.loading">
                     </umb-load-indicator>
 
                     <div class="flex justify-center">
-                        <umb-pagination
-                                        ng-if="vm.searchOptions.totalPages > 0 && !vm.loading"
+                        <umb-pagination ng-if="vm.searchOptions.totalPages > 0 && !vm.loading"
                                         page-number="vm.searchOptions.pageNumber"
                                         total-pages="vm.searchOptions.totalPages"
                                         on-change="vm.changePagination(pageNumber)">
@@ -145,11 +142,30 @@
                     </umb-empty-state>
 
                 </div>
-
-
-
             </form>
 
+        </umb-editor-container>
+        <umb-editor-container ng-if="vm.activeTab.alias === 'clipboard'">
+
+            <div style="margin-bottom:20px; text-align: right;">
+                <umb-button
+                    type="button"
+                    icon="icon-trash"
+                    button-style="link"
+                    label-key="clipboard_labelForClearClipboard"
+                    action="vm.clickClearClipboard()">
+                </umb-button>
+            </div>
+
+            <div class="umb-media-card-grid">
+                <umb-media-card
+                    ng-repeat="media in model.clipboardItems"
+                    media-key="!media.data.length ? media.data.mediaKey : null"
+                    name="media.data.length ? media.label : null"
+                    icon="media.data.length ? media.icon : null"
+                    ng-click="model.clickPasteItem(media, $event)">
+                </umb-media-card>
+            </div>
 
         </umb-editor-container>
 

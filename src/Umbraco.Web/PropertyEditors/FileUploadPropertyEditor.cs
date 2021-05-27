@@ -32,6 +32,10 @@ namespace Umbraco.Web.PropertyEditors
             _uploadAutoFillProperties = new UploadAutoFillProperties(_mediaFileSystem, logger, contentSection);
         }
 
+
+        /// <inheritdoc />
+        protected override IConfigurationEditor CreateConfigurationEditor() => new FileUploadConfigurationEditor();
+
         /// <summary>
         /// Creates the corresponding property value editor.
         /// </summary>
