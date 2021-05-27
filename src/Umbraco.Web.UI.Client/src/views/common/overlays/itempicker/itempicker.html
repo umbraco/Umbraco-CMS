@@ -12,7 +12,7 @@
 
     <div class="umb-overlay__section-header" ng-if="(model.pasteItems | filter:filter.searchTerm).length > 0">
         <h5><localize key="content_createFromClipboard">Paste from clipboard</localize></h5>
-        <button ng-if="model.clickClearPaste" ng-click="model.clickClearPaste($event)" alt="Clear clipboard for entries accepted in this context.">
+        <button type="button" ng-if="model.clickClearPaste" ng-click="model.clickClearPaste($event)" alt="Clear clipboard for entries accepted in this context.">
             <i class="icon-trash" aria-hidden="true"></i>
         </button>
     </div>
