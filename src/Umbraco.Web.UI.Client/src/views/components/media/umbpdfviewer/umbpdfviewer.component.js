@@ -12,20 +12,90 @@
       }
     });
 
-  UmbPDFViewerController.$inject = ['$scope', 'assetsService'];
+  UmbPDFViewerController.$inject = ['$scope', '$element', 'assetsService'];
 
-  function UmbPDFViewerController($scope, assetsService) {
+  function UmbPDFViewerController($scope, $element, assetsService) {
 
-    var vm = this;
+    const vm = this;
+    const element = $element[0];
 
     vm.pdf = null;
+    vm.pageNumber = 1;
+    vm.pageRendering = false;
+    vm.pageNumberPending = null;
+
     vm.$onInit = onInit;
+    vm.nextPage = nextPage;
+    vm.prevPage = prevPage;
 
     function onInit() {
+
       assetsService.load(['lib/pdfjs-dist/build/pdf.min.js', 'lib/pdfjs-dist/build/pdf.worker.min.js'], $scope)
         .then(function () {
+
+          // TODO: figure out how this works and implement
+          // pdfjsLib.GlobalWorkerOptions.workerSrc = '//mozilla.github.io/pdf.js/build/pdf.worker.js';
+
           loadDocument();
         });
+    }
+
+    function nextPage () {
+      if (vm.pageNumber >= vm.pdf.numPages) {
+        return;
+      }
+
+      vm.pageNumber = vm.pageNumber + 1;
+      queueRenderPage(vm.pageNumber);
+    }
+
+    function prevPage() {
+      if (vm.pageNumber <= 1) {
+        return;
+      }
+
+      vm.pageNumber = vm.pageNumber - 1;
+      queueRenderPage(vm.pageNumber);
+    }
+
+    function queueRenderPage (pageNumber) {
+      if (vm.pageRendering) {
+        vm.pageNumberPending = pageNumber;
+      } else {
+        renderPage(pageNumber);
+      }
+    }
+
+    function renderPage(pageNumber) {
+      vm.pageRendering = true;
+
+      vm.pdf.getPage(pageNumber).then(function(page) {
+        const desiredWidth = 500;
+        const viewport = page.getViewport({ scale: 1 });
+        const scale = desiredWidth / viewport.width;
+        const scaledViewport = page.getViewport({ scale });
+
+        const canvas = element.querySelector('.pdf-canvas');
+        const context = canvas.getContext('2d');
+        canvas.height = scaledViewport.height;
+        canvas.width = scaledViewport.width;
+
+        const renderContext = {
+          canvasContext: context,
+          viewport: viewport
+        };
+
+        const renderTask = page.render(renderContext);
+
+        renderTask.promise.then(function() {
+          vm.pageRendering = false;
+
+          if (vm.pageNumberPending !== null) {
+            renderPage(vm.pageNumberPending);
+            vm.pageNumberPending = null;
+          }
+        });
+      });
     }
 
     function loadDocument () {
@@ -34,28 +104,7 @@
 
         loadingTask.promise.then((pdf) => {
           vm.pdf = pdf;
-
-          let pageNumber = 1;
-
-          pdf.getPage(pageNumber).then(function(page) {
-            const desiredWidth = 500;
-            const viewport = page.getViewport({ scale: 1 });
-            const scale = desiredWidth / viewport.width;
-            const scaledViewport = page.getViewport({ scale });
-
-            const canvas = document.getElementById('pdfCanvas');
-            const context = canvas.getContext('2d');
-            canvas.height = scaledViewport.height;
-            canvas.width = scaledViewport.width;
-
-            const renderContext = {
-              canvasContext: context,
-              viewport: viewport
-            };
-
-            page.render(renderContext);
-          });
-
+          renderPage(vm.pageNumber);
         });
       } catch (e) {
         console.log('error', e);
