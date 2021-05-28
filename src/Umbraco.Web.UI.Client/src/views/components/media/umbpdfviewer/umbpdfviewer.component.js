@@ -34,7 +34,7 @@
     vm.nextPage = nextPage;
     vm.prevPage = prevPage;
     vm.updatePage = updatePage;
-    vm.handleKeypress = handleKeypress;
+    vm.handleInputKeypress = handleInputKeypress;
 
     function onInit() {
 
@@ -45,6 +45,9 @@
           pdfjsLib.GlobalWorkerOptions.workerSrc = `${Umbraco.Sys.ServerVariables.umbracoSettings.umbracoPath}/lib/pdfjs-dist/build/pdf.worker.min.js`;
           loadDocument();
         });
+
+      windowResizeListener.register(onResize);
+      canvas.addEventListener("keydown", handleKeydown);
     }
 
     function nextPage () {
@@ -159,22 +162,45 @@
         });
     }
 
-    function handleKeypress (event) {
-      // enter
-      if (event.keyCode === 13) {
-        event.stopPropagation();
-        event.preventDefault();
+    function handleKeydown (event) {
+      switch (event.keyCode) {
+        // arrow left
+        case 37:
+          event.stopPropagation();
+          event.preventDefault();
+          prevPage();
+          break;
 
-        updatePage();
-        return;
+        // arrow right
+        case 39:
+          event.stopPropagation();
+          event.preventDefault();
+          nextPage();
+          break;
+
+        default:
+          break;
+      }
+
+      $scope.$applyAsync();
+    }
+
+    function handleInputKeypress (event) {
+      switch (event.keyCode) {
+        case 13:
+          event.stopPropagation();
+          event.preventDefault();
+          updatePage();
+          break;
+        default:
+          break;
       }
     }
 
-    windowResizeListener.register(onResize);
-
     //ensure to unregister from all events and kill jquery plugins
     $scope.$on('$destroy', function () {
-        windowResizeListener.unregister(onResize);
+      windowResizeListener.unregister(onResize);
+      canvas.removeEventListener("keydown", handleKeydown);
     });
   }
 
