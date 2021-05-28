@@ -1,9 +1,10 @@
 <div class="umb-pdf-viewer">
-    <canvas class="umb-pdf-viewer--pdf-canvas"></canvas>
+  
+  <canvas class="umb-pdf-viewer--pdf-canvas" tabindex="0"></canvas>
 
   <div class="umb-pdf-viewer__actions">
     <div class="umb-pdf-viewer__action-group umb-pdf-viewer__action-group--pages">
-      <span><input type="number" ng-model="vm.pageNumber" ng-blur="vm.updatePage(vm.pageNumber)" ng-blur="vm.updatePage()" ng-keypress="vm.handleKeypress($event)" no-dirty-check></span>
+      <span><input type="number" ng-model="vm.pageNumber" ng-blur="vm.updatePage(vm.pageNumber)" ng-blur="vm.updatePage()" ng-keypress="vm.handleInputKeypress($event)" no-dirty-check></span>
       <span>/</span>
       <span>{{ vm.totalPages }}</span>
     </div>
