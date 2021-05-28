@@ -552,7 +552,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var mailMessage = new EmailMessage(fromEmail, to.Email, emailSubject, emailBody, true);
 
-            await _emailSender.SendAsync(mailMessage);
+            await _emailSender.SendAsync(mailMessage, true);
         }
 
         /// <summary>
