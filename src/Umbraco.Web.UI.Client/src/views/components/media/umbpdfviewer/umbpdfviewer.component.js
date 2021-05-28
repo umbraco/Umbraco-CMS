@@ -101,6 +101,7 @@
 
         loadingTask.promise.then((pdf) => {
           vm.pdf = pdf;
+          console.log(pdf);
           vm.totalPages = pdf.numPages;
           loadPage(vm.pageNumber);
           $scope.$applyAsync();
@@ -190,7 +191,7 @@
     //ensure to unregister from all events and kill jquery plugins
     $scope.$on('$destroy', function () {
       windowResizeListener.unregister(onResize);
-      canvas.removeEventListener("keydown", handleElementKeypress);
+      canvas.removeEventListener("keydown", handleKeydown);
     });
   }
 
