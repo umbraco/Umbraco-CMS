@@ -8,7 +8,7 @@ var connect = require('gulp-connect');
 var open = require('gulp-open');
 var gulpDocs = require('gulp-ngdocs');
 
-var documentationFiles = ['../Umbraco.Web.UI.Client/src/common/**/*.js', './src/api/**/*.ngdoc'];
+var documentationFiles = ['../Umbraco.Web.UI.Client/src/common/**/*.js', '../Umbraco.Web.UI.Client/src/views/**/*.js', './src/api/**/*.ngdoc'];
 
 /**************************
  * Build Backoffice UI API documentation

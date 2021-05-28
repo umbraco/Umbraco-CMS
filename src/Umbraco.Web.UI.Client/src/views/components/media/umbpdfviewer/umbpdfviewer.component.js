@@ -1,3 +1,22 @@
+/**
+@ngdoc directive
+@name umbraco.directives.directive:umbPdfViewer
+@restrict E
+@scope
+
+@description
+Use this component to render an Umbraco PDF viewer. The PDF viewer will load the provided PDF and you can navigate the content.
+
+<h3>Markup example</h3>
+<pre>
+    <div>
+        <umb-pdf-viewer src="path/to/file.pdf"></umb-pdf-viewer>
+    </div>
+</pre>
+
+@param {string} src Url/Path to the PDF
+**/
+
 (function () {
   'use strict';
 
