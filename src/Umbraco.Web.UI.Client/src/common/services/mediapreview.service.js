@@ -1,11 +1,23 @@
 ﻿/**
 * @ngdoc service
-* @name umbraco.services.mediaHelper
-* @description A helper object used for dealing with media items
+* @name umbraco.services.mediaPreview
+* @description A service providing views used for dealing with previewing files.
+*
+* ##usage
+* The service allows for registering and retrieving the view for one or more file extensions.
+*
+* You can register your own custom view in this way:
+*
+* <pre>
+*    angular.module('umbraco').run(['mediaPreview', function (mediaPreview) {
+*        mediaPreview.registerPreview(['docx'], "app_plugins/My_PACKAGE/preview.html");
+*    }]);
+* </pre>
+*
 **/
 function mediaPreview() {
 
-    var DEFAULT_FILE_PREVIEW = "views/components/media/umbfilepreview/umb-file-preview.html";
+    const DEFAULT_FILE_PREVIEW = "views/components/media/umbfilepreview/umb-file-preview.html";
 
     var _mediaPreviews = [];
 
@@ -19,6 +31,17 @@ function mediaPreview() {
 
     var service = {
 
+        /**
+        * @ngdoc method
+        * @name umbraco.services.mediaPreview#getMediaPreview
+        * @methodOf umbraco.services.mediaPreview
+        *
+        * @param {string} fileExtension A string with the file extension, example: "pdf"
+        *
+        * @description
+        * The registered view matching this file extensions will be returned.
+        *
+        */
         getMediaPreview: function (fileExtension) {
 
             fileExtension = fileExtension.toLowerCase();
@@ -32,6 +55,18 @@ function mediaPreview() {
             return DEFAULT_FILE_PREVIEW;
         },
 
+        /**
+        * @ngdoc method
+        * @name umbraco.services.mediaPreview#registerPreview
+        * @methodOf umbraco.services.mediaPreview
+        *
+        * @param {array} fileExtensions An array of file extensions, example: ["pdf", "jpg"]
+        * @param {array} view A URL to the view to be used for these file extensions.
+        *
+        * @description
+        * The registered view will be used when file extensions match the given file.
+        *
+        */
         registerPreview: function (fileExtensions, view) {
             _mediaPreviews.push({
                 fileExtensions: fileExtensions.map(e => e.toLowerCase()),
