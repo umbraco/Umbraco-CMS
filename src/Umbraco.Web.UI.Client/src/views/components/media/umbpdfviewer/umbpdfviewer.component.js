@@ -23,6 +23,7 @@
     var currentPage = null;
     var pageLoading = false;
     var pageRendering = false;
+    var initialLoad = true;
 
     vm.pdf = null;
     vm.pageNumber = 1;
@@ -36,6 +37,8 @@
     vm.handleKeypress = handleKeypress;
 
     function onInit() {
+
+      $scope.$emit("mediaPreviewLoadingStart");
 
       assetsService.load(['lib/pdfjs-dist/build/pdf.min.js'], $scope)
         .then(function () {
@@ -89,6 +92,12 @@
       vm.pdf.getPage(pageNumber).then(function(page) {
         pageLoading = false;
         currentPage = page;
+
+        if(initialLoad === true) {
+            $scope.$emit("mediaPreviewLoadingComplete");
+            initialLoad = false;
+        }
+
         render();
       });
     }
