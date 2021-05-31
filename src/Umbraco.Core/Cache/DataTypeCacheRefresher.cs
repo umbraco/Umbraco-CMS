@@ -3,6 +3,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
@@ -62,6 +63,11 @@ namespace Umbraco.Cms.Core.Cache
             foreach (var payload in payloads)
             {
                 _idKeyMap.ClearCache(payload.Id);
+
+                if (dataTypeCache.Success)
+                {
+                    dataTypeCache.Result.Clear(RepositoryCacheKeys.GetKey<IDataType, int>(payload.Id));
+                }
             }
 
             // TODO: not sure I like these?

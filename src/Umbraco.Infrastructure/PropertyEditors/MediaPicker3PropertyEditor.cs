@@ -17,7 +17,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
     [DataEditor(
         Constants.PropertyEditors.Aliases.MediaPicker3,
         EditorType.PropertyValue,
-        "Media Picker v3",
+        "Media Picker",
         "mediapicker3",
         ValueType = ValueTypes.Json,
         Group = Constants.PropertyEditors.Groups.Media,
