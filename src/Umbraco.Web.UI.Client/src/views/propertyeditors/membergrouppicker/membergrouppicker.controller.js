@@ -65,7 +65,6 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
         setDirty();
     }
 
-    // TODO: I don't believe this is used
     function clear() {
         $scope.renderModel = [];
         setDirty();
