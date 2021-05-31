@@ -11,6 +11,9 @@ using Umbraco.Cms.Core;
 
 namespace Umbraco.Tests.Benchmarks
 {
+    // TODO: I very quickly tried converting this to netcore using the new AssemblyBuilder
+    // but didn't get far enough. I'm unsure where we use the different concepts of this code.
+
     // some conclusions
     // - ActivatorCreateInstance is slow
     // - it's faster to get+invoke the ctor
@@ -92,13 +95,15 @@ namespace Umbraco.Tests.Benchmarks
             // dump to disk so we can review IL code with eg DotPeek
 
             var assemblyName = new AssemblyName("Umbraco.Tests.Benchmarks.IL");
-            var assembly = AppDomain.CurrentDomain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Save);
-            var module = assembly.DefineDynamicModule(assemblyName.Name, assemblyName.Name + ".dll");
+            var assembly = AssemblyBuilder.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
+            var module = assembly.DefineDynamicModule("CtorInvoke");
+            //var module = assembly.DefineDynamicModule(assemblyName.Name, assemblyName.Name + ".dll");
             var typeBuilder = module.DefineType("CtorInvoke", TypeAttributes.Public | TypeAttributes.Abstract);
 
             var expressionMethodBuilder = typeBuilder.DefineMethod("ExpressionCtor",
                 MethodAttributes.Public | MethodAttributes.Static, // CompileToMethod requires a static method
                 typeof (IFoo), ctorArgTypes);
+
             expr.CompileToMethod(expressionMethodBuilder);
 
             var dynamicMethodBuilder = typeBuilder.DefineMethod("DynamicCtor",
