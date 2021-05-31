@@ -1,7 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json.Linq;
 using System.Globalization;
-using System.Text;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -31,6 +29,8 @@ namespace Umbraco.Web
         /// The ImageProcessor.Web URL.
         /// </returns>
         public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, cropAlias, Current.ImageUrlGenerator);
+
+        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, ImageCropperValue imageCropperValue) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, cropAlias, Current.ImageUrlGenerator, imageCropperValue);
 
         /// <summary>
         /// Gets the ImageProcessor URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
@@ -117,6 +117,13 @@ namespace Umbraco.Web
              string furtherOptions = null,
              ImageCropRatioMode? ratioMode = null,
              bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, Current.ImageUrlGenerator, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode, upScale);
+
+        public static string GetLocalCropUrl(this MediaWithCrops mediaWithCrops,
+            string alias,
+            string cacheBusterValue = null)
+            => ImageCropperTemplateCoreExtensions.GetLocalCropUrl(mediaWithCrops, alias, Current.ImageUrlGenerator,  cacheBusterValue);
+
+
 
         /// <summary>
         /// Gets the ImageProcessor URL from the image path.

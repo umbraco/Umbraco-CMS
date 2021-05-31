@@ -24,6 +24,12 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
         });
     }
 
+    function setDirty() {
+        if ($scope.modelValueForm) {
+            $scope.modelValueForm.modelValue.$setDirty();
+        }
+    }
+
     function openMemberGroupPicker() {
         var memberGroupPicker = {
             multiPicker: true,
@@ -38,6 +44,7 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
                 if (newGroupIds && newGroupIds.length) {
                     memberGroupResource.getByIds(newGroupIds).then(function (groups) {
                         $scope.renderModel = _.union($scope.renderModel, groups);
+                        setDirty();
                         editorService.close();
                     });
                 }
@@ -53,12 +60,18 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
         editorService.memberGroupPicker(memberGroupPicker);
     }
 
+    // TODO: I don't believe this is used
     function remove(index){
         $scope.renderModel.splice(index, 1);
+        setDirty();
+    // TODO: I don't believe this is used
+            setDirty();
     }
 
+    // TODO: I don't believe this is used
     function clear() {
         $scope.renderModel = [];
+        setDirty();
     }
 
     function renderModelIds() {

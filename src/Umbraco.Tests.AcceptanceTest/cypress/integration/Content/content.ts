@@ -761,7 +761,7 @@ context('Content', () => {
         cy.umbracoTreeItem("content", [name]).click();
         // Click add
         cy.get(':nth-child(2) > .preview-row > .preview-col > .preview-cell').click(); // Choose 1 column layout.
-        cy.get('.umb-column > .templates-preview > :nth-child(2) > .ng-binding').click(); // Choose headline
+        cy.get('.umb-column > .templates-preview > :nth-child(2) > small').click(); // Choose headline
         cy.get('.umb-cell-placeholder').click();
         // Click macro
         cy.get(':nth-child(4) > .umb-card-grid-item > :nth-child(1)').click();

@@ -32,7 +32,8 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
         return true;
     }
 
-    function showNotificationsForModelsState(ms) {
+    function showNotificationsForModelsState(ms, messageType) {
+        messageType = messageType || 2;
         for (const [key, value] of Object.entries(ms)) {
 
             var errorMsg = value[0];
@@ -42,12 +43,12 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                 var idsToErrors = serverValidationManager.parseComplexEditorError(errorMsg, "");
                 idsToErrors.forEach(x => {
                     if (x.modelState) {
-                        showNotificationsForModelsState(x.modelState);
+                        showNotificationsForModelsState(x.modelState, messageType);
                     }
                 });
             }
             else if (value[0]) {
-                notificationsService.error("Validation", value[0]);
+                notificationsService.showNotification({type:messageType, header:"Validation", message:value[0]})
             }
         }
     }
@@ -93,7 +94,12 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
             //we will use the default one for content if not specified
             var rebindCallback = args.rebindCallback === undefined ? self.reBindChangedProperties : args.rebindCallback;
 
-            if (formHelper.submitForm({ scope: args.scope, action: args.action })) {
+            var formSubmitOptions = { scope: args.scope, action: args.action };
+            if(args.skipValidation === true) {
+                formSubmitOptions.skipValidation = true;
+                formSubmitOptions.keepServerValidation = true;
+            }
+            if (formHelper.submitForm(formSubmitOptions)) {
 
                 return args.saveMethod(args.content, args.create, fileManager.getFiles(), args.showNotifications)
                     .then(function (data) {
@@ -124,6 +130,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                             showNotifications: args.showNotifications,
                             softRedirect: args.softRedirect,
                             err: err,
+                            action: args.action,
                             rebindCallback: function () {
                                 // if the error contains data, we want to map that back as we want to continue editing this save. Especially important when the content is new as the returned data will contain ID etc.
                                 if(err.data) {
@@ -639,9 +646,14 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
                     //wire up the server validation errs
                     formHelper.handleServerValidation(args.err.data.ModelState);
 
+                    var messageType = 2;//error
+                    if (args.action === "save") {
+                        messageType = 4;//warning
+                    }
+
                     //add model state errors to notifications
                     if (args.showNotifications) {
-                        showNotificationsForModelsState(args.err.data.ModelState);
+                        showNotificationsForModelsState(args.err.data.ModelState, messageType);
                     }
 
                     if (!this.redirectToCreatedContent(args.err.data.id, args.softRedirect) || args.softRedirect) {
@@ -775,10 +787,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          */
         sortVariants: function (a, b) {
             const statesOrder = {'PublishedPendingChanges':1, 'Published': 1, 'Draft': 2, 'NotCreated': 3};
-            const compareDefault = (a,b) => (!a.language.isDefault ? 1 : -1) - (!b.language.isDefault ? 1 : -1);
+            const compareDefault = (a,b) => (a.language && a.language.isDefault ? -1 : 1) - (b.language && b.language.isDefault ? -1 : 1);
 
             // Make sure mandatory variants goes on top, unless they are published, cause then they already goes to the top and then we want to mix them with other published variants.
-            const compareMandatory = (a,b) => (a.state === 'PublishedPendingChanges' || a.state === 'Published') ? 0 : (!a.language.isMandatory ? 1 : -1) - (!b.language.isMandatory ? 1 : -1);
+            const compareMandatory = (a,b) => (a.state === 'PublishedPendingChanges' || a.state === 'Published') ? 0 : (a.language && a.language.isMandatory ? -1 : 1) - (b.language && b.language.isMandatory ? -1 : 1);
             const compareState = (a, b) => (statesOrder[a.state] || 99) - (statesOrder[b.state] || 99);
             const compareName = (a, b) => a.displayName.localeCompare(b.displayName);
 
@@ -799,17 +811,18 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, editorSt
          */
         getSortedVariantsAndSegments: function (variantsAndSegments) {
             const sortedVariants = variantsAndSegments.filter(variant => !variant.segment).sort(this.sortVariants);
-            let segments = variantsAndSegments.filter(variant => variant.segment);
+            let variantsWithSegments = variantsAndSegments.filter(variant => variant.segment);
             let sortedAvailableVariants = [];
 
             sortedVariants.forEach((variant) => {
-                const sortedMatchedSegments = segments.filter(segment => segment.language.culture === variant.language.culture).sort(this.sortVariants);
-                segments = segments.filter(segment => segment.language.culture !== variant.language.culture);
+                const sortedMatchedSegments = variantsWithSegments.filter(segment => segment.language && variant.language && segment.language.culture === variant.language.culture).sort(this.sortVariants);
+                // remove variants for this culture
+                variantsWithSegments = variantsWithSegments.filter(segment => !segment.language || segment.language && variant.language && segment.language.culture !== variant.language.culture);
                 sortedAvailableVariants = [...sortedAvailableVariants, ...[variant], ...sortedMatchedSegments];
             })
 
-            // if we have segments without a parent language variant we need to add the remaining segments to the array
-            sortedAvailableVariants = [...sortedAvailableVariants, ...segments.sort(this.sortVariants)];
+            // if we have segments without a parent language variant we need to add the remaining variantsWithSegments to the array
+            sortedAvailableVariants = [...sortedAvailableVariants, ...variantsWithSegments.sort(this.sortVariants)];
 
             return sortedAvailableVariants;
         }

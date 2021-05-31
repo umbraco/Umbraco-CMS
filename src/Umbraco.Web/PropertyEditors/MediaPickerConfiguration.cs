@@ -8,6 +8,9 @@ namespace Umbraco.Web.PropertyEditors
     /// </summary>
     public class MediaPickerConfiguration : IIgnoreUserStartNodesConfig
     {
+        [ConfigurationField("notice", "You can NOT change the property editor", "obsoletemediapickernotice")]
+        public bool Notice { get; set; }
+
         [ConfigurationField("multiPicker", "Pick multiple items", "boolean")]
         public bool Multiple { get; set; }
 
