@@ -36,15 +36,16 @@
         <div class="umb-table-body">
             <div class="umb-table-row -selectable umb-outline"
                  ng-repeat="item in vm.items track by $index"
+                 ng-init="item.icon = vm.getIcon(item)"
                  ng-class="{'-selected':item.selected, '-light':!item.published && item.updater != null}"
                  ng-click="vm.selectItem(item, $index, $event)">
 
                 <div class="umb-table-cell">
-                    <umb-icon icon="{{vm.getIcon(item)}}" class="{{vm.getIcon(item)}} umb-table-body__icon umb-table-body__fileicon" ng-if="!item.selected"></umb-icon>
+                    <umb-icon icon="{{item.icon}}" class="{{item.icon}} umb-table-body__icon umb-table-body__fileicon" ng-if="!item.selected"></umb-icon>
                     <umb-icon icon="icon-check" class="icon-check umb-table-body__icon umb-table-body__checkicon" ng-if="item.selected"></umb-icon>
                 </div>
                 <div class="umb-table-cell umb-table__name">
-                    <a title="{{ item.name }}" class="umb-table-body__link"
+                    <a title="{{item.name}}" class="umb-table-body__link"
                        ng-href="{{'#' + item.editPath}}"
                        ng-click="vm.clickItem(item, $event)"
                        ng-bind="item.name">
