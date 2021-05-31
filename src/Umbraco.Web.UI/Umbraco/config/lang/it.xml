@@ -37,6 +37,7 @@
         <key alias="remove">Rimuovi</key>
         <key alias="restore" version="7.3.0">Ripristina</key>
         <key alias="createblueprint">Crea Content Template</key>
+        <key alias="createGroup">Crea gruppo</key>
     </area>
     <area alias="assignDomain">
         <key alias="addNew">Aggiungi nuovo dominio</key>
@@ -369,6 +370,7 @@
         <key alias="history">Cronologia</key>
         <key alias="general">Generale</key>
         <key alias="remove">Rimuovi</key>
+        <key alias="groups">Gruppi</key>
     </area>
     <area alias="graphicheadline">
         <key alias="backgroundcolor">Colore di sfondo</key>
@@ -923,6 +925,11 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="writer">Autore</key>
         <key alias="yourProfile" version="7.0">Il tuo profilo</key>
         <key alias="yourHistory" version="7.0">La tua storia recente</key>
+        <key alias="createUser">Crea utente</key>
+        <key alias="createUserHelp">Crea nuovi utenti e dai loro accesso ad Umbraco. Quando un nuovo utente viene creato viene generata una password che potrai condividere con l'utente.</key>
+        <key alias="groupsHelp">Aggiungi gruppi per assegnare accessi e permessi</key>
+        <key alias="backToUsers">Torna agli utenti</key>
+        <key alias="userManagement">Gestione utenti</key>
     </area>
     <area alias="validation">
         <key alias="minCount">Devi aggiungere almeno</key>
@@ -933,6 +940,7 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
         <key alias="email">Inserisci la tua email</key>
         <key alias="password">Inserisci la tua password</key>
         <key alias="entername">Inserisci un nome...</key>
+        <key alias="enteremail">Inserisci una email...</key>
     </area>
     <area alias="media">
         <key alias="orClickHereToUpload">o clicca qui per scegliere i file</key>
@@ -941,5 +949,6 @@ Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e in
     <area alias="apps">
         <key alias="umbContent">Contenuti</key>
         <key alias="umbInfo">Info</key>
+        <key alias="umbListView">Elementi</key>
     </area>
 </language>
