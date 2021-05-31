@@ -6,7 +6,7 @@
 
         <div class="umb-nested-content__items" ng-hide="vm.nodes.length === 0" ui-sortable="vm.sortableOptions" ng-model="vm.nodes">
 
-            <div ng-repeat="node in vm.nodes" ng-init="node.icon == vm.getIcon($index)">
+            <div ng-repeat="node in vm.nodes" ng-init="node.icon = vm.getIcon($index)">
 
                 <ng-form name="ncRowForm" val-server-match="{ 'contains': node.key }">
 
