@@ -61,11 +61,9 @@ function memberGroupPicker($scope, editorService, memberGroupResource){
     }
 
     // TODO: I don't believe this is used
-    function remove(index){
+    function remove(index) {
         $scope.renderModel.splice(index, 1);
         setDirty();
-    // TODO: I don't believe this is used
-            setDirty();
     }
 
     // TODO: I don't believe this is used
