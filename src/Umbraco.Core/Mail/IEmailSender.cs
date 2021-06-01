@@ -10,6 +10,8 @@ namespace Umbraco.Cms.Core.Mail
     {
         Task SendAsync(EmailMessage message);
 
+        Task SendAsync(EmailMessage message, bool enableNotification);
+
         bool CanSendRequiredEmail();
     }
 }

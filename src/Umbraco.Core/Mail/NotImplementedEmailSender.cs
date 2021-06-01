@@ -9,6 +9,10 @@ namespace Umbraco.Cms.Core.Mail
         public Task SendAsync(EmailMessage message)
             => throw new NotImplementedException("To send an Email ensure IEmailSender is implemented with a custom implementation");
 
+        public Task SendAsync(EmailMessage message, bool enableNotification) =>
+            throw new NotImplementedException(
+                "To send an Email ensure IEmailSender is implemented with a custom implementation");
+
         public bool CanSendRequiredEmail()
             => throw new NotImplementedException("To send an Email ensure IEmailSender is implemented with a custom implementation");
     }
