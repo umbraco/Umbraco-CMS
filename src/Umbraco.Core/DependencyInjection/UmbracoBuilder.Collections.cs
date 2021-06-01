@@ -115,6 +115,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .Append<Hulu>()
                 .Append<Giphy>();
             builder.SearchableTrees().Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
+            builder.BackOfficeAssets();
         }
 
         /// <summary>
