@@ -17,6 +17,13 @@ namespace Umbraco.Web.PropertyEditors
     [PluginController("UmbracoApi")]
     public class TagsDataController : UmbracoAuthorizedApiController
     {
+        private readonly ITagQuery _tagQuery;
+
+        public TagsDataController(ITagQuery tagQuery)
+        {
+           _tagQuery = tagQuery;
+        }
+
         /// <summary>
         /// Returns all tags matching tagGroup, culture and an optional query
         /// </summary>
@@ -28,7 +35,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             if (culture == string.Empty) culture = null;
 
-            var result = Umbraco.TagQuery.GetAllTags(tagGroup, culture);
+            var result = _tagQuery.GetAllTags(tagGroup, culture);
 
             
             if (!query.IsNullOrWhiteSpace())

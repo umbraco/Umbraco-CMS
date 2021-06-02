@@ -26,8 +26,9 @@ namespace Umbraco.Web.Macros
         private readonly ILocalizedTextService _textService;
         private readonly AppCaches _appCaches;
         private readonly IMacroService _macroService;
+        private readonly IUserService _userService;
 
-        public MacroRenderer(IProfilingLogger plogger, IUmbracoContextAccessor umbracoContextAccessor, IContentSection contentSection, ILocalizedTextService textService, AppCaches appCaches, IMacroService macroService)
+        public MacroRenderer(IProfilingLogger plogger, IUmbracoContextAccessor umbracoContextAccessor, IContentSection contentSection, ILocalizedTextService textService, AppCaches appCaches, IMacroService macroService, IUserService userService)
         {
             _plogger = plogger ?? throw new ArgumentNullException(nameof(plogger));
             _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
@@ -35,6 +36,7 @@ namespace Umbraco.Web.Macros
             _textService = textService;
             _appCaches = appCaches ?? throw new ArgumentNullException(nameof(appCaches));
             _macroService = macroService ?? throw new ArgumentNullException(nameof(macroService));
+            _userService = userService;
         }
 
         #region MacroContent cache
@@ -208,7 +210,7 @@ namespace Umbraco.Web.Macros
             if (m == null)
                 throw new InvalidOperationException("No macro found by alias " + macroAlias);
 
-            var page = new PublishedContentHashtableConverter(content);
+            var page = new PublishedContentHashtableConverter(content, _userService);
 
             var macro = new MacroModel(m);
 

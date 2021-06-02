@@ -37,7 +37,7 @@ namespace Umbraco.Web.Compose
         public static DatabaseServerMessengerOptions GetDefaultOptions(IFactory factory)
         {
             var logger = factory.GetInstance<ILogger>();
-            var indexRebuilder = factory.GetInstance<IndexRebuilder>();
+            var backgroundIndexRebuilder = factory.GetInstance<BackgroundIndexRebuilder>();
 
             return new DatabaseServerMessengerOptions
             {
@@ -61,7 +61,7 @@ namespace Umbraco.Web.Compose
                     //rebuild indexes if the server is not synced
                     // NOTE: This will rebuild ALL indexes including the members, if developers want to target specific
                     // indexes then they can adjust this logic themselves.
-                    () => { ExamineComponent.RebuildIndexes(indexRebuilder, logger, false, 5000); }
+                    () => { backgroundIndexRebuilder.RebuildIndexes(false, 5000); }
                 }
             };
         }
