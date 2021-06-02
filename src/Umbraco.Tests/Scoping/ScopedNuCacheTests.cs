@@ -119,7 +119,11 @@ namespace Umbraco.Tests.Scoping
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
-                new TestVariationContextAccessor());
+                new TestVariationContextAccessor(),
+                new ContextUrlProviderFactory(TestObjects.GetUmbracoSettings().WebRouting,
+                urlProviders ?? Enumerable.Empty<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
+                new TestVariationContextAccessor()));
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

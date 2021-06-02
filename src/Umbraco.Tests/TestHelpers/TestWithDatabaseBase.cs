@@ -383,7 +383,13 @@ namespace Umbraco.Tests.TestHelpers
                 urlProviders ?? Enumerable.Empty<IUrlProvider>(),
                 mediaUrlProviders ?? Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings ?? Factory.GetInstance<IGlobalSettings>(),
-                new TestVariationContextAccessor());
+                new TestVariationContextAccessor(),
+                new ContextUrlProviderFactory(
+                    (umbracoSettings ?? Factory.GetInstance<IUmbracoSettingsSection>()).WebRouting,
+                     urlProviders ?? Enumerable.Empty<IUrlProvider>(),
+                     mediaUrlProviders ?? Enumerable.Empty<IMediaUrlProvider>(),
+                     new TestVariationContextAccessor()
+                    ));
 
             if (setSingleton)
                 Umbraco.Web.Composing.Current.UmbracoContextAccessor.UmbracoContext = umbracoContext;

@@ -443,7 +443,13 @@ namespace Umbraco.Tests.Web.Mvc
                 Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
-                new TestVariationContextAccessor());
+                new TestVariationContextAccessor(),
+                 new ContextUrlProviderFactory(
+                    TestObjects.GetUmbracoSettings().WebRouting,
+                     Enumerable.Empty<IUrlProvider>(),
+                     Enumerable.Empty<IMediaUrlProvider>(),
+                     new TestVariationContextAccessor()
+                    ));
 
             //if (setSingleton)
             //{

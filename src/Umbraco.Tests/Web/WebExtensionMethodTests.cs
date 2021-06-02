@@ -34,7 +34,13 @@ namespace Umbraco.Tests.Web
                 new List<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
-                new TestVariationContextAccessor());
+                new TestVariationContextAccessor(),
+                new ContextUrlProviderFactory(
+                    TestObjects.GetUmbracoSettings().WebRouting,
+                     Enumerable.Empty<IUrlProvider>(),
+                      Enumerable.Empty<IMediaUrlProvider>(),
+                     new TestVariationContextAccessor()
+                    ));
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
 
@@ -53,7 +59,13 @@ namespace Umbraco.Tests.Web
                 new List<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
-                new TestVariationContextAccessor());
+                new TestVariationContextAccessor(),
+                new ContextUrlProviderFactory(
+                    TestObjects.GetUmbracoSettings().WebRouting,
+                     Enumerable.Empty<IUrlProvider>(),
+                      Enumerable.Empty<IMediaUrlProvider>(),
+                     new TestVariationContextAccessor()
+                    ));
 
             var r1 = new RouteData();
             r1.DataTokens.Add(Core.Constants.Web.UmbracoContextDataToken, umbCtx);
@@ -82,7 +94,13 @@ namespace Umbraco.Tests.Web
                 new List<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
                 TestObjects.GetGlobalSettings(),
-                new TestVariationContextAccessor());
+                new TestVariationContextAccessor(),
+                new ContextUrlProviderFactory(
+                    TestObjects.GetUmbracoSettings().WebRouting,
+                     Enumerable.Empty<IUrlProvider>(),
+                      Enumerable.Empty<IMediaUrlProvider>(),
+                     new TestVariationContextAccessor()
+                    ));
 
             var httpContext = Mock.Of<HttpContextBase>();
 
