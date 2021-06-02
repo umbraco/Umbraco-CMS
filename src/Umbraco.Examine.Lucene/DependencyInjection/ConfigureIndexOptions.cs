@@ -2,9 +2,14 @@ using System;
 using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Analyzers;
+using Examine.Lucene.Directories;
 using Lucene.Net.Analysis.Standard;
+using Lucene.Net.Index;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection
 {
@@ -14,9 +19,18 @@ namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection
     public sealed class ConfigureIndexOptions : IConfigureNamedOptions<LuceneDirectoryIndexOptions>
     {
         private readonly IUmbracoIndexConfig _umbracoIndexConfig;
+        private readonly IOptions<IndexCreatorSettings> _settings;
+        private readonly ITypeFinder _typeFinder;
 
-        public ConfigureIndexOptions(IUmbracoIndexConfig umbracoIndexConfig)
-            => _umbracoIndexConfig = umbracoIndexConfig;
+        public ConfigureIndexOptions(
+            IUmbracoIndexConfig umbracoIndexConfig,
+            IOptions<IndexCreatorSettings> settings,
+            ITypeFinder typeFinder)
+        {
+            _umbracoIndexConfig = umbracoIndexConfig;
+            _settings = settings;
+            _typeFinder = typeFinder;
+        }
 
         public void Configure(string name, LuceneDirectoryIndexOptions options)
         {
@@ -38,6 +52,17 @@ namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection
                     options.FieldDefinitions = new UmbracoFieldDefinitionCollection();
                     break;
             }
+
+            // ensure indexes are unlocked on startup
+            options.UnlockIndex = true;
+
+            Type directoryFactoryType = _settings.Value.GetRequiredLuceneDirectoryFactoryType(_typeFinder);
+            if (directoryFactoryType == typeof(SyncFileSystemDirectoryFactory))
+            {
+                // if this directory factory is enabled then a snapshot deletion policy is required
+                options.IndexDeletionPolicy = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
+            }
+            
         }
 
         public void Configure(LuceneDirectoryIndexOptions options)

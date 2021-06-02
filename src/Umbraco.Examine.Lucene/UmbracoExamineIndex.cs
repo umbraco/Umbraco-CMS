@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             : base(loggerFactory, name, indexOptions)
         {
             _runtimeState = runtimeState;
-            _diagnostics = new UmbracoExamineIndexDiagnostics(this, loggerFactory.CreateLogger<UmbracoExamineIndexDiagnostics>(), hostingEnvironment);
+            _diagnostics = new UmbracoExamineIndexDiagnostics(this, loggerFactory.CreateLogger<UmbracoExamineIndexDiagnostics>(), hostingEnvironment, indexOptions);
             _logger = loggerFactory.CreateLogger<UmbracoExamineIndex>();
         }
 
