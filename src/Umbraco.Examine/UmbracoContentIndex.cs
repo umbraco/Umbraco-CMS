@@ -17,7 +17,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// An indexer for Umbraco content and media
     /// </summary>
-    public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex
+    public class UmbracoContentIndex : UmbracoExamineIndex, IUmbracoContentIndex2
     {
         public const string VariesByCultureFieldName = SpecialFieldPrefix + "VariesByCulture";
         protected ILocalizationService LanguageService { get; }
@@ -133,7 +133,7 @@ namespace Umbraco.Examine
                 var filtered = c.NativeQuery(rawQuery);
                 var results = filtered.Execute();
 
-                ProfilingLogger.Debug(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
+                ProfilingLogger.Debug<string,long>(GetType(), "DeleteFromIndex with query: {Query} (found {TotalItems} results)", rawQuery, results.TotalItemCount);
 
                 //need to queue a delete item for each one found
                 QueueIndexOperation(results.Select(r => new IndexOperation(new ValueSet(r.Id), IndexOperationType.Delete)));

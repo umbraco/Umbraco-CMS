@@ -4,7 +4,9 @@ using System.Linq;
 using Examine;
 using Examine.LuceneEngine.Providers;
 using Umbraco.Core;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Models;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 
 namespace Umbraco.Examine
@@ -15,9 +17,9 @@ namespace Umbraco.Examine
     public class ContentValueSetValidator : ValueSetValidator, IContentValueSetValidator
     {
         private readonly IPublicAccessService _publicAccessService;
-
+        private readonly IScopeProvider _scopeProvider;
         private const string PathKey = "path";
-        private static readonly IEnumerable<string> ValidCategories = new[] {IndexTypes.Content, IndexTypes.Media};
+        private static readonly IEnumerable<string> ValidCategories = new[] { IndexTypes.Content, IndexTypes.Media };
         protected override IEnumerable<string> ValidIndexCategories => ValidCategories;
 
         public bool PublishedValuesOnly { get; }
@@ -53,25 +55,38 @@ namespace Umbraco.Examine
 
         public bool ValidateProtectedContent(string path, string category)
         {
-            if (category == IndexTypes.Content
-                && !SupportProtectedContent
-                //if the service is null we can't look this up so we'll return false
-                && (_publicAccessService == null || _publicAccessService.IsProtected(path)))
+            if (category == IndexTypes.Content && !SupportProtectedContent)
             {
-                return false;
+                //if the service is null we can't look this up so we'll return false
+                if (_publicAccessService == null || _scopeProvider == null)
+                {
+                    return false;
+                }
+
+                // explicit scope since we may be in a background thread
+                using (_scopeProvider.CreateScope(autoComplete: true))
+                {
+                    if (_publicAccessService.IsProtected(path))
+                    {
+                        return false;
+                    }
+                }
             }
 
             return true;
         }
 
+        // used for tests
         public ContentValueSetValidator(bool publishedValuesOnly, int? parentId = null,
             IEnumerable<string> includeItemTypes = null, IEnumerable<string> excludeItemTypes = null)
-            : this(publishedValuesOnly, true, null, parentId, includeItemTypes, excludeItemTypes)
+            : this(publishedValuesOnly, true, null, null, parentId, includeItemTypes, excludeItemTypes)
         {
         }
 
         public ContentValueSetValidator(bool publishedValuesOnly, bool supportProtectedContent,
-            IPublicAccessService publicAccessService, int? parentId = null,
+            IPublicAccessService publicAccessService,
+            IScopeProvider scopeProvider,
+            int? parentId = null,
             IEnumerable<string> includeItemTypes = null, IEnumerable<string> excludeItemTypes = null)
             : base(includeItemTypes, excludeItemTypes, null, null)
         {
@@ -79,6 +94,16 @@ namespace Umbraco.Examine
             SupportProtectedContent = supportProtectedContent;
             ParentId = parentId;
             _publicAccessService = publicAccessService;
+            _scopeProvider = scopeProvider;
+        }
+
+        [Obsolete("Use the ctor with all parameters instead")]
+        public ContentValueSetValidator(bool publishedValuesOnly, bool supportProtectedContent,
+            IPublicAccessService publicAccessService, int? parentId = null,
+            IEnumerable<string> includeItemTypes = null, IEnumerable<string> excludeItemTypes = null)
+            : this(publishedValuesOnly, supportProtectedContent, publicAccessService, Current.ScopeProvider,
+                  parentId, includeItemTypes, excludeItemTypes)
+        {
         }
 
         public override ValueSetValidationResult Validate(ValueSet valueSet)
@@ -103,7 +128,7 @@ namespace Umbraco.Examine
                     && variesByCulture.Count > 0 && variesByCulture[0].Equals("y"))
                 {
                     //so this valueset is for a content that varies by culture, now check for non-published cultures and remove those values
-                    foreach(var publishField in valueSet.Values.Where(x => x.Key.StartsWith($"{UmbracoExamineIndex.PublishedFieldName}_")).ToList())
+                    foreach (var publishField in valueSet.Values.Where(x => x.Key.StartsWith($"{UmbracoExamineIndex.PublishedFieldName}_")).ToList())
                     {
                         if (publishField.Value.Count <= 0 || !publishField.Value[0].Equals("y"))
                         {
@@ -134,7 +159,7 @@ namespace Umbraco.Examine
                 || !ValidateProtectedContent(path, valueSet.Category))
                 return ValueSetValidationResult.Filtered;
 
-            return isFiltered ? ValueSetValidationResult.Filtered: ValueSetValidationResult.Valid;
+            return isFiltered ? ValueSetValidationResult.Filtered : ValueSetValidationResult.Valid;
         }
     }
 }

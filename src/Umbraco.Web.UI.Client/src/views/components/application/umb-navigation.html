@@ -23,7 +23,7 @@
                         class="umb-language-picker__dropdown-item"
                         ng-class="{'umb-language-picker__dropdown-item--current': language.active}"
                         ng-click="selectLanguage(language)"
-                        ng-repeat="language in languages | orderBy:'name'"
+                        ng-repeat="language in languages"
                     >
                     <span class="sr-only">
                         <localize key="visuallyHiddenTexts_switchLanguage">Switch language to</localize>
@@ -45,15 +45,13 @@
 
         <div class="offset6" id="navOffset" style="z-index: 10">
 
-            <!-- The context menu -->
-            <div id='contextMenu' class="umb-modalcolumn fill shadow" ng-if="showContextMenu" ng-animate="'slide'">
-                <umb-context-menu
-                    menu-dialog-title="{{menuDialogTitle}}"
-                    current-section="{{currentSection}}"
-                    current-node="menuNode"
-                    menu-actions="menuActions">
-                </umb-context-menu>
-            </div>
+            <umb-context-menu
+                ng-if="showContextMenu"
+                menu-dialog-title="{{menuDialogTitle}}"
+                current-section="{{currentSection}}"
+                current-node="menuNode"
+                menu-actions="menuActions">
+            </umb-context-menu>
 
             <umb-context-dialog
                 ng-if="showContextMenuDialog"

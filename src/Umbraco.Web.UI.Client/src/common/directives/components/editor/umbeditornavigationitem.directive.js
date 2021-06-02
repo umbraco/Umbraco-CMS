@@ -4,8 +4,13 @@
     function UmbEditorNavigationItemController($scope, $element, $attrs) {
         
         var vm = this;
-        
-        vm.clicked = function() {
+
+        vm.close = function () {
+            vm.expanded = false;
+        };
+
+        vm.clicked = function () {
+            vm.expanded = vm.item.anchors && vm.item.anchors.length > 1 && !vm.expanded;
             vm.onOpen({item:vm.item});
         };
         

@@ -8,15 +8,17 @@ namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
     /// Represents a media picker property editor.
+    /// Marked as Deprecated as best to use the NEW Media Picker aka MediaPicker3
     /// </summary>
     [DataEditor(
         Constants.PropertyEditors.Aliases.MediaPicker,
         EditorType.PropertyValue | EditorType.MacroParameter,
-        "Media Picker",
+        "(Obsolete) Media Picker",
         "mediapicker",
         ValueType = ValueTypes.Text,
         Group = Constants.PropertyEditors.Groups.Media,
-        Icon = Constants.Icons.MediaImage)]
+        Icon = Constants.Icons.MediaImage,
+        IsDeprecated = true)]
     public class MediaPickerPropertyEditor : DataEditor
     {
 
@@ -45,7 +47,7 @@ namespace Umbraco.Web.PropertyEditors
 
                 if (string.IsNullOrEmpty(asString)) yield break;
 
-                foreach (var udiStr in asString.Split(','))
+                foreach (var udiStr in asString.Split(Constants.CharArrays.Comma))
                 {
                     if (Udi.TryParse(udiStr, out var udi))
                         yield return new UmbracoEntityReference(udi);

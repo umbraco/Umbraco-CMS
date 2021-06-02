@@ -5,6 +5,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Web.Security;
 using Microsoft.AspNet.Identity;
+using Umbraco.Core.Cache;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
@@ -38,20 +40,26 @@ namespace Umbraco.Core.Security
         private readonly IExternalLoginService _externalLoginService;
         private readonly IGlobalSettings _globalSettings;
         private readonly UmbracoMapper _mapper;
+        private readonly AppCaches _appCaches;
         private bool _disposed = false;
 
+        [Obsolete("Use the constructor specifying all dependencies")]
         public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, MembershipProviderBase usersMembershipProvider, UmbracoMapper mapper)
+            : this(userService, memberTypeService, entityService, externalLoginService, globalSettings, usersMembershipProvider, mapper, Current.AppCaches) { }
+
+        public BackOfficeUserStore(IUserService userService, IMemberTypeService memberTypeService, IEntityService entityService, IExternalLoginService externalLoginService, IGlobalSettings globalSettings, MembershipProviderBase usersMembershipProvider, UmbracoMapper mapper, AppCaches appCaches)
         {
+            if (userService == null) throw new ArgumentNullException("userService");
+            if (usersMembershipProvider == null) throw new ArgumentNullException("usersMembershipProvider");
+            if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
+
             _userService = userService;
             _memberTypeService = memberTypeService;
             _entityService = entityService;
             _externalLoginService = externalLoginService;
-            _globalSettings = globalSettings;
-            if (userService == null) throw new ArgumentNullException("userService");
-            if (usersMembershipProvider == null) throw new ArgumentNullException("usersMembershipProvider");
-            if (externalLoginService == null) throw new ArgumentNullException("externalLoginService");
+            _globalSettings = globalSettings;            
             _mapper = mapper;
-
+            _appCaches = appCaches;
             _userService = userService;
             _externalLoginService = externalLoginService;
 
@@ -775,8 +783,8 @@ namespace Umbraco.Core.Security
             }
 
             //we should re-set the calculated start nodes
-            identityUser.CalculatedMediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService);
-            identityUser.CalculatedContentStartNodeIds = user.CalculateContentStartNodeIds(_entityService);
+            identityUser.CalculatedMediaStartNodeIds = user.CalculateMediaStartNodeIds(_entityService, _appCaches);
+            identityUser.CalculatedContentStartNodeIds = user.CalculateContentStartNodeIds(_entityService, _appCaches);
 
             //reset all changes
             identityUser.ResetDirtyProperties(false);

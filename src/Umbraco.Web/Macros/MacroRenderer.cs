@@ -89,7 +89,7 @@ namespace Umbraco.Web.Macros
 
             if (macroContent == null) return null;
 
-            _plogger.Debug<MacroRenderer>("Macro content loaded from cache '{MacroCacheId}'", model.CacheIdentifier);
+            _plogger.Debug<MacroRenderer, string>("Macro content loaded from cache '{MacroCacheId}'", model.CacheIdentifier);
 
             // ensure that the source has not changed
             // note: does not handle dependencies, and never has
@@ -149,7 +149,7 @@ namespace Umbraco.Web.Macros
                 priority: CacheItemPriority.NotRemovable
                 );
 
-            _plogger.Debug<MacroRenderer>("Macro content saved to cache '{MacroCacheId}'", model.CacheIdentifier);
+            _plogger.Debug<MacroRenderer, string>("Macro content saved to cache '{MacroCacheId}'", model.CacheIdentifier);
         }
 
         // gets the macro source file name
@@ -284,7 +284,7 @@ namespace Umbraco.Web.Macros
             }
             catch (Exception e)
             {
-                _plogger.Warn<MacroRenderer>(e, "Failed {MsgIn}", msgIn);
+                _plogger.Warn<MacroRenderer, string>(e, "Failed {MsgIn}", msgIn);
 
                 var macroErrorEventArgs = new MacroErrorEventArgs
                 {
@@ -381,7 +381,7 @@ namespace Umbraco.Web.Macros
             if (attributeValue.StartsWith("[") == false)
                 return attributeValue;
 
-            var tokens = attributeValue.Split(',').Select(x => x.Trim()).ToArray();
+            var tokens = attributeValue.Split(Constants.CharArrays.Comma).Select(x => x.Trim()).ToArray();
 
             // ensure we only process valid input ie each token must be [?x] and not eg a json array
             // like [1,2,3] which we don't want to parse - however the last one can be a literal, so

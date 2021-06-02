@@ -24,7 +24,7 @@ using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using File = System.IO.File;
 using Notification = Umbraco.Web.Models.ContentEditing.Notification;
-
+using CharArrays = Umbraco.Core.Constants.CharArrays;
 namespace Umbraco.Web.Editors
 {
     /// <summary>
@@ -151,7 +151,7 @@ namespace Umbraco.Web.Editors
             //get the files
             foreach (var file in result.FileData)
             {
-                var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
+                var fileName = file.Headers.ContentDisposition.FileName.Trim(CharArrays.DoubleQuote);
                 var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
                 if (ext.InvariantEquals("zip") || ext.InvariantEquals("umb"))

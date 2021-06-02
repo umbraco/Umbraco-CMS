@@ -40,7 +40,7 @@ namespace Umbraco.Web.PublishedCache
             var pos = route.IndexOf('/');
             var path = pos == 0 ? route : route.Substring(pos);
             var startNodeId = pos == 0 ? 0 : int.Parse(route.Substring(0, pos));
-            var parts = path.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            var parts = path.Split(Constants.CharArrays.ForwardSlash, StringSplitOptions.RemoveEmptyEntries);
 
             IPublishedContent content;
 
@@ -197,7 +197,7 @@ namespace Umbraco.Web.PublishedCache
 
             const string propertyAlias = Constants.Conventions.Content.UrlAlias;
 
-            var test1 = alias.TrimStart('/') + ",";
+            var test1 = alias.TrimStart(Constants.CharArrays.ForwardSlash) + ",";
             var test2 = ",/" + test1; // test2 is ",/alias,"
             test1 = "," + test1; // test1 is ",alias,"
 

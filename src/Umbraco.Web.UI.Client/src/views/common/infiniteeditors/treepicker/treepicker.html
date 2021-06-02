@@ -28,9 +28,8 @@
                                     </div>
                                 </div>
 
-                                <div class="umb-control-group">
+                                <div class="umb-control-group" ng-if="vm.enableSearh">
                                     <umb-tree-search-box
-                                        ng-if="vm.enableSearh"
                                         hide-search-callback="vm.hideSearch"
                                         search-callback="vm.onSearchResults"
                                         search-from-id="{{vm.searchInfo.searchFromId}}"
@@ -94,6 +93,15 @@
                         label-key="general_close"
                         shortcut="esc"
                         action="vm.close()">
+                    </umb-button>
+
+                    <umb-button
+                        ng-if="model.extraActions"
+                        ng-repeat="action in model.extraActions track by $index"
+                        type="button"
+                        button-style="{{action.style || 'link'}}"
+                        label-key="{{action.labelKey}}"
+                        action="action.action()">
                     </umb-button>
 
                     <umb-button

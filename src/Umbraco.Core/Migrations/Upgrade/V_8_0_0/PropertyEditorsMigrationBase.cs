@@ -30,7 +30,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         protected int[] ConvertStringValues(string val)
         {
-            var splitVals = val.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var splitVals = val.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
             var intVals = splitVals
                 .Select(x => int.TryParse(x, out var i) ? i : int.MinValue)

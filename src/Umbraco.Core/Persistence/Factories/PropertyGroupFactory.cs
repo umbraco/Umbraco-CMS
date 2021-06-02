@@ -132,7 +132,8 @@ namespace Umbraco.Core.Persistence.Factories
                 ValidationRegExp = propertyType.ValidationRegExp,
                 ValidationRegExpMessage = propertyType.ValidationRegExpMessage,
                 UniqueId = propertyType.Key,
-                Variations = (byte)propertyType.Variations
+                Variations = (byte)propertyType.Variations,
+                LabelOnTop = propertyType.LabelOnTop
             };
 
             if (tabId != default)

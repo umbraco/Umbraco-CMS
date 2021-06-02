@@ -129,10 +129,12 @@ namespace Umbraco.Web.Trees
 
                 if (_isUmbracoProvider)
                 {
-                    nodes.AddRange(Services.MemberTypeService.GetAll()
-                        .Select(memberType =>
-                            CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, memberType.Icon.IfNullOrWhiteSpace(Constants.Icons.Member), true,
-                                queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
+                    nodes.AddRange(
+                        Services.MemberTypeService.GetAll()
+                            .OrderBy(x => x.Name)
+                            .Select(memberType =>
+                                CreateTreeNode(memberType.Alias, id, queryStrings, memberType.Name, memberType.Icon.IfNullOrWhiteSpace(Constants.Icons.Member), true,
+                                    queryStrings.GetRequiredValue<string>("application") + TreeAlias.EnsureStartsWith('/') + "/list/" + memberType.Alias)));
                 }
             }
 

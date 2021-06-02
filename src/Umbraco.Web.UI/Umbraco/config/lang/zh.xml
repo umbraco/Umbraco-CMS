@@ -169,7 +169,7 @@
     <key alias="childItems" version="7.0">子项</key>
     <key alias="target" version="7.0">目标</key>
     <key alias="scheduledPublishServerTime">这将转换到服务器上的以下时间:</key>
-    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank">这是什么意思？</a>]]></key>
+    <key alias="scheduledPublishDocumentation"><![CDATA[<a href="https://our.umbraco.com/documentation/Getting-Started/Data/Scheduled-Publishing/#timezones" target="_blank" rel="noopener">这是什么意思？</a>]]></key>
   </area>
   <area alias="media">
     <key alias="clickToUpload">点击上传</key>
@@ -257,7 +257,7 @@
     <key alias="recycleBinDeleting">正在清空回收站，请不要关闭窗口。</key>
     <key alias="recycleBinIsEmpty">回收站已清空</key>
     <key alias="recycleBinWarning">从回收站删除的项目将不可恢复</key>
-    <key alias="regexSearchError"><![CDATA[<a target='_blank' href='http://regexlib.com'>regexlib.com</a>的服务暂时出现问题。]]></key>
+    <key alias="regexSearchError"><![CDATA[<a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a>的服务暂时出现问题。]]></key>
     <key alias="regexSearchHelp">查找正则表达式来验证输入，如: 'email、'zip-code'、'URL'。</key>
     <key alias="removeMacro">移除宏</key>
     <key alias="requiredField">必填项</key>
@@ -514,7 +514,7 @@
     <key alias="databaseNotFound"><![CDATA[<p>数据库未找到！请检查数据库连接串设置。</p>
               <p>您可以自行编辑“web.config”文件，键名为 “UmbracoDbDSN”</p>
               <p>
-             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="https://our.umbraco.com/documentation/Using-Umbraco/Config-files/webconfig7" target="_blank">。
+             当自行编辑后，单击<strong>重试</strong>按钮<br /><a href="https://our.umbraco.com/documentation/Reference/Config/webconfig/" target="_blank" rel="noopener">。
                                     如何编辑web.config</a></p>
     ]]></key>
     <key alias="databaseText"><![CDATA[完成本步，需要配置一个正确的连接字符串（“connection string”）。<br />
@@ -562,7 +562,7 @@
     <key alias="runwayFromScratch">我要从头开始</key>
     <key alias="runwayFromScratchText"><![CDATA[
        此时您的网站是全空的,您应该首先建立您的文档类型和模板
-        (<a href="http://Umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">如何操作？</a>)
+        (<a href="https://umbraco.tv/documentation/videos/for-site-builders/foundation/document-types">如何操作？</a>)
        您也可以安装晚一些安装“Runway”。
     ]]></key>
     <key alias="runwayHeader">您刚刚安装了一个干净的系统，要继续吗？</key>
@@ -630,7 +630,7 @@
     <key alias="instruction">在下方登录</key>
     <key alias="signInWith">登录</key>
     <key alias="timeout">会话超时</key>
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="http://umbraco.com" style="text-decoration: none" target="_blank">Umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">Umbraco.com</a></p> ]]></key>
     <key alias="forgottenPassword">忘记密码?</key>
     <key alias="forgottenPasswordInstruction">电子邮件将发送到地址指定的链接, 以重置您的密码</key>
     <key alias="requestPasswordResetConfirmation">如果电子邮件与我们的记录相符, 则将发送带有密码重置指令的邮件</key>
@@ -847,7 +847,6 @@
     <key alias="tabs">选项卡</key>
     <key alias="contentTypeEnabled">主控文档类型激活</key>
     <key alias="contentTypeUses">该文档类型使用</key>
-    <key alias="asAContentMasterType">作为主控文档类型. 主控文档类型的标签只能在主控文档类型里修改。</key>
     <key alias="noPropertiesDefinedOnTab">没有字段设置在该标签页</key>
     <key alias="addIcon">添加图标</key>
   </area>

@@ -107,7 +107,7 @@ namespace Umbraco.Web.Search
 
             var registeredIndexers = _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 
-            _logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
+            _logger.Info<ExamineComponent,int>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)
@@ -267,6 +267,24 @@ namespace Umbraco.Web.Search
                     if (args.MessageObject is IMember c4)
                     {
                         DeleteIndexForEntity(c4.Id, false);
+                    }
+                    break;
+                case MessageType.RefreshByPayload:
+                    var payload = (MemberCacheRefresher.JsonPayload[])args.MessageObject;
+                    foreach(var p in payload)
+                    {
+                        if (p.Removed)
+                        {
+                            DeleteIndexForEntity(p.Id, false);
+                        }
+                        else
+                        {
+                            var m = _services.MemberService.GetById(p.Id);
+                            if (m != null)
+                            {
+                                ReIndexForMember(m);
+                            }
+                        }
                     }
                     break;
                 case MessageType.RefreshAll:
@@ -621,22 +639,27 @@ namespace Umbraco.Web.Search
                 // perform the ValueSet lookup on a background thread
                 examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
                 {
-                    // for content we have a different builder for published vs unpublished
-                    // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
-                    var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
+                    // Background thread, wrap the whole thing in an explicit scope since we know
+                    // DB services are used within this logic.
+                    using (examineComponent._scopeProvider.CreateScope(autoComplete: true))
                     {
-                        [true] = new Lazy<List<ValueSet>>(() => examineComponent._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
-                        [false] = new Lazy<List<ValueSet>>(() => examineComponent._contentValueSetBuilder.GetValueSets(content).ToList())
-                    };
+                        // for content we have a different builder for published vs unpublished
+                        // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
+                        var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
+                        {
+                            [true] = new Lazy<List<ValueSet>>(() => examineComponent._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
+                            [false] = new Lazy<List<ValueSet>>(() => examineComponent._contentValueSetBuilder.GetValueSets(content).ToList())
+                        };
 
-                    foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                        //filter the indexers
-                        .Where(x => isPublished || !x.PublishedValuesOnly)
-                        .Where(x => x.EnableDefaultEventHandler))
-                    {
-                        var valueSet = builders[index.PublishedValuesOnly].Value;
-                        index.IndexItems(valueSet);
-                    }
+                        foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                            //filter the indexers
+                            .Where(x => isPublished || !x.PublishedValuesOnly)
+                            .Where(x => x.EnableDefaultEventHandler))
+                        {
+                            var valueSet = builders[index.PublishedValuesOnly].Value;
+                            index.IndexItems(valueSet);
+                        }
+                    }   
                 }));
             }
         }
@@ -667,14 +690,19 @@ namespace Umbraco.Web.Search
                 // perform the ValueSet lookup on a background thread
                 examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
                 {
-                    var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
-
-                    foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                        //filter the indexers
-                        .Where(x => isPublished || !x.PublishedValuesOnly)
-                        .Where(x => x.EnableDefaultEventHandler))
+                    // Background thread, wrap the whole thing in an explicit scope since we know
+                    // DB services are used within this logic.
+                    using (examineComponent._scopeProvider.CreateScope(autoComplete: true))
                     {
-                        index.IndexItems(valueSet);
+                        var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
+
+                        foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                            //filter the indexers
+                            .Where(x => isPublished || !x.PublishedValuesOnly)
+                            .Where(x => x.EnableDefaultEventHandler))
+                        {
+                            index.IndexItems(valueSet);
+                        }
                     }
                 })); 
             }
@@ -704,12 +732,17 @@ namespace Umbraco.Web.Search
                 // perform the ValueSet lookup on a background thread
                 examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
                 {
-                    var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
-                    foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                        //filter the indexers
-                        .Where(x => x.EnableDefaultEventHandler))
+                    // Background thread, wrap the whole thing in an explicit scope since we know
+                    // DB services are used within this logic.
+                    using (examineComponent._scopeProvider.CreateScope(autoComplete: true))
                     {
-                        index.IndexItems(valueSet);
+                        var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
+                        foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                            //filter the indexers
+                            .Where(x => x.EnableDefaultEventHandler))
+                        {
+                            index.IndexItems(valueSet);
+                        }
                     }
                 }));
             }
@@ -746,6 +779,6 @@ namespace Umbraco.Web.Search
         }
         #endregion
 
-        
+
     }
 }

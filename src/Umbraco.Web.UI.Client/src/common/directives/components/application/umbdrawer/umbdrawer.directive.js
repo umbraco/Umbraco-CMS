@@ -57,7 +57,7 @@ The drawer component is a global component and is already added to the umbraco m
 <ul>
     <li>{@link umbraco.directives.directive:umbDrawerView umbDrawerView}</li>
     <li>{@link umbraco.directives.directive:umbDrawerHeader umbDrawerHeader}</li>
-    <li>{@link umbraco.directives.directive:umbDrawerView umbDrawerContent}</li>
+    <li>{@link umbraco.directives.directive:umbDrawerContent umbDrawerContent}</li>
     <li>{@link umbraco.directives.directive:umbDrawerFooter umbDrawerFooter}</li>
 </ul>
 

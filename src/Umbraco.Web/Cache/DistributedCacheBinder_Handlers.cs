@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Umbraco.Core;
 using Umbraco.Core.Events;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
@@ -121,6 +122,8 @@ namespace Umbraco.Web.Cache
             // bind to media events - handles all media changes
             Bind(() => MediaService.TreeChanged += MediaService_TreeChanged,
                 () => MediaService.TreeChanged -= MediaService_TreeChanged);
+            Bind(() => MediaService.EmptiedRecycleBin += MediaService_EmptiedRecycleBin,
+                () => MediaService.EmptiedRecycleBin -= MediaService_EmptiedRecycleBin);
 
             // bind to content events
             Bind(() => ContentService.Saved += ContentService_Saved, // needed for permissions
@@ -129,6 +132,8 @@ namespace Umbraco.Web.Cache
                 () => ContentService.Copied -= ContentService_Copied);
             Bind(() => ContentService.TreeChanged += ContentService_TreeChanged,// handles all content changes
                 () => ContentService.TreeChanged -= ContentService_TreeChanged);
+            Bind(() => ContentService.EmptiedRecycleBin += ContentService_EmptiedRecycleBin,
+                () => ContentService.EmptiedRecycleBin -= ContentService_EmptiedRecycleBin);
 
             // TreeChanged should also deal with this
             //Bind(() => ContentService.SavedBlueprint += ContentService_SavedBlueprint,
@@ -200,7 +205,12 @@ namespace Umbraco.Web.Cache
         private void ContentService_Deleted(IContentService sender, DeleteEventArgs<IContent> e) { }
         private void ContentService_Moved(IContentService sender, MoveEventArgs<IContent> e) { }
         private void ContentService_Trashed(IContentService sender, MoveEventArgs<IContent> e) { }
-        private void ContentService_EmptiedRecycleBin(IContentService sender, RecycleBinEventArgs e) { }
+
+        private void ContentService_EmptiedRecycleBin(IContentService sender, RecycleBinEventArgs e)
+        {
+            var payloads = new[] { new ContentCacheRefresher.JsonPayload(Constants.System.RecycleBinContent, null, TreeChangeTypes.RefreshNode) };
+            _distributedCache.RefreshByPayload(ContentCacheRefresher.UniqueId, payloads);
+        }
         private void ContentService_Published(IContentService sender, PublishEventArgs<IContent> e) { }
         private void ContentService_Unpublished(IContentService sender, PublishEventArgs<IContent> e) { }
 
@@ -413,7 +423,12 @@ namespace Umbraco.Web.Cache
         private void MediaService_Deleted(IMediaService sender, DeleteEventArgs<IMedia> e) { }
         private void MediaService_Moved(IMediaService sender, MoveEventArgs<IMedia> e) { }
         private void MediaService_Trashed(IMediaService sender, MoveEventArgs<IMedia> e) { }
-        private void MediaService_EmptiedRecycleBin(IMediaService sender, RecycleBinEventArgs e) { }
+
+        private void MediaService_EmptiedRecycleBin(IMediaService sender, RecycleBinEventArgs e)
+        {
+            var payloads = new[] { new MediaCacheRefresher.JsonPayload(Constants.System.RecycleBinMedia, null, TreeChangeTypes.RefreshNode) };
+            _distributedCache.RefreshByPayload(MediaCacheRefresher.UniqueId, payloads);
+        }
 
         #endregion
 

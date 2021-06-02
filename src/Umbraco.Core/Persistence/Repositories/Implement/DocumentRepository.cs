@@ -610,17 +610,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                     Database.Insert(documentVersionDto);
                 }
 
-                // replace the property data (rather than updating)
+            // replace the property data (rather than updating)
                 // only need to delete for the version that existed, the new version (if any) has no property data yet
-                var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
-                var deletePropertyDataSql = Sql().Delete<PropertyDataDto>().Where<PropertyDataDto>(x => x.VersionId == versionToDelete);
-                Database.Execute(deletePropertyDataSql);
-
-                // insert property data
-                var propertyDataDtos = PropertyFactory.BuildDtos(entity.ContentType.Variations, entity.VersionId, publishing ? entity.PublishedVersionId : 0,
-                    entity.Properties, LanguageRepository, out var edited, out var editedCultures);
-                foreach (var propertyDataDto in propertyDataDtos)
-                    Database.Insert(propertyDataDto);
+            var versionToDelete = publishing ? entity.PublishedVersionId : entity.VersionId;
+            // insert property data
+            ReplacePropertyValues(entity, versionToDelete, publishing ? entity.PublishedVersionId : 0, out var edited, out var editedCultures);
 
                 // if !publishing, we may have a new name != current publish name,
                 // also impacts 'edited'
@@ -900,7 +894,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (content.ParentId == -1)
                 return content.Published;
 
-            var ids = content.Path.Split(',').Skip(1).Select(int.Parse);
+            var ids = content.Path.Split(Constants.CharArrays.Comma).Skip(1).Select(int.Parse);
 
             var sql = SqlContext.Sql()
                 .SelectCount<NodeDto>(x => x.NodeId)
@@ -917,6 +911,15 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         #region Recycle Bin
 
         public override int RecycleBinId => Constants.System.RecycleBinContent;
+
+        public bool RecycleBinSmells()
+        {
+            var cache = _appCaches.RuntimeCache;
+            var cacheKey = CacheKeys.ContentRecycleBinCacheKey;
+
+            // always cache either true or false
+            return cache.GetCacheItem<bool>(cacheKey, () => CountChildren(RecycleBinId) > 0);
+        }
 
         #endregion
 
@@ -1160,7 +1163,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
                 if (withCache)
                 {
                     // if the cache contains the (proper version of the) item, use it
-                    var cached = IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent>(dto.NodeId));
+                    var cached = IsolatedCache.GetCacheItem<IContent>(RepositoryCacheKeys.GetKey<IContent, int>(dto.NodeId));
                     if (cached != null && cached.VersionId == dto.DocumentVersionDto.ContentVersionDto.Id)
                     {
                         content[i] = (Content)cached;

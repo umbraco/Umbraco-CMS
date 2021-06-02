@@ -29,7 +29,7 @@ namespace Umbraco.Web.PropertyEditors
                     yield break;
             }
 
-            var fileNames = selectedFiles?.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+            var fileNames = selectedFiles?.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries);
 
             if (fileNames == null || !fileNames.Any())
                 yield break;

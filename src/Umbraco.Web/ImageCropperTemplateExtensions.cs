@@ -1,7 +1,5 @@
 ﻿using System;
-using Newtonsoft.Json.Linq;
 using System.Globalization;
-using System.Text;
 using Newtonsoft.Json;
 using Umbraco.Core;
 using Umbraco.Core.Composing;
@@ -9,6 +7,7 @@ using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors.ValueConverters;
 using Umbraco.Web.Models;
+using Umbraco.Core.Logging;
 
 namespace Umbraco.Web
 {
@@ -30,6 +29,8 @@ namespace Umbraco.Web
         /// The ImageProcessor.Web URL.
         /// </returns>
         public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, cropAlias, Current.ImageUrlGenerator);
+
+        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, ImageCropperValue imageCropperValue) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, cropAlias, Current.ImageUrlGenerator, imageCropperValue);
 
         /// <summary>
         /// Gets the ImageProcessor URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
@@ -116,6 +117,13 @@ namespace Umbraco.Web
              string furtherOptions = null,
              ImageCropRatioMode? ratioMode = null,
              bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(mediaItem, Current.ImageUrlGenerator, width, height, propertyAlias, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBuster, furtherOptions, ratioMode, upScale);
+
+        public static string GetLocalCropUrl(this MediaWithCrops mediaWithCrops,
+            string alias,
+            string cacheBusterValue = null)
+            => ImageCropperTemplateCoreExtensions.GetLocalCropUrl(mediaWithCrops, alias, Current.ImageUrlGenerator,  cacheBusterValue);
+
+
 
         /// <summary>
         /// Gets the ImageProcessor URL from the image path.
@@ -253,26 +261,28 @@ namespace Umbraco.Web
             ImageCropRatioMode? ratioMode = null,
             bool upScale = true) => ImageCropperTemplateCoreExtensions.GetCropUrl(imageUrl, Current.ImageUrlGenerator, cropDataSet, width, height, cropAlias, quality, imageCropMode, imageCropAnchor, preferFocalPoint, useCropDimensions, cacheBusterValue, furtherOptions, ratioMode, upScale);
 
+        private static readonly JsonSerializerSettings ImageCropperValueJsonSerializerSettings = new JsonSerializerSettings
+        {
+            Culture = CultureInfo.InvariantCulture,
+            FloatParseHandling = FloatParseHandling.Decimal
+        };
 
         internal static ImageCropperValue DeserializeImageCropperValue(this string json)
         {
-            var imageCrops = new ImageCropperValue();
+            ImageCropperValue imageCrops = null;
             if (json.DetectIsJson())
             {
                 try
                 {
-                    imageCrops = JsonConvert.DeserializeObject<ImageCropperValue>(json, new JsonSerializerSettings
-                    {
-                        Culture = CultureInfo.InvariantCulture,
-                        FloatParseHandling = FloatParseHandling.Decimal
-                    });
+                    imageCrops = JsonConvert.DeserializeObject<ImageCropperValue>(json, ImageCropperValueJsonSerializerSettings);
                 }
                 catch (Exception ex)
                 {
-                    Current.Logger.Error(typeof(ImageCropperTemplateExtensions), ex, "Could not parse the json string: {Json}", json);
+                    Current.Logger.Error<string>(typeof(ImageCropperTemplateExtensions), ex, "Could not parse the json string: {Json}", json);
                 }
             }
 
+            imageCrops = imageCrops ?? new ImageCropperValue();
             return imageCrops;
         }
     }

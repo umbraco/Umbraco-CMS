@@ -54,7 +54,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
             if (propertyType.EditorAlias.Equals(Constants.PropertyEditors.Aliases.MultiNodeTreePicker))
             {
                 var nodeIds = source.ToString()
-                    .Split(new[] { "," }, StringSplitOptions.RemoveEmptyEntries)
+                    .Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                     .Select(Udi.Parse)
                     .ToArray();
                 return nodeIds;

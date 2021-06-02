@@ -24,9 +24,11 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
     vm.page.menu.currentNode = null;
     vm.description = "";
     vm.showBackButton = true;
+    vm.maxlength = 1000;
     
     vm.save = saveDictionary;
     vm.back = back;
+    vm.change = change;
   
     function loadDictionary() {
 
@@ -56,6 +58,7 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
         // create data for  umb-property displaying
         for (var i = 0; i < data.translations.length; i++) {
             data.translations[i].property = createTranslationProperty(data.translations[i]);
+            change(data.translations[i]);
         }
 
         contentEditingHelper.handleSuccessfulSave({
@@ -109,6 +112,13 @@ function DictionaryEditController($scope, $routeParams, $location, dictionaryRes
     
     function back() {
         $location.path(vm.page.menu.currentSection + "/dictionary/list");
+    }
+
+    function change(translation) {
+        if (translation.translation) {
+            var charsCount = translation.translation.length;
+            translation.nearMaxLimit = charsCount > Math.max(vm.maxlength * .8, vm.maxlength - 50);
+        }
     }
 
     $scope.$watch("vm.content.name", function (newVal, oldVal) {

@@ -15,8 +15,28 @@ namespace Umbraco.Web.Scheduling
     public abstract class RecurringTaskBase : LatchedBackgroundTaskBase
     {
         private readonly IBackgroundTaskRunner<RecurringTaskBase> _runner;
-        private readonly int _periodMilliseconds;
+        private readonly long _periodMilliseconds;
         private readonly Timer _timer;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RecurringTaskBase"/> class.
+        /// </summary>
+        /// <param name="runner">The task runner.</param>
+        /// <param name="delayMilliseconds">The delay.</param>
+        /// <param name="periodMilliseconds">The period.</param>
+        /// <remarks>The task will repeat itself periodically. Use this constructor to create a new task.</remarks>
+        protected RecurringTaskBase(IBackgroundTaskRunner<RecurringTaskBase> runner, long delayMilliseconds, long periodMilliseconds)
+        {
+            _runner = runner;
+            _periodMilliseconds = periodMilliseconds;
+
+            // note
+            // must use the single-parameter constructor on Timer to avoid it from being GC'd
+            // read http://stackoverflow.com/questions/4962172/why-does-a-system-timers-timer-survive-gc-but-not-system-threading-timer
+
+            _timer = new Timer(_ => Release());
+            _timer.Change(delayMilliseconds, 0);
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RecurringTaskBase"/> class.
