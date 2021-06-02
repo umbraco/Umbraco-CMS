@@ -36,7 +36,8 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
-                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetByIds", "ids", typeof(int[]), typeof(Guid[]), typeof(Udi[]))
                 ));
             }
         }
@@ -93,12 +94,34 @@ namespace Umbraco.Web.Editors
             return Mapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
         }
 
-        public IEnumerable<MemberGroupDisplay> GetByIds([FromUri]int[] ids)
+        public IEnumerable<MemberGroupDisplay> GetByIds([FromJsonPath] int[] ids)
         {
             if (_provider.IsUmbracoMembershipProvider())
             {
-                return Services.MemberGroupService.GetByIds(ids)
-                    .Select(Mapper.Map<IMemberGroup, MemberGroupDisplay>);
+                var memberGroups = Services.MemberGroupService.GetByIds(ids);
+                return memberGroups.Select(Mapper.Map<IMemberGroup, MemberGroupDisplay>);
+            }
+
+            return Enumerable.Empty<MemberGroupDisplay>();
+        }
+
+        public IEnumerable<MemberGroupDisplay> GetByIds([FromJsonPath] Guid[] ids)
+        {
+            if (_provider.IsUmbracoMembershipProvider())
+            {
+                var memberGroups = Services.MemberGroupService.GetByIds(ids);
+                return memberGroups.Select(Mapper.Map<IMemberGroup, MemberGroupDisplay>);
+            }
+
+            return Enumerable.Empty<MemberGroupDisplay>();
+        }
+
+        public IEnumerable<MemberGroupDisplay> GetByIds([FromJsonPath] Udi[] ids)
+        {
+            if (_provider.IsUmbracoMembershipProvider())
+            {
+                var memberGroups = Services.MemberGroupService.GetByIds(ids);
+                return memberGroups.Select(Mapper.Map<IMemberGroup, MemberGroupDisplay>);
             }
 
             return Enumerable.Empty<MemberGroupDisplay>();

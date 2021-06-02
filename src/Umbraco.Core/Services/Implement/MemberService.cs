@@ -942,7 +942,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberGroupRepository.GetMany().Select(x => x.Name).Distinct();
+                return _memberGroupRepository.GetMany(new int[0]).Select(x => x.Name).Distinct();
             }
         }
 
@@ -971,7 +971,7 @@ namespace Umbraco.Core.Services.Implement
             using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 scope.ReadLock(Constants.Locks.MemberTree);
-                return _memberGroupRepository.GetMany().Select(x => x.Id).Distinct();
+                return _memberGroupRepository.GetMany(new int[0]).Select(x => x.Id).Distinct();
             }
         }
 
