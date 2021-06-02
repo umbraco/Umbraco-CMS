@@ -288,10 +288,14 @@
     <Compile Include="PublishedCache\RoutingOutcome.cs" />
     <Compile Include="RoutableDocumentFilter.cs" />
     <Compile Include="Routing\DefaultMediaUrlProvider.cs" />
+    <Compile Include="Routing\IContextUrlProvider.cs" />
+    <Compile Include="Routing\IContextUrlProviderFactory.cs" />
     <Compile Include="Routing\IMediaUrlProvider.cs" />
     <Compile Include="Routing\IPublishedRouter.cs" />
     <Compile Include="Routing\MediaUrlProviderCollection.cs" />
     <Compile Include="Routing\MediaUrlProviderCollectionBuilder.cs" />
+    <Compile Include="Routing\ContextUrlProviderFactory.cs" />
+    <Compile Include="Routing\UrlProviderComposer.cs" />
     <Compile Include="Scheduling\SimpleTask.cs" />
     <Compile Include="Scheduling\TempFileCleanup.cs" />
     <Compile Include="Search\BackgroundIndexRebuilder.cs" />

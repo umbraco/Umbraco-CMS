@@ -5,13 +5,12 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Web.Composing;
-
 namespace Umbraco.Web.Routing
 {
     /// <summary>
     /// Provides URLs.
     /// </summary>
-    public class UrlProvider
+    public class UrlProvider : IContextUrlProvider
     {
         #region Ctor and configuration
 
@@ -85,7 +84,7 @@ namespace Umbraco.Web.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute URL.</param>
         /// <returns>The URL for the published content.</returns>
-        public string GetUrl(Guid id, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
+        public virtual string GetUrl(Guid id, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), mode, culture, current);
 
         /// <summary>
@@ -96,7 +95,7 @@ namespace Umbraco.Web.Routing
         /// <param name="culture">A culture.</param>
         /// <param name="current">The current absolute URL.</param>
         /// <returns>The URL for the published content.</returns>
-        public string GetUrl(int id, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
+        public virtual string GetUrl(int id, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
             => GetUrl(GetDocument(id), mode, culture, current);
 
         /// <summary>
@@ -113,7 +112,7 @@ namespace Umbraco.Web.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a URL, it returns "#".</para>
         /// </remarks>
-        public string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
+        public virtual string GetUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string culture = null, Uri current = null)
         {
             if (content == null || content.ContentType.ItemType == PublishedItemType.Element)
                 return "#";
@@ -161,7 +160,7 @@ namespace Umbraco.Web.Routing
         /// URLs for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// <para>The results depend on the current URL.</para>
         /// </remarks>
-        public IEnumerable<UrlInfo> GetOtherUrls(int id)
+        public virtual IEnumerable<UrlInfo> GetOtherUrls(int id)
         {
             return GetOtherUrls(id, _umbracoContext.CleanedUmbracoUrl);
         }
@@ -176,7 +175,7 @@ namespace Umbraco.Web.Routing
         /// <para>Other URLs are those that <c>GetUrl</c> would not return in the current context, but would be valid
         /// URLs for the node in other contexts (different domain for current request, umbracoUrlAlias...).</para>
         /// </remarks>
-        public IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
+        public virtual IEnumerable<UrlInfo> GetOtherUrls(int id, Uri current)
         {
             return _urlProviders.SelectMany(provider => provider.GetOtherUrls(_umbracoContext, id, current) ?? Enumerable.Empty<UrlInfo>());
         }
@@ -194,7 +193,7 @@ namespace Umbraco.Web.Routing
         /// <param name="propertyAlias"></param>
         /// <param name="current"></param>
         /// <returns></returns>
-        public string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null)
+        public virtual string GetMediaUrl(Guid id, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null)
             => GetMediaUrl(GetMedia(id), mode, culture, propertyAlias, current);
 
         /// <summary>
@@ -212,7 +211,7 @@ namespace Umbraco.Web.Routing
         /// when no culture is specified, the current culture.</para>
         /// <para>If the provider is unable to provide a URL, it returns <see cref="String.Empty"/>.</para>
         /// </remarks>
-        public string GetMediaUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null)
+        public virtual string GetMediaUrl(IPublishedContent content, UrlMode mode = UrlMode.Default, string culture = null, string propertyAlias = Constants.Conventions.Media.File, Uri current = null)
         {
             if (propertyAlias == null) throw new ArgumentNullException(nameof(propertyAlias));
 
