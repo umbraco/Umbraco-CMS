@@ -36,7 +36,7 @@ namespace Umbraco.Web.Trees
                         id,
                         queryStrings,
                         macro.Name,
-                        "icon-settings-alt",
+                        Constants.Icons.Macro,
                         false));
                 }
             }

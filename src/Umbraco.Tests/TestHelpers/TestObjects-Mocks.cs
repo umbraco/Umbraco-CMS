@@ -13,6 +13,7 @@ using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.SqlSyntax;
 using Umbraco.Core.Services;
@@ -147,7 +148,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var umbracoSettingsMock = new Mock<IUmbracoSettingsSection>();
             var webRoutingSectionMock = new Mock<IWebRoutingSection>();
-            webRoutingSectionMock.Setup(x => x.UrlProviderMode).Returns(UrlProviderMode.Auto.ToString());
+            webRoutingSectionMock.Setup(x => x.UrlProviderMode).Returns(UrlMode.Auto.ToString());
             umbracoSettingsMock.Setup(x => x.WebRouting).Returns(webRoutingSectionMock.Object);
             return umbracoSettingsMock.Object;
         }
@@ -325,6 +326,11 @@ namespace Umbraco.Tests.TestHelpers
             }
 
             public Attempt<OperationResult<MoveOperationStatusType>> Move(IDataType toMove, int parentId)
+            {
+                throw new NotImplementedException();
+            }
+
+            public IReadOnlyDictionary<Udi, IEnumerable<string>> GetReferences(int id)
             {
                 throw new NotImplementedException();
             }

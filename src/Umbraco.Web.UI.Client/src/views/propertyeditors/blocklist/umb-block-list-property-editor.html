@@ -1,0 +1,80 @@
+<div class="umb-block-list">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <div class="umb-block-list__wrapper" ng-style="vm.listWrapperStyles">
+
+        <div ui-sortable="vm.sortableOptions" ng-model="vm.layout" ng-if="vm.loading !== true">
+
+            <div ng-repeat="layout in vm.layout track by layout.$block.key">
+
+                <button type="button"
+                        class="btn-reset umb-block-list__block--create-button"
+                        ng-click="vm.requestShowCreate($index, $event)"
+                        ng-controller="Umbraco.PropertyEditors.BlockListPropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
+                        ng-mousemove="inlineCreateButtonCtrl.onMouseMove($event)">
+                    <div class="__plus" ng-style="{'left':inlineCreateButtonCtrl.plusPosX}">
+                        <i class="icon icon-add" aria-hidden="true"></i>
+                    </div>
+                </button>
+
+                <umb-block-list-row block-editor-api="vm.blockEditorApi"
+                                    layout="layout"
+                                    index="$index">
+                </umb-block-list-row>
+
+            </div>
+        </div>
+
+        <div class="umb-block-list__actions" ng-if="vm.loading !== true">
+            <button
+                    id="{{vm.model.alias}}"
+                    type="button"
+                    class="btn-reset umb-block-list__create-button umb-outline"
+                    ng-disabled="vm.availableBlockTypes.length === 0"
+                    ng-click="vm.requestShowCreate(vm.layout.length, $event)">
+                <localize ng-if="vm.availableBlockTypes.length !== 1" key="blockEditor_addBlock">Add content</localize>
+                <localize ng-if="vm.availableBlockTypes.length === 1" key="blockEditor_addThis" tokens="[vm.availableBlockTypes[0].elementTypeModel.name]">Add content</localize>
+            </button>
+            <button
+                type="button"
+                class="btn-reset umb-block-list__clipboard-button umb-outline"
+                ng-class="{'--jump': vm.jumpClipboardButton}"
+                ng-disabled="vm.clipboardItems.length === 0"
+                ng-click="vm.requestShowClipboard(vm.layout.length, $event)"
+                localize="title"
+                title="@blockEditor_tabClipboard">
+                <i class="icon icon-paste-in" aria-hidden="true"></i>
+                <span class="sr-only">
+                    <localize key="blockEditor_tabClipboard">Clipboard</localize>
+                </span>
+            </button>
+        </div>
+
+        <input type="hidden" name="minCount" ng-model="vm.layout" val-server="minCount" />
+        <input type="hidden" name="maxCount" ng-model="vm.layout" val-server="maxCount" />
+
+        <div ng-messages="vm.propertyForm.minCount.$error">
+            <div class="help text-error" ng-message="minCount">
+                <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.layout.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
+            </div>
+            <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.minCount.errorMsg">></span>
+        </div>
+        <div ng-messages="vm.propertyForm.maxCount.$error">
+            <div class="help text-error" ng-message="maxCount">
+                <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.layout.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
+            </div>
+            <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.maxCount.errorMsg"></span>
+        </div>
+
+    </div>
+
+    <umb-overlay
+        ng-if="vm.blockTypePicker.show"
+        position="target"
+        size="vm.blockTypePicker.size"
+        view="vm.blockTypePicker.view"
+        model="vm.blockTypePicker">
+    </umb-overlay>
+
+</div>

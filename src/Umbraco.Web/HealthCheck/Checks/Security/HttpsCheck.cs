@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Security.Cryptography.X509Certificates;
-using System.Web;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
+using Umbraco.Core.Configuration.UmbracoSettings;
 using Umbraco.Core.IO;
 using Umbraco.Core.Services;
 using Umbraco.Web.HealthCheck.Checks.Config;
@@ -21,14 +21,16 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
         private readonly ILocalizedTextService _textService;
         private readonly IRuntimeState _runtime;
         private readonly IGlobalSettings _globalSettings;
+        private readonly IContentSection _contentSection;
 
         private const string FixHttpsSettingAction = "fixHttpsSetting";
 
-        public HttpsCheck(ILocalizedTextService textService, IRuntimeState runtime, IGlobalSettings globalSettings)
+        public HttpsCheck(ILocalizedTextService textService, IRuntimeState runtime, IGlobalSettings globalSettings, IContentSection contentSection)
         {
             _textService = textService;
             _runtime = runtime;
             _globalSettings = globalSettings;
+            _contentSection = contentSection;
         }
 
         /// <summary>
@@ -65,12 +67,25 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
             // Attempt to access the site over HTTPS to see if it HTTPS is supported
             // and a valid certificate has been configured
             var url = _runtime.ApplicationUrl.ToString().Replace("http:", "https:");
+
             var request = (HttpWebRequest) WebRequest.Create(url);
-            request.Method = "HEAD";
+            request.AllowAutoRedirect = false;
 
             try
             {
+
                 var response = (HttpWebResponse)request.GetResponse();
+
+                // Check for 301/302 as a external login provider such as UmbracoID might be in use
+                if (response.StatusCode == HttpStatusCode.Moved || response.StatusCode == HttpStatusCode.Redirect)
+                {
+                    // Reset request to use the static login background image
+                    var absoluteLoginBackgroundImage = $"{url}/{_contentSection.LoginBackgroundImage}";
+                    
+                    request = (HttpWebRequest)WebRequest.Create(absoluteLoginBackgroundImage);
+                    response = (HttpWebResponse)request.GetResponse();
+                }
+
                 if (response.StatusCode == HttpStatusCode.OK)
                 {
                     // Got a valid response, check now for if certificate expiring within 14 days

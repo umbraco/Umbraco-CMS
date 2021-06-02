@@ -5,6 +5,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Mapping;
+using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PackageActions;
 using Umbraco.Core.Packaging;
@@ -154,6 +155,9 @@ namespace Umbraco.Core.Composing
         public static DataEditorCollection DataEditors
             => Factory.GetInstance<DataEditorCollection>();
 
+        public static DataValueReferenceFactoryCollection DataValueReferenceFactories
+            => Factory.GetInstance<DataValueReferenceFactoryCollection>();
+
         public static PropertyEditorCollection PropertyEditors
             => Factory.GetInstance<PropertyEditorCollection>();
 
@@ -205,6 +209,8 @@ namespace Umbraco.Core.Composing
         public static IVariationContextAccessor VariationContextAccessor
             => Factory.GetInstance<IVariationContextAccessor>();
 
+        public static IImageUrlGenerator ImageUrlGenerator
+            => Factory.GetInstance<IImageUrlGenerator>();
         #endregion
     }
 }

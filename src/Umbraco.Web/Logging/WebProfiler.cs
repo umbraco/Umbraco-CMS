@@ -26,12 +26,16 @@ namespace Umbraco.Web.Logging
             _provider = new WebProfilerProvider();
 
             //see https://miniprofiler.com/dotnet/AspDotNet
-            MiniProfiler.Configure(new MiniProfilerOptions
+            var options = new MiniProfilerOptions
             {
                 SqlFormatter = new SqlServerFormatter(),
-                StackMaxLength = 5000, 
+                StackMaxLength = 5000,
                 ProfilerProvider = _provider
-            });
+            };
+            // this is a default path and by default it performs a 'contains' check which will match our content controller
+            // (and probably other requests) and ignore them.
+            options.IgnoredPaths.Remove("/content/"); 
+            MiniProfiler.Configure(options);
         }
 
         public void UmbracoApplicationBeginRequest(object sender, EventArgs e)
@@ -68,6 +72,7 @@ namespace Umbraco.Web.Logging
             if (request.Result.Url.IsClientSideRequest()) return false;
             if (bool.TryParse(request.Result.QueryString["umbDebug"], out var umbDebug)) return umbDebug;
             if (bool.TryParse(request.Result.Headers["X-UMB-DEBUG"], out var xUmbDebug)) return xUmbDebug;
+            if (bool.TryParse(request.Result.Cookies["UMB-DEBUG"]?.Value, out var cUmbDebug)) return cUmbDebug;
             return false;
         }
 

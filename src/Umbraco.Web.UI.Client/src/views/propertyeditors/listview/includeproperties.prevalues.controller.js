@@ -53,10 +53,9 @@ function includePropsPreValsController($rootScope, $scope, localizationService, 
         $scope.errorMsg = "";
     }
 
-    $scope.removeField = function(e) {
-        $scope.model.value = _.reject($scope.model.value, function (x) {
-            return x.alias === e.alias;
-        }); 
+    $scope.removeField = function (e) {
+        var index = $scope.model.value.indexOf(e);
+        $scope.model.value.splice(index, 1);
     }
 
     //now we'll localize these strings, for some reason the directive doesn't work inside of the select group with an ng-model declared

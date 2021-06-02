@@ -7,73 +7,24 @@ using Umbraco.Core.Logging;
 
 namespace Umbraco.Examine
 {
-    public class UmbracoExamineIndexDiagnostics : IIndexDiagnostics
+    public class UmbracoExamineIndexDiagnostics : LuceneIndexDiagnostics
     {
         private readonly UmbracoExamineIndex _index;
-        private readonly ILogger _logger;
 
         public UmbracoExamineIndexDiagnostics(UmbracoExamineIndex index, ILogger logger)
+            : base(index, logger)
         {
             _index = index;
-            _logger = logger;
         }
 
-        public int DocumentCount
+        public override IReadOnlyDictionary<string, object> Metadata
         {
             get
             {
-                try
-                {
-                    return _index.GetIndexDocumentCount();
-                }
-                catch (AlreadyClosedException)
-                {
-                    _logger.Warn(typeof(UmbracoContentIndex), "Cannot get GetIndexDocumentCount, the writer is already closed");
-                    return 0;
-                }
-            }
-        }
+                var d = base.Metadata.ToDictionary(x => x.Key, x => x.Value);
 
-        public int FieldCount
-        {
-            get
-            {
-                try
-                {
-                    return _index.GetIndexFieldCount();
-                }
-                catch (AlreadyClosedException)
-                {
-                    _logger.Warn(typeof(UmbracoContentIndex), "Cannot get GetIndexFieldCount, the writer is already closed");
-                    return 0;
-                }
-            }
-        }
-
-        public Attempt<string> IsHealthy()
-        {
-            var isHealthy = _index.IsHealthy(out var indexError);
-            return isHealthy ? Attempt<string>.Succeed() : Attempt.Fail(indexError.Message);
-        }
-
-        public virtual IReadOnlyDictionary<string, object> Metadata
-        {
-            get
-            {
-                var d = new Dictionary<string, object>
-                {
-                    [nameof(UmbracoExamineIndex.CommitCount)] = _index.CommitCount,
-                    [nameof(UmbracoExamineIndex.DefaultAnalyzer)] = _index.DefaultAnalyzer.GetType().Name,
-                    ["LuceneDirectory"] = _index.GetLuceneDirectory().GetType().Name,
-                    [nameof(UmbracoExamineIndex.EnableDefaultEventHandler)] = _index.EnableDefaultEventHandler,
-                    [nameof(UmbracoExamineIndex.LuceneIndexFolder)] =
-                        _index.LuceneIndexFolder == null
-                            ? string.Empty
-                            : _index.LuceneIndexFolder.ToString().ToLowerInvariant().TrimStart(IOHelper.MapPath(SystemDirectories.Root).ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/'),
-                    [nameof(UmbracoExamineIndex.PublishedValuesOnly)] = _index.PublishedValuesOnly,
-                    //There's too much info here
-                    //[nameof(UmbracoExamineIndexer.FieldDefinitionCollection)] = _index.FieldDefinitionCollection,
-                };
+                d[nameof(UmbracoExamineIndex.EnableDefaultEventHandler)] = _index.EnableDefaultEventHandler;
+                d[nameof(UmbracoExamineIndex.PublishedValuesOnly)] = _index.PublishedValuesOnly;
 
                 if (_index.ValueSetValidator is ValueSetValidator vsv)
                 {

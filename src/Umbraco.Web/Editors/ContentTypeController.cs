@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Xml;
 using System.Xml.Linq;
 using Umbraco.Core;
@@ -17,9 +18,11 @@ using Umbraco.Core.IO;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Editors;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Packaging;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.PropertyEditors;
+using Umbraco.Core.Scoping;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models;
 using Umbraco.Web.Models.ContentEditing;
@@ -42,10 +45,12 @@ namespace Umbraco.Web.Editors
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
     [EnableOverrideAuthorization]
+    [ContentTypeControllerConfiguration]
     public class ContentTypeController : ContentTypeControllerBase<IContentType>
     {
         private readonly IEntityXmlSerializer _serializer;
         private readonly PropertyEditorCollection _propertyEditors;
+        private readonly IScopeProvider _scopeProvider;
 
         public ContentTypeController(IEntityXmlSerializer serializer,
             ICultureDictionaryFactory cultureDictionaryFactory,
@@ -53,11 +58,24 @@ namespace Umbraco.Web.Editors
             IUmbracoContextAccessor umbracoContextAccessor,
             ISqlContext sqlContext, PropertyEditorCollection propertyEditors,
             ServiceContext services, AppCaches appCaches,
-            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper)
+            IProfilingLogger logger, IRuntimeState runtimeState, UmbracoHelper umbracoHelper,
+            IScopeProvider scopeProvider)
             : base(cultureDictionaryFactory, globalSettings, umbracoContextAccessor, sqlContext, services, appCaches, logger, runtimeState, umbracoHelper)
         {
             _serializer = serializer;
             _propertyEditors = propertyEditors;
+            _scopeProvider = scopeProvider;
+        }
+
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class ContentTypeControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))));            }
         }
 
         public int GetCount()
@@ -65,15 +83,65 @@ namespace Umbraco.Web.Editors
             return Services.ContentTypeService.Count();
         }
 
+        [HttpGet]
+        [UmbracoTreeAuthorize(Constants.Trees.DocumentTypes)]
+        public bool HasContentNodes(int id)
+        {
+            return Services.ContentTypeService.HasContentNodes(id);
+        }
+
+        /// <summary>
+        /// Gets the document type a given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public DocumentTypeDisplay GetById(int id)
         {
-            var ct = Services.ContentTypeService.Get(id);
-            if (ct == null)
+            var contentType = Services.ContentTypeService.Get(id);
+            if (contentType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(ct);
+            var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(contentType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the document type a given guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DocumentTypeDisplay GetById(Guid id)
+        {
+            var contentType = Services.ContentTypeService.Get(id);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(contentType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the document type a given udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public DocumentTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var contentType = Services.ContentTypeService.Get(guidUdi.Guid);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(contentType);
             return dto;
         }
 
@@ -132,7 +200,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage GetAvailableCompositeContentTypes(GetAvailableCompositionsFilter filter)
         {
-            var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType, filter.FilterContentTypes, filter.FilterPropertyTypes)
+            var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.DocumentType, filter.FilterContentTypes, filter.FilterPropertyTypes, filter.IsElement)
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -214,91 +282,35 @@ namespace Umbraco.Web.Editors
                 : Request.CreateNotificationValidationErrorResponse(result.Exception.Message);
         }
 
-        public CreatedContentTypeCollectionResult PostCreateCollection(int parentId, string collectionName, bool collectionCreateTemplate, string collectionItemName, bool collectionItemCreateTemplate, string collectionIcon, string collectionItemIcon)
-        {
-            // create item doctype
-            var itemDocType = new ContentType(parentId);
-            itemDocType.Name = collectionItemName;
-            itemDocType.Alias = collectionItemName.ToSafeAlias(true);
-            itemDocType.Icon = collectionItemIcon;
-
-            // create item doctype template
-            if (collectionItemCreateTemplate)
-            {
-                var template = CreateTemplateForContentType(itemDocType.Alias, itemDocType.Name);
-                itemDocType.SetDefaultTemplate(template);
-            }
-
-            // save item doctype
-            Services.ContentTypeService.Save(itemDocType);
-
-            // create collection doctype
-            var collectionDocType = new ContentType(parentId);
-            collectionDocType.Name = collectionName;
-            collectionDocType.Alias = collectionName.ToSafeAlias(true);
-            collectionDocType.Icon = collectionIcon;
-            collectionDocType.IsContainer = true;
-            collectionDocType.AllowedContentTypes = new List<ContentTypeSort>()
-            {
-                new ContentTypeSort(itemDocType.Id, 0)
-            };
-
-            // create collection doctype template
-            if (collectionCreateTemplate)
-            {
-                var template = CreateTemplateForContentType(collectionDocType.Alias, collectionDocType.Name);
-                collectionDocType.SetDefaultTemplate(template);
-            }
-
-            // save collection doctype
-            Services.ContentTypeService.Save(collectionDocType);
-
-            // test if the parent exist and then allow the collection underneath
-            var parentCt = Services.ContentTypeService.Get(parentId);
-            if (parentCt != null)
-            {
-                var allowedCts = parentCt.AllowedContentTypes.ToList();
-                allowedCts.Add(new ContentTypeSort(collectionDocType.Id, allowedCts.Count()));
-                parentCt.AllowedContentTypes = allowedCts;
-                Services.ContentTypeService.Save(parentCt);
-            }
-
-            return new CreatedContentTypeCollectionResult
-            {
-                CollectionId = collectionDocType.Id,
-                ContainerId = itemDocType.Id
-            };
-        }
-
         public DocumentTypeDisplay PostSave(DocumentTypeSave contentTypeSave)
         {
-            //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.
-            //If the doc type does not allow content variations, we need to update all of it's property types to not allow this either
-            //else we may end up with ysods. I'm unsure if the service level handles this but we'll make sure it is updated here
+            //Before we send this model into this saving/mapping pipeline, we need to do some cleanup on variations.	
+            //If the doc type does not allow content variations, we need to update all of it's property types to not allow this either	
+            //else we may end up with ysods. I'm unsure if the service level handles this but we'll make sure it is updated here	
             if (!contentTypeSave.AllowCultureVariant)
             {
-                foreach(var prop in contentTypeSave.Groups.SelectMany(x => x.Properties))
+                foreach (var prop in contentTypeSave.Groups.SelectMany(x => x.Properties))
                 {
                     prop.AllowCultureVariant = false;
                 }
             }
 
             var savedCt = PerformPostSave<DocumentTypeDisplay, DocumentTypeSave, PropertyTypeBasic>(
-                contentTypeSave:    contentTypeSave,
-                getContentType:     i => Services.ContentTypeService.Get(i),
-                saveContentType:    type => Services.ContentTypeService.Save(type),
-                beforeCreateNew:    ctSave =>
+                contentTypeSave: contentTypeSave,
+                getContentType: i => Services.ContentTypeService.Get(i),
+                saveContentType: type => Services.ContentTypeService.Save(type),
+                beforeCreateNew: ctSave =>
                 {
-                    //create a default template if it doesn't exist -but only if default template is == to the content type
+                    //create a default template if it doesn't exist -but only if default template is == to the content type	
                     if (ctSave.DefaultTemplate.IsNullOrWhiteSpace() == false && ctSave.DefaultTemplate == ctSave.Alias)
                     {
                         var template = CreateTemplateForContentType(ctSave.Alias, ctSave.Name);
 
-                        // If the alias has been manually updated before the first save,
-                        // make sure to also update the first allowed template, as the
-                        // name will come back as a SafeAlias of the document type name,
-                        // not as the actual document type alias.
-                        // For more info: http://issues.umbraco.org/issue/U4-11059
+                        // If the alias has been manually updated before the first save,	
+                        // make sure to also update the first allowed template, as the	
+                        // name will come back as a SafeAlias of the document type name,	
+                        // not as the actual document type alias.	
+                        // For more info: http://issues.umbraco.org/issue/U4-11059	
                         if (ctSave.DefaultTemplate != template.Alias)
                         {
                             var allowedTemplates = ctSave.AllowedTemplates.ToArray();
@@ -307,7 +319,7 @@ namespace Umbraco.Web.Editors
                             ctSave.AllowedTemplates = allowedTemplates;
                         }
 
-                        //make sure the template alias is set on the default and allowed template so we can map it back
+                        //make sure the template alias is set on the default and allowed template so we can map it back	
                         ctSave.DefaultTemplate = template.Alias;
 
                     }
@@ -347,7 +359,7 @@ namespace Umbraco.Web.Editors
                 var tryCreateTemplate = Services.FileService.CreateTemplateForContentType(contentTypeAlias, contentTypeName);
                 if (tryCreateTemplate == false)
                 {
-                    Logger.Warn<ContentTypeController>("Could not create a template for Content Type: \"{ContentTypeAlias}\", status: {Status}",
+                    Logger.Warn<ContentTypeController, string, OperationResultType>("Could not create a template for Content Type: \"{ContentTypeAlias}\", status: {Status}",
                         contentTypeAlias, tryCreateTemplate.Result.Result);
                 }
 
@@ -373,7 +385,7 @@ namespace Umbraco.Web.Editors
             else
                 ct = new ContentType(parentId);
 
-            ct.Icon = "icon-document";
+            ct.Icon = Constants.Icons.Content;
 
             var dto = Mapper.Map<IContentType, DocumentTypeDisplay>(ct);
             return dto;
@@ -409,11 +421,7 @@ namespace Umbraco.Web.Editors
             IEnumerable<IContentType> types;
             if (contentId == Constants.System.Root)
             {
-                var allContentTypes = Services.ContentTypeService.GetAll().ToList();
-                bool AllowedAsRoot(IContentType x) => x.AllowedAsRoot;
-                types = allContentTypes.Any(AllowedAsRoot)
-                    ? allContentTypes.Where(AllowedAsRoot).ToList()
-                    : allContentTypes;
+                types = Services.ContentTypeService.GetAll().Where(x => x.AllowedAsRoot).ToList();
             }
             else
             {
@@ -424,11 +432,11 @@ namespace Umbraco.Web.Editors
                 }
 
                 var contentType = Services.ContentTypeBaseServices.GetContentTypeOf(contentItem);
-                var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+                var ids = contentType.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
-                types = Services.ContentTypeService.GetAll(ids).ToList();
+                types = Services.ContentTypeService.GetAll(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
             }
 
             var basics = types.Where(type => type.IsElement == false).Select(Mapper.Map<IContentType, ContentTypeBasic>).ToList();
@@ -451,7 +459,7 @@ namespace Umbraco.Web.Editors
                 }
             }
 
-            return basics;
+            return basics.OrderBy(c => contentId == Constants.System.Root ? c.Name : string.Empty);
         }
 
         /// <summary>
@@ -520,7 +528,7 @@ namespace Umbraco.Web.Editors
             }
 
             var dataInstaller = new PackageDataInstallation(Logger, Services.FileService, Services.MacroService, Services.LocalizationService,
-                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors);
+                Services.DataTypeService, Services.EntityService, Services.ContentTypeService, Services.ContentService, _propertyEditors, _scopeProvider);
 
             var xd = new XmlDocument {XmlResolver = null};
             xd.Load(filePath);
@@ -536,14 +544,13 @@ namespace Umbraco.Web.Editors
             }
             catch (Exception ex)
             {
-                Logger.Error<ContentTypeController>(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
+                Logger.Error<ContentTypeController, string>(ex, "Error cleaning up temporary udt file in App_Data: {File}", filePath);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK);
         }
 
         [HttpPost]
-        [FileUploadCleanupFilter(false)]
         public async Task<ContentTypeImportModel> Upload()
         {
             if (Request.Content.IsMimeMultipartContent() == false)
@@ -566,22 +573,30 @@ namespace Umbraco.Web.Editors
             var model = new ContentTypeImportModel();
 
             var file = result.FileData[0];
-            var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
+            var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote);
             var ext = fileName.Substring(fileName.LastIndexOf('.') + 1).ToLower();
 
-            // renaming the file because MultipartFormDataStreamProvider has created a random fileName instead of using the name from the
-            // content-disposition for more than 6 years now. Creating a CustomMultipartDataStreamProvider deriving from MultipartFormDataStreamProvider
-            // seems like a cleaner option, but I'm not sure where to put it and renaming only takes one line of code.
-            System.IO.File.Move(result.FileData[0].LocalFileName, root + "\\" + fileName);
+            var destFileName = root + "\\" + fileName;
+            try
+            {
+                // due to a bug before 8.7.0 we didn't delete temp files, so we need to make sure to delete before
+                // moving else you get errors and the upload fails without a message in the UI (there's a JS error)
+                if(System.IO.File.Exists(destFileName))
+                    System.IO.File.Delete(destFileName);
+
+                // renaming the file because MultipartFormDataStreamProvider has created a random fileName instead of using the name from the
+                // content-disposition for more than 6 years now. Creating a CustomMultipartDataStreamProvider deriving from MultipartFormDataStreamProvider
+                // seems like a cleaner option, but I'm not sure where to put it and renaming only takes one line of code.
+                System.IO.File.Move(result.FileData[0].LocalFileName, destFileName);
+            }
+            catch (Exception ex)
+            {
+                Logger.Error<ContentTypeController, string>(ex, "Error uploading udt file to App_Data: {File}", destFileName);
+            }
 
             if (ext.InvariantEquals("udt"))
             {
                 model.TempFileName = Path.Combine(root, fileName);
-
-                model.UploadedFiles.Add(new ContentPropertyFile
-                {
-                    TempFilePath = model.TempFileName
-                });
 
                 var xd = new XmlDocument
                 {

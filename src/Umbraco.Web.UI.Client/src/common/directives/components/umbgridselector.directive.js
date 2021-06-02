@@ -1,7 +1,7 @@
 (function () {
     'use strict';
 
-    function GridSelector($location, overlayService) {
+    function GridSelector($location, overlayService, editorService) {
 
         function link(scope, el, attr, ctrl) {
 
@@ -56,8 +56,16 @@
             };
 
             scope.openTemplate = function (selectedItem) {
-                var url = "/settings/templates/edit/" + selectedItem.id;
-                $location.url(url);
+                const editor = {
+                    id: selectedItem.id,
+                    submit: function () {
+                        editorService.close();
+                    },
+                    close: function () {
+                        editorService.close();
+                    }
+                };
+                editorService.templateEditor(editor);
             }
 
             scope.setAsDefaultItem = function (selectedItem) {

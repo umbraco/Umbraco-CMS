@@ -142,7 +142,7 @@ namespace Umbraco.Web.PropertyEditors
         {
             // process the file
             // no file, invalid file, reject change
-            if (UploadFileTypeValidator.ValidateFileExtension(file.FileName) == false)
+            if (UploadFileTypeValidator.IsValidFileExtension(file.FileName) == false)
                 return null;
 
             // get the filepath
@@ -174,7 +174,12 @@ namespace Umbraco.Web.PropertyEditors
             // more magic here ;-(
             var configuration = dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
             var crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
-            return "{src: '" + val + "', crops: " + crops + "}";
+
+            return JsonConvert.SerializeObject(new
+            {
+                src = val,
+                crops = crops
+            });
         }
     }
 }

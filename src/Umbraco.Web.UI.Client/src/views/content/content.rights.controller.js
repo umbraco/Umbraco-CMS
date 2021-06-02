@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function ContentRightsController($scope, $timeout, contentResource, localizationService, angularHelper, navigationService) {
+    function ContentRightsController($scope, $timeout, contentResource, localizationService, angularHelper, navigationService, overlayService) {
 
         var vm = this;
         var currentForm;
@@ -11,7 +11,6 @@
         vm.removedUserGroups = [];
         vm.viewState = "manageGroups";
         vm.labels = {};
-        vm.showNotification = false;
         
         vm.setViewSate = setViewSate;
         vm.editPermissions = editPermissions;
@@ -20,7 +19,6 @@
         vm.removePermissions = removePermissions;
         vm.cancelManagePermissions = cancelManagePermissions;
         vm.closeDialog = closeDialog;
-        vm.stay = stay;
         vm.discardChanges = discardChanges;
 
         function onInit() {
@@ -41,7 +39,7 @@
           //reset this
           vm.selectedUserGroups = [];
           vm.availableUserGroups = userGroups;
-          angular.forEach(vm.availableUserGroups, function (group) {
+          vm.availableUserGroups.forEach(function (group) {
             if (group.permissions) {
               //if there's explicit permissions assigned than it's selected
               assignGroupPermissions(group);
@@ -72,8 +70,8 @@
           group.allowedPermissions = [];
 
           // get list of checked permissions
-          angular.forEach(group.permissions, function (permissionGroup) {
-            angular.forEach(permissionGroup, function (permission) {
+          Object.values(group.permissions).forEach(function (permissionGroup) {
+            permissionGroup.forEach(function (permission) {
               if (permission.checked) {
                 //the `allowedPermissions` is what will get sent up to the server for saving
                 group.allowedPermissions.push(permission);
@@ -95,6 +93,7 @@
         function setPermissions(group) {
             assignGroupPermissions(group);  
             setViewSate("manageGroups");
+            $scope.dialog.confirmDiscardChanges = true;
         }
 
         /**
@@ -118,9 +117,9 @@
         }
 
         function formatSaveModel(permissionsSave, groupCollection) {
-          angular.forEach(groupCollection, function (g) {
+          groupCollection.forEach(function (g) {
             permissionsSave[g.id] = [];
-            angular.forEach(g.allowedPermissions, function (p) {
+            g.allowedPermissions.forEach(function (p) {
               permissionsSave[g.id].push(p.permissionCode);
             });
           });
@@ -164,14 +163,31 @@
             });
         }
 
-        function stay() {
-          vm.showNotification = false;
-        }
-
         function closeDialog() {
           // check if form has been changed. If it has show discard changes notification
           if (currentForm && currentForm.$dirty) {
-            vm.showNotification = true;
+              localizationService.localizeMany(["prompt_unsavedChanges", "prompt_unsavedChangesWarning", "prompt_discardChanges", "prompt_stay"]).then(
+                  function(values) {
+                      var overlay = {
+                          "view": "default",
+                          "title": values[0],
+                          "content": values[1],
+                          "disableBackdropClick": true,
+                          "disableEscKey": true,
+                          "submitButtonLabel": values[2],
+                          "closeButtonLabel": values[3],
+                          submit: function () {
+                              overlayService.close();
+                              navigationService.hideDialog();
+                          },
+                          close: function () {
+                              overlayService.close();
+                          }
+                      };
+
+                      overlayService.open(overlay);
+                  }
+              );
           } else {
             navigationService.hideDialog();
           }

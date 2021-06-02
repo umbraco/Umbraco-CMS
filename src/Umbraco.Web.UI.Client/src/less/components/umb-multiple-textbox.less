@@ -1,9 +1,12 @@
-﻿.umb-multiple-textbox{
-    &__confirm{
-        position: relative;
+﻿.umb-multiple-textbox {
+    .umb-property-editor--limit-width();
 
-        &-action{
-            margin: 0;
+    &__confirm {
+        position: relative;
+        display: inline-block;
+
+        &-action {
+            margin: -2px 0 0 0;
             padding: 2px;
             background: transparent;
             border: 0 none;
@@ -25,13 +28,8 @@
 }
 
 .umb-multiple-textbox .textbox-wrapper i.handle {
-    margin-left: 5px;
+    margin-left: 10px;
     cursor: move;
-}
-
-.umb-multiple-textbox .textbox-wrapper a.remove {
-    margin-left: 5px;
-    text-decoration: none;
 }
 
 .umb-multiple-textbox .add-link {

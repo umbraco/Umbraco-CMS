@@ -42,7 +42,7 @@ namespace Umbraco.Tests.TestHelpers
                 new DataType(new VoidEditor(Mock.Of<ILogger>())) { Id = 1 });
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
-            var type = new AutoPublishedContentType(0, "anything", new PublishedPropertyType[] { });
+            var type = new AutoPublishedContentType(Guid.NewGuid(), 0, "anything", new PublishedPropertyType[] { });
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => GetPublishedContentTypeByAlias(alias) ?? type;
         }
 

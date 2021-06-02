@@ -9,7 +9,7 @@
         <form name="importDoctype">
 
             <!-- Select files -->
-            <button class="btn"
+            <button class="btn btn-action"
                 name="file"
                 ngf-select
                 ng-model="filesHolder"
@@ -21,14 +21,12 @@
 
             <localize key="general_or">or</localize>
 
-            <a class="btn-link" ng-click="close()">
+            <button type="button" class="btn-link" ng-click="close()">
                 <localize key="cancel">Cancel</localize>
-            </a>
+            </button>
         </form>        
 
         <div ng-if="importDoctype.file.$error.pattern">Please choose a .udt file to import</div>
-        
-
         
     </div>
     <div ng-if="vm.state === 'confirm'">

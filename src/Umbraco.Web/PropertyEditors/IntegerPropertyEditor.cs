@@ -8,7 +8,12 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// Represents an integer property and parameter editor.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.Integer, EditorType.PropertyValue | EditorType.MacroParameter, "Numeric", "integer", ValueType = ValueTypes.Integer)]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.Integer,
+        EditorType.PropertyValue | EditorType.MacroParameter,
+        "Numeric",
+        "integer",
+        ValueType = ValueTypes.Integer)]
     public class IntegerPropertyEditor : DataEditor
     {
         public IntegerPropertyEditor(ILogger logger)

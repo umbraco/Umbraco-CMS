@@ -15,10 +15,7 @@
         text-decoration: none;
     }
 
-    ins {
-        margin: -4px 0 0 -16px;
-        width: 16px;
-        height: 16px;
+    .umb-tree-item__arrow {
         visibility: hidden;
         text-decoration: none;
         font-size: 12px;
@@ -28,7 +25,6 @@
             color: @ui-option-type-hover;
         }
     }
-
     i.noSpr {
         display: inline-block;
         margin-top: 1px;
@@ -47,22 +43,18 @@
             display: none;
         }
     }
-    
-    //loader defaults
-    .umb-loader {
-        height: 10px;
-        margin: 10px 10px 10px 10px;
-    }
 
     .search-subtitle {
         color: @gray-7;
         display: block;
         padding-left: 35px;
+        white-space: initial;
+        text-align: left;
     }
 }
 
 body.touch .umb-tree {
-    ins {
+    .umb-tree-item__arrow {
         font-size: 14px;
         visibility: visible;
         padding: 7px;
@@ -86,9 +78,7 @@ body.touch .umb-tree {
     overflow: hidden;
     display: flex;
     flex-wrap: nowrap;
-    align-items: center;
-    
-    border:2px solid transparent;
+    align-items: center;  
     
     color: @ui-option-type;
     a {
@@ -97,20 +87,33 @@ body.touch .umb-tree {
     
     &:hover {
         background: @ui-option-hover;
-        
         color: @ui-option-type-hover;
+
         a {
             color: @ui-option-type-hover;
         }
         
         > .umb-options {
-            visibility: visible;
+            position: relative;
+            width: auto;
+            height: auto;
+            overflow: visible;
+            clip: auto;
         }
-        
+
+        .umb-button-ellipsis--hidden {
+            opacity: 1;
+        }
+         
         .umb-tree-icon {
             color: @ui-option-type-hover;
         }
     }
+}
+
+.umb-tree-item__inner {
+    border: 2px solid transparent;
+    overflow: visible;
 }
 
 .umb-tree-header {
@@ -130,7 +133,6 @@ body.touch .umb-tree {
 .umb-tree .umb-search-group {
     position: inherit;
     display: inherit;
-
     list-style: none;
 
     h6 {
@@ -153,6 +155,18 @@ body.touch .umb-tree {
 
         &-link {
             display: block;
+            width: 100%;
+            text-align: left;
+        }
+
+        &-name {
+            display: flex;
+
+            &__text { 
+                margin: 1px 0 0;
+                overflow:hidden;
+                text-overflow: ellipsis;
+            }
         }
     }
 
@@ -167,7 +181,9 @@ body.touch .umb-tree {
 .umb-tree .umb-tree-node-checked > .umb-tree-item__inner > i[class^="icon-"],
 .umb-tree .umb-tree-node-checked > .umb-tree-item__inner > i[class*=" icon-"],
 .umb-tree .umb-tree-node-checked .umb-search-group-item-name > i[class^="icon-"],
-.umb-tree .umb-tree-node-checked .umb-search-group-item-name > i[class*=" icon-"] {
+.umb-tree .umb-tree-node-checked .umb-search-group-item-name > i[class*=" icon-"], 
+.umb-tree .umb-tree-node-checked > i[class^="icon-"],
+.umb-tree .umb-tree-node-checked > i[class*="icon-"] {
     font-family: 'icomoon' !important;
     color: @green !important;
 
@@ -178,31 +194,53 @@ body.touch .umb-tree {
 }
 
 .umb-options {
-    visibility: hidden;
+    position: relative;
     display: flex;
     flex: 0 0 auto;
     justify-content: flex-end;
-    padding: 9px 5px;
     text-align: center;
     margin: 0 10px 0 auto;
     cursor: pointer;
     border-radius: @baseBorderRadius;
+    transition: background-color 120ms;
 
-    &:hover {
-        background: @btnBackgroundHighlight;
+    .umb-button-ellipsis {
+        padding: 3px 5px;
     }
 
     i {
         height: 5px !important;
         width: 5px !important;
         border-radius: 20px;
-        background: @black;
         display: inline-block;
         margin: 0 2px 0 0;
+        background: @ui-active-type;
 
         &:last-child {
             margin: 0;
         }
+    }
+
+    &:hover {
+        background-color: rgba(255, 255, 255, .8);
+
+        i {
+            background: @ui-active-type-hover;
+        }
+    }
+
+    // NOTE - We're having to repeat ourselves here due to an .sr-only class appearing in umbraco/lib/font-awesome/css/font-awesome.min.css
+    &.sr-only--hoverable:hover,
+    &.sr-only--focusable:focus {
+        position: relative;
+        display: flex;
+        flex: 0 0 auto;
+        justify-content: flex-end;
+        padding: 7px 5px;
+        text-align: center;
+        margin: 0 auto;
+        cursor: pointer;
+        border-radius: 3px;
     }
 
     .hide-options & {
@@ -224,6 +262,7 @@ body.touch .umb-tree {
     > .umb-tree-item__inner > i.icon,
     > .umb-tree-item__inner > a {
         cursor: not-allowed;
+        opacity: 0.4;
     }
 }
 
@@ -251,7 +290,7 @@ body.touch .umb-tree {
     }
 
     &.current > .umb-tree-item__inner > .umb-tree-item__annotation {
-        background-color: @pinkLight;
+        background-color: @ui-active;
     }
 }
 
@@ -288,9 +327,8 @@ body.touch .umb-tree {
 }
 
 .no-access {
-    .umb-tree-icon,
-    .root-link,
-    .umb-tree-item__label {
+    > .umb-tree-item__inner .umb-tree-icon,
+    > .umb-tree-item__inner .umb-tree-item__label {
         color: @gray-7;
         cursor: not-allowed;
     }
@@ -302,9 +340,13 @@ body.touch .umb-tree {
 .umb-tree-icon { 
     vertical-align: middle;
     margin: 0 13px 0 0;
-    //color: @gray-1;
     color: @ui-option-type;
-    font-size: 20px;   
+    font-size: 20px;
+
+    &.-hidden {
+        display: none;
+        visibility: hidden;
+    }
     
     &.blue {
         color: @blue;

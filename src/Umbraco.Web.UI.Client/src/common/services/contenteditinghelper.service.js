@@ -1,16 +1,16 @@
-﻿
+
 /**
 * @ngdoc service
 * @name umbraco.services.contentEditingHelper
 * @description A helper service for most editors, some methods are specific to content/media/member model types but most are used by
 * all editors to share logic and reduce the amount of replicated code among editors.
 **/
-function contentEditingHelper(fileManager, $q, $location, $routeParams, notificationsService, navigationService, localizationService, serverValidationManager, formHelper) {
+function contentEditingHelper(fileManager, $q, $location, $routeParams, editorState, notificationsService, navigationService, localizationService, serverValidationManager, formHelper) {
 
     function isValidIdentifier(id) {
 
         //empty id <= 0
-        if (angular.isNumber(id)) {
+        if (Utilities.isNumber(id)) {
             if (id === 0) {
                 return false;
             }
@@ -32,13 +32,35 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
         return true;
     }
 
+    function showNotificationsForModelsState(ms, messageType) {
+        messageType = messageType || 2;
+        for (const [key, value] of Object.entries(ms)) {
+
+            var errorMsg = value[0];
+            // if the error message is json it's a complex editor validation response that we need to parse
+            if ((Utilities.isString(errorMsg) && errorMsg.startsWith("[")) || Utilities.isArray(errorMsg)) {
+                // flatten the json structure, create validation paths for each property and add each as a property error
+                var idsToErrors = serverValidationManager.parseComplexEditorError(errorMsg, "");
+                idsToErrors.forEach(x => {
+                    if (x.modelState) {
+                        showNotificationsForModelsState(x.modelState, messageType);
+                    }
+                });
+            }
+            else if (value[0]) {
+                notificationsService.showNotification({type:messageType, header:"Validation", message:value[0]})
+            }
+        }
+    }
+
     return {
 
+        //TODO: We need to move some of this to formHelper for saving, too many editors use this method for saving when this entire
+        //service should only be used for content/media/members
+
         /** Used by the content editor and mini content editor to perform saving operations */
-        // TODO: Make this a more helpful/reusable method for other form operations! we can simplify this form most forms
-        //         = this is already done in the formhelper service
         contentEditorPerformSave: function (args) {
-            if (!angular.isObject(args)) {
+            if (!Utilities.isObject(args)) {
                 throw "args must be an object";
             }
             if (!args.scope) {
@@ -53,47 +75,73 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             if (args.showNotifications === undefined) {
                 args.showNotifications = true;
             }
+			// needed for infinite editing to create new items
+			if (args.create === undefined) {
+                if ($routeParams.create) {
+                    args.create = true;
+                }
+            }
+            if (args.softRedirect === undefined) {
+                //when true, the url will change but it won't actually re-route
+                //this is merely here for compatibility, if only the content/media/members used this service we'd prob be ok but tons of editors
+                //use this service unfortunately and probably packages too.
+                args.softRedirect = false;
+            }
 
-            var redirectOnSuccess = args.redirectOnSuccess !== undefined ? args.redirectOnSuccess : true;
-            var redirectOnFailure = args.redirectOnFailure !== undefined ? args.redirectOnFailure : true;
 
             var self = this;
 
             //we will use the default one for content if not specified
             var rebindCallback = args.rebindCallback === undefined ? self.reBindChangedProperties : args.rebindCallback;
 
-            if (!args.scope.busy && formHelper.submitForm({ scope: args.scope, action: args.action })) {
+            var formSubmitOptions = { scope: args.scope, action: args.action };
+            if(args.skipValidation === true) {
+                formSubmitOptions.skipValidation = true;
+                formSubmitOptions.keepServerValidation = true;
+            }
+            if (formHelper.submitForm(formSubmitOptions)) {
 
-                args.scope.busy = true;
-
-                return args.saveMethod(args.content, $routeParams.create, fileManager.getFiles(), args.showNotifications)
+                return args.saveMethod(args.content, args.create, fileManager.getFiles(), args.showNotifications)
                     .then(function (data) {
 
                         formHelper.resetForm({ scope: args.scope });
 
-                        self.handleSuccessfulSave({
-                            scope: args.scope,
-                            savedContent: data,
-                            redirectOnSuccess: redirectOnSuccess,
-                            rebindCallback: function () {
-                                rebindCallback.apply(self, [args.content, data]);
-                            }
-                        });
+                        if (!args.infiniteMode) {
+                            self.handleSuccessfulSave({
+                                scope: args.scope,
+                                savedContent: data,
+                                softRedirect: args.softRedirect,
+                                rebindCallback: function () {
+                                    rebindCallback.apply(self, [args.content, data]);
+                                }
+                            });
 
-                        args.scope.busy = false;
+                            //update editor state to what is current
+                            editorState.set(args.content);
+                        }
+
                         return $q.resolve(data);
 
                     }, function (err) {
+
+                        formHelper.resetForm({ scope: args.scope, hasErrors: true });
+
                         self.handleSaveError({
                             showNotifications: args.showNotifications,
-                            redirectOnFailure: redirectOnFailure,
+                            softRedirect: args.softRedirect,
                             err: err,
+                            action: args.action,
                             rebindCallback: function () {
-                                rebindCallback.apply(self, [args.content, err.data]);
+                                // if the error contains data, we want to map that back as we want to continue editing this save. Especially important when the content is new as the returned data will contain ID etc.
+                                if(err.data) {
+                                    rebindCallback.apply(self, [args.content, err.data]);
+                                }
                             }
                         });
 
-                        args.scope.busy = false;
+                        //update editor state to what is current
+                        editorState.set(args.content);
+
                         return $q.reject(err);
                     });
             }
@@ -116,7 +164,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             // first check if tab is already added
             var foundInfoTab = false;
 
-            angular.forEach(tabs, function (tab) {
+            tabs.forEach(function (tab) {
                 if (tab.id === infoTab.id && tab.alias === infoTab.alias) {
                     foundInfoTab = true;
                 }
@@ -137,7 +185,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
         here we'll build the buttons according to the chars of the user. */
         configureContentEditorButtons: function (args) {
 
-            if (!angular.isObject(args)) {
+            if (!Utilities.isObject(args)) {
                 throw "args must be an object";
             }
             if (!args.content) {
@@ -263,9 +311,9 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 }
 
                 // if publishing is allowed also allow schedule publish
-                // we add this manually becuase it doesn't have a permission so it wont 
+                // we add this manually becuase it doesn't have a permission so it wont
                 // get picked up by the loop through permissions
-                if( _.contains(args.content.allowedActions, "U")) {
+                if (_.contains(args.content.allowedActions, "U")) {
                     buttons.subButtons.push(createButtonDefinition("SCHEDULE"));
                     buttons.subButtons.push(createButtonDefinition("PUBLISH_DESCENDANTS"));
                 }
@@ -274,7 +322,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // so long as it's already published and if the user has access to publish
                 // and the user has access to unpublish (may have been removed via Event)
                 if (!args.create) {
-                    var hasPublishedVariant = args.content.variants.filter(function(variant) { return (variant.state === "Published" || variant.state === "PublishedPendingChanges"); }).length > 0;
+                    var hasPublishedVariant = args.content.variants.filter(function (variant) { return (variant.state === "Published" || variant.state === "PublishedPendingChanges"); }).length > 0;
                     if (hasPublishedVariant && _.contains(args.content.allowedActions, "U") && _.contains(args.content.allowedActions, "Z")) {
                         buttons.subButtons.push(createButtonDefinition("Z"));
                     }
@@ -313,9 +361,11 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          *
          * @description
          * Returns a id for the variant that is unique between all variants on the content
+         * Note "invariant" is used for the invariant culture,
+         * "null" is used for the NULL segment
          */
         buildCompositeVariantId: function (variant) {
-            return (variant.language ? variant.language.culture : "invariant") + "_" + (variant.segment ? variant.segment : "");
+            return (variant.language ? variant.language.culture : "invariant") + "_" + (variant.segment ? variant.segment : "null");
         },
 
 
@@ -444,11 +494,13 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             var shouldIgnore = function (propName) {
                 return _.some([
                     "variants",
-                    
+
                     "tabs",
                     "properties",
                     "apps",
                     "createDateFormatted",
+                    "releaseDateFormatted",
+                    "expireDateFormatted",
                     "releaseDate",
                     "expireDate"
                 ], function (i) {
@@ -478,7 +530,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             var savedVariants = [];
             if (origContent.variants) {
                 isContent = true;
-                //it's contnet so assign the variants as they exist
+                //it's content so assign the variants as they exist
                 origVariants = origContent.variants;
                 savedVariants = savedContent.variants;
             }
@@ -504,7 +556,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
 
                 //special case for content, don't sync this variant if it wasn't tagged
                 //for saving in the first place
-                if (!origVariant.save) {
+                if (isContent && !origVariant.save) {
                     continue;
                 }
 
@@ -550,7 +602,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                         //instead of having a property editor $watch their expression to check if it has
                         // been updated, instead we'll check for the existence of a special method on their model
                         // and just call it.
-                        if (angular.isFunction(origProp.onValueChanged)) {
+                        if (Utilities.isFunction(origProp.onValueChanged)) {
                             //send the newVal + oldVal
                             origProp.onValueChanged(origProp.value, origVal);
                         }
@@ -574,13 +626,14 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * A function to handle what happens when we have validation issues from the server side
          *
          */
+
+        //TODO: Too many editors use this method for saving when this entire service should only be used for content/media/members,
+        // there is formHelper.handleError for other editors which should be used!
+
         handleSaveError: function (args) {
 
             if (!args.err) {
                 throw "args.err cannot be null";
-            }
-            if (args.redirectOnFailure === undefined || args.redirectOnFailure === null) {
-                throw "args.redirectOnFailure must be set to true or false";
             }
 
             //When the status is a 400 status with a custom header: X-Status-Reason: Validation failed, we have validation errors.
@@ -593,23 +646,26 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                     //wire up the server validation errs
                     formHelper.handleServerValidation(args.err.data.ModelState);
 
-                    //add model state errors to notifications
-                    if (args.showNotifications) {
-                        for (var e in args.err.data.ModelState) {
-                            notificationsService.error("Validation", args.err.data.ModelState[e][0]);
-                        }
+                    var messageType = 2;//error
+                    if (args.action === "save") {
+                        messageType = 4;//warning
                     }
 
-                    if (!args.redirectOnFailure || !this.redirectToCreatedContent(args.err.data.id, args.err.data.ModelState)) {
-                        //we are not redirecting because this is not new content, it is existing content. In this case
-                        // we need to detect what properties have changed and re-bind them with the server data. Then we need
-                        // to re-bind any server validation errors after the digest takes place.
+                    //add model state errors to notifications
+                    if (args.showNotifications) {
+                        showNotificationsForModelsState(args.err.data.ModelState, messageType);
+                    }
 
-                        if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
+                    if (!this.redirectToCreatedContent(args.err.data.id, args.softRedirect) || args.softRedirect) {
+                        // If we are not redirecting it's because this is not newly created content, else in some cases we are
+                        // soft-redirecting which means the URL will change but the route wont (i.e. creating content).
+
+                        // In this case we need to detect what properties have changed and re-bind them with the server data.
+                        if (args.rebindCallback && Utilities.isFunction(args.rebindCallback)) {
                             args.rebindCallback();
                         }
 
-                        //notify all validators (don't clear the server validations though since we need to maintain their state because of
+                        // In this case notify all validators (don't clear the server validations though since we need to maintain their state because of
                         // how the variant switcher works in content). server validation state is always cleared when an editor first loads
                         // and in theory when an editor is destroyed.
                         serverValidationManager.notify();
@@ -633,6 +689,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * ensure the notifications are displayed and that the appropriate events are fired. This will also check if we need to redirect
          * when we're creating new content.
          */
+
+        //TODO: We need to move some of this to formHelper for saving, too many editors use this method for saving when this entire
+        //service should only be used for content/media/members
+
         handleSuccessfulSave: function (args) {
 
             if (!args) {
@@ -642,15 +702,13 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 throw "args.savedContent cannot be null";
             }
 
-            // the default behaviour is to redirect on success. This adds option to prevent when false
-            args.redirectOnSuccess = args.redirectOnSuccess !== undefined ? args.redirectOnSuccess : true;
+            if (!this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id, args.softRedirect) || args.softRedirect) {
 
-            if (!args.redirectOnSuccess || !this.redirectToCreatedContent(args.redirectId ? args.redirectId : args.savedContent.id)) {
+                // If we are not redirecting it's because this is not newly created content, else in some cases we are
+                // soft-redirecting which means the URL will change but the route wont (i.e. creating content).
 
-                //we are not redirecting because this is not new content, it is existing content. In this case
-                // we need to detect what properties have changed and re-bind them with the server data.
-                //call the callback
-                if (args.rebindCallback && angular.isFunction(args.rebindCallback)) {
+                // In this case we need to detect what properties have changed and re-bind them with the server data.
+                if (args.rebindCallback && Utilities.isFunction(args.rebindCallback)) {
                     args.rebindCallback();
                 }
             }
@@ -667,7 +725,7 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * We need to decide if we need to redirect to edito mode or if we will remain in create mode.
          * We will only need to maintain create mode if we have not fulfilled the basic requirements for creating an entity which is at least having a name and ID
          */
-        redirectToCreatedContent: function (id, modelState) {
+        redirectToCreatedContent: function (id, softRedirect) {
 
             //only continue if we are currently in create mode and not in infinite mode and if the resulting ID is valid
             if ($routeParams.create && (isValidIdentifier(id))) {
@@ -678,8 +736,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
                 // /belle/#/content/edit/9876 (where 9876 is the new id)
 
                 //clear the query strings
-                navigationService.clearSearch(["cculture"]);
-
+                navigationService.clearSearch(["cculture", "csegment"]);
+                if (softRedirect) {
+                    navigationService.setSoftRedirect();
+                }
                 //change to new path
                 $location.path("/" + $routeParams.section + "/" + $routeParams.tree + "/" + $routeParams.method + "/" + id);
                 //don't add a browser history for this
@@ -699,6 +759,10 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
          * For some editors like scripts or entites that have names as ids, these names can change and we need to redirect
          * to their new paths, this is helper method to do that.
          */
+
+        //TODO: We need to move some of this to formHelper for saving, too many editors use this method for saving when this entire
+        //service should only be used for content/media/members
+
         redirectToRenamedContent: function (id) {
             //clear the query strings
             navigationService.clearSearch();
@@ -707,6 +771,60 @@ function contentEditingHelper(fileManager, $q, $location, $routeParams, notifica
             //don't add a browser history for this
             $location.replace();
             return true;
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.contentEditingHelper#sortVariants
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Sorts the variants so default language is shown first. Mandatory languages are shown next and all other underneath. Both Mandatory and non mandatory languages are
+         * sorted in the following groups 'Published', 'Draft', 'Not Created'. Within each of those groups the variants are
+         * sorted by the language display name.
+         *
+         */
+        sortVariants: function (a, b) {
+            const statesOrder = {'PublishedPendingChanges':1, 'Published': 1, 'Draft': 2, 'NotCreated': 3};
+            const compareDefault = (a,b) => (a.language && a.language.isDefault ? -1 : 1) - (b.language && b.language.isDefault ? -1 : 1);
+
+            // Make sure mandatory variants goes on top, unless they are published, cause then they already goes to the top and then we want to mix them with other published variants.
+            const compareMandatory = (a,b) => (a.state === 'PublishedPendingChanges' || a.state === 'Published') ? 0 : (a.language && a.language.isMandatory ? -1 : 1) - (b.language && b.language.isMandatory ? -1 : 1);
+            const compareState = (a, b) => (statesOrder[a.state] || 99) - (statesOrder[b.state] || 99);
+            const compareName = (a, b) => a.displayName.localeCompare(b.displayName);
+
+            return compareDefault(a, b) || compareMandatory(a, b) || compareState(a, b) || compareName(a, b);
+        },
+
+        /**
+         * @ngdoc function
+         * @name umbraco.services.contentEditingHelper#getSortedVariantsAndSegments
+         * @methodOf umbraco.services.contentEditingHelper
+         * @function
+         *
+         * @description
+         * Returns an array of variants and segments sorted by the rules in the sortVariants method.
+         * A variant language is followed by its segments in the array. If a segment doesn't have a parent variant it is
+         * added to the end of the array.
+         *
+         */
+        getSortedVariantsAndSegments: function (variantsAndSegments) {
+            const sortedVariants = variantsAndSegments.filter(variant => !variant.segment).sort(this.sortVariants);
+            let variantsWithSegments = variantsAndSegments.filter(variant => variant.segment);
+            let sortedAvailableVariants = [];
+
+            sortedVariants.forEach((variant) => {
+                const sortedMatchedSegments = variantsWithSegments.filter(segment => segment.language && variant.language && segment.language.culture === variant.language.culture).sort(this.sortVariants);
+                // remove variants for this culture
+                variantsWithSegments = variantsWithSegments.filter(segment => !segment.language || segment.language && variant.language && segment.language.culture !== variant.language.culture);
+                sortedAvailableVariants = [...sortedAvailableVariants, ...[variant], ...sortedMatchedSegments];
+            })
+
+            // if we have segments without a parent language variant we need to add the remaining variantsWithSegments to the array
+            sortedAvailableVariants = [...sortedAvailableVariants, ...variantsWithSegments.sort(this.sortVariants)];
+
+            return sortedAvailableVariants;
         }
     };
 }

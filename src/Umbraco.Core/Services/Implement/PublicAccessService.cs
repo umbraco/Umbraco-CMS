@@ -54,7 +54,7 @@ namespace Umbraco.Core.Services.Implement
         {
             //Get all ids in the path for the content item and ensure they all
             // parse to ints that are not -1.
-            var ids = contentPath.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
+            var ids = contentPath.Split(Constants.CharArrays.Comma, StringSplitOptions.RemoveEmptyEntries)
                 .Select(x => int.TryParse(x, out int val) ? val : -1)
                 .Where(x => x != -1)
                 .ToList();
@@ -62,12 +62,10 @@ namespace Umbraco.Core.Services.Implement
             //start with the deepest id
             ids.Reverse();
 
-            using (var scope = ScopeProvider.CreateScope())
+            using (var scope = ScopeProvider.CreateScope(autoComplete: true))
             {
                 //This will retrieve from cache!
-                var entries = _publicAccessRepository.GetMany().ToArray();
-
-                scope.Complete();
+                var entries = _publicAccessRepository.GetMany().ToList();
                 foreach (var id in ids)
                 {
                     var found = entries.FirstOrDefault(x => x.ProtectedNodeId == id);

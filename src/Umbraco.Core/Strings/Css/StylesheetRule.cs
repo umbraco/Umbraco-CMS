@@ -28,7 +28,7 @@ namespace Umbraco.Core.Strings.Css
             {
                 // since we already have a string builder in play here, we'll append to it the "hard" way
                 // instead of using string interpolation (for increased performance)
-                foreach (var style in Styles.Split(new[] { ';' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var style in Styles.Split(Constants.CharArrays.Semicolon, StringSplitOptions.RemoveEmptyEntries))
                 {
                     sb.Append("\t").Append(style.StripNewLines().Trim()).Append(";").Append(Environment.NewLine);
                 }

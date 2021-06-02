@@ -1,15 +1,17 @@
 (function () {
     "use strict";
 
-    function CompositionsController($scope, $location, $filter) {
+    function CompositionsController($scope, $location, $filter, $timeout, overlayService, localizationService) {
 
         var vm = this;
         var oldModel = null;
 
         vm.showConfirmSubmit = false;
+        vm.loadingAlias = null;
 
         vm.isSelected = isSelected;
         vm.openContentType = openContentType;
+        vm.selectCompositeContentType = selectCompositeContentType;
         vm.submit = submit;
         vm.close = close;
 
@@ -17,16 +19,19 @@
 
             /* make a copy of the init model so it is possible to roll 
             back the changes on cancel */
-            oldModel = angular.copy($scope.model);
+            oldModel = Utilities.copy($scope.model);
 
             if (!$scope.model.title) {
                 $scope.model.title = "Compositions";
             }
 
-            // group the content types by their container paths
+            // Group the content types by their container paths
             vm.availableGroups = $filter("orderBy")(
                 _.map(
                     _.groupBy($scope.model.availableCompositeContentTypes, function (compositeContentType) {
+                        
+                        compositeContentType.selected = isSelected(compositeContentType.contentType.alias);
+
                         return compositeContentType.contentType.metaData.containerPath;
                     }), function (group) {
                         return {
@@ -40,11 +45,11 @@
         }
 
         
-
         function isSelected(alias) {
             if ($scope.model.contentType.compositeContentTypes.indexOf(alias) !== -1) {
                 return true;
             }
+            return false;
         }
 
         function openContentType(contentType, section) {
@@ -52,23 +57,62 @@
             $location.path(url);
         }
 
+        function selectCompositeContentType(compositeContentType) {
+            vm.loadingAlias = compositeContentType.contentType.alias
+            
+            var contentType = compositeContentType.contentType;
+
+            $scope.model.selectCompositeContentType(contentType).then(function (response) {
+                vm.loadingAlias = null;
+            });
+
+            // Check if the template is already selected.
+            var index = $scope.model.contentType.compositeContentTypes.indexOf(contentType.alias);
+
+            if (index === -1) {
+                $scope.model.contentType.compositeContentTypes.push(contentType.alias);
+            } else {
+                $scope.model.contentType.compositeContentTypes.splice(index, 1);
+            }
+        }
+
         function submit() {
             if ($scope.model && $scope.model.submit) {
 
                 // check if any compositions has been removed
-                vm.compositionRemoved = false;
+                var compositionRemoved = false;
                 for (var i = 0; oldModel.compositeContentTypes.length > i; i++) {
                     var oldComposition = oldModel.compositeContentTypes[i];
                     if (_.contains($scope.model.compositeContentTypes, oldComposition) === false) {
-                        vm.compositionRemoved = true;
+                        compositionRemoved = true;
                     }
                 }
 
                 /* submit the form if there havne't been removed any composition
                 or the confirm checkbox has been checked */
-                if (!vm.compositionRemoved || vm.allowSubmit) {
-                    $scope.model.submit($scope.model);
+                if (compositionRemoved) {
+                    vm.allowSubmit = false;
+                    localizationService.localize("general_remove").then(function (value) {
+                        const dialog = {
+                            view: "views/common/infiniteeditors/compositions/overlays/confirmremove.html",
+                            title: value,
+                            submitButtonLabelKey: "general_ok",
+                            submitButtonStyle: "danger",
+                            closeButtonLabelKey: "general_cancel",
+                            submit: function (model) {
+                                $scope.model.submit($scope.model);
+                                overlayService.close();
+                            },
+                            close: function () {
+                                overlayService.close();
+                            }
+                        };
+                        overlayService.open(dialog);
+                    });
+                    return;
                 }
+
+                $scope.model.submit($scope.model);
             }
         }
 

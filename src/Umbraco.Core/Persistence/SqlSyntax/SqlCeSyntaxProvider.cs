@@ -1,7 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
+using System.Data;
+using System.Data.SqlServerCe;
 using System.Linq;
 using NPoco;
+using Umbraco.Core.Composing;
 using Umbraco.Core.Persistence.DatabaseAnnotations;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 
@@ -52,6 +56,8 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             return "(" + string.Join("+", args) + ")";
         }
 
+        public override System.Data.IsolationLevel DefaultIsolationLevel => System.Data.IsolationLevel.RepeatableRead;
+
         public override string FormatColumnRename(string tableName, string oldName, string newName)
         {
             //NOTE Sql CE doesn't support renaming a column, so a new column needs to be created, then copy data and finally remove old column
@@ -79,7 +85,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
             string columns = string.IsNullOrEmpty(columnDefinition.PrimaryKeyColumns)
                                  ? GetQuotedColumnName(columnDefinition.Name)
                                  : string.Join(", ", columnDefinition.PrimaryKeyColumns
-                                                                     .Split(new[]{',', ' '}, StringSplitOptions.RemoveEmptyEntries)
+                                                                     .Split(Constants.CharArrays.CommaSpace, StringSplitOptions.RemoveEmptyEntries)
                                                                      .Select(GetQuotedColumnName));
 
             return string.Format(CreateConstraint,
@@ -132,6 +138,17 @@ ORDER BY TABLE_NAME, INDEX_NAME");
                     item => new Tuple<string, string, string, bool>(item.TABLE_NAME, item.INDEX_NAME, item.COLUMN_NAME, item.UNIQUE));
         }
 
+        /// <inheritdoc />
+        public override bool TryGetDefaultConstraint(IDatabase db, string tableName, string columnName, out string constraintName)
+        {
+            // cannot return a true default constraint name (does not exist on SqlCe)
+            // but we won't really need it anyways - just check whether there is a constraint
+            constraintName = null;
+            var hasDefault = db.Fetch<bool>(@"select column_hasdefault from information_schema.columns
+where table_name=@0 and column_name=@1", tableName, columnName).FirstOrDefault();
+            return hasDefault;
+        }
+
         public override bool DoesTableExist(IDatabase db, string tableName)
         {
             var result =
@@ -139,6 +156,75 @@ ORDER BY TABLE_NAME, INDEX_NAME");
                                        new { TableName = tableName });
 
             return result > 0;
+        }
+
+        public override void WriteLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            ObtainWriteLock(db, timeout, lockId);
+        }
+
+        public override void WriteLock(IDatabase db, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            var timeout = TimeSpan.FromMilliseconds(Current.Configs.Global().SqlWriteLockTimeOut);
+
+            foreach (var lockId in lockIds)
+            {
+                ObtainWriteLock(db, timeout, lockId);
+            }
+        }
+
+        private static void ObtainWriteLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            db.Execute(@"SET LOCK_TIMEOUT " + timeout.TotalMilliseconds  + ";");
+            var i = db.Execute(@"UPDATE umbracoLock SET value = (CASE WHEN (value=1) THEN -1 ELSE 1 END) WHERE id=@id", new { id = lockId });
+            if (i == 0) // ensure we are actually locking!
+                throw new ArgumentException($"LockObject with id={lockId} does not exist.");
+        }
+
+        public override void ReadLock(IDatabase db, TimeSpan timeout, int lockId)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            ObtainReadLock(db, timeout, lockId);
+        }
+
+        public override void ReadLock(IDatabase db, params int[] lockIds)
+        {
+            // soon as we get Database, a transaction is started
+
+            if (db.Transaction.IsolationLevel < IsolationLevel.RepeatableRead)
+                throw new InvalidOperationException("A transaction with minimum RepeatableRead isolation level is required.");
+
+            foreach (var lockId in lockIds)
+            {
+                ObtainReadLock(db, null, lockId);
+            }
+        }
+
+        private static void ObtainReadLock(IDatabase db, TimeSpan? timeout, int lockId)
+        {
+            if (timeout.HasValue)
+            {
+                db.Execute(@"SET LOCK_TIMEOUT " + timeout.Value.TotalMilliseconds + ";");
+            }
+
+            var i = db.ExecuteScalar<int?>("SELECT value FROM umbracoLock WHERE id=@id", new {id = lockId});
+
+            if (i == null) // ensure we are actually locking!
+                throw new ArgumentException($"LockObject with id={lockId} does not exist.");
         }
 
         protected override string FormatIdentity(ColumnDefinition column)
@@ -175,7 +261,7 @@ ORDER BY TABLE_NAME, INDEX_NAME");
         {
             get
             {
-                return "ALTER TABLE [{0}] ALTER COLUMN [{1}] DROP DEFAULT";
+                return "ALTER TABLE {0} ALTER COLUMN {1} DROP DEFAULT";
             }
         }
 
@@ -183,5 +269,11 @@ ORDER BY TABLE_NAME, INDEX_NAME");
 
         public override string DropIndex { get { return "DROP INDEX {1}.{0}"; } }
 
+        public override string GetSpecialDbType(SpecialDbTypes dbTypes)
+        {
+            if (dbTypes == SpecialDbTypes.NVARCHARMAX) // SqlCE does not have nvarchar(max) for now
+                return "NTEXT";
+            return base.GetSpecialDbType(dbTypes);
+        }
     }
 }

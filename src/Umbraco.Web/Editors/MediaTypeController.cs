@@ -19,6 +19,7 @@ using Umbraco.Core.Dictionary;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Persistence;
 using Umbraco.Web.Composing;
+using IMediaType = Umbraco.Core.Models.IMediaType;
 
 namespace Umbraco.Web.Editors
 {
@@ -48,6 +49,7 @@ namespace Umbraco.Web.Editors
             public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
             {
                 controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi)),
                     new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetAllowedChildren", "contentId", typeof(int), typeof(Guid), typeof(Udi))));
             }
         }
@@ -57,21 +59,66 @@ namespace Umbraco.Web.Editors
             return Services.ContentTypeService.Count();
         }
 
+        /// <summary>
+        /// Gets the media type a given id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
         public MediaTypeDisplay GetById(int id)
         {
-            var ct = Services.MediaTypeService.Get(id);
-            if (ct == null)
+            var mediaType = Services.MediaTypeService.Get(id);
+            if (mediaType == null)
             {
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(ct);
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
             return dto;
         }
 
         /// <summary>
-        /// Deletes a media type with a given ID
+        /// Gets the media type a given guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public MediaTypeDisplay GetById(Guid id)
+        {
+            var mediaType = Services.MediaTypeService.Get(id);
+            if (mediaType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Gets the media type a given udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [UmbracoTreeAuthorize(Constants.Trees.MediaTypes, Constants.Trees.Media)]
+        public MediaTypeDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var mediaType = Services.MediaTypeService.Get(guidUdi.Guid);
+            if (mediaType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(mediaType);
+            return dto;
+        }
+
+        /// <summary>
+        /// Deletes a media type with a given id
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -109,7 +156,7 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public HttpResponseMessage GetAvailableCompositeMediaTypes(GetAvailableCompositionsFilter filter)
         {
-            var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType, filter.FilterContentTypes, filter.FilterPropertyTypes)
+            var result = PerformGetAvailableCompositeContentTypes(filter.ContentTypeId, UmbracoObjectTypes.MediaType, filter.FilterContentTypes, filter.FilterPropertyTypes, filter.IsElement)
                 .Select(x => new
                 {
                     contentType = x.Item1,
@@ -135,9 +182,18 @@ namespace Umbraco.Web.Editors
         }
         public MediaTypeDisplay GetEmpty(int parentId)
         {
-            var ct = new MediaType(parentId) {Icon = "icon-picture"};
+            IMediaType mt;
+            if (parentId != Constants.System.Root)
+            {
+                var parent = Services.MediaTypeService.Get(parentId);
+                mt = parent != null ? new MediaType(parent, string.Empty) : new MediaType(parentId);
+            }
+            else
+                mt = new MediaType(parentId);
 
-            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(ct);
+            mt.Icon = Constants.Icons.MediaImage;
+
+            var dto = Mapper.Map<IMediaType, MediaTypeDisplay>(mt);
             return dto;
         }
 
@@ -230,11 +286,11 @@ namespace Umbraco.Web.Editors
                 }
 
                 var contentType = Services.MediaTypeService.Get(contentItem.ContentTypeId);
-                var ids = contentType.AllowedContentTypes.Select(x => x.Id.Value).ToArray();
+                var ids = contentType.AllowedContentTypes.OrderBy(c => c.SortOrder).Select(x => x.Id.Value).ToArray();
 
                 if (ids.Any() == false) return Enumerable.Empty<ContentTypeBasic>();
 
-                types = Services.MediaTypeService.GetAll(ids).ToList();
+                types = Services.MediaTypeService.GetAll(ids).OrderBy(c => ids.IndexOf(c.Id)).ToList();
             }
 
             var basics = types.Select(Mapper.Map<IMediaType, ContentTypeBasic>).ToList();
@@ -245,7 +301,7 @@ namespace Umbraco.Web.Editors
                 basic.Description = TranslateItem(basic.Description);
             }
 
-            return basics.OrderBy(x => x.Name);
+            return basics.OrderBy(c => contentId == Constants.System.Root ? c.Name : string.Empty);
         }
 
         /// <summary>

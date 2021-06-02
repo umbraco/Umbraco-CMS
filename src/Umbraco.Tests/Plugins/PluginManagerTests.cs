@@ -327,7 +327,7 @@ AnotherContentFinder
         public void Resolves_RestExtensions()
         {
             var types = _manager.ResolveRestExtensions();
-            Assert.AreEqual(3, types.Count());
+            Assert.AreEqual(2, types.Count());
         }
 
         [Test]

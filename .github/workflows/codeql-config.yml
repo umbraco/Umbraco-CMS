@@ -1,0 +1,14 @@
+name: "CodeQL config"
+on:
+  push:
+    branches: [v8/contrib,v8/dev]
+paths-ignore: 
+  - node_modules
+  - Umbraco.TestData
+  - Umbraco.Tests
+  - Umbraco.Tests.AcceptanceTest
+  - Umbraco.Tests.Benchmarks
+  - bin
+  - build.tmp
+paths:
+  - src   

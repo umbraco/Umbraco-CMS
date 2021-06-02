@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using CSharpTest.Net.Serialization;
 using Umbraco.Core;
@@ -9,7 +10,7 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     {
         public IDictionary<string, PropertyData[]> ReadFrom(Stream stream)
         {
-            var dict = new Dictionary<string, PropertyData[]>();
+            var dict = new Dictionary<string, PropertyData[]>(StringComparer.InvariantCultureIgnoreCase);
 
             // read properties count
             var pcount = PrimitiveSerializer.Int32.ReadFrom(stream);

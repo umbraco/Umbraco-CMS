@@ -1,0 +1,26 @@
+<div ng-controller="Umbraco.Tours.UmbEmailMarketing.EmailsController as vm" class="umb-email-marketing">
+
+    <umb-tour-step on-close="model.endTour()">
+
+        <h2>{{ model.currentStep.title }}</h2>
+
+        <div class="layout">
+            <!-- HTML Content stored in tour JSON config file -->
+            <div class="primary">
+                <div ng-bind-html="model.currentStep.content"></div>
+            </div>
+
+            <!-- Secondary Column with paperplane -->
+            <div class="secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 220 1080 640"><defs><style>.cls-1{fill:#fba0a2;}.cls-2{fill:#3544b1;}</style></defs><title>paperplane</title><g id="Layer_54" data-name="Layer 54"><polygon class="cls-1" points="1012.92 370.19 894.84 709.81 832.53 529.1 691.24 457.68 1012.92 370.19"/><polygon class="cls-2" points="1012.92 370.19 832.53 529.1 894.84 709.81 1012.92 370.19"/><path class="cls-2" d="M784.24,590.07s-34.16,66.82-88,70.95l-11.65-32s46.67-12.34,79.51-42.3Z"/><path class="cls-2" d="M633.49,670s-66.81,25.65-94.62,7l-3.5-26s35.92,19.8,79.74-9.67Z"/><path class="cls-2" d="M475.1,673.19S405.19,650.45,383,623.94l4.21-15.08,95.94,33.81Z"/><path class="cls-2" d="M311.51,601.88s-36.8-46.78-77.3-41.65l3.14-21.17s36.46-21.71,82.28,31.89Z"/><path class="cls-2" d="M183.21,562.23S119,565.32,89.29,588.69L67.08,569.22s61.6-41.75,103.69-36.05Z"/></g></svg>
+            </div>
+        </div>
+
+        <div class="cta">
+            <umb-button size="m" button-style="link" type="button" label="No thanks" action="model.disableTour()"></umb-button>
+            <umb-button size="m" button-style="action" type="button" action="vm.optIn()" label="Keep me updated!"></umb-button>
+        </div>
+
+    </umb-tour-step>
+
+</div>

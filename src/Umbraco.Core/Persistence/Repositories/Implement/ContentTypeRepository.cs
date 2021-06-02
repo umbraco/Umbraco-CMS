@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using NPoco;
 using Umbraco.Core.Cache;
+using Umbraco.Core.Exceptions;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
+using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.SqlSyntax;
@@ -17,8 +19,8 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
     /// </summary>
     internal class ContentTypeRepository : ContentTypeRepositoryBase<IContentType>, IContentTypeRepository
     {
-        public ContentTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository)
-            : base(scopeAccessor, cache, logger, commonRepository)
+        public ContentTypeRepository(IScopeAccessor scopeAccessor, AppCaches cache, ILogger logger, IContentTypeCommonRepository commonRepository, ILanguageRepository languageRepository)
+            : base(scopeAccessor, cache, logger, commonRepository, languageRepository)
         { }
 
         protected override bool SupportsPublishing => ContentType.SupportsPublishingConst;
@@ -55,7 +57,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         {
             // the cache policy will always want everything
             // even GetMany(ids) gets everything and filters afterwards
-            if (ids.Any()) throw new Exception("panic");
+            if (ids.Any()) throw new PanicException("There can be no ids specified");
             return CommonRepository.GetAllTypes().OfType<IContentType>();
         }
 
@@ -132,7 +134,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
             if (objectTypes.Any())
             {
-                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", objectTypes);
+                sql = sql.Where("umbracoNode.nodeObjectType IN (@objectTypes)", new { objectTypes = objectTypes });
             }
 
             return Database.Fetch<string>(sql);
@@ -226,11 +228,11 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             if (string.IsNullOrWhiteSpace(entity.Alias))
             {
                 var ex = new Exception($"ContentType '{entity.Name}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.");
-                Logger.Error<ContentTypeRepository>("ContentType '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.", entity.Name);
+                Logger.Error<ContentTypeRepository,string>("ContentType '{EntityName}' cannot have an empty Alias. This is most likely due to invalid characters stripped from the Alias.", entity.Name);
                 throw ex;
             }
 
-            ((ContentType)entity).AddingEntity();
+            entity.AddingEntity();
 
             PersistNewBaseContentType(entity);
             PersistTemplates(entity, false);
@@ -270,7 +272,7 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
             ValidateAlias(entity);
 
             //Updates Modified date
-            ((ContentType)entity).UpdatingEntity();
+            entity.UpdatingEntity();
 
             //Look up parent to get and set the correct Path if ParentId has changed
             if (entity.IsPropertyDirty("ParentId"))

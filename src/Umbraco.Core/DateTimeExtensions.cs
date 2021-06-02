@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -15,7 +16,7 @@ namespace Umbraco.Core
         /// <returns></returns>
         public static string ToIsoString(this DateTime dt)
         {
-            return dt.ToString("yyyy-MM-dd HH:mm:ss");
+            return dt.ToString("yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
         }
 
         public static DateTime TruncateTo(this DateTime dt, DateTruncate truncateTo)

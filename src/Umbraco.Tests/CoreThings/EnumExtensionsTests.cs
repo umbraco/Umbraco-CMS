@@ -1,6 +1,7 @@
-﻿using NUnit.Framework;
-using Umbraco.Web.Trees;
+﻿using System;
+using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Web.Trees;
 
 namespace Umbraco.Tests.CoreThings
 {
@@ -22,6 +23,7 @@ namespace Umbraco.Tests.CoreThings
                 Assert.IsFalse(value.HasFlag(test));
         }
 
+        [Obsolete]
         [TestCase(TreeUse.Dialog, TreeUse.Dialog, true)]
         [TestCase(TreeUse.Dialog, TreeUse.Main, false)]
         [TestCase(TreeUse.Dialog | TreeUse.Main, TreeUse.Dialog, true)]

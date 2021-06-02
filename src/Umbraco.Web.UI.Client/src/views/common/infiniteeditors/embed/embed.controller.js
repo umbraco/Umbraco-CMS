@@ -7,6 +7,7 @@
         var origWidth = 500;
         var origHeight = 300;
 
+        vm.loading = false;
         vm.trustedPreview = null;
 
         $scope.model.embed = {
@@ -17,16 +18,26 @@
             preview: "",
             success: false,
             info: "",
-            supportsDimensions: ""
-        };
+            a11yInfo: "",
+            supportsDimensions: false,
+            originalWidth: 360,
+            originalHeight: 240
+   };
 
+        if ($scope.model.modify) {
+            Utilities.extend($scope.model.embed, $scope.model.modify);
+
+            showPreview();
+        }
+
+        vm.toggleConstrain = toggleConstrain;
         vm.showPreview = showPreview;
         vm.changeSize = changeSize;
         vm.submit = submit;
         vm.close = close;
-
-        function onInit() {
-            if(!$scope.model.title) {
+        
+       function onInit() {
+            if (!$scope.model.title) {
                 localizationService.localize("general_embed").then(function(value){
                     $scope.model.title = value;
                 });
@@ -37,10 +48,10 @@
 
             if ($scope.model.embed.url) {
                 $scope.model.embed.show = true;
-                $scope.model.embed.preview = "<div class=\"umb-loader\" style=\"height: 10px; margin: 10px 0px;\"></div>";
                 $scope.model.embed.info = "";
+                $scope.model.embed.a11yInfo = "";
                 $scope.model.embed.success = false;
-
+                vm.loading = true;
 
                 $http({
                     method: 'GET',
@@ -54,44 +65,64 @@
 
                     $scope.model.embed.preview = "";
 
-
                     switch (response.data.OEmbedStatus) {
                         case 0:
                             //not supported
+                            $scope.model.embed.preview = "";
                             $scope.model.embed.info = "Not supported";
+                            $scope.model.embed.a11yInfo = $scope.model.embed.info;
+                            $scope.model.embed.success = false;
+                            $scope.model.embed.supportsDimensions = false;
+                            vm.trustedPreview = null;
                             break;
                         case 1:
                             //error
+                            $scope.model.embed.preview = "";
                             $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
+                            $scope.model.embed.a11yInfo = $scope.model.embed.info;
+                            $scope.model.embed.success = false;
+                            $scope.model.embed.supportsDimensions = false;
+                            vm.trustedPreview = null;
                             break;
                         case 2:
-                            $scope.model.embed.preview = response.data.Markup;
-                            vm.trustedPreview = $sce.trustAsHtml(response.data.Markup);
-                            $scope.model.embed.supportsDimensions = response.data.SupportsDimensions;
                             $scope.model.embed.success = true;
+                            $scope.model.embed.supportsDimensions = response.data.SupportsDimensions;
+                            $scope.model.embed.preview = response.data.Markup;
+                            $scope.model.embed.info = "";
+                            $scope.model.embed.a11yInfo = "Retrieved URL";
+                            vm.trustedPreview = $sce.trustAsHtml(response.data.Markup);
                             break;
                     }
+
+                    vm.loading = false;
+
                 }, function() {
+                    $scope.model.embed.success = false;
                     $scope.model.embed.supportsDimensions = false;
                     $scope.model.embed.preview = "";
                     $scope.model.embed.info = "Could not embed media - please ensure the URL is valid";
+                    $scope.model.embed.a11yInfo = $scope.model.embed.info;
+                    vm.loading = false;
                 });
-
             } else {
                 $scope.model.embed.supportsDimensions = false;
                 $scope.model.embed.preview = "";
                 $scope.model.embed.info = "Please enter a URL";
+                $scope.model.embed.a11yInfo = $scope.model.embed.info;
             }
         }
 
        function changeSize(type) {
 
-           var width, height;
+           var width = parseInt($scope.model.embed.width, 10);
+           var height = parseInt($scope.model.embed.height, 10);
+           var originalWidth = parseInt($scope.model.embed.originalWidth, 10);
+           var originalHeight = parseInt($scope.model.embed.originalHeight, 10);
+           var resize = originalWidth !== width || originalHeight !== height;
 
            if ($scope.model.embed.constrain) {
-               width = parseInt($scope.model.embed.width, 10);
-               height = parseInt($scope.model.embed.height, 10);
-               if (type == 'width') {
+
+               if (type === 'width') {
                    origHeight = Math.round((width / origWidth) * height);
                    $scope.model.embed.height = origHeight;
                } else {
@@ -99,26 +130,31 @@
                    $scope.model.embed.width = origWidth;
                }
            }
-           if ($scope.model.embed.url !== "") {
+           $scope.model.embed.originalWidth = $scope.model.embed.width;
+           $scope.model.embed.originalHeight = $scope.model.embed.height;
+           if ($scope.model.embed.url !== "" && resize) {
                showPreview();
            }
 
        }
 
+       function toggleConstrain() {
+           $scope.model.embed.constrain = !$scope.model.embed.constrain;
+       }
+
        function submit() {
-            if($scope.model && $scope.model.submit) {
+            if ($scope.model && $scope.model.submit) {
                 $scope.model.submit($scope.model);
             }
         }
 
         function close() {
-            if($scope.model && $scope.model.close) {
+            if ($scope.model && $scope.model.close) {
                 $scope.model.close();
             }
-        }
+       }
 
         onInit();
-
    }
 
    angular.module("umbraco").controller("Umbraco.Editors.EmbedController", EmbedController);

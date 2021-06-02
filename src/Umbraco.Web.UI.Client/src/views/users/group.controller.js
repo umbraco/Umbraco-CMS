@@ -1,23 +1,31 @@
 (function () {
     "use strict";
 
-    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService) {
+    function UserGroupEditController($scope, $location, $routeParams, userGroupsResource, localizationService, contentEditingHelper, editorService, overlayService) {
+
+        var infiniteMode = $scope.model && $scope.model.infiniteMode;
+        var id = infiniteMode ? $scope.model.id : $routeParams.id;
+        var create = infiniteMode ? $scope.model.create : $routeParams.create;
 
         var vm = this;
         var contentPickerOpen = false;
 
-        vm.page = {};        
+        vm.page = {};
         vm.page.rootIcon = "icon-folder";
+        vm.page.submitButtonLabelKey = infiniteMode ? "buttons_saveAndClose" : "buttons_save";
+
         vm.userGroup = {};
         vm.labels = {};
-        vm.showBackButton = true;
+        vm.showBackButton = !infiniteMode;
 
         vm.goToPage = goToPage;
         vm.openSectionPicker = openSectionPicker;
         vm.openContentPicker = openContentPicker;
         vm.openMediaPicker = openMediaPicker;
         vm.openUserPicker = openUserPicker;
-        vm.removeSelectedItem = removeSelectedItem;
+        vm.removeSection = removeSection;
+        vm.removeAssignedPermissions = removeAssignedPermissions;
+        vm.removeUser = removeUser;
         vm.clearStartNode = clearStartNode;
         vm.save = save;
         vm.openGranularPermissionsPicker = openGranularPermissionsPicker;
@@ -53,7 +61,7 @@
                 vm.labels.noStartNode = name;
             });
 
-            if ($routeParams.create) {
+            if (create) {
                 // get user group scaffold
                 userGroupsResource.getUserGroupScaffold().then(function (userGroup) {
                     vm.userGroup = userGroup;
@@ -63,15 +71,14 @@
                 });
             } else {
                 // get user group
-               userGroupsResource.getUserGroup($routeParams.id).then(function (userGroup) {
-                   vm.userGroup = userGroup;
-                   formatGranularPermissionSelection();
+                userGroupsResource.getUserGroup(id).then(function (userGroup) {
+                    vm.userGroup = userGroup;
+                    formatGranularPermissionSelection();
                     setSectionIcon(vm.userGroup.sections);
                     makeBreadcrumbs();
                     vm.loading = false;
                 });
             }
-
         }
 
         function save() {
@@ -81,19 +88,19 @@
                 saveMethod: userGroupsResource.saveUserGroup,
                 scope: $scope,
                 content: vm.userGroup,
-                // We do not redirect on failure for users - this is because it is not possible to actually save a user
-                // when server side validation fails - as opposed to content where we are capable of saving the content
-                // item if server side validation fails
-                redirectOnFailure: false,
                 rebindCallback: function (orignal, saved) { }
             }).then(function (saved) {
 
                 vm.userGroup = saved;
-                formatGranularPermissionSelection();
-                setSectionIcon(vm.userGroup.sections);
-                makeBreadcrumbs();
-                vm.page.saveButtonState = "success";
 
+                if (infiniteMode) {
+                    $scope.model.submit(vm.userGroup);
+                } else {
+                    formatGranularPermissionSelection();
+                    setSectionIcon(vm.userGroup.sections);
+                    makeBreadcrumbs();
+                    vm.page.saveButtonState = "success";
+                }
             }, function (err) {
                 vm.page.saveButtonState = "error";
             });
@@ -104,14 +111,15 @@
         }
 
         function openSectionPicker() {
-            var oldSelection = angular.copy(vm.userGroup.sections);
+            var currentSelection = [];
+            Utilities.copy(vm.userGroup.sections, currentSelection);
             var sectionPicker = {
-                selection: vm.userGroup.sections,
+                selection: currentSelection,
                 submit: function (model) {
+                    vm.userGroup.sections = model.selection;
                     editorService.close();
                 },
                 close: function () {
-                    vm.userGroup.sections = oldSelection;
                     editorService.close();
                 }
             };
@@ -168,14 +176,15 @@
         }
 
         function openUserPicker() {
-            var oldSelection = angular.copy(vm.userGroup.users);
+            var currentSelection = [];
+            Utilities.copy(vm.userGroup.users, currentSelection);
             var userPicker = {
-                selection: vm.userGroup.users,
-                submit: function () {
+                selection: currentSelection,
+                submit: function (model) {
+                    vm.userGroup.users = model.selection;
                     editorService.close();
                 },
                 close: function () {
-                    vm.userGroup.users = oldSelection;
                     editorService.close();
                 }
             };
@@ -187,7 +196,7 @@
          * however the list to display the permissions isn't via the dictionary way so we need to format it
          */
         function formatGranularPermissionSelection() {
-            angular.forEach(vm.userGroup.assignedPermissions, function (node) {
+            vm.userGroup.assignedPermissions.forEach(function (node) {
                 formatGranularPermissionSelectionForNode(node);
             });
         }
@@ -195,8 +204,8 @@
         function formatGranularPermissionSelectionForNode(node) {
             //the dictionary is assigned via node.permissions we will reformat to node.allowedPermissions
             node.allowedPermissions = [];
-            angular.forEach(node.permissions, function (permissions, key) {
-                angular.forEach(permissions, function (p) {
+            Object.values(node.permissions).forEach(function (permissions) {
+                permissions.forEach(function (p) {
                     if (p.checked) {
                         node.allowedPermissions.push(p);
                     }
@@ -214,8 +223,8 @@
                     if (model.selection) {
                         var node = model.selection[0];
                         //check if this is already in our selection
-                        var found = _.find(vm.userGroup.assignedPermissions, function(i) {
-                            return i.id === node.id; 
+                        var found = _.find(vm.userGroup.assignedPermissions, function (i) {
+                            return i.id === node.id;
                         });
                         node = found ? found : node;
                         setPermissionsForNode(node);
@@ -233,7 +242,7 @@
 
             //clone the current defaults to pass to the model
             if (!node.permissions) {
-                node.permissions = angular.copy(vm.userGroup.defaultPermissions);    
+                node.permissions = Utilities.copy(vm.userGroup.defaultPermissions);
             }
 
             vm.nodePermissions = {
@@ -259,7 +268,7 @@
 
                     editorService.close();
 
-                    if(contentPickerOpen) {
+                    if (contentPickerOpen) {
                         editorService.close();
                         contentPickerOpen = false;
                     }
@@ -274,10 +283,33 @@
 
         }
 
-        function removeSelectedItem(index, selection) {
-            if (selection && selection.length > 0) {
-                selection.splice(index, 1);
-            }
+        function removeSection(index) {
+            vm.userGroup.sections.splice(index, 1);
+        }
+
+        function removeAssignedPermissions(index) {
+            vm.userGroup.assignedPermissions.splice(index, 1);
+        }
+
+        function removeUser(index) {
+            const dialog = {
+                view: "views/users/views/overlays/remove.html",
+                username: vm.userGroup.users[index].username,
+                userGroupName: vm.userGroup.name.toLowerCase(),
+                submitButtonLabelKey: "defaultdialogs_yesRemove",
+                submitButtonStyle: "danger",
+
+                submit: function () {
+                    vm.userGroup.users.splice(index, 1);
+
+                    overlayService.close();
+                },
+                close: function () {
+                    overlayService.close();
+                }
+            };
+
+            overlayService.open(dialog);
         }
 
         function clearStartNode(type) {
@@ -301,7 +333,7 @@
         }
 
         function setSectionIcon(sections) {
-            angular.forEach(sections, function (section) {
+            sections.forEach(function (section) {
                 section.icon = "icon-section";
             });
         }

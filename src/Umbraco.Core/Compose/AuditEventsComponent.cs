@@ -42,23 +42,36 @@ namespace Umbraco.Core.Compose
         }
 
         public void Terminate()
-        { }
+        {
+            UserService.SavedUserGroup -= OnSavedUserGroupWithUsers;
+
+            UserService.SavedUser -= OnSavedUser;
+            UserService.DeletedUser -= OnDeletedUser;
+            UserService.UserGroupPermissionsAssigned -= UserGroupPermissionAssigned;
+
+            MemberService.Saved -= OnSavedMember;
+            MemberService.Deleted -= OnDeletedMember;
+            MemberService.AssignedRoles -= OnAssignedRoles;
+            MemberService.RemovedRoles -= OnRemovedRoles;
+            MemberService.Exported -= OnMemberExported;
+        }
+
+        internal static IUser UnknownUser => new User { Id = Constants.Security.UnknownUserId, Name = Constants.Security.UnknownUserName, Email = "" };
 
         private IUser CurrentPerformingUser
         {
             get
             {
                 var identity = Thread.CurrentPrincipal?.GetUmbracoIdentity();
-                return identity == null
-                    ? new User { Id = 0, Name = "SYSTEM", Email = "" }
-                    : _userService.GetUserById(Convert.ToInt32(identity.Id));
+                var user = identity == null ? null : _userService.GetUserById(Convert.ToInt32(identity.Id));
+                return user ?? UnknownUser;
             }
         }
 
         private IUser GetPerformingUser(int userId)
         {
             var found = userId >= 0 ? _userService.GetUserById(userId) : null;
-            return found ?? new User {Id = 0, Name = "SYSTEM", Email = ""};
+            return found ?? UnknownUser;
         }
 
         private string PerformingIp
@@ -67,7 +80,7 @@ namespace Umbraco.Core.Compose
             {
                 var httpContext = HttpContext.Current == null ? (HttpContextBase) null : new HttpContextWrapper(HttpContext.Current);
                 var ip = httpContext.GetCurrentRequestIpAddress();
-                if (ip.ToLowerInvariant().StartsWith("unknown")) ip = "";
+                if (ip == null || ip.ToLowerInvariant().StartsWith("unknown")) ip = "";
                 return ip;
             }
         }

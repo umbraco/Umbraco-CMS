@@ -38,15 +38,11 @@ namespace Umbraco.Tests.Routing
             _module = new UmbracoInjectedModule
             (
                 globalSettings,
-                Mock.Of<IUmbracoContextAccessor>(),
-                Factory.GetInstance<IPublishedSnapshotService>(),
-                Factory.GetInstance<IUserService>(),
-                new UrlProviderCollection(new IUrlProvider[0]),
                 runtime,
                 logger,
                 null, // FIXME: PublishedRouter complexities...
-                Mock.Of<IVariationContextAccessor>(),
-                Mock.Of<IUmbracoContextFactory>()
+                Mock.Of<IUmbracoContextFactory>(),
+                new RoutableDocumentFilter(globalSettings)
             );
 
             runtime.Level = RuntimeLevel.Run;
@@ -104,7 +100,7 @@ namespace Umbraco.Tests.Routing
         [Test]
         public void Is_Client_Side_Request_InvalidPath_ReturnFalse()
         {
-            //This url is invalid. Default to false when the extension cannot be determined
+            //This URL is invalid. Default to false when the extension cannot be determined
             var uri = new Uri("http://test.com/installing-modules+foobar+\"yipee\"");
             var result = uri.IsClientSideRequest();
             Assert.AreEqual(false, result);

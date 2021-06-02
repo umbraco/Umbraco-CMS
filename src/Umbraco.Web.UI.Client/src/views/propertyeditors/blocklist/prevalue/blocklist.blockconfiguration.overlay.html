@@ -1,0 +1,258 @@
+<div class="umb-block-list-block-configuration-overlay" ng-controller="Umbraco.PropertyEditors.BlockList.BlockConfigurationOverlayController as vm">
+
+    <form novalidate name="blockListBlockConfigurationForm" val-form-manager>
+
+        <umb-editor-view ng-if="!page.loading">
+
+            <umb-editor-header
+                name="model.title"
+                name-locked="true"
+                hide-alias="true"
+                hide-icon="true"
+                hide-description="true">
+            </umb-editor-header>
+
+            <umb-editor-container>
+                <div class="form-vertical">
+
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_headlineEditorAppearance">Editor appearance</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <!-- label -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="label"><localize key="blockEditor_labelLabelTemplate">label</localize></label>
+                                    <div class="controls">
+                                        <input type="text" name="label" ng-model="vm.block.label" style="width:100%" umb-auto-focus/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- custom view -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="iconcolor"><localize key="blockEditor_labelCustomView">Custom view</localize></label>
+                                    <umb-property-info-button button-title="@blockEditor_labelCustomViewInfoTitle" localize="button-title"><localize key="blockEditor_labelCustomViewDescription">Overwrite how this block appears in the BackOffice UI. Pick a .html file containing your presentation.</localize></umb-property-info-button>
+                                    <div class="controls">
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.view !== null" >
+
+                                            <umb-node-preview icon="'icon-document'" name="vm.block.view"></umb-node-preview>
+                                            <div class="__control-actions">
+                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.requestRemoveViewForBlock(vm.block)">
+                                                    <i class="icon icon-wrong"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-reset __settings-input --noValue umb-outline" ng-if="vm.block.view === null" ng-click="vm.addViewForBlock(vm.block)">
+                                            <localize key="blockEditor_addCustomView">Add custom view</localize>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- custom stylesheet -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="iconcolor"><localize key="blockEditor_labelCustomStylesheet">Custom stylesheet</localize></label>
+                                    <div class="controls">
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.stylesheet !== null" >
+
+                                            <umb-node-preview icon="'icon-document'" name="vm.block.stylesheet"></umb-node-preview>
+                                            <div class="__control-actions">
+                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.requestRemoveStylesheetForBlock(vm.block)">
+                                                    <i class="icon icon-wrong"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-reset __settings-input --noValue umb-outline" ng-if="vm.block.stylesheet === null" ng-click="vm.addStylesheetForBlock(vm.block)">
+                                            <localize key="blockEditor_addCustomStylesheet">Add custom stylesheet</localize>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- editor overlay size -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="editorSize"><localize key="blockEditor_labelEditorSize">Editor size</localize></label>
+                                    <div class="controls">
+                                        <select id="editorSize" ng-model="vm.block.editorSize">
+                                            <option value="small">Small</option>
+                                            <option value="medium">Medium</option>
+                                            <option value="large">Large</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_headlineDataModels">Data Models</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <!-- Content Element Type -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label"><localize key="blockEditor_labelContentElementType">Content ElementType</localize></label>
+                                    <div class="controls">
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.contentElementTypeKey !== null" >
+                                            <umb-node-preview icon="vm.contentPreview.icon" name="vm.contentPreview.name" alias="vm.contentPreview.alias"></umb-node-preview>
+                                            <div class="__control-actions">
+                                                <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.contentElementTypeKey)">
+                                                    <i class="icon icon-edit"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Settings Element Type -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label"><localize key="blockEditor_labelSettingsElementType">Settings Element Type</localize></label>
+                                    <div class="controls">
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.settingsElementTypeKey !== null">
+                                            <umb-node-preview icon="vm.settingsPreview.icon" name="vm.settingsPreview.name" alias="vm.settingsPreview.alias"></umb-node-preview>
+                                            <div class="__control-actions">
+                                                <button type="button" class="btn-reset __control-actions-btn --open umb-outline" ng-click="vm.openElementType(vm.block.settingsElementTypeKey)">
+                                                    <i class="icon icon-edit"></i>
+                                                </button>
+                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.requestRemoveSettingsForBlock(vm.block)">
+                                                    <i class="icon icon-wrong"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-reset __settings-input --noValue umb-outline" ng-if="vm.block.settingsElementTypeKey === null" ng-click="vm.addSettingsForBlock($event, vm.block)">
+                                            <localize key="blockEditor_addSettingsElementType">Add settings</localize>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_headlineCatalogueAppearance">Catalogue appearance</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <!-- backgroundColor -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="backgroundColor"><localize key="blockEditor_labelBackgroundColor">Background Color</localize></label>
+                                    <div class="controls">
+                                        <umb-color-picker
+                                            ng-model="vm.block.backgroundColor"
+                                            options="vm.colorPickerOptions"
+                                            on-change="vm.changeBackgroundColor(color)">
+                                        </umb-color-picker>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- iconColor -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="iconColor"><localize key="blockEditor_labelIconColor">Icon Color</localize></label>
+                                    <div class="controls">
+                                        <umb-color-picker
+                                            ng-model="vm.block.iconColor"
+                                            options="vm.colorPickerOptions"
+                                            on-change="vm.changeIconColor(color)">
+                                        </umb-color-picker>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- thumbnail -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="iconcolor"><localize key="blockEditor_thumbnail">Thumbnail</localize></label>
+                                    <div class="controls">
+                                        <div class="__settings-input --hasValue" ng-if="vm.block.thumbnail !== null" >
+
+                                            <umb-node-preview icon="'icon-document'" name="vm.block.thumbnail"></umb-node-preview>
+                                            <div class="__control-actions">
+                                                <button type="button" class="btn-reset __control-actions-btn --remove umb-outline" ng-click="vm.removeThumbnailForBlock(vm.block)">
+                                                    <i class="icon icon-wrong"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <button type="button" class="btn-reset __settings-input --noValue umb-outline" ng-if="vm.block.thumbnail === null" ng-click="vm.addThumbnailForBlock(vm.block)">
+                                            <localize key="blockEditor_addThumbnail">Add thumbnail</localize>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="umb-group-panel">
+
+                        <div class="umb-group-panel__header">
+                            <localize key="blockEditor_headlineAdvanced">Advanced</localize>
+                        </div>
+
+                        <div class="umb-group-panel__content">
+
+                            <!-- forceHideContentEditorInOverlay -->
+                            <div class="control-group umb-control-group -no-border">
+                                <div class="umb-el-wrap">
+                                    <label class="control-label" for="forceHideContentEditorInOverlay"><localize key="blockEditor_forceHideContentEditor">Force hide content editor</localize></label>
+                                    <div class="controls">
+                                        <umb-toggle checked="vm.block.forceHideContentEditorInOverlay" on-click="vm.block.forceHideContentEditorInOverlay = vm.block.forceHideContentEditorInOverlay != true"></umb-toggle>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+            </umb-editor-container>
+
+            <umb-editor-footer>
+
+                <umb-editor-footer-content-right>
+
+                    <umb-button
+                        action="vm.close()"
+                        shortcut="esc"
+                        button-style="link"
+                        label-key="general_close"
+                        type="button">
+                    </umb-button>
+
+                    <umb-button
+                        action="vm.submit()"
+                        button-style="primary"
+                        state="submitButtonState"
+                        label-key="buttons_submitChanges"
+                        type="button">
+                    </umb-button>
+
+                </umb-editor-footer-content-right>
+
+            </umb-editor-footer>
+        </umb-editor-view>
+    </form>
+</div>

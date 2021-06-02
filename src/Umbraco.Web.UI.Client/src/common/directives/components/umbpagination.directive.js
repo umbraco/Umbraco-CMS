@@ -16,6 +16,7 @@ Use this directive to generate a pagination.
             total-pages="vm.pagination.totalPages"
             on-next="vm.nextPage"
             on-prev="vm.prevPage"
+            on-change="vm.changePage"
             on-go-to-page="vm.goToPage">
         </umb-pagination>
 
@@ -34,10 +35,11 @@ Use this directive to generate a pagination.
             vm.pagination = {
                 pageNumber: 1,
                 totalPages: 10
-            }
+            };
 
             vm.nextPage = nextPage;
             vm.prevPage = prevPage;
+            vm.changePage = changePage;
             vm.goToPage = goToPage;
 
             function nextPage(pageNumber) {
@@ -50,6 +52,12 @@ Use this directive to generate a pagination.
                 // do magic here
                 console.log(pageNumber);
                 alert("prevpage");
+            }
+            
+            function changePage(pageNumber) {
+                // do magic here
+                console.log(pageNumber);
+                alert("changepage");
             }
 
             function goToPage(pageNumber) {
@@ -81,6 +89,11 @@ Use this directive to generate a pagination.
     <ul>
         <li><code>pageNumber</code>: The page number</li>
     </ul>
+@param {callback=} onChange (<code>binding</code>): Callback method when changing page.
+    <h3>The callback returns:</h3>
+    <ul>
+        <li><code>pageNumber</code>: The page number</li>
+    </ul>
 **/
 
 (function() {
@@ -96,13 +109,13 @@ Use this directive to generate a pagination.
                 scope.pageNumber = parseInt(scope.pageNumber);
             }
 
-            scope.pagination = [];
+            let tempPagination = [];
              
             var i = 0;
 
             if (scope.totalPages <= 10) {
                 for (i = 0; i < scope.totalPages; i++) {
-                    scope.pagination.push({
+                    tempPagination.push({
                         val: (i + 1),
                         isActive: scope.pageNumber === (i + 1)
                     });
@@ -119,7 +132,7 @@ Use this directive to generate a pagination.
                 start = Math.min(maxIndex, start);
 
                 for (i = start; i < (10 + start) ; i++) {
-                    scope.pagination.push({
+                    tempPagination.push({
                         val: (i + 1),
                         isActive: scope.pageNumber === (i + 1)
                     });
@@ -129,7 +142,7 @@ Use this directive to generate a pagination.
                 if (start > 0) {
                     localizationService.localize("general_first").then(function(value){
                         var firstLabel = value;
-                        scope.pagination.unshift({ name: firstLabel, val: 1, isActive: false }, {val: "...",isActive: false});
+                        tempPagination.unshift({ name: firstLabel, val: 1, isActive: false }, {val: "...",isActive: false});
                     });
                 }
 
@@ -137,11 +150,12 @@ Use this directive to generate a pagination.
                 if (start < maxIndex) {
                     localizationService.localize("general_last").then(function(value){
                         var lastLabel = value;
-                        scope.pagination.push({ val: "...", isActive: false }, { name: lastLabel, val: scope.totalPages, isActive: false });
+                        tempPagination.push({ val: "...", isActive: false }, { name: lastLabel, val: scope.totalPages, isActive: false });
                     });
                 }
             }
 
+            scope.pagination = tempPagination;
          }
 
          scope.next = function () {
@@ -174,9 +188,7 @@ Use this directive to generate a pagination.
                  scope.onGoToPage(scope.pageNumber);
              }
              if (scope.onChange) {
-                 if (scope.onChange) {
-                     scope.onChange({ "pageNumber": scope.pageNumber });
-                 }
+                 scope.onChange({ "pageNumber": scope.pageNumber });
              }
          };
 

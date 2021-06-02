@@ -101,7 +101,7 @@ namespace Umbraco.Core.Models
         PropertyGroupCollection PropertyGroups { get; set; }
 
         /// <summary>
-        /// Gets all local property types belonging to a group, across all local property groups.
+        /// Gets all local property types all local property groups or ungrouped.
         /// </summary>
         IEnumerable<PropertyType> PropertyTypes { get; }
 

@@ -78,7 +78,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 var response = request.GetResponse();
 
                 // Check first for header
-                success = DoHttpHeadersContainHeader(response);
+                success = HasMatchingHeader(response.Headers.AllKeys);
 
                 // If not found, and available, check for meta-tag
                 if (success == false && _metaTagOptionAvailable)
@@ -113,9 +113,9 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 };
         }
 
-        private bool DoHttpHeadersContainHeader(WebResponse response)
+        private bool HasMatchingHeader(IEnumerable<string> headerKeys)
         {
-            return response.Headers.AllKeys.Contains(_header);
+            return headerKeys.Contains(_header, StringComparer.InvariantCultureIgnoreCase);
         }
 
         private bool DoMetaTagsContainKeyForHeader(WebResponse response)
@@ -127,7 +127,7 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 {
                     var html = reader.ReadToEnd();
                     var metaTags = ParseMetaTags(html);
-                    return metaTags.ContainsKey(_header);
+                    return HasMatchingHeader(metaTags.Keys);
                 }
             }
         }
@@ -186,24 +186,22 @@ namespace Umbraco.Web.HealthCheck.Checks.Security
                 }
 
                 var removeHeaderElement = customHeadersElement.Elements("remove")
-                    .SingleOrDefault(x => x.Attribute("name") != null &&
-                                          x.Attribute("name")?.Value == _value);
+                    .SingleOrDefault(x => x.Attribute("name")?.Value.Equals(_value, StringComparison.InvariantCultureIgnoreCase) == true);
                 if (removeHeaderElement == null)
                 {
-                    removeHeaderElement = new XElement("remove");
-                    removeHeaderElement.Add(new XAttribute("name", _header));
-                    customHeadersElement.Add(removeHeaderElement);
+                    customHeadersElement.Add(
+                        new XElement("remove",
+                            new XAttribute("name", _header)));
                 }
 
                 var addHeaderElement = customHeadersElement.Elements("add")
-                    .SingleOrDefault(x => x.Attribute("name") != null &&
-                                          x.Attribute("name").Value == _header);
+                    .SingleOrDefault(x => x.Attribute("name")?.Value.Equals(_header, StringComparison.InvariantCultureIgnoreCase) == true);
                 if (addHeaderElement == null)
                 {
-                    addHeaderElement = new XElement("add");
-                    addHeaderElement.Add(new XAttribute("name", _header));
-                    addHeaderElement.Add(new XAttribute("value", _value));
-                    customHeadersElement.Add(addHeaderElement);
+                    customHeadersElement.Add(
+                        new XElement("add",
+                            new XAttribute("name", _header),
+                            new XAttribute("value", _value)));
                 }
 
                 doc.Save(configFile);

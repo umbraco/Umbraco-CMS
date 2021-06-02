@@ -133,8 +133,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistNewItem(IRelationType entity)
         {
-            ((EntityBase)entity).AddingEntity();
-            
+            entity.AddingEntity();
+
+            CheckNullObjectTypeValues(entity);
+
             var dto = RelationTypeFactory.BuildDto(entity);
 
             var id = Convert.ToInt32(Database.Insert(dto));
@@ -145,8 +147,10 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
 
         protected override void PersistUpdatedItem(IRelationType entity)
         {
-            ((EntityBase)entity).UpdatingEntity();
-            
+            entity.UpdatingEntity();
+
+            CheckNullObjectTypeValues(entity);
+
             var dto = RelationTypeFactory.BuildDto(entity);
             Database.Update(dto);
 
@@ -154,5 +158,13 @@ namespace Umbraco.Core.Persistence.Repositories.Implement
         }
 
         #endregion
+
+        private void CheckNullObjectTypeValues(IRelationType entity)
+        {
+            if (entity.ParentObjectType.HasValue && entity.ParentObjectType == Guid.Empty)
+                entity.ParentObjectType = null;
+            if (entity.ChildObjectType.HasValue && entity.ChildObjectType == Guid.Empty)
+                entity.ChildObjectType = null;
+        }
     }
 }

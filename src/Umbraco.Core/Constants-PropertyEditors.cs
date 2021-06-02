@@ -14,11 +14,33 @@ namespace Umbraco.Core
             /// </summary>
             public const string InternalGenericPropertiesPrefix = "_umb_";
 
+            public static class Legacy
+            {
+                public static class Aliases
+                {
+                    public const string Textbox = "Umbraco.Textbox";
+                    public const string Date = "Umbraco.Date";
+                    public const string ContentPicker2 = "Umbraco.ContentPicker2";
+                    public const string MediaPicker2 = "Umbraco.MediaPicker2";
+                    public const string MemberPicker2 = "Umbraco.MemberPicker2";
+                    public const string MultiNodeTreePicker2 = "Umbraco.MultiNodeTreePicker2";
+                    public const string TextboxMultiple = "Umbraco.TextboxMultiple";
+                    public const string RelatedLinks2 = "Umbraco.RelatedLinks2";
+                    public const string RelatedLinks = "Umbraco.RelatedLinks";
+
+                }
+            }
+
             /// <summary>
             /// Defines Umbraco built-in property editor aliases.
             /// </summary>
             public static class Aliases
             {
+                /// <summary>
+                /// Block List.
+                /// </summary>
+                public const string BlockList = "Umbraco.BlockList";
+
                 /// <summary>
                 /// CheckBox List.
                 /// </summary>
@@ -28,6 +50,11 @@ namespace Umbraco.Core
                 /// Color Picker.
                 /// </summary>
                 public const string ColorPicker = "Umbraco.ColorPicker";
+
+                /// <summary>
+                /// EyeDropper Color Picker.
+                /// </summary>
+                public const string ColorPickerEyeDropper = "Umbraco.ColorPicker.EyeDropper";
 
                 /// <summary>
                 /// Content Picker.
@@ -70,14 +97,19 @@ namespace Umbraco.Core
                 public const string ListView = "Umbraco.ListView";
 
                 /// <summary>
-                /// Macro Container.
-                /// </summary>
-                public const string MacroContainer = "Umbraco.MacroContainer";
-
-                /// <summary>
                 /// Media Picker.
                 /// </summary>
                 public const string MediaPicker = "Umbraco.MediaPicker";
+
+                /// <summary>
+                /// Media Picker v.3.
+                /// </summary>
+                public const string MediaPicker3 = "Umbraco.MediaPicker3";
+
+                /// <summary>
+                /// Multiple Media Picker.
+                /// </summary>
+                public const string MultipleMediaPicker = "Umbraco.MultipleMediaPicker";
 
                 /// <summary>
                 /// Member Picker.
@@ -170,7 +202,7 @@ namespace Umbraco.Core
                 public const string NestedContent = "Umbraco.NestedContent";
 
                 /// <summary>
-                /// Alias for the multi url picker editor.
+                /// Alias for the multi URL picker editor.
                 /// </summary>
                 public const string MultiUrlPicker = "Umbraco.MultiUrlPicker";
             }
@@ -185,6 +217,24 @@ namespace Umbraco.Core
                 /// </summary>
                 /// <remarks>Must be a valid <see cref="ValueTypes"/> value.</remarks>
                 public const string DataValueType = "umbracoDataValueType";
+            }
+
+            /// <summary>
+            /// Defines Umbraco's built-in property editor groups.
+            /// </summary>
+            public static class Groups
+            {
+                public const string Common = "Common";
+
+                public const string Lists = "Lists";
+
+                public const string Media = "Media";
+
+                public const string People = "People";
+
+                public const string Pickers = "Pickers";
+
+                public const string RichContent = "Rich Content";
             }
         }
     }

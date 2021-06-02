@@ -1,24 +1,48 @@
 function RowConfigController($scope, localizationService) {
 
+    var vm = this;
+
+    vm.configureCell = configureCell;
+    vm.closeArea = closeArea;
+    vm.deleteArea = deleteArea;
+    vm.selectEditor = selectEditor;
+    vm.toggleAllowed = toggleAllowed;
+    vm.percentage = percentage;
+    vm.scaleUp = scaleUp;
+    vm.scaleDown = scaleDown;
+    vm.close = close;
+    vm.submit = submit;
+
+    vm.labels = {};
+    
     function init() {
-        setTitle();
+
+        $scope.currentRow = $scope.model.currentRow;
+        $scope.columns = $scope.model.columns;
+        $scope.editors = $scope.model.editors;
+        $scope.nameChanged = false;
+
+        var labelKeys = [
+            "grid_addRowConfiguration",
+            "grid_allowAllEditors"
+        ];
+
+        localizationService.localizeMany(labelKeys).then(function (data) {
+
+            vm.labels.title = data[0];
+            vm.labels.allowAllEditors = data[1];
+
+            setTitle(vm.labels.title);
+        });
     }
 
-    function setTitle() {
+    function setTitle(value) {
         if (!$scope.model.title) {
-            localizationService.localize("grid_addRowConfiguration")
-                .then(function(data){
-                    $scope.model.title = data;
-                });
+            $scope.model.title = value;
         }
     }
-    
-    
-    $scope.currentRow = $scope.model.currentRow;
-    $scope.editors = $scope.model.editors;
-    $scope.columns = $scope.model.columns;
 
-    $scope.scaleUp = function(section, max, overflow) {
+    function scaleUp(section, max, overflow) {
         var add = 1;
         if (overflow !== true) {
             add = (max > 1) ? 1 : max;
@@ -27,24 +51,24 @@ function RowConfigController($scope, localizationService) {
         section.grid = section.grid + add;
     };
 
-    $scope.scaleDown = function(section) {
+    function scaleDown(section) {
         var remove = (section.grid > 1) ? 1 : 0;
         section.grid = section.grid - remove;
-    };
+    }
 
-    $scope.percentage = function(spans) {
+    function percentage(spans) {
         return ((spans / $scope.columns) * 100).toFixed(8);
-    };
+    }
 
     /****************
         area
     *****************/
-    $scope.configureCell = function(cell, row) {
+    function configureCell(cell, row) {
         if ($scope.currentCell && $scope.currentCell === cell) {
             delete $scope.currentCell;
         }
         else {
-            if (cell === undefined) {
+            if (cell === null) {
                 var available = $scope.availableRowSpace;
                 var space = 4;
 
@@ -58,12 +82,20 @@ function RowConfigController($scope, localizationService) {
 
                 row.areas.push(cell);
             }
-            $scope.currentCell = cell;
-            $scope.currentCell.allowAll = cell.allowAll || !cell.allowed || !cell.allowed.length;
-        }
-    };
 
-    $scope.toggleAllowed = function (cell) {
+            cell.allowed = cell.allowed || [];
+
+            $scope.editors.forEach(function (e) { e.allowed = cell.allowed.indexOf(e.alias) !== -1 });
+
+            cell.allowAll = cell.allowAll || !cell.allowed || !cell.allowed.length;
+
+            $scope.currentCell = cell;
+        }
+    }
+
+    function toggleAllowed(cell) {
+        cell.allowAll = !cell.allowAll;
+
         if (cell.allowed) {
             delete cell.allowed;
         }
@@ -72,32 +104,45 @@ function RowConfigController($scope, localizationService) {
         }
     }
 
-    $scope.deleteArea = function (cell, row) {
+    function deleteArea(cell, row) {
     	if ($scope.currentCell === cell) {
-    		$scope.currentCell = undefined;
+    		$scope.currentCell = null;
     	}
     	var index = row.areas.indexOf(cell)
     	row.areas.splice(index, 1);
-    };
+    }
 
-    $scope.closeArea = function() {
-        $scope.currentCell = undefined;
-    };
+    // This doesn't seem to be used?
+    function closeArea() {
+        $scope.currentCell = null;
+    }
+
+    function selectEditor(cell, editor) {
+        cell.allowed = cell.allowed || [];
+
+        var index = cell.allowed.indexOf(editor.alias);
+        if (editor.allowed === true) {
+            if (index === -1) {
+                cell.allowed.push(editor.alias);
+            }
+        }
+        else {
+            cell.allowed.splice(index, 1);
+        }
+    }
     
-    $scope.close = function() {
-        if($scope.model.close) {
+    function close () {
+        if ($scope.model.close) {
             $scope.model.close();
         }
     }
 
-    $scope.submit = function () {
+    function submit() {
         if ($scope.model.submit) {
             $scope.model.submit($scope.currentRow);
         }
     }
 
-    $scope.nameChanged = false;
-    var originalName = $scope.currentRow.name;
     $scope.$watch("currentRow", function(row) {
         if (row) {
 
@@ -108,6 +153,7 @@ function RowConfigController($scope, localizationService) {
 
             $scope.availableRowSpace = $scope.columns - total;
 
+            var originalName = $scope.currentRow.name;
             if (originalName) {
                 if (originalName != row.name) {
                     $scope.nameChanged = true;
@@ -118,11 +164,8 @@ function RowConfigController($scope, localizationService) {
             }
         }
     }, true);
-
     
     init();
-    
-
 }
 
 angular.module("umbraco").controller("Umbraco.PropertyEditors.GridPrevalueEditor.RowConfigController", RowConfigController);

@@ -7,6 +7,7 @@ using System.Web.Http;
 using System.Web.Http.Controllers;
 using System.Web.Http.Filters;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
@@ -23,28 +24,32 @@ namespace Umbraco.Web.Editors.Filters
     /// </summary>
     internal sealed class ContentSaveValidationAttribute : ActionFilterAttribute
     {
-        public ContentSaveValidationAttribute(): this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.ContentService, Current.Services.UserService, Current.Services.EntityService)
-        { }
-
-        public ContentSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, IContentService contentService, IUserService userService, IEntityService entityService)
-        {
-            _logger = logger;
-            _umbracoContextAccessor = umbracoContextAccessor;
-            _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
-            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
-            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
-        }
-
         private readonly ILogger _logger;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
+        private readonly ILocalizedTextService _textService;
         private readonly IContentService _contentService;
         private readonly IUserService _userService;
         private readonly IEntityService _entityService;
+        private readonly AppCaches _appCaches;
+
+        public ContentSaveValidationAttribute(): this(Current.Logger, Current.UmbracoContextAccessor, Current.Services.TextService, Current.Services.ContentService, Current.Services.UserService, Current.Services.EntityService, Current.AppCaches)
+        { }
+
+        public ContentSaveValidationAttribute(ILogger logger, IUmbracoContextAccessor umbracoContextAccessor, ILocalizedTextService textService, IContentService contentService, IUserService userService, IEntityService entityService, AppCaches appCaches)
+        {
+            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _umbracoContextAccessor = umbracoContextAccessor ?? throw new ArgumentNullException(nameof(umbracoContextAccessor));
+            _textService = textService ?? throw new ArgumentNullException(nameof(textService));
+            _contentService = contentService ?? throw new ArgumentNullException(nameof(contentService));
+            _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+            _entityService = entityService ?? throw new ArgumentNullException(nameof(entityService));
+            _appCaches = appCaches;
+        }
 
         public override void OnActionExecuting(HttpActionContext actionContext)
         {
             var model = (ContentItemSave)actionContext.ActionArguments["contentItem"];
-            var contentItemValidator = new ContentSaveModelValidator(_logger, _umbracoContextAccessor);
+            var contentItemValidator = new ContentSaveModelValidator(_logger, _umbracoContextAccessor, _textService);
 
             if (!ValidateAtLeastOneVariantIsBeingSaved(model, actionContext)) return;
             if (!contentItemValidator.ValidateExistingContent(model, actionContext)) return;
@@ -193,13 +198,13 @@ namespace Umbraco.Web.Editors.Filters
 
                 accessResult = ContentPermissionsHelper.CheckPermissions(
                     contentToCheck, webSecurity.CurrentUser,
-                    _userService, _entityService, permissionToCheck.ToArray());
+                    _userService, _entityService, _appCaches, permissionToCheck.ToArray());
             }
             else
             {
                 accessResult = ContentPermissionsHelper.CheckPermissions(
                        contentIdToCheck, webSecurity.CurrentUser,
-                       _userService, _contentService, _entityService,
+                       _userService, _contentService, _entityService, _appCaches,
                        out contentToCheck,
                        permissionToCheck.ToArray());
                 if (contentToCheck != null)

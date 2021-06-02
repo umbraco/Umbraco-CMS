@@ -5,7 +5,6 @@ using System.ComponentModel.DataAnnotations;
 using System.Web;
 using System.Web.Mvc;
 using Umbraco.Core;
-using Umbraco.Core.Composing;
 using Umbraco.Web.Security;
 using Current = Umbraco.Web.Composing.Current;
 
@@ -65,7 +64,7 @@ namespace Umbraco.Web.Models
         /// </summary>
         [Required]
         public string Password { get; set; }
-        
+
         /// <summary>
         /// The username of the model, if UsernameIsEmail is true then this is ignored.
         /// </summary>

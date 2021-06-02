@@ -4,6 +4,7 @@ using NUnit.Framework;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Tests.Testing;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Tests.Services
 {
@@ -47,6 +48,20 @@ namespace Umbraco.Tests.Services
 
             Assert.AreEqual(123 + 5, entries[0].PerformingUserId);
             Assert.AreEqual(123 + 4, entries[1].PerformingUserId);
+        }
+
+        [Test]
+        public void CanReadEntries()
+        {
+            var yesterday = DateTime.UtcNow.AddDays(-1);
+
+            for (var i = 0; i < 10; i++)
+            {
+                yesterday = yesterday.AddMinutes(1);
+                ServiceContext.AuditService.Add(AuditType.Unpublish, -1, 33, "", "blah");
+            }
+
+            var logs = ServiceContext.AuditService.GetUserLogs(-1, AuditType.Unpublish);
         }
     }
 }

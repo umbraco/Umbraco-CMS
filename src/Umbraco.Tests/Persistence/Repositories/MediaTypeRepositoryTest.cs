@@ -23,7 +23,8 @@ namespace Umbraco.Tests.Persistence.Repositories
             var cacheHelper = AppCaches.Disabled;
             var templateRepository = new TemplateRepository((IScopeAccessor)provider, cacheHelper, Logger, TestObjects.GetFileSystemsMock());
             var commonRepository = new ContentTypeCommonRepository((IScopeAccessor)provider, templateRepository, AppCaches);
-            return new MediaTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository);
+            var languageRepository = new LanguageRepository((IScopeAccessor)provider, AppCaches, Logger);
+            return new MediaTypeRepository((IScopeAccessor) provider, AppCaches.Disabled, Logger, commonRepository, languageRepository);
         }
 
         private EntityContainerRepository CreateContainerRepository(IScopeProvider provider)
@@ -49,7 +50,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 containerRepository.Save(container2);
                 
 
-                var contentType = (IMediaType)MockedContentTypes.CreateVideoMediaType();
+                var contentType = (IMediaType)MockedContentTypes.CreateNewMediaType();
                 contentType.ParentId = container2.Id;
                 repository.Save(contentType);
                 
@@ -132,7 +133,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 containerRepository.Save(container);
                 
 
-                var contentType = MockedContentTypes.CreateVideoMediaType();
+                var contentType = MockedContentTypes.CreateNewMediaType();
                 contentType.ParentId = container.Id;
                 repository.Save(contentType);
                 
@@ -154,7 +155,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 containerRepository.Save(container);
                 
 
-                IMediaType contentType = MockedContentTypes.CreateVideoMediaType();
+                IMediaType contentType = MockedContentTypes.CreateNewMediaType();
                 contentType.ParentId = container.Id;
                 repository.Save(contentType);
                 
@@ -182,7 +183,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(provider);
 
                 // Act
-                var contentType = MockedContentTypes.CreateVideoMediaType();
+                var contentType = MockedContentTypes.CreateNewMediaType();
                 repository.Save(contentType);
                 
 
@@ -209,7 +210,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var videoMediaType = MockedContentTypes.CreateVideoMediaType();
+                var videoMediaType = MockedContentTypes.CreateNewMediaType();
                 repository.Save(videoMediaType);
                 
 
@@ -248,7 +249,7 @@ namespace Umbraco.Tests.Persistence.Repositories
                 var repository = CreateRepository(provider);
 
                 // Act
-                var mediaType = MockedContentTypes.CreateVideoMediaType();
+                var mediaType = MockedContentTypes.CreateNewMediaType();
                 repository.Save(mediaType);
                 
 
@@ -377,7 +378,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var mediaType = MockedContentTypes.CreateVideoMediaType();
+                var mediaType = MockedContentTypes.CreateNewMediaType();
                 repository.Save(mediaType);
                 
 
@@ -405,7 +406,7 @@ namespace Umbraco.Tests.Persistence.Repositories
             {
                 var repository = CreateRepository(provider);
 
-                var mediaType = MockedContentTypes.CreateVideoMediaType();
+                var mediaType = MockedContentTypes.CreateNewMediaType();
                 repository.Save(mediaType);
                 
 

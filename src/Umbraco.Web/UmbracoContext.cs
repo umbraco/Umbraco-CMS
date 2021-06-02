@@ -1,18 +1,21 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Web;
+using System.Web.Routing;
 using Umbraco.Core;
 using Umbraco.Core.Configuration;
-using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration.UmbracoSettings;
+using Umbraco.Core.Events;
 using Umbraco.Core.Models.PublishedContent;
+using Umbraco.Web;
 using Umbraco.Web.PublishedCache;
 using Umbraco.Web.Routing;
-using Umbraco.Web.Runtime;
 using Umbraco.Web.Security;
 
 namespace Umbraco.Web
 {
+
     /// <summary>
     /// Class that encapsulates Umbraco information of a specific HTTP request
     /// </summary>
@@ -20,7 +23,6 @@ namespace Umbraco.Web
     {
         private readonly IGlobalSettings _globalSettings;
         private readonly Lazy<IPublishedSnapshot> _publishedSnapshot;
-        private DomainHelper _domainHelper;
         private string _previewToken;
         private bool? _previewing;
 
@@ -64,7 +66,7 @@ namespace Umbraco.Web
             // beware - we cannot expect a current user here, so detecting preview mode must be a lazy thing
             _publishedSnapshot = new Lazy<IPublishedSnapshot>(() => publishedSnapshotService.CreatePublishedSnapshot(PreviewToken));
 
-            // set the urls...
+            // set the URLs...
             // NOTE: The request will not be available during app startup so we can only set this to an absolute URL of localhost, this
             // is a work around to being able to access the UmbracoContext during application startup and this will also ensure that people
             // 'could' still generate URLs during startup BUT any domain driven URL generation will not work because it is NOT possible to get
@@ -99,7 +101,7 @@ namespace Umbraco.Web
         internal Uri OriginalRequestUrl { get; }
 
         /// <summary>
-        /// Gets the cleaned up url that is handled by Umbraco.
+        /// Gets the cleaned up URL that is handled by Umbraco.
         /// </summary>
         /// <remarks>That is, lowercase, no trailing slash after path, no .aspx...</remarks>
         internal Uri CleanedUmbracoUrl { get; }
@@ -109,18 +111,32 @@ namespace Umbraco.Web
         /// </summary>
         public IPublishedSnapshot PublishedSnapshot => _publishedSnapshot.Value;
 
-        // for unit tests
-        internal bool HasPublishedSnapshot => _publishedSnapshot.IsValueCreated;
+        /// <summary>
+        /// Gets the published content cache.
+        /// </summary>
+        [Obsolete("Use the Content property.")]
+        public IPublishedContentCache ContentCache => PublishedSnapshot.Content;
 
         /// <summary>
         /// Gets the published content cache.
         /// </summary>
-        public IPublishedContentCache ContentCache => PublishedSnapshot.Content;
+        public IPublishedContentCache Content => PublishedSnapshot.Content;
 
         /// <summary>
         /// Gets the published media cache.
         /// </summary>
+        [Obsolete("Use the Media property.")]
         public IPublishedMediaCache MediaCache => PublishedSnapshot.Media;
+
+        /// <summary>
+        /// Gets the published media cache.
+        /// </summary>
+        public IPublishedMediaCache Media => PublishedSnapshot.Media;
+
+        /// <summary>
+        /// Gets the domains cache.
+        /// </summary>
+        public IDomainCache Domains => PublishedSnapshot.Domains;
 
         /// <summary>
         /// Boolean value indicating whether the current request is a front-end umbraco request
@@ -128,7 +144,7 @@ namespace Umbraco.Web
         public bool IsFrontEndUmbracoRequest => PublishedRequest != null;
 
         /// <summary>
-        /// Gets the url provider.
+        /// Gets the URL provider.
         /// </summary>
         public UrlProvider UrlProvider { get; }
 
@@ -148,20 +164,6 @@ namespace Umbraco.Web
         public IVariationContextAccessor VariationContextAccessor { get; }
 
         /// <summary>
-        /// Creates and caches an instance of a DomainHelper
-        /// </summary>
-        /// <remarks>
-        /// We keep creating new instances of DomainHelper, it would be better if we didn't have to do that so instead we can
-        /// have one attached to the UmbracoContext. This method accepts an external ISiteDomainHelper otherwise the UmbracoContext
-        /// ctor will have to have another parameter added only for this one method which is annoying and doesn't make a ton of sense
-        /// since the UmbracoContext itself doesn't use this.
-        ///
-        /// TODO: The alternative is to have a IDomainHelperAccessor singleton which is cached per UmbracoContext
-        /// </remarks>
-        internal DomainHelper GetDomainHelper(ISiteDomainHelper siteDomainHelper)
-            => _domainHelper ?? (_domainHelper = new DomainHelper(PublishedSnapshot.Domains, siteDomainHelper));
-
-        /// <summary>
         /// Gets a value indicating whether the request has debugging enabled
         /// </summary>
         /// <value><c>true</c> if this instance is debug; otherwise, <c>false</c>.</value>
@@ -174,7 +176,8 @@ namespace Umbraco.Web
                 return GlobalSettings.DebugMode
                     && request != null
                     && (string.IsNullOrEmpty(request["umbdebugshowtrace"]) == false
-                        || string.IsNullOrEmpty(request["umbdebug"]) == false);
+                        || string.IsNullOrEmpty(request["umbdebug"]) == false
+                        || string.IsNullOrEmpty(request.Cookies["UMB-DEBUG"]?.Value) == false);
             }
         }
 
@@ -194,71 +197,73 @@ namespace Umbraco.Web
         #region Urls
 
         /// <summary>
-        /// Gets the url of a content identified by its identifier.
+        /// Gets the URL of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
+        /// <returns>The URL for the content.</returns>
         public string Url(int contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, culture);
+            return UrlProvider.GetUrl(contentId, culture: culture);
         }
 
         /// <summary>
-        /// Gets the url of a content identified by its identifier.
+        /// Gets the URL of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
+        /// <returns>The URL for the content.</returns>
         public string Url(Guid contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, culture);
+            return UrlProvider.GetUrl(contentId, culture: culture);
         }
 
         /// <summary>
-        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// Gets the URL of a content identified by its identifier, in a specified mode.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="mode">The mode.</param>
         /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        public string Url(int contentId, UrlProviderMode mode, string culture = null)
+        /// <returns>The URL for the content.</returns>
+        public string Url(int contentId, UrlMode mode, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, mode, culture);
         }
 
         /// <summary>
-        /// Gets the url of a content identified by its identifier, in a specified mode.
+        /// Gets the URL of a content identified by its identifier, in a specified mode.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="mode">The mode.</param>
         /// <param name="culture"></param>
-        /// <returns>The url for the content.</returns>
-        public string Url(Guid contentId, UrlProviderMode mode, string culture = null)
+        /// <returns>The URL for the content.</returns>
+        public string Url(Guid contentId, UrlMode mode, string culture = null)
         {
             return UrlProvider.GetUrl(contentId, mode, culture);
         }
 
         /// <summary>
-        /// Gets the absolute url of a content identified by its identifier.
+        /// Gets the absolute URL of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
-        /// <returns>The absolute url for the content.</returns>
+        /// <returns>The absolute URL for the content.</returns>
+        [Obsolete("Use the Url() method with UrlMode.Absolute.")]
         public string UrlAbsolute(int contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, true, culture);
+            return UrlProvider.GetUrl(contentId, UrlMode.Absolute, culture);
         }
 
         /// <summary>
-        /// Gets the absolute url of a content identified by its identifier.
+        /// Gets the absolute URL of a content identified by its identifier.
         /// </summary>
         /// <param name="contentId">The content identifier.</param>
         /// <param name="culture"></param>
-        /// <returns>The absolute url for the content.</returns>
+        /// <returns>The absolute URL for the content.</returns>
+        [Obsolete("Use the Url() method with UrlMode.Absolute.")]
         public string UrlAbsolute(Guid contentId, string culture = null)
         {
-            return UrlProvider.GetUrl(contentId, true, culture);
+            return UrlProvider.GetUrl(contentId, UrlMode.Absolute, culture);
         }
 
         #endregion
@@ -285,7 +290,7 @@ namespace Umbraco.Web
 
             _previewing = _previewToken.IsNullOrWhiteSpace() == false;
         }
-
+        
         // say we render a macro or RTE in a give 'preview' mode that might not be the 'current' one,
         // then due to the way it all works at the moment, the 'current' published snapshot need to be in the proper
         // default 'preview' mode - somehow we have to force it. and that could be recursive.

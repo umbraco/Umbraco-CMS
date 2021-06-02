@@ -10,10 +10,12 @@ using Umbraco.Web.Routing;
 
 namespace Umbraco.Web.Mvc
 {
+
     /// <summary>
     /// Represents the default front-end rendering controller.
     /// </summary>
     [PreRenderViewActionFilter]
+    [ModelBindingExceptionFilter]
     public class RenderMvcController : UmbracoController, IRenderMvcController
     {
         private PublishedRequest _publishedRequest;
@@ -66,7 +68,7 @@ namespace Umbraco.Web.Mvc
             var result = ViewEngines.Engines.FindView(ControllerContext, template, null);
             if (result.View != null) return true;
 
-            Logger.Warn<RenderMvcController>("No physical template file was found for template {Template}", template);
+            Logger.Warn<RenderMvcController, string>("No physical template file was found for template {Template}", template);
             return false;
         }
 

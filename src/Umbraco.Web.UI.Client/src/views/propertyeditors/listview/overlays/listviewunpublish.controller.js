@@ -17,8 +17,14 @@
 
             $scope.model.disableSubmitButton = !firstSelected;
 
-            //need to set the Save state to true if publish is true
-            language.save = language.unpublish;
+            if (language.isMandatory) {
+                $scope.model.languages.forEach(function (lang) {
+                    if (lang !== language) {
+                        lang.unpublish = true;
+                        lang.disabled = language.unpublish;
+                    }
+                });
+            }
         }
 
         function onInit() {
@@ -50,13 +56,13 @@
                     if (active) {
                         //ensure that the current one is selected
                         active.unpublish = true;
+                        changeSelection(active);
                     }
 
                 }
             }
 
             vm.loading = false;
-            
         }
 
         onInit();

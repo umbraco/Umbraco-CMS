@@ -5,10 +5,14 @@ using System.Web;
 using System.Xml.XPath;
 using Umbraco.Core;
 using Umbraco.Core.Dictionary;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Xml;
+using Umbraco.Web.Composing;
+using Umbraco.Web.Mvc;
 using Umbraco.Web.Security;
+using Constants = Umbraco.Core.Constants;
 
 namespace Umbraco.Web
 {
@@ -66,24 +70,31 @@ namespace Umbraco.Web
         #endregion
 
         // ensures that we can return the specified value
+        [Obsolete("This method is only used in Obsolete properties")]
         T Ensure<T>(T o) where T : class => o ?? throw new InvalidOperationException("This UmbracoHelper instance has not been initialized.");
 
+        [Obsolete("Inject and use an instance of " + nameof(IUmbracoComponentRenderer) + " in the constructor for using it in classes or get it from Current.UmbracoComponentRenderer in views.")]
         private IUmbracoComponentRenderer ComponentRenderer => Ensure(_componentRenderer);
+
+        [Obsolete("Inject and use an instance of " + nameof(ICultureDictionaryFactory) + " in the constructor for using it in classes or get it from Current.CultureDictionaryFactory in views.")]
         private ICultureDictionaryFactory CultureDictionaryFactory => Ensure(_cultureDictionaryFactory);
 
         /// <summary>
         /// Gets the tag context.
         /// </summary>
+        [Obsolete("Inject and use an instance of " + nameof(ITagQuery) + " in the constructor for using it in classes or get it from Current.TagQuery in views.")]
         public ITagQuery TagQuery => Ensure(_tagQuery);
 
         /// <summary>
         /// Gets the query context.
         /// </summary>
+        [Obsolete("Inject and use an instance of " + nameof(IPublishedContentQuery) + " in the constructor for using it in classes or get it from Current.PublishedContentQuery in views")]
         public IPublishedContentQuery ContentQuery => Ensure(_publishedContentQuery);
 
         /// <summary>
         /// Gets the membership helper.
         /// </summary>
+        [Obsolete("Inject and use an instance of " + nameof(Security.MembershipHelper) + " in the constructor instead. In views you can use @Members.")]
         public MembershipHelper MembershipHelper => Ensure(_membershipHelper);
 
         /// <summary>
@@ -130,7 +141,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderTemplate(int contentId, int? altTemplateId = null)
         {
-            return ComponentRenderer.RenderTemplate(contentId, altTemplateId);
+            return _componentRenderer.RenderTemplate(contentId, altTemplateId);
         }
 
         #region RenderMacro
@@ -142,7 +153,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias)
         {
-            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, new { });
+            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, null);
         }
 
         /// <summary>
@@ -153,7 +164,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias, object parameters)
         {
-            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters.ToDictionary<object>());
+            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters?.ToDictionary<object>());
         }
 
         /// <summary>
@@ -164,7 +175,7 @@ namespace Umbraco.Web
         /// <returns></returns>
         public IHtmlString RenderMacro(string alias, IDictionary<string, object> parameters)
         {
-            return ComponentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters);
+            return _componentRenderer.RenderMacro(AssignedContentItem?.Id ?? 0, alias, parameters);
         }
 
         #endregion
@@ -201,7 +212,7 @@ namespace Umbraco.Web
         /// Returns the ICultureDictionary for access to dictionary items
         /// </summary>
         public ICultureDictionary CultureDictionary => _cultureDictionary
-            ?? (_cultureDictionary = CultureDictionaryFactory.CreateDictionary());
+            ?? (_cultureDictionary = _cultureDictionaryFactory.CreateDictionary());
 
         #endregion
 
@@ -214,7 +225,7 @@ namespace Umbraco.Web
         /// <returns>True if the current user has access or if the current document isn't protected</returns>
         public bool MemberHasAccess(string path)
         {
-            return MembershipHelper.MemberHasAccess(path);
+            return _membershipHelper.MemberHasAccess(path);
         }
 
         /// <summary>
@@ -223,12 +234,12 @@ namespace Umbraco.Web
         /// <returns>True is the current user is logged in</returns>
         public bool MemberIsLoggedOn()
         {
-            return MembershipHelper.IsLoggedIn();
+            return _membershipHelper.IsLoggedIn();
         }
 
         #endregion
 
-       
+
 
         #region Member/Content/Media from Udi
 
@@ -264,7 +275,7 @@ namespace Umbraco.Web
 
         public IPublishedContent Member(Guid id)
         {
-            return MembershipHelper.GetById(id);
+            return _membershipHelper.GetById(id);
         }
 
         public IPublishedContent Member(object id)
@@ -280,18 +291,18 @@ namespace Umbraco.Web
 
         public IPublishedContent Member(int id)
         {
-            return MembershipHelper.GetById(id);
+            return _membershipHelper.GetById(id);
         }
 
         public IPublishedContent Member(string id)
         {
             var asInt = id.TryConvertTo<int>();
-            return asInt ? MembershipHelper.GetById(asInt.Result) : MembershipHelper.GetByProviderKey(id);
+            return asInt ? _membershipHelper.GetById(asInt.Result) : _membershipHelper.GetByProviderKey(id);
         }
 
         public IEnumerable<IPublishedContent> Members(IEnumerable<int> ids)
         {
-            return MembershipHelper.GetByIds(ids);
+            return _membershipHelper.GetByIds(ids);
         }
 
         public IEnumerable<IPublishedContent> Members(IEnumerable<string> ids)
@@ -301,7 +312,7 @@ namespace Umbraco.Web
 
         public IEnumerable<IPublishedContent> Members(IEnumerable<Guid> ids)
         {
-            return MembershipHelper.GetByIds(ids);
+            return _membershipHelper.GetByIds(ids);
         }
 
         public IEnumerable<IPublishedContent> Members(IEnumerable<Udi> ids)
@@ -326,7 +337,7 @@ namespace Umbraco.Web
 
         public IEnumerable<IPublishedContent> Members(params Guid[] ids)
         {
-            return MembershipHelper.GetByIds(ids);
+            return _membershipHelper.GetByIds(ids);
         }
 
         public IEnumerable<IPublishedContent> Members(params Udi[] ids)
@@ -356,11 +367,11 @@ namespace Umbraco.Web
         private IPublishedContent ContentForObject(object id)
         {
             if (ConvertIdObjectToInt(id, out var intId))
-                return ContentQuery.Content(intId);
+                return _publishedContentQuery.Content(intId);
             if (ConvertIdObjectToGuid(id, out var guidId))
-                return ContentQuery.Content(guidId);
+                return _publishedContentQuery.Content(guidId);
             if (ConvertIdObjectToUdi(id, out var udiId))
-                return ContentQuery.Content(udiId);
+                return _publishedContentQuery.Content(udiId);
             return null;
         }
 
@@ -371,7 +382,7 @@ namespace Umbraco.Web
         /// <returns>The content, or null of the content item is not in the cache.</returns>
         public IPublishedContent Content(int id)
         {
-            return ContentQuery.Content(id);
+            return _publishedContentQuery.Content(id);
         }
 
         /// <summary>
@@ -381,7 +392,7 @@ namespace Umbraco.Web
         /// <returns>The content, or null of the content item is not in the cache.</returns>
         public IPublishedContent Content(Guid id)
         {
-            return ContentQuery.Content(id);
+            return _publishedContentQuery.Content(id);
         }
 
         /// <summary>
@@ -396,12 +407,12 @@ namespace Umbraco.Web
 
         public IPublishedContent Content(Udi id)
         {
-            return ContentQuery.Content(id);
+            return _publishedContentQuery.Content(id);
         }
 
         public IPublishedContent ContentSingleAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return ContentQuery.ContentSingleAtXPath(xpath, vars);
+            return _publishedContentQuery.ContentSingleAtXPath(xpath, vars);
         }
 
         /// <summary>
@@ -423,7 +434,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Content(params Udi[] ids)
         {
-            return ids.Select(id => ContentQuery.Content(id)).WhereNotNull();
+            return ids.Select(id => _publishedContentQuery.Content(id)).WhereNotNull();
         }
 
         /// <summary>
@@ -434,16 +445,16 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Content(params GuidUdi[] ids)
         {
-            return ids.Select(id => ContentQuery.Content(id));
+            return ids.Select(id => _publishedContentQuery.Content(id));
         }
 
         private IEnumerable<IPublishedContent> ContentForObjects(IEnumerable<object> ids)
         {
             var idsA = ids.ToArray();
             if (ConvertIdsObjectToInts(idsA, out var intIds))
-                return ContentQuery.Content(intIds);
+                return _publishedContentQuery.Content(intIds);
             if (ConvertIdsObjectToGuids(idsA, out var guidIds))
-                return ContentQuery.Content(guidIds);
+                return _publishedContentQuery.Content(guidIds);
             return Enumerable.Empty<IPublishedContent>();
         }
 
@@ -454,7 +465,7 @@ namespace Umbraco.Web
         /// <returns>The content items that were found in the cache.</returns>
         public IEnumerable<IPublishedContent> Content(params int[] ids)
         {
-            return ContentQuery.Content(ids);
+            return _publishedContentQuery.Content(ids);
         }
 
         /// <summary>
@@ -464,7 +475,7 @@ namespace Umbraco.Web
         /// <returns>The content items that were found in the cache.</returns>
         public IEnumerable<IPublishedContent> Content(params Guid[] ids)
         {
-            return ContentQuery.Content(ids);
+            return _publishedContentQuery.Content(ids);
         }
 
         /// <summary>
@@ -495,8 +506,8 @@ namespace Umbraco.Web
         /// <returns>The existing contents corresponding to the identifiers.</returns>
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Content(IEnumerable<Udi> ids)
-        {          
-            return ids.Select(id => ContentQuery.Content(id)).WhereNotNull();
+        {
+            return ids.Select(id => _publishedContentQuery.Content(id)).WhereNotNull();
         }
 
         /// <summary>
@@ -507,7 +518,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Content(IEnumerable<GuidUdi> ids)
         {
-            return ids.Select(id => ContentQuery.Content(id));
+            return ids.Select(id => _publishedContentQuery.Content(id));
         }
 
         /// <summary>
@@ -529,22 +540,22 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing content, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Content(IEnumerable<int> ids)
         {
-            return ContentQuery.Content(ids);
+            return _publishedContentQuery.Content(ids);
         }
 
         public IEnumerable<IPublishedContent> ContentAtXPath(string xpath, params XPathVariable[] vars)
         {
-            return ContentQuery.ContentAtXPath(xpath, vars);
+            return _publishedContentQuery.ContentAtXPath(xpath, vars);
         }
 
         public IEnumerable<IPublishedContent> ContentAtXPath(XPathExpression xpath, params XPathVariable[] vars)
         {
-            return ContentQuery.ContentAtXPath(xpath, vars);
+            return _publishedContentQuery.ContentAtXPath(xpath, vars);
         }
 
         public IEnumerable<IPublishedContent> ContentAtRoot()
         {
-            return ContentQuery.ContentAtRoot();
+            return _publishedContentQuery.ContentAtRoot();
         }
 
         internal static bool ConvertIdObjectToInt(object id, out int intId)
@@ -643,7 +654,7 @@ namespace Umbraco.Web
 
         public IPublishedContent Media(Guid id)
         {
-            return ContentQuery.Media(id);
+            return _publishedContentQuery.Media(id);
         }
 
         /// <summary>
@@ -664,17 +675,17 @@ namespace Umbraco.Web
         private IPublishedContent MediaForObject(object id)
         {
             if (ConvertIdObjectToInt(id, out var intId))
-                return ContentQuery.Media(intId);
+                return _publishedContentQuery.Media(intId);
             if (ConvertIdObjectToGuid(id, out var guidId))
-                return ContentQuery.Media(guidId);
+                return _publishedContentQuery.Media(guidId);
             if (ConvertIdObjectToUdi(id, out var udiId))
-                return ContentQuery.Media(udiId);
+                return _publishedContentQuery.Media(udiId);
             return null;
         }
 
         public IPublishedContent Media(int id)
         {
-            return ContentQuery.Media(id);
+            return _publishedContentQuery.Media(id);
         }
 
         public IPublishedContent Media(string id)
@@ -697,9 +708,9 @@ namespace Umbraco.Web
         {
             var idsA = ids.ToArray();
             if (ConvertIdsObjectToInts(idsA, out var intIds))
-                return ContentQuery.Media(intIds);
+                return _publishedContentQuery.Media(intIds);
             if (ConvertIdsObjectToGuids(idsA, out var guidIds))
-                return ContentQuery.Media(guidIds);
+                return _publishedContentQuery.Media(guidIds);
             return Enumerable.Empty<IPublishedContent>();
         }
 
@@ -711,7 +722,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Media(params int[] ids)
         {
-            return ContentQuery.Media(ids);
+            return _publishedContentQuery.Media(ids);
         }
 
         /// <summary>
@@ -734,7 +745,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Media(params Udi[] ids)
         {
-            return ids.Select(id => ContentQuery.Media(id)).WhereNotNull();
+            return ids.Select(id => _publishedContentQuery.Media(id)).WhereNotNull();
         }
 
         /// <summary>
@@ -745,7 +756,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Media(params GuidUdi[] ids)
         {
-            return ids.Select(id => ContentQuery.Media(id));
+            return ids.Select(id => _publishedContentQuery.Media(id));
         }
 
         /// <summary>
@@ -767,7 +778,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Media(IEnumerable<int> ids)
         {
-            return ContentQuery.Media(ids);
+            return _publishedContentQuery.Media(ids);
         }
 
         /// <summary>
@@ -778,7 +789,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Media(IEnumerable<Udi> ids)
         {
-            return ids.Select(id => ContentQuery.Media(id)).WhereNotNull();
+            return ids.Select(id => _publishedContentQuery.Media(id)).WhereNotNull();
         }
 
         /// <summary>
@@ -789,7 +800,7 @@ namespace Umbraco.Web
         /// <remarks>If an identifier does not match an existing media, it will be missing in the returned value.</remarks>
         public IEnumerable<IPublishedContent> Media(IEnumerable<GuidUdi> ids)
         {
-            return ids.Select(id => ContentQuery.Media(id));
+            return ids.Select(id => _publishedContentQuery.Media(id));
         }
 
         /// <summary>
@@ -805,15 +816,41 @@ namespace Umbraco.Web
 
         public IEnumerable<IPublishedContent> MediaAtRoot()
         {
-            return ContentQuery.MediaAtRoot();
+            return _publishedContentQuery.MediaAtRoot();
         }
 
         #endregion
+        internal static bool DecryptAndValidateEncryptedRouteString(string ufprt, out IDictionary<string, string> parts)
+        {
+            string decryptedString;
+            try
+            {
+                decryptedString = ufprt.DecryptWithMachineKey();
+            }
+            catch (Exception ex) when (ex is FormatException || ex is ArgumentException)
+            {
+                Current.Logger.Warn(typeof(UmbracoHelper), "A value was detected in the ufprt parameter but Umbraco could not decrypt the string");
+                parts = null;
+                return false;
+            }
+            var parsedQueryString = HttpUtility.ParseQueryString(decryptedString);
+            parts = new Dictionary<string, string>();
+            foreach (var key in parsedQueryString.AllKeys)
+            {
+                parts[key] = parsedQueryString[key];
+            }
+            //validate all required keys exist
+            //the controller
+            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Controller))
+                return false;
+            //the action
+            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Action))
+                return false;
+            //the area
+            if (parts.All(x => x.Key != RenderRouteHandler.ReservedAdditionalKeys.Area))
+                return false;
 
-       
-
-        
-
-        
+            return true;
+        }
     }
 }

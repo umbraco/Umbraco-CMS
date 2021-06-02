@@ -1,9 +1,11 @@
 (function () {
     "use strict";
 
-    function TemplateSectionsController($scope, formHelper) {
+    function TemplateSectionsController($scope, formHelper, localizationService) {
 
         var vm = this;
+
+        vm.labels = {};
 
         vm.select = select;
         vm.submit = submit;
@@ -11,15 +13,29 @@
 
         $scope.model.mandatoryRenderSection = false;
 
-        if(!$scope.model.title) {
-            $scope.model.title = "Sections";
-        }
-
         function onInit() {
-            if($scope.model.hasMaster) {
+            if ($scope.model.hasMaster) {
                 $scope.model.insertType = 'addSection';
             } else {
                 $scope.model.insertType = 'renderBody';
+            }
+
+            var labelKeys = [
+                "template_insertSections",
+                "template_sectionMandatory"
+            ];
+
+            localizationService.localizeMany(labelKeys).then(function (data) {
+                vm.labels.title = data[0];
+                vm.labels.sectionMandatory = data[1];
+
+                setTitle(vm.labels.title);
+            });
+        }
+
+        function setTitle(value) {
+            if (!$scope.model.title) {
+                $scope.model.title = value;
             }
         }
 
@@ -34,13 +50,12 @@
         }
 
         function close() {
-            if($scope.model.close) {
+            if ($scope.model.close) {
                 $scope.model.close();
             }
         }
 
         onInit();
-
     }
 
     angular.module("umbraco").controller("Umbraco.Editors.TemplateSectionsController", TemplateSectionsController);

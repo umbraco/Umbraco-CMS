@@ -37,6 +37,7 @@ using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Security;
 using Umbraco.Web.Routing;
+using Umbraco.Core.Collections;
 
 namespace Umbraco.Web.Editors
 {
@@ -303,7 +304,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the content json for the content guid
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -323,7 +324,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets the content json for the content id
+        /// Gets the content json for the content udi
         /// </summary>
         /// <param name="id"></param>
         /// <returns></returns>
@@ -341,7 +342,7 @@ namespace Umbraco.Web.Editors
         }
 
         /// <summary>
-        /// Gets an empty content item for the
+        /// Gets an empty content item for the document type.
         /// </summary>
         /// <param name="contentTypeAlias"></param>
         /// <param name="parentId"></param>
@@ -354,6 +355,29 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
+            return GetEmpty(contentType, parentId);
+        }
+
+
+        /// <summary>
+        /// Gets an empty content item for the document type.
+        /// </summary>
+        /// <param name="contentTypeKey"></param>
+        /// <param name="parentId"></param>
+        [OutgoingEditorModelEvent]
+        public ContentItemDisplay GetEmptyByKey(Guid contentTypeKey, int parentId)
+        {
+            var contentType = Services.ContentTypeService.Get(contentTypeKey);
+            if (contentType == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return GetEmpty(contentType, parentId);
+        }
+
+        private ContentItemDisplay GetEmpty(IContentType contentType, int parentId)
+        {
             var emptyContent = Services.ContentService.Create("", parentId, contentType.Alias, Security.GetUserId().ResultOr(0));
             var mapped = MapToDisplay(emptyContent);
             // translate the content type name if applicable
@@ -576,8 +600,13 @@ namespace Umbraco.Web.Editors
                     Services.ContentService.SaveBlueprint(contentItem.PersistedContent, Security.CurrentUser.Id);
                     //we need to reuse the underlying logic so return the result that it wants
                     return OperationResult.Succeed(new EventMessages());
+                },
+                content =>
+                {
+                    var display = MapToDisplay(content);
+                    SetupBlueprint(display, content);
+                    return display;
                 });
-            SetupBlueprint(contentItemDisplay, contentItemDisplay.PersistedContent);
 
             return contentItemDisplay;
         }
@@ -591,11 +620,15 @@ namespace Umbraco.Web.Editors
         [OutgoingEditorModelEvent]
         public ContentItemDisplay PostSave([ModelBinder(typeof(ContentItemBinder))] ContentItemSave contentItem)
         {
-            var contentItemDisplay = PostSaveInternal(contentItem, content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id));
+            var contentItemDisplay = PostSaveInternal(
+                contentItem,
+                content => Services.ContentService.Save(contentItem.PersistedContent, Security.CurrentUser.Id),
+                MapToDisplay);
+
             return contentItemDisplay;
         }
 
-        private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod)
+        private ContentItemDisplay PostSaveInternal(ContentItemSave contentItem, Func<IContent, OperationResult> saveMethod, Func<IContent, ContentItemDisplay> mapToDisplay)
         {
             //Recent versions of IE/Edge may send in the full client side file path instead of just the file name.
             //To ensure similar behavior across all browsers no matter what they do - we strip the FileName property of all
@@ -626,7 +659,7 @@ namespace Umbraco.Web.Editors
                 {
                     //ok, so the absolute mandatory data is invalid and it's new, we cannot actually continue!
                     // add the model state to the outgoing object and throw a validation message
-                    var forDisplay = MapToDisplay(contentItem.PersistedContent);
+                    var forDisplay = mapToDisplay(contentItem.PersistedContent);
                     forDisplay.Errors = ModelState.ToErrorDictionary();
                     throw new HttpResponseException(Request.CreateValidationErrorResponse(forDisplay));
                 }
@@ -666,7 +699,7 @@ namespace Umbraco.Web.Editors
 
             //The default validation language will be either: The default languauge, else if the content is brand new and the default culture is
             // not marked to be saved, it will be the first culture in the list marked for saving.
-            var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.CultureName;
+            var defaultCulture = _allLangs.Value.Values.FirstOrDefault(x => x.IsDefault)?.IsoCode;
             var cultureForInvariantErrors = CultureImpact.GetCultureForInvariantErrors(
                 contentItem.PersistedContent,
                 contentItem.Variants.Where(x => x.Save).Select(x => x.Culture).ToArray(),
@@ -697,12 +730,19 @@ namespace Umbraco.Web.Editors
                     {
                         if (variantCount > 1)
                         {
-                            var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
-                            foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
+                            var variantErrors = ModelState.GetVariantsWithErrors(cultureForInvariantErrors);
+
+                            var validVariants = contentItem.Variants
+                                .Where(x => x.Save && !variantErrors.Contains((x.Culture, x.Segment)))
+                                .Select(x => (culture: x.Culture, segment: x.Segment));
+
+                            foreach (var (culture, segment) in validVariants)
                             {
-                                AddSuccessNotification(notifications, c,
+                                var variantName = GetVariantName(culture, segment);
+
+                                AddSuccessNotification(notifications, culture, segment,
                                     Services.TextService.Localize("speechBubbles/editContentSendToPublish"),
-                                    Services.TextService.Localize("speechBubbles/editVariantSendToPublishText", new[] { _allLangs.Value[c].CultureName }));
+                                    Services.TextService.Localize("speechBubbles/editVariantSendToPublishText", new[] { variantName }));
                             }
                         }
                         else if (ModelState.IsValid)
@@ -717,11 +757,7 @@ namespace Umbraco.Web.Editors
                 case ContentSaveAction.PublishNew:
                     {
                         var publishStatus = PublishInternal(contentItem, defaultCulture, cultureForInvariantErrors, out wasCancelled, out var successfulCultures);
-                        //global notifications
-                        AddMessageForPublishStatus(new[] { publishStatus }, globalNotifications, successfulCultures);
-                        //variant specific notifications
-                        foreach (var c in successfulCultures)
-                            AddMessageForPublishStatus(new[] { publishStatus }, notifications.GetOrCreate(c), successfulCultures);
+                        AddPublishStatusNotifications(new[] { publishStatus }, globalNotifications, notifications, successfulCultures);
                     }
                     break;
                 case ContentSaveAction.PublishWithDescendants:
@@ -737,12 +773,7 @@ namespace Umbraco.Web.Editors
                         }
 
                         var publishStatus = PublishBranchInternal(contentItem, false, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
-
-                        //global notifications
-                        AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
-                        //variant specific notifications
-                        foreach (var c in successfulCultures)
-                            AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
+                        AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
                     }
                     break;
                 case ContentSaveAction.PublishWithDescendantsForce:
@@ -758,12 +789,7 @@ namespace Umbraco.Web.Editors
                         }
 
                         var publishStatus = PublishBranchInternal(contentItem, true, cultureForInvariantErrors, out wasCancelled, out var successfulCultures).ToList();
-
-                        //global notifications
-                        AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
-                        //variant specific notifications
-                        foreach (var c in successfulCultures)
-                            AddMessageForPublishStatus(publishStatus, notifications.GetOrCreate(c), successfulCultures);
+                        AddPublishStatusNotifications(publishStatus, globalNotifications, notifications, successfulCultures);
                     }
                     break;
                 default:
@@ -771,7 +797,7 @@ namespace Umbraco.Web.Editors
             }
 
             //get the updated model
-            var display = MapToDisplay(contentItem.PersistedContent);
+            var display = mapToDisplay(contentItem.PersistedContent);
 
             //merge the tracked success messages with the outgoing model
             display.Notifications.AddRange(globalNotifications.Notifications);
@@ -801,6 +827,15 @@ namespace Umbraco.Web.Editors
             return display;
         }
 
+        private void AddPublishStatusNotifications(IReadOnlyCollection<PublishResult> publishStatus, SimpleNotificationModel globalNotifications, Dictionary<string, SimpleNotificationModel> variantNotifications, string[] successfulCultures)
+        {
+            //global notifications
+            AddMessageForPublishStatus(publishStatus, globalNotifications, successfulCultures);
+            //variant specific notifications
+            foreach (var c in successfulCultures ?? Array.Empty<string>())
+                AddMessageForPublishStatus(publishStatus, variantNotifications.GetOrCreate(c), successfulCultures);
+        }
+
         /// <summary>
         /// Validates critical data for persistence and updates the ModelState and result accordingly
         /// </summary>
@@ -809,7 +844,7 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         /// <remarks>
         /// For invariant, the variants collection count will be 1 and this will check if that invariant item has the critical values for persistence (i.e. Name)
-        /// 
+        ///
         /// For variant, each variant will be checked for critical data for persistence and if it's not there then it's flags will be reset and it will not
         /// be persisted. However, we also need to deal with the case where all variants don't pass this check and then there is nothing to save. This also deals
         /// with removing the Name validation keys based on data annotations validation for items that haven't been marked to be saved.
@@ -838,7 +873,7 @@ namespace Umbraco.Web.Editors
                         //if there's more than 1 variant, then we need to add the culture specific error
                         //messages based on the variants in error so that the messages show in the publish/save dialog
                         if (variants.Count > 1)
-                            AddCultureValidationError(variant.Culture, "publish/contentPublishedFailedByMissingName");
+                            AddVariantValidationError(variant.Culture, variant.Segment, "publish/contentPublishedFailedByMissingName");
                         else
                             return false; //It's invariant and is missing critical data, it cannot be saved
                     }
@@ -865,7 +900,7 @@ namespace Umbraco.Web.Editors
             return true;
         }
 
-        
+
 
         /// <summary>
         /// Helper method to perform the saving of the content and add the notifications to the result
@@ -892,12 +927,19 @@ namespace Umbraco.Web.Editors
             {
                 if (variantCount > 1)
                 {
-                    var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
-                    foreach (var c in contentItem.Variants.Where(x => x.Save && !cultureErrors.Contains(x.Culture)).Select(x => x.Culture).ToArray())
+                    var variantErrors = ModelState.GetVariantsWithErrors(cultureForInvariantErrors);
+
+                    var savedWithoutErrors = contentItem.Variants
+                        .Where(x => x.Save && !variantErrors.Contains((x.Culture, x.Segment)))
+                        .Select(x => (culture: x.Culture, segment: x.Segment));
+
+                    foreach (var (culture, segment) in savedWithoutErrors)
                     {
-                        AddSuccessNotification(notifications, c,
+                        var variantName = GetVariantName(culture, segment);
+
+                        AddSuccessNotification(notifications, culture, segment,
                             Services.TextService.Localize("speechBubbles/editContentSavedHeader"),
-                            Services.TextService.Localize(variantSavedLocalizationKey, new[] { _allLangs.Value[c].CultureName }));
+                            Services.TextService.Localize(variantSavedLocalizationKey, new[] { variantName }));
                     }
                 }
                 else if (ModelState.IsValid)
@@ -1030,14 +1072,16 @@ namespace Umbraco.Web.Editors
                 if (!isPublished && releaseDates.Count == 0)
                 {
                     //can't continue, a mandatory variant is not published and not scheduled for publishing
-                    AddCultureValidationError(culture, "speechBubbles/scheduleErrReleaseDate2");
+                    // TODO: Add segment
+                    AddVariantValidationError(culture, null, "speechBubbles/scheduleErrReleaseDate2");
                     isValid = false;
                     continue;
                 }
                 if (!isPublished && releaseDates.Any(x => nonMandatoryVariantReleaseDates.Any(r => x.Date > r.Date)))
                 {
                     //can't continue, a mandatory variant is not published and it's scheduled for publishing after a non-mandatory
-                    AddCultureValidationError(culture, "speechBubbles/scheduleErrReleaseDate3");
+                    // TODO: Add segment
+                    AddVariantValidationError(culture, null, "speechBubbles/scheduleErrReleaseDate3");
                     isValid = false;
                     continue;
                 }
@@ -1051,7 +1095,7 @@ namespace Umbraco.Web.Editors
                 //1) release date cannot be less than now
                 if (variant.ReleaseDate.HasValue && variant.ReleaseDate < DateTime.Now)
                 {
-                    AddCultureValidationError(variant.Culture, "speechBubbles/scheduleErrReleaseDate1");
+                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles/scheduleErrReleaseDate1");
                     isValid = false;
                     continue;
                 }
@@ -1059,7 +1103,7 @@ namespace Umbraco.Web.Editors
                 //2) expire date cannot be less than now
                 if (variant.ExpireDate.HasValue && variant.ExpireDate < DateTime.Now)
                 {
-                    AddCultureValidationError(variant.Culture, "speechBubbles/scheduleErrExpireDate1");
+                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles/scheduleErrExpireDate1");
                     isValid = false;
                     continue;
                 }
@@ -1067,7 +1111,7 @@ namespace Umbraco.Web.Editors
                 //3) expire date cannot be less than release date
                 if (variant.ExpireDate.HasValue && variant.ReleaseDate.HasValue && variant.ExpireDate <= variant.ReleaseDate)
                 {
-                    AddCultureValidationError(variant.Culture, "speechBubbles/scheduleErrExpireDate2");
+                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles/scheduleErrExpireDate2");
                     isValid = false;
                     continue;
                 }
@@ -1092,12 +1136,13 @@ namespace Umbraco.Web.Editors
         /// global notifications will be shown if all variant processing is successful and the save/publish dialog is closed, otherwise
         /// variant specific notifications are used to show success messages in the save/publish dialog.
         /// </remarks>
-        private static void AddSuccessNotification(IDictionary<string, SimpleNotificationModel> notifications, string culture, string header, string msg)
+        private static void AddSuccessNotification(IDictionary<string, SimpleNotificationModel> notifications, string culture, string segment, string header, string msg)
         {
             //add the global notification (which will display globally if all variants are successfully processed)
             notifications[string.Empty].AddSuccessNotification(header, msg);
             //add the variant specific notification (which will display in the dialog if all variants are not successfully processed)
-            notifications.GetOrCreate(culture).AddSuccessNotification(header, msg);
+            var key = culture + "_" + segment;
+            notifications.GetOrCreate(key).AddSuccessNotification(header, msg);
         }
 
         /// <summary>
@@ -1123,7 +1168,7 @@ namespace Umbraco.Web.Editors
                     //if this item's path has already been denied or if the user doesn't have access to it, add to the deny list
                     if (denied.Any(x => c.Path.StartsWith($"{x.Path},"))
                         || (ContentPermissionsHelper.CheckPermissions(c,
-                            Security.CurrentUser, Services.UserService, Services.EntityService,
+                            Security.CurrentUser, Services.UserService, Services.EntityService, AppCaches,
                             ActionPublish.ActionLetter) == ContentPermissionsHelper.ContentAccess.Denied))
                     {
                         denied.Add(c);
@@ -1143,35 +1188,34 @@ namespace Umbraco.Web.Editors
                 var publishStatus = Services.ContentService.SaveAndPublishBranch(contentItem.PersistedContent, force, userId: Security.CurrentUser.Id);
                 // TODO: Deal with multiple cancellations
                 wasCancelled = publishStatus.Any(x => x.Result == PublishResultType.FailedPublishCancelledByEvent);
-                successfulCultures = Array.Empty<string>();
+                successfulCultures = null; //must be null! this implies invariant
                 return publishStatus;
             }
 
-            //All variants in this collection should have a culture if we get here! but we'll double check and filter here
-            var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
-
             var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
 
-            var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
+            var variantErrors = ModelState.GetVariantsWithErrors(cultureForInvariantErrors);
+
+            var variants = contentItem.Variants.ToList();
 
             //validate if we can publish based on the mandatory language requirements
             var canPublish = ValidatePublishingMandatoryLanguages(
-                cultureErrors,
-                contentItem, cultureVariants, mandatoryCultures, 
+                variantErrors,
+                contentItem, variants, mandatoryCultures,
                 mandatoryVariant => mandatoryVariant.Publish);
 
             //Now check if there are validation errors on each variant.
             //If validation errors are detected on a variant and it's state is set to 'publish', then we
             //need to change it to 'save'.
             //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
-            
+
             foreach (var variant in contentItem.Variants)
             {
-                if (cultureErrors.Contains(variant.Culture))
+                if (variantErrors.Contains((variant.Culture, variant.Segment)))
                     variant.Publish = false;
             }
 
-            var culturesToPublish = cultureVariants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
+            var culturesToPublish = variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
 
             if (canPublish)
             {
@@ -1215,21 +1259,20 @@ namespace Umbraco.Web.Editors
                 //its invariant, proceed normally
                 var publishStatus = Services.ContentService.SaveAndPublish(contentItem.PersistedContent, userId: Security.CurrentUser.Id);
                 wasCancelled = publishStatus.Result == PublishResultType.FailedPublishCancelledByEvent;
-                successfulCultures = Array.Empty<string>();
+                successfulCultures = null; //must be null! this implies invariant
                 return publishStatus;
             }
 
-            //All variants in this collection should have a culture if we get here! but we'll double check and filter here
-            var cultureVariants = contentItem.Variants.Where(x => !x.Culture.IsNullOrWhiteSpace()).ToList();
-
             var mandatoryCultures = _allLangs.Value.Values.Where(x => x.IsMandatory).Select(x => x.IsoCode).ToList();
 
-            var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
+            var variantErrors = ModelState.GetVariantsWithErrors(cultureForInvariantErrors);
+
+            var variants = contentItem.Variants.ToList();
 
             //validate if we can publish based on the mandatory languages selected
             var canPublish = ValidatePublishingMandatoryLanguages(
-                cultureErrors,
-                contentItem, cultureVariants, mandatoryCultures,
+                variantErrors,
+                contentItem, variants, mandatoryCultures,
                 mandatoryVariant => mandatoryVariant.Publish);
 
             //if none are published and there are validation errors for mandatory cultures, then we can't publish anything
@@ -1238,22 +1281,22 @@ namespace Umbraco.Web.Editors
             //Now check if there are validation errors on each variant.
             //If validation errors are detected on a variant and it's state is set to 'publish', then we
             //need to change it to 'save'.
-            //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.            
+            //It is a requirement that this is performed AFTER ValidatePublishingMandatoryLanguages.
             foreach (var variant in contentItem.Variants)
             {
-                if (cultureErrors.Contains(variant.Culture))
+                if (variantErrors.Contains((variant.Culture, variant.Segment)))
                     variant.Publish = false;
             }
 
             //At this stage all variants might have failed validation which means there are no cultures flagged for publishing!
-            var culturesToPublish = cultureVariants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
+            var culturesToPublish = variants.Where(x => x.Publish).Select(x => x.Culture).ToArray();
             canPublish = canPublish && culturesToPublish.Length > 0;
 
             if (canPublish)
             {
                 //try to publish all the values on the model - this will generally only fail if someone is tampering with the request
                 //since there's no reason variant rules would be violated in normal cases.
-                canPublish = PublishCulture(contentItem.PersistedContent, cultureVariants, defaultCulture);
+                canPublish = PublishCulture(contentItem.PersistedContent, variants, defaultCulture);
             }
 
             if (canPublish)
@@ -1278,16 +1321,16 @@ namespace Umbraco.Web.Editors
         /// <summary>
         /// Validate if publishing is possible based on the mandatory language requirements
         /// </summary>
-        /// <param name="culturesWithValidationErrors"></param>
+        /// <param name="variantsWithValidationErrors"></param>
         /// <param name="contentItem"></param>
-        /// <param name="cultureVariants"></param>
+        /// <param name="variants"></param>
         /// <param name="mandatoryCultures"></param>
         /// <param name="publishingCheck"></param>
         /// <returns></returns>
         private bool ValidatePublishingMandatoryLanguages(
-            IReadOnlyCollection<string> culturesWithValidationErrors,
+            IReadOnlyCollection<(string culture, string segment)> variantsWithValidationErrors,
             ContentItemSave contentItem,
-            IReadOnlyCollection<ContentVariantSave> cultureVariants,
+            IReadOnlyCollection<ContentVariantSave> variants,
             IReadOnlyList<string> mandatoryCultures,
             Func<ContentVariantSave, bool> publishingCheck)
         {
@@ -1298,11 +1341,11 @@ namespace Umbraco.Web.Editors
             {
                 //Check if a mandatory language is missing from being published
 
-                var mandatoryVariant = cultureVariants.First(x => x.Culture.InvariantEquals(culture));
+                var mandatoryVariant = variants.First(x => x.Culture.InvariantEquals(culture));
 
                 var isPublished = contentItem.PersistedContent.Published && contentItem.PersistedContent.IsCulturePublished(culture);
                 var isPublishing = isPublished || publishingCheck(mandatoryVariant);
-                var isValid = !culturesWithValidationErrors.InvariantContains(culture);
+                var isValid = !variantsWithValidationErrors.Select(v => v.culture).InvariantContains(culture);
 
                 result.Add((mandatoryVariant, isPublished || isPublishing, isValid));
             }
@@ -1317,19 +1360,19 @@ namespace Umbraco.Web.Editors
                 if (r.publishing && !r.isValid)
                 {
                     //flagged for publishing but the mandatory culture is invalid
-                    AddCultureValidationError(r.model.Culture, "publish/contentPublishedFailedReqCultureValidationError");
+                    AddVariantValidationError(r.model.Culture, r.model.Segment, "publish/contentPublishedFailedReqCultureValidationError");
                     canPublish = false;
                 }
                 else if (r.publishing && r.isValid && firstInvalidMandatoryCulture != null)
                 {
                     //in this case this culture also cannot be published because another mandatory culture is invalid
-                    AddCultureValidationError(r.model.Culture, "publish/contentPublishedFailedReqCultureValidationError", firstInvalidMandatoryCulture);
+                    AddVariantValidationError(r.model.Culture, r.model.Segment, "publish/contentPublishedFailedReqCultureValidationError", firstInvalidMandatoryCulture);
                     canPublish = false;
                 }
                 else if (!r.publishing)
                 {
                     //cannot continue publishing since a required culture that is not currently being published isn't published
-                    AddCultureValidationError(r.model.Culture, "speechBubbles/contentReqCulturePublishError");
+                    AddVariantValidationError(r.model.Culture, r.model.Segment, "speechBubbles/contentReqCulturePublishError");
                     canPublish = false;
                 }
             }
@@ -1354,7 +1397,7 @@ namespace Umbraco.Web.Editors
                 var valid = persistentContent.PublishCulture(CultureImpact.Explicit(variant.Culture, defaultCulture.InvariantEquals(variant.Culture)));
                 if (!valid)
                 {
-                    AddCultureValidationError(variant.Culture, "speechBubbles/contentCultureValidationError");
+                    AddVariantValidationError(variant.Culture, variant.Segment, "speechBubbles/contentCultureValidationError");
                     return false;
                 }
             }
@@ -1366,14 +1409,40 @@ namespace Umbraco.Web.Editors
         /// Adds a generic culture error for use in displaying the culture validation error in the save/publish/etc... dialogs
         /// </summary>
         /// <param name="culture">Culture to assign the error to</param>
+        /// <param name="segment">Segment to assign the error to</param>
         /// <param name="localizationKey"></param>
         /// <param name="cultureToken">
-        /// The culture used in the localization message, null by default which means <see cref="culture"/> will be used. 
+        /// The culture used in the localization message, null by default which means <see cref="culture"/> will be used.
         /// </param>
-        private void AddCultureValidationError(string culture, string localizationKey, string cultureToken = null)
+        private void AddVariantValidationError(string culture, string segment, string localizationKey, string cultureToken = null)
         {
-            var errMsg = Services.TextService.Localize(localizationKey, new[] { cultureToken == null ? _allLangs.Value[culture].CultureName : _allLangs.Value[cultureToken].CultureName });
-            ModelState.AddCultureValidationError(culture, errMsg);
+            var cultureToUse = cultureToken ?? culture;
+            var variantName = GetVariantName(cultureToUse, segment);
+
+            var errMsg = Services.TextService.Localize(localizationKey, new[] { variantName });
+
+            ModelState.AddVariantValidationError(culture, segment, errMsg);
+        }
+
+        /// <summary>
+        /// Creates the human readable variant name based on culture and segment
+        /// </summary>
+        /// <param name="culture">Culture</param>
+        /// <param name="segment">Segment</param>
+        /// <returns></returns>
+        private string GetVariantName(string culture, string segment)
+        {
+            if(culture.IsNullOrWhiteSpace() && segment.IsNullOrWhiteSpace())
+            {
+                // TODO: Get name for default variant from somewhere?
+                return "Default";
+            }
+
+            var cultureName = culture == null ? null : _allLangs.Value[culture].CultureName;
+            var variantName = string.Join(" — ", new[] { segment, cultureName }.Where(x => !x.IsNullOrWhiteSpace()));
+
+            // Format: <segment> [&mdash;] <culture name>
+            return variantName;
         }
 
         /// <summary>
@@ -1652,14 +1721,14 @@ namespace Umbraco.Web.Editors
         [HttpPost]
         public DomainSave PostSaveLanguageAndDomains(DomainSave model)
         {
-            foreach(var domain in model.Domains)
+            foreach (var domain in model.Domains)
             {
                 try
                 {
-                    var uri = DomainHelper.ParseUriFromDomainName(domain.Name, Request.RequestUri);
+                    var uri = DomainUtilities.ParseUriFromDomainName(domain.Name, Request.RequestUri);
                 }
                 catch (UriFormatException)
-                {                    
+                {
                     var response = Request.CreateValidationErrorResponse(Services.TextService.Localize("assignDomain/invalidDomain"));
                     throw new HttpResponseException(response);
                 }
@@ -1675,9 +1744,9 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(response);
             }
 
-            var permission = Services.UserService.GetPermissions(Security.CurrentUser, node.Path);
+            var assignedPermissions = Services.UserService.GetAssignedPermissions(Security.CurrentUser, node.Id);
 
-            if (permission.AssignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
+            if (assignedPermissions.Contains(ActionAssignDomain.ActionLetter.ToString(), StringComparer.Ordinal) == false)
             {
                 var response = Request.CreateResponse(HttpStatusCode.BadRequest);
                 response.Content = new StringContent("You do not have permission to assign domains on that node.");
@@ -1814,26 +1883,31 @@ namespace Umbraco.Web.Editors
             if (!ModelState.IsValid && display.Variants.Count() > 1)
             {
                 //Add any culture specific errors here
-                var cultureErrors = ModelState.GetCulturesWithErrors(Services.LocalizationService, cultureForInvariantErrors);
+                var variantErrors = ModelState.GetVariantsWithErrors(cultureForInvariantErrors);
 
-                foreach (var cultureError in cultureErrors)
+                foreach (var (culture, segment) in variantErrors)
                 {
-                    AddCultureValidationError(cultureError, "speechBubbles/contentCultureValidationError");
+                    AddVariantValidationError(culture, segment, "speechBubbles/contentCultureValidationError");
                 }
             }
 
             base.HandleInvalidModelState(display);
 
         }
-        
+
         /// <summary>
         /// Maps the dto property values and names to the persisted model
         /// </summary>
         /// <param name="contentSave"></param>
         private void MapValuesForPersistence(ContentItemSave contentSave)
         {
-            // inline method to determine if a property type varies
-            bool Varies(Property property) => property.PropertyType.VariesByCulture();
+            // inline method to determine the culture and segment to persist the property
+            (string culture, string segment) PropertyCultureAndSegment(Property property, ContentVariantSave variant)
+            {
+                var culture = property.PropertyType.VariesByCulture() ? variant.Culture : null;
+                var segment = property.PropertyType.VariesBySegment() ? variant.Segment : null;
+                return (culture, segment);
+            }
 
             var variantIndex = 0;
 
@@ -1865,15 +1939,26 @@ namespace Umbraco.Web.Editors
                     ? variant.PropertyCollectionDto
                     : new ContentPropertyCollectionDto
                     {
-                        Properties = variant.PropertyCollectionDto.Properties.Where(x => !x.Culture.IsNullOrWhiteSpace())
+                        Properties = variant.PropertyCollectionDto.Properties.Where(
+                            x => !x.Culture.IsNullOrWhiteSpace() || !x.Segment.IsNullOrWhiteSpace())
                     };
 
                 //for each variant, map the property values
                 MapPropertyValuesForPersistence<IContent, ContentItemSave>(
                     contentSave,
                     propertyCollection,
-                    (save, property) => Varies(property) ? property.GetValue(variant.Culture) : property.GetValue(),         //get prop val
-                    (save, property, v) => { if (Varies(property)) property.SetValue(v, variant.Culture); else property.SetValue(v); },  //set prop val
+                    (save, property) =>
+                    {
+                        // Get property value
+                        (var culture, var segment) = PropertyCultureAndSegment(property, variant);
+                        return property.GetValue(culture, segment);
+                    },
+                    (save, property, v) =>
+                    {
+                        // Set property value
+                        (var culture, var segment) = PropertyCultureAndSegment(property, variant);
+                        property.SetValue(v, culture, segment);
+                    },
                     variant.Culture);
 
                 variantIndex++;
@@ -1893,7 +1978,7 @@ namespace Umbraco.Web.Editors
                 if (template == null)
                 {
                     //ModelState.AddModelError("Template", "No template exists with the specified alias: " + contentItem.TemplateAlias);
-                    Logger.Warn<ContentController>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
+                    Logger.Warn<ContentController, string>("No template exists with the specified alias: {TemplateAlias}", contentSave.TemplateAlias);
                 }
                 else if (template.Id != contentSave.PersistedContent.TemplateId)
                 {
@@ -1922,10 +2007,8 @@ namespace Umbraco.Web.Editors
             }
             if (model.ParentId < 0)
             {
-                //cannot move if the content item is not allowed at the root unless there are
-                //none allowed at root (in which case all should be allowed at root)
-                var contentTypeService = Services.ContentTypeService;
-                if (toMove.ContentType.AllowedAsRoot == false && contentTypeService.GetAll().Any(ct => ct.AllowedAsRoot))
+                //cannot move if the content item is not allowed at the root
+                if (toMove.ContentType.AllowedAsRoot == false)
                 {
                     throw new HttpResponseException(
                             Request.CreateNotificationValidationErrorResponse(
@@ -2128,7 +2211,7 @@ namespace Umbraco.Web.Editors
                             {
                                 foreach (var c in successfulCultures)
                                 {
-                                    var names = string.Join(", ", status.Select(x => $"'{x.Content.GetCultureName(c)}'"));
+                                    var names = string.Join(", ", status.Select(x => $"'{(x.Content.ContentType.VariesByCulture() ? x.Content.GetCultureName(c) : x.Content.Name)}'"));
                                     display.AddWarningNotification(
                                         Services.TextService.Localize("publish"),
                                         Services.TextService.Localize("publish/contentPublishedFailedInvalid",
@@ -2155,7 +2238,10 @@ namespace Umbraco.Web.Editors
         /// <returns></returns>
         private ContentItemDisplay MapToDisplay(IContent content)
         {
-            var display = Mapper.Map<ContentItemDisplay>(content);
+            var display = Mapper.Map<ContentItemDisplay>(content, context =>
+            {
+                context.Items["CurrentUser"] = Security.CurrentUser;
+            });
             display.AllowPreview = display.AllowPreview && content.Trashed == false && content.ContentType.IsElement == false;
             return display;
         }
@@ -2293,7 +2379,7 @@ namespace Umbraco.Web.Editors
             }
 
             var entry = Services.PublicAccessService.GetEntryForContent(content);
-            if (entry == null)
+            if (entry == null || entry.ProtectedNodeId != content.Id)
             {
                 return Request.CreateResponse(HttpStatusCode.OK);
             }
@@ -2375,7 +2461,7 @@ namespace Umbraco.Web.Editors
 
             var entry = Services.PublicAccessService.GetEntryForContent(content);
 
-            if (entry == null)
+            if (entry == null || entry.ProtectedNodeId != content.Id)
             {
                 entry = new PublicAccessEntry(content, loginPage, errorPage, new List<PublicAccessRule>());
 

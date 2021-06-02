@@ -51,9 +51,9 @@ namespace Umbraco.Web.Cache
                 var macroRepoCache = AppCaches.IsolatedCaches.Get<IMacro>();
                 if (macroRepoCache)
                 {
-                    macroRepoCache.Result.Clear(RepositoryCacheKeys.GetKey<IMacro>(payload.Id));
+                    macroRepoCache.Result.Clear(RepositoryCacheKeys.GetKey<IMacro, int>(payload.Id));
                 }
-            };
+            }
 
             base.Refresh(json);
         }
@@ -99,6 +99,7 @@ namespace Umbraco.Web.Cache
             return new[]
                 {
                     CacheKeys.MacroContentCacheKey, // macro render cache
+                    CacheKeys.MacroFromAliasCacheKey, // lookup macro by alias
                 };
         }
 

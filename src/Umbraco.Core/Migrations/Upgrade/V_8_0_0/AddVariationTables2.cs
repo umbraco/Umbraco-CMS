@@ -11,8 +11,8 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_0_0
 
         public override void Migrate()
         {
-            Create.Table<ContentVersionCultureVariationDto>().Do();
-            Create.Table<DocumentCultureVariationDto>().Do();
+            Create.Table<ContentVersionCultureVariationDto>(true).Do();
+            Create.Table<DocumentCultureVariationDto>(true).Do();
         }
     }
 }

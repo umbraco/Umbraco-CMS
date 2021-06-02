@@ -38,12 +38,12 @@ namespace Umbraco.Web.PublishedCache.NuCache
         private string _valuesCacheKey;
 
         // initializes a published content property with no value
-        public Property(PublishedPropertyType propertyType, PublishedContent content, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
+        public Property(IPublishedPropertyType propertyType, PublishedContent content, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
             : this(propertyType, content, null, publishedSnapshotAccessor, referenceCacheLevel)
         { }
 
         // initializes a published content property with a value
-        public Property(PublishedPropertyType propertyType, PublishedContent content, PropertyData[] sourceValues, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
+        public Property(IPublishedPropertyType propertyType, PublishedContent content, PropertyData[] sourceValues, IPublishedSnapshotAccessor publishedSnapshotAccessor, PropertyCacheLevel referenceCacheLevel = PropertyCacheLevel.Element)
             : base(propertyType, referenceCacheLevel)
         {
             if (sourceValues != null)
@@ -90,7 +90,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
         // determines whether a property has value
         public override bool HasValue(string culture = null, string segment = null)
         {
-            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
             var value = GetSourceValue(culture, segment);
             var hasValue = PropertyType.IsValue(value, PropertyValueLevel.Source);
@@ -194,7 +194,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override object GetSourceValue(string culture = null, string segment = null)
         {
-            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
             if (culture == "" && segment == "")
                 return _sourceValue;
@@ -208,7 +208,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override object GetValue(string culture = null, string segment = null)
         {
-            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
             object value;
             lock (_locko)
@@ -229,7 +229,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public override object GetXPathValue(string culture = null, string segment = null)
         {
-            _content.VariationContextAccessor.ContextualizeVariation(_variations, ref culture, ref segment);
+            _content.VariationContextAccessor.ContextualizeVariation(_variations, _content.Id, ref culture, ref segment);
 
             lock (_locko)
             {

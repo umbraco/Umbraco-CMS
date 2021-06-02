@@ -1,12 +1,10 @@
 <div class="umb-box-header">
     <div>
-        <div class="umb-box-header-title" ng-if="title || titleKey">
-            <localize ng-if="titleKey" key="{{titleKey}}"></localize>
-            <span ng-if="title">{{title}}</span>
+        <div class="umb-box-header-title" ng-if="titleLabel">
+            {{titleLabel}}
         </div>
-        <div class="umb-box-header-description" ng-if="description || descriptionKey">
-            <localize ng-if="descriptionKey" key="{{descriptionKey}}"></localize>
-            <span ng-if="description">{{description}}</span>
+        <div class="umb-box-header-description" ng-if="descriptionLabel">
+            {{descriptionLabel}}
         </div>
     </div>
     <ng-transclude></ng-transclude>

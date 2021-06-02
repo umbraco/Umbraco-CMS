@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Threading;
 using Examine;
 using Umbraco.Core;
 using Umbraco.Core.Cache;
@@ -15,45 +14,47 @@ using Umbraco.Core.Sync;
 using Umbraco.Web.Cache;
 using Umbraco.Examine;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
-using Umbraco.Web.Scheduling;
-using System.Threading.Tasks;
 using Examine.LuceneEngine.Directories;
 using Umbraco.Core.Composing;
+using System.ComponentModel;
+using System.Threading;
+using Umbraco.Web.Scheduling;
 
 namespace Umbraco.Web.Search
 {
-    public sealed class ExamineComponent : IComponent
+    
+
+    public sealed class ExamineComponent : Umbraco.Core.Composing.IComponent
     {
         private readonly IExamineManager _examineManager;
         private readonly IContentValueSetBuilder _contentValueSetBuilder;
         private readonly IPublishedContentValueSetBuilder _publishedContentValueSetBuilder;
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
         private readonly IValueSetBuilder<IMember> _memberValueSetBuilder;
-        private static bool _disableExamineIndexing = false;
-        private static volatile bool _isConfigured = false;
-        private static readonly object IsConfiguredLocker = new object();
+        private readonly BackgroundIndexRebuilder _backgroundIndexRebuilder;
+        private static object _isConfiguredLocker = new object();
         private readonly IScopeProvider _scopeProvider;
-        private readonly ServiceContext _services;
-        private static BackgroundTaskRunner<IBackgroundTask> _rebuildOnStartupRunner;
-        private static readonly object RebuildLocker = new object();
+        private readonly ServiceContext _services;        
         private readonly IMainDom _mainDom;
         private readonly IProfilingLogger _logger;
         private readonly IUmbracoIndexesCreator _indexCreator;
-        private readonly IndexRebuilder _indexRebuilder;
+        private readonly BackgroundTaskRunner<IBackgroundTask> _indexItemTaskRunner;
+
 
         // the default enlist priority is 100
         // enlist with a lower priority to ensure that anything "default" runs after us
         // but greater that SafeXmlReaderWriter priority which is 60
         private const int EnlistPriority = 80;
-
+        
         public ExamineComponent(IMainDom mainDom,
             IExamineManager examineManager, IProfilingLogger profilingLogger,
             IScopeProvider scopeProvider, IUmbracoIndexesCreator indexCreator,
-            IndexRebuilder indexRebuilder, ServiceContext services,
+            ServiceContext services,
             IContentValueSetBuilder contentValueSetBuilder,
             IPublishedContentValueSetBuilder publishedContentValueSetBuilder,
             IValueSetBuilder<IMedia> mediaValueSetBuilder,
-            IValueSetBuilder<IMember> memberValueSetBuilder)
+            IValueSetBuilder<IMember> memberValueSetBuilder,
+            BackgroundIndexRebuilder backgroundIndexRebuilder)
         {
             _services = services;
             _scopeProvider = scopeProvider;
@@ -62,11 +63,11 @@ namespace Umbraco.Web.Search
             _publishedContentValueSetBuilder = publishedContentValueSetBuilder;
             _mediaValueSetBuilder = mediaValueSetBuilder;
             _memberValueSetBuilder = memberValueSetBuilder;
-
+            _backgroundIndexRebuilder = backgroundIndexRebuilder;
             _mainDom = mainDom;
             _logger = profilingLogger;
             _indexCreator = indexCreator;
-            _indexRebuilder = indexRebuilder;
+            _indexItemTaskRunner = new BackgroundTaskRunner<IBackgroundTask>(_logger);
         }
 
         public void Initialize()
@@ -91,11 +92,10 @@ namespace Umbraco.Web.Search
 
             if (!examineShutdownRegistered)
             {
-                _logger.Debug<ExamineComponent>("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
+                _logger.Info<ExamineComponent>("Examine shutdown not registered, this AppDomain is not the MainDom, Examine will be disabled");
 
                 //if we could not register the shutdown examine ourselves, it means we are not maindom! in this case all of examine should be disabled!
                 Suspendable.ExamineEvents.SuspendIndexers(_logger);
-                _disableExamineIndexing = true;
                 return; //exit, do not continue
             }
 
@@ -107,7 +107,7 @@ namespace Umbraco.Web.Search
 
             var registeredIndexers = _examineManager.Indexes.OfType<IUmbracoIndex>().Count(x => x.EnableDefaultEventHandler);
 
-            _logger.Info<ExamineComponent>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
+            _logger.Info<ExamineComponent,int>("Adding examine event handlers for {RegisteredIndexers} index providers.", registeredIndexers);
 
             // don't bind event handlers if we're not suppose to listen
             if (registeredIndexers == 0)
@@ -116,71 +116,24 @@ namespace Umbraco.Web.Search
             // bind to distributed cache events - this ensures that this logic occurs on ALL servers
             // that are taking part in a load balanced environment.
             ContentCacheRefresher.CacheUpdated += ContentCacheRefresherUpdated;
-            ContentTypeCacheRefresher.CacheUpdated += ContentTypeCacheRefresherUpdated; ;
+            ContentTypeCacheRefresher.CacheUpdated += ContentTypeCacheRefresherUpdated;
             MediaCacheRefresher.CacheUpdated += MediaCacheRefresherUpdated;
             MemberCacheRefresher.CacheUpdated += MemberCacheRefresherUpdated;
-
-            EnsureUnlocked(_logger, _examineManager);
-
-            // TODO: Instead of waiting 5000 ms, we could add an event handler on to fulfilling the first request, then start?
-            RebuildIndexes(_indexRebuilder, _logger, true, 5000);
+            LanguageCacheRefresher.CacheUpdated += LanguageCacheRefresherUpdated;
         }
 
         public void Terminate()
-        { }
-
-        /// <summary>
-        /// Called to rebuild empty indexes on startup
-        /// </summary>
-        /// <param name="indexRebuilder"></param>
-        /// <param name="logger"></param>
-        /// <param name="onlyEmptyIndexes"></param>
-        /// <param name="waitMilliseconds"></param>
-        public static void RebuildIndexes(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
         {
-            // TODO: need a way to disable rebuilding on startup
-
-            lock(RebuildLocker)
-            {
-                if (_rebuildOnStartupRunner != null && _rebuildOnStartupRunner.IsRunning)
-                {
-                    logger.Warn<ExamineComponent>("Call was made to RebuildIndexes but the task runner for rebuilding is already running");
-                    return;
-                }
-
-                logger.Info<ExamineComponent>("Starting initialize async background thread.");
-                //do the rebuild on a managed background thread
-                var task = new RebuildOnStartupTask(indexRebuilder, logger, onlyEmptyIndexes, waitMilliseconds);
-
-                _rebuildOnStartupRunner = new BackgroundTaskRunner<IBackgroundTask>(
-                    "RebuildIndexesOnStartup",
-                    logger);
-
-                _rebuildOnStartupRunner.TryAdd(task);
-            }
+            ContentCacheRefresher.CacheUpdated -= ContentCacheRefresherUpdated;
+            ContentTypeCacheRefresher.CacheUpdated -= ContentTypeCacheRefresherUpdated;
+            MediaCacheRefresher.CacheUpdated -= MediaCacheRefresherUpdated;
+            MemberCacheRefresher.CacheUpdated -= MemberCacheRefresherUpdated;
+            LanguageCacheRefresher.CacheUpdated -= LanguageCacheRefresherUpdated;
         }
 
-        /// <summary>
-        /// Must be called to each index is unlocked before any indexing occurs
-        /// </summary>
-        /// <remarks>
-        /// Indexing rebuilding can occur on a normal boot if the indexes are empty or on a cold boot by the database server messenger. Before
-        /// either of these happens, we need to configure the indexes.
-        /// </remarks>
-        private static void EnsureUnlocked(ILogger logger, IExamineManager examineManager)
-        {
-            if (_disableExamineIndexing) return;
-            if (_isConfigured) return;
-
-            lock (IsConfiguredLocker)
-            {
-                //double check
-                if (_isConfigured) return;
-
-                _isConfigured = true;
-                examineManager.UnlockLuceneIndexes(logger);
-            }
-        }
+        [EditorBrowsable(EditorBrowsableState.Never)]
+        [Obsolete("This method should not be used and will be removed in future versions, rebuilding indexes can be done with the IndexRebuilder or the BackgroundIndexRebuilder")]
+        public static void RebuildIndexes(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0) => Current.Factory.GetInstance<BackgroundIndexRebuilder>().RebuildIndexes(onlyEmptyIndexes, waitMilliseconds);
 
         #region Cache refresher updated event handlers
 
@@ -316,6 +269,24 @@ namespace Umbraco.Web.Search
                         DeleteIndexForEntity(c4.Id, false);
                     }
                     break;
+                case MessageType.RefreshByPayload:
+                    var payload = (MemberCacheRefresher.JsonPayload[])args.MessageObject;
+                    foreach(var p in payload)
+                    {
+                        if (p.Removed)
+                        {
+                            DeleteIndexForEntity(p.Id, false);
+                        }
+                        else
+                        {
+                            var m = _services.MemberService.GetById(p.Id);
+                            if (m != null)
+                            {
+                                ReIndexForMember(m);
+                            }
+                        }
+                    }
+                    break;
                 case MessageType.RefreshAll:
                 case MessageType.RefreshByJson:
                 default:
@@ -379,6 +350,25 @@ namespace Umbraco.Web.Search
                         }
                     }
                 }
+            }
+        }
+
+        private void LanguageCacheRefresherUpdated(LanguageCacheRefresher sender, CacheRefresherEventArgs e)
+        {
+            if (!(e.MessageObject is LanguageCacheRefresher.JsonPayload[] payloads))
+                return;
+
+            if (payloads.Length == 0) return;
+
+            var removedOrCultureChanged = payloads.Any(x =>
+                x.ChangeType == LanguageCacheRefresher.JsonPayload.LanguageChangeType.ChangeCulture
+                    || x.ChangeType == LanguageCacheRefresher.JsonPayload.LanguageChangeType.Remove);
+
+            if (removedOrCultureChanged)
+            {
+                //if a lang is removed or it's culture has changed, we need to rebuild the indexes since
+                //field names and values in the index have a string culture value.
+                _backgroundIndexRebuilder.RebuildIndexes(false);
             }
         }
 
@@ -614,12 +604,18 @@ namespace Umbraco.Web.Search
             }
         }
 
+        /// <summary>
+        /// An action that will execute at the end of the Scope being completed
+        /// </summary>
         private abstract class DeferedAction
         {
             public virtual void Execute()
             { }
         }
 
+        /// <summary>
+        /// Re-indexes an <see cref="IContent"/> item on a background thread
+        /// </summary>
         private class DeferedReIndexForContent : DeferedAction
         {
             private readonly ExamineComponent _examineComponent;
@@ -640,21 +636,37 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IContent content, bool isPublished)
             {
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                    //filter the indexers
-                    .Where(x => isPublished || !x.PublishedValuesOnly)
-                    .Where(x => x.EnableDefaultEventHandler))
+                // perform the ValueSet lookup on a background thread
+                examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
                 {
-                    //for content we have a different builder for published vs unpublished
-                    var builder = index.PublishedValuesOnly
-                        ? examineComponent._publishedContentValueSetBuilder
-                        : (IValueSetBuilder<IContent>)examineComponent._contentValueSetBuilder;
+                    // Background thread, wrap the whole thing in an explicit scope since we know
+                    // DB services are used within this logic.
+                    using (examineComponent._scopeProvider.CreateScope(autoComplete: true))
+                    {
+                        // for content we have a different builder for published vs unpublished
+                        // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
+                        var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
+                        {
+                            [true] = new Lazy<List<ValueSet>>(() => examineComponent._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
+                            [false] = new Lazy<List<ValueSet>>(() => examineComponent._contentValueSetBuilder.GetValueSets(content).ToList())
+                        };
 
-                    index.IndexItems(builder.GetValueSets(content));
-                }
+                        foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                            //filter the indexers
+                            .Where(x => isPublished || !x.PublishedValuesOnly)
+                            .Where(x => x.EnableDefaultEventHandler))
+                        {
+                            var valueSet = builders[index.PublishedValuesOnly].Value;
+                            index.IndexItems(valueSet);
+                        }
+                    }   
+                }));
             }
         }
 
+        /// <summary>
+        /// Re-indexes an <see cref="IMedia"/> item on a background thread
+        /// </summary>
         private class DeferedReIndexForMedia : DeferedAction
         {
             private readonly ExamineComponent _examineComponent;
@@ -675,18 +687,30 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMedia media, bool isPublished)
             {
-                var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
-
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                    //filter the indexers
-                    .Where(x => isPublished || !x.PublishedValuesOnly)
-                    .Where(x => x.EnableDefaultEventHandler))
+                // perform the ValueSet lookup on a background thread
+                examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
                 {
-                    index.IndexItems(valueSet);
-                }
+                    // Background thread, wrap the whole thing in an explicit scope since we know
+                    // DB services are used within this logic.
+                    using (examineComponent._scopeProvider.CreateScope(autoComplete: true))
+                    {
+                        var valueSet = examineComponent._mediaValueSetBuilder.GetValueSets(media).ToList();
+
+                        foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                            //filter the indexers
+                            .Where(x => isPublished || !x.PublishedValuesOnly)
+                            .Where(x => x.EnableDefaultEventHandler))
+                        {
+                            index.IndexItems(valueSet);
+                        }
+                    }
+                })); 
             }
         }
 
+        /// <summary>
+        /// Re-indexes an <see cref="IMember"/> item on a background thread
+        /// </summary>
         private class DeferedReIndexForMember : DeferedAction
         {
             private readonly ExamineComponent _examineComponent;
@@ -705,13 +729,22 @@ namespace Umbraco.Web.Search
 
             public static void Execute(ExamineComponent examineComponent, IMember member)
             {
-                var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
-                foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                    //filter the indexers
-                    .Where(x => x.EnableDefaultEventHandler))
+                // perform the ValueSet lookup on a background thread
+                examineComponent._indexItemTaskRunner.Add(new SimpleTask(() =>
                 {
-                    index.IndexItems(valueSet);
-                }
+                    // Background thread, wrap the whole thing in an explicit scope since we know
+                    // DB services are used within this logic.
+                    using (examineComponent._scopeProvider.CreateScope(autoComplete: true))
+                    {
+                        var valueSet = examineComponent._memberValueSetBuilder.GetValueSets(member).ToList();
+                        foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
+                            //filter the indexers
+                            .Where(x => x.EnableDefaultEventHandler))
+                        {
+                            index.IndexItems(valueSet);
+                        }
+                    }
+                }));
             }
         }
 
@@ -737,7 +770,7 @@ namespace Umbraco.Web.Search
             {
                 var strId = id.ToString(CultureInfo.InvariantCulture);
                 foreach (var index in examineComponent._examineManager.Indexes.OfType<IUmbracoIndex>()
-                    .Where(x => (keepIfUnpublished && !x.PublishedValuesOnly) || !keepIfUnpublished)
+                    .Where(x => x.PublishedValuesOnly || !keepIfUnpublished)
                     .Where(x => x.EnableDefaultEventHandler))
                 {
                     index.DeleteFromIndex(strId);
@@ -746,63 +779,6 @@ namespace Umbraco.Web.Search
         }
         #endregion
 
-        /// <summary>
-        /// Background task used to rebuild empty indexes on startup
-        /// </summary>
-        private class RebuildOnStartupTask : IBackgroundTask
-        {
-            private readonly IndexRebuilder _indexRebuilder;
-            private readonly ILogger _logger;
-            private readonly bool _onlyEmptyIndexes;
-            private readonly int _waitMilliseconds;
 
-            public RebuildOnStartupTask(IndexRebuilder indexRebuilder, ILogger logger, bool onlyEmptyIndexes, int waitMilliseconds = 0)
-            {
-                _indexRebuilder = indexRebuilder ?? throw new ArgumentNullException(nameof(indexRebuilder));
-                _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-                _onlyEmptyIndexes = onlyEmptyIndexes;
-                _waitMilliseconds = waitMilliseconds;
-            }
-
-            public bool IsAsync => false;
-
-            public void Dispose()
-            {
-            }
-
-            public void Run()
-            {
-                try
-                {
-                    // rebuilds indexes
-                    RebuildIndexes();
-                }
-                catch (Exception ex)
-                {
-                    _logger.Error<ExamineComponent>(ex, "Failed to rebuild empty indexes.");
-                }
-            }
-
-            public Task RunAsync(CancellationToken token)
-            {
-                throw new NotImplementedException();
-            }
-
-            /// <summary>
-            /// Used to rebuild indexes on startup or cold boot
-            /// </summary>
-            private void RebuildIndexes()
-            {
-                //do not attempt to do this if this has been disabled since we are not the main dom.
-                //this can be called during a cold boot
-                if (_disableExamineIndexing) return;
-
-                if (_waitMilliseconds > 0)
-                    Thread.Sleep(_waitMilliseconds);
-
-                EnsureUnlocked(_logger, _indexRebuilder.ExamineManager);
-                _indexRebuilder.RebuildIndexes(_onlyEmptyIndexes);
-            }
-        }
     }
 }

@@ -226,7 +226,7 @@
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
             //change asc/desct
@@ -293,6 +293,38 @@
                         "GetById",
                         { id: userId })),
                 "Failed to retrieve data for user " + userId);
+        }
+
+
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.usersResource#getUsers
+          * @methodOf umbraco.resources.usersResource
+          *
+          * @description
+          * Gets users from ids
+          *
+          * ##usage
+          * <pre>
+          * usersResource.getUsers([1,2,3])
+          *    .then(function(data) {
+          *        alert("It's here");
+          *    });
+          * </pre>
+          * 
+          * @param {Array} userIds user ids.
+          * @returns {Promise} resourcePromise object containing the users array.
+          *
+          */
+        function getUsers(userIds) {
+
+            return umbRequestHelper.resourcePromise(
+                $http.get(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "GetByIds",
+                        { ids: userIds })),
+                "Failed to retrieve data for users " + userIds);
         }
 
         /**
@@ -405,6 +437,43 @@
                     formattedSaveData),
                 "Failed to save user");
         }
+        
+        /**
+          * @ngdoc method
+          * @name umbraco.resources.usersResource#changePassword
+          * @methodOf umbraco.resources.usersResource
+          *
+          * @description
+          * Changes a user's password
+          *
+          * ##usage
+          * <pre>
+          * usersResource.changePassword(changePasswordModel)
+          *    .then(function() {
+          *        // password changed
+          *    });
+          * </pre>
+          * 
+          * @param {Object} model object to save
+          * @returns {Promise} resourcePromise object containing the updated user.
+          *
+          */        
+        function changePassword(changePasswordModel) {
+            if (!changePasswordModel) {
+                throw "password model not specified";
+            }
+
+            //need to convert the password data into the correctly formatted save data - it is *not* the same and we don't want to over-post
+            var formattedPasswordData = umbDataFormatter.formatChangePasswordModel(changePasswordModel);
+
+            return umbRequestHelper.resourcePromise(
+                $http.post(
+                    umbRequestHelper.getApiUrl(
+                        "userApiBaseUrl",
+                        "PostChangePassword"),
+                    formattedPasswordData),
+                "Failed to save user");
+        }        
 
         /**
           * @ngdoc method
@@ -444,9 +513,11 @@
             setUserGroupsOnUsers: setUserGroupsOnUsers,
             getPagedResults: getPagedResults,
             getUser: getUser,
+            getUsers: getUsers,
             createUser: createUser,
             inviteUser: inviteUser,
             saveUser: saveUser,
+            changePassword: changePassword,
             deleteNonLoggedInUser: deleteNonLoggedInUser,
             clearAvatar: clearAvatar
         };

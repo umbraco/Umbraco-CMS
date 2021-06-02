@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using NPoco;
 using Umbraco.Core.Cache;
 using Umbraco.Core.Logging;
@@ -105,7 +106,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
                 CreateDateUtc = redirectUrl.CreateDateUtc,
                 Url = redirectUrl.Url,
                 Culture = redirectUrl.Culture,
-                UrlHash = redirectUrl.Url.ToSHA1()
+                UrlHash = redirectUrl.Url.GenerateHash<SHA1>()
             };
         }
 
@@ -134,7 +135,7 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IRedirectUrl Get(string url, Guid contentKey, string culture)
         {
-            var urlHash = url.ToSHA1();
+            var urlHash = url.GenerateHash<SHA1>();
             var sql = GetBaseQuery(false).Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash && x.ContentKey == contentKey && x.Culture == culture);
             var dto = Database.Fetch<RedirectUrlDto>(sql).FirstOrDefault();
             return dto == null ? null : Map(dto);
@@ -157,12 +158,29 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
 
         public IRedirectUrl GetMostRecentUrl(string url)
         {
-            var urlHash = url.ToSHA1();
+            var urlHash = url.GenerateHash<SHA1>();
             var sql = GetBaseQuery(false)
                 .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash)
                 .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
             var dtos = Database.Fetch<RedirectUrlDto>(sql);
             var dto = dtos.FirstOrDefault();
+            return dto == null ? null : Map(dto);
+        }
+
+        public IRedirectUrl GetMostRecentUrl(string url, string culture)
+        {
+            if (string.IsNullOrWhiteSpace(culture)) return GetMostRecentUrl(url);
+            var urlHash = url.GenerateHash<SHA1>();
+            var sql = GetBaseQuery(false)
+                .Where<RedirectUrlDto>(x => x.Url == url && x.UrlHash == urlHash &&
+                    (x.Culture == culture.ToLower() || x.Culture == string.Empty))
+                .OrderByDescending<RedirectUrlDto>(x => x.CreateDateUtc);
+            var dtos = Database.Fetch<RedirectUrlDto>(sql);
+            var dto = dtos.FirstOrDefault(f => f.Culture == culture.ToLower());
+
+            if (dto == null)
+                dto = dtos.FirstOrDefault(f => f.Culture == string.Empty);
+
             return dto == null ? null : Map(dto);
         }
 

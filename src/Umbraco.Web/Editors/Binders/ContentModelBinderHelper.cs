@@ -1,5 +1,9 @@
-﻿using System.Net;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Net;
 using System.Net.Http;
+using System.Text;
+using System.Text.RegularExpressions;
 using System.Web.Http;
 using System.Web.Http.Controllers;
 using Umbraco.Core;
@@ -15,9 +19,11 @@ namespace Umbraco.Web.Editors.Binders
     /// <summary>
     /// Helper methods to bind media/member models
     /// </summary>
-    internal class ContentModelBinderHelper
+    internal static class ContentModelBinderHelper
     {
-        public TModelSave BindModelFromMultipartRequest<TModelSave>(HttpActionContext actionContext, ModelBindingContext bindingContext)
+        private const char _escapeChar = '\\';
+
+        public static TModelSave BindModelFromMultipartRequest<TModelSave>(HttpActionContext actionContext, ModelBindingContext bindingContext)
             where TModelSave : IHaveUploadedFiles
         {
             var result = actionContext.ReadAsMultipart(SystemDirectories.TempFileUploads);
@@ -29,7 +35,8 @@ namespace Umbraco.Web.Editors.Binders
             {
                 //The name that has been assigned in JS has 2 or more parts. The second part indicates the property id
                 // for which the file belongs, the remaining parts are just metadata that can be used by the property editor.
-                var parts = file.Headers.ContentDisposition.Name.Trim('\"').Split('_');
+                var parts = file.Headers.ContentDisposition.Name.Trim(Constants.CharArrays.DoubleQuote).Split(Constants.CharArrays.Underscore);
+
                 if (parts.Length < 2)
                 {
                     var response = actionContext.Request.CreateResponse(HttpStatusCode.BadRequest);
@@ -50,15 +57,28 @@ namespace Umbraco.Web.Editors.Binders
                     }
                 }
 
-                // TODO: anything after 3 parts we can put in metadata
+                //if there are 4 parts part 4 is always segment
+                string segment = null;
+                if (parts.Length > 3)
+                {
+                    segment = parts[3];
+                    //normalize to null if empty
+                    if (segment.IsNullOrWhiteSpace())
+                    {
+                        segment = null;
+                    }
+                }
 
-                var fileName = file.Headers.ContentDisposition.FileName.Trim('\"');
+                // TODO: anything after 4 parts we can put in metadata
+
+                var fileName = file.Headers.ContentDisposition.FileName.Trim(Constants.CharArrays.DoubleQuote);
 
                 model.UploadedFiles.Add(new ContentPropertyFile
                 {
                     TempFilePath = file.LocalFileName,
                     PropertyAlias = propAlias,
                     Culture = culture,
+                    Segment = segment,
                     FileName = fileName
                 });
             }
@@ -73,7 +93,7 @@ namespace Umbraco.Web.Editors.Binders
         /// </summary>
         /// <param name="saveModel"></param>
         /// <param name="dto"></param>
-        public void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel, ContentPropertyCollectionDto dto)
+        public static void MapPropertyValuesFromSaved(IContentProperties<ContentPropertyBasic> saveModel, ContentPropertyCollectionDto dto)
         {
             //NOTE: Don't convert this to linq, this is much quicker
             foreach (var p in saveModel.Properties)

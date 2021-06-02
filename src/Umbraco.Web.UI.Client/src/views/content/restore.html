@@ -39,7 +39,7 @@
                 </div>
 
                 <div ng-hide="miniListView">
-                    <umb-tree-search-box 
+                    <umb-tree-search-box
                         hide-search-callback="hideSearch"
                         search-callback="onSearchResults"
                         show-search="{{searchInfo.showSearch}}"
@@ -82,12 +82,12 @@
 	</div>
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="loading || moving || success">
-        <a class="btn btn-link" ng-click="close()"><localize key="general_cancel">Cancel</localize></a>
+        <button type="button" class="btn btn-link" ng-click="close()"><localize key="general_cancel">Cancel</localize></button>
         <button class="btn btn-primary" ng-click="restore()" ng-show="error == null"><localize key="actions_restore">Restore</localize></button>
     </div>
 
     <div class="umb-dialog-footer btn-toolbar umb-btn-toolbar" ng-hide="loading || !moving || success">
-        <a class="btn btn-link" ng-click="close()"><localize key="general_cancel">Cancel</localize></a>
+        <button type="button" class="btn btn-link" ng-click="close()"><localize key="general_cancel">Cancel</localize></button>
         <button class="btn btn-primary" ng-click="restore()" ng-show="error == null" ng-disabled="!target"><localize key="actions_move">Move</localize></button>
     </div>
 </div>

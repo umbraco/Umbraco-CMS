@@ -9,6 +9,8 @@ namespace Umbraco.Core
         /// </summary>
         public static class AppSettings
         {
+            public const string MainDomLock = "Umbraco.Core.MainDom.Lock";
+
             // TODO: Kill me - still used in Umbraco.Core.IO.SystemFiles:27
             [Obsolete("We need to kill this appsetting as we do not use XML content cache umbraco.config anymore due to NuCache")]
             public const string ContentXML = "Umbraco.Core.ContentXML"; //umbracoContentXML
@@ -42,7 +44,27 @@ namespace Umbraco.Core
             public const string Path = "Umbraco.Core.Path";
 
             /// <summary>
-            /// The reserved urls from web.config.
+            /// Gets the path to umbraco's icons directory (/umbraco/assets/icons by default).
+            /// </summary>
+            public const string IconsPath = "Umbraco.Icons.Path";
+
+            /// <summary>
+            /// Gets the path to the css directory (/css by default).
+            /// </summary>
+            public const string CssPath = "umbracoCssPath";
+
+            /// <summary>
+            /// Gets the path to the scripts directory (/scripts by default).
+            /// </summary>
+            public const string ScriptsPath = "umbracoScriptsPath";
+
+            /// <summary>
+            /// Gets the path to  media directory (/media by default).
+            /// </summary>
+            public const string MediaPath = "umbracoMediaPath";
+
+            /// <summary>
+            /// The reserved URLs from web.config.
             /// </summary>
             public const string ReservedUrls = "Umbraco.Core.ReservedUrls";
 
@@ -79,7 +101,7 @@ namespace Umbraco.Core
             public const string DefaultUILanguage = "Umbraco.Core.DefaultUILanguage";
 
             /// <summary>
-            /// A true/false value indicating whether umbraco should hide top level nodes from generated urls.
+            /// A true/false value indicating whether umbraco should hide top level nodes from generated URLs.
             /// </summary>
             public const string HideTopLevelNodeFromPath = "Umbraco.Core.HideTopLevelNodeFromPath";
 
@@ -87,6 +109,11 @@ namespace Umbraco.Core
             /// A true or false indicating whether umbraco should force a secure (https) connection to the backoffice.
             /// </summary>
             public const string UseHttps = "Umbraco.Core.UseHttps";
+
+            /// <summary>
+            /// A true/false value indicating whether the content dashboard should be visible for all user groups.
+            /// </summary>
+            public const string AllowContentDashboardAccessToAllUsers = "Umbraco.Core.AllowContentDashboardAccessToAllUsers";
 
             /// <summary>
             /// TODO: FILL ME IN
@@ -118,6 +145,11 @@ namespace Umbraco.Core
                 /// </summary>
                 public const string DatabaseFactoryServerVersion = "Umbraco.Core.Debug.DatabaseFactoryServerVersion";
             }
+
+            /// <summary>
+            /// An int value representing the time in milliseconds to lock the database for a write operation
+            /// </summary>
+            public const string SqlWriteLockTimeOut = "Umbraco.Core.SqlWriteLockTimeOut";
         }
     }
 }

@@ -9,15 +9,28 @@ namespace Umbraco.Web.PublishedCache.NuCache.DataSource
     /// </summary>
     internal class ContentNestedData
     {
-        [JsonProperty("properties")]
+        //dont serialize empty properties
+        [JsonProperty("pd")]
         [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<PropertyData[]>))]
         public Dictionary<string, PropertyData[]> PropertyData { get; set; }
 
-        [JsonProperty("cultureData")]
+        [JsonProperty("cd")]
         [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<CultureVariation>))]
         public Dictionary<string, CultureVariation> CultureData { get; set; }
 
-        [JsonProperty("urlSegment")]
+        [JsonProperty("us")]
         public string UrlSegment { get; set; }
+
+        //Legacy properties used to deserialize existing nucache db entries
+        [JsonProperty("properties")]
+        [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<PropertyData[]>))]
+        private Dictionary<string, PropertyData[]> LegacyPropertyData { set { PropertyData = value; } }
+
+        [JsonProperty("cultureData")]
+        [JsonConverter(typeof(CaseInsensitiveDictionaryConverter<CultureVariation>))]
+        private Dictionary<string, CultureVariation> LegacyCultureData { set { CultureData = value; } }
+
+        [JsonProperty("urlSegment")]
+        private string LegacyUrlSegment { set { UrlSegment = value; } }
     }
 }

@@ -1,11 +1,15 @@
 <div>
-    
-    <div ng-if="model.deletesVariants" class="umb-alert umb-alert--warning mb2">
-        <localize key="defaultdialogs_variantdeletewarning">
-            This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.
-        </localize>
+
+    <p class="abstract">
+        <localize key="defaultdialogs_confirmdelete"></localize>?
+    </p>
+
+    <div class="umb-alert umb-alert--warning" ng-show="model.deletesVariants && !model.isTrashed">
+        <localize key="defaultdialogs_variantdeletewarning">This will delete the node and all its languages. If you only want to delete one language go and unpublish it instead.</localize>
     </div>
-    
-    <localize key="defaultdialogs_confirmdelete"></localize>?
+
+    <div class="umb-alert umb-alert--warning" ng-show="model.isTrashed">
+        <localize key="defaultdialogs_recycleBinWarning">When items are deleted from the recycle bin, they will be gone forever</localize>.
+    </div>
 
 </div>

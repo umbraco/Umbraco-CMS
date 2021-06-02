@@ -113,7 +113,7 @@ namespace Umbraco.Core.PropertyEditors
             }
             catch (Exception e)
             {
-                throw new Exception($"Failed to parse configuration \"{configuration}\" as \"{typeof(TConfiguration).Name}\" (see inner exception).", e);
+                throw new InvalidOperationException($"Failed to parse configuration \"{configuration}\" as \"{typeof(TConfiguration).Name}\" (see inner exception).", e);
             }
         }
 

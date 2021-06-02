@@ -26,7 +26,7 @@ namespace Umbraco.Web.PublishedCache
         // so making it configurable.
         private const bool FullCacheWhenPreviewing = true;
 
-        public PublishedElementPropertyBase(PublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null, IPublishedSnapshotAccessor publishedSnapshotAccessor = null)
+        public PublishedElementPropertyBase(IPublishedPropertyType propertyType, IPublishedElement element, bool previewing, PropertyCacheLevel referenceCacheLevel, object sourceValue = null, IPublishedSnapshotAccessor publishedSnapshotAccessor = null)
             : base(propertyType, referenceCacheLevel)
         {
             _sourceValue = sourceValue;

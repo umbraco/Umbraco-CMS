@@ -25,11 +25,15 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
         public async Task<Tuple<HttpResponseMessage, string>> Execute(string controllerName, string actionName, HttpMethod method,
             HttpContent content = null,
             MediaTypeWithQualityHeaderValue mediaTypeHeader = null,
-            bool assertOkResponse = true)
+            bool assertOkResponse = true, object routeDefaults = null, string url = null)
         {
             if (mediaTypeHeader == null)
             {
                 mediaTypeHeader = new MediaTypeWithQualityHeaderValue("application/json");
+            }
+            if (routeDefaults == null)
+            {
+                routeDefaults = new { controller = controllerName, action = actionName, id = RouteParameter.Optional };
             }
 
             var startup = new TestStartup(
@@ -37,7 +41,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
                 {
                     configuration.Routes.MapHttpRoute("Default",
                         routeTemplate: "{controller}/{action}/{id}",
-                        defaults: new { controller = controllerName, action = actionName, id = RouteParameter.Optional });
+                        defaults: routeDefaults);
                 },
                 _controllerFactory);
 
@@ -45,7 +49,7 @@ namespace Umbraco.Tests.TestHelpers.ControllerTesting
             {
                 var request = new HttpRequestMessage
                 {
-                    RequestUri = new Uri("https://testserver/"),
+                    RequestUri = new Uri("https://testserver/" + (url ?? "")),
                     Method = method
                 };
 

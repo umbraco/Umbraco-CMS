@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Serilog.Events;
 using Serilog.Formatting.Compact.Reader;
+using Umbraco.Core.IO;
 
 namespace Umbraco.Core.Logging.Viewer
 {
@@ -16,7 +17,7 @@ namespace Umbraco.Core.Logging.Viewer
         public JsonLogViewer(ILogger logger, string logsPath = "", string searchPath = "") : base(searchPath)
         {
             if (string.IsNullOrEmpty(logsPath))
-                logsPath = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
+                logsPath = IOHelper.MapPath(SystemDirectories.LogFiles);
 
             _logsPath = logsPath;
             _logger = logger;
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Logging.Viewer
 
         public override bool CanHandleLargeLogs => false;
 
-        public override bool CheckCanOpenLogs(DateTimeOffset startDate, DateTimeOffset endDate)
+        public override bool CheckCanOpenLogs(LogTimePeriod logTimePeriod)
         {
             //Log Directory
             var logDirectory = _logsPath;
@@ -36,7 +37,7 @@ namespace Umbraco.Core.Logging.Viewer
 
             //foreach full day in the range - see if we can find one or more filenames that end with
             //yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
-            for (var day = startDate.Date; day.Date <= endDate.Date; day = day.AddDays(1))
+            for (var day = logTimePeriod.StartTime.Date; day.Date <= logTimePeriod.EndTime.Date; day = day.AddDays(1))
             {
                 //Filename ending to search for (As could be multiple)
                 var filesToFind = GetSearchPattern(day);
@@ -57,18 +58,18 @@ namespace Umbraco.Core.Logging.Viewer
             return $"*{day:yyyyMMdd}*.json";
         }
 
-        protected override IReadOnlyList<LogEvent> GetLogs(DateTimeOffset startDate, DateTimeOffset endDate, ILogFilter filter, int skip, int take)
+        protected override IReadOnlyList<LogEvent> GetLogs(LogTimePeriod logTimePeriod, ILogFilter filter, int skip, int take)
         {
             var logs = new List<LogEvent>();
 
             //Log Directory
-            var logDirectory = $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\";
+            var logDirectory = _logsPath;
 
             var count = 0;
 
             //foreach full day in the range - see if we can find one or more filenames that end with
             //yyyyMMdd.json - Ends with due to MachineName in filenames - could be 1 or more due to load balancing
-            for (var day = startDate.Date; day.Date <= endDate.Date; day = day.AddDays(1))
+            for (var day = logTimePeriod.StartTime.Date; day.Date <= logTimePeriod.EndTime.Date; day = day.AddDays(1))
             {
                 //Filename ending to search for (As could be multiple)
                 var filesToFind = GetSearchPattern(day);

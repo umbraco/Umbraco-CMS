@@ -50,8 +50,7 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
                 $location.path(location);
             }
 
-            navigationService.hideMenu();
-
+            $scope.success = true;
         }, function (err) {
 
             $scope.currentNode.loading = false;
@@ -66,7 +65,7 @@ function MediaDeleteController($scope, mediaResource, treeService, navigationSer
         });
     };
 
-    $scope.cancel = function() {
+    $scope.close = function() {
         navigationService.hideDialog();
     };
 }

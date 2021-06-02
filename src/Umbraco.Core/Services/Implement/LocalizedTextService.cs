@@ -104,7 +104,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 if (xmlSource.ContainsKey(culture) == false)
                 {
-                    _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                    _logger.Warn<LocalizedTextService, CultureInfo>("The culture specified {Culture} was not found in any configured sources for this service", culture);
                     return result;
                 }
 
@@ -124,7 +124,7 @@ namespace Umbraco.Core.Services.Implement
             {
                 if (_dictionarySource.ContainsKey(culture) == false)
                 {
-                    _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                    _logger.Warn<LocalizedTextService,CultureInfo>("The culture specified {Culture} was not found in any configured sources for this service", culture);
                     return result;
                 }
 
@@ -207,7 +207,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (_dictionarySource.ContainsKey(culture) == false)
             {
-                _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                _logger.Warn<LocalizedTextService,CultureInfo>("The culture specified {Culture} was not found in any configured sources for this service", culture);
                 return "[" + key + "]";
             }
 
@@ -245,7 +245,7 @@ namespace Umbraco.Core.Services.Implement
         {
             if (xmlSource.ContainsKey(culture) == false)
             {
-                _logger.Warn<LocalizedTextService>("The culture specified {Culture} was not found in any configured sources for this service", culture);
+                _logger.Warn<LocalizedTextService,CultureInfo>("The culture specified {Culture} was not found in any configured sources for this service", culture);
                 return "[" + key + "]";
             }
 

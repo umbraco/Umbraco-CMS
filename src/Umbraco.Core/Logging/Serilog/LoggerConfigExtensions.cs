@@ -7,6 +7,7 @@ using Serilog.Core;
 using Serilog.Events;
 using Serilog.Formatting;
 using Serilog.Formatting.Compact;
+using Umbraco.Core.IO;
 using Umbraco.Core.Logging.Serilog.Enrichers;
 
 namespace Umbraco.Core.Logging.Serilog
@@ -26,7 +27,7 @@ namespace Umbraco.Core.Logging.Serilog
 
             //Set this environment variable - so that it can be used in external config file
             //add key="serilog:write-to:RollingFile.pathFormat" value="%BASEDIR%\logs\log.txt" />
-            Environment.SetEnvironmentVariable("BASEDIR", AppDomain.CurrentDomain.BaseDirectory, EnvironmentVariableTarget.Process);
+            Environment.SetEnvironmentVariable("BASEDIR", IOHelper.MapPath("/").TrimEnd("\\"), EnvironmentVariableTarget.Process);
             Environment.SetEnvironmentVariable("MACHINENAME", Environment.MachineName, EnvironmentVariableTarget.Process);
 
             logConfig.MinimumLevel.Verbose() //Set to highest level of logging (as any sinks may want to restrict it to Errors only)
@@ -54,7 +55,7 @@ namespace Umbraco.Core.Logging.Serilog
         {
             //Main .txt logfile - in similar format to older Log4Net output
             //Ends with ..txt as Date is inserted before file extension substring
-            logConfig.WriteTo.File($@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.{Environment.MachineName}..txt",
+            logConfig.WriteTo.File(IOHelper.MapPath(SystemDirectories.LogFiles + $"/UmbracoTraceLog.{Environment.MachineName}..txt"),
                 shared: true,
                 rollingInterval: RollingInterval.Day,
                 restrictedToMinimumLevel: minimumLevel,
@@ -110,7 +111,8 @@ namespace Umbraco.Core.Logging.Serilog
         {
             //.clef format (Compact log event format, that can be imported into local SEQ & will make searching/filtering logs easier)
             //Ends with ..txt as Date is inserted before file extension substring
-            logConfig.WriteTo.File(new CompactJsonFormatter(), $@"{AppDomain.CurrentDomain.BaseDirectory}\App_Data\Logs\UmbracoTraceLog.{Environment.MachineName}..json",
+            logConfig.WriteTo.File(new CompactJsonFormatter(),
+                IOHelper.MapPath(SystemDirectories.LogFiles + $"/UmbracoTraceLog.{Environment.MachineName}..json"),
                 shared: true,
                 rollingInterval: RollingInterval.Day, //Create a new JSON file every day
                 retainedFileCountLimit: retainedFileCount, //Setting to null means we keep all files - default is 31 days
@@ -127,7 +129,7 @@ namespace Umbraco.Core.Logging.Serilog
         public static LoggerConfiguration ReadFromConfigFile(this LoggerConfiguration logConfig)
         {
             //Read from main serilog.config file
-            logConfig.ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + @"\config\serilog.config");
+            logConfig.ReadFrom.AppSettings(filePath: IOHelper.MapPath(SystemDirectories.Config + "/serilog.config"));
 
             return logConfig;
         }
@@ -141,7 +143,7 @@ namespace Umbraco.Core.Logging.Serilog
         {
             //A nested logger - where any user configured sinks via config can not effect the main 'umbraco' logger above
             logConfig.WriteTo.Logger(cfg =>
-                cfg.ReadFrom.AppSettings(filePath: AppDomain.CurrentDomain.BaseDirectory + @"\config\serilog.user.config"));
+                cfg.ReadFrom.AppSettings(filePath: IOHelper.MapPath(SystemDirectories.Config + "/serilog.user.config")));
 
             return logConfig;
         }

@@ -21,13 +21,17 @@ namespace Umbraco.Core.Models
         private string _alias;
         private string _description;
         private int _dataTypeId;
+        private Guid _dataTypeKey;
         private Lazy<int> _propertyGroupId;
         private string _propertyEditorAlias;
         private ValueStorageType _valueStorageType;
         private bool _mandatory;
+        private string _mandatoryMessage;
         private int _sortOrder;
         private string _validationRegExp;
+        private string _validationRegExpMessage;
         private ContentVariation _variations;
+        private bool _labelOnTop;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PropertyType"/> class.
@@ -113,7 +117,7 @@ namespace Umbraco.Core.Models
         /// Gets of sets the alias of the property type.
         /// </summary>
         [DataMember]
-        public string Alias
+        public virtual string Alias
         {
             get => _alias;
             set => SetPropertyValueAndDetectChanges(SanitizeAlias(value), ref _alias, nameof(Alias));
@@ -137,6 +141,13 @@ namespace Umbraco.Core.Models
         {
             get => _dataTypeId;
             set => SetPropertyValueAndDetectChanges(value, ref _dataTypeId, nameof(DataTypeId));
+        }
+
+        [DataMember]
+        public Guid DataTypeKey
+        {
+            get => _dataTypeKey;
+            set => SetPropertyValueAndDetectChanges(value, ref _dataTypeKey, nameof(DataTypeKey));
         }
 
         /// <summary>
@@ -168,20 +179,41 @@ namespace Umbraco.Core.Models
         /// </summary>
         /// <remarks>For generic properties, the value is <c>null</c>.</remarks>
         [DataMember]
-        internal Lazy<int> PropertyGroupId
+        [DoNotClone]
+        public Lazy<int> PropertyGroupId
         {
             get => _propertyGroupId;
             set => SetPropertyValueAndDetectChanges(value, ref _propertyGroupId, nameof(PropertyGroupId));
         }
 
         /// <summary>
-        /// Gets of sets a value indicating whether a value for this property type is required.
+        /// Gets or sets a value indicating whether a value for this property type is required.
         /// </summary>
         [DataMember]
         public bool Mandatory
         {
             get => _mandatory;
             set => SetPropertyValueAndDetectChanges(value, ref _mandatory, nameof(Mandatory));
+        }
+
+        /// <summary>
+        /// Gets or sets the custom validation message used when a value for this PropertyType is required
+        /// </summary>
+        [DataMember]
+        public string MandatoryMessage
+        {
+            get => _mandatoryMessage;
+            set => SetPropertyValueAndDetectChanges(value, ref _mandatoryMessage, nameof(MandatoryMessage));
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether the label of this property type should be displayed on top.
+        /// </summary>
+        [DataMember]
+        public bool LabelOnTop
+        {
+            get => _labelOnTop;
+            set => SetPropertyValueAndDetectChanges(value, ref _labelOnTop, nameof(LabelOnTop));
         }
 
         /// <summary>
@@ -202,6 +234,16 @@ namespace Umbraco.Core.Models
         {
             get => _validationRegExp;
             set => SetPropertyValueAndDetectChanges(value, ref _validationRegExp, nameof(ValidationRegExp));
+        }
+
+        /// <summary>
+        /// Gets or sets the custom validation message used when a pattern for this PropertyType must be matched
+        /// </summary>
+        [DataMember]
+        public string ValidationRegExpMessage
+        {
+            get => _validationRegExpMessage;
+            set => SetPropertyValueAndDetectChanges(value, ref _validationRegExpMessage, nameof(ValidationRegExpMessage));
         }
 
         /// <summary>
@@ -407,7 +449,7 @@ namespace Umbraco.Core.Models
             base.PerformDeepClone(clone);
 
             var clonedEntity = (PropertyType)clone;
-            
+
             //need to manually assign the Lazy value as it will not be automatically mapped
             if (PropertyGroupId != null)
             {

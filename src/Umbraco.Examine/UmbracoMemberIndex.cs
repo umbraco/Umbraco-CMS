@@ -11,7 +11,7 @@ namespace Umbraco.Examine
     /// <summary>
     /// Custom indexer for members
     /// </summary>
-    public class UmbracoMemberIndex : UmbracoExamineIndex
+    public class UmbracoMemberIndex : UmbracoExamineIndex, IUmbracoMemberIndex
     {
         /// <summary>
         /// Constructor to allow for creating an indexer at runtime
@@ -32,6 +32,6 @@ namespace Umbraco.Examine
             base(name, luceneDirectory, fieldDefinitions, analyzer, profilingLogger, validator)
         {
         }
-        
+
     }
 }

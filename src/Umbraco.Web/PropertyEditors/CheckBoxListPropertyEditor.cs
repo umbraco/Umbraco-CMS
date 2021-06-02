@@ -8,7 +8,12 @@ namespace Umbraco.Web.PropertyEditors
     /// <summary>
     /// A property editor to allow multiple checkbox selection of pre-defined items.
     /// </summary>
-    [DataEditor(Constants.PropertyEditors.Aliases.CheckBoxList, "Checkbox list", "checkboxlist", Icon="icon-bulleted-list", Group="lists")]
+    [DataEditor(
+        Constants.PropertyEditors.Aliases.CheckBoxList,
+        "Checkbox list",
+        "checkboxlist",
+        Icon = "icon-bulleted-list",
+        Group = Constants.PropertyEditors.Groups.Lists)]
     public class CheckBoxListPropertyEditor : DataEditor
     {
         private readonly ILocalizedTextService _textService;

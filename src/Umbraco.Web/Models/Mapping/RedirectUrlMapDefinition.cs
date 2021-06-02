@@ -26,7 +26,7 @@ namespace Umbraco.Web.Models.Mapping
             target.ContentId = source.ContentId;
             target.CreateDateUtc = source.CreateDateUtc;
             target.Culture = source.Culture;
-            target.DestinationUrl = source.ContentId > 0 ? UmbracoContext?.UrlProvider?.GetUrl(source.ContentId, source.Culture) : "#";
+            target.DestinationUrl = source.ContentId > 0 ? UmbracoContext?.UrlProvider?.GetUrl(source.ContentId, culture: source.Culture) : "#";
             target.OriginalUrl = UmbracoContext?.UrlProvider?.GetUrlFromRoute(source.ContentId, source.Url, source.Culture);
             target.RedirectId = source.Key;
         }

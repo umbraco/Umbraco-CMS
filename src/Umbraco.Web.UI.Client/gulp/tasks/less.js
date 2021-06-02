@@ -1,14 +1,13 @@
 'use strict';
 
 var config = require('../config');
-var gulp = require('gulp');
 
 var _ = require('lodash');
 var MergeStream = require('merge-stream');
 
 var processLess = require('../util/processLess');
 
-gulp.task('less', function () {
+function less() {
 
     var stream = new MergeStream();
 
@@ -17,4 +16,6 @@ gulp.task('less', function () {
     });
 
     return stream;
-});
+};
+
+module.exports = { less: less };

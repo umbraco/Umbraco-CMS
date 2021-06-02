@@ -1,10 +1,9 @@
 (function () {
     "use strict";
 
-    function MediaSortController($scope, $filter, mediaResource, navigationService) {
+    function MediaSortController($scope, $filter, mediaResource, navigationService, eventsService) {
 
         var vm = this;
-        var parentId = $scope.currentNode.parentId ? $scope.currentNode.parentId : "-1";
         var id = $scope.currentNode.id;
 
         vm.loading = false;
@@ -12,6 +11,8 @@
         vm.saveButtonState = "init";
         vm.sortOrder = {};
         vm.sortableOptions = {
+            axis: "y",
+            containment: "parent",
             distance: 10,
             tolerance: "pointer",
             opacity: 0.7,
@@ -42,7 +43,7 @@
             vm.saveButtonState = "busy";
             
             var args = {
-                parentId: parentId,
+                parentId: id,
                 sortedIds: _.map(vm.children, function(child){ return child.id; })
             };
 
@@ -51,6 +52,7 @@
                     navigationService.syncTree({ tree: "media", path: $scope.currentNode.path, forceReload: true })
                         .then(() => navigationService.reloadNode($scope.currentNode));
 
+                    eventsService.emit("sortCompleted", { id: id });
                     vm.saveButtonState = "success";
                 }, function(error) {
                     vm.error = error;

@@ -29,8 +29,8 @@ namespace Umbraco.Web.PropertyEditors
 
             foreach (var provider in _embedCollection)
             {
-                //Url Scheme Regex is an array of possible regex patterns to match against the URL
-                foreach(var urlPattern in provider.UrlSchemeRegex)
+                // UrlSchemeRegex is an array of possible regex patterns to match against the URL
+                foreach (var urlPattern in provider.UrlSchemeRegex)
                 {
                     var regexPattern = new Regex(urlPattern, RegexOptions.IgnoreCase);
                     if (regexPattern.IsMatch(url))
@@ -60,7 +60,7 @@ namespace Umbraco.Web.PropertyEditors
             }
             catch(Exception ex)
             {
-                Logger.Error<RteEmbedController>(ex, "Error embedding url {Url} - width: {Width} height: {Height}", url, width, height);
+                Logger.Error<RteEmbedController, string,int,int>(ex, "Error embedding url {Url} - width: {Width} height: {Height}", url, width, height);
                 result.OEmbedStatus = OEmbedStatus.Error;
             }
 

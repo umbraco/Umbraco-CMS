@@ -3,8 +3,7 @@
     public class DropPreValueTable : MigrationBase
     {
         public DropPreValueTable(IMigrationContext context) : base(context)
-        {
-        }
+        { }
 
         public override void Migrate()
         {

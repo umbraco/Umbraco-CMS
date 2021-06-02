@@ -1,14 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
+using System.Web.Http.Controllers;
 using System.Web.Security;
+using Umbraco.Core;
 using Umbraco.Core.Models;
 using Umbraco.Core.Security;
 using Umbraco.Core.Services;
 using Umbraco.Web.Models.ContentEditing;
 using Umbraco.Web.Mvc;
+using Umbraco.Web.WebApi;
 using Umbraco.Web.WebApi.Filters;
 using Constants = Umbraco.Core.Constants;
 
@@ -19,10 +23,29 @@ namespace Umbraco.Web.Editors
     /// </summary>
     [PluginController("UmbracoApi")]
     [UmbracoTreeAuthorize(Constants.Trees.MemberGroups)]
+    [MemberGroupControllerConfiguration]
     public class MemberGroupController : UmbracoAuthorizedJsonController
     {
         private readonly MembershipProvider _provider = Core.Security.MembershipProviderExtensions.GetMembersMembershipProvider();
 
+        /// <summary>
+        /// Configures this controller with a custom action selector
+        /// </summary>
+        private class MemberGroupControllerConfigurationAttribute : Attribute, IControllerConfiguration
+        {
+            public void Initialize(HttpControllerSettings controllerSettings, HttpControllerDescriptor controllerDescriptor)
+            {
+                controllerSettings.Services.Replace(typeof(IHttpActionSelector), new ParameterSwapControllerActionSelector(
+                    new ParameterSwapControllerActionSelector.ParameterSwapInfo("GetById", "id", typeof(int), typeof(Guid), typeof(Udi))
+                ));
+            }
+        }
+
+        /// <summary>
+        /// Gets the member group json for the member group id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         public MemberGroupDisplay GetById(int id)
         {
             var memberGroup = Services.MemberGroupService.GetById(id);
@@ -31,8 +54,43 @@ namespace Umbraco.Web.Editors
                 throw new HttpResponseException(HttpStatusCode.NotFound);
             }
 
-            var dto = Mapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
-            return dto;
+            return Mapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+        }
+
+        /// <summary>
+        /// Gets the member group json for the member group guid
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public MemberGroupDisplay GetById(Guid id)
+        {
+            var memberGroup = Services.MemberGroupService.GetById(id);
+            if (memberGroup == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return Mapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
+        }
+
+        /// <summary>
+        /// Gets the member group json for the member group udi
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public MemberGroupDisplay GetById(Udi id)
+        {
+            var guidUdi = id as GuidUdi;
+            if (guidUdi == null)
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+
+            var memberGroup = Services.MemberGroupService.GetById(guidUdi.Guid);
+            if (memberGroup == null)
+            {
+                throw new HttpResponseException(HttpStatusCode.NotFound);
+            }
+
+            return Mapper.Map<IMemberGroup, MemberGroupDisplay>(memberGroup);
         }
 
         public IEnumerable<MemberGroupDisplay> GetByIds([FromUri]int[] ids)

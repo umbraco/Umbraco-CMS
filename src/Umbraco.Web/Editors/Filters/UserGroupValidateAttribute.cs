@@ -50,13 +50,17 @@ namespace Umbraco.Web.Editors.Filters
                         actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, message);
                         return;
                     }
-                    //map the model to the persisted instance
-                    Mapper.Map(userGroupSave, persisted);
+
+                    if (persisted.Alias != userGroupSave.Alias && persisted.IsSystemUserGroup())
+                    {
+                        var message = $"User group with alias: {persisted.Alias} cannot be changed";
+                        actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.BadRequest, message);
+                        return;
+                    }
+
                     break;
                 case ContentSaveAction.SaveNew:
-                    //create the persisted model from mapping the saved model
-                    persisted = Mapper.Map<IUserGroup>(userGroupSave);
-                    ((UserGroup)persisted).ResetIdentity();
+                    persisted = new UserGroup();
                     break;
                 default:
                     actionContext.Response = actionContext.Request.CreateErrorResponse(HttpStatusCode.NotFound, new ArgumentOutOfRangeException());

@@ -85,12 +85,12 @@ namespace Umbraco.Web.WebApi.Filters
                 () => user.Groups.Select(x => x.Alias).UnsortedSequenceEqual(identity.Roles) == false,
                 () =>
                 {
-                    var startContentIds = UserExtensions.CalculateContentStartNodeIds(user, Current.Services.EntityService);
+                    var startContentIds = UserExtensions.CalculateContentStartNodeIds(user, Current.Services.EntityService, Current.AppCaches);
                     return startContentIds.UnsortedSequenceEqual(identity.StartContentNodes) == false;
                 },
                 () =>
                 {
-                    var startMediaIds = UserExtensions.CalculateMediaStartNodeIds(user, Current.Services.EntityService);
+                    var startMediaIds = UserExtensions.CalculateMediaStartNodeIds(user, Current.Services.EntityService, Current.AppCaches);
                     return startMediaIds.UnsortedSequenceEqual(identity.StartMediaNodes) == false;
                 }
             };

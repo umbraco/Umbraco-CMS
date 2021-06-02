@@ -8,7 +8,7 @@ namespace Umbraco.Web.Editors
     /// Provides a base class for <see cref="IEditorValidator"/> implementations.
     /// </summary>
     /// <typeparam name="T">The validated object type.</typeparam>
-    internal abstract class EditorValidator<T> : IEditorValidator
+    public abstract class EditorValidator<T> : IEditorValidator
     {
         public Type ModelType => typeof (T);
 

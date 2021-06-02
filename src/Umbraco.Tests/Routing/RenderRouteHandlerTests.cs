@@ -40,7 +40,7 @@ namespace Umbraco.Tests.Routing
         {
             base.SetUp();
 
-            WebFinalComponent.CreateRoutes(
+            WebInitialComponent.CreateRoutes(
                 new TestUmbracoContextAccessor(),
                 TestObjects.GetGlobalSettings(),
                 new SurfaceControllerTypeCollection(Enumerable.Empty<Type>()),
@@ -100,7 +100,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            frequest.PublishedContent = umbracoContext.ContentCache.GetById(1174);
+            frequest.PublishedContent = umbracoContext.Content.GetById(1174);
             frequest.TemplateModel = template;
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
@@ -136,11 +136,11 @@ namespace Umbraco.Tests.Routing
             var umbracoContext = GetUmbracoContext("~/dummy-page", template.Id, routeData, true);
             var publishedRouter = CreatePublishedRouter();
             var frequest = publishedRouter.CreateRequest(umbracoContext);
-            frequest.PublishedContent = umbracoContext.ContentCache.GetById(1172);
+            frequest.PublishedContent = umbracoContext.Content.GetById(1172);
             frequest.TemplateModel = template;
 
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
-            var type = new AutoPublishedContentType(22, "CustomDocument", new PublishedPropertyType[] { });
+            var type = new AutoPublishedContentType(Guid.NewGuid(), 22, "CustomDocument", new PublishedPropertyType[] { });
             ContentTypesCache.GetPublishedContentTypeByAlias = alias => type;
 
             var handler = new RenderRouteHandler(umbracoContext, new TestControllerFactory(umbracoContextAccessor, Mock.Of<ILogger>(), context =>

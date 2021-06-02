@@ -19,7 +19,8 @@
                 </div>
 
                 <umb-control-group label="@macro_enterMacroName" hide-label="false">
-                    <input type="text" name="itemKey" ng-model="vm.itemKey" class="umb-textstring textstring input-block-level" umb-auto-focus required />
+                    <input type="text" name="itemKey" ng-model="vm.itemKey" class="umb-textstring textstring input-block-level"
+                           umb-auto-focus required maxlength="255" />
                 </umb-control-group>
 
                 <button type="submit" class="btn btn-primary"><localize key="general_create">Create</localize></button>

@@ -192,7 +192,7 @@ namespace Umbraco.Core.Sync
                     if (count > Options.MaxProcessingInstructionCount)
                     {
                         //too many instructions, proceed to cold boot
-                        Logger.Warn<DatabaseServerMessenger>(
+                        Logger.Warn<DatabaseServerMessenger,int,int>(
                             "The instruction count ({InstructionCount}) exceeds the specified MaxProcessingInstructionCount ({MaxProcessingInstructionCount})."
                             + " The server will skip existing instructions, rebuild its caches and indexes entirely, adjust its last synced Id"
                             + " to the latest found in the database and maintain cache updates based on that Id.",
@@ -352,7 +352,7 @@ namespace Umbraco.Core.Sync
                 }
                 catch (JsonException ex)
                 {
-                    Logger.Error<DatabaseServerMessenger>(ex, "Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').",
+                    Logger.Error<DatabaseServerMessenger,int, string>(ex, "Failed to deserialize instructions ({DtoId}: '{DtoInstructions}').",
                         dto.Id,
                         dto.Instructions);
 
@@ -410,7 +410,7 @@ namespace Umbraco.Core.Sync
             //}
             catch (Exception ex)
             {
-                    Logger.Error<DatabaseServerMessenger>(
+                    Logger.Error<DatabaseServerMessenger,int, string> (
                         ex,
                         "DISTRIBUTED CACHE IS NOT UPDATED. Failed to execute instructions ({DtoId}: '{DtoInstructions}'). Instruction is being skipped/ignored",
                         dto.Id,

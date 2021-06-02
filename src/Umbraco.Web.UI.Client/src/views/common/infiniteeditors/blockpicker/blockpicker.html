@@ -1,0 +1,84 @@
+<div class="umb-block-editor" ng-controller="Umbraco.Editors.BlockPickerController as vm">
+
+    <umb-editor-view ng-if="!page.loading">
+
+        <umb-editor-header
+            name="vm.model.title"
+            navigation="vm.navigation"
+            on-select-navigation-item="vm.onNavigationChanged(item)"
+            name-locked="true"
+            hide-alias="true"
+            hide-icon="true"
+            hide-description="true">
+        </umb-editor-header>
+
+        <umb-editor-container class="block-form">
+
+            <div ng-if="vm.activeTab.alias === 'empty'">
+
+                <div class="umb-control-group" ng-if="vm.model.filter === true" style="margin-bottom: 20px;">
+                    <umb-search-filter
+                        input-id="icon-search"
+                        model="vm.filter.searchTerm"
+                        label-key="placeholders_filter"
+                        text="Type to filter..."
+                        css-class="w-100"
+                        auto-focus="true">
+                    </umb-search-filter>
+                </div>
+
+                <div class="umb-block-card-grid">
+
+                    <umb-block-card
+                        class="umb-outline"
+                        ng-repeat="block in vm.model.availableItems | filter: vm.filter.searchTerm"
+                        block-config-model="block.blockConfigModel"
+                        element-type-model="block.elementTypeModel"
+                        ng-click="vm.selectItem(block, $event)">
+                    </umb-block-card>
+
+                </div>
+            </div>
+
+            <div ng-if="vm.activeTab.alias === 'clipboard'">
+                <div style="margin-bottom:20px; text-align: right;">
+                    <umb-button
+                        type="button"
+                        icon="icon-trash"
+                        button-style="link"
+                        label-key="clipboard_labelForClearClipboard"
+                        action="vm.clickClearClipboard()">
+                    </umb-button>
+                </div>
+
+                <div class="umb-block-card-grid">
+
+                    <umb-block-card
+                        block-config-model="block.blockConfigModel"
+                        element-type-model="block.elementTypeModel"
+                        ng-repeat="block in vm.model.clipboardItems"
+                        ng-click="vm.model.clickPasteItem(block, $event)">
+                    </umb-block-card>
+
+                </div>
+            </div>
+
+        </umb-editor-container>
+
+        <umb-editor-footer>
+
+            <umb-editor-footer-content-right>
+
+                <umb-button
+                    action="vm.close()"
+                    shortcut="esc"
+                    button-style="link"
+                    label-key="general_cancel"
+                    type="button">
+                </umb-button>
+
+            </umb-editor-footer-content-right>
+
+        </umb-editor-footer>
+    </umb-editor-view>
+</div>

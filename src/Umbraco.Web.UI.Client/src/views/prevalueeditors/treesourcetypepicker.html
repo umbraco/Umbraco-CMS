@@ -1,0 +1,22 @@
+<div ng-controller="Umbraco.PrevalueEditors.TreeSourceTypePickerController as vm" class="umb-property-editor umb-contenttypepicker">
+
+    <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
+
+    <div ng-show="!vm.loading">
+        <umb-node-preview ng-repeat="itemType in vm.itemTypes"
+                          class="mt1"
+                          icon="itemType.icon"
+                          name="itemType.name"
+                          allow-remove="true"
+                          allow-edit="false"
+                          on-remove="vm.remove(itemType)">
+        </umb-node-preview>
+
+        <button type="button"
+                class="umb-node-preview-add"
+                ng-click="vm.add()">
+            <localize key="general_add">Add</localize>
+        </button>
+    </div>
+
+</div>

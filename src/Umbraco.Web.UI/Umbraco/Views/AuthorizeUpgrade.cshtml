@@ -61,7 +61,7 @@
     <script type="text/javascript">
     document.angularReady = function (app) {
 
-        @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInError())
+        @Html.AngularValueExternalLoginInfoScript(ViewData.GetExternalSignInProviderErrors())
         @Html.AngularValueResetPasswordCodeInfoScript(ViewData["PasswordResetCode"])
 
     }

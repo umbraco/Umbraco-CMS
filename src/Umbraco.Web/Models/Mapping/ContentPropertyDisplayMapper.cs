@@ -14,8 +14,8 @@ namespace Umbraco.Web.Models.Mapping
     {
         private readonly ILocalizedTextService _textService;
 
-        public ContentPropertyDisplayMapper(IDataTypeService dataTypeService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
-            : base(dataTypeService, logger, propertyEditors)
+        public ContentPropertyDisplayMapper(IDataTypeService dataTypeService, IEntityService entityService, ILocalizedTextService textService, ILogger logger, PropertyEditorCollection propertyEditors)
+            : base(dataTypeService, entityService, logger, propertyEditors)
         {
             _textService = textService;
         }
@@ -39,10 +39,13 @@ namespace Umbraco.Web.Models.Mapping
             dest.Description = originalProp.PropertyType.Description;
             dest.Label = originalProp.PropertyType.Name;
             dest.HideLabel = valEditor.HideLabel;
+            dest.LabelOnTop = originalProp.PropertyType.LabelOnTop;
 
             //add the validation information
             dest.Validation.Mandatory = originalProp.PropertyType.Mandatory;
+            dest.Validation.MandatoryMessage = originalProp.PropertyType.MandatoryMessage;
             dest.Validation.Pattern = originalProp.PropertyType.ValidationRegExp;
+            dest.Validation.PatternMessage = originalProp.PropertyType.ValidationRegExpMessage;
 
             if (dest.PropertyEditor == null)
             {

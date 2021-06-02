@@ -102,6 +102,7 @@
                         };
                     });
                     navigationService.syncTree({ tree: "content", path: $scope.currentNode.path, forceReload: true });
+                    $scope.dialog.confirmDiscardChanges = true;
                 }, function (error) {
                     vm.error = error;
                     vm.buttonState = "error";
@@ -117,6 +118,7 @@
 
         function toggle(group) {
             group.selected = !group.selected;
+            $scope.dialog.confirmDiscardChanges = true;
         }
 
         function pickGroup() {
@@ -137,6 +139,7 @@
                         });
                     editorService.close();
                     navigationService.allowHideDialog(true);
+                    $scope.dialog.confirmDiscardChanges = true;
                 },
                 close: function() {
                     editorService.close();
@@ -147,6 +150,7 @@
 
         function removeGroup(group) {
             vm.groups = _.reject(vm.groups, function(g) { return g.id === group.id });
+            $scope.dialog.confirmDiscardChanges = true;
         }
 
         function pickMember() {
@@ -186,6 +190,7 @@
                         $q.all(promises).then(function() {
                             vm.loading = false;
                         });
+                        $scope.dialog.confirmDiscardChanges = true;
                     }
                 },
                 close: function () {
@@ -219,6 +224,7 @@
                     }
                     editorService.close();
                     navigationService.allowHideDialog(true);
+                    $scope.dialog.confirmDiscardChanges = true;
                 },
                 close: function () {
                     editorService.close();

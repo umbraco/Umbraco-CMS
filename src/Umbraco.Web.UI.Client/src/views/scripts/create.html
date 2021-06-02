@@ -7,16 +7,16 @@
 
             <ul class="umb-actions umb-actions-child">
                 <li class="umb-action">
-                    <a href="" class="umb-action-link" umb-auto-focus ng-click="vm.createFile()">
-                        <i class="large icon icon-script"></i>
+                    <button type="button" class="umb-action-link umb-outline btn-reset" umb-auto-focus ng-click="vm.createFile()">
+                        <i class="large icon icon-script" aria-hidden="true"></i>
                         <span class="menu-label"><localize key="create_newJavascriptFile">New javascript file</localize></span>
-                    </a>
+                    </button>
                 </li>
                 <li class="umb-action">
-                    <a href="" class="umb-action-link" ng-click="vm.showCreateFolder()">
-                        <i class="large icon icon-folder"></i>
+                    <button type="button" class="umb-action-link umb-outline btn-reset" ng-click="vm.showCreateFolder()">
+                        <i class="large icon icon-folder" aria-hidden="true"></i>
                         <span class="menu-label"><localize key="general_folder"></localize>...</span>
-                    </a>
+                    </button>
                 </li>
             </ul>
 
@@ -26,7 +26,7 @@
             <form novalidate name="createFolderForm"
                 ng-submit="vm.createFolder(createFolderForm)"
                 val-form-manager>
-                
+
                 <div ng-show="vm.createFolderError">
                     <div class="alert alert-error">
                         <div>{{vm.createFolderError.data.message}}</div>

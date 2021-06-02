@@ -1,16 +1,18 @@
 angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListController",
-    function ($scope) {
+    function ($scope, validationMessageService) {
         
         var vm = this;
         
         vm.configItems = [];
         vm.viewItems = [];
-        vm.changed = changed;
+        vm.change = change;
         
         function init() {
+
+            vm.uniqueId = String.CreateGuid();
             
-            // currently the property editor will onyl work if our input is an object.
-            if (angular.isObject($scope.model.config.items)) {
+            // currently the property editor will only work if our input is an object.
+            if (Utilities.isObject($scope.model.config.items)) {
 
                 // formatting the items in the dictionary into an array
                 var sortedItems = [];
@@ -20,7 +22,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                     sortedItems.push({ key: keys[i], sortOrder: vals[i].sortOrder, value: vals[i].value});
                 }
 
-                //ensure the items are sorted by the provided sort order
+                // ensure the items are sorted by the provided sort order
                 sortedItems.sort(function (a, b) { return (a.sortOrder > b.sortOrder) ? 1 : ((b.sortOrder > a.sortOrder) ? -1 : 0); });
                 
                 vm.configItems = sortedItems;
@@ -35,6 +37,12 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
                 //watch the model.value in case it changes so that we can keep our view model in sync
                 $scope.$watchCollection("model.value", updateViewModel);
             }
+
+            // Set the message to use for when a mandatory field isn't completed.
+            // Will either use the one provided on the property type or a localised default.
+            validationMessageService.getMandatoryMessage($scope.model.validation).then(function (value) {
+                $scope.mandatoryMessage = value;
+            });  
             
         }
         
@@ -74,7 +82,7 @@ angular.module("umbraco").controller("Umbraco.PropertyEditors.CheckboxListContro
             
         }
 
-        function changed(model, value) {
+        function change(model, value) {
             
             var index = $scope.model.value.indexOf(value);
             

@@ -30,10 +30,12 @@
         vm.close = close;
 
         vm.toggleAllowCultureVariants = toggleAllowCultureVariants;
+        vm.toggleAllowSegmentVariants = toggleAllowSegmentVariants;
         vm.toggleValidation = toggleValidation;
         vm.toggleShowOnMemberProfile = toggleShowOnMemberProfile;
         vm.toggleMemberCanEdit = toggleMemberCanEdit;
         vm.toggleIsSensitiveData = toggleIsSensitiveData;
+        vm.toggleLabelOnTop = toggleLabelOnTop;
 
         function onInit() {
 
@@ -41,22 +43,24 @@
                 vm.showSensitiveData = user.userGroups.indexOf("sensitiveData") != -1;
             });
 
-            //make the default the same as the content type            
+            //make the default the same as the content type
             if (!$scope.model.property.dataTypeId) {
                 $scope.model.property.allowCultureVariant = $scope.model.contentTypeAllowCultureVariant;
             }
-            
+
             loadValidationTypes();
-            
+
         }
 
         function loadValidationTypes() {
 
             var labels = [
-                "validation_validateAsEmail", 
-                "validation_validateAsNumber", 
-                "validation_validateAsUrl", 
-                "validation_enterCustomValidation"
+                "validation_validateAsEmail",
+                "validation_validateAsNumber",
+                "validation_validateAsUrl",
+                "validation_enterCustomValidation",
+                "validation_fieldIsMandatory",
+                "contentTypeEditor_displaySettingsLabelOnTop"
             ];
 
             localizationService.localizeMany(labels)
@@ -66,6 +70,8 @@
                     vm.labels.validateAsNumber = data[1];
                     vm.labels.validateAsUrl = data[2];
                     vm.labels.customValidation = data[3];
+                    vm.labels.fieldIsMandatory = data[4];
+                    vm.labels.displaySettingsLabelOnTop = data[5];
 
                     vm.validationTypes = [
                         {
@@ -112,13 +118,13 @@
                 property: $scope.model.property,
                 contentTypeName: $scope.model.contentTypeName,
                 view: "views/common/infiniteeditors/datatypepicker/datatypepicker.html",
-                size: "small",
+                size: "medium",
                 submit: function(model) {
 
                     $scope.model.updateSameDataTypes = model.updateSameDataTypes;
 
                     vm.focusOnMandatoryField = true;
-    
+
                     // update property
                     property.config = model.property.config;
                     property.editor = model.property.editor;
@@ -176,7 +182,7 @@
             if(event && event.keyCode === 13) {
                 submit();
             }
-        } 
+        }
 
         function submit() {
             if($scope.model.submit) {
@@ -199,7 +205,7 @@
                 var match = false;
 
                 // find and show if a match from the list has been chosen
-                angular.forEach(vm.validationTypes, function (validationType, index) {
+                vm.validationTypes.forEach(function (validationType, index) {
                     if ($scope.model.property.validation.pattern === validationType.pattern) {
                         vm.selectedValidationType = vm.validationTypes[index];
                         vm.showValidationPattern = true;
@@ -209,7 +215,7 @@
 
                 // if there is no match - choose the custom validation option.
                 if (!match) {
-                    angular.forEach(vm.validationTypes, function (validationType) {
+                    vm.validationTypes.forEach(function (validationType) {
                         if (validationType.key === "custom") {
                             vm.selectedValidationType = validationType;
                             vm.showValidationPattern = true;
@@ -242,24 +248,31 @@
             return !settingValue;
         }
 
-        function toggleAllowCultureVariants() {            
+        function toggleAllowCultureVariants() {
             $scope.model.property.allowCultureVariant = toggleValue($scope.model.property.allowCultureVariant);
         }
 
+        function toggleAllowSegmentVariants() {
+            $scope.model.property.allowSegmentVariant = toggleValue($scope.model.property.allowSegmentVariant);
+        }
+
         function toggleValidation() {
-            $scope.model.property.validation.mandatory = toggleValue($scope.model.property.validation.mandatory);            
+            $scope.model.property.validation.mandatory = toggleValue($scope.model.property.validation.mandatory);
         }
 
         function toggleShowOnMemberProfile() {
-            $scope.model.property.showOnMemberProfile = toggleValue($scope.model.property.showOnMemberProfile);           
+            $scope.model.property.showOnMemberProfile = toggleValue($scope.model.property.showOnMemberProfile);
         }
 
         function toggleMemberCanEdit() {
-            $scope.model.property.memberCanEdit = toggleValue($scope.model.property.memberCanEdit);            
+            $scope.model.property.memberCanEdit = toggleValue($scope.model.property.memberCanEdit);
         }
 
         function toggleIsSensitiveData() {
-            $scope.model.property.isSensitiveData = toggleValue($scope.model.property.isSensitiveData);             
+            $scope.model.property.isSensitiveData = toggleValue($scope.model.property.isSensitiveData);
+        }
+        function toggleLabelOnTop() {
+            $scope.model.property.labelOnTop = toggleValue($scope.model.property.labelOnTop);
         }
 
         onInit();

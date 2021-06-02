@@ -16,12 +16,12 @@ namespace Umbraco.Web.Models.ContentEditing
         /// Gets or sets the parent object type ID.
         /// </summary>
         [DataMember(Name = "parentObjectType", IsRequired = false)]
-        public Guid ParentObjectType { get; set; }
+        public Guid? ParentObjectType { get; set; }
 
         /// <summary>
         /// Gets or sets the child object type ID.
         /// </summary>
         [DataMember(Name = "childObjectType", IsRequired = false)]
-        public Guid ChildObjectType { get; set; }
+        public Guid? ChildObjectType { get; set; }
     }
 }

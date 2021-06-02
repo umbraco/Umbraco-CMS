@@ -127,7 +127,9 @@ Use this directive to render a button with a dropdown of alternative actions.
                 float: "@?",
                 buttonStyle: "@?",
                 size: "@?",
-                icon: "@?"
+                icon: "@?",
+                label: "@?",
+                labelKey: "@?"
             },
             link: link
         };

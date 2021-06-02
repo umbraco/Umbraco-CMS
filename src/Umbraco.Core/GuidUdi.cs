@@ -33,8 +33,8 @@ namespace Umbraco.Core
             : base(uriValue)
         {
             Guid guid;
-            if (Guid.TryParse(uriValue.AbsolutePath.TrimStart('/'), out guid) == false)
-                throw new FormatException("Url \"" + uriValue + "\" is not a guid entity id.");
+            if (Guid.TryParse(uriValue.AbsolutePath.TrimStart(Constants.CharArrays.ForwardSlash), out guid) == false)
+                throw new FormatException("URI \"" + uriValue + "\" is not a GUID entity ID.");
 
             Guid = guid;
         }
@@ -48,7 +48,7 @@ namespace Umbraco.Core
         {
             var udi = Udi.Parse(s);
             if (udi is GuidUdi == false)
-                throw new FormatException("String \"" + s + "\" is not a guid entity id.");
+                throw new FormatException("String \"" + s + "\" is not a GUID entity id.");
 
             return (GuidUdi) udi;
         }

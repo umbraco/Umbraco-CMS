@@ -7,11 +7,9 @@ using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Persistence;
-using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
 using Umbraco.Core.Persistence.Repositories;
-using Umbraco.Core.Persistence.Repositories.Implement;
 using Umbraco.Core.Scoping;
 
 namespace Umbraco.Core.Services.Implement
@@ -19,30 +17,25 @@ namespace Umbraco.Core.Services.Implement
     public class EntityService : ScopeRepositoryService, IEntityService
     {
         private readonly IEntityRepository _entityRepository;
-        private readonly Dictionary<string, (UmbracoObjectTypes ObjectType, Func<int, IUmbracoEntity> GetById, Func<Guid, IUmbracoEntity> GetByKey)> _objectTypes;
+        private readonly Dictionary<string, UmbracoObjectTypes> _objectTypes;
         private IQuery<IUmbracoEntity> _queryRootEntity;
         private readonly IdkMap _idkMap;
 
-        public EntityService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory,
-           IContentService contentService, IContentTypeService contentTypeService,
-           IMediaService mediaService, IMediaTypeService mediaTypeService,
-           IDataTypeService dataTypeService,
-           IMemberService memberService, IMemberTypeService memberTypeService, IdkMap idkMap,
-           IEntityRepository entityRepository)
+        public EntityService(IScopeProvider provider, ILogger logger, IEventMessagesFactory eventMessagesFactory, IdkMap idkMap, IEntityRepository entityRepository)
             : base(provider, logger, eventMessagesFactory)
         {
             _idkMap = idkMap;
             _entityRepository = entityRepository;
 
-            _objectTypes = new Dictionary<string, (UmbracoObjectTypes, Func<int, IUmbracoEntity>, Func<Guid, IUmbracoEntity>)>
+            _objectTypes = new Dictionary<string, UmbracoObjectTypes>
             {
-                { typeof (IDataType).FullName, (UmbracoObjectTypes.DataType, dataTypeService.GetDataType, dataTypeService.GetDataType) },
-                { typeof (IContent).FullName, (UmbracoObjectTypes.Document, contentService.GetById, contentService.GetById) },
-                { typeof (IContentType).FullName, (UmbracoObjectTypes.DocumentType, contentTypeService.Get, contentTypeService.Get) },
-                { typeof (IMedia).FullName, (UmbracoObjectTypes.Media, mediaService.GetById, mediaService.GetById) },
-                { typeof (IMediaType).FullName, (UmbracoObjectTypes.MediaType, mediaTypeService.Get, mediaTypeService.Get) },
-                { typeof (IMember).FullName, (UmbracoObjectTypes.Member, memberService.GetById, memberService.GetByKey) },
-                { typeof (IMemberType).FullName, (UmbracoObjectTypes.MemberType, memberTypeService.Get, memberTypeService.Get) },
+                { typeof (IDataType).FullName, UmbracoObjectTypes.DataType },
+                { typeof (IContent).FullName, UmbracoObjectTypes.Document },
+                { typeof (IContentType).FullName, UmbracoObjectTypes.DocumentType },
+                { typeof (IMedia).FullName, UmbracoObjectTypes.Media },
+                { typeof (IMediaType).FullName, UmbracoObjectTypes.MediaType },
+                { typeof (IMember).FullName, UmbracoObjectTypes.Member },
+                { typeof (IMemberType).FullName, UmbracoObjectTypes.MemberType },
             };
         }
 
@@ -54,162 +47,68 @@ namespace Umbraco.Core.Services.Implement
 
         #endregion
 
-        // gets the getters, throws if not supported
-        private (UmbracoObjectTypes ObjectType, Func<int, IUmbracoEntity> GetById, Func<Guid, IUmbracoEntity> GetByKey) GetGetters(Type type)
+        // gets the object type, throws if not supported
+        private UmbracoObjectTypes GetObjectType(Type type)
         {
-            if (type?.FullName == null || !_objectTypes.TryGetValue(type.FullName, out var getters))
+            if (type?.FullName == null || !_objectTypes.TryGetValue(type.FullName, out var objType))
                 throw new NotSupportedException($"Type \"{type?.FullName ?? "<null>"}\" is not supported here.");
-            return getters;
+            return objType;
         }
 
         /// <inheritdoc />
         public IEntitySlim Get(int id)
         {
-            return (IEntitySlim) Get(id, false);
-        }
-
-        /// <inheritdoc />
-        public IUmbracoEntity Get(int id, bool full)
-        {
-            if (!full)
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
-                // get the light entity
-                using (ScopeProvider.CreateScope(autoComplete: true))
-                {
-                    return _entityRepository.Get(id);
-                }
+                return _entityRepository.Get(id);
             }
-
-            // get the full entity
-            var objectType = GetObjectType(id);
-            var entityType = objectType.GetClrType();
-            var getters = GetGetters(entityType);
-            return getters.GetById(id);
         }
 
         /// <inheritdoc />
         public IEntitySlim Get(Guid key)
         {
-            return (IEntitySlim) Get(key, false);
-        }
-
-        /// <inheritdoc />
-        public IUmbracoEntity Get(Guid key, bool full)
-        {
-            if (!full)
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
-                // get the light entity
-                using (ScopeProvider.CreateScope(autoComplete: true))
-                {
-                    return _entityRepository.Get(key);
-                }
+                return _entityRepository.Get(key);
             }
-
-            // get the full entity
-            var objectType = GetObjectType(key);
-            var entityType = objectType.GetClrType();
-            var getters = GetGetters(entityType);
-            return getters.GetByKey(key);
         }
 
         /// <inheritdoc />
         public virtual IEntitySlim Get(int id, UmbracoObjectTypes objectType)
         {
-            return (IEntitySlim) Get(id, objectType, false);
-        }
-
-        /// <inheritdoc />
-        public virtual IUmbracoEntity Get(int id, UmbracoObjectTypes objectType, bool full)
-        {
-            if (!full)
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
-                // get the light entity
-                using (ScopeProvider.CreateScope(autoComplete: true))
-                {
-                    return _entityRepository.Get(id, objectType.GetGuid());
-                }
+                return _entityRepository.Get(id, objectType.GetGuid());
             }
-
-            // get the full entity
-            var entityType = objectType.GetClrType();
-            var getters = GetGetters(entityType);
-            return getters.GetById(id);
         }
 
         /// <inheritdoc />
         public IEntitySlim Get(Guid key, UmbracoObjectTypes objectType)
         {
-            return (IEntitySlim) Get(key, objectType, false);
-        }
-
-        /// <inheritdoc />
-        public IUmbracoEntity Get(Guid key, UmbracoObjectTypes objectType, bool full)
-        {
-            if (!full)
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
-                // get the light entity
-                using (ScopeProvider.CreateScope(autoComplete: true))
-                {
-                    return _entityRepository.Get(key, objectType.GetGuid());
-                }
+                return _entityRepository.Get(key, objectType.GetGuid());
             }
-
-            // get the full entity
-            var entityType = objectType.GetClrType();
-            var getters = GetGetters(entityType);
-            return getters.GetByKey(key);
         }
 
         /// <inheritdoc />
         public virtual IEntitySlim Get<T>(int id)
             where T : IUmbracoEntity
         {
-            return (IEntitySlim) Get<T>(id, false);
-        }
-
-        /// <inheritdoc />
-        public virtual IUmbracoEntity Get<T>(int id, bool full)
-            where T : IUmbracoEntity
-        {
-            if (!full)
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
-                // get the light entity
-                using (ScopeProvider.CreateScope(autoComplete: true))
-                {
-                    return _entityRepository.Get(id);
-                }
+                return _entityRepository.Get(id);
             }
-
-            // get the full entity
-            var entityType = typeof (T);
-            var getters = GetGetters(entityType);
-            return getters.GetById(id);
         }
 
         /// <inheritdoc />
         public virtual IEntitySlim Get<T>(Guid key)
             where T : IUmbracoEntity
         {
-            return (IEntitySlim) Get<T>(key, false);
-        }
-
-        /// <inheritdoc />
-        public IUmbracoEntity Get<T>(Guid key, bool full)
-            where T : IUmbracoEntity
-        {
-            if (!full)
+            using (ScopeProvider.CreateScope(autoComplete: true))
             {
-                // get the light entity
-                using (ScopeProvider.CreateScope(autoComplete: true))
-                {
-                    return _entityRepository.Get(key);
-                }
+                return _entityRepository.Get(key);
             }
-
-            // get the full entity
-            var entityType = typeof (T);
-            var getters = GetGetters(entityType);
-            return getters.GetByKey(key);
         }
 
         /// <inheritdoc />
@@ -240,8 +139,7 @@ namespace Umbraco.Core.Services.Implement
             where T : IUmbracoEntity
         {
             var entityType = typeof (T);
-            var getters = GetGetters(entityType);
-            var objectType = getters.ObjectType;
+            var objectType = GetObjectType(entityType);
             var objectTypeId = objectType.GetGuid();
 
             using (ScopeProvider.CreateScope(autoComplete: true))
@@ -261,7 +159,7 @@ namespace Umbraco.Core.Services.Implement
             if (entityType == null)
                 throw new NotSupportedException($"Type \"{objectType}\" is not supported here.");
 
-            GetGetters(entityType);
+            GetObjectType(entityType);
 
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -277,7 +175,7 @@ namespace Umbraco.Core.Services.Implement
         public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params int[] ids)
         {
             var entityType = ObjectTypes.GetClrType(objectType);
-            GetGetters(entityType);
+            GetObjectType(entityType);
 
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -290,8 +188,7 @@ namespace Umbraco.Core.Services.Implement
             where T : IUmbracoEntity
         {
             var entityType = typeof (T);
-            var getters = GetGetters(entityType);
-            var objectType = getters.ObjectType;
+            var objectType = GetObjectType(entityType);
             var objectTypeId = objectType.GetGuid();
 
             using (ScopeProvider.CreateScope(autoComplete: true))
@@ -304,7 +201,7 @@ namespace Umbraco.Core.Services.Implement
         public IEnumerable<IEntitySlim> GetAll(UmbracoObjectTypes objectType, Guid[] keys)
         {
             var entityType = objectType.GetClrType();
-            GetGetters(entityType);
+            GetObjectType(entityType);
 
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -316,7 +213,7 @@ namespace Umbraco.Core.Services.Implement
         public virtual IEnumerable<IEntitySlim> GetAll(Guid objectType, params Guid[] keys)
         {
             var entityType = ObjectTypes.GetClrType(objectType);
-            GetGetters(entityType);
+            GetObjectType(entityType);
 
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -374,22 +271,6 @@ namespace Umbraco.Core.Services.Implement
             {
                 var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
                 return _entityRepository.GetByQuery(query, objectType.GetGuid());
-            }
-        }
-
-        /// <summary>
-        /// Gets a collection of children by the parent's Id and UmbracoObjectType without adding property data
-        /// </summary>
-        /// <param name="parentId">Id of the parent to retrieve children for</param>
-        /// <returns>An enumerable list of <see cref="IUmbracoEntity"/> objects</returns>
-        internal IEnumerable<IEntitySlim> GetMediaChildrenWithoutPropertyData(int parentId)
-        {
-            using (ScopeProvider.CreateScope(autoComplete: true))
-            {
-                var query = Query<IUmbracoEntity>().Where(x => x.ParentId == parentId);
-
-                // TODO: see https://github.com/umbraco/Umbraco-CMS/pull/3460#issuecomment-434903930 we need to not load any property data at all for media
-                return ((EntityRepository)_entityRepository).GetMediaByQueryWithoutPropertyData(query);
             }
         }
 
@@ -578,7 +459,7 @@ namespace Umbraco.Core.Services.Implement
         public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params int[] ids)
         {
             var entityType = objectType.GetClrType();
-            GetGetters(entityType);
+            GetObjectType(entityType);
 
             using (ScopeProvider.CreateScope(autoComplete: true))
             {
@@ -590,7 +471,7 @@ namespace Umbraco.Core.Services.Implement
         public virtual IEnumerable<TreeEntityPath> GetAllPaths(UmbracoObjectTypes objectType, params Guid[] keys)
         {
             var entityType = objectType.GetClrType();
-            GetGetters(entityType);
+            GetObjectType(entityType);
 
             using (ScopeProvider.CreateScope(autoComplete: true))
             {

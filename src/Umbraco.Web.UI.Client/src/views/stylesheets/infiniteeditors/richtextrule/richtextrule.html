@@ -2,7 +2,7 @@
     
     <form novalidate name="richTextRuleForm" val-form-manager>
 
-    <umb-editor-view>
+        <umb-editor-view>
 
             <umb-editor-header
                 name="model.title"
@@ -27,7 +27,7 @@
                         </umb-control-group>
 
                         <umb-control-group label="@stylesheet_styles" description="@stylesheet_stylesHelp">
-                            <textarea class="umb-stylesheet-rule-styles" ng-model="model.rule.styles" required></textarea>
+                            <textarea class="umb-stylesheet-rule-styles" ng-model="model.rule.styles" ng-required="model.rule.selector.charAt(0) === '.' || model.rule.selector.charAt(0) === '#' "></textarea>
                         </umb-control-group>
 
                         <umb-control-group label="@stylesheet_preview" description="@stylesheet_previewHelp">
@@ -64,9 +64,8 @@
                         action="vm.submit(model)">
                     </umb-button>
                 </umb-editor-footer-content-right>
-            </umb-editor-footer>
-            '        
-    </umb-editor-view>
+            </umb-editor-footer>     
+        </umb-editor-view>
 
     </form>
 

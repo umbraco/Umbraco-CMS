@@ -8,7 +8,6 @@
 
 .umb-healthcheck-help-text {
 	line-height: 1.6em;
-	max-width: 750px;
 }
 
 .umb-healthcheck-action-bar {
@@ -22,15 +21,18 @@
 .umb-healthcheck-group {
 	display: flex;
 	flex-wrap: wrap;
-	flex-direction: column;
-	background: @white;
+    flex-direction: column;
+    align-items: center;
+    background: @white;
+    border: 0;
 	border-radius: 3px;
 	padding: 20px;
 	box-sizing: border-box;
 	text-align: center;
 	box-shadow: 0 1px 1px 0 rgba(0,0,0,0.16);
 	height: 100%;
-	box-sizing: border-box;
+    box-sizing: border-box;
+    width: 100%;
 }
 
 .umb-healthcheck-group:hover {
@@ -117,7 +119,10 @@
 /* DETAILS */
 
 .umb-healthcheck-back-link {
-	font-weight: bold;
+    background: transparent;
+    border: 0 none;
+    padding: 0;
+    font-weight: bold;
 	color: @black;
 }
 

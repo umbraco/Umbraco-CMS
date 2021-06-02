@@ -3,12 +3,12 @@
     function () {
 
         var link = function ($scope) {
-            
+
             // Clone the model because some property editors
             // do weird things like updating and config values
             // so we want to ensure we start from a fresh every
             // time, we'll just sync the value back when we need to
-            $scope.model = angular.copy($scope.ngModel);
+            $scope.model = Utilities.copy($scope.ngModel);
             $scope.nodeContext = $scope.model;
 
             // Find the selected tab
@@ -31,7 +31,7 @@
 
                     // Tell inner controls we are submitting
                     $scope.$broadcast("formSubmitting", { scope: $scope });
-                    
+
                     // Sync the values back
                     angular.forEach($scope.ngModel.variants[0].tabs, function (tab) {
                         if (tab.alias.toLowerCase() === selectedTab.alias.toLowerCase()) {
@@ -49,6 +49,7 @@
 
                         }
                     });
+                    
                 }
             });
 

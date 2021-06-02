@@ -1,17 +1,40 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Threading;
+using Moq;
 using NUnit.Framework;
+using Umbraco.Core.Events;
 using Umbraco.Core.Mapping;
 using Umbraco.Core.Models;
+using Umbraco.Core.Scoping;
 using Umbraco.Web.Models.ContentEditing;
+using PropertyCollection = Umbraco.Core.Models.PropertyCollection;
 
 namespace Umbraco.Tests.Mapping
 {
     [TestFixture]
     public class MappingTests
     {
+        private IScopeProvider _scopeProvider;
+
+        [SetUp]
+        public void MockScopeProvider()
+        {
+            var scopeMock = new Mock<IScopeProvider>();
+            scopeMock.Setup(x => x.CreateScope(
+                    It.IsAny<IsolationLevel>(),
+                    It.IsAny<RepositoryCacheMode>(),
+                    It.IsAny<IEventDispatcher>(),
+                    It.IsAny<bool?>(),
+                    It.IsAny<bool>(),
+                    It.IsAny<bool>()))
+                .Returns(Mock.Of<IScope>);
+
+            _scopeProvider = scopeMock.Object;
+        }
+
         [Test]
         public void SimpleMap()
         {
@@ -19,7 +42,7 @@ namespace Umbraco.Tests.Mapping
             {
                 new MapperDefinition1(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             var thing1 = new Thing1 { Value = "value" };
             var thing2 = mapper.Map<Thing1, Thing2>(thing1);
@@ -44,7 +67,7 @@ namespace Umbraco.Tests.Mapping
             {
                 new MapperDefinition1(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             var thing1A = new Thing1 { Value = "valueA" };
             var thing1B = new Thing1 { Value = "valueB" };
@@ -78,7 +101,7 @@ namespace Umbraco.Tests.Mapping
             {
                 new MapperDefinition1(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             var thing3 = new Thing3 { Value = "value" };
             var thing2 = mapper.Map<Thing3, Thing2>(thing3);
@@ -103,7 +126,7 @@ namespace Umbraco.Tests.Mapping
             {
                 new MapperDefinition2(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             // can map a PropertyCollection
             var source = new PropertyCollection();
@@ -119,7 +142,7 @@ namespace Umbraco.Tests.Mapping
                 new MapperDefinition1(),
                 new MapperDefinition3(),
             });
-            var mapper = new UmbracoMapper(definitions);
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
 
             // the mapper currently has a map from Thing1 to Thing2
             // because Thing3 inherits from Thing1, it will map a Thing3 instance,
@@ -172,6 +195,48 @@ namespace Umbraco.Tests.Mapping
             }
         }
 
+        [Test]
+        public void EnumMap()
+        {
+            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            {
+                new MapperDefinition4(),
+            });
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
+
+            var thing5 = new Thing5()
+            {
+                Fruit1 = Thing5Enum.Apple,
+                Fruit2 = Thing5Enum.Banana,
+                Fruit3= Thing5Enum.Cherry
+            };
+
+            var thing6 = mapper.Map<Thing5, Thing6>(thing5);
+
+            Assert.IsNotNull(thing6);
+            Assert.AreEqual(Thing6Enum.Apple, thing6.Fruit1);
+            Assert.AreEqual(Thing6Enum.Banana, thing6.Fruit2);
+            Assert.AreEqual(Thing6Enum.Cherry, thing6.Fruit3);
+        }
+
+        [Test]
+        public void NullPropertyMap()
+        {
+            var definitions = new MapDefinitionCollection(new IMapDefinition[]
+            {
+                new MapperDefinition5(),
+            });
+            var mapper = new UmbracoMapper(definitions, _scopeProvider);
+
+            var thing7 = new Thing7();
+
+            var thing8 = mapper.Map<Thing7, Thing8>(thing7);
+
+            Assert.IsNotNull(thing8);
+            Assert.IsNull(thing8.Things);
+        }
+
+
         private class Thing1
         {
             public string Value { get; set; }
@@ -187,6 +252,44 @@ namespace Umbraco.Tests.Mapping
 
         private class Thing4
         { }
+
+        private class Thing5
+        {
+            public Thing5Enum Fruit1 { get; set; }
+            public Thing5Enum Fruit2 { get; set; }
+            public Thing5Enum Fruit3 { get; set; }
+        }
+
+        private enum Thing5Enum
+        {
+            Apple = 0,
+            Banana = 1,
+            Cherry = 2
+        }
+
+        private class Thing6
+        {
+            public Thing6Enum Fruit1 { get; set; }
+            public Thing6Enum Fruit2 { get; set; }
+            public Thing6Enum Fruit3 { get; set; }
+        }
+
+        private enum Thing6Enum
+        {
+            Apple = 0,
+            Banana = 1,
+            Cherry = 2
+        }
+
+        private class Thing7
+        {
+            public IEnumerable<Thing1> Things { get; set; }
+        }
+
+        private class Thing8
+        {
+            public IEnumerable<Thing2> Things { get; set; }
+        }
 
         private class MapperDefinition1 : IMapDefinition
         {
@@ -222,6 +325,42 @@ namespace Umbraco.Tests.Mapping
                 mapper.Define<double, object>();
                 mapper.Define<UmbracoMapper, object>();
                 mapper.Define<Property, object>();
+            }
+        }
+
+        private class MapperDefinition4 : IMapDefinition
+        {
+            public void DefineMaps(UmbracoMapper mapper)
+            {
+                mapper.Define<Thing5, Thing6>((source, context) => new Thing6(), Map);
+                mapper.Define<Thing5Enum, Thing6Enum>(
+                    (source, context) => (Thing6Enum)source);
+            }
+
+            private void Map(Thing5 source, Thing6 target, MapperContext context)
+            {
+                target.Fruit1 = context.Map<Thing6Enum>(source.Fruit1);
+                target.Fruit2 = context.Map<Thing6Enum>(source.Fruit2);
+                target.Fruit3 = context.Map<Thing6Enum>(source.Fruit3);
+            }
+        }
+
+        private class MapperDefinition5 : IMapDefinition
+        {
+            public void DefineMaps(UmbracoMapper mapper)
+            {
+                mapper.Define<Thing1, Thing2>((source, context) => new Thing2(), Map1);
+                mapper.Define<Thing7, Thing8>((source, context) => new Thing8(), Map2);
+            }
+
+            private void Map1(Thing1 source, Thing2 target, MapperContext context)
+            {
+                target.Value = source.Value;
+            }
+
+            private void Map2(Thing7 source, Thing8 target, MapperContext context)
+            {
+                target.Things = context.Map<IEnumerable<Thing2>>(source.Things);
             }
         }
     }

@@ -35,7 +35,7 @@ function MacrosSettingsController($scope, editorService, localizationService) {
             },
             filterCssClass: "not-allowed",
             select: function (node) {
-                const id = unescape(node.id);
+                const id = decodeURIComponent(node.id.replace(/\+/g, " "));
 
                 //vm.macro.view = id;
                 $scope.model.macro.view = "~/Views/MacroPartials/" + id;

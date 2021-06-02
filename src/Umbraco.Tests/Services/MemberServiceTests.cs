@@ -11,15 +11,20 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Entities;
 using Umbraco.Core.Models.Membership;
+using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.Persistence;
 using Umbraco.Core.Persistence.DatabaseModelDefinitions;
 using Umbraco.Core.Persistence.Dtos;
 using Umbraco.Core.Persistence.Querying;
+using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.Services;
 using Umbraco.Core.Services.Implement;
 using Umbraco.Tests.LegacyXmlPublishedCache;
 using Umbraco.Tests.TestHelpers.Entities;
 using Umbraco.Tests.Testing;
+using Umbraco.Tests.Testing.Objects.Accessors;
+using Umbraco.Web;
+using Umbraco.Web.PublishedCache.NuCache;
 using Umbraco.Web.Security.Providers;
 
 namespace Umbraco.Tests.Services
@@ -41,6 +46,119 @@ namespace Umbraco.Tests.Services
             var provider = providerMock.Object;
 
             ((MemberService)ServiceContext.MemberService).MembershipProvider = provider;
+        }
+
+        [Test]
+        public void Can_Update_Member_Property_Values()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "hello", "helloworld@test123.com", "hello", "hello");
+            member.SetValue("title", "title of mine");
+            member.SetValue("bodyText", "hello world");
+            ServiceContext.MemberService.Save(member);
+
+            // re-get
+            member = ServiceContext.MemberService.GetById(member.Id);
+            member.SetValue("title", "another title of mine");          // Change a value
+            member.SetValue("bodyText", null);                          // Clear a value
+            member.SetValue("author", "new author");                    // Add a value
+            ServiceContext.MemberService.Save(member);
+
+            // re-get
+            member = ServiceContext.MemberService.GetById(member.Id);
+            Assert.AreEqual("another title of mine", member.GetValue("title"));
+            Assert.IsNull(member.GetValue("bodyText"));
+            Assert.AreEqual("new author", member.GetValue("author"));
+        }
+
+        [Test]
+        public void Can_Get_By_Username()
+        {
+            var memberType = ServiceContext.MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
+            ServiceContext.MemberService.Save(member);
+
+            var member2 = ServiceContext.MemberService.GetByUsername(member.Username);
+
+            Assert.IsNotNull(member2);
+            Assert.AreEqual(member.Email, member2.Email);
+        }
+
+        [Test]
+        public void Can_Set_Last_Login_Date()
+        {
+            var now = DateTime.Now;
+            var memberType = ServiceContext.MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true)
+            {
+                LastLoginDate = now,
+                UpdateDate = now
+            };
+            ServiceContext.MemberService.Save(member);
+
+            var newDate = now.AddDays(10);
+            ServiceContext.MemberService.SetLastLogin(member.Username, newDate);
+
+            //re-get
+            member = ServiceContext.MemberService.GetById(member.Id);
+
+            Assert.That(member.LastLoginDate, Is.EqualTo(newDate).Within(1).Seconds);
+            Assert.That(member.UpdateDate, Is.EqualTo(newDate).Within(1).Seconds);
+        }
+
+        [Test]
+        public void Can_Create_Member_With_Properties()
+        {
+            var memberType = ServiceContext.MemberTypeService.Get("member");
+            IMember member = new Member("xname", "xemail", "xusername", "xrawpassword", memberType, true);
+            ServiceContext.MemberService.Save(member);
+
+            member = ServiceContext.MemberService.GetById(member.Id);
+            Assert.AreEqual("xemail", member.Email);
+
+            var dataTypeService = ServiceContext.DataTypeService;
+            var contentTypeFactory = new PublishedContentTypeFactory(new NoopPublishedModelFactory(), new PropertyValueConverterCollection(Enumerable.Empty<IPropertyValueConverter>()), dataTypeService);
+            var pmemberType = new PublishedContentType(memberType, contentTypeFactory);
+
+            var publishedSnapshotAccessor = new TestPublishedSnapshotAccessor();
+            var variationContextAccessor = new TestVariationContextAccessor();
+            var pmember = PublishedMember.Create(member, pmemberType, false, publishedSnapshotAccessor, variationContextAccessor);
+
+            // contains the umbracoMember... properties created when installing, on the member type
+            // contains the other properties, that PublishedContentType adds (BuiltinMemberProperties)
+            //
+            // TODO: see TODO in PublishedContentType, this list contains duplicates
+
+            var aliases = new[]
+            {
+                "umbracoMemberPasswordRetrievalQuestion",
+                "umbracoMemberPasswordRetrievalAnswer",
+                "umbracoMemberComments",
+                "umbracoMemberFailedPasswordAttempts",
+                "umbracoMemberApproved",
+                "umbracoMemberLockedOut",
+                "umbracoMemberLastLockoutDate",
+                "umbracoMemberLastLogin",
+                "umbracoMemberLastPasswordChangeDate",
+                "Email",
+                "Username",
+                "PasswordQuestion",
+                "Comments",
+                "IsApproved",
+                "IsLockedOut",
+                "LastLockoutDate",
+                "CreateDate",
+                "LastLoginDate",
+                "LastPasswordChangeDate"
+            };
+
+            var properties = pmember.Properties.ToList();
+
+            Assert.IsTrue(properties.Select(x => x.Alias).ContainsAll(aliases));
+
+            var email = properties[aliases.IndexOf("Email")];
+            Assert.AreEqual("xemail", email.GetSourceValue());
         }
 
         [Test]
@@ -138,7 +256,17 @@ namespace Umbraco.Tests.Services
 
             Assert.AreEqual(3, found.Count());
         }
+        [Test]
+        public void Can_Get_All_Roles_IDs()
+        {
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+            ServiceContext.MemberService.AddRole("MyTestRole2");
+            ServiceContext.MemberService.AddRole("MyTestRole3");
 
+            var found = ServiceContext.MemberService.GetAllRolesIds();
+
+            Assert.AreEqual(3, found.Count());
+        }
         [Test]
         public void Can_Get_All_Roles_By_Member_Id()
         {
@@ -157,7 +285,24 @@ namespace Umbraco.Tests.Services
             Assert.AreEqual(2, memberRoles.Count());
 
         }
+        [Test]
+        public void Can_Get_All_Roles_Ids_By_Member_Id()
+        {
+            IMemberType memberType = MockedContentTypes.CreateSimpleMemberType();
+            ServiceContext.MemberTypeService.Save(memberType);
+            IMember member = MockedMember.CreateSimpleMember(memberType, "test", "test@test.com", "pass", "test");
+            ServiceContext.MemberService.Save(member);
 
+            ServiceContext.MemberService.AddRole("MyTestRole1");
+            ServiceContext.MemberService.AddRole("MyTestRole2");
+            ServiceContext.MemberService.AddRole("MyTestRole3");
+            ServiceContext.MemberService.AssignRoles(new[] { member.Id }, new[] { "MyTestRole1", "MyTestRole2" });
+
+            var memberRoles = ServiceContext.MemberService.GetAllRolesIds(member.Id);
+
+            Assert.AreEqual(2, memberRoles.Count());
+
+        }
         [Test]
         public void Can_Get_All_Roles_By_Member_Username()
         {
