@@ -21,7 +21,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         public class PublishedSnapshotElements : IDisposable
         {
-            public ContentCache ContentCache;
+            public ContentCacheAdapter ContentCache;
             public MediaCache MediaCache;
             public MemberCache MemberCache;
             public DomainCache DomainCache;
@@ -63,6 +63,8 @@ namespace Umbraco.Web.PublishedCache.NuCache
         public IPublishedMemberCache Members => Elements.MemberCache;
 
         public IDomainCache Domains => Elements.DomainCache;
+
+        public bool DefaultPreview  => _defaultPreview;
 
         public IDisposable ForcedPreview(bool preview, Action<bool> callback = null)
         {

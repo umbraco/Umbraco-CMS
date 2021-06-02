@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using Moq;
@@ -160,7 +161,11 @@ namespace Umbraco.Tests.Cache
                 TestObjects.GetGlobalSettings(),
                 new UrlProviderCollection(Enumerable.Empty<IUrlProvider>()),
                 new MediaUrlProviderCollection(Enumerable.Empty<IMediaUrlProvider>()),
-                Mock.Of<IUserService>());
+                Mock.Of<IUserService>(),
+                new ContextUrlProviderFactory(TestObjects.GetUmbracoSettings().WebRouting,
+                Enumerable.Empty<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
+                new TestVariationContextAccessor()));
 
             // just assert it does not throw
             var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null);

@@ -5,6 +5,7 @@ using System.Linq;
 using Moq;
 using NUnit.Framework;
 using Umbraco.Core;
+using Umbraco.Core.Cache;
 using Umbraco.Core.Composing;
 using Umbraco.Core.Configuration;
 using Umbraco.Core.Events;
@@ -181,6 +182,9 @@ namespace Umbraco.Tests.PublishedContent
             // create a variation accessor
             _variationAccesor = new TestVariationContextAccessor();
 
+            var snapshotAccessor = new TestPublishedSnapshotAccessor();
+            var contentRouter = new ContentCacheContentRouter(globalSettings);
+
             // at last, create the complete NuCache snapshot service!
             var options = new PublishedSnapshotServiceOptions { IgnoreLocalDb = true };
             _snapshotService = new PublishedSnapshotService(options,
@@ -189,7 +193,7 @@ namespace Umbraco.Tests.PublishedContent
                 serviceContext,
                 contentTypeFactory,
                 null,
-                new TestPublishedSnapshotAccessor(),
+                snapshotAccessor,
                 _variationAccesor,
                 Mock.Of<IProfilingLogger>(),
                 scopeProvider,
@@ -201,7 +205,7 @@ namespace Umbraco.Tests.PublishedContent
                 globalSettings,
                 Mock.Of<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), contentRouter);
 
             // invariant is the current default
             _variationAccesor.VariationContext = new VariationContext();

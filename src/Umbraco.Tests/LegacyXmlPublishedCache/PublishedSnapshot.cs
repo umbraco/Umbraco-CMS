@@ -44,6 +44,8 @@ namespace Umbraco.Tests.LegacyXmlPublishedCache
         /// <inheritdoc />
         public IAppCache ElementsCache => null;
 
+        public bool DefaultPreview => false;
+
         /// <inheritdoc />
         public IDisposable ForcedPreview(bool preview, Action<bool> callback = null)
         {

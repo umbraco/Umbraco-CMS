@@ -73,7 +73,11 @@ namespace Umbraco.Tests.PublishedContent
                 Enumerable.Empty<IUrlProvider>(),
                 Enumerable.Empty<IMediaUrlProvider>(),
                 globalSettings,
-                new TestVariationContextAccessor());
+                new TestVariationContextAccessor(),
+                new ContextUrlProviderFactory(TestObjects.GetUmbracoSettings().WebRouting,
+                Enumerable.Empty<IUrlProvider>(),
+                Enumerable.Empty<IMediaUrlProvider>(),
+                new TestVariationContextAccessor()));
 
             return umbracoContext;
         }

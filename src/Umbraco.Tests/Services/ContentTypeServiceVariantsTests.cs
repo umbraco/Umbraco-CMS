@@ -53,6 +53,8 @@ namespace Umbraco.Tests.Services
             var mediaRepository = Mock.Of<IMediaRepository>();
             var memberRepository = Mock.Of<IMemberRepository>();
 
+            var contentRouter = new ContentCacheContentRouter(Factory.GetInstance<IGlobalSettings>());
+
             return new PublishedSnapshotService(
                 options,
                 null,
@@ -70,7 +72,7 @@ namespace Umbraco.Tests.Services
                 Factory.GetInstance<IGlobalSettings>(),
                 Factory.GetInstance<IEntityXmlSerializer>(),
                 Mock.Of<IPublishedModelFactory>(),
-                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }));
+                new UrlSegmentProviderCollection(new[] { new DefaultUrlSegmentProvider() }), contentRouter);
         }
 
         public class LocalServerMessenger : ServerMessengerBase

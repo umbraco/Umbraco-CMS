@@ -165,7 +165,7 @@ namespace Umbraco.Web.PublishedCache.NuCache
 
         #region IDisposable
 
-        public void Dispose()
+        public override void Dispose()
         {
             _snapshot.Dispose();
         }

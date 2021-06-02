@@ -40,6 +40,8 @@ namespace Umbraco.Tests.PublishedContent
 
         public IAppCache ElementsCache => null;
 
+        public bool DefaultPreview => false;
+
         public void Dispose()
         { }
     }
@@ -158,6 +160,9 @@ namespace Umbraco.Tests.PublishedContent
         public override IEnumerable<IPublishedContent> GetByContentType(IPublishedContentType contentType)
         {
             throw new NotImplementedException();
+        }
+        public override void Dispose()
+        {
         }
     }
 
@@ -443,6 +448,9 @@ namespace Umbraco.Tests.PublishedContent
         {
             var propertyType = base.GetPropertyType(alias);
             return propertyType ?? Default;
+        }
+        public void Dispose()
+        {
         }
     }
 }

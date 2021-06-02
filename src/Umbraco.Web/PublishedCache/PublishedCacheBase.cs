@@ -8,7 +8,7 @@ using Umbraco.Core.Xml;
 
 namespace Umbraco.Web.PublishedCache
 {
-    internal abstract class PublishedCacheBase : IPublishedCache2
+    internal abstract class PublishedCacheBase : IPublishedCache3
     {
         public bool PreviewDefault { get; }
 
@@ -100,5 +100,7 @@ namespace Umbraco.Web.PublishedCache
                 .SelectMany(x => x.DescendantsOrSelf())
                 .Where(x => x.ContentType.Id == contentType.Id);
         }
+
+        public abstract void Dispose();
     }
 }
