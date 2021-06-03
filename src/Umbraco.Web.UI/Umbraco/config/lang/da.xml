@@ -1328,9 +1328,9 @@ Mange hilsner fra Umbraco robotten
       ]]></key>
     <key alias="sectionName">Sektionsnavn</key>
     <key alias="sectionMandatory">Sektionen er obligatorisk</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Hvis obligatorisk, skal underskabelonen indeholde en <code>@section</code> -definition.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Query builder</key>
     <key alias="itemsReturned">sider returneret, på</key>
     <key alias="iWant">Returner</key>
@@ -1907,7 +1907,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="addBlock">Tilføj indhold</key>
     <key alias="addThis">Tilføj %0%</key>
     <key alias="propertyEditorNotSupported">Feltet %0% bruger editor %1% som ikke er supporteret for blokke.</key>
-  </area>
   </area>
     <area alias="contentTemplatesDashboard">
         <key alias="whatHeadline">Hvad er Indholdsskabeloner?</key>

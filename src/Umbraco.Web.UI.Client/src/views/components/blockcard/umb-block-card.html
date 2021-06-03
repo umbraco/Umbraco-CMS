@@ -2,7 +2,13 @@
     <div class="__showcase"
         ng-class="{'--error':vm.elementTypeModel === null}"
         ng-style="{'background-color': vm.blockConfigModel ? vm.blockConfigModel.backgroundColor : '', 'background-image': vm.styleBackgroundImage}">
-        <i ng-if="vm.blockConfigModel == null || vm.blockConfigModel.thumbnail == null" class="__icon {{ vm.elementTypeModel ? vm.elementTypeModel.icon : 'icon-block' }}" ng-attr-style="{{'color:'+vm.blockConfigModel.iconColor+' !important'}}" aria-hidden="true"></i>
+        <div class="__icon">
+            <umb-icon icon="{{vm.elementTypeModel ? vm.elementTypeModel.icon : 'icon-block'}}"
+                      class="{{vm.elementTypeModel ? vm.elementTypeModel.icon : 'icon-block'}}"
+                      ng-attr-style="{{'color:' + vm.blockConfigModel.iconColor + ' !important'}}"
+                      ng-if="vm.blockConfigModel == null || vm.blockConfigModel.thumbnail == null">
+            </umb-icon>
+        </div>
     </div>
     <div class="__info" ng-if="vm.elementTypeModel !== null">
         <div class="__name" ng-bind="vm.elementTypeModel.name"></div>
