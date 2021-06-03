@@ -93,10 +93,18 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
             if (useBackgroundThread)
             {
-                _logger.LogInformation($"Starting async background thread for {nameof(RebuildIndexes)}.");
+                _logger.LogDebug($"Queuing background job for {nameof(RebuildIndexes)}.");
 
                 _backgroundTaskQueue.QueueBackgroundWorkItem(
-                    cancellationToken => Task.Run(() => RebuildIndexes(onlyEmptyIndexes, delay.Value, cancellationToken)));
+                    cancellationToken =>
+                    {
+                        // This is a fire/forget task spawned by the background thread queue (which means we
+                        // don't need to worry about ExecutionContext flowing).
+                        Task.Run(() => RebuildIndexes(onlyEmptyIndexes, delay.Value, cancellationToken));
+
+                        // immediately return so the queue isn't waiting.
+                        return Task.CompletedTask;
+                    });
             }
             else
             {

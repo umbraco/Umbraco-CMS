@@ -11,41 +11,20 @@ using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Infrastructure.Examine
 {
-    public class LuceneRAMDirectoryFactory : IDirectoryFactory
+    public class LuceneRAMDirectoryFactory : DirectoryFactoryBase
     {
-        private Directory _directory;
-        private bool _disposedValue;
 
         public LuceneRAMDirectoryFactory()
         {
         }
 
-        public Directory CreateDirectory(LuceneIndex luceneIndex, bool forceUnlock)
-            => LazyInitializer.EnsureInitialized(ref _directory, () => new RandomIdRAMDirectory());
+        protected override Directory CreateDirectory(LuceneIndex luceneIndex, bool forceUnlock)
+            => new RandomIdRAMDirectory();
 
         private class RandomIdRAMDirectory : RAMDirectory
         {
             private readonly string _lockId = Guid.NewGuid().ToString();
             public override string GetLockID() => _lockId;
-        }
-
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!_disposedValue)
-            {
-                if (disposing)
-                {
-                    _directory?.Dispose();
-                }
-
-                _disposedValue = true;
-            }
-        }
-
-        public void Dispose()
-        {
-            // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-            Dispose(disposing: true);
         }
     }
 }

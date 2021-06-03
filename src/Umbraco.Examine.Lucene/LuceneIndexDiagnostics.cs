@@ -68,8 +68,16 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
                 if (_indexOptions != null)
                 {
-                    d[nameof(LuceneDirectoryIndexOptions.DirectoryFactory)] = _indexOptions.DirectoryFactory.GetType();
-                    d[nameof(LuceneDirectoryIndexOptions.IndexDeletionPolicy)] = _indexOptions.IndexDeletionPolicy.GetType();
+                    if (_indexOptions.DirectoryFactory != null)
+                    {
+                        d[nameof(LuceneDirectoryIndexOptions.DirectoryFactory)] = _indexOptions.DirectoryFactory.GetType();
+                    }
+                    
+                    if (_indexOptions.IndexDeletionPolicy != null)
+                    {
+                        d[nameof(LuceneDirectoryIndexOptions.IndexDeletionPolicy)] = _indexOptions.IndexDeletionPolicy.GetType();
+                    } 
+                    
                 }
 
                 return d;

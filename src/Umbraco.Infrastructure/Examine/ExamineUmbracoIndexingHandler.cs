@@ -242,34 +242,35 @@ namespace Umbraco.Cms.Infrastructure.Examine
         private class DeferedReIndexForContent : DeferedAction
         {
             private readonly IBackgroundTaskQueue _backgroundTaskQueue;
-            private readonly ExamineUmbracoIndexingHandler _ExamineUmbracoIndexingHandler;
+            private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
             private readonly IContent _content;
             private readonly bool _isPublished;
 
-            public DeferedReIndexForContent(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler ExamineUmbracoIndexingHandler, IContent content, bool isPublished)
+            public DeferedReIndexForContent(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IContent content, bool isPublished)
             {
                 _backgroundTaskQueue = backgroundTaskQueue;
-                _ExamineUmbracoIndexingHandler = ExamineUmbracoIndexingHandler;
+                _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
                 _content = content;
                 _isPublished = isPublished;
             }
 
-            public override void Execute() => Execute(_backgroundTaskQueue, _ExamineUmbracoIndexingHandler, _content, _isPublished);
+            public override void Execute() => Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _content, _isPublished);
 
-            public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler ExamineUmbracoIndexingHandler, IContent content, bool isPublished)
+            public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IContent content, bool isPublished)
                 => backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
                 {
-                    using IScope scope = ExamineUmbracoIndexingHandler._scopeProvider.CreateScope(autoComplete: true);
+                    using IScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateScope(autoComplete: true);
 
                     // for content we have a different builder for published vs unpublished
                     // we don't want to build more value sets than is needed so we'll lazily build 2 one for published one for non-published
                     var builders = new Dictionary<bool, Lazy<List<ValueSet>>>
                     {
-                        [true] = new Lazy<List<ValueSet>>(() => ExamineUmbracoIndexingHandler._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
-                        [false] = new Lazy<List<ValueSet>>(() => ExamineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList())
+                        [true] = new Lazy<List<ValueSet>>(() => examineUmbracoIndexingHandler._publishedContentValueSetBuilder.GetValueSets(content).ToList()),
+                        [false] = new Lazy<List<ValueSet>>(() => examineUmbracoIndexingHandler._contentValueSetBuilder.GetValueSets(content).ToList())
                     };
 
-                    foreach (IUmbracoIndex index in ExamineUmbracoIndexingHandler._examineManager.Indexes.OfType<IUmbracoIndex>()
+                    // This is only for content - so only index items for IUmbracoContentIndex (to exlude members)
+                    foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes.OfType<IUmbracoContentIndex>()
                         //filter the indexers
                         .Where(x => isPublished || !x.PublishedValuesOnly)
                         .Where(x => x.EnableDefaultEventHandler))
@@ -293,29 +294,30 @@ namespace Umbraco.Cms.Infrastructure.Examine
         private class DeferedReIndexForMedia : DeferedAction
         {
             private readonly IBackgroundTaskQueue _backgroundTaskQueue;
-            private readonly ExamineUmbracoIndexingHandler _ExamineUmbracoIndexingHandler;
+            private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
             private readonly IMedia _media;
             private readonly bool _isPublished;
 
-            public DeferedReIndexForMedia(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler ExamineUmbracoIndexingHandler, IMedia media, bool isPublished)
+            public DeferedReIndexForMedia(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IMedia media, bool isPublished)
             {
                 _backgroundTaskQueue = backgroundTaskQueue;
-                _ExamineUmbracoIndexingHandler = ExamineUmbracoIndexingHandler;
+                _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
                 _media = media;
                 _isPublished = isPublished;
             }
 
-            public override void Execute() => Execute(_backgroundTaskQueue, _ExamineUmbracoIndexingHandler, _media, _isPublished);
+            public override void Execute() => Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _media, _isPublished);
 
-            public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler ExamineUmbracoIndexingHandler, IMedia media, bool isPublished) =>
+            public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IMedia media, bool isPublished) =>
                 // perform the ValueSet lookup on a background thread
                 backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
                 {
-                    using IScope scope = ExamineUmbracoIndexingHandler._scopeProvider.CreateScope(autoComplete: true);
+                    using IScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateScope(autoComplete: true);
 
-                    var valueSet = ExamineUmbracoIndexingHandler._mediaValueSetBuilder.GetValueSets(media).ToList();
+                    var valueSet = examineUmbracoIndexingHandler._mediaValueSetBuilder.GetValueSets(media).ToList();
 
-                    foreach (IUmbracoIndex index in ExamineUmbracoIndexingHandler._examineManager.Indexes.OfType<IUmbracoIndex>()
+                    // This is only for content - so only index items for IUmbracoContentIndex (to exlude members)
+                    foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes.OfType<IUmbracoContentIndex>()
                         //filter the indexers
                         .Where(x => isPublished || !x.PublishedValuesOnly)
                         .Where(x => x.EnableDefaultEventHandler))
@@ -332,27 +334,29 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// </summary>
         private class DeferedReIndexForMember : DeferedAction
         {
-            private readonly ExamineUmbracoIndexingHandler _ExamineUmbracoIndexingHandler;
+            private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
             private readonly IMember _member;
             private readonly IBackgroundTaskQueue _backgroundTaskQueue;
 
-            public DeferedReIndexForMember(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler ExamineUmbracoIndexingHandler, IMember member)
+            public DeferedReIndexForMember(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IMember member)
             {
-                _ExamineUmbracoIndexingHandler = ExamineUmbracoIndexingHandler;
+                _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
                 _member = member;
                 _backgroundTaskQueue = backgroundTaskQueue;
             }
 
-            public override void Execute() => Execute(_backgroundTaskQueue, _ExamineUmbracoIndexingHandler, _member);
+            public override void Execute() => Execute(_backgroundTaskQueue, _examineUmbracoIndexingHandler, _member);
 
-            public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler ExamineUmbracoIndexingHandler, IMember member) =>
+            public static void Execute(IBackgroundTaskQueue backgroundTaskQueue, ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, IMember member) =>
                 // perform the ValueSet lookup on a background thread
                 backgroundTaskQueue.QueueBackgroundWorkItem(cancellationToken =>
                 {
-                    using IScope scope = ExamineUmbracoIndexingHandler._scopeProvider.CreateScope(autoComplete: true);
+                    using IScope scope = examineUmbracoIndexingHandler._scopeProvider.CreateScope(autoComplete: true);
 
-                    var valueSet = ExamineUmbracoIndexingHandler._memberValueSetBuilder.GetValueSets(member).ToList();
-                    foreach (IUmbracoIndex index in ExamineUmbracoIndexingHandler._examineManager.Indexes.OfType<IUmbracoIndex>()
+                    var valueSet = examineUmbracoIndexingHandler._memberValueSetBuilder.GetValueSets(member).ToList();
+
+                    // only process for IUmbracoMemberIndex (not content indexes)
+                    foreach (IUmbracoIndex index in examineUmbracoIndexingHandler._examineManager.Indexes.OfType<IUmbracoMemberIndex>()
                         //filter the indexers
                         .Where(x => x.EnableDefaultEventHandler))
                     {
@@ -365,23 +369,23 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         private class DeferedDeleteIndex : DeferedAction
         {
-            private readonly ExamineUmbracoIndexingHandler _ExamineUmbracoIndexingHandler;
+            private readonly ExamineUmbracoIndexingHandler _examineUmbracoIndexingHandler;
             private readonly int _id;
             private readonly bool _keepIfUnpublished;
 
-            public DeferedDeleteIndex(ExamineUmbracoIndexingHandler ExamineUmbracoIndexingHandler, int id, bool keepIfUnpublished)
+            public DeferedDeleteIndex(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, int id, bool keepIfUnpublished)
             {
-                _ExamineUmbracoIndexingHandler = ExamineUmbracoIndexingHandler;
+                _examineUmbracoIndexingHandler = examineUmbracoIndexingHandler;
                 _id = id;
                 _keepIfUnpublished = keepIfUnpublished;
             }
 
-            public override void Execute() => Execute(_ExamineUmbracoIndexingHandler, _id, _keepIfUnpublished);
+            public override void Execute() => Execute(_examineUmbracoIndexingHandler, _id, _keepIfUnpublished);
 
-            public static void Execute(ExamineUmbracoIndexingHandler ExamineUmbracoIndexingHandler, int id, bool keepIfUnpublished)
+            public static void Execute(ExamineUmbracoIndexingHandler examineUmbracoIndexingHandler, int id, bool keepIfUnpublished)
             {
                 var strId = id.ToString(CultureInfo.InvariantCulture);
-                foreach (var index in ExamineUmbracoIndexingHandler._examineManager.Indexes.OfType<IUmbracoIndex>()
+                foreach (var index in examineUmbracoIndexingHandler._examineManager.Indexes.OfType<IUmbracoIndex>()
                     .Where(x => x.PublishedValuesOnly || !keepIfUnpublished)
                     .Where(x => x.EnableDefaultEventHandler))
                 {
