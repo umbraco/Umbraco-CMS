@@ -2,14 +2,11 @@ using System;
 using Examine;
 using Examine.Lucene;
 using Examine.Lucene.Analyzers;
-using Examine.Lucene.Directories;
 using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Index;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection
 {
@@ -20,16 +17,13 @@ namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection
     {
         private readonly IUmbracoIndexConfig _umbracoIndexConfig;
         private readonly IOptions<IndexCreatorSettings> _settings;
-        private readonly ITypeFinder _typeFinder;
 
         public ConfigureIndexOptions(
             IUmbracoIndexConfig umbracoIndexConfig,
-            IOptions<IndexCreatorSettings> settings,
-            ITypeFinder typeFinder)
+            IOptions<IndexCreatorSettings> settings)
         {
             _umbracoIndexConfig = umbracoIndexConfig;
             _settings = settings;
-            _typeFinder = typeFinder;
         }
 
         public void Configure(string name, LuceneDirectoryIndexOptions options)
@@ -56,12 +50,12 @@ namespace Umbraco.Cms.Infrastructure.Examine.DependencyInjection
             // ensure indexes are unlocked on startup
             options.UnlockIndex = true;
 
-            Type directoryFactoryType = _settings.Value.GetRequiredLuceneDirectoryFactoryType(_typeFinder);
-            if (directoryFactoryType == typeof(SyncFileSystemDirectoryFactory))
+            if (_settings.Value.LuceneDirectoryFactory == LuceneDirectoryFactory.SyncedTempFileSystemDirectoryFactory)
             {
                 // if this directory factory is enabled then a snapshot deletion policy is required
                 options.IndexDeletionPolicy = new SnapshotDeletionPolicy(new KeepOnlyLastCommitDeletionPolicy());
             }
+            
             
         }
 

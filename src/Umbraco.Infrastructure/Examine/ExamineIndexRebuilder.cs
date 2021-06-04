@@ -170,8 +170,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
                 }
                 else
                 {
+                    // If an index exists but it has zero docs we'll consider it empty and rebuild
                     IIndex[] indexes = (onlyEmptyIndexes
-                      ? _examineManager.Indexes.Where(x => !x.IndexExists())
+                      ? _examineManager.Indexes.Where(x => !x.IndexExists() || (x is IIndexStats stats && stats.GetDocumentCount() == 0))
                       : _examineManager.Indexes).ToArray();
 
                     if (indexes.Length == 0)

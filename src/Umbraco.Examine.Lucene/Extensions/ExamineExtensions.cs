@@ -22,30 +22,6 @@ namespace Umbraco.Extensions
     /// </summary>
     public static class ExamineExtensions
     {
-        /// <summary>
-        /// Returns the Type of the directory factory based on it's configured value
-        /// </summary>
-        /// <returns></returns>
-        /// <exception cref="InvalidOperationException">Throw if there is a value configured but it doesn't resolve to a type</exception>
-        internal static Type GetRequiredLuceneDirectoryFactoryType(
-            this IndexCreatorSettings indexCreatorSettings,
-            ITypeFinder typeFinder)
-        {
-            if (indexCreatorSettings.LuceneDirectoryFactory.IsNullOrWhiteSpace())
-            {
-                return null;
-            }
-
-            //this should be a fully qualified type
-            Type factoryType = typeFinder.GetTypeByName(indexCreatorSettings.LuceneDirectoryFactory);
-            if (factoryType == null)
-            {
-                throw new InvalidOperationException("No directory type found for value: " + indexCreatorSettings.LuceneDirectoryFactory);
-            }
-
-            return factoryType;
-        }
-
         internal static bool TryParseLuceneQuery(string query)
         {
             // TODO: I'd assume there would be a more strict way to parse the query but not that i can find yet, for now we'll
