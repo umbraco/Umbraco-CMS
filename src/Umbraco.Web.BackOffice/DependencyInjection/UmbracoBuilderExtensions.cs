@@ -48,11 +48,11 @@ namespace Umbraco.Extensions
                 .AddNuCache()
                 .AddDistributedCache()
                 .AddModelsBuilderDashboard()
-                .AddUnattedInstallCreateUser()
+                .AddUnattendedInstallInstallCreateUser()
                 .AddExamine()
                 .AddExamineIndexes();
 
-        public static IUmbracoBuilder AddUnattedInstallCreateUser(this IUmbracoBuilder builder)
+        public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
         {
             builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
             return builder;
