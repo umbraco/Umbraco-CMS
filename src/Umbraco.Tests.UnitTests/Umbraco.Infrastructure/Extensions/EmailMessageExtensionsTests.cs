@@ -78,5 +78,25 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions
             Assert.AreEqual(body, result.TextBody.ToString());
             Assert.AreEqual(1, result.Attachments.Count());
         }
+
+        [Test]
+        public void Can_Construct_MimeMessage_With_ConfiguredSender()
+        {
+            const string to = "to@email.com";
+            const string subject = "Subject";
+            const string body = "<p>Message</p>";
+            const bool isBodyHtml = true;
+            var emailMesasge = new EmailMessage(null, to, subject, body, isBodyHtml);
+
+            var result = emailMesasge.ToMimeMessage(ConfiguredSender);
+
+            Assert.AreEqual(1, result.From.Count());
+            Assert.AreEqual(ConfiguredSender, result.From.First().ToString());
+            Assert.AreEqual(1, result.To.Count());
+            Assert.AreEqual(to, result.To.First().ToString());
+            Assert.AreEqual(subject, result.Subject);
+            Assert.IsNull(result.TextBody);
+            Assert.AreEqual(body, result.HtmlBody.ToString());
+        }
     }
 }
