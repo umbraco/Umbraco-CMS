@@ -1,7 +1,7 @@
 using System;
 using MimeKit;
 using MimeKit.Text;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Email;
 
 namespace Umbraco.Cms.Infrastructure.Extensions
 {

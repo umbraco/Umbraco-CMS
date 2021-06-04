@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models.Email
 {
     public class EmailMessage
     {
