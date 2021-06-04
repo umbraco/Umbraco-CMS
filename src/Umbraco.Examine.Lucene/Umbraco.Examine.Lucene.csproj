@@ -26,7 +26,6 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Examine" Version="2.0.0-beta.147" />
-    <PackageReference Include="Examine" Version="2.0.0-beta.136" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
