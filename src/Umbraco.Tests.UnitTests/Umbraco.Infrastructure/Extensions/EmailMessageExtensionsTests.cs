@@ -123,6 +123,28 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions
         }
 
         [Test]
+        public void Can_Construct_NotificationEmailModel_From_Simple_MailMessage_With_Configured_Sender()
+        {
+            const string to = "to@email.com";
+            const string subject = "Subject";
+            const string body = "<p>Message</p>";
+            const bool isBodyHtml = true;
+            var emailMessage = new EmailMessage(null, to, subject, body, isBodyHtml);
+
+            NotificationEmailModel result = emailMessage.ToNotificationEmail(ConfiguredSender);
+
+            Assert.AreEqual(ConfiguredSender, result.From.Adress);
+            Assert.AreEqual("", result.From.DisplayName);
+            Assert.AreEqual(1, result.To.Count());
+            Assert.AreEqual(to, result.To.First().Adress);
+            Assert.AreEqual("", result.To.First().DisplayName);
+            Assert.AreEqual(subject, result.Subject);
+            Assert.AreEqual(body, result.Body);
+            Assert.IsTrue(result.IsBodyHtml);
+            Assert.IsFalse(result.HasAttachments);
+        }
+
+        [Test]
         public void Can_Construct_NotificationEmailModel_From_Simple_MailMessage_With_DisplayName()
         {
             const string from = "\"From Email\" <from@from.com>";

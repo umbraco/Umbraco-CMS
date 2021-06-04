@@ -10,11 +10,7 @@ namespace Umbraco.Cms.Infrastructure.Extensions
     {
         public static MimeMessage ToMimeMessage(this EmailMessage mailMessage, string configuredFromAddress)
         {
-            var fromEmail = mailMessage.From;
-            if (string.IsNullOrEmpty(fromEmail))
-            {
-                fromEmail = configuredFromAddress;
-            }
+            var fromEmail = string.IsNullOrEmpty(mailMessage.From) ? configuredFromAddress : mailMessage.From;
 
             if (!InternetAddress.TryParse(fromEmail, out InternetAddress fromAddress))
             {
@@ -62,7 +58,9 @@ namespace Umbraco.Cms.Infrastructure.Extensions
         public static NotificationEmailModel ToNotificationEmail(this EmailMessage emailMessage,
             string configuredFromAddress)
         {
-            NotificationEmailAddress from = ToNotificationAddress(emailMessage.From);
+            var fromEmail = string.IsNullOrEmpty(emailMessage.From) ? configuredFromAddress : emailMessage.From;
+
+            NotificationEmailAddress from = ToNotificationAddress(fromEmail);
 
             return new NotificationEmailModel(from,
                 GetNotificationAddresses(emailMessage.To),
