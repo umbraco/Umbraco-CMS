@@ -150,10 +150,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions
         public void Can_Construct_NotificationEmailModel_From_Full_EmailMessage()
         {
             const string from = "\"From Email\" <from@from.com>";
-            string[] to = new[] { "to@email.com", "\"Second Email\" <to2@email.com>" };
-            string[] cc = new[] { "\"First CC\" <cc@email.com>", "cc2@email.com" };
-            string[] bcc = new[] { "bcc@email.com", "bcc2@email.com", "\"Third BCC\" <bcc3@email.com>", "invalid@email@address" };
-            string[] replyTo = new[] { "replyto@email.com" };
+            string[] to = { "to@email.com", "\"Second Email\" <to2@email.com>", "invalid@invalid@invalid" };
+            string[] cc = { "\"First CC\" <cc@email.com>", "cc2@email.com", "invalid@invalid@invalid" };
+            string[] bcc = { "bcc@email.com", "bcc2@email.com", "\"Third BCC\" <bcc3@email.com>", "invalid@email@address" };
+            string[] replyTo = { "replyto@email.com", "invalid@invalid@invalid" };
             const string subject = "Subject";
             const string body = "Message";
             const bool isBodyHtml = false;
