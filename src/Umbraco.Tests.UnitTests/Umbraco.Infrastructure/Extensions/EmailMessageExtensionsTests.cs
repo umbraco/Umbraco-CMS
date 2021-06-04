@@ -111,10 +111,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions
 
             NotificationEmailModel result = emailMessage.ToNotificationEmail(ConfiguredSender);
 
-            Assert.AreEqual(from, result.From.Adress);
+            Assert.AreEqual(from, result.From.Address);
             Assert.AreEqual("", result.From.DisplayName);
             Assert.AreEqual(1, result.To.Count());
-            Assert.AreEqual(to, result.To.First().Adress);
+            Assert.AreEqual(to, result.To.First().Address);
             Assert.AreEqual("", result.To.First().DisplayName);
             Assert.AreEqual(subject, result.Subject);
             Assert.AreEqual(body, result.Body);
@@ -133,10 +133,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions
 
             NotificationEmailModel result = emailMessage.ToNotificationEmail(ConfiguredSender);
 
-            Assert.AreEqual(ConfiguredSender, result.From.Adress);
+            Assert.AreEqual(ConfiguredSender, result.From.Address);
             Assert.AreEqual("", result.From.DisplayName);
             Assert.AreEqual(1, result.To.Count());
-            Assert.AreEqual(to, result.To.First().Adress);
+            Assert.AreEqual(to, result.To.First().Address);
             Assert.AreEqual("", result.To.First().DisplayName);
             Assert.AreEqual(subject, result.Subject);
             Assert.AreEqual(body, result.Body);
@@ -156,10 +156,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions
 
             NotificationEmailModel result = emailMessage.ToNotificationEmail(ConfiguredSender);
 
-            Assert.AreEqual("from@from.com", result.From.Adress);
+            Assert.AreEqual("from@from.com", result.From.Address);
             Assert.AreEqual("From Email", result.From.DisplayName);
             Assert.AreEqual(1, result.To.Count());
-            Assert.AreEqual("to@to.com", result.To.First().Adress);
+            Assert.AreEqual("to@to.com", result.To.First().Address);
             Assert.AreEqual("To Email", result.To.First().DisplayName);
             Assert.AreEqual(subject, result.Subject);
             Assert.AreEqual(body, result.Body);
@@ -189,31 +189,31 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions
 
             var result = emailMessage.ToNotificationEmail(ConfiguredSender);
 
-            Assert.AreEqual("from@from.com", result.From.Adress);
+            Assert.AreEqual("from@from.com", result.From.Address);
             Assert.AreEqual("From Email", result.From.DisplayName);
 
             Assert.AreEqual(2, result.To.Count());
-            Assert.AreEqual("to@email.com", result.To.First().Adress);
+            Assert.AreEqual("to@email.com", result.To.First().Address);
             Assert.AreEqual("", result.To.First().DisplayName);
-            Assert.AreEqual("to2@email.com", result.To.Skip(1).First().Adress);
+            Assert.AreEqual("to2@email.com", result.To.Skip(1).First().Address);
             Assert.AreEqual("Second Email", result.To.Skip(1).First().DisplayName);
 
             Assert.AreEqual(2, result.Cc.Count());
-            Assert.AreEqual("cc@email.com", result.Cc.First().Adress);
+            Assert.AreEqual("cc@email.com", result.Cc.First().Address);
             Assert.AreEqual("First CC", result.Cc.First().DisplayName);
-            Assert.AreEqual("cc2@email.com", result.Cc.Skip(1).First().Adress);
+            Assert.AreEqual("cc2@email.com", result.Cc.Skip(1).First().Address);
             Assert.AreEqual("", result.Cc.Skip(1).First().DisplayName);
 
             Assert.AreEqual(3, result.Bcc.Count());
-            Assert.AreEqual("bcc@email.com", result.Bcc.First().Adress);
+            Assert.AreEqual("bcc@email.com", result.Bcc.First().Address);
             Assert.AreEqual("", result.Bcc.First().DisplayName);
-            Assert.AreEqual("bcc2@email.com", result.Bcc.Skip(1).First().Adress);
+            Assert.AreEqual("bcc2@email.com", result.Bcc.Skip(1).First().Address);
             Assert.AreEqual("", result.Bcc.Skip(1).First().DisplayName);
-            Assert.AreEqual("bcc3@email.com", result.Bcc.Skip(2).First().Adress);
+            Assert.AreEqual("bcc3@email.com", result.Bcc.Skip(2).First().Address);
             Assert.AreEqual("Third BCC", result.Bcc.Skip(2).First().DisplayName);
 
             Assert.AreEqual(1, result.ReplyTo.Count());
-            Assert.AreEqual("replyto@email.com", result.ReplyTo.First().Adress);
+            Assert.AreEqual("replyto@email.com", result.ReplyTo.First().Address);
             Assert.AreEqual("", result.ReplyTo.First().DisplayName);
 
             Assert.AreEqual(subject, result.Subject);

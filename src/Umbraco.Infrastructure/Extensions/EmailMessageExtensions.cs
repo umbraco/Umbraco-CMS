@@ -55,6 +55,27 @@ namespace Umbraco.Cms.Infrastructure.Extensions
             return messageToSend;
         }
 
+        private static void AddAddresses(MimeMessage message, string[] addresses, Func<MimeMessage, InternetAddressList> addressListGetter, bool throwIfNoneValid = false)
+        {
+            var foundValid = false;
+            if (addresses != null)
+            {
+                foreach (var address in addresses)
+                {
+                    if (InternetAddress.TryParse(address, out InternetAddress internetAddress))
+                    {
+                        addressListGetter(message).Add(internetAddress);
+                        foundValid = true;
+                    }
+                }
+            }
+
+            if (throwIfNoneValid && foundValid == false)
+            {
+                throw new InvalidOperationException($"Email could not be sent. Could not parse a valid recipient address.");
+            }
+        }
+
         public static NotificationEmailModel ToNotificationEmail(this EmailMessage emailMessage,
             string configuredFromAddress)
         {
@@ -105,27 +126,6 @@ namespace Umbraco.Cms.Infrastructure.Extensions
             }
 
             return notificationAddresses;
-        }
-
-        private static void AddAddresses(MimeMessage message, string[] addresses, Func<MimeMessage, InternetAddressList> addressListGetter, bool throwIfNoneValid = false)
-        {
-            var foundValid = false;
-            if (addresses != null)
-            {
-                foreach (var address in addresses)
-                {
-                    if (InternetAddress.TryParse(address, out InternetAddress internetAddress))
-                    {
-                        addressListGetter(message).Add(internetAddress);
-                        foundValid = true;
-                    }
-                }
-            }
-
-            if (throwIfNoneValid && foundValid == false)
-            {
-                throw new InvalidOperationException($"Email could not be sent. Could not parse a valid recipient address.");
-            }
         }
     }
 }

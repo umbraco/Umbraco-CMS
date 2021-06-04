@@ -7,11 +7,11 @@ namespace Umbraco.Cms.Core.Models.Email
     {
         public string DisplayName { get; }
 
-        public string Adress { get; }
+        public string Address { get; }
 
         public NotificationEmailAddress(string address, string displayName)
         {
-            Adress = address;
+            Address = address;
             DisplayName = displayName;
         }
     }
