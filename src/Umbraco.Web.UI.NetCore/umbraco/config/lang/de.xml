@@ -1557,10 +1557,10 @@
     </key>
     <key alias="sectionName">Bereichsname</key>
     <key alias="sectionMandatory">Bereich ist notwendig</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
       Wenn notwendig, dann muss die untergeordnete Vorlage eine <code>@section</code> Definition gleichen Namens enthalten,
       anderfalls tritt ein Fehler auf.
-    </key>
+    ]]></key>
     <key alias="queryBuilder">Abfrage-Generator</key>
     <key alias="itemsReturned">zurückgegebene Elemente, in</key>
     <key alias="iWant">Ich möchte</key>
@@ -2098,6 +2098,7 @@
     <key alias="trySkipIisCustomErrorsCheckSuccessMessage">"trySkipIisCustomErrors" ist auf '%0%' gestellt und Sie verwenden IIS-Version '%1%'.</key>
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">"trySkipIisCustomErrors" ist aktuell auf '%0%' gestellt. Für Ihre IIS-Version (%2%) wird empfohlen, diese auf '%1%' zu stellen.</key>
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">"trySkipIisCustomErrors" wurde erfolgreich auf '%0%' gestellt.</key>
+    <key alias="configurationServiceFileNotFound">Folgende Datei ist nicht vorhanden: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[<strong>'%0%'</strong> wurde nicht in der Konfigurationsdatei <strong>'%1%'</strong> gefunden.]]></key>
     <key alias="configurationServiceError">Es trat ein Fehler auf, für eine vollständige Fehlermeldung suchen Sie in den Logs nach: %0%</key>
     <key alias="databaseSchemaValidationCheckDatabaseOk">Datenbank - Das Datenbank-Schema ist korrekt für diese Umbraco-Version</key>

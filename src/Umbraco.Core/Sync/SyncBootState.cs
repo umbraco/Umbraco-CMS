@@ -1,4 +1,4 @@
-namespace Umbraco.Cms.Core.Sync
+﻿namespace Umbraco.Cms.Core.Sync
 {
     public enum SyncBootState
     {

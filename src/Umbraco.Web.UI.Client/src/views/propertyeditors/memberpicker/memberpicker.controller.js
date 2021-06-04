@@ -40,7 +40,7 @@ function memberPickerController($scope, entityResource, iconHelper, editorServic
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options
     if ($scope.model.config) {
-        angular.extend(dialogOptions, $scope.model.config);
+        Utilities.extend(dialogOptions, $scope.model.config);
     }
 
     $scope.openMemberPicker = function () {

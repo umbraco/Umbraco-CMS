@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -81,6 +81,10 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Umbraco\logs" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
       <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
       <ProjectReference Include="..\Umbraco.PublishedCache.NuCache\Umbraco.PublishedCache.NuCache.csproj" />
@@ -89,10 +93,6 @@
       <ProjectReference Include="..\Umbraco.Web.UI.NetCore\Umbraco.Web.UI.NetCore.csproj" />
       <ProjectReference Include="..\Umbraco.Web.Website\Umbraco.Web.Website.csproj" />
       <ProjectReference Include="..\Umbraco.Persistence.SqlCe\Umbraco.Persistence.SqlCe.csproj" Condition="'$(OS)' == 'Windows_NT'" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Umbraco\logs" />
     </ItemGroup>
 
     <ItemGroup>

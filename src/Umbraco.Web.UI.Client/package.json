@@ -53,6 +53,7 @@
   "devDependencies": {
     "@babel/core": "7.6.4",
     "@babel/preset-env": "7.6.3",
+    "@babel/plugin-proposal-object-rest-spread": "7.13.8",
     "autoprefixer": "9.6.5",
     "caniuse-lite": "^1.0.30001037",
     "cssnano": "4.1.10",
