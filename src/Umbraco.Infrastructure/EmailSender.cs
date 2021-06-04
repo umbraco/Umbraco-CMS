@@ -53,7 +53,8 @@ namespace Umbraco.Cms.Infrastructure
             {
                 if (enableNotification)
                 {
-                    await _eventAggregator.PublishAsync(new SendEmailNotification(message.ToNotificationEmail(_globalSettings.Smtp.From)));
+                    await _eventAggregator.PublishAsync(
+                        new SendEmailNotification(message.ToNotificationEmail(_globalSettings.Smtp?.From)));
                 }
                 return;
             }
