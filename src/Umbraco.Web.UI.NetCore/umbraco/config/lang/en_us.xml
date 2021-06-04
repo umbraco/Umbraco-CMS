@@ -358,6 +358,7 @@
     <key alias="uploadNotAllowed">Upload is not allowed in this location.</key>
   </area>
   <area alias="member">
+    <key alias="createNewMember">Create a new member</key>
     <key alias="allMembers">All Members</key>
     <key alias="createNewMember">Create a new member</key>
     <key alias="duplicateMemberLogin">A member with this login already exists</key>
@@ -1609,9 +1610,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       ]]></key>
     <key alias="sectionName">Section Name</key>
     <key alias="sectionMandatory">Section is mandatory</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
             If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.
-        </key>
+    ]]></key>
     <key alias="queryBuilder">Query builder</key>
     <key alias="itemsReturned">items returned, in</key>
     <key alias="copyToClipboard">copy to clipboard</key>
@@ -2184,6 +2185,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors is currently '%0%'. It is recommended to set this to '%1%' for your IIS version (%2%).</key>
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors successfully set to '%0%'.</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+    <key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
     <key alias="databaseSchemaValidationCheckDatabaseOk">Database - The database schema is correct for this version of Umbraco</key>

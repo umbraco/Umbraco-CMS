@@ -111,11 +111,11 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
+      <Folder Include="Services\Notifications" />
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Services\Notifications" />
+      <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     </ItemGroup>
 
 </Project>

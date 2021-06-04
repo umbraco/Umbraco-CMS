@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -18,6 +18,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         [ConfigurationField("validationLimit", "Amount", "numberrange", Description = "Set a required range of medias")]
         public NumberRange ValidationLimit { get; set; } = new NumberRange();
 
+        [DataContract]
         public class NumberRange
         {
             [DataMember(Name = "min")]
@@ -41,6 +42,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         [ConfigurationField("crops", "Image Crops", "views/propertyeditors/MediaPicker3/prevalue/mediapicker3.crops.html", Description = "Local crops, stored on document")]
         public CropConfiguration[] Crops { get; set; }
 
+        [DataContract]
         public class CropConfiguration
         {
             [DataMember(Name = "alias")]
