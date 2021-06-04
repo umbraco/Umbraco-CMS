@@ -77,7 +77,8 @@ namespace Umbraco.Cms.Infrastructure.Extensions
                 mimeMessage.ReplyTo.Mailboxes.Select(ToNotificationAddress),
                 mimeMessage.Subject,
                 emailMessage.Body,
-                emailMessage.Attachments);
+                emailMessage.Attachments,
+                emailMessage.IsBodyHtml);
         }
 
         private static NotificationEmailAddress ToNotificationAddress(MailboxAddress mailboxAddress) =>

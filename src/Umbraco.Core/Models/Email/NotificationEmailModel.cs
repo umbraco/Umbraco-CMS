@@ -22,6 +22,8 @@ namespace Umbraco.Cms.Core.Models.Email
 
         public string Body { get; }
 
+        public bool IsBodyHtml { get; }
+
         public IList<EmailMessageAttachment> Attachments { get; }
 
         public bool HasAttachments => Attachments != null && Attachments.Count > 0;
@@ -34,7 +36,8 @@ namespace Umbraco.Cms.Core.Models.Email
             IEnumerable<NotificationEmailAddress> replyTo,
             string subject,
             string body,
-            IEnumerable<EmailMessageAttachment> attachments)
+            IEnumerable<EmailMessageAttachment> attachments,
+            bool isBodyHtml)
         {
             From = from;
             To = to;
@@ -43,6 +46,7 @@ namespace Umbraco.Cms.Core.Models.Email
             ReplyTo = replyTo;
             Subject = subject;
             Body = body;
+            IsBodyHtml = isBodyHtml;
             Attachments = attachments?.ToList();
         }
 
