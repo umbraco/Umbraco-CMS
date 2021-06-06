@@ -130,7 +130,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
             delete $scope.model.config.startNode;
         }
         //merge the server config on top of the default config, then set the server config to use the result
-        $scope.model.config = angular.extend(defaultConfig, $scope.model.config);
+        $scope.model.config = Utilities.extend(defaultConfig, $scope.model.config);
 
         // if the property is mandatory, set the minCount config to 1 (unless of course it is set to something already),
         // that way the minCount/maxCount validation handles the mandatory as well
@@ -189,7 +189,7 @@ function contentPickerController($scope, $q, $routeParams, $location, entityReso
 
     //since most of the pre-value config's are used in the dialog options (i.e. maxNumber, minNumber, etc...) we'll merge the
     // pre-value config on to the dialog options
-    angular.extend(dialogOptions, $scope.model.config);
+    Utilities.extend(dialogOptions, $scope.model.config);
 
     dialogOptions.dataTypeKey = $scope.model.dataTypeKey;
 

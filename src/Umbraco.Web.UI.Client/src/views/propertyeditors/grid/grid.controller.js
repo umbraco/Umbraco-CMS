@@ -753,7 +753,7 @@ angular.module("umbraco")
                             // allowed for this template based on the current config.
 
                             _.each(found.sections, function (templateSection, index) {
-                                angular.extend($scope.model.value.sections[index], Utilities.copy(templateSection));
+                                Utilities.extend($scope.model.value.sections[index], Utilities.copy(templateSection));
                             });
 
                         }

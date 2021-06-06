@@ -436,7 +436,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                 // We are not ready to limit the pasted elements further than default, we will return to this feature. ( TODO: Make this feature an option. )
                 // We keep spans here, cause removing spans here also removes b-tags inside of them, instead we strip them out later. (TODO: move this definition to the config file... )
                 var validPasteElements = "-strong/b,-em/i,-u,-span,-p,-ol,-ul,-li,-p/div,-a[href|name],sub,sup,strike,br,del,table[width],tr,td[colspan|rowspan|width],th[colspan|rowspan|width],thead,tfoot,tbody,img[src|alt|width|height],ul,ol,li,hr,pre,dl,dt,figure,figcaption,wbr"
-                
+
                 // add elements from user configurated styleFormats to our list of validPasteElements.
                 // (This means that we only allow H3-element if its configured as a styleFormat on this specific propertyEditor.)
                 var style, i = 0;
@@ -463,8 +463,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 };
 
-                angular.extend(config, pasteConfig);
-
+                Utilities.extend(config, pasteConfig);
 
                 if (tinyMceConfig.customConfig) {
 
@@ -481,7 +480,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                                     //overwrite the baseline config item if it is an array, we want to concat the items in the array, otherwise
                                     //if it's an object it will overwrite the baseline
                                     if (Utilities.isArray(config[i]) && Utilities.isArray(tinyMceConfig.customConfig[i])) {
-                                        //concat it and below this concat'd array will overwrite the baseline in angular.extend
+                                        //concat it and below this concat'd array will overwrite the baseline in Utilities.extend
                                         tinyMceConfig.customConfig[i] = config[i].concat(tinyMceConfig.customConfig[i]);
                                     }
                                 }
@@ -498,7 +497,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         }
                     }
 
-                    angular.extend(config, tinyMceConfig.customConfig);
+                    Utilities.extend(config, tinyMceConfig.customConfig);
                 }
 
                 return config;
@@ -605,7 +604,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                     'contenteditable': false
                 },
                 embed.preview);
-            
+
             // Only replace if activeElement is an Embed element.
             if (activeElement && activeElement.nodeName.toUpperCase() === "DIV" && activeElement.classList.contains("embeditem")){
                 activeElement.replaceWith(wrapper); // directly replaces the html node
@@ -733,9 +732,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         id: "__mcenew",
                         "data-udi": img.udi
                     };
-                    
+
                     editor.selection.setContent(editor.dom.createHTML('img', data));
-                    
+
                     // Using settimeout to wait for a DoM-render, so we can find the new element by ID.
                     $timeout(function () {
 
@@ -756,7 +755,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
                         }
 
                     });
-                    
+
                 }
             }
         },
@@ -1396,11 +1395,26 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             function syncContent() {
 
+                if(args.model.value === args.editor.getContent()) {
+                    return;
+                }
+
                 //stop watching before we update the value
                 stopWatch();
                 angularHelper.safeApply($rootScope, function () {
                     args.model.value = args.editor.getContent();
+
+                    //make the form dirty manually so that the track changes works, setting our model doesn't trigger
+                    // the angular bits because tinymce replaces the textarea.
+                    if (args.currentForm) {
+                        args.currentForm.$setDirty();
+                    }
+                    // With complex validation we need to set a input field to dirty, not the form. but we will keep the old code for backwards compatibility.
+                    if (args.currentFormInput) {
+                        args.currentFormInput.$setDirty();
+                    }
                 });
+
                 //re-watch the value
                 startWatch();
             }
@@ -1425,7 +1439,7 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
                 // Upload BLOB images (dragged/pasted ones)
                 // find src attribute where value starts with `blob:`
-                // search is case-insensitive and allows single or double quotes 
+                // search is case-insensitive and allows single or double quotes
                 if(content.search(/src=["']blob:.*?["']/gi) !== -1){
                     args.editor.uploadImages(function(data) {
                         // Once all images have been uploaded
@@ -1491,6 +1505,9 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
             args.editor.on('Change', function (e) {
                 syncContent();
             });
+            args.editor.on('Keyup', function (e) {
+                syncContent();
+            });
 
             //when we leave the editor (maybe)
             args.editor.on('blur', function (e) {
@@ -1508,12 +1525,6 @@ function tinyMceService($rootScope, $q, imageHelper, $locale, $http, $timeout, s
 
             args.editor.on('Dirty', function (e) {
             	syncContent(); // Set model.value to the RTE's content
-
-                //make the form dirty manually so that the track changes works, setting our model doesn't trigger
-                // the angular bits because tinymce replaces the textarea.
-                if (args.currentForm) {
-                    args.currentForm.$setDirty();
-                }
             });
 
             let self = this;
