@@ -1,4 +1,6 @@
+using System;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 {
@@ -21,19 +23,22 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
         /// <summary>
         /// Executes before Umbraco middlewares are registered
         /// </summary>
-        /// <param name="app"></param>
         void OnPrePipeline(IApplicationBuilder app);
 
         /// <summary>
         /// Executes after core Umbraco middlewares are registered and before any Endpoints are declared
         /// </summary>
-        /// <param name="app"></param>
         void OnPostPipeline(IApplicationBuilder app);
 
         /// <summary>
         /// Executes after <see cref="OnPostPipeline(IApplicationBuilder)"/> just before any Umbraco endpoints are declared.
         /// </summary>
-        /// <param name="app"></param>
-        void OnEndpoints(IApplicationBuilder app);
+        void OnPreEndpoints(IApplicationBuilder app);
+
+        /// <summary>
+        /// Appends registered endpoints to default Umbraco endpoint configuration.
+        /// </summary>
+        /// <returns></returns>
+        Action<IUmbracoEndpointBuilder> AppendEndpoints(Action<IUmbracoEndpointBuilder> configure);
     }
 }

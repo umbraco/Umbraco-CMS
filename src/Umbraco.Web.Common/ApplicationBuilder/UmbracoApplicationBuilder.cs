@@ -37,6 +37,12 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
             IOptions<UmbracoPipelineOptions> startupOptions = ApplicationServices.GetRequiredService<IOptions<UmbracoPipelineOptions>>();
             RunPreEndpointsPipeline(startupOptions.Value);
 
+            // Append any application or package registered endpoints to those configured in Startup.
+            foreach (IUmbracoPipelineFilter filter in startupOptions.Value.PipelineFilters)
+            {
+                configureUmbraco = filter.AppendEndpoints(configureUmbraco);
+            }
+
             AppBuilder.UseEndpoints(endpoints =>
             {
                 var umbAppBuilder = (IUmbracoEndpointBuilder)ActivatorUtilities.CreateInstance<UmbracoEndpointBuilder>(
@@ -58,7 +64,7 @@ namespace Umbraco.Cms.Web.Common.ApplicationBuilder
         {
             foreach (IUmbracoPipelineFilter filter in startupOptions.PipelineFilters)
             {
-                filter.OnEndpoints(AppBuilder);
+                filter.OnPreEndpoints(AppBuilder);
             }
         }
     }
