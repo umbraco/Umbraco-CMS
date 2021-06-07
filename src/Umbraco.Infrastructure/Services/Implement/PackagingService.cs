@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -161,8 +161,6 @@ namespace Umbraco.Cms.Core.Services.Implement
                 allSummaries.Add(versionUninstallSummary);
 
                 //merge the summary
-                summary.ActionErrors = summary.ActionErrors.Concat(versionUninstallSummary.ActionErrors).Distinct().ToList();
-                summary.Actions = summary.Actions.Concat(versionUninstallSummary.Actions).Distinct().ToList();
                 summary.DataTypesUninstalled = summary.DataTypesUninstalled.Concat(versionUninstallSummary.DataTypesUninstalled).Distinct().ToList();
                 summary.DictionaryItemsUninstalled = summary.DictionaryItemsUninstalled.Concat(versionUninstallSummary.DictionaryItemsUninstalled).Distinct().ToList();
                 summary.DocumentTypesUninstalled = summary.DocumentTypesUninstalled.Concat(versionUninstallSummary.DocumentTypesUninstalled).Distinct().ToList();

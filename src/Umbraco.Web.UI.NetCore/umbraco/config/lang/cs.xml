@@ -1119,7 +1119,6 @@
     <key alias="noPackagesCreated">Zatím nebyly vytvořeny žádné balíčky</key>
     <key alias="noPackages">Nemáte nainstalované žádné balíčky</key>
     <key alias="noPackagesDescription"><![CDATA[Nemáte nainstalované žádné balíčky. Nainstalujte místní balíček tak, že jej vyberete ze svého počítače, nebo procházejte dostupné balíčky pomocí ikony <strong>Balíčky</strong> v pravém horním rohu obrazovky.]]></key>
-    <key alias="packageActions">Akce balíčku</key>
     <key alias="packageAuthorUrl">Web autora</key>
     <key alias="packageContent">Obsah balíčku</key>
     <key alias="packageFiles">Soubory balíčku</key>

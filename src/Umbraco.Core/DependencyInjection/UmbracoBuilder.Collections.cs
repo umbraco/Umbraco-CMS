@@ -8,7 +8,6 @@ using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Media.EmbedProviders;
-using Umbraco.Cms.Core.PackageActions;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Routing;
@@ -86,7 +85,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .Add<RedirectUrlDashboard>()
                 .Add<SettingsDashboard>()
                 .Add(builder.TypeLoader.GetTypes<IDashboard>());
-            builder.PackageActions().Add(() => builder.TypeLoader.GetPackageActions());
             builder.DataValueReferenceFactories();
             builder.PropertyValueConverters().Append(builder.TypeLoader.GetTypes<IPropertyValueConverter>());
             builder.UrlSegmentProviders().Append<DefaultUrlSegmentProvider>();
@@ -202,13 +200,6 @@ namespace Umbraco.Cms.Core.DependencyInjection
         /// <param name="builder">The builder.</param>
         public static CacheRefresherCollectionBuilder CacheRefreshers(this IUmbracoBuilder builder)
             => builder.WithCollectionBuilder<CacheRefresherCollectionBuilder>();
-
-        /// <summary>
-        /// Gets the package actions collection builder.
-        /// </summary>
-        /// <param name="builder">The builder.</param>
-        internal static PackageActionCollectionBuilder PackageActions(this IUmbracoBuilder builder)
-            => builder.WithCollectionBuilder<PackageActionCollectionBuilder>();
 
         /// <summary>
         /// Gets the data editor collection builder.

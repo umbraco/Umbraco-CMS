@@ -67,8 +67,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<IEntityXmlSerializer, EntityXmlSerializer>();
 
-            builder.Services.AddUnique<IPackageActionRunner, PackageActionRunner>();
-
             builder.Services.AddUnique<ConflictingPackageData>();
             builder.Services.AddUnique<CompiledPackageXmlParser>();
             builder.Services.AddUnique<ICreatedPackagesRepository>(factory => CreatePackageRepository(factory, "createdPackages.config"));

@@ -1183,7 +1183,6 @@ Pour gérer votre site, ouvrez simplement le backoffice Umbraco et commencez à 
     <key alias="noPackagesCreated">Aucun package n'a encore été créé</key>
     <key alias="noPackages">Vous n'avez aucun package installé</key>
     <key alias="noPackagesDescription"><![CDATA[Vous n'avez pas de package installé. Veuillez soit installer un package local en le sélectionnant sur votre ordinateur, soit naviguer dans la liste des packages disponibles en utilisant l'icone <strong>'Packages'</strong> en haut à droite de votre écran]]></key>
-    <key alias="packageActions">Actions du package</key>
     <key alias="packageAuthorUrl">URL de l'auteur</key>
     <key alias="packageContent">Contenu du package</key>
     <key alias="packageFiles">Fichiers du package</key>

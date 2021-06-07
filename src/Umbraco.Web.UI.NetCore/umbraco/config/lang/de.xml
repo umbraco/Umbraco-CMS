@@ -1181,7 +1181,6 @@
     <strong>'Pakete'</strong> rechts, oben), um es zu installieren
     ]]>
     </key>
-    <key alias="packageActions">Packet Aktionen</key>
     <key alias="packageAuthorUrl">Autor URL</key>
     <key alias="packageContent">Paketinhalt</key>
     <key alias="packageFiles">Paketdateien</key>

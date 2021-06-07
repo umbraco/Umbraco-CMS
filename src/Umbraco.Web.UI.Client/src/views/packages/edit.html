@@ -285,29 +285,6 @@
 
                 </div>
 
-                <div class="umb-expansion-panel">
-                    <button type="button" aria-expanded="{{vm.actionsOpen}}" class="btn-reset umb-expansion-panel__header" ng-click="vm.actionsOpen = !vm.actionsOpen">
-                        <span><localize key="packager_packageActions">Package Actions</localize></span>
-                        <umb-icon icon="{{vm.actionsOpen ? 'icon-navigation-up' : 'icon-navigation-down'}}" class="umb-expansion-panel__expand">&nbsp;</umb-icon>
-                    </button>
-                    <div class="umb-expansion-panel__content" ng-show="vm.actionsOpen">
-                        <umb-control-group
-                            label="@packager_actions"
-                            description="Here you can add custom installer / uninstaller events to perform certain tasks during installation and uninstallation.
-                            All actions are formed as a xml node, containing data for the action to be performed.">
-                            <div>
-                                <a href="https://our.umbraco.com/documentation/Reference/Packaging/" target="_blank" rel="noopener">Documentation</a>
-                                <div>
-                                    <div data-element="package-actions"
-                                         umb-ace-editor="vm.aceOption"
-                                         model="vm.package.actions">
-                                    </div>
-                                </div>
-                            </div>
-                        </umb-control-group>
-                    </div>
-                </div>
-
             </umb-editor-container>
 
             <umb-editor-footer>

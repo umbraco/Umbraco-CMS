@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="nl" intName="Dutch" localName="Nederlands" lcid="19" culture="nl-NL">
   <creator>
     <name>The Umbraco community</name>
@@ -1037,7 +1037,6 @@ Echter, Runway biedt een gemakkelijke basis om je snel op weg te helpen. Als je 
     <key alias="noPackagesCreated">Er zijn nog geen packages aangemaakt</key>
     <key alias="noPackages">Er zijn geen packages geïnstalleerd</key>
     <key alias="noPackagesDescription"><![CDATA[Je hebt geen packages geïnstalleerd. Installeer een lokale package door het op je computer te selecteren of blader door beschikbare packages met het pictogram <strong>'Packages'</strong> rechtsboven in je scherm.]]></key>
-    <key alias="packageActions">Package Acties</key>
     <key alias="packageAuthorUrl">Auteur URL</key>
     <key alias="packageContent">Package Inhoud</key>
     <key alias="packageFiles">Package Bestanden</key>

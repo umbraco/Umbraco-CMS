@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
@@ -20,7 +20,6 @@ namespace Umbraco.Cms.Core.Packaging
         public IEnumerable<ITemplate> TemplatesUninstalled { get; set; } = Enumerable.Empty<ITemplate>();
         public IEnumerable<IContentType> DocumentTypesUninstalled { get; set; } = Enumerable.Empty<IContentType>();
         public IEnumerable<IFile> StylesheetsUninstalled { get; set; } = Enumerable.Empty<IFile>();
-        public IEnumerable<PackageAction> Actions { get; set; } = Enumerable.Empty<PackageAction>();
-        public IEnumerable<string> ActionErrors { get; set; } = Enumerable.Empty<string>();
+
     }
 }

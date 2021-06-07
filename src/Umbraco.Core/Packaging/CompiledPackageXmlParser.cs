@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -148,52 +148,5 @@ namespace Umbraco.Cms.Core.Packaging
             return path;
         }
 
-        /// <summary>
-        /// Parses the package actions stored in the package definition
-        /// </summary>
-        /// <param name="actionsElement"></param>
-        /// <param name="packageName"></param>
-        /// <returns></returns>
-        public static IEnumerable<PackageAction> GetPackageActions(XElement actionsElement, string packageName)
-        {
-            if (actionsElement == null) return Enumerable.Empty<PackageAction>();
-
-            //invariant check ... because people can really enter anything :/
-            if (!string.Equals("actions", actionsElement.Name.LocalName, StringComparison.InvariantCultureIgnoreCase))
-                throw new FormatException("Must be \"<actions>\" as root");
-
-            if (!actionsElement.HasElements) return Enumerable.Empty<PackageAction>();
-
-            var actionElementName = actionsElement.Elements().First().Name.LocalName;
-
-            //invariant check ... because people can really enter anything :/
-            if (!string.Equals("action", actionElementName, StringComparison.InvariantCultureIgnoreCase))
-                throw new FormatException("Must be \"<action\" as element");
-
-            return actionsElement.Elements(actionElementName)
-                .Select(e =>
-                {
-                    var aliasAttr = e.Attribute("alias") ?? e.Attribute("Alias"); //allow both ... because people can really enter anything :/
-                    if (aliasAttr == null)
-                        throw new ArgumentException("missing \"alias\" attribute in alias element", nameof(actionsElement));
-
-                    var packageAction = new PackageAction
-                    {
-                        XmlData = e,
-                        Alias = aliasAttr.Value,
-                        PackageName = packageName,
-                    };
-
-                    var attr = e.Attribute("runat") ?? e.Attribute("Runat"); //allow both ... because people can really enter anything :/
-
-                    if (attr != null && Enum.TryParse(attr.Value, true, out ActionRunAt runAt)) { packageAction.RunAt = runAt; }
-
-                    attr = e.Attribute("undo") ?? e.Attribute("Undo"); //allow both ... because people can really enter anything :/
-
-                    if (attr != null && bool.TryParse(attr.Value, out var undo)) { packageAction.Undo = undo; }
-
-                    return packageAction;
-                }).ToArray();
-        }
     }
 }

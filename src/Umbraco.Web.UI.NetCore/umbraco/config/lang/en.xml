@@ -1235,7 +1235,6 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="noPackagesCreated">No packages have been created yet</key>
     <key alias="noPackages">You don’t have any packages installed</key>
     <key alias="noPackagesDescription"><![CDATA[You don’t have any packages installed. Either install a local package by selecting it from your machine, or browse through available packages using the <strong>'Packages'</strong> icon in the top right of your screen]]></key>
-    <key alias="packageActions">Package Actions</key>
     <key alias="packageAuthorUrl">Author URL</key>
     <key alias="packageContent">Package Content</key>
     <key alias="packageFiles">Package Files</key>

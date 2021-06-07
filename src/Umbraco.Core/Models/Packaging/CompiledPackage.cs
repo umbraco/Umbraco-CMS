@@ -26,8 +26,6 @@ namespace Umbraco.Cms.Core.Models.Packaging
         public string PackageView { get; set; }
         public string IconUrl { get; set; }
 
-        public string Actions { get; set; } // TODO: Should we make this strongly typed to IEnumerable<PackageAction> ?
-
         public PreInstallWarnings Warnings { get; set; } = new PreInstallWarnings();
 
         public List<CompiledPackageFile> Files { get; set; } = new List<CompiledPackageFile>();

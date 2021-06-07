@@ -1260,7 +1260,6 @@ Web sitenizi yönetmek için, Umbraco'nun arka ofisini açın ve içerik eklemey
     <key alias="noPackagesCreated">Henüz paket oluşturulmadı</key>
     <key alias="noPackages">Kurulu paketiniz yok</key>
     <key alias="noPackagesDescription"><![CDATA[Kurulu paketiniz yok. Makinenizden seçerek yerel bir paket kurun veya ekranınızın sağ üst kısmındaki <strong>'Paketler'</strong> simgesini kullanarak mevcut paketlere göz atın]]></key>
-    <key alias="packageActions">Paket İşlemleri</key>
     <key alias="packageAuthorUrl">Yazar URL'si</key>
     <key alias="packageContent">Paket İçeriği</key>
     <key alias="packageFiles">Paket Dosyaları</key>

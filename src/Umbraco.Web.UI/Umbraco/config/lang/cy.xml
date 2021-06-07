@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <language alias="cy_gb" intName="Welsh (UK)" localName="Cymraeg (UK)" lcid="1106" culture="cy-GB">
     <creator>
         <name>Method4 Ltd</name>
@@ -1340,7 +1340,6 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         <key alias="noPackagesDescription"><![CDATA[Nid oes gennych unrhyw becynnau wedi'u gosod. Naill ai gosodwch becyn leol wrth ddewis o'ch peiriant, neu porwch drwy pecynnau sydd ar gael wrth ddefnyddio'r eicon <strong>'Pecynnau'</strong> yng nghornel dop, dde eich sgrîn]]></key>
         <key alias="noConfigurationView">Nid oes gan y pecyn hwn unrhyw olwg cyfluniad</key>
         <key alias="noPackagesCreated">Nid oes unrhyw becynnau wedi'u creu eto</key>
-        <key alias="packageActions">Camau Gweithredu Pecyn</key>
         <key alias="packageAuthorUrl">URL y Awdur</key>
         <key alias="packageContent">Cynnwys y Pecyn</key>
         <key alias="packageFiles">Ffeiliau y Pecyn</key>
