@@ -1,5 +1,7 @@
 using System;
+using System.Security.Claims;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,7 +23,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
         /// <inheritdoc/>
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
-            var request = context.Request;
+            HttpRequest request = context.Request;
 
             // do not process if client-side request
             if (request.IsClientSideRequest())
@@ -36,32 +38,12 @@ namespace Umbraco.Cms.Web.Common.Middleware
                                 && context.User != null
                                 && !request.IsBackOfficeRequest();
 
+                // If we've gotten this far it means a preview cookie has been set and a front-end umbraco document request is executing.
+                // In this case, authentication will not have occurred for an Umbraco back office User, however we need to perform the authentication
+                // for the user here so that the preview capability can be authorized otherwise only the non-preview page will be rendered.
                 if (isPreview)
                 {
-                    var cookieOptions = context.RequestServices.GetRequiredService<IOptionsSnapshot<CookieAuthenticationOptions>>()
-                        .Get(Core.Constants.Security.BackOfficeAuthenticationType);
-
-                    if (cookieOptions == null)
-                    {
-                        throw new InvalidOperationException("No cookie options found with name " + Core.Constants.Security.BackOfficeAuthenticationType);
-                    }
-
-                    // If we've gotten this far it means a preview cookie has been set and a front-end umbraco document request is executing.
-                    // In this case, authentication will not have occurred for an Umbraco back office User, however we need to perform the authentication
-                    // for the user here so that the preview capability can be authorized otherwise only the non-preview page will be rendered.
-                    if (request.Cookies.TryGetValue(cookieOptions.Cookie.Name, out var cookie))
-                    {
-                        var unprotected = cookieOptions.TicketDataFormat.Unprotect(cookie);
-                        var backOfficeIdentity = unprotected?.Principal.GetUmbracoIdentity();
-                        if (backOfficeIdentity != null)
-                        {
-                            // Ok, we've got a real ticket, now we can add this ticket's identity to the current
-                            // Principal, this means we'll have 2 identities assigned to the principal which we can
-                            // use to authorize the preview and allow for a back office User.
-                            context.User.AddIdentity(backOfficeIdentity);
-                        }
-                    }
-
+                    context.AddBackOfficeIdentityFromAuthenticationCookie();
                 }
             }
             catch (Exception ex)
