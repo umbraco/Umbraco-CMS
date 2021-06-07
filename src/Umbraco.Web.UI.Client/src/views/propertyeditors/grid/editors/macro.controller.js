@@ -2,6 +2,8 @@ angular.module("umbraco")
     .controller("Umbraco.PropertyEditors.Grid.MacroController",
         function ($scope, $timeout, editorService, macroResource, macroService, localizationService, $routeParams) {
 
+            $scope.control.icon = $scope.control.icon || 'icon-settings-alt';
+
             localizationService.localize("grid_clickToInsertMacro").then(function(label) {
                 $scope.title = label;
             });

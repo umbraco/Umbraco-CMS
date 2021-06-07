@@ -318,7 +318,6 @@ angular.module("umbraco")
             // Add items overlay menu
             // *********************************************
             $scope.openEditorOverlay = function (event, area, index, key) {
-
                 const dialog = {
                     view: "itempicker",
                     filter: area.$allowedEditors.length > 15,
