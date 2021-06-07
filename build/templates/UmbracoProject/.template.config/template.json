@@ -15,7 +15,7 @@
     },
     "primaryOutputs": [
         {
-			"path": "UmbracoProject.csproj"
+            "path": "UmbracoProject.csproj"
         }
     ],
     "postActions": [
