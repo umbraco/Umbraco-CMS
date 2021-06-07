@@ -37,18 +37,7 @@ function DataTypeEditController($scope, $routeParams, appState, navigationServic
     
     //method used to configure the pre-values when we retrieve them from the server
     function createPreValueProps(preVals) {
-        vm.preValues = [];
-        for (var i = 0; i < preVals.length; i++) {
-            vm.preValues.push({
-                hideLabel: preVals[i].hideLabel,
-                alias: preVals[i].key,
-                description: preVals[i].description,
-                label: preVals[i].label,
-                view: preVals[i].view,
-                value: preVals[i].value,
-                config: preVals[i].config
-            });
-        }
+        vm.preValues = dataTypeHelper.createPreValueProps(preVals);
     }
     
     
