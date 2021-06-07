@@ -55,7 +55,6 @@ namespace Umbraco.Cms.Core.Packaging
                 UmbracoVersion = new Version((int)requirements.Element("major"), (int)requirements.Element("minor"), (int)requirements.Element("patch")),
                 UmbracoVersionRequirementsType = requirements.AttributeValue<string>("type").IsNullOrWhiteSpace() ? RequirementsType.Legacy : Enum<RequirementsType>.Parse(requirements.AttributeValue<string>("type"), true),
                 PackageView = xml.Root.Element("view")?.Value,
-                Actions = xml.Root.Element("Actions")?.ToString(SaveOptions.None) ?? "<Actions></Actions>", //take the entire outer xml value
                 Files = xml.Root.Element("files")?.Elements("file")?.Select(CompiledPackageFile.Create).ToList() ?? new List<CompiledPackageFile>(),
                 Macros = xml.Root.Element("Macros")?.Elements("macro") ?? Enumerable.Empty<XElement>(),
                 Templates = xml.Root.Element("Templates")?.Elements("Template") ?? Enumerable.Empty<XElement>(),

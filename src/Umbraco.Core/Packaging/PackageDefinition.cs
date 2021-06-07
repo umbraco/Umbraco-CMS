@@ -20,10 +20,8 @@ namespace Umbraco.Cms.Core.Packaging
         /// This is used only for conversions and will not 'get' a PackageDefinition from the repository with a valid ID
         /// </remarks>
         public static PackageDefinition FromCompiledPackage(CompiledPackage compiled)
-        {
-            return new PackageDefinition
+            => new PackageDefinition
             {
-                Actions = compiled.Actions,
                 Author = compiled.Author,
                 AuthorUrl = compiled.AuthorUrl,
                 Contributors = compiled.Contributors,
@@ -38,7 +36,6 @@ namespace Umbraco.Cms.Core.Packaging
                 Version = compiled.Version,
                 Files = compiled.Files.Select(x => x.OriginalPath).ToList()
             };
-        }
 
         [DataMember(Name = "id")]
         public int Id { get; set; }
