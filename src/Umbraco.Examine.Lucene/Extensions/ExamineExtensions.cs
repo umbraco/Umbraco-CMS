@@ -10,6 +10,8 @@ using Lucene.Net.Analysis.Core;
 using Lucene.Net.Index;
 using Lucene.Net.QueryParsers.Classic;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Infrastructure.Examine;
 

@@ -4,9 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Examine.Lucene;
 using Examine.Lucene.Providers;
 using Lucene.Net.Store;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Extensions;
@@ -16,10 +18,16 @@ namespace Umbraco.Cms.Infrastructure.Examine
     public class LuceneIndexDiagnostics : IIndexDiagnostics
     {
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly LuceneDirectoryIndexOptions _indexOptions;
 
-        public LuceneIndexDiagnostics(LuceneIndex index, ILogger<LuceneIndexDiagnostics> logger, IHostingEnvironment hostingEnvironment)
+        public LuceneIndexDiagnostics(
+            LuceneIndex index,
+            ILogger<LuceneIndexDiagnostics> logger,
+            IHostingEnvironment hostingEnvironment,
+            IOptionsSnapshot<LuceneDirectoryIndexOptions> indexOptions)
         {
             _hostingEnvironment = hostingEnvironment;
+            _indexOptions = indexOptions.Get(index.Name);
             Index = index;
             Logger = logger;
         }
@@ -43,7 +51,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         {
             get
             {
-                var luceneDir = Index.GetLuceneDirectory();
+                Directory luceneDir = Index.GetLuceneDirectory();
                 var d = new Dictionary<string, object>
                 {
                     [nameof(UmbracoExamineIndex.CommitCount)] = Index.CommitCount,
@@ -56,6 +64,20 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
                     var rootDir = _hostingEnvironment.ApplicationPhysicalPath;
                     d[nameof(UmbracoExamineIndex.LuceneIndexFolder)] = fsDir.Directory.ToString().ToLowerInvariant().TrimStart(rootDir.ToLowerInvariant()).Replace("\\", "/").EnsureStartsWith('/');
+                }
+
+                if (_indexOptions != null)
+                {
+                    if (_indexOptions.DirectoryFactory != null)
+                    {
+                        d[nameof(LuceneDirectoryIndexOptions.DirectoryFactory)] = _indexOptions.DirectoryFactory.GetType();
+                    }
+                    
+                    if (_indexOptions.IndexDeletionPolicy != null)
+                    {
+                        d[nameof(LuceneDirectoryIndexOptions.IndexDeletionPolicy)] = _indexOptions.IndexDeletionPolicy.GetType();
+                    } 
+                    
                 }
 
                 return d;

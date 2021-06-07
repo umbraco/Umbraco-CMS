@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -66,7 +66,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Examine.Lucene" Version="2.0.0-beta.136" />
+        <PackageReference Include="Examine.Lucene" Version="2.0.0-beta.150" />
         <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.7" />
         <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="5.0.6" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.9.4" />

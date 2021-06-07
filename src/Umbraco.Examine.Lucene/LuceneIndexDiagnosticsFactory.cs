@@ -1,9 +1,13 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using Examine;
+using Examine.Lucene;
 using Examine.Lucene.Providers;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Infrastructure.Examine
@@ -17,7 +21,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
         private readonly ILoggerFactory _loggerFactory;
         private readonly IHostingEnvironment _hostingEnvironment;
 
-        public LuceneIndexDiagnosticsFactory(ILoggerFactory loggerFactory, IHostingEnvironment hostingEnvironment)
+        public LuceneIndexDiagnosticsFactory(
+            ILoggerFactory loggerFactory,
+            IHostingEnvironment hostingEnvironment)
         {
             _loggerFactory = loggerFactory;
             _hostingEnvironment = hostingEnvironment;
@@ -29,7 +35,11 @@ namespace Umbraco.Cms.Infrastructure.Examine
             {
                 if (index is LuceneIndex luceneIndex)
                 {
-                    indexDiag = new LuceneIndexDiagnostics(luceneIndex, _loggerFactory.CreateLogger<LuceneIndexDiagnostics>(), _hostingEnvironment);
+                    indexDiag = new LuceneIndexDiagnostics(
+                        luceneIndex,
+                        _loggerFactory.CreateLogger<LuceneIndexDiagnostics>(),
+                        _hostingEnvironment,
+                        null);
                 }
                 else
                 {

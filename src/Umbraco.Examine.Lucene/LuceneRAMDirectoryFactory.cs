@@ -3,19 +3,23 @@
 
 using System;
 using System.IO;
+using System.Threading;
 using Examine.Lucene.Directories;
+using Examine.Lucene.Providers;
 using Lucene.Net.Store;
 using Directory = Lucene.Net.Store.Directory;
 
 namespace Umbraco.Cms.Infrastructure.Examine
 {
-    public class LuceneRAMDirectoryFactory : IDirectoryFactory
+    public class LuceneRAMDirectoryFactory : DirectoryFactoryBase
     {
+
         public LuceneRAMDirectoryFactory()
         {
         }
 
-        public Directory CreateDirectory(string indexName) => new RandomIdRAMDirectory();
+        protected override Directory CreateDirectory(LuceneIndex luceneIndex, bool forceUnlock)
+            => new RandomIdRAMDirectory();
 
         private class RandomIdRAMDirectory : RAMDirectory
         {
