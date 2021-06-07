@@ -571,7 +571,7 @@ namespace Umbraco.Core.Persistence.SqlSyntax
         public virtual string CreateDefaultConstraint => "ALTER TABLE {0} ADD CONSTRAINT {1} DEFAULT ({2}) FOR {3}";
 
         public virtual string ConvertIntegerToOrderableString => "REPLACE(STR({0}, 8), SPACE(1), '0')";
-        public virtual string ConvertDateToOrderableString => "CONVERT(nvarchar, {0}, 102)";
+        public virtual string ConvertDateToOrderableString => "CONVERT(nvarchar, {0}, 120)";
         public virtual string ConvertDecimalToOrderableString => "REPLACE(STR({0}, 20, 9), SPACE(1), '0')";
     }
 }
