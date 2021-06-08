@@ -951,7 +951,9 @@
         width: 50%;
         padding-right: 5px;
 
-        &--w-100 {
+        // when the anchor input is hidden by config
+        // the URL input should be full-width
+        &:only-child {
             width: 100%;
         }
     }
