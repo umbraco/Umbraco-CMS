@@ -20,6 +20,8 @@ namespace Umbraco.Web.HealthCheck.Checks.Config
 
         public override ValueComparisonType ValueComparisonType => ValueComparisonType.ShouldNotEqual;
 
+        public override ProvidedValueValidation ProvidedValueValidation => ProvidedValueValidation.Email;
+
         public override IEnumerable<AcceptableConfiguration> Values => new List<AcceptableConfiguration>
         {
             new AcceptableConfiguration { IsRecommended = false, Value = DefaultFromEmail }
