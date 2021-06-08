@@ -1,5 +1,6 @@
 using System;
 using Umbraco.Cms.Core.Configuration;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.Common;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade.V_8_0_0;
@@ -85,7 +86,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             }
         }
 
-        protected override void ThrowOnUnknownInitialState(string state)
+        public override void ThrowOnUnknownInitialState(string state)
         {
             if (TryGetInitStateVersion(state, out var initVersion))
             {

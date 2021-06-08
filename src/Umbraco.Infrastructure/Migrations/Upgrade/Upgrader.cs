@@ -1,5 +1,5 @@
-﻿using System;
-using Microsoft.Extensions.Logging;
+using System;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 
@@ -37,23 +37,16 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
         /// Executes.
         /// </summary>
         /// <param name="scopeProvider">A scope provider.</param>
-        /// <param name="migrationBuilder">A migration builder.</param>
         /// <param name="keyValueService">A key-value service.</param>
-        /// <param name="logger">A logger.</param>
-        /// <param name="loggerFactory">A logger factory</param>
-        public void Execute(IScopeProvider scopeProvider, IMigrationBuilder migrationBuilder, IKeyValueService keyValueService, ILogger<Upgrader> logger, ILoggerFactory loggerFactory)
+        public void Execute(IMigrationPlanExecutor migrationPlanExecutor, IScopeProvider scopeProvider, IKeyValueService keyValueService)
         {
             if (scopeProvider == null) throw new ArgumentNullException(nameof(scopeProvider));
-            if (migrationBuilder == null) throw new ArgumentNullException(nameof(migrationBuilder));
             if (keyValueService == null) throw new ArgumentNullException(nameof(keyValueService));
-            if (logger == null) throw new ArgumentNullException(nameof(logger));
 
             var plan = Plan;
 
             using (var scope = scopeProvider.CreateScope())
             {
-                BeforeMigrations(scope, logger);
-
                 // read current state
                 var currentState = keyValueService.GetValue(StateValueKey);
                 var forceState = false;
@@ -65,33 +58,24 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
                 }
 
                 // execute plan
-                var state = plan.Execute(scope, currentState, migrationBuilder, loggerFactory.CreateLogger<MigrationPlan>(), loggerFactory);
+                var state = migrationPlanExecutor.Execute(plan, currentState);
                 if (string.IsNullOrWhiteSpace(state))
+                {
                     throw new Exception("Plan execution returned an invalid null or empty state.");
+                }
 
                 // save new state
                 if (forceState)
+                {
                     keyValueService.SetValue(StateValueKey, state);
+                }
                 else if (currentState != state)
+                {
                     keyValueService.SetValue(StateValueKey, currentState, state);
-
-                AfterMigrations(scope, logger);
+                }
 
                 scope.Complete();
             }
         }
-
-        /// <summary>
-        /// Executes as part of the upgrade scope and before all migrations have executed.
-        /// </summary>
-        public virtual void BeforeMigrations(IScope scope, ILogger<Upgrader> logger)
-        { }
-
-        /// <summary>
-        /// Executes as part of the upgrade scope and after all migrations have executed.
-        /// </summary>
-        public virtual void AfterMigrations(IScope scope, ILogger<Upgrader> logger)
-        { }
-
     }
 }

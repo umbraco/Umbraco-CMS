@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Logging.Serilog.Enrichers;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Media;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -103,6 +104,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique<IShortStringHelper>(factory
                 => new DefaultShortStringHelper(new DefaultShortStringHelperConfig().WithDefault(factory.GetRequiredService<IOptions<RequestHandlerSettings>>().Value)));
 
+            builder.Services.AddUnique<IMigrationPlanExecutor, MigrationPlanExecutor>();
             builder.Services.AddUnique<IMigrationBuilder>(factory => new MigrationBuilder(factory));
 
             builder.Services.AddUnique<IPublishedSnapshotRebuilder, PublishedSnapshotRebuilder>();
