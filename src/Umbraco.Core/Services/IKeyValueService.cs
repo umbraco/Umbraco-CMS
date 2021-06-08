@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Cms.Core.Services
+using System.Collections;
+using System.Collections.Generic;
+
+namespace Umbraco.Cms.Core.Services
 {
     /// <summary>
     /// Manages the simplified key/value store.
@@ -10,6 +13,13 @@
         /// </summary>
         /// <remarks>Returns <c>null</c> if no value was found for the key.</remarks>
         string GetValue(string key);
+
+        /// <summary>
+        /// Returns key/value pairs for all keys with the specified prefix.
+        /// </summary>
+        /// <param name="keyPrefix"></param>
+        /// <returns></returns>
+        IReadOnlyDictionary<string, string> Find(string keyPrefix);
 
         /// <summary>
         /// Sets a value.

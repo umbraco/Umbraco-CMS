@@ -1,4 +1,5 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
@@ -22,6 +23,15 @@ namespace Umbraco.Cms.Core.Services.Implement
             using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {
                 return _repository.Get(key)?.Value;
+            }
+        }
+
+        /// <inheritdoc />
+        public IReadOnlyDictionary<string, string> Find(string keyPrefix)
+        {
+            using (var scope = _scopeProvider.CreateScope(autoComplete: true))
+            {
+                return _repository.Find(keyPrefix);
             }
         }
 
