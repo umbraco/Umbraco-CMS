@@ -13,6 +13,12 @@ namespace Umbraco.Cms.Core.Packaging
     {
         protected PackageMigrationPlan(string name) : base(name)
         {
+            // A call to From must be done first
+            From(string.Empty);
+
+            DefinePlan();
         }
+
+        protected abstract void DefinePlan();
     }
 }

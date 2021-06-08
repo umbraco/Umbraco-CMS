@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Umbraco.Extensions;
@@ -25,10 +25,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             return (value ?? fallbackValue).Equals(other ?? fallbackValue);
         }
 
-        public static bool SqlIn<T>(this IEnumerable<T> collection, T item)
-        {
-            return collection.Contains(item);
-        }
+        public static bool SqlIn<T>(this IEnumerable<T> collection, T item) => collection.Contains(item);
 
         public static bool SqlWildcard(this string str, string txt, TextColumnType columnType)
         {
@@ -39,24 +36,14 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
             return wildcardmatch.IsMatch(str);
         }
 
-        public static bool SqlContains(this string str, string txt, TextColumnType columnType)
-        {
-            return str.InvariantContains(txt);
-        }
+#pragma warning disable IDE0060 // Remove unused parameter
+        public static bool SqlContains(this string str, string txt, TextColumnType columnType) => str.InvariantContains(txt);
 
-        public static bool SqlEquals(this string str, string txt, TextColumnType columnType)
-        {
-            return str.InvariantEquals(txt);
-        }
+        public static bool SqlEquals(this string str, string txt, TextColumnType columnType) => str.InvariantEquals(txt);
 
-        public static bool SqlStartsWith(this string str, string txt, TextColumnType columnType)
-        {
-            return str.InvariantStartsWith(txt);
-        }
+        public static bool SqlStartsWith(this string str, string txt, TextColumnType columnType) => str.InvariantStartsWith(txt);
 
-        public static bool SqlEndsWith(this string str, string txt, TextColumnType columnType)
-        {
-            return str.InvariantEndsWith(txt);
-        }
+        public static bool SqlEndsWith(this string str, string txt, TextColumnType columnType) => str.InvariantEndsWith(txt);
+#pragma warning restore IDE0060 // Remove unused parameter
     }
 }

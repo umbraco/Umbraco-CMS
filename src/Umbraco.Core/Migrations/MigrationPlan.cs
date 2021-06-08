@@ -25,9 +25,14 @@ namespace Umbraco.Cms.Core.Migrations
         public MigrationPlan(string name)
         {
             if (name == null)
+            {
                 throw new ArgumentNullException(nameof(name));
+            }
+
             if (string.IsNullOrWhiteSpace(name))
+            {
                 throw new ArgumentException("Value can't be empty or consist only of white-space characters.", nameof(name));
+            }
 
             Name = name;
         }
@@ -48,7 +53,7 @@ namespace Umbraco.Cms.Core.Migrations
         private MigrationPlan Add(string sourceState, string targetState, Type migration)
         {
             if (sourceState == null)
-                throw new ArgumentNullException(nameof(sourceState));
+                throw new ArgumentNullException(nameof(sourceState), $"{nameof(sourceState)} is null, {nameof(MigrationPlan)}.{nameof(MigrationPlan.From)} must not have been called.");
             if (targetState == null)
                 throw new ArgumentNullException(nameof(targetState));
             if (string.IsNullOrWhiteSpace(targetState))
@@ -90,10 +95,17 @@ namespace Umbraco.Cms.Core.Migrations
         public MigrationPlan To(string targetState)
             => To<NoopMigration>(targetState);
 
+        public MigrationPlan To(Guid targetState)
+            => To<NoopMigration>(targetState.ToString());
+
         /// <summary>
         /// Adds a transition to a target state through a migration.
         /// </summary>
         public MigrationPlan To<TMigration>(string targetState)
+            where TMigration : IMigration
+            => To(targetState, typeof(TMigration));
+
+        public MigrationPlan To<TMigration>(Guid targetState)
             where TMigration : IMigration
             => To(targetState, typeof(TMigration));
 
@@ -102,6 +114,9 @@ namespace Umbraco.Cms.Core.Migrations
         /// </summary>
         public MigrationPlan To(string targetState, Type migration)
             => Add(_prevState, targetState, migration);
+
+        public MigrationPlan To(Guid targetState, Type migration)
+            => Add(_prevState, targetState.ToString(), migration);
 
         /// <summary>
         /// Sets the starting state.
