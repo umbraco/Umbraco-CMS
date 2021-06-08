@@ -26,8 +26,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Migrations
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
     public class AdvancedMigrationTests : UmbracoIntegrationTest
     {
-        private readonly ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
-
         private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
         private IEventAggregator EventAggregator => GetRequiredService<IEventAggregator>();
         private IMigrationPlanExecutor MigrationPlanExecutor => GetRequiredService<IMigrationPlanExecutor>();
