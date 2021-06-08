@@ -236,26 +236,36 @@ namespace Umbraco.Cms.Core
         {
             // unattended install is not enabled
             if (_unattendedSettings.Value.InstallUnattended == false)
+            {
                 return;
+            }
 
             // no connection string set
             if (_databaseFactory.Configured == false)
+            {
                 return;
+            }
 
-            var connect = false;
             var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
+
+            bool connect;
             for (var i = 0; ;)
             {
                 connect = _databaseFactory.CanConnect;
                 if (connect || ++i == tries)
+                {
                     break;
+                }
+
                 _logger.LogDebug("Could not immediately connect to database, trying again.");
                 Thread.Sleep(1000);
             }
 
             // could not connect to the database
             if (connect == false)
+            {
                 return;
+            }
 
             using (var database = _databaseFactory.CreateDatabase())
             {

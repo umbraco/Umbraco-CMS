@@ -15,6 +15,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.Runtime
 {
@@ -106,7 +107,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             DoUnattendedInstall();
             DetermineRuntimeLevel();
 
-            if (State.Level <= RuntimeLevel.BootFailed)
+            if (!State.UmbracoCanBoot())
             {
                 return; // The exception will be rethrown by BootFailedMiddelware
             }
@@ -117,17 +118,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(StartAsync)}");
             }
 
-
-
             // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
-            if (State.Reason == RuntimeLevelReason.UpgradeMigrations && State.Level == RuntimeLevel.Run)
+            if (State.RunUnattendedBootLogic())
             {
                 // do the upgrade
                 DoUnattendedUpgrade();
 
                 // upgrade is done, set reason to Run
                 DetermineRuntimeLevel();
-
             }
 
             // create & initialize the components

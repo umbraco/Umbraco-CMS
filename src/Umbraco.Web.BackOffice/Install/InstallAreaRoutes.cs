@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Umbraco.Cms.Core;
@@ -29,9 +29,8 @@ namespace Umbraco.Cms.Web.BackOffice.Install
 
             switch (_runtime.Level)
             {
-                case RuntimeLevel.Install:
-                case RuntimeLevel.Upgrade:
-
+                case var _ when _runtime.EnableInstaller():
+                
                     endpoints.MapUmbracoRoute<InstallApiController>(installPathSegment, Cms.Core.Constants.Web.Mvc.InstallArea, "api", includeControllerNameInRoute: false);
                     endpoints.MapUmbracoRoute<InstallController>(installPathSegment, Cms.Core.Constants.Web.Mvc.InstallArea, string.Empty, includeControllerNameInRoute: false);
 

@@ -47,7 +47,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <param name="notification"></param>
         public void Handle(UmbracoRequestBeginNotification notification)
         {
-            if (_runtimeState.Level < RuntimeLevel.Run)
+            if (_runtimeState.Level != RuntimeLevel.Run)
             {
                 return;
             }

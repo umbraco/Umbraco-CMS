@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Web.Common.Profiler
 
         public void UmbracoApplicationBeginRequest(HttpContext context, RuntimeLevel runtimeLevel)
         {
-            if (runtimeLevel < RuntimeLevel.Run)
+            if (runtimeLevel != RuntimeLevel.Run)
             {
                 return;
             }
@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Web.Common.Profiler
 
         public void UmbracoApplicationEndRequest(HttpContext context, RuntimeLevel runtimeLevel)
         {
-            if (runtimeLevel < RuntimeLevel.Run)
+            if (runtimeLevel != RuntimeLevel.Run)
             {
                 return;
             }
