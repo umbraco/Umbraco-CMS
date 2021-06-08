@@ -16,7 +16,7 @@
             <umb-button-ellipsis
                 element="tree-item-options"
                 action="options(tree.root, $event)"
-                text="Open context node for {{tree.name}}"
+                text="{{openContextMenuText}} {{tree.name}}"
                 state="hidden"
                 class="umb-options"
                 ng-hide="tree.root.isContainer || !tree.root.menuUrl"
@@ -54,7 +54,7 @@
             <umb-button-ellipsis
                 element="tree-item-options"
                 action="options(group, $event)"
-                text="Open context node for {{group.name}}"
+                text="{{openContextMenuText}} {{group.name}}"
                 state="hidden"
                 class="umb-options"
                 ng-hide="group.isContainer || !group.menuUrl"

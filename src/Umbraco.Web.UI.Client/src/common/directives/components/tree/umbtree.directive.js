@@ -3,7 +3,7 @@
 * @name umbraco.directives.directive:umbTree
 * @restrict E
 **/
-function umbTreeDirective($q, $rootScope, treeService, notificationsService, userService, backdropService) {
+function umbTreeDirective($q, treeService, notificationsService, localizationService, backdropService) {
 
     return {
         restrict: 'E',
@@ -263,6 +263,12 @@ function umbTreeDirective($q, $rootScope, treeService, notificationsService, use
                     if ($scope.customtreeparams) {
                         args["queryString"] = $scope.customtreeparams;
                     }
+
+                    // localize the text for the ellipsis button
+                    // this isn't tokenised as it's used in two places in the view
+                    // so the string is appended instead
+                    localizationService.localize('visuallyHiddenTexts_openContextMenu')
+                        .then(text => $scope.openContextMenuText = text);
 
                     return treeService.getTree(args)
                         .then(function (data) {
