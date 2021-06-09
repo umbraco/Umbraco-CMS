@@ -207,9 +207,9 @@ namespace Umbraco.Cms.Core
                     // TODO: Can we save the result of this since we'll need to re-use it?
                     IReadOnlyList<string> packagesRequiringMigration = DoesUmbracoRequirePackageMigrations(keyValues);
                     if (packagesRequiringMigration.Count > 0)
-                    {                        
+                    {
                         return UmbracoDatabaseState.NeedsPackageMigration;
-                    } 
+                    }
                 }
 
                 return UmbracoDatabaseState.Ok;
@@ -321,7 +321,7 @@ namespace Umbraco.Cms.Core
             return CurrentMigrationState != FinalMigrationState;
         }
 
-        private IReadOnlyList<string> DoesUmbracoRequirePackageMigrations(IReadOnlyDictionary<string, string> keyValues)r
+        private IReadOnlyList<string> DoesUmbracoRequirePackageMigrations(IReadOnlyDictionary<string, string> keyValues)
         {
             var packageMigrationPlans = _packageMigrationPlans.ToList();
 
