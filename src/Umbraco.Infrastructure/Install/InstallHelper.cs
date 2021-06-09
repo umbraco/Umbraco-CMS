@@ -136,32 +136,5 @@ namespace Umbraco.Cms.Infrastructure.Install
                 return _databaseBuilder.IsUmbracoInstalled() == false;
             }
         }
-
-        public IEnumerable<Package> GetStarterKits()
-        {
-            if (_httpClient == null)
-                _httpClient = new HttpClient();
-
-            var packages = new List<Package>();
-            try
-            {
-                var requestUri = $"https://our.umbraco.com/webapi/StarterKit/Get/?umbracoVersion={_umbracoVersion.Version}";
-
-                using (var request = new HttpRequestMessage(HttpMethod.Get, requestUri))
-                {
-                    var response = _httpClient.SendAsync(request).Result;
-
-
-                    var json = response.Content.ReadAsStringAsync().Result;
-                    packages = _jsonSerializer.Deserialize<IEnumerable<Package>>(json).ToList();
-                }
-            }
-            catch (AggregateException ex)
-            {
-                _logger.LogError(ex, "Could not download list of available starter kits");
-            }
-
-            return packages;
-        }
     }
 }

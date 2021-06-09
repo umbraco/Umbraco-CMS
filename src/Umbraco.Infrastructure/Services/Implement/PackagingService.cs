@@ -94,24 +94,6 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public CompiledPackage GetCompiledPackageInfo(FileInfo packageFile) => _packageInstallation.ReadPackage(packageFile);
 
-        public IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Cms.Core.Constants.Security.SuperUserId)
-        {
-            if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
-            if (packageDefinition.Id == default) throw new ArgumentException("The package definition has not been persisted");
-            if (packageDefinition.Name == default) throw new ArgumentException("The package definition has incomplete information");
-
-            var compiledPackage = GetCompiledPackageInfo(packageFile);
-            if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFile);
-
-            var files = _packageInstallation.InstallPackageFiles(packageDefinition, compiledPackage, userId).ToList();
-
-            SaveInstalledPackage(packageDefinition);
-
-            _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package files installed for package '{compiledPackage.Name}'.");
-
-            return files;
-        }
-
         public InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Cms.Core.Constants.Security.SuperUserId)
         {
             if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
@@ -208,24 +190,17 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public IEnumerable<PackageDefinition> GetInstalledPackageByName(string name)
         {
-            var found = _installedPackages.GetAll().Where(x => x.Name.InvariantEquals(name)).OrderByDescending(x => SemVersion.Parse(x.Version));
+            var found = _installedPackages.GetAll().Where(x => x.Name.InvariantEquals(name));
             return found;
         }
 
-        public PackageInstallType GetPackageInstallType(string packageName, SemVersion packageVersion, out PackageDefinition alreadyInstalled)
+        public PackageInstallType GetPackageInstallType(string packageName, out PackageDefinition alreadyInstalled)
         {
             if (packageName == null) throw new ArgumentNullException(nameof(packageName));
-            if (packageVersion == null) throw new ArgumentNullException(nameof(packageVersion));
 
             //get the latest version installed
-            alreadyInstalled = GetInstalledPackageByName(packageName)?.OrderByDescending(x => SemVersion.Parse(x.Version)).FirstOrDefault();
+            alreadyInstalled = GetInstalledPackageByName(packageName)?.FirstOrDefault();
             if (alreadyInstalled == null) return PackageInstallType.NewInstall;
-
-            if (!SemVersion.TryParse(alreadyInstalled.Version, out var installedVersion))
-                throw new InvalidOperationException("Could not parse the currently installed package version " + alreadyInstalled.Version);
-
-            //compare versions
-            if (installedVersion >= packageVersion) return PackageInstallType.AlreadyInstalled;
 
             //it's an upgrade
             return PackageInstallType.Upgrade;

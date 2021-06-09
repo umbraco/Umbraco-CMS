@@ -210,13 +210,21 @@ namespace Umbraco.Cms.Core.Packaging
 
                 // check if there's a packages directory below media
 
-                if (Directory.Exists(_hostingEnvironment.MapPathWebRoot(_mediaFolderPath)) == false)
+                var directoryName =
+                    _hostingEnvironment.MapPathWebRoot(Path.Combine(_mediaFolderPath, definition.Name.Replace(' ', '_')));
+
+                if (Directory.Exists(directoryName) == false)
                 {
-                    Directory.CreateDirectory(_hostingEnvironment.MapPathWebRoot(_mediaFolderPath));
+                    Directory.CreateDirectory(directoryName);
                 }
 
-                var packPath = _mediaFolderPath.EnsureEndsWith('/') + (definition.Name + "_" + definition.Version).Replace(' ', '_') + ".zip";
-                ZipPackage(temporaryPath, _hostingEnvironment.MapPathWebRoot(packPath));
+                var packPath = Path.Combine(directoryName, "package.xml");
+
+                if (File.Exists(packPath))
+                {
+                    File.Delete(packPath);
+                }
+                File.Move(packageXmlFileName, packPath);
 
                 //we need to update the package path and save it
                 definition.PackagePath = packPath;
@@ -451,17 +459,6 @@ namespace Umbraco.Cms.Core.Packaging
 
         // TODO: Delete this
         /// <summary>
-        /// Zips the package.
-        /// </summary>
-        /// <param name="path">The path.</param>
-        /// <param name="savePath">The save path.</param>
-        private static void ZipPackage(string path, string savePath)
-        {
-            if (File.Exists(savePath))
-                File.Delete(savePath);
-            ZipFile.CreateFromDirectory(path, savePath);
-        }
-
         private XElement GetMacroXml(int macroId, out IMacro macro)
         {
             macro = _macroService.GetById(macroId);

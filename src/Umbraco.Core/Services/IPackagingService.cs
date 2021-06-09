@@ -20,14 +20,6 @@ namespace Umbraco.Cms.Core.Services
         CompiledPackage GetCompiledPackageInfo(FileInfo packageFile);
 
         /// <summary>
-        /// Installs the package files contained in an umbraco package file (zip)
-        /// </summary>
-        /// <param name="packageDefinition"></param>
-        /// <param name="packageFile"></param>
-        /// <param name="userId"></param>
-        IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Constants.Security.SuperUserId);
-
-        /// <summary>
         /// Installs the data, entities, objects contained in an umbraco package file (zip)
         /// </summary>
         /// <param name="packageDefinition"></param>
@@ -72,7 +64,7 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="packageVersion"></param>
         /// <param name="alreadyInstalled">If the package is an upgrade, the original/current PackageDefinition is returned</param>
         /// <returns></returns>
-        PackageInstallType GetPackageInstallType(string packageName, SemVersion packageVersion, out PackageDefinition alreadyInstalled);
+        PackageInstallType GetPackageInstallType(string packageName,out PackageDefinition alreadyInstalled);
         void DeleteInstalledPackage(int packageId, int userId = Constants.Security.SuperUserId);
 
         /// <summary>

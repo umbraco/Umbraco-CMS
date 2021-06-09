@@ -81,9 +81,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             var def1 = new PackageDefinition
             {
                 Name = "test",
-                Url = "http://test.com",
-                Author = "Someone",
-                AuthorUrl = "http://test.com"
             };
 
             bool result = PackageBuilder.SavePackage(def1);
@@ -101,9 +98,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             var def1 = new PackageDefinition
             {
                 Name = "test",
-                Url = "http://test.com",
-                Author = "Someone",
-                AuthorUrl = "http://test.com"
             };
 
             bool result = PackageBuilder.SavePackage(def1);
@@ -115,9 +109,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             var def2 = new PackageDefinition
             {
                 Name = "test2",
-                Url = "http://test2.com",
-                Author = "Someone2",
-                AuthorUrl = "http://test2.com"
             };
 
             result = PackageBuilder.SavePackage(def2);
@@ -134,9 +125,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             {
                 Id = 3, // doesn't exist
                 Name = "test",
-                Url = "http://test.com",
-                Author = "Someone",
-                AuthorUrl = "http://test.com"
             };
 
             bool result = PackageBuilder.SavePackage(def);
@@ -150,21 +138,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             var def = new PackageDefinition
             {
                 Name = "test",
-                Url = "http://test.com",
-                Author = "Someone",
-                AuthorUrl = "http://test.com"
             };
             bool result = PackageBuilder.SavePackage(def);
 
             def.Name = "updated";
-            def.Files = new List<string> { "hello.txt", "world.png" };
             result = PackageBuilder.SavePackage(def);
             Assert.IsTrue(result);
 
             // re-get
             def = PackageBuilder.GetById(def.Id);
             Assert.AreEqual("updated", def.Name);
-            Assert.AreEqual(2, def.Files.Count);
 
             // TODO: There's a whole lot more assertions to be done
         }
@@ -184,10 +167,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             var def = new PackageDefinition
             {
                 Name = "test",
-                Url = "http://test.com",
-                Author = "Someone",
-                AuthorUrl = "http://test.com",
-                Files = new List<string> { file1, file2 },
                 Actions = "<actions><Action alias='test' /></actions>"
             };
             bool result = PackageBuilder.SavePackage(def);
@@ -201,7 +180,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
 
             using (ZipArchive archive = ZipFile.OpenRead(HostingEnvironment.MapPathWebRoot(zip)))
             {
-                Assert.AreEqual(3, archive.Entries.Count);
+                Assert.AreEqual(1, archive.Entries.Count);
 
                 // the 2 files we manually added
                 Assert.IsNotNull(archive.Entries.Where(x => x.Name == "package.manifest"));
@@ -215,7 +194,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
                 {
                     var xml = XDocument.Load(stream);
                     Assert.AreEqual("umbPackage", xml.Root.Name.ToString());
-                    Assert.AreEqual(2, xml.Root.Element("files").Elements("file").Count());
 
                     Assert.AreEqual("<Actions><Action alias=\"test\" /></Actions>", xml.Element("umbPackage").Element("Actions").ToString(SaveOptions.DisableFormatting));
 

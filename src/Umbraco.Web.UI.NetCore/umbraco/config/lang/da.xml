@@ -974,18 +974,12 @@ Mange hilsner fra Umbraco robotten
     <key alias="deletewarning">Dette vil slette pakken</key>
     <key alias="dropHere">Slip her for at uploade</key>
     <key alias="includeAllChildNodes">Inkludér alle underliggende sider</key>
-    <key alias="orClickHereToUpload">eller klik her for at vælge pakkefil</key>
-    <key alias="uploadPackage">Upload pakke</key>
-    <key alias="localPackageDescription">Installér en lokal pakke ved at vælge den fra din computer. Installér kun pakker fra kilder, du kender og stoler på</key>
-    <key alias="uploadAnother">Upload en anden pakke</key>
-    <key alias="cancelAndUploadAnother">Annuller og upload en anden pakke</key>
     <key alias="accept">Jeg accepterer</key>
     <key alias="termsOfUse">betingelser for anvendelse</key>
     <key alias="pathToFile">Sti til fil</key>
     <key alias="pathToFileDescription">Absolut sti til fil (f.eks.: /bin/umbraco.bin)</key>
     <key alias="installed">Installeret</key>
     <key alias="installedPackages">Installerede pakker</key>
-    <key alias="installLocal">Installér lokal</key>
     <key alias="installFinish">Afslut</key>
     <key alias="noConfigurationView">Denne pakke har ingen konfigurationsvisning</key>
     <key alias="noPackagesCreated">Der er ikke blevet oprettet nogle pakker endnu</key>
@@ -1036,14 +1030,6 @@ Mange hilsner fra Umbraco robotten
     <key alias="packageVersion">Pakke version</key>
     <key alias="packageAlreadyInstalled">Pakke allerede installeret</key>
     <key alias="targetVersionMismatch">Denne pakke kan ikke installeres, den kræver en minimum Umbraco version af</key>
-    <key alias="installStateUninstalling">Afinstallerer...</key>
-    <key alias="installStateDownloading">Downloader...</key>
-    <key alias="installStateImporting">Importeret...</key>
-    <key alias="installStateInstalling">Installerer...</key>
-    <key alias="installStateRestarting">Genstarter, vent venligst...</key>
-    <key alias="installStateComplete">Færdig, din browser opdateres nu, vent venligst...</key>
-    <key alias="installStateCompleted">Klik venligst på 'Afslut' for at gennemføre installation og opdatere siden.</key>
-    <key alias="installStateUploading">Uploader pakke...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Indsæt med fuld formattering (Anbefales ikke)</key>

@@ -19,26 +19,9 @@ namespace Umbraco.Cms.Core.Models
         [DataMember(Name = "isCompatible")]
         public bool IsCompatible { get; set; }
 
-        /// <summary>
-        /// The minimum umbraco version that this package is pinned to
-        /// </summary>
-        [DataMember(Name = "umbracoVersion")]
-        public string UmbracoVersion { get; set; }
-
         [DataMember(Name = "name")]
         public string Name { get; set; }
 
-        [DataMember(Name = "url")]
-        public string Url { get; set; }
-
-        [DataMember(Name = "version")]
-        public string Version { get; set; }
-
-        /// <summary>
-        /// If this is not null then it means the package is being from this version
-        /// </summary>
-        [DataMember(Name = "originalVersion")]
-        public string OriginalVersion { get; set; }
 
         [DataMember(Name = "containsUnsecureFiles")]
         public bool ContainsUnsecureFiles { get; set; }
@@ -70,25 +53,6 @@ namespace Umbraco.Cms.Core.Models
         [DataMember(Name = "conflictingMacroAliases")]
         public IDictionary<string, string> ConflictingMacroAliases { get; set; }
 
-        [DataMember(Name = "readme")]
-        public string Readme { get; set; }
 
-        [DataMember(Name = "licenseUrl")]
-        public string LicenseUrl { get; set; }
-
-        [DataMember(Name = "license")]
-        public string License { get; set; }
-
-        [DataMember(Name = "authorUrl")]
-        public string AuthorUrl { get; set; }
-
-        [DataMember(Name = "author")]
-        public string Author { get; set; }
-
-        [DataMember(Name = "contributors")]
-        public IList<string> Contributors { get; set; }
-
-        [DataMember(Name = "iconUrl")]
-        public string IconUrl { get; set; }
     }
 }
