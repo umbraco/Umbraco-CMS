@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             KeyValueService.SetValue("test4", "hello4");
             KeyValueService.SetValue("someotherprefix1", "helloagain1");
             // Act
-            IReadOnlyDictionary<string, string> value = KeyValueService.Find("test");
+            IReadOnlyDictionary<string, string> value = KeyValueService.FindByKeyPrefix("test");
 
             // Assert
 
