@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
-using Umbraco.Cms.Core.Configuration;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Packaging
@@ -13,18 +12,12 @@ namespace Umbraco.Cms.Core.Packaging
     /// </summary>
     public class PackageDefinitionXmlParser
     {
-        private readonly ILogger<PackageDefinitionXmlParser> _logger;
-        private readonly IUmbracoVersion _umbracoVersion;
-
-        public PackageDefinitionXmlParser(ILogger<PackageDefinitionXmlParser> logger, IUmbracoVersion umbracoVersion)
-        {
-            _logger = logger;
-            _umbracoVersion = umbracoVersion;
-        }
-
         public PackageDefinition ToPackageDefinition(XElement xml)
         {
-            if (xml == null) return null;
+            if (xml == null)
+            {
+                return null;
+            }
 
             var retVal = new PackageDefinition
             {
@@ -51,8 +44,6 @@ namespace Umbraco.Cms.Core.Packaging
 
         public XElement ToXml(PackageDefinition def)
         {
-
-
             var packageXml = new XElement("package",
                 new XAttribute("id", def.Id),
                 new XAttribute("name", def.Name ?? string.Empty),
@@ -74,8 +65,8 @@ namespace Umbraco.Cms.Core.Packaging
 
                 new XElement(
                     "media",
-                    def.MediaUdis.Select(x=> (object)new XElement("nodeUdi", x))
-                    .Union(new []{new XAttribute("loadChildNodes", def.MediaLoadChildNodes) }))
+                    def.MediaUdis.Select(x => (object)new XElement("nodeUdi", x))
+                    .Union(new[] { new XAttribute("loadChildNodes", def.MediaLoadChildNodes) }))
                 );
             return packageXml;
         }

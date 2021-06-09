@@ -2,16 +2,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
-using System.IO.Compression;
 using System.Linq;
 using System.Xml.Linq;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 using File = System.IO.File;
@@ -30,15 +27,12 @@ namespace Umbraco.Cms.Core.Packaging
         private readonly IMacroService _macroService;
         private readonly ILocalizationService _languageService;
         private readonly IEntityXmlSerializer _serializer;
-        private readonly ILoggerFactory _loggerFactory;
-        private readonly ILogger<PackagesRepository> _logger;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly string _packageRepositoryFileName;
         private readonly string _mediaFolderPath;
         private readonly string _packagesFolderPath;
         private readonly string _tempFolderPath;
         private readonly PackageDefinitionXmlParser _parser;
-        private readonly IUmbracoVersion _umbracoVersion;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
 
@@ -60,18 +54,22 @@ namespace Umbraco.Cms.Core.Packaging
         /// <param name="tempFolderPath"></param>
         /// <param name="packagesFolderPath"></param>
         /// <param name="mediaFolderPath"></param>
-        public PackagesRepository(IContentService contentService, IContentTypeService contentTypeService,
-            IDataTypeService dataTypeService, IFileService fileService, IMacroService macroService,
+        public PackagesRepository(
+            IContentService contentService,
+            IContentTypeService contentTypeService,
+            IDataTypeService dataTypeService,
+            IFileService fileService,
+            IMacroService macroService,
             ILocalizationService languageService,
             IHostingEnvironment hostingEnvironment,
             IEntityXmlSerializer serializer,
-            ILoggerFactory loggerFactory,
-            IUmbracoVersion umbracoVersion,
             IOptions<GlobalSettings> globalSettings,
             IMediaService mediaService,
             IMediaTypeService mediaTypeService,
             string packageRepositoryFileName,
-            string tempFolderPath = null, string packagesFolderPath = null, string mediaFolderPath = null)
+            string tempFolderPath = null,
+            string packagesFolderPath = null,
+            string mediaFolderPath = null)
         {
             if (string.IsNullOrWhiteSpace(packageRepositoryFileName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(packageRepositoryFileName));
             _contentService = contentService;
@@ -81,8 +79,6 @@ namespace Umbraco.Cms.Core.Packaging
             _macroService = macroService;
             _languageService = languageService;
             _serializer = serializer;
-            _loggerFactory = loggerFactory;
-            _logger = _loggerFactory.CreateLogger<PackagesRepository>();
             _hostingEnvironment = hostingEnvironment;
             _packageRepositoryFileName = packageRepositoryFileName;
 
@@ -90,8 +86,7 @@ namespace Umbraco.Cms.Core.Packaging
             _packagesFolderPath = packagesFolderPath ?? Constants.SystemDirectories.Packages;
             _mediaFolderPath = mediaFolderPath ?? globalSettings.Value.UmbracoMediaPath + "/created-packages";
 
-            _parser = new PackageDefinitionXmlParser(_loggerFactory.CreateLogger<PackageDefinitionXmlParser>(), umbracoVersion);
-            _umbracoVersion = umbracoVersion;
+            _parser = new PackageDefinitionXmlParser();
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
         }
@@ -110,7 +105,7 @@ namespace Umbraco.Cms.Core.Packaging
 
         public PackageDefinition GetById(int id)
         {
-            var packagesXml = EnsureStorage(out _);
+            var packagesXml = EnsureStorage(out var packageFile);
             var packageXml = packagesXml?.Root?.Elements("package").FirstOrDefault(x => x.AttributeValue<int>("id") == id);
             return packageXml == null ? null : _parser.ToPackageDefinition(packageXml);
         }
@@ -226,7 +221,6 @@ namespace Umbraco.Cms.Core.Packaging
                 }
                 File.Move(packageXmlFileName, packPath);
 
-                //we need to update the package path and save it
                 definition.PackagePath = packPath;
                 SavePackage(definition);
 

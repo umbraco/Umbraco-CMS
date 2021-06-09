@@ -62,9 +62,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             MacroService,
             LocalizationService,
             HostingEnvironment,
-            EntityXmlSerializer,
-            LoggerFactory,
-            UmbracoVersion,
+            EntityXmlSerializer,            
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             MediaService,
             MediaTypeService,
@@ -166,8 +164,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
 
             var def = new PackageDefinition
             {
-                Name = "test",
-                Actions = "<actions><Action alias='test' /></actions>"
+                Name = "test"
             };
             bool result = PackageBuilder.SavePackage(def);
             Assert.IsTrue(result);

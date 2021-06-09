@@ -128,13 +128,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         }
 
-        public ActionResult<PackageDefinition> GetInstalledPackageById(int id)
-        {
-            var pack = _packagingService.GetInstalledPackageById(id);
-            if (pack == null) return NotFound();
-            return pack;
-        }
-
         /// <summary>
         /// Returns all installed packages - only shows their latest versions
         /// </summary>

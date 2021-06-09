@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.Models.ContentEditing;
 
@@ -13,18 +13,8 @@ namespace Umbraco.Cms.Core.Models
         [DataMember(Name = "notifications")]
         public List<BackOfficeNotification> Notifications { get; } = new List<BackOfficeNotification>();
 
-        /// <summary>
-        /// A flag to determine if this package is compatible to be installed
-        /// </summary>
-        [DataMember(Name = "isCompatible")]
-        public bool IsCompatible { get; set; }
-
         [DataMember(Name = "name")]
         public string Name { get; set; }
-
-
-        [DataMember(Name = "containsUnsecureFiles")]
-        public bool ContainsUnsecureFiles { get; set; }
 
         [DataMember(Name = "containsTemplateConflicts")]
         public bool ContainsTemplateConflicts => ConflictingTemplateAliases != null && ConflictingTemplateAliases.Count > 0;

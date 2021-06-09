@@ -11,7 +11,6 @@ namespace Umbraco.Cms.Core.Packaging
     [DataContract(IsReference = true)]
     public class InstallationSummary
     {
-        public IPackageInfo MetaData { get; set; }
         public IEnumerable<IDataType> DataTypesInstalled { get; set; } = Enumerable.Empty<IDataType>();
         public IEnumerable<ILanguage> LanguagesInstalled { get; set; } = Enumerable.Empty<ILanguage>();
         public IEnumerable<IDictionaryItem> DictionaryItemsInstalled { get; set; } = Enumerable.Empty<IDictionaryItem>();

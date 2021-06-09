@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
+using Umbraco.Cms.Core.Models.Packaging;
 
 namespace Umbraco.Cms.Core.Packaging
 {
@@ -18,6 +20,13 @@ namespace Umbraco.Cms.Core.Packaging
         [DataMember(Name = "name")]
         [Required]
         public string Name { get; set; } = string.Empty;
+
+        /// <summary>
+        /// The full path to the package's xml file
+        /// </summary>
+        [ReadOnly(true)]
+        [DataMember(Name = "packagePath")]
+        public string PackagePath { get; set; } = string.Empty;
 
         [DataMember(Name = "contentLoadChildNodes")]
         public bool ContentLoadChildNodes { get; set; }

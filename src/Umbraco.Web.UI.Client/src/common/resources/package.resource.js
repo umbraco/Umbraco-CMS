@@ -24,54 +24,6 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
                'Failed to get installed packages');
         },
 
-        validateInstalled: function (name, version) {
-            return umbRequestHelper.resourcePromise(
-               $http.post(
-                   umbRequestHelper.getApiUrl(
-                       "packageInstallApiBaseUrl",
-                       "ValidateInstalled", { name: name, version: version })),
-               'Failed to validate package ' + name);
-        },
-
-        uninstall: function(packageId) {
-            return umbRequestHelper.resourcePromise(
-                $http.post(
-                  umbRequestHelper.getApiUrl(
-                      "packageInstallApiBaseUrl",
-                      "Uninstall", { packageId: packageId })),
-              'Failed to uninstall package');
-        },
-
-        /**
-         * @ngdoc method
-         * @name umbraco.resources.packageInstallResource#fetchPackage
-         * @methodOf umbraco.resources.packageInstallResource
-         *
-         * @description
-         * Downloads a package file from our.umbraco.com to the website server.
-         *
-         * ##usage
-         * <pre>
-         * packageResource.download("guid-guid-guid-guid")
-         *    .then(function(path) {
-         *        alert('downloaded');
-         *    });
-         * </pre>
-         *
-         * @param {String} the unique package ID
-         * @returns {String} path to the downloaded zip file.
-         *
-         */
-        fetch: function (id) {
-            return umbRequestHelper.resourcePromise(
-               $http.get(
-                   umbRequestHelper.getApiUrl(
-                       "packageInstallApiBaseUrl",
-                       "Fetch",
-                       [{ packageGuid: id }])),
-               'Failed to download package with guid ' + id);
-        },
-
         /**
          * @ngdoc method
          * @name umbraco.resources.packageInstallResource#getCreated

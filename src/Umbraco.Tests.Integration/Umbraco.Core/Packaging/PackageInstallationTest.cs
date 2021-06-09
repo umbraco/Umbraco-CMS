@@ -2,7 +2,6 @@
 // See LICENSE for more details.
 
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using NUnit.Framework;
@@ -31,12 +30,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage));
             CompiledPackage package = PackageInstallation.ReadPackage(testPackageFile);
             Assert.IsNotNull(package);
-            Assert.AreEqual(1, package.Files.Count);
-            Assert.AreEqual("095e064b-ba4d-442d-9006-3050983c13d8.dll", package.Files[0].UniqueFileName);
-            Assert.AreEqual("/bin", package.Files[0].OriginalPath);
-            Assert.AreEqual("Auros.DocumentTypePicker.dll", package.Files[0].OriginalName);
             Assert.AreEqual("Document Type Picker", package.Name);
-            Assert.AreEqual(RequirementsType.Legacy, package.UmbracoVersionRequirementsType);
             Assert.AreEqual(1, package.DataTypes.Count());
         }
 
@@ -46,9 +40,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), HelloPackage));
             CompiledPackage package = PackageInstallation.ReadPackage(testPackageFile);
             Assert.IsNotNull(package);
-            Assert.AreEqual(0, package.Files.Count);
             Assert.AreEqual("Hello", package.Name);
-            Assert.AreEqual(RequirementsType.Strict, package.UmbracoVersionRequirementsType);
             Assert.AreEqual(1, package.Documents.Count());
             Assert.AreEqual(1, package.DocumentTypes.Count());
             Assert.AreEqual(1, package.Templates.Count());
@@ -71,9 +63,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             InstallWarnings preInstallWarnings = package.Warnings;
             Assert.IsNotNull(preInstallWarnings);
 
-            Assert.AreEqual(1, preInstallWarnings.FilesReplaced.Count());
-            Assert.AreEqual(Path.Combine("bin", "Auros.DocumentTypePicker.dll"), preInstallWarnings.FilesReplaced.First());
-
             // TODO: More Asserts
         }
 
@@ -82,11 +71,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         {
             var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage));
             CompiledPackage package = PackageInstallation.ReadPackage(testPackageFile);
-            var def = PackageDefinition.FromCompiledPackage(package);
-            def.Id = 1;
-            def.PackageId = Guid.NewGuid();
-
-            InstallationSummary summary = PackageInstallation.InstallPackageData(def, package, -1);
+            
+            InstallationSummary summary = PackageInstallation.InstallPackageData(package, -1, out PackageDefinition def);
 
             Assert.AreEqual(1, summary.DataTypesInstalled.Count());
 

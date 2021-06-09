@@ -16,10 +16,20 @@ namespace Umbraco.Cms.Core.Packaging
 
         public CompiledPackageXmlParser(ConflictingPackageData conflictingPackageData) => _conflictingPackageData = conflictingPackageData;
 
-        public CompiledPackage ToCompiledPackage(XDocument xml, FileInfo packageFile)
+        public CompiledPackage ToCompiledPackage(FileInfo packageXmlFile)
         {
-            if (xml == null) throw new ArgumentNullException(nameof(xml));
-            if (xml.Root == null) throw new ArgumentException(nameof(xml), "The xml document is invalid");
+            if (packageXmlFile is null)
+            {
+                throw new ArgumentNullException(nameof(packageXmlFile));
+            }
+
+            XDocument xml;
+            using (StreamReader streamReader = File.OpenText(packageXmlFile.FullName))
+            {
+                xml = XDocument.Load(streamReader);
+            }
+
+            if (xml.Root == null) throw new InvalidOperationException("The xml document is invalid");
             if (xml.Root.Name != "umbPackage") throw new FormatException("The xml document is invalid");
 
             var info = xml.Root.Element("info");
@@ -33,7 +43,8 @@ namespace Umbraco.Cms.Core.Packaging
 
             var def = new CompiledPackage
             {
-                PackageFile = packageFile,
+                PackageFile = packageXmlFile,
+                Name = package.Element("name")?.Value,
                 Macros = xml.Root.Element("Macros")?.Elements("macro") ?? Enumerable.Empty<XElement>(),
                 Templates = xml.Root.Element("Templates")?.Elements("Template") ?? Enumerable.Empty<XElement>(),
                 Stylesheets = xml.Root.Element("Stylesheets")?.Elements("styleSheet") ?? Enumerable.Empty<XElement>(),

@@ -1,9 +1,6 @@
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Xml.Linq;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Extensions;
 
@@ -24,26 +21,21 @@ namespace Umbraco.Cms.Core.Packaging
             _parser = parser ?? throw new ArgumentNullException(nameof(parser));
         }
 
-        public CompiledPackage ReadPackage(FileInfo packageFile)
+        public CompiledPackage ReadPackage(FileInfo packageXmlFile)
         {
-            if (packageFile == null) throw new ArgumentNullException(nameof(packageFile));
-            var doc = GetConfigXmlDoc(packageFile);
+            if (packageXmlFile == null) throw new ArgumentNullException(nameof(packageXmlFile));
 
-            var compiledPackage = _parser.ToCompiledPackage(doc, packageFile);
-
+            var compiledPackage = _parser.ToCompiledPackage(packageXmlFile);
             return compiledPackage;
         }
 
-        /// <inheritdoc />
-        public UninstallationSummary UninstallPackage(PackageDefinition package, int userId)
+        public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId, out PackageDefinition packageDefinition)
         {
-            //running this will update the PackageDefinition with the items being removed
-            var summary = _packageDataInstallation.UninstallPackageData(package, userId);
-            return summary;
-        }
+            packageDefinition = new PackageDefinition
+            {
+                Name = compiledPackage.Name
+            };
 
-        public InstallationSummary InstallPackageData(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId)
-        {
             var installationSummary = _packageDataInstallation.InstallPackageData(compiledPackage, userId);
 
             //make sure the definition is up to date with everything
@@ -59,20 +51,6 @@ namespace Umbraco.Cms.Core.Packaging
 
             return installationSummary;
         }
-
-        private XDocument GetConfigXmlDoc(FileInfo packageFile)
-        {
-            var configXmlContent = _packageExtraction.ReadTextFileFromArchive(packageFile, "package.xml", out _);
-
-            var document = XDocument.Parse(configXmlContent);
-
-            if (document.Root == null ||
-                document.Root.Name.LocalName.Equals("umbPackage") == false)
-                throw new FormatException("xml does not have a root node called \"umbPackage\"");
-
-            return document;
-        }
-
 
     }
 }
