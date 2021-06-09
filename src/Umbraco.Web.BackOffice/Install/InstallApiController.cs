@@ -90,12 +90,6 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             return setup;
         }
 
-        public IEnumerable<Package> GetPackages()
-        {
-            var starterKits = InstallHelper.GetStarterKits();
-            return starterKits;
-        }
-
         [HttpPost]
         public async Task<ActionResult> CompleteInstall()
         {

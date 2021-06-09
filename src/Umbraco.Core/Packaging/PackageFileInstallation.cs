@@ -54,31 +54,6 @@ namespace Umbraco.Cms.Core.Packaging
             }
         }
 
-        public IEnumerable<string> UninstallFiles(PackageDefinition package)
-        {
-            var removedFiles = new List<string>();
-
-            foreach (var item in package.Files.ToArray())
-            {
-                removedFiles.Add(_ioHelper.GetRelativePath(item));
-
-                //here we need to try to find the file in question as most packages does not support the tilde char
-                var file = _ioHelper.FindFile(item);
-                if (file != null)
-                {
-                    file = file.EnsureStartsWith("/");
-                    var filePath = _hostingEnvironment.MapPathContentRoot(file);
-
-                    if (File.Exists(filePath))
-                        File.Delete(filePath);
-
-                }
-                package.Files.Remove(file);
-            }
-
-            return removedFiles;
-        }
-
         private static IEnumerable<(string packageUniqueFile, string appAbsolutePath)> AppendRootToDestination(string applicationRootFolder, IEnumerable<(string packageUniqueFile, string appRelativePath)> sourceDestination)
         {
             return

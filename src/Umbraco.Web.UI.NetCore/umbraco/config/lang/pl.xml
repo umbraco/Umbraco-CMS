@@ -809,11 +809,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
       i wskaż gdzie jest zapisany. Pakiety Umbraco przeważnie posiadają rozszerzenie ".umb" lub ".zip".
       ]]></key>
     <key alias="dropHere">Upuść, aby załadować</key>
-    <key alias="orClickHereToUpload">lub kliknij tutaj, aby wybrać pliki</key>
-    <key alias="uploadPackage">Załaduj pakiet</key>
-    <key alias="localPackageDescription">Zainstaluj lokalny pakiet poprzez wybranie go ze swojego komputera. Instaluj jedynie te pakiety, z zaufanych i znanych Tobie źródeł</key>
-    <key alias="uploadAnother">Załaduj kolejny pakiet</key>
-    <key alias="cancelAndUploadAnother">Anuluj i załaduj kolejny pakiet</key>
     <key alias="packageLicense">Licencja</key>
     <key alias="accept">Zgadzam się</key>
     <key alias="termsOfUse">zasady użytkowania</key>
@@ -861,14 +856,6 @@ Naciśnij przycisk <strong>instaluj</strong>, aby zainstalować bazę danych Umb
     <key alias="packageVersion">Wersja pakietu</key>
     <key alias="packageAlreadyInstalled">Pakiet jest już zainstalowany</key>
     <key alias="targetVersionMismatch">Ten pakiet nie może być zainstalowany, ponieważ wymaga Umbraco w wersji przynajmniej %0%</key>
-    <key alias="installStateUninstalling">Odinstalowywanie...</key>
-    <key alias="installStateDownloading">Pobieranie...</key>
-    <key alias="installStateImporting">Importowanie...</key>
-    <key alias="installStateInstalling">Instalowanie...</key>
-    <key alias="installStateRestarting">Restartowanie, proszę czekać...</key>
-    <key alias="installStateComplete">Wszystko skończone, Twoja przeglądarka się teraz odświeży, proszę czekać...</key>
-    <key alias="installStateCompleted">Proszę kliknąć Zakończ, aby zakończyć instalację i przeładować stronę.</key>
-    <key alias="installStateUploading">Wgrywanie pakietu...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Wklej z zachowaniem formatowania (Nie zalecane)</key>

@@ -24,15 +24,6 @@ namespace Umbraco.Cms.Core.Packaging
         InstallationSummary InstallPackageData(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId);
 
         /// <summary>
-        /// Installs a packages files
-        /// </summary>
-        /// <param name="packageDefinition"></param>
-        /// <param name="compiledPackage"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        IEnumerable<string> InstallPackageFiles(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId);
-
-        /// <summary>
         /// Reads the package (zip) file and returns the <see cref="CompiledPackage"/> model
         /// </summary>
         /// <param name="packageFile"></param>

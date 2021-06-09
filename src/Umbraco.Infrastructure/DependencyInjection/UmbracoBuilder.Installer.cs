@@ -24,10 +24,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddScoped<InstallSetupStep, DatabaseInstallStep>();
             builder.Services.AddScoped<InstallSetupStep, DatabaseUpgradeStep>();
 
-            // TODO: Add these back once we have a compatible Starter kit
-            // composition.Services.AddScoped<InstallSetupStep,StarterKitDownloadStep>();
-            // composition.Services.AddScoped<InstallSetupStep,StarterKitInstallStep>();
-            // composition.Services.AddScoped<InstallSetupStep,StarterKitCleanupStep>();
             builder.Services.AddScoped<InstallSetupStep, CompleteInstallStep>();
 
             builder.Services.AddTransient<InstallStepCollection>();

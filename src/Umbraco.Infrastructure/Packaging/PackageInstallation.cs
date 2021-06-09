@@ -42,32 +42,11 @@ namespace Umbraco.Cms.Core.Packaging
             return compiledPackage;
         }
 
-        public IEnumerable<string> InstallPackageFiles(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId)
-        {
-            if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
-            if (compiledPackage == null) throw new ArgumentNullException(nameof(compiledPackage));
-
-            //these should be the same, TODO: we should have a better validator for this
-            if (packageDefinition.Name != compiledPackage.Name)
-                throw new InvalidOperationException("The package definition does not match the compiled package manifest");
-
-            var packageZipFile = compiledPackage.PackageFile;
-
-            var files = _packageFileInstallation.InstallFiles(compiledPackage, packageZipFile, _applicationRootFolder.FullName).ToList();
-
-            packageDefinition.Files = files;
-
-            return files;
-        }
-
         /// <inheritdoc />
         public UninstallationSummary UninstallPackage(PackageDefinition package, int userId)
         {
             //running this will update the PackageDefinition with the items being removed
             var summary = _packageDataInstallation.UninstallPackageData(package, userId);
-
-            var filesRemoved = _packageFileInstallation.UninstallFiles(package);
-            summary.FilesUninstalled = filesRemoved;
 
             return summary;
         }
@@ -77,7 +56,6 @@ namespace Umbraco.Cms.Core.Packaging
             var installationSummary = _packageDataInstallation.InstallPackageData(compiledPackage, userId);
 
             installationSummary.MetaData = compiledPackage;
-            installationSummary.FilesInstalled = packageDefinition.Files;
 
             //make sure the definition is up to date with everything
             foreach (var x in installationSummary.DataTypesInstalled) packageDefinition.DataTypes.Add(x.Id.ToInvariantString());

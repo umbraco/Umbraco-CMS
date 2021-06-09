@@ -197,40 +197,6 @@ namespace Umbraco.Cms.Core.Packaging
                 PackageDataTypes(definition, root);
                 PackageMedia(definition, root);
 
-
-                // TODO: This needs to be split into content vs web files, for now we are going to
-                // assume all files are web (www) files. But this is a larger discussion/change since
-                // we will actually need to modify how packages and files are organized.
-
-                //Files
-                foreach (var fileName in definition.Files)
-                    AppendFileToPackage(fileName, temporaryPath, filesXml);
-
-                //Load view on install...
-                if (!string.IsNullOrEmpty(definition.PackageView))
-                {
-                    var control = new XElement("view", definition.PackageView);
-                    AppendFileToPackage(definition.PackageView, temporaryPath, filesXml);
-                    root.Add(control);
-                }
-
-                //Actions
-                if (string.IsNullOrEmpty(definition.Actions) == false)
-                {
-                    var actionsXml = new XElement("Actions");
-                    try
-                    {
-                        //this will be formatted like a full xml block like <actions>...</actions> and we want the child nodes
-                        var parsed = XElement.Parse(definition.Actions);
-                        actionsXml.Add(parsed.Elements());
-                        root.Add(actionsXml);
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogWarning(e, "Could not add package actions to the package, the xml did not parse");
-                    }
-                }
-
                 var packageXmlFileName = temporaryPath + "/package.xml";
 
                 if (File.Exists(packageXmlFileName))
@@ -240,11 +206,21 @@ namespace Umbraco.Cms.Core.Packaging
 
                 // check if there's a packages directory below media
 
-                if (Directory.Exists(_hostingEnvironment.MapPathWebRoot(_mediaFolderPath)) == false)
-                    Directory.CreateDirectory(_hostingEnvironment.MapPathWebRoot(_mediaFolderPath));
+                var directoryName =
+                    _hostingEnvironment.MapPathWebRoot(Path.Combine(_mediaFolderPath, definition.Name.Replace(' ', '_')));
 
-                var packPath = _mediaFolderPath.EnsureEndsWith('/') + (definition.Name + "_" + definition.Version).Replace(' ', '_') + ".zip";
-                ZipPackage(temporaryPath, _hostingEnvironment.MapPathWebRoot(packPath));
+                if (Directory.Exists(directoryName) == false)
+                {
+                    Directory.CreateDirectory(directoryName);
+                }
+
+                var packPath = Path.Combine(directoryName, "package.xml");
+
+                if (File.Exists(packPath))
+                {
+                    File.Delete(packPath);
+                }
+                File.Move(packageXmlFileName, packPath);
 
                 //we need to update the package path and save it
                 definition.PackagePath = packPath;
@@ -482,18 +458,6 @@ namespace Umbraco.Cms.Core.Packaging
 
 
         /// <summary>
-        /// Zips the package.
-        /// </summary>
-        /// <param name="path">The path.</param>
-        /// <param name="savePath">The save path.</param>
-        private static void ZipPackage(string path, string savePath)
-        {
-            if (File.Exists(savePath))
-                File.Delete(savePath);
-            ZipFile.CreateFromDirectory(path, savePath);
-        }
-
-        /// <summary>
         /// Appends a file to package and copies the file to the correct folder.
         /// </summary>
         /// <param name="path">The path.</param>
@@ -622,48 +586,7 @@ namespace Umbraco.Cms.Core.Packaging
             //Package info
             var package = new XElement("package");
             package.Add(new XElement("name", definition.Name));
-            package.Add(new XElement("version", definition.Version));
-            package.Add(new XElement("iconUrl", definition.IconUrl));
-
-            var license = new XElement("license", definition.License);
-            license.Add(new XAttribute("url", definition.LicenseUrl));
-            package.Add(license);
-
-            package.Add(new XElement("url", definition.Url));
-
-            var requirements = new XElement("requirements");
-
-            requirements.Add(new XElement("major", definition.UmbracoVersion == null ? umbracoVersion.SemanticVersion.Major.ToInvariantString() : definition.UmbracoVersion.Major.ToInvariantString()));
-            requirements.Add(new XElement("minor", definition.UmbracoVersion == null ? umbracoVersion.SemanticVersion.Minor.ToInvariantString() : definition.UmbracoVersion.Minor.ToInvariantString()));
-            requirements.Add(new XElement("patch", definition.UmbracoVersion == null ? umbracoVersion.SemanticVersion.Patch.ToInvariantString() : definition.UmbracoVersion.Build.ToInvariantString()));
-
-            if (definition.UmbracoVersion != null)
-                requirements.Add(new XAttribute("type", RequirementsType.Strict.ToString()));
-
-            package.Add(requirements);
             info.Add(package);
-
-            // Author
-            var author = new XElement("author", "");
-            author.Add(new XElement("name", definition.Author));
-            author.Add(new XElement("website", definition.AuthorUrl));
-            info.Add(author);
-
-            // Contributors
-            var contributors = new XElement("contributors", "");
-
-            if (definition.Contributors != null && definition.Contributors.Any())
-            {
-                foreach (var contributor in definition.Contributors)
-                {
-                    contributors.Add(new XElement("contributor", contributor));
-                }
-            }
-
-            info.Add(contributors);
-
-            info.Add(new XElement("readme", new XCData(definition.Readme)));
-
             return info;
         }
 
