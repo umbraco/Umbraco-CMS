@@ -263,22 +263,6 @@ namespace Umbraco.Cms.Core
             }
         }
 
-        private bool EnsureUmbracoUpgradeState(IUmbracoDatabaseFactory databaseFactory, ILogger logger)
-        {
-            var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
-            var stateValueKey = upgrader.StateValueKey;
-
-            // no scope, no service - just directly accessing the database
-            using (var database = databaseFactory.CreateDatabase())
-            {
-                CurrentMigrationState = database.GetFromKeyValueTable(stateValueKey);
-                FinalMigrationState = upgrader.Plan.FinalState;
-            }
-
-            logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
-
-            return CurrentMigrationState == FinalMigrationState;
-        }
         private bool DoesUmbracoRequireUpgrade(IUmbracoDatabase database)
         {
             var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));

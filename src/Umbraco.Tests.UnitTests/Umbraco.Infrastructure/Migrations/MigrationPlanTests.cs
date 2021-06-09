@@ -57,6 +57,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                     }
                 });
 
+            var executor = new MigrationPlanExecutor(scopeProvider, loggerFactory, migrationBuilder);
+
             MigrationPlan plan = new MigrationPlan("default")
                 .From(string.Empty)
                 .To<DeleteRedirectUrlTable>("{4A9A1A8F-0DA1-4BCF-AD06-C19D79152E35}")
@@ -72,8 +74,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
                 // read current state
                 var sourceState = kvs.GetValue("Umbraco.Tests.MigrationPlan") ?? string.Empty;
 
-                // execute plan
-                state = plan.Execute(s, sourceState, migrationBuilder, loggerFactory.CreateLogger<MigrationPlan>(), loggerFactory);
+                // execute plan                
+                state = executor.Execute(plan, sourceState);
 
                 // save new state
                 kvs.SetValue("Umbraco.Tests.MigrationPlan", sourceState, state);

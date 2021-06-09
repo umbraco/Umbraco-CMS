@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -24,6 +24,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
     public class PostMigrationTests
     {
         private static readonly ILoggerFactory s_loggerFactory = NullLoggerFactory.Instance;
+        private IMigrationPlanExecutor GetMigrationPlanExecutor(IScopeProvider scopeProvider, IMigrationBuilder builder)
+            => new MigrationPlanExecutor(scopeProvider, s_loggerFactory, builder);
 
         [Test]
         public void ExecutesPlanPostMigration()
@@ -63,12 +65,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             TestPostMigration.MigrateCount = 0;
 
             var upgrader = new Upgrader(plan);
+            IMigrationPlanExecutor executor = GetMigrationPlanExecutor(scopeProvider, builder);
             upgrader.Execute(
+                executor,
                 scopeProvider,
-                builder,
-                Mock.Of<IKeyValueService>(),
-                s_loggerFactory.CreateLogger<Upgrader>(),
-                s_loggerFactory);
+                Mock.Of<IKeyValueService>());
 
             Assert.AreEqual(1, TestPostMigration.MigrateCount);
         }
@@ -115,12 +116,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             new MigrationContext(database, s_loggerFactory.CreateLogger<MigrationContext>());
 
             var upgrader = new Upgrader(plan);
+            IMigrationPlanExecutor executor = GetMigrationPlanExecutor(scopeProvider, builder);
             upgrader.Execute(
+                executor,
                 scopeProvider,
-                builder,
-                Mock.Of<IKeyValueService>(),
-                s_loggerFactory.CreateLogger<Upgrader>(),
-                s_loggerFactory);
+                Mock.Of<IKeyValueService>());
 
             Assert.AreEqual(1, TestMigration.MigrateCount);
             Assert.AreEqual(1, TestPostMigration.MigrateCount);
