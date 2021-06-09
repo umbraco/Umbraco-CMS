@@ -321,7 +321,7 @@ namespace Umbraco.Cms.Core
             return CurrentMigrationState != FinalMigrationState;
         }
 
-        private IReadOnlyList<string> DoesUmbracoRequirePackageMigrations(IReadOnlyDictionary<string, string> keyValues)
+        private IReadOnlyList<string> DoesUmbracoRequirePackageMigrations(IReadOnlyDictionary<string, string> keyValues)r
         {
             var packageMigrationPlans = _packageMigrationPlans.ToList();
 
