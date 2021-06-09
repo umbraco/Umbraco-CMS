@@ -1,23 +1,10 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <files />
   <info>
     <package>
-      <name>Compositions Packaged</name>
-      <version>1.0</version>
-      <license url="http://opensource.org/licenses/MIT">MIT License</license>
-      <url>http://blog.sitereactor.dk</url>
-      <requirements>
-        <major>3</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
-    </package>
-    <author>
-      <name>Morten Christensen</name>
-      <website>http://blog.sitereactor.dk</website>
-    </author>
-    <readme><![CDATA[This is a test of packaging compositions]]></readme>
+      <name>Compositions Packaged</name>      
+    </package>    
   </info>
   <Documents>
     <DocumentSet importMode="root">

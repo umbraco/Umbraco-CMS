@@ -1,23 +1,10 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <files />
   <info>
     <package>
-      <name>CheckboxListTest</name>
-      <version>1</version>
-      <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
-      <url>1</url>
-      <requirements>
-        <major>3</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
-    </package>
-    <author>
-      <name>1</name>
-      <website>1</website>
-    </author>
-    <readme><![CDATA[]]></readme>
+      <name>CheckboxListTest</name>      
+    </package>    
   </info>
   <Documents>
     <DocumentSet importMode="root">

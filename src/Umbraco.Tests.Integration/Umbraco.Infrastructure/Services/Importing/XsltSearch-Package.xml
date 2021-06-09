@@ -1,62 +1,9 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
-  <files>
-    <file>
-      <guid>XSLTsearch.xslt</guid>
-      <orgPath>/xslt</orgPath>
-      <orgName>XSLTsearch.xslt</orgName>
-    </file>
-    <file>
-      <guid>XSLTsearch.cs</guid>
-      <orgPath>/App_Code</orgPath>
-      <orgName>XSLTsearch.cs</orgName>
-    </file>
-  </files>
   <info>
     <package>
-      <name>XSLTsearch</name>
-      <version>3.0.4</version>
-      <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
-      <url>http://www.percipientstudios.com</url>
-      <requirements>
-        <major>3</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
+      <name>XSLTsearch</name>      
     </package>
-    <author>
-      <name>Percipient Studios</name>
-      <website>http://www.percipientstudios.com</website>
-    </author>
-    <readme>
-      <![CDATA[XSLTsearch is the easy search solution for Umbraco web sites with up to a few thousand pages. It is fast, completely self-contained, and extremely configurable.
-
-With XSLTsearch you can search for all words and phrases in all document properties and attributes, including your custom properties. Search results are automatically sorted by relevance with search terms highlighted in the results.
-
-XSLTsearch installs in all Umbraco sites.
-
-New in 3.0:
-- Multi-lingual support with dictionary items
-- Medium trust support (helper functions now in /app_code/xsltsearch.cs)
-- Many bug fixes
-
-Version 3.0.1 
-- For umbraco 4.5+ and new XML schema
-- Fixed xslt error when a previewed field had fewer than six characters
-- Changed default behavior to only search within current site if source node id is not specified (better for multiple sites in one installation)
-- Multi-site searching made easier. Now searches only within the current site if the source= parameter is not specified (better for multiple sites in one installation)
-                  
-Version 3.0.2 
-- Fixed issue of PreviewMode="CONTEXT" in which the search term would not be highlighted if it were the last word in the content being searched
-  
-Version 3.0.3 
-- Removed extraneous whitespace and empty quotes from search term
-  
-Version 3.0.4 
-- Additional fix for PreviewMode="CONTEXT" in which the search term would not be displayed if it were the last word in the content being search and the search term were more than $maxChars from the beginning of the search field
-- Removed errant 'xmp' debug statement that appeared in v3.0.3
-]]>
-    </readme>
   </info>
   <Documents>
     <DocumentSet importMode="root">

@@ -1,23 +1,10 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <files />
   <info>
     <package>
       <name>Template-Update</name>
-      <version>0.1</version>
-      <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
-      <url>https://our.umbraco.com/projects</url>
-      <requirements>
-        <major>3</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
     </package>
-    <author>
-      <name>Morten Christensen</name>
-      <website>http://blog.sitereactor.dk</website>
-    </author>
-    <readme><![CDATA[]]></readme>
   </info>
   <DocumentTypes />
   <Templates>

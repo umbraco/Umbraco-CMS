@@ -1,25 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <umbPackage>
   <files />
   <info>
     <package>
-      <name>Package With MediaTypes And Media + Folder</name>
-      <version>1.0.0</version>
-      <iconUrl></iconUrl>
-      <license url="http://opensource.org/licenses/MIT">MIT License</license>
-      <url>http://www.umbraco.com</url>
-      <requirements type="Strict">
-        <major>0</major>
-        <minor>5</minor>
-        <patch>0</patch>
-      </requirements>
+      <name>Package With MediaTypes And Media + Folder</name>      
     </package>
-    <author>
-      <name>dteam</name>
-      <website>http://www.umbraco.com</website>
-    </author>
-    <contributors></contributors>
-    <readme><![CDATA[]]></readme>
   </info>
   <DocumentTypes />
   <MediaTypes>

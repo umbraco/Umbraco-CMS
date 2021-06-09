@@ -1,23 +1,10 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <files />
   <info>
     <package>
-      <name>Composite Test</name>
-      <version>dfsfd</version>
-      <license url="http://opensource.org/licenses/MIT">MIT License</license>
-      <url>ddsff</url>
-      <requirements>
-        <major>3</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
+      <name>Composite Test</name>      
     </package>
-    <author>
-      <name>fsdfds</name>
-      <website>sfdf</website>
-    </author>
-    <readme><![CDATA[sdffds]]></readme>
   </info>
   <Documents>
     <DocumentSet importMode="root">

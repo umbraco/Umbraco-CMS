@@ -1,23 +1,10 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <umbPackage>
   <files />
   <info>
     <package>
-      <name>Dictionary-Package</name>
-      <version>1.0</version>
-      <license url="http://www.opensource.org/licenses/mit-license.php">MIT license</license>
-      <url>http://not.available</url>
-      <requirements>
-        <major>3</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
+      <name>Dictionary-Package</name>      
     </package>
-    <author>
-      <name>Test</name>
-      <website>http://not.available</website>
-    </author>
-    <readme><![CDATA[]]></readme>
   </info>
   <DictionaryItems>
     <DictionaryItem Key="Parent">
