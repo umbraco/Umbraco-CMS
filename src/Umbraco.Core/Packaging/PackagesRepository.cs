@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.IO;
@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Core.Packaging
     /// <summary>
     /// Manages the storage of installed/created package definitions
     /// </summary>
-    public class PackagesRepository : ICreatedPackagesRepository, IInstalledPackagesRepository
+    public class PackagesRepository : ICreatedPackagesRepository
     {
         private readonly IContentService _contentService;
         private readonly IContentTypeService _contentTypeService;
@@ -176,72 +176,44 @@ namespace Umbraco.Cms.Core.Packaging
             //Create a folder for building this package
             var temporaryPath = _hostingEnvironment.MapPathContentRoot(_tempFolderPath.EnsureEndsWith('/') + Guid.NewGuid());
             if (Directory.Exists(temporaryPath) == false)
+            {
                 Directory.CreateDirectory(temporaryPath);
+            }
 
             try
             {
                 //Init package file
-                var compiledPackageXml = CreateCompiledPackageXml(out var root, out var filesXml);
+                var compiledPackageXml = CreateCompiledPackageXml(out var root);
 
                 //Info section
-                root.Add(GetPackageInfoXml(definition, _umbracoVersion));
+                root.Add(GetPackageInfoXml(definition));
 
                 PackageDocumentsAndTags(definition, root);
                 PackageDocumentTypes(definition, root);
                 PackageMediaTypes(definition, root);
                 PackageTemplates(definition, root);
                 PackageStylesheets(definition, root);
-                PackageMacros(definition, root, filesXml, temporaryPath);
+                PackageMacros(definition, root);
                 PackageDictionaryItems(definition, root);
                 PackageLanguages(definition, root);
                 PackageDataTypes(definition, root);
                 PackageMedia(definition, root);
 
-
-                // TODO: This needs to be split into content vs web files, for now we are going to
-                // assume all files are web (www) files. But this is a larger discussion/change since
-                // we will actually need to modify how packages and files are organized.
-
-                //Files
-                foreach (var fileName in definition.Files)
-                    AppendFileToPackage(fileName, temporaryPath, filesXml);
-
-                //Load view on install...
-                if (!string.IsNullOrEmpty(definition.PackageView))
-                {
-                    var control = new XElement("view", definition.PackageView);
-                    AppendFileToPackage(definition.PackageView, temporaryPath, filesXml);
-                    root.Add(control);
-                }
-
-                //Actions
-                if (string.IsNullOrEmpty(definition.Actions) == false)
-                {
-                    var actionsXml = new XElement("Actions");
-                    try
-                    {
-                        //this will be formatted like a full xml block like <actions>...</actions> and we want the child nodes
-                        var parsed = XElement.Parse(definition.Actions);
-                        actionsXml.Add(parsed.Elements());
-                        root.Add(actionsXml);
-                    }
-                    catch (Exception e)
-                    {
-                        _logger.LogWarning(e, "Could not add package actions to the package, the xml did not parse");
-                    }
-                }
-
                 var packageXmlFileName = temporaryPath + "/package.xml";
 
                 if (File.Exists(packageXmlFileName))
+                {
                     File.Delete(packageXmlFileName);
+                }
 
                 compiledPackageXml.Save(packageXmlFileName);
 
                 // check if there's a packages directory below media
 
                 if (Directory.Exists(_hostingEnvironment.MapPathWebRoot(_mediaFolderPath)) == false)
+                {
                     Directory.CreateDirectory(_hostingEnvironment.MapPathWebRoot(_mediaFolderPath));
+                }
 
                 var packPath = _mediaFolderPath.EnsureEndsWith('/') + (definition.Name + "_" + definition.Version).Replace(' ', '_') + ".zip";
                 ZipPackage(temporaryPath, _hostingEnvironment.MapPathWebRoot(packPath));
@@ -308,7 +280,7 @@ namespace Umbraco.Cms.Core.Packaging
             root.Add(dictionaryItems);
         }
 
-        private void PackageMacros(PackageDefinition definition, XContainer root, XContainer filesXml, string temporaryPath)
+        private void PackageMacros(PackageDefinition definition, XContainer root)
         {
             var macros = new XElement("Macros");
             foreach (var macroId in definition.Macros)
@@ -317,10 +289,7 @@ namespace Umbraco.Cms.Core.Packaging
 
                 var macroXml = GetMacroXml(outInt, out var macro);
                 if (macroXml == null) continue;
-                macros.Add(macroXml);
-                //if the macro has a file copy it to the xml
-                if (!string.IsNullOrEmpty(macro.MacroSource))
-                    AppendFileToPackage(macro.MacroSource, temporaryPath, filesXml);
+                macros.Add(macroXml);                
             }
             root.Add(macros);
         }
@@ -480,7 +449,7 @@ namespace Umbraco.Cms.Core.Packaging
                     medias.Select(x => new XElement("MediaSet", _serializer.Serialize(x, definition.MediaLoadChildNodes)))));
         }
 
-
+        // TODO: Delete this
         /// <summary>
         /// Zips the package.
         /// </summary>
@@ -491,63 +460,6 @@ namespace Umbraco.Cms.Core.Packaging
             if (File.Exists(savePath))
                 File.Delete(savePath);
             ZipFile.CreateFromDirectory(path, savePath);
-        }
-
-        /// <summary>
-        /// Appends a file to package and copies the file to the correct folder.
-        /// </summary>
-        /// <param name="path">The path.</param>
-        /// <param name="packageDirectory">The package directory.</param>
-        /// <param name="filesXml">The files xml node</param>
-        /// <param name="isWebFile">true if it's a web file, false if it's a content file</param>
-        private void AppendFileToPackage(string path, string packageDirectory, XContainer filesXml)
-        {
-            if (!path.StartsWith("~/") && !path.StartsWith("/"))
-                path = "~/" + path;
-
-            var serverPath = _hostingEnvironment.MapPathContentRoot(path);
-
-            if (File.Exists(serverPath))
-                AppendFileXml(new FileInfo(serverPath), path, packageDirectory, filesXml);
-            else if (Directory.Exists(serverPath))
-                ProcessDirectory(new DirectoryInfo(serverPath), path, packageDirectory, filesXml);
-        }
-
-        //Process files in directory and add them to package
-        private static void ProcessDirectory(DirectoryInfo directory, string dirPath, string packageDirectory, XContainer filesXml)
-        {
-            if (directory == null) throw new ArgumentNullException(nameof(directory));
-            if (string.IsNullOrWhiteSpace(packageDirectory)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(packageDirectory));
-            if (string.IsNullOrWhiteSpace(dirPath)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(dirPath));
-            if (!directory.Exists) return;
-
-            foreach (var file in directory.GetFiles())
-                AppendFileXml(new FileInfo(Path.Combine(directory.FullName, file.Name)), dirPath + "/" + file.Name, packageDirectory, filesXml);
-
-            foreach (var dir in directory.GetDirectories())
-                ProcessDirectory(dir, dirPath + "/" + dir.Name, packageDirectory, filesXml);
-        }
-
-        private static void AppendFileXml(FileInfo file, string filePath, string packageDirectory, XContainer filesXml)
-        {
-            if (file == null) throw new ArgumentNullException(nameof(file));
-            if (string.IsNullOrWhiteSpace(filePath)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(filePath));
-            if (string.IsNullOrWhiteSpace(packageDirectory)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(packageDirectory));
-
-            var orgPath = filePath.Substring(0, (filePath.LastIndexOf('/')));
-            var orgName = filePath.Substring((filePath.LastIndexOf('/') + 1));
-            var newFileName = orgName;
-
-            if (File.Exists(packageDirectory.EnsureEndsWith('/') + orgName))
-                newFileName = Guid.NewGuid() + "_" + newFileName;
-
-            //Copy file to directory for zipping...
-            File.Copy(file.FullName, packageDirectory + "/" + newFileName, true);
-
-            filesXml.Add(new XElement("file",
-                new XElement("guid", newFileName),
-                new XElement("orgPath", orgPath == "" ? "/" : orgPath),
-                new XElement("orgName", orgName)));
         }
 
         private XElement GetMacroXml(int macroId, out IMacro macro)
@@ -614,63 +526,20 @@ namespace Umbraco.Cms.Core.Packaging
                 mediaTypes.Add(mediaType);
         }
 
-        private static XElement GetPackageInfoXml(PackageDefinition definition, IUmbracoVersion umbracoVersion)
+        private static XElement GetPackageInfoXml(PackageDefinition definition)
         {
-
             var info = new XElement("info");
 
             //Package info
             var package = new XElement("package");
             package.Add(new XElement("name", definition.Name));
-            package.Add(new XElement("version", definition.Version));
-            package.Add(new XElement("iconUrl", definition.IconUrl));
-
-            var license = new XElement("license", definition.License);
-            license.Add(new XAttribute("url", definition.LicenseUrl));
-            package.Add(license);
-
-            package.Add(new XElement("url", definition.Url));
-
-            var requirements = new XElement("requirements");
-
-            requirements.Add(new XElement("major", definition.UmbracoVersion == null ? umbracoVersion.SemanticVersion.Major.ToInvariantString() : definition.UmbracoVersion.Major.ToInvariantString()));
-            requirements.Add(new XElement("minor", definition.UmbracoVersion == null ? umbracoVersion.SemanticVersion.Minor.ToInvariantString() : definition.UmbracoVersion.Minor.ToInvariantString()));
-            requirements.Add(new XElement("patch", definition.UmbracoVersion == null ? umbracoVersion.SemanticVersion.Patch.ToInvariantString() : definition.UmbracoVersion.Build.ToInvariantString()));
-
-            if (definition.UmbracoVersion != null)
-                requirements.Add(new XAttribute("type", RequirementsType.Strict.ToString()));
-
-            package.Add(requirements);
             info.Add(package);
-
-            // Author
-            var author = new XElement("author", "");
-            author.Add(new XElement("name", definition.Author));
-            author.Add(new XElement("website", definition.AuthorUrl));
-            info.Add(author);
-
-            // Contributors
-            var contributors = new XElement("contributors", "");
-
-            if (definition.Contributors != null && definition.Contributors.Any())
-            {
-                foreach (var contributor in definition.Contributors)
-                {
-                    contributors.Add(new XElement("contributor", contributor));
-                }
-            }
-
-            info.Add(contributors);
-
-            info.Add(new XElement("readme", new XCData(definition.Readme)));
-
             return info;
         }
 
-        private static XDocument CreateCompiledPackageXml(out XElement root, out XElement files)
+        private static XDocument CreateCompiledPackageXml(out XElement root)
         {
-            files = new XElement("files");
-            root = new XElement("umbPackage", files);
+            root = new XElement("umbPackage");
             var compiledPackageXml = new XDocument(root);
             return compiledPackageXml;
         }

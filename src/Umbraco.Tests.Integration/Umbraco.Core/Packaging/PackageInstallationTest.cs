@@ -66,7 +66,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             Assert.AreEqual("http://hello.com", package.AuthorUrl);
             Assert.AreEqual("asdf", package.Readme);
             Assert.AreEqual(1, package.Documents.Count());
-            Assert.AreEqual("root", package.Documents.First().ImportMode);
             Assert.AreEqual(1, package.DocumentTypes.Count());
             Assert.AreEqual(1, package.Templates.Count());
             Assert.AreEqual(1, package.DataTypes.Count());
@@ -85,7 +84,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             Console.WriteLine(packageFile);
 
             CompiledPackage package = PackageInstallation.ReadPackage(new FileInfo(packageFile));
-            PreInstallWarnings preInstallWarnings = package.Warnings;
+            InstallWarnings preInstallWarnings = package.Warnings;
             Assert.IsNotNull(preInstallWarnings);
 
             Assert.AreEqual(1, preInstallWarnings.FilesReplaced.Count());

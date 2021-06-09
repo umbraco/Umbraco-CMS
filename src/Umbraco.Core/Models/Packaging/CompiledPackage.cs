@@ -6,29 +6,13 @@ using System.Xml.Linq;
 namespace Umbraco.Cms.Core.Models.Packaging
 {
     /// <summary>
-    /// The model of the package definition within an umbraco (zip) package file
+    /// The model of the umbraco package data manifest (xml file)
     /// </summary>
-    public class CompiledPackage : IPackageInfo
+    public class CompiledPackage
     {
         public FileInfo PackageFile { get; set; }
 
-        public string Name { get; set; }
-        public string Version { get; set; }
-        public string Url { get; set; }
-        public string License { get; set; }
-        public string LicenseUrl { get; set; }
-        public Version UmbracoVersion { get; set; }
-        public RequirementsType UmbracoVersionRequirementsType { get; set; }
-        public string Author { get; set; }
-        public string AuthorUrl { get; set; }
-        public IList<string> Contributors { get; set; }
-        public string Readme { get; set; }
-        public string PackageView { get; set; }
-        public string IconUrl { get; set; }
-
-        public PreInstallWarnings Warnings { get; set; } = new PreInstallWarnings();
-
-        public List<CompiledPackageFile> Files { get; set; } = new List<CompiledPackageFile>();
+        public InstallWarnings Warnings { get; set; } = new InstallWarnings();
 
         public IEnumerable<XElement> Macros { get; set; } // TODO: make strongly typed
         public IEnumerable<XElement> Templates { get; set; } // TODO: make strongly typed

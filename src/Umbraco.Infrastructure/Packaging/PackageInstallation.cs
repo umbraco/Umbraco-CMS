@@ -11,23 +11,17 @@ namespace Umbraco.Cms.Core.Packaging
 {
     public class PackageInstallation : IPackageInstallation
     {
-        private readonly PackageExtraction _packageExtraction;
         private readonly PackageDataInstallation _packageDataInstallation;
-        private readonly PackageFileInstallation _packageFileInstallation;
         private readonly CompiledPackageXmlParser _parser;
-        private readonly DirectoryInfo _applicationRootFolder;
 
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PackageInstallation"/> class.
         /// </summary>
-        public PackageInstallation(PackageDataInstallation packageDataInstallation, PackageFileInstallation packageFileInstallation, CompiledPackageXmlParser parser, IHostingEnvironment hostingEnvironment)
+        public PackageInstallation(PackageDataInstallation packageDataInstallation, CompiledPackageXmlParser parser)
         {
-            _packageExtraction = new PackageExtraction();
-            _packageFileInstallation = packageFileInstallation ?? throw new ArgumentNullException(nameof(packageFileInstallation));
             _packageDataInstallation = packageDataInstallation ?? throw new ArgumentNullException(nameof(packageDataInstallation));
             _parser = parser ?? throw new ArgumentNullException(nameof(parser));
-            _applicationRootFolder = new DirectoryInfo(hostingEnvironment.ApplicationPhysicalPath);
         }
 
         public CompiledPackage ReadPackage(FileInfo packageFile)
@@ -35,29 +29,9 @@ namespace Umbraco.Cms.Core.Packaging
             if (packageFile == null) throw new ArgumentNullException(nameof(packageFile));
             var doc = GetConfigXmlDoc(packageFile);
 
-            var compiledPackage = _parser.ToCompiledPackage(doc, packageFile, _applicationRootFolder.FullName);
-
-            ValidatePackageFile(packageFile, compiledPackage);
+            var compiledPackage = _parser.ToCompiledPackage(doc, packageFile);
 
             return compiledPackage;
-        }
-
-        public IEnumerable<string> InstallPackageFiles(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId)
-        {
-            if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
-            if (compiledPackage == null) throw new ArgumentNullException(nameof(compiledPackage));
-
-            //these should be the same, TODO: we should have a better validator for this
-            if (packageDefinition.Name != compiledPackage.Name)
-                throw new InvalidOperationException("The package definition does not match the compiled package manifest");
-
-            var packageZipFile = compiledPackage.PackageFile;
-
-            var files = _packageFileInstallation.InstallFiles(compiledPackage, packageZipFile, _applicationRootFolder.FullName).ToList();
-
-            packageDefinition.Files = files;
-
-            return files;
         }
 
         /// <inheritdoc />
@@ -65,19 +39,12 @@ namespace Umbraco.Cms.Core.Packaging
         {
             //running this will update the PackageDefinition with the items being removed
             var summary = _packageDataInstallation.UninstallPackageData(package, userId);
-
-            var filesRemoved = _packageFileInstallation.UninstallFiles(package);
-            summary.FilesUninstalled = filesRemoved;
-
             return summary;
         }
 
         public InstallationSummary InstallPackageData(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId)
         {
             var installationSummary = _packageDataInstallation.InstallPackageData(compiledPackage, userId);
-
-            installationSummary.MetaData = compiledPackage;
-            installationSummary.FilesInstalled = packageDefinition.Files;
 
             //make sure the definition is up to date with everything
             foreach (var x in installationSummary.DataTypesInstalled) packageDefinition.DataTypes.Add(x.Id.ToInvariantString());
@@ -105,35 +72,6 @@ namespace Umbraco.Cms.Core.Packaging
 
             return document;
         }
-
-        private void ValidatePackageFile(FileInfo packageFile, CompiledPackage package)
-        {
-            if (!(package.Files?.Count > 0)) return;
-
-            var sourceDestination = _parser.ExtractSourceDestinationFileInformation(package.Files).ToArray();
-
-            var missingFiles = _packageExtraction.FindMissingFiles(packageFile, sourceDestination.Select(i => i.packageUniqueFile)).ToArray();
-
-            if (missingFiles.Any())
-            {
-                throw new Exception("The following file(s) are missing in the package: " +
-                                    string.Join(", ", missingFiles.Select(
-                                        mf =>
-                                        {
-                                            var (packageUniqueFile, appRelativePath) = sourceDestination.Single(fi => fi.packageUniqueFile == mf);
-                                            return $"source: \"{packageUniqueFile}\" destination: \"{appRelativePath}\"";
-                                        })));
-            }
-
-            IEnumerable<string> duplicates = _packageExtraction.FindDuplicateFileNames(packageFile).ToArray();
-
-            if (duplicates.Any())
-            {
-                throw new Exception("The following filename(s) are found more than one time in the package, since the filename is used ad primary key, this is not allowed: " +
-                                    string.Join(", ", duplicates));
-            }
-        }
-
 
 
     }
