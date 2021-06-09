@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
@@ -35,21 +36,25 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         #region Installation
 
-        public CompiledPackage GetCompiledPackageInfo(FileInfo packageXmlFile) => _packageInstallation.ReadPackage(packageXmlFile);
+        public CompiledPackage GetCompiledPackageInfo(XDocument xml) => _packageInstallation.ReadPackage(xml);
 
-        public InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId)
+        public InstallationSummary InstallCompiledPackageData(XDocument packageXml, int userId = Constants.Security.SuperUserId)
         {
-            var compiledPackage = GetCompiledPackageInfo(packageXmlFile);
-            if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageXmlFile);
+            CompiledPackage compiledPackage = GetCompiledPackageInfo(packageXml);
+
+            if (compiledPackage == null)
+            {
+                throw new InvalidOperationException("Could not read the package file " + packageXml);
+            }
 
             // Trigger the Importing Package Notification and stop execution if event/user is cancelling it
-            var importingPackageNotification = new ImportingPackageNotification(packageXmlFile.Name);
+            var importingPackageNotification = new ImportingPackageNotification(compiledPackage.Name);
             if (_eventAggregator.PublishCancelable(importingPackageNotification))
             {
                 return new InstallationSummary();
             }
 
-            var summary = _packageInstallation.InstallPackageData(compiledPackage, userId, out PackageDefinition packageDefinition);
+            var summary = _packageInstallation.InstallPackageData(compiledPackage, userId, out _);
 
             _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
 
@@ -57,6 +62,16 @@ namespace Umbraco.Cms.Core.Services.Implement
             _eventAggregator.Publish(new ImportedPackageNotification(summary).WithStateFrom(importingPackageNotification));
 
             return summary;
+        }
+
+        public InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId)
+        {
+            XDocument xml;
+            using (StreamReader streamReader = System.IO.File.OpenText(packageXmlFile.FullName))
+            {
+                xml = XDocument.Load(streamReader);                
+            }
+            return InstallCompiledPackageData(xml, userId);
         }
 
         #endregion

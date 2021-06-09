@@ -85,15 +85,16 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core
             }
         }
 
-        private class TestMigration : MigrationBase
+        private class TestMigration : PackageMigrationBase
         {
-            public TestMigration(IMigrationContext context) : base(context)
+            public TestMigration(IPackagingService packagingService, IMigrationContext context)
+                : base(packagingService, context)
             {
             }
 
             public override void Migrate()
             {
-
+                ImportPackage.FromEmbeddedResource().Do();
             }
         }
     }

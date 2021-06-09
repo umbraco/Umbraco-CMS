@@ -16,17 +16,11 @@ namespace Umbraco.Cms.Core.Packaging
 
         public CompiledPackageXmlParser(ConflictingPackageData conflictingPackageData) => _conflictingPackageData = conflictingPackageData;
 
-        public CompiledPackage ToCompiledPackage(FileInfo packageXmlFile)
+        public CompiledPackage ToCompiledPackage(XDocument xml)
         {
-            if (packageXmlFile is null)
+            if (xml is null)
             {
-                throw new ArgumentNullException(nameof(packageXmlFile));
-            }
-
-            XDocument xml;
-            using (StreamReader streamReader = File.OpenText(packageXmlFile.FullName))
-            {
-                xml = XDocument.Load(streamReader);
+                throw new ArgumentNullException(nameof(xml));
             }
 
             if (xml.Root == null) throw new InvalidOperationException("The xml document is invalid");
@@ -43,7 +37,9 @@ namespace Umbraco.Cms.Core.Packaging
 
             var def = new CompiledPackage
             {
-                PackageFile = packageXmlFile,
+                // will be null because we don't know where this data is coming from and
+                // this value is irrelevant during install.
+                PackageFile = null,
                 Name = package.Element("name")?.Value,
                 Macros = xml.Root.Element("Macros")?.Elements("macro") ?? Enumerable.Empty<XElement>(),
                 Templates = xml.Root.Element("Templates")?.Elements("Template") ?? Enumerable.Empty<XElement>(),

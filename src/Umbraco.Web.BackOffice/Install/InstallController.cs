@@ -1,4 +1,4 @@
-﻿using System.IO;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
@@ -68,6 +68,7 @@ namespace Umbraco.Cms.Web.BackOffice.Install
             if (_runtime.Level == RuntimeLevel.Run)
                 return Redirect(umbracoPath);
 
+            // TODO: Update for package migrations
             if (_runtime.Level == RuntimeLevel.Upgrade)
             {
                 // Update ClientDependency version and delete its temp directories to make sure we get fresh caches

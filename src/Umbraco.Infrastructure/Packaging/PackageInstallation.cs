@@ -1,11 +1,12 @@
 using System;
-using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Packaging
 {
+
     public class PackageInstallation : IPackageInstallation
     {
         private readonly PackageDataInstallation _packageDataInstallation;
@@ -21,7 +22,7 @@ namespace Umbraco.Cms.Core.Packaging
             _parser = parser ?? throw new ArgumentNullException(nameof(parser));
         }
 
-        public CompiledPackage ReadPackage(FileInfo packageXmlFile)
+        public CompiledPackage ReadPackage(XDocument packageXmlFile)
         {
             if (packageXmlFile == null) throw new ArgumentNullException(nameof(packageXmlFile));
 

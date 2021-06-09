@@ -95,9 +95,9 @@ namespace Umbraco.Cms.Core.Migrations
         public MigrationPlan To(string targetState)
             => To<NoopMigration>(targetState);
 
-
         public MigrationPlan To(Guid targetState)
             => To<NoopMigration>(targetState.ToString());
+
         /// <summary>
         /// Adds a transition to a target state through a migration.
         /// </summary>
@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Core.Migrations
             where TMigration : IMigration
             => To(targetState, typeof(TMigration));
 
-        public MigrationPlan To<TMigration>(Guid targetState)
+        public virtual MigrationPlan To<TMigration>(Guid targetState)
             where TMigration : IMigration
             => To(targetState, typeof(TMigration));
 

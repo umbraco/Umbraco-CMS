@@ -1,4 +1,5 @@
 using System.IO;
+using System.Xml.Linq;
 using Umbraco.Cms.Core.Models.Packaging;
 
 namespace Umbraco.Cms.Core.Packaging
@@ -20,10 +21,10 @@ namespace Umbraco.Cms.Core.Packaging
         InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId, out PackageDefinition packageDefinition);
 
         /// <summary>
-        /// Reads the package (xml) file and returns the <see cref="CompiledPackage"/> model
+        /// Reads the package xml and returns the <see cref="CompiledPackage"/> model
         /// </summary>
         /// <param name="packageFile"></param>
         /// <returns></returns>
-        CompiledPackage ReadPackage(FileInfo packageXmlFile);
+        CompiledPackage ReadPackage(XDocument packageXmlFile);
     }
 }

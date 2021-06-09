@@ -1252,10 +1252,6 @@ namespace Umbraco.Cms.Core.Packaging
             return macro;
         }
 
-
-
-
-
         #endregion
 
         #region Stylesheets

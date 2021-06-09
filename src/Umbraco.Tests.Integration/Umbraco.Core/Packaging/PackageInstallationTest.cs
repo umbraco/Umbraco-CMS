@@ -4,6 +4,7 @@
 using System;
 using System.IO;
 using System.Linq;
+using System.Xml.Linq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.Packaging;
@@ -28,7 +29,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         public void Can_Read_Compiled_Package_1()
         {
             var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage));
-            CompiledPackage package = PackageInstallation.ReadPackage(testPackageFile);
+            using var fileStream = testPackageFile.OpenRead();
+            CompiledPackage package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
             Assert.IsNotNull(package);
             Assert.AreEqual("Document Type Picker", package.Name);
             Assert.AreEqual(1, package.DataTypes.Count());
@@ -38,7 +40,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         public void Can_Read_Compiled_Package_2()
         {
             var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), HelloPackage));
-            CompiledPackage package = PackageInstallation.ReadPackage(testPackageFile);
+            using var fileStream = testPackageFile.OpenRead();
+            CompiledPackage package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
             Assert.IsNotNull(package);
             Assert.AreEqual("Hello", package.Name);
             Assert.AreEqual(1, package.Documents.Count());
@@ -59,7 +62,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             string packageFile = Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage);
             Console.WriteLine(packageFile);
 
-            CompiledPackage package = PackageInstallation.ReadPackage(new FileInfo(packageFile));
+            using var fileStream = File.OpenRead(packageFile);
+            CompiledPackage package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
             InstallWarnings preInstallWarnings = package.Warnings;
             Assert.IsNotNull(preInstallWarnings);
 
@@ -70,7 +74,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         public void Install_Data()
         {
             var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage));
-            CompiledPackage package = PackageInstallation.ReadPackage(testPackageFile);
+            using var fileStream = testPackageFile.OpenRead();
+            CompiledPackage package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
             
             InstallationSummary summary = PackageInstallation.InstallPackageData(package, -1, out PackageDefinition def);
 

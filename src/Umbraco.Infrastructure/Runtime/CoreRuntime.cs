@@ -136,6 +136,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
         private void DoUnattendedUpgrade()
         {
+            // TODO: Here is also where we would run package migrations!
+
             var plan = new UmbracoPlan(_umbracoVersion);
             using (_profilingLogger.TraceDuration<RuntimeState>("Starting unattended upgrade.", "Unattended upgrade completed."))
             {

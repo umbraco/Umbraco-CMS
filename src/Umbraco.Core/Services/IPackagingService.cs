@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Xml.Linq;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
 
@@ -12,7 +13,7 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         /// <param name="packageFile"></param>
         /// <returns></returns>
-        CompiledPackage GetCompiledPackageInfo(FileInfo packageXmlFile);
+        CompiledPackage GetCompiledPackageInfo(XDocument packageXml);
 
         /// <summary>
         /// Installs the data, entities, objects contained in an umbraco package file (zip)
@@ -20,6 +21,8 @@ namespace Umbraco.Cms.Core.Services
         /// <param name="packageFile"></param>
         /// <param name="userId"></param>
         InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId);
+
+        InstallationSummary InstallCompiledPackageData(XDocument packageXml, int userId = Constants.Security.SuperUserId);
 
         IEnumerable<PackageDefinition> GetAllInstalledPackages();
 
