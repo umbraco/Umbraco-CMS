@@ -27,11 +27,11 @@ namespace Umbraco.Cms.Core.Services.Implement
         }
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, string> Find(string keyPrefix)
+        public IReadOnlyDictionary<string, string> FindByKeyPrefix(string keyPrefix)
         {
             using (var scope = _scopeProvider.CreateScope(autoComplete: true))
             {
-                return _repository.Find(keyPrefix);
+                return _repository.FindByKeyPrefix(keyPrefix);
             }
         }
 

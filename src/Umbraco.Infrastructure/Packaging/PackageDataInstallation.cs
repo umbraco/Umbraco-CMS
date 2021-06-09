@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -78,128 +78,6 @@ namespace Umbraco.Cms.Core.Packaging
         }
 
         #region Install/Uninstall
-
-        public UninstallationSummary UninstallPackageData(PackageDefinition package, int userId)
-        {
-            if (package == null) throw new ArgumentNullException(nameof(package));
-
-            var removedTemplates = new List<ITemplate>();
-            var removedMacros = new List<IMacro>();
-            var removedContentTypes = new List<IContentType>();
-            var removedDictionaryItems = new List<IDictionaryItem>();
-            var removedDataTypes = new List<IDataType>();
-            var removedLanguages = new List<ILanguage>();
-
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                //Uninstall templates
-                foreach (var item in package.Templates.ToArray())
-                {
-                    if (int.TryParse(item, out var nId) == false) continue;
-                    var found = _fileService.GetTemplate(nId);
-                    if (found != null)
-                    {
-                        removedTemplates.Add(found);
-                        _fileService.DeleteTemplate(found.Alias, userId);
-                    }
-                    package.Templates.Remove(nId.ToString());
-                }
-
-                //Uninstall macros
-                foreach (var item in package.Macros.ToArray())
-                {
-                    if (int.TryParse(item, out var nId) == false) continue;
-                    var macro = _macroService.GetById(nId);
-                    if (macro != null)
-                    {
-                        removedMacros.Add(macro);
-                        _macroService.Delete(macro, userId);
-                    }
-                    package.Macros.Remove(nId.ToString());
-                }
-
-                //Remove Document Types
-                var contentTypes = new List<IContentType>();
-                var contentTypeService = _contentTypeService;
-                foreach (var item in package.DocumentTypes.ToArray())
-                {
-                    if (int.TryParse(item, out var nId) == false) continue;
-                    var contentType = contentTypeService.Get(nId);
-                    if (contentType == null) continue;
-                    contentTypes.Add(contentType);
-                    package.DocumentTypes.Remove(nId.ToString(CultureInfo.InvariantCulture));
-                }
-
-                //Order the DocumentTypes before removing them
-                if (contentTypes.Any())
-                {
-                    // TODO: I don't think this ordering is necessary
-                    var orderedTypes = (from contentType in contentTypes
-                                        orderby contentType.ParentId descending, contentType.Id descending
-                                        select contentType).ToList();
-                    removedContentTypes.AddRange(orderedTypes);
-                    contentTypeService.Delete(orderedTypes, userId);
-                }
-
-                //Remove Dictionary items
-                foreach (var item in package.DictionaryItems.ToArray())
-                {
-                    if (int.TryParse(item, out var nId) == false) continue;
-                    var di = _localizationService.GetDictionaryItemById(nId);
-                    if (di != null)
-                    {
-                        removedDictionaryItems.Add(di);
-                        _localizationService.Delete(di, userId);
-                    }
-                    package.DictionaryItems.Remove(nId.ToString());
-                }
-
-                //Remove Data types
-                foreach (var item in package.DataTypes.ToArray())
-                {
-                    if (int.TryParse(item, out var nId) == false) continue;
-                    var dtd = _dataTypeService.GetDataType(nId);
-                    if (dtd != null)
-                    {
-                        removedDataTypes.Add(dtd);
-                        _dataTypeService.Delete(dtd, userId);
-                    }
-                    package.DataTypes.Remove(nId.ToString());
-                }
-
-                //Remove Langs
-                foreach (var item in package.Languages.ToArray())
-                {
-                    if (int.TryParse(item, out var nId) == false) continue;
-                    var lang = _localizationService.GetLanguageById(nId);
-                    if (lang != null)
-                    {
-                        removedLanguages.Add(lang);
-                        _localizationService.Delete(lang, userId);
-                    }
-                    package.Languages.Remove(nId.ToString());
-                }
-
-                scope.Complete();
-            }
-
-            // create a summary of what was actually removed, for PackagingService.UninstalledPackage
-            var summary = new UninstallationSummary
-            {
-                MetaData = package,
-                TemplatesUninstalled = removedTemplates,
-                MacrosUninstalled = removedMacros,
-                DocumentTypesUninstalled = removedContentTypes,
-                DictionaryItemsUninstalled = removedDictionaryItems,
-                DataTypesUninstalled = removedDataTypes,
-                LanguagesUninstalled = removedLanguages,
-
-            };
-
-            return summary;
-
-
-        }
 
         public InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId)
         {
@@ -1506,11 +1384,6 @@ namespace Umbraco.Cms.Core.Packaging
                 _fileService.SaveTemplate(templates, userId);
 
             return templates;
-        }
-
-        private string ViewPath(string alias)
-        {
-            return Cms.Core.Constants.SystemDirectories.MvcViews + "/" + alias.Replace(" ", "") + ".cshtml";
         }
 
         #endregion

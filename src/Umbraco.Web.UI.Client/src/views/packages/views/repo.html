@@ -104,7 +104,7 @@
 
                                 </div>
                             </div>
-                            
+
                         </button>
                     </div> <!-- end package -->
 
@@ -180,26 +180,14 @@
 
                 <div class="umb-package-details__sidebar">
 
-                    <umb-box>
-                        <umb-box-content>
-                            <umb-button
-                                ng-if="vm.package.isValid === true"
-                                type="button"
-                                button-style="[success,block]"
-                                size="m"
-                                action="vm.downloadPackage(vm.package)"
-                                label-key="packager_packageInstall">
-                            </umb-button>
-                            <umb-button
-                                ng-if="vm.package.isValid === false"
-                                type="button"
-                                button-style="[block]"
-                                size="m"
-                                disabled="vm.package.isValid === false"
-                                label-key="packager_packageAlreadyInstalled">
-                            </umb-button>
-                        </umb-box-content>
-                    </umb-box>
+                  <umb-box>
+                    <umb-box-content>
+                      <div class="umb-package-details__section-title"><localize key="packager_installInstructions">Install Instructions</localize></div>
+                      <div class="umb-package-details__install-instructions">
+                      dotnet add package <span>Umbraco.Forms</span>
+                      </div>
+                    </umb-box-content>
+                  </umb-box>
 
                     <umb-box>
                         <umb-box-content>
@@ -305,101 +293,6 @@
 
                 </div>
 
-            </div>
-        </div>
-    </div>
-
-    <!-- Package details -->
-    <div ng-if="vm.packageViewState === 'packageInstall' && vm.loading === false">
-        <umb-editor-sub-header>
-            <umb-editor-sub-header-content-left>
-                <button type="button" class="umb-package-details__back-action" ng-click="vm.setPackageViewState('packageDetails');" prevent-default><span aria-hidden="true">&larr;</span> <localize key="general_back">Back</localize></button>
-            </umb-editor-sub-header-content-left>
-        </umb-editor-sub-header>
-
-        <div class="umb-packages-view-wrapper">
-
-            <div class="flex items-center justify-center">
-
-                <div class="umb-info-local-items">
-
-                    <form novalidate name="localPackageForm" class="w-100">
-                        <div class="umb-package-icon">
-                            <i ng-if="!vm.localPackage.icon" class="icon-box" aria-hidden="true"></i>
-                            <img ng-if="vm.localPackage.icon" ng-src="{{vm.localPackage.icon}}" alt="" />
-                        </div>
-
-
-                        <div class="umb-package-info">
-                            <h4 class="umb-info-local-item"><strong>{{ vm.localPackage.name }}</strong></h4>
-
-                            <div class="umb-info-local-item">
-                                <strong>Author</strong>
-                                <a href="{{ vm.localPackage.authorLink }}" target="_blank" rel="noopener noreferrer">{{ vm.localPackage.author }}</a>
-                            </div>
-
-                            <div class="umb-info-local-item">
-                                <strong><localize key="packager_packageVersion">Version</localize></strong>
-                                {{ vm.localPackage.version }}
-                            </div>
-
-                            <div class="umb-info-local-item">
-                                <strong><localize key="packager_packageLicense">License</localize></strong>
-                                <a href="{{ vm.localPackage.licenseUrl }}" target="_blank" rel="noopener noreferrer">{{ vm.localPackage.license }}</a>
-                            </div>
-
-                            <div class="umb-info-local-item">
-                                <strong><localize key="packager_packageReadme">Read me</localize></strong>
-                                <br>
-                                <small ng-bind-html="vm.localPackage.readme"></small>
-                            </div>
-
-                            <div class="umb-info-local-item mt4 flex items-center flex-column" ng-if="vm.installState.status == '' && vm.localPackage.isCompatible">
-
-                                <umb-checkbox model="vm.localPackage.packageLicenseAccept" required="true">
-                                    <strong class="label-text"><localize key="packager_accept">I accept</localize> <a href="#" ng-href="{{vm.localPackage.licenseUrl}}" target="_blank" rel="noopener noreferrer"><localize key="packager_termsOfUse">terms of use</localize></a></strong>
-                                </umb-checkbox>
-
-                                <umb-button ng-if="vm.installState.type !== 'error'"
-                                            class="mt3"
-                                            type="button"
-                                            size="m"
-                                            button-style="success"
-                                            disabled="localPackageForm.$invalid"
-                                            action="vm.installPackage(vm.localPackage)"
-                                            label-key="packager_packageInstall">
-                                </umb-button>
-                            </div>
-
-                            <div class="umb-info-local-item">
-                                <umb-progress-bar
-                                    ng-if="vm.installState.status !== ''"
-                                    percentage="{{vm.installState.progress}}">
-                                </umb-progress-bar>
-                            </div>
-
-                            <div class="umb-info-local-item text-error" ng-if="!vm.localPackage.isCompatible">
-                                <localize key="packager_targetVersionMismatch">This package cannot be installed, it requires a minimum Umbraco version of</localize> {{vm.localPackage.umbracoVersion}}
-                            </div>
-
-                            <div class="umb-info-local-item text-info" ng-class="{'text-info' : vm.installState.type !== 'error'}">
-                                <p>{{vm.installState.status}}</p>
-                            </div>
-
-                            <div class="umb-info-local-item text-info"
-                                 ng-show="vm.installCompleted">
-
-                                <button type="button"
-                                        class="btn btn-success flex-inline mt3"
-                                        ng-click="vm.reloadPage()">
-                                    <localize key="packager_installFinish">Finish</localize>
-                                </button>
-                            </div>
-
-                        </div>
-                    </form>
-
-                </div>
             </div>
         </div>
     </div>

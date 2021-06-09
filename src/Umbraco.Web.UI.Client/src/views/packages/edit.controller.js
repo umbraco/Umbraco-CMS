@@ -11,22 +11,15 @@
         vm.showBackButton = true;
 
         // open all expansion panels
-        vm.propertiesOpen = true;
-        vm.contentOpen = true;
-        vm.filesOpen = true;
-        vm.actionsOpen = true;
         vm.loading = true;
         vm.mediaNodeDisplayModels = [];
         vm.back = back;
         vm.createOrUpdatePackage = createOrUpdatePackage;
         vm.removeContentItem = removeContentItem;
         vm.openContentPicker = openContentPicker;
-        vm.openFilePicker = openFilePicker;
-        vm.removeFile = removeFile;
         vm.openViewPicker = openViewPicker;
         vm.removePackageView = removePackageView;
         vm.downloadFile = downloadFile;
-        vm.contributorsEditor = null;
 
         vm.selectDocumentType = selectDocumentType;
         vm.selectMediaType = selectMediaType;
@@ -76,8 +69,6 @@
 
                     loadResources();
 
-                    buildContributorsEditor(vm.package);
-
                     vm.loading = false;
                 });
 
@@ -91,8 +82,6 @@
                     vm.package = createdPackage;
 
                     loadResources();
-
-                    buildContributorsEditor(vm.package);
 
                     vm.loading = false;
 
@@ -221,10 +210,6 @@
 
         function createOrUpdatePackage(editPackageForm) {
 
-            let contributors = vm.contributorsEditor.value.map(o => o.value)
-
-            vm.package.contributors = contributors;
-
             // Split by comma and remove empty entries
             vm.package.mediaUdis = vm.mediaPickerModel.value.split(",").filter(i => i);
             if (formHelper.submitForm({ formCtrl: editPackageForm, scope: $scope })) {
@@ -272,46 +257,6 @@
         };
         editorService.contentPicker(contentPicker);
       }
-
-      function openFilePicker() {
-
-            let selection = Utilities.copy(vm.package.files);
-
-            const filePicker = {
-                title: "Select files",
-                section: "settings",
-                treeAlias: "files",
-                entityType: "file",
-                multiPicker: true,
-                isDialog: true,
-                select: function (node) {
-                    node.selected = !node.selected;
-
-                    const id = decodeURIComponent(node.id.replace(/\+/g, " "));
-                    const index = selection.indexOf(id);
-
-                    if (node.selected) {
-                        if (index === -1) {
-                            selection.push(id);
-                        }
-                    } else {
-                        selection.splice(index, 1);
-                    }
-                },
-                submit: function () {
-                    vm.package.files = selection;
-                    editorService.close();
-                },
-                close: function () {
-                    editorService.close();
-                }
-            };
-            editorService.treePicker(filePicker);
-        }
-
-        function removeFile(index) {
-            vm.package.files.splice(index, 1);
-        }
 
         function openViewPicker() {
             const controlPicker = {
@@ -437,27 +382,6 @@
             } else {
                 vm.package.dataTypes.splice(index, 1);
             }
-        }
-
-        function buildContributorsEditor(pkg) {
-
-            vm.contributorsEditor = {
-                alias: "contributors",
-                editor: "Umbraco.MultipleTextstring",
-                label: "Contributors",
-                description: "",
-                hideLabel: true,
-                view: "views/propertyeditors/multipletextbox/multipletextbox.html",
-                value: getVals(pkg.contributors),
-                validation: {
-                    mandatory: false,
-                    pattern: null
-                },
-                config: {
-                    min: 0,
-                    max: 0
-                }
-            };
         }
 
         function getVals(array) {

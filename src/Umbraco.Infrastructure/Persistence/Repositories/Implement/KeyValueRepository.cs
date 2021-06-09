@@ -21,7 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         { }
 
         /// <inheritdoc />
-        public IReadOnlyDictionary<string, string> Find(string keyPrefix)
+        public IReadOnlyDictionary<string, string> FindByKeyPrefix(string keyPrefix)
             => Get(Query<IKeyValue>().Where(entity => entity.Identifier.StartsWith(keyPrefix)))
                 .ToDictionary(x => x.Identifier, x => x.Value);
 

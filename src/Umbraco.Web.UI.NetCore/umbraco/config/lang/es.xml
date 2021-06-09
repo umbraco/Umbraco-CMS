@@ -815,14 +815,9 @@
   </area>
   <area alias="packager">
     <key alias="chooseLocalPackageText"><![CDATA[Elige un paquete de tu máquina, seleccionando el botón Examinar<br />y localizando el paquete. Los paquetes de Umbraco normalmente tienen la extensión ".umb" o ".zip".]]></key>
-        <key alias="dropHere">Suelta para subir archivo</key>
-        <key alias="orClickHereToUpload">o Pulsa aquí para elegir paquete</key>
-    <key alias="uploadPackage">Subir paquete</key>
-        <key alias="localPackageDescription">Instala un paquete local seleccionándolo desde tu ordenador. instala sólo paquetes de fuentes que conoces y en las que confías</key>
-    <key alias="uploadAnother">Subir otro paquete</key>
-    <key alias="cancelAndUploadAnother">Cancelar y subir otro paquete</key>
+    <key alias="dropHere">Suelta para subir archivo</key>
     <key alias="packageLicense">Licencia</key>
-        <key alias="accept">Aceptar</key>
+    <key alias="accept">Aceptar</key>
     <key alias="termsOfUse">términos de uso</key>
     <key alias="packageInstall">Instalar paquete</key>
     <key alias="installFinish">Terminar</key>
@@ -865,14 +860,6 @@
     <key alias="packageVersion">Versión del paquete</key>
     <key alias="packageAlreadyInstalled">Paquete ya instalado</key>
     <key alias="targetVersionMismatch">Este paquete no se puede instalar, requiere un versión mínima de Umbraco de </key>
-    <key alias="installStateUninstalling">Desinstalando...</key>
-    <key alias="installStateDownloading">Descargando...</key>
-    <key alias="installStateImporting">Importando...</key>
-    <key alias="installStateInstalling">Instalando...</key>
-    <key alias="installStateRestarting">Reiniciando, por favor espera...</key>
-    <key alias="installStateComplete">Todo hecho, tu navegador se actualizará, por favor espera...</key>
-    <key alias="installStateCompleted">Por favor pulsa 'Terminar' para completar la instalación y actualizar la página.</key>
-    <key alias="installStateUploading">Subiendo paquete...</key>
   </area>
   <area alias="paste">
     <key alias="doNothing">Pegar con formato completo (No recomendado)</key>
