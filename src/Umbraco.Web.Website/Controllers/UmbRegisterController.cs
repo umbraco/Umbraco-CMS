@@ -98,7 +98,6 @@ namespace Umbraco.Cms.Web.Website.Controllers
             {
                 model.UsernameIsEmail = usernameIsEmail.ToString() == "True";
             }
-
         }
 
         private void AddErrors(IdentityResult result)
@@ -164,7 +163,6 @@ namespace Umbraco.Cms.Web.Website.Controllers
             }
 
             return identityResult;
-
         }
     }
 }
