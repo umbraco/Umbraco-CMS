@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-
 namespace Umbraco.Cms.Core.Notifications
 {
     /// <summary>
@@ -16,8 +13,6 @@ namespace Umbraco.Cms.Core.Notifications
         /// Gets/sets the result of the unattended upgrade
         /// </summary>
         public UpgradeResult UnattendedUpgradeResult { get; set; } = UpgradeResult.NotRequired;
-
-        public List<Exception> UpgradeExceptions { get; } = new List<Exception>();
 
         public enum UpgradeResult
         {

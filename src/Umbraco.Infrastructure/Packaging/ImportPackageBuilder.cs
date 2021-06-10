@@ -14,9 +14,10 @@ namespace Umbraco.Cms.Core.Packaging
 
         public void Do() => Expression.Execute();
 
-        public IExecutableBuilder FromEmbeddedResource()
+        public IExecutableBuilder FromEmbeddedResource<TPackageMigration>()
+            where TPackageMigration : PackageMigrationBase
         {
-            Expression.FromEmbeddedResource = true;
+            Expression.EmbeddedResourceMigrationType = typeof(TPackageMigration);
             return this;
         }
     }

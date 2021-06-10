@@ -16,6 +16,7 @@ using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Extensions;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Install
 {
@@ -58,7 +59,7 @@ namespace Umbraco.Cms.Infrastructure.Install
 
                 switch (_runtimeState.Reason)
                 {
-                    case Core.RuntimeLevelReason.UpgradeMigrations:
+                    case RuntimeLevelReason.UpgradeMigrations:
                     {
                         var plan = new UmbracoPlan(_umbracoVersion);
                         using (_profilingLogger.TraceDuration<UnattendedUpgrader>(
@@ -77,7 +78,7 @@ namespace Umbraco.Cms.Infrastructure.Install
                         }
                     }
                     break;
-                    case Core.RuntimeLevelReason.UpgradePackageMigrations:
+                    case RuntimeLevelReason.UpgradePackageMigrations:
                     {
                         if (!_runtimeState.StartupState.TryGetValue(RuntimeState.PendingPacakgeMigrationsStateKey, out var pm)
                             || pm is not IReadOnlyList<string> pendingMigrations)
@@ -90,6 +91,7 @@ namespace Umbraco.Cms.Infrastructure.Install
                             throw new InvalidOperationException("No pending migrations found but the runtime level reason is " + Core.RuntimeLevelReason.UpgradePackageMigrations);
                         }
 
+                        var exceptions = new List<Exception>();
                         var packageMigrationsPlans = _packageMigrationPlans.ToDictionary(x => x.Name);
 
                         foreach (var migrationName in pendingMigrations)
@@ -108,25 +110,48 @@ namespace Umbraco.Cms.Infrastructure.Install
                                 try
                                 {
                                     upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService);
-                                    notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete;
                                 }
                                 catch (Exception ex)
                                 {
-                                    notification.UpgradeExceptions.Add(new UnattendedInstallException("Unattended package migration failed for " + migrationName, ex));
+                                    exceptions.Add(new UnattendedInstallException("Unattended package migration failed for " + migrationName, ex));                                    
                                 }
                             }
+                        }
+
+                        if (exceptions.Count > 0)
+                        {
+                            notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors;
+                            SetRuntimeErrors(exceptions);
+                        }
+                        else
+                        {
+                            notification.UnattendedUpgradeResult = RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete;
                         }
                     }
                     break;
                     default:
                         throw new InvalidOperationException("Invalid reason " + _runtimeState.Reason);
                 }
+            }
+            return Task.CompletedTask;
+        }
 
-
-
+        private void SetRuntimeErrors(List<Exception> exception)
+        {            
+            Exception innerException;
+            if (exception.Count == 1)
+            {
+                innerException = exception[0];
+            }
+            else
+            {
+                innerException = new AggregateException(exception);
             }
 
-            return Task.CompletedTask;
+            _runtimeState.Configure(
+                RuntimeLevel.BootFailed,
+                RuntimeLevelReason.BootFailedOnException,
+                innerException);
         }
     }
 }

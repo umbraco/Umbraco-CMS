@@ -30,11 +30,7 @@ namespace Umbraco.Cms.Core.Packaging
             if (info == null) throw new FormatException("The xml document is invalid");
             var package = info.Element("package");
             if (package == null) throw new FormatException("The xml document is invalid");
-            var author = info.Element("author");
-            if (author == null) throw new FormatException("The xml document is invalid");
-            var requirements = package.Element("requirements");
-            if (requirements == null) throw new FormatException("The xml document is invalid");
-
+            
             var def = new CompiledPackage
             {
                 // will be null because we don't know where this data is coming from and

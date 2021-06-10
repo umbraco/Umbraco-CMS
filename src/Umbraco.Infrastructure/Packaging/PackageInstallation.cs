@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Core.Packaging
                 Name = compiledPackage.Name
             };
 
-            var installationSummary = _packageDataInstallation.InstallPackageData(compiledPackage, userId);
+            InstallationSummary installationSummary = _packageDataInstallation.InstallPackageData(compiledPackage, userId);
 
             //make sure the definition is up to date with everything
             foreach (var x in installationSummary.DataTypesInstalled) packageDefinition.DataTypes.Add(x.Id.ToInvariantString());

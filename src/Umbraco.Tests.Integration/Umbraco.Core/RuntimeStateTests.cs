@@ -94,7 +94,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core
 
             public override void Migrate()
             {
-                ImportPackage.FromEmbeddedResource().Do();
+                ImportPackage.FromEmbeddedResource<TestMigration>().Do();
             }
         }
     }

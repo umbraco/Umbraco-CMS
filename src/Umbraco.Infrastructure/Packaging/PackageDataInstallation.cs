@@ -85,6 +85,7 @@ namespace Umbraco.Cms.Core.Packaging
             {
                 var installationSummary = new InstallationSummary
                 {
+                    Warnings = compiledPackage.Warnings,
                     DataTypesInstalled = ImportDataTypes(compiledPackage.DataTypes.ToList(), userId),
                     LanguagesInstalled = ImportLanguages(compiledPackage.Languages, userId),
                     DictionaryItemsInstalled = ImportDictionaryItems(compiledPackage.DictionaryItems, userId),

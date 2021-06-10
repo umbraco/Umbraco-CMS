@@ -1,24 +1,9 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <umbPackage>
-  <files />
   <info>
     <package>
       <name>Hello</name>
-      <version>1.0.0</version>
-      <iconUrl></iconUrl>
-      <license url="http://opensource.org/licenses/MIT">MIT License</license>
-      <url>http://hello.com</url>
-      <requirements type="Strict">
-        <major>8</major>
-        <minor>0</minor>
-        <patch>0</patch>
-      </requirements>
     </package>
-    <author>
-      <name>asdf</name>
-      <website>http://hello.com</website>
-    </author>
-    <readme><![CDATA[asdf]]></readme>
   </info>
   <Documents>
     <DocumentSet importMode="root">
@@ -85,11 +70,13 @@
     <Template>
       <Name>Simple Page</Name>
       <Alias>SimplePage</Alias>
-      <Design><![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.SimplePage>
+      <Design>
+        <![CDATA[@inherits Umbraco.Web.Mvc.UmbracoViewPage<ContentModels.SimplePage>
 @using ContentModels = Umbraco.Web.PublishedModels;
 @{
 	Layout = null;
-}]]></Design>
+}]]>
+      </Design>
     </Template>
   </Templates>
   <Stylesheets />

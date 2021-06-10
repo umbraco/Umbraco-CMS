@@ -13,46 +13,48 @@ namespace Umbraco.Cms.Core.Packaging
     internal class ImportPackageBuilderExpression : MigrationExpressionBase
     {
         private readonly IPackagingService _packagingService;
+        private bool _executed;
 
         public ImportPackageBuilderExpression(IPackagingService packagingService, IMigrationContext context) : base(context)
             => _packagingService = packagingService;
 
-        public bool FromEmbeddedResource { get; set; }
+        /// <summary>
+        /// The type of the migration which dictates the namespace of the embedded resource
+        /// </summary>
+        public Type EmbeddedResourceMigrationType { get; set; }
 
         public override void Execute()
         {
-            if (!FromEmbeddedResource)
+            if (_executed)
             {
-                throw new InvalidOperationException($"Nothing to execute, {nameof(FromEmbeddedResource)} has not been called.");
+                throw new InvalidOperationException("This expression has already been executed.");
             }
 
-            try
+            _executed = true;
+            Context.BuildingExpression = false;
+
+            if (EmbeddedResourceMigrationType == null)
             {
-                // lookup the embedded resource by convention
-                Type currentType = GetType();
-                Assembly currentAssembly = currentType.Assembly;
-                var fileName = $"{currentType.Namespace}.package.xml";
-                Stream stream = currentAssembly.GetManifestResourceStream(fileName);
-                if (stream == null)
-                {
-                    throw new FileNotFoundException("Cannot find the embedded file.", fileName);
-                }
-                XDocument xml;
-                using (stream)
-                {
-                    xml = XDocument.Load(stream);
-                }
-
-                InstallationSummary installationSummary = _packagingService.InstallCompiledPackageData(xml);
-
-                Logger.LogInformation($"Package migration executed. Summary: {installationSummary}");
+                throw new InvalidOperationException($"Nothing to execute, {nameof(EmbeddedResourceMigrationType)} has not been set.");
             }
-            catch (Exception ex)
+
+            // lookup the embedded resource by convention            
+            Assembly currentAssembly = EmbeddedResourceMigrationType.Assembly;
+            var fileName = $"{EmbeddedResourceMigrationType.Namespace}.package.xml";
+            Stream stream = currentAssembly.GetManifestResourceStream(fileName);
+            if (stream == null)
             {
-                Logger.LogError(ex, "Package migration failed.");
-
-                // TODO: We need to exit with a status
+                throw new FileNotFoundException("Cannot find the embedded file.", fileName);
             }
+            XDocument xml;
+            using (stream)
+            {
+                xml = XDocument.Load(stream);
+            }
+
+            InstallationSummary installationSummary = _packagingService.InstallCompiledPackageData(xml);
+
+            Logger.LogInformation($"Package migration executed. Summary: {installationSummary}");
         }
     }
 }

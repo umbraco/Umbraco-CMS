@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Migrations
     /// </summary>
     public class MigrationPlan
     {
-        private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>();
+        private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>(StringComparer.InvariantCultureIgnoreCase);
         private readonly List<Type> _postMigrationTypes = new List<Type>();
 
         private string _prevState;

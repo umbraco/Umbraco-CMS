@@ -122,28 +122,12 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             switch (unattendedUpgradeNotification.UnattendedUpgradeResult)
             {
                 case RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors:
-                    if (unattendedUpgradeNotification.UpgradeExceptions.Count == 0)
+                    if (State.BootFailedException == null)
                     {
-                        throw new InvalidOperationException("The upgrade result was " + RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors + " but no exceptions have been registered");
+                        throw new InvalidOperationException($"Unattended upgrade result was {RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors} but no {nameof(BootFailedException)} was registered");
                     }
-                    BootFailedException bootFailedException;
-                    if (unattendedUpgradeNotification.UpgradeExceptions.Count == 1)
-                    {
-                        bootFailedException = new BootFailedException(
-                            unattendedUpgradeNotification.UpgradeExceptions[0].Message,
-                            unattendedUpgradeNotification.UpgradeExceptions[0]);
-                    }
-                    else
-                    {
-                        bootFailedException = new BootFailedException(
-                            "Several package migrations failed" ,
-                            new AggregateException(unattendedUpgradeNotification.UpgradeExceptions));
-                    }
-                    State.Configure(
-                        RuntimeLevel.BootFailed,
-                        RuntimeLevelReason.BootFailedOnException,
-                        bootFailedException);
-                    break;
+                    // we cannot continue here, the exception will be rethrown by BootFailedMiddelware
+                    return;
                 case RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete:
                 case RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete:
                     // upgrade is done, set reason to Run
