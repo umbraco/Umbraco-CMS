@@ -35,19 +35,19 @@
     <a ng-if="!sortingMode" hotkey="alt+shift+p" ng-click="addPropertyToActiveGroup()"></a>
     <a ng-if="!sortingMode" hotkey="alt+shift+g" ng-click="addGroupToActiveTab()"></a>
 
-    <div class="umb-group-builder__tabs" ng-if="(sortingMode && model.tabs.length > 0) || (!sortingMode)">
+    <div class="umb-group-builder__tabs" ng-if="(sortingMode && tabs.length > 0) || (!sortingMode)">
         <div ng-show="overflow.left > 0" class="umb-group-builder__tabs-overflow umb-group-builder__tabs-overflow--left">
             <span class="caret"></span>
         </div>
-        <ul class="umb-group-builder__tabs-list" ui-sortable="sortableOptionsTab" ng-model="model.tabs" umb-overflow-checker on-overflow="setTabOverflowState(overflowLeft, overflowRight)">
-            <li ng-repeat="(tabIndex, tab) in model.tabs track by tab.id" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-id="{{tab.id}}" val-groups-in-tab="{ tab: tab, groups: model.groups }">
+        <ul class="umb-group-builder__tabs-list" ui-sortable="sortableOptionsTab" ng-model="tabs" umb-overflow-checker on-overflow="setTabOverflowState(overflowLeft, overflowRight)">
+            <li ng-repeat="(tabIndex, tab) in tabs track by tab.key" ng-class="{'umb-group-builder__tab-sortable': sortingMode}" umb-droppable="droppableOptionsTab" data-tab-key="{{tab.key}}" val-groups-in-tab="{ tab: tab, groups: model.groups }">
                 <umb-content-type-tab
                     tab="tab"
-                    is-open="tab.id === openTabId"
+                    is-open="tab.key === openTabKey"
                     on-click="changeTab(tab)"
                     sorting="sortingMode"
                     allow-remove="canRemoveTab(tab) && !sortingMode"
-                    on-remove="removeTab(tabIndex)"
+                    on-remove="removeTab(tab)"
                     val-server-field-name="{{'Tabs[' + $index + '].Name'}}"
                     on-change-sort-order-value="onChangeTabSortOrderValue(tab)"
                     on-change-icon="onChangeTabIcon(icon, color, tab)">
@@ -75,7 +75,7 @@
     </div>
 
     <div class="umb-group-builder__groups" ui-sortable="sortableOptionsGroup" ng-model="model.groups">
-        <div ng-repeat="(groupIndex, group) in model.groups track by group.id" ng-show="group.tabId === openTabId" ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}" data-group-id="{{group.id}}">
+        <div ng-repeat="(groupIndex, group) in model.groups track by group.key" ng-show="group.parentKey === openTabKey" ng-class="{'umb-group-builder__group-sortable': sortingMode && !group.inherited}" data-group-key="{{group.key}}">
             <umb-content-type-group
                 ng-if="group.tabState !== 'init'"
                 on-focus="activateGroup(group)"
@@ -116,7 +116,7 @@
         ng-if="!sortingMode"
         type="button"
         class="umb-group-builder__group -placeholder"
-        ng-click="addGroup(openTabId)"
+        ng-click="addGroup(openTabKey)"
         data-element="group-add">
         <localize key="contentTypeEditor_addGroup"></localize>
     </button>

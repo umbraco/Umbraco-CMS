@@ -16,6 +16,16 @@
             scope.toolbar = [];
             scope.sortingButtonKey = "general_reorder";
             scope.compositionsButtonState = "init";
+            scope.tabs = [];
+            
+            scope.$watchCollection('model.groups', (newValue, oldValue) => {
+                if (newValue && newValue.length === 0) return;
+                if (newValue === oldValue) return;
+
+                scope.tabs = $filter("filter")(scope.model.groups, (group) => {
+                    return group.parentKey === "00000000-0000-0000-0000-000000000000"
+                });
+            });
 
             function activate() {
                 setSortingOptions();
@@ -52,7 +62,7 @@
                     handle: ".umb-group-builder__tab-handle",
                     items: ".umb-group-builder__tab-sortable",
                     stop: function (event, ui) {
-                        updateSortOrder(scope.model.tabs);
+                        updateSortOrder(scope.tabs);
                     }
                 };
 
@@ -63,10 +73,10 @@
                     handle: ".umb-group-builder__group-handle",
                     items: ".umb-group-builder__group-sortable",
                     stop: function (event, ui) {
-                        const groupId = ui.item[0].dataset.groupId ? parseInt(ui.item[0].dataset.groupId) : null;
-                        const group = groupId ? scope.model.groups.find(group => group.id === parseInt(groupId)) : null;
-                        group.tabId = scope.openTabId;
-                        const groupsInTab = scope.model.groups.filter(group => group.tabId === scope.openTabId);
+                        const groupKey = ui.item[0].dataset.groupKey ? ui.item[0].dataset.groupKey : "";    
+                        const group = groupKey ? scope.model.groups.find(group => group.key === groupKey) : "";
+                        group.parentKey = scope.openTabKey;
+                        const groupsInTab = scope.model.groups.filter(group => group.parentKey === scope.openTabKey);
                         updateSortOrder(groupsInTab);
                     }
                 };
@@ -86,7 +96,7 @@
                     accept: '.umb-group-builder__property-sortable, .umb-group-builder__group-sortable',
                     tolerance : 'pointer',
                     over: function (evt, ui) {
-                        scope.openTabId = evt.target.dataset.tabId ? parseInt(evt.target.dataset.tabId) : null;
+                        scope.openTabKey = evt.target.dataset.tabKey || "";
                         scope.$evalAsync();
                     }
                 };
@@ -375,38 +385,38 @@
             };
 
             /* ---------- TABS ---------- */
-            scope.changeTab = function ({ id }) {
-                scope.openTabId = id;
+            scope.changeTab = function ({ key }) {
+                scope.openTabKey = key;
             };
 
             scope.addTab = function () {
-                scope.model.tabs = scope.model.tabs || [];
-
-                const newTabIndex = scope.model.tabs.length;
-                const lastTab = scope.model.tabs[newTabIndex - 1];
+                const newTabIndex = scope.tabs.length;
+                const lastTab = scope.tabs[newTabIndex - 1];
                 const sortOrder = lastTab && lastTab.sortOrder !== undefined ? lastTab.sortOrder + 1 : 0;
 
                 const tab = {
-                    id: newTabIndex + 1, // temp id
+                    key: String.CreateGuid(),
                     name: "",
+                    parentKey: "00000000-0000-0000-0000-000000000000",
                     sortOrder,
-                    icon: 'icon-document color-black'
+                    icon: "icon-document color-black"
                 };
 
                 if (newTabIndex === 0) {
-                    scope.model.groups.forEach(group => group.tabId = tab.id);
+                    scope.model.groups.forEach(group => group.parentKey = tab.key);
                 }
 
-                scope.model.tabs = [...scope.model.tabs, tab];
+                scope.model.groups = [...scope.model.groups, tab];
 
-                scope.openTabId = tab.id;
+                scope.openTabKey = tab.key;
 
                 scope.$broadcast('umbOverflowChecker.scrollTo', { position: 'end' });
                 scope.$broadcast('umbOverflowChecker.checkOverflow');
             };
 
-            scope.removeTab = function (index) {
-                scope.model.tabs.splice(index, 1);
+            scope.removeTab = function (tab) {
+                const index = scope.model.groups.findIndex(group => group.key === tab.key)
+                scope.model.groups.splice(index, 1);
                 scope.$broadcast('umbOverflowChecker.checkOverflow');
             };
 
@@ -418,8 +428,8 @@
                 scope.overflow = { left: overflowLeft, right: overflowRight };
             };
 
-            scope.onChangeTabSortOrderValue = function (tab) {
-                scope.model.tabs = $filter('orderBy')(scope.model.tabs, 'sortOrder');
+            scope.onChangeTabSortOrderValue = function () {
+                scope.tabs = $filter('orderBy')(scope.tabs, 'sortOrder');
             };
 
             scope.onChangeTabIcon = function (icon, color, tab) {
@@ -467,19 +477,19 @@
 
             /* ---------- GROUPS ---------- */
 
-            scope.addGroup = function (tabId) {
+            scope.addGroup = function (tabKey) {
                 scope.model.groups = scope.model.groups || [];
 
-                const groupsInTab = scope.model.groups.filter(group => group.tabId === tabId);
+                const groupsInTab = scope.model.groups.filter(group => group.parentKey === tabKey);
                 const lastGroupSortOrder = groupsInTab.length > 0 ? groupsInTab[groupsInTab.length - 1].sortOrder + 1 : 0;
 
                 const group = {
-                    id: scope.model.groups.length + 1, // temp id
+                    key: String.CreateGuid(),
                     properties: [],
                     parentTabContentTypes: [],
                     parentTabContentTypeNames: [],
                     name: "",
-                    tabId: tabId || undefined,
+                    parentKey: tabKey || "",
                     sortOrder: lastGroupSortOrder
                 };
 
@@ -513,7 +523,7 @@
             };
 
             scope.addGroupToActiveTab = function () {
-                scope.addGroup(scope.openTabId);
+                scope.addGroup(scope.openTabKey);
             };
 
             scope.changeSortOrderValue = function (group) {
@@ -526,8 +536,8 @@
             };
 
             scope.onChangeGroupSortOrderValue = function (sortedGroup) {
-                const groupsInTab = scope.model.groups.filter(group => group.tabId === sortedGroup.tabId);
-                const otherGroups = scope.model.groups.filter(group => group.tabId !== sortedGroup.tabId);
+                const groupsInTab = scope.model.groups.filter(group => group.parentKey === sortedGroup.parentKey);
+                const otherGroups = scope.model.groups.filter(group => group.parentKey !== sortedGroup.parentKey);
                 const sortedGroups = $filter('orderBy')(groupsInTab, 'sortOrder');
                 scope.model.groups = [...otherGroups, ...sortedGroups];
             };
