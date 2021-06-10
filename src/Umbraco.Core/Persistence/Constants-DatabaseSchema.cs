@@ -34,7 +34,6 @@ namespace Umbraco.Core
 
                 public const string PropertyType = /*TableNamePrefix*/ "cms" + "PropertyType";
                 public const string PropertyTypeGroup = /*TableNamePrefix*/ "cms" + "PropertyTypeGroup";
-                public const string PropertyTypeTab = "cmsPropertyTypeTab";
                 public const string PropertyData = TableNamePrefix + "PropertyData";
 
 
