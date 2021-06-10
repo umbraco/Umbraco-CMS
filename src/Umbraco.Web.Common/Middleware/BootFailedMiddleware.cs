@@ -25,10 +25,14 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
         public async Task InvokeAsync(HttpContext context, RequestDelegate next)
         {
+            // TODO: It would be possible to redirect to the installer here in debug mode while
+            // still showing the error. This would be a lot more friendly than just the YSOD.
+            // We could also then have a different installer view for when package migrations fails
+            // and to retry each one individually. Perhaps this can happen in the future.
+
             if (_runtimeState.Level == RuntimeLevel.BootFailed)
             {
                 // short circuit
-                //
 
                 if (_hostingEnvironment.IsDebugMode)
                 {

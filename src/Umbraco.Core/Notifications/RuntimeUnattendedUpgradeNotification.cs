@@ -1,4 +1,7 @@
-﻿namespace Umbraco.Cms.Core.Notifications
+using System;
+using System.Collections.Generic;
+
+namespace Umbraco.Cms.Core.Notifications
 {
     /// <summary>
     /// Used to notify when the core runtime can do an unattended upgrade.
@@ -14,9 +17,12 @@
         /// </summary>
         public UpgradeResult UnattendedUpgradeResult { get; set; } = UpgradeResult.NotRequired;
 
+        public List<Exception> UpgradeExceptions { get; } = new List<Exception>();
+
         public enum UpgradeResult
         {
             NotRequired = 0,
+            HasErrors = 1,
             CoreUpgradeComplete = 100,
             PackageMigrationComplete = 101
         }

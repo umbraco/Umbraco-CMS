@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Semver;
 
@@ -55,5 +56,10 @@ namespace Umbraco.Cms.Core.Services
         void DetermineRuntimeLevel();
 
         void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception bootFailedException = null);
+
+        /// <summary>
+        /// Returns any state data that was collected during startup
+        /// </summary>
+        IReadOnlyDictionary<string, object> StartupState { get; }
     }
 }

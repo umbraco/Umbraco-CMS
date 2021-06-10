@@ -22,12 +22,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
     /// </summary>
     public class RuntimeState : IRuntimeState
     {
+        internal const string PendingPacakgeMigrationsStateKey = "PendingPackageMigrations";
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IOptions<UnattendedSettings> _unattendedSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly ILogger<RuntimeState> _logger;
-        private readonly PackageMigrationPlanCollection _packageMigrationPlans;
+        private readonly PendingPackageMigrations _packageMigrationState;
+        private readonly Dictionary<string, object> _startupState = new Dictionary<string, object>();
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -48,14 +50,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IUmbracoVersion umbracoVersion,
             IUmbracoDatabaseFactory databaseFactory,
             ILogger<RuntimeState> logger,
-            PackageMigrationPlanCollection packageMigrationPlans)
+            PendingPackageMigrations packageMigrationState)
         {
             _globalSettings = globalSettings;
             _unattendedSettings = unattendedSettings;
             _umbracoVersion = umbracoVersion;
             _databaseFactory = databaseFactory;
             _logger = logger;
-            _packageMigrationPlans = packageMigrationPlans;
+            _packageMigrationState = packageMigrationState;
         }
 
 
@@ -82,6 +84,9 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
         /// <inheritdoc />
         public BootFailedException BootFailedException { get; internal set; }
+
+        /// <inheritdoc />
+        public IReadOnlyDictionary<string, object> StartupState => _startupState;
 
         /// <inheritdoc />
         public void DetermineRuntimeLevel()
@@ -199,9 +204,10 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     // TODO: We will need to scan for implicit migrations.
 
                     // TODO: Can we save the result of this since we'll need to re-use it?
-                    IReadOnlyList<string> packagesRequiringMigration = DoesUmbracoRequirePackageMigrations(keyValues);
+                    IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetUmbracoPendingPackageMigrations(keyValues);
                     if (packagesRequiringMigration.Count > 0)
                     {
+                        _startupState.Add(PendingPacakgeMigrationsStateKey, packagesRequiringMigration);
                         return UmbracoDatabaseState.NeedsPackageMigration;
                     }
                 }
@@ -244,41 +250,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
 
             return CurrentMigrationState != FinalMigrationState;
-        }
-
-        private IReadOnlyList<string> DoesUmbracoRequirePackageMigrations(IReadOnlyDictionary<string, string> keyValues)
-        {
-            var packageMigrationPlans = _packageMigrationPlans.ToList();
-
-            var result = new List<string>(packageMigrationPlans.Count);
-
-            foreach (PackageMigrationPlan plan in packageMigrationPlans)
-            {
-                string currentMigrationState = null;
-                var planKeyValueKey = Constants.Conventions.Migrations.KeyValuePrefix + plan.Name;
-                if (keyValues.TryGetValue(planKeyValueKey, out var value))
-                {
-                    currentMigrationState = value;
-
-                    if (plan.FinalState != value)
-                    {
-                        // Not equal so we need to run
-                        result.Add(plan.Name);
-                    }
-                }
-                else
-                {
-                    // If there is nothing in the DB then we need to run
-                    result.Add(plan.Name);
-                }
-
-                _logger.LogDebug("Final package migration for {PackagePlan} state is {FinalMigrationState}, database contains {DatabaseState}",
-                    plan.Name,
-                    plan.FinalState,
-                    currentMigrationState ?? "<null>");
-            }
-
-            return result;
         }
 
         private bool TryDbConnect(IUmbracoDatabaseFactory databaseFactory)

@@ -62,6 +62,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.Services.AddUnique<IRuntimeState, RuntimeState>();
             builder.Services.AddUnique<IRuntime, CoreRuntime>();
+            builder.Services.AddUnique<PendingPackageMigrations>();
             builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
             builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
 

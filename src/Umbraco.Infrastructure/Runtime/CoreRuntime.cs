@@ -119,10 +119,38 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
             var unattendedUpgradeNotification = new RuntimeUnattendedUpgradeNotification();
             await _eventAggregator.PublishAsync(unattendedUpgradeNotification);
-            if ((int)unattendedUpgradeNotification.UnattendedUpgradeResult >= 100)
+            switch (unattendedUpgradeNotification.UnattendedUpgradeResult)
             {
-                // upgrade is done, set reason to Run
-                DetermineRuntimeLevel();
+                case RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors:
+                    if (unattendedUpgradeNotification.UpgradeExceptions.Count == 0)
+                    {
+                        throw new InvalidOperationException("The upgrade result was " + RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors + " but no exceptions have been registered");
+                    }
+                    BootFailedException bootFailedException;
+                    if (unattendedUpgradeNotification.UpgradeExceptions.Count == 1)
+                    {
+                        bootFailedException = new BootFailedException(
+                            unattendedUpgradeNotification.UpgradeExceptions[0].Message,
+                            unattendedUpgradeNotification.UpgradeExceptions[0]);
+                    }
+                    else
+                    {
+                        bootFailedException = new BootFailedException(
+                            "Several package migrations failed" ,
+                            new AggregateException(unattendedUpgradeNotification.UpgradeExceptions));
+                    }
+                    State.Configure(
+                        RuntimeLevel.BootFailed,
+                        RuntimeLevelReason.BootFailedOnException,
+                        bootFailedException);
+                    break;
+                case RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete:
+                case RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete:
+                    // upgrade is done, set reason to Run
+                    DetermineRuntimeLevel();
+                    break;
+                case RuntimeUnattendedUpgradeNotification.UpgradeResult.NotRequired:
+                    break;
             }
 
             // create & initialize the components
@@ -160,7 +188,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             {
                 // there's already been an exception so cannot boot and no need to check
                 return;
-            } 
+            }
 
             using DisposableTimer timer = _profilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined.");
 
