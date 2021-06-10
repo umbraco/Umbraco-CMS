@@ -156,15 +156,15 @@ namespace Umbraco.Web.PropertyEditors
                             continue;
                         }
 
-                        if (!valEditors.ContainsKey(dataType.Id))
+                        if (!valEditors.TryGetValue(dataType.Id, out var valEditor))
                         {
                             var tempConfig = dataType.Configuration;
-                            var valEditor = propEditor.GetValueEditor(tempConfig);
+                            valEditor = propEditor.GetValueEditor(tempConfig);
 
                             valEditors.Add(dataType.Id, valEditor);
                         }
 
-                        var convValue = valEditors[dataType.Id].ToEditor(tempProp, dataTypeService);
+                        var convValue = valEditor.ToEditor(tempProp, dataTypeService);
 
                         // update the raw value since this is what will get serialized out
                         row.RawPropertyValues[prop.Key] = convValue;

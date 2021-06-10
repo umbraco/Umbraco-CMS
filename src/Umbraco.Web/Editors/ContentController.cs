@@ -414,22 +414,17 @@ namespace Umbraco.Web.Editors
         {
             var result = new Dictionary<Guid, ContentItemDisplay>();
 
-            using (var scope = _scopeProvider.CreateScope())
-            {
-                var contentTypes = Services.ContentTypeService.GetAll(contentTypeKeys).ToList();
+            using var scope = _scopeProvider.CreateScope(autoComplete: true);
+            var contentTypes = Services.ContentTypeService.GetAll(contentTypeKeys).ToList();
 
-                if (contentTypes.Any(contentType => contentType == null))
+            foreach (var contentType in contentTypes)
+            {
+                if (contentType is null)
                 {
                     throw new HttpResponseException(HttpStatusCode.NotFound);
                 }
 
-                foreach (var contentTypeKey in contentTypeKeys)
-                {
-                    var contentType = contentTypes.First(c => c.Key == contentTypeKey);
-                    result.Add(contentTypeKey, GetEmpty(contentType, parentId));
-                }
-
-                scope.Complete();
+                result.Add(contentType.Key, GetEmpty(contentType, parentId));
             }
 
             return result;
