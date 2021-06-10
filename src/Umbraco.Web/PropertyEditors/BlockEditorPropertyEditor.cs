@@ -26,7 +26,6 @@ namespace Umbraco.Web.PropertyEditors
         private readonly Lazy<PropertyEditorCollection> _propertyEditors;
         private readonly IDataTypeService _dataTypeService;
         private readonly IContentTypeService _contentTypeService;
-        private readonly Lazy<Dictionary<Guid, IContentType>> _contentTypes;
 
         public BlockEditorPropertyEditor(ILogger logger, Lazy<PropertyEditorCollection> propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService localizedTextService)
             : base(logger)
@@ -35,7 +34,6 @@ namespace Umbraco.Web.PropertyEditors
             _propertyEditors = propertyEditors;
             _dataTypeService = dataTypeService;
             _contentTypeService = contentTypeService;
-            _contentTypes = new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
         }
 
         // has to be lazy else circular dep in ctor
@@ -43,7 +41,7 @@ namespace Umbraco.Web.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, Logger, _contentTypes);
+        protected override IDataValueEditor CreateValueEditor() => new BlockEditorPropertyValueEditor(Attribute, PropertyEditors, _dataTypeService, _contentTypeService, _localizedTextService, Logger);
 
         internal class BlockEditorPropertyValueEditor : DataValueEditor, IDataValueReference
         {
@@ -52,14 +50,14 @@ namespace Umbraco.Web.PropertyEditors
             private readonly ILogger _logger;
             private readonly BlockEditorValues _blockEditorValues;
 
-            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger logger, Lazy<Dictionary<Guid, IContentType>> contentTypes)
+            public BlockEditorPropertyValueEditor(DataEditorAttribute attribute, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, IContentTypeService contentTypeService, ILocalizedTextService textService, ILogger logger)
                 : base(attribute)
             {
                 _propertyEditors = propertyEditors;
                 _dataTypeService = dataTypeService;
                 _logger = logger;
 
-                _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypes, _logger);
+                _blockEditorValues = new BlockEditorValues(new BlockListEditorDataConverter(), contentTypeService, _logger);
                 Validators.Add(new BlockEditorValidator(_blockEditorValues, propertyEditors, dataTypeService, textService, contentTypeService));
                 Validators.Add(new MinMaxValidator(_blockEditorValues, textService));
             }
@@ -338,9 +336,9 @@ namespace Umbraco.Web.PropertyEditors
             private readonly BlockEditorDataConverter _dataConverter;
             private readonly ILogger _logger;
 
-            public BlockEditorValues(BlockEditorDataConverter dataConverter, Lazy<Dictionary<Guid, IContentType>> contentTypes, ILogger logger)
+            public BlockEditorValues(BlockEditorDataConverter dataConverter, IContentTypeService contentTypeService, ILogger logger)
             {
-                _contentTypes = contentTypes;
+                _contentTypes = new Lazy<Dictionary<Guid, IContentType>>(() => contentTypeService.GetAll().ToDictionary(c => c.Key));
                 _dataConverter = dataConverter;
                 _logger = logger;
             }
