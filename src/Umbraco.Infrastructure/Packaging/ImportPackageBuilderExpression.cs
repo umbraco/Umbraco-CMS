@@ -1,7 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Xml.Linq;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
 
@@ -23,22 +26,33 @@ namespace Umbraco.Cms.Core.Packaging
                 throw new InvalidOperationException($"Nothing to execute, {nameof(FromEmbeddedResource)} has not been called.");
             }
 
-            // lookup the embedded resource by convention
-            Type currentType = GetType();
-            Assembly currentAssembly = currentType.Assembly;
-            var fileName = $"{currentType.Namespace}.package.xml";
-            Stream stream = currentAssembly.GetManifestResourceStream(fileName);
-            if (stream == null)
+            try
             {
-                throw new FileNotFoundException("Cannot find the embedded file.", fileName);
-            }
-            XDocument xml;
-            using (stream)
-            {
-                xml = XDocument.Load(stream);
-            }
+                // lookup the embedded resource by convention
+                Type currentType = GetType();
+                Assembly currentAssembly = currentType.Assembly;
+                var fileName = $"{currentType.Namespace}.package.xml";
+                Stream stream = currentAssembly.GetManifestResourceStream(fileName);
+                if (stream == null)
+                {
+                    throw new FileNotFoundException("Cannot find the embedded file.", fileName);
+                }
+                XDocument xml;
+                using (stream)
+                {
+                    xml = XDocument.Load(stream);
+                }
 
-            // TODO: Use the packaging service
+                InstallationSummary installationSummary = _packagingService.InstallCompiledPackageData(xml);
+
+                Logger.LogInformation($"Package migration executed. Summary: {installationSummary}");
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Package migration failed.");
+
+                // TODO: We need to exit with a status
+            }
         }
     }
 }

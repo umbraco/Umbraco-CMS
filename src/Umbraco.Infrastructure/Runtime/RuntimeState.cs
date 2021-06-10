@@ -4,20 +4,19 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Infrastructure.Runtime
 {
+
     /// <summary>
     /// Represents the state of the Umbraco runtime.
     /// </summary>
@@ -28,8 +27,6 @@ namespace Umbraco.Cms.Core
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly ILogger<RuntimeState> _logger;
-        private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
-        private readonly IEventAggregator _eventAggregator;
         private readonly PackageMigrationPlanCollection _packageMigrationPlans;
 
         /// <summary>
@@ -51,8 +48,6 @@ namespace Umbraco.Cms.Core
             IUmbracoVersion umbracoVersion,
             IUmbracoDatabaseFactory databaseFactory,
             ILogger<RuntimeState> logger,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            IEventAggregator eventAggregator,
             PackageMigrationPlanCollection packageMigrationPlans)
         {
             _globalSettings = globalSettings;
@@ -60,8 +55,6 @@ namespace Umbraco.Cms.Core
             _umbracoVersion = umbracoVersion;
             _databaseFactory = databaseFactory;
             _logger = logger;
-            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
-            _eventAggregator = eventAggregator;
             _packageMigrationPlans = packageMigrationPlans;
         }
 
@@ -227,83 +220,14 @@ namespace Umbraco.Cms.Core
             }
         }
 
-        public void Configure(RuntimeLevel level, RuntimeLevelReason reason)
+        public void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception bootFailedException = null)
         {
             Level = level;
             Reason = reason;
-        }
 
-        public void DoUnattendedInstall()
-        {
-            // unattended install is not enabled
-            if (_unattendedSettings.Value.InstallUnattended == false)
+            if (bootFailedException != null)
             {
-                return;
-            }
-
-            // no connection string set
-            if (_databaseFactory.Configured == false)
-            {
-                return;
-            }
-
-            var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
-
-            bool connect;
-            for (var i = 0; ;)
-            {
-                connect = _databaseFactory.CanConnect;
-                if (connect || ++i == tries)
-                {
-                    break;
-                }
-
-                _logger.LogDebug("Could not immediately connect to database, trying again.");
-                Thread.Sleep(1000);
-            }
-
-            // could not connect to the database
-            if (connect == false)
-            {
-                return;
-            }
-
-            using (var database = _databaseFactory.CreateDatabase())
-            {
-                var hasUmbracoTables = database.IsUmbracoInstalled();
-
-                // database has umbraco tables, assume Umbraco is already installed
-                if (hasUmbracoTables)
-                    return;
-
-                // all conditions fulfilled, do the install
-                _logger.LogInformation("Starting unattended install.");
-
-                try
-                {
-                    database.BeginTransaction();
-                    var creator = _databaseSchemaCreatorFactory.Create(database);
-                    creator.InitializeDatabaseSchema();
-                    database.CompleteTransaction();
-                    _logger.LogInformation("Unattended install completed.");
-
-                    // Emit an event with EventAggregator that unattended install completed
-                    // Then this event can be listened for and create an unattended user
-                    _eventAggregator.Publish(new UnattendedInstallNotification());
-
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogInformation(ex, "Error during unattended install.");
-                    database.AbortTransaction();
-
-                    var innerException = new UnattendedInstallException(
-                        "The database configuration failed with the following message: " + ex.Message
-                        + "\n Please check log file for additional information (can be found in '/App_Data/Logs/')");
-                    BootFailedException = new BootFailedException(innerException.Message, innerException);
-
-                    throw BootFailedException;
-                }
+                BootFailedException = new BootFailedException(bootFailedException.Message, bootFailedException);
             }
         }
 
@@ -328,7 +252,7 @@ namespace Umbraco.Cms.Core
 
             var result = new List<string>(packageMigrationPlans.Count);
 
-            foreach(PackageMigrationPlan plan in packageMigrationPlans)
+            foreach (PackageMigrationPlan plan in packageMigrationPlans)
             {
                 string currentMigrationState = null;
                 var planKeyValueKey = Constants.Conventions.Migrations.KeyValuePrefix + plan.Name;

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Semver;
 
@@ -54,8 +54,6 @@ namespace Umbraco.Cms.Core.Services
         /// </summary>
         void DetermineRuntimeLevel();
 
-        void Configure(RuntimeLevel level, RuntimeLevelReason reason);
-
-        void DoUnattendedInstall();
+        void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception bootFailedException = null);
     }
 }

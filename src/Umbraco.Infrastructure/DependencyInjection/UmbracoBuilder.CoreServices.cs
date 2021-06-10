@@ -16,6 +16,7 @@ using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -61,6 +62,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
             builder.Services.AddUnique(factory => factory.GetRequiredService<IUmbracoDatabaseFactory>().SqlContext);
             builder.Services.AddUnique<IRuntimeState, RuntimeState>();
             builder.Services.AddUnique<IRuntime, CoreRuntime>();
+            builder.AddNotificationAsyncHandler<RuntimeUnattendedInstallNotification, UnattendedInstaller>();
+            builder.AddNotificationAsyncHandler<RuntimeUnattendedUpgradeNotification, UnattendedUpgrader>();
 
             // composers
             builder
