@@ -2,14 +2,14 @@
 
     <umb-load-indicator ng-if="vm.loading"></umb-load-indicator>
 
-    <div class="umb-media-card-grid" ng-class="{'--singleMode':(vm.validationLimit.max === 1 && vm.model.value.length <= 1)}">
+    <div class="umb-media-card-grid" ng-class="{'--singleMode':(vm.validationLimit.max === 1 && vm.syncModel.length <= 1)}">
 
-        <div style="display:contents;" ui-sortable="vm.sortableOptions" ng-model="vm.model.value" ng-if="vm.loading !== true">
+        <div style="display:contents;" ui-sortable="vm.sortableOptions" ng-model="vm.syncModel" ng-if="vm.loading !== true">
 
-            <div ng-repeat="media in vm.model.value track by media.key" class="umb-media-card-grid__cell">
+            <div ng-repeat="media in vm.syncModel track by media.key" class="umb-media-card-grid__cell">
 
                 <button type="button"
-                        ng-if="vm.loading !== true && vm.allowAdd && ((vm.singleMode === true && vm.model.value.length === 0) || vm.singleMode === false)"
+                        ng-if="vm.loading !== true && vm.allowAdd && ((vm.singleMode === true && vm.syncModel.length === 0) || vm.singleMode === false)"
                         class="btn-reset umb-media-card-grid--inline-create-button"
                         ng-click="vm.addMediaAt($index, $event)"
                         ng-controller="Umbraco.PropertyEditors.MediaPicker3PropertyEditor.CreateButtonController as inlineCreateButtonCtrl"
@@ -38,12 +38,12 @@
             </div>
         </div>
 
-        <button ng-if="vm.loading !== true && ((vm.singleMode === true && vm.model.value.length === 0) || vm.singleMode !== true)"
+        <button ng-if="vm.loading !== true && ((vm.singleMode === true && vm.syncModel.length === 0) || vm.singleMode !== true)"
                 id="{{vm.model.alias}}"
                 type="button"
                 class="btn-reset umb-media-card-grid__create-button umb-outline"
                 disbled="!vm.allowAdd"
-                ng-click="vm.addMediaAt(vm.model.value.length, $event)">
+                ng-click="vm.addMediaAt(vm.syncModel.length, $event)">
                 <div>
                     <i class="icon icon-add large" aria-hidden="true"></i>
                     <localize key="general_add">Add</localize>
@@ -52,18 +52,18 @@
 
     </div>
 
-    <input type="hidden" name="minCount" ng-model="vm.model.value" val-server="minCount" />
-    <input type="hidden" name="maxCount" ng-model="vm.model.value" val-server="maxCount" />
+    <input type="hidden" name="minCount" ng-model="vm.syncModel" val-server="minCount" />
+    <input type="hidden" name="maxCount" ng-model="vm.syncModel" val-server="maxCount" />
 
     <div ng-messages="vm.propertyForm.minCount.$error">
         <div class="help text-error" ng-message="minCount">
-            <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.model.value.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
+            <localize key="validation_entriesShort" tokens="[vm.validationLimit.min, vm.validationLimit.min - vm.syncModel.length]" watch-tokens="true">Minimum %0% entries, needs <strong>%1%</strong> more.</localize>
         </div>
         <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.minCount.errorMsg">></span>
     </div>
     <div ng-messages="vm.propertyForm.maxCount.$error">
         <div class="help text-error" ng-message="maxCount">
-            <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.model.value.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
+            <localize key="validation_entriesExceed" tokens="[vm.validationLimit.max, vm.syncModel.length - vm.validationLimit.max]" watch-tokens="true">Maximum %0% entries, <strong>%1%</strong> too many.</localize>
         </div>
         <span class="help-inline" ng-message="valServer" ng-bind-html="vm.propertyForm.maxCount.errorMsg"></span>
     </div>
