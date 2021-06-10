@@ -22,8 +22,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
 
         private IPackageInstallation PackageInstallation => GetRequiredService<IPackageInstallation>();
 
-        private const string DocumentTypePickerPackage = "Document_Type_Picker_1.1.umb";
-        private const string HelloPackage = "Hello_1.0.0.zip";
+        private const string DocumentTypePickerPackage = "Document_Type_Picker_1.1.package.xml";
+        private const string HelloPackage = "Hello_1.0.0.package.xml";
 
         [Test]
         public void Can_Read_Compiled_Package_1()
