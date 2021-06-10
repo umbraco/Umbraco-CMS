@@ -228,7 +228,7 @@ namespace Umbraco.Cms.Web.Common.Views
 
             // if not possible or it is not generic then we need to create a new ViewDataDictionary
             Type nViewDataType = typeof(ViewDataDictionary<>).MakeGenericType(modelType);
-            var tViewData = new ViewDataDictionary(viewData) { Model = null }; // temp view data to copy values
+            var tViewData = new ViewDataDictionary(viewData) { Model = default(TModel) }; // temp view data to copy values
             var nViewData = (ViewDataDictionary)Activator.CreateInstance(nViewDataType, tViewData);
             return nViewData;
         }
