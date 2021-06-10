@@ -12,11 +12,12 @@
 
             <ng-form data-element="tab-icon" name="vm.tabIconForm">
                 <button
-                    type="button" 
+                    type="button"
                     class="btn-reset umb-group-builder__tab-icon"
                     ng-click="vm.openIconPicker()"
                     ng-class="{'-placeholder': !vm.tab.icon }"
-                    title="{{vm.tab.icon}}">
+                    title="{{vm.tab.icon}}"
+                    ng-disabled="vm.sorting">
                         <umb-icon class="icon {{vm.tab.icon}}" icon="{{vm.tab.icon}}" ng-if="vm.tab.icon"></umb-icon>
                         <span class="umb-group-builder__tab-icon-text" ng-if="!vm.tab.icon">
                             <localize key="settings_addIcon">Add icon</localize>
