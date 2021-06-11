@@ -11,12 +11,8 @@ namespace Umbraco.Cms.Core.Models.Packaging
     public class CompiledPackage
     {
         public FileInfo PackageFile { get; set; }
-
         public string Name { get; set; }
-
-        // TODO: Do we want this? Maybe for logging or something? 
         public InstallWarnings Warnings { get; set; } = new InstallWarnings();
-
         public IEnumerable<XElement> Macros { get; set; } // TODO: make strongly typed
         public IEnumerable<XElement> Templates { get; set; } // TODO: make strongly typed
         public IEnumerable<XElement> Stylesheets { get; set; } // TODO: make strongly typed

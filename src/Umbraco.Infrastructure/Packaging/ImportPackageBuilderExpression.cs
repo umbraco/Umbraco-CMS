@@ -1,10 +1,11 @@
 using System;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
 
-namespace Umbraco.Cms.Core.Packaging
+namespace Umbraco.Cms.Infrastructure.Packaging
 {
     internal class ImportPackageBuilderExpression : MigrationExpressionBase
     {
@@ -46,7 +47,7 @@ namespace Umbraco.Cms.Core.Packaging
             {
                 xml = PackageDataManifest;
             }
-            
+
             InstallationSummary installationSummary = _packagingService.InstallCompiledPackageData(xml);
 
             Logger.LogInformation($"Package migration executed. Summary: {installationSummary}");

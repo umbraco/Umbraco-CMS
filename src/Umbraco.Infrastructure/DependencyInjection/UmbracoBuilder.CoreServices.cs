@@ -38,6 +38,7 @@ using Umbraco.Cms.Infrastructure.Media;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.PostMigrations;
+using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Runtime;
 using Umbraco.Cms.Infrastructure.Search;

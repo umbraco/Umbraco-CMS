@@ -51,7 +51,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             var importingPackageNotification = new ImportingPackageNotification(compiledPackage.Name);
             if (_eventAggregator.PublishCancelable(importingPackageNotification))
             {
-                return new InstallationSummary();
+                return new InstallationSummary(compiledPackage.Name);
             }
 
             var summary = _packageInstallation.InstallPackageData(compiledPackage, userId, out _);

@@ -5,8 +5,6 @@ namespace Umbraco.Cms.Core.Packaging
     /// </summary>
     public interface ICreatedPackagesRepository : IPackageDefinitionRepository
     {
-        // TODO: This will need to change, it will export the XML
-
         /// <summary>
         /// Creates the package file and returns it's physical path
         /// </summary>

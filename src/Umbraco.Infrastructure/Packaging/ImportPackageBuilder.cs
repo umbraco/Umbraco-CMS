@@ -5,7 +5,7 @@ using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Cms.Core.Packaging
+namespace Umbraco.Cms.Infrastructure.Packaging
 {
     internal class ImportPackageBuilder : ExpressionBuilderBase<ImportPackageBuilderExpression>, IImportPackageBuilder, IExecutableBuilder
     {

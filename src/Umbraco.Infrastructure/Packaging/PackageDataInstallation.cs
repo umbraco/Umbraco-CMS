@@ -7,12 +7,14 @@ using System.Xml.Linq;
 using System.Xml.XPath;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Packaging;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
@@ -20,7 +22,7 @@ using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Packaging
+namespace Umbraco.Cms.Infrastructure.Packaging
 {
     public class PackageDataInstallation
     {
@@ -83,7 +85,7 @@ namespace Umbraco.Cms.Core.Packaging
         {
             using (var scope = _scopeProvider.CreateScope())
             {
-                var installationSummary = new InstallationSummary
+                var installationSummary = new InstallationSummary(compiledPackage.Name)
                 {
                     Warnings = compiledPackage.Warnings,
                     DataTypesInstalled = ImportDataTypes(compiledPackage.DataTypes.ToList(), userId),
@@ -133,10 +135,10 @@ namespace Umbraco.Cms.Core.Packaging
             int userId,
             IContentTypeBaseService<S> typeService,
             IContentServiceBase<T> service)
-        where T: class, IContentBase
-        where S: IContentTypeComposition
+        where T : class, IContentBase
+        where S : IContentTypeComposition
         {
-            return docs.SelectMany(x => ImportContentBase<T, S>(
+            return docs.SelectMany(x => ImportContentBase(
                 x.XmlData.Elements().Where(doc => (string)doc.Attribute("isDoc") == string.Empty),
                 -1,
                 importedDocumentTypes,
@@ -160,8 +162,8 @@ namespace Umbraco.Cms.Core.Packaging
             int userId,
             IContentTypeBaseService<S> typeService,
             IContentServiceBase<T> service)
-            where T: class, IContentBase
-            where S: IContentTypeComposition
+            where T : class, IContentBase
+            where S : IContentTypeComposition
         {
 
             var contents = ParseContentBaseRootXml(roots, parentId, importedDocumentTypes, typeService, service).ToList();
@@ -193,8 +195,8 @@ namespace Umbraco.Cms.Core.Packaging
             IDictionary<string, S> importedContentTypes,
             IContentTypeBaseService<S> typeService,
             IContentServiceBase<T> service)
-            where T: class, IContentBase
-            where S: IContentTypeComposition
+            where T : class, IContentBase
+            where S : IContentTypeComposition
         {
             var contents = new List<T>();
             foreach (var root in roots)
@@ -207,8 +209,9 @@ namespace Umbraco.Cms.Core.Packaging
                     importedContentTypes.Add(contentTypeAlias, contentType);
                 }
 
-                var content = CreateContentFromXml(root, importedContentTypes[contentTypeAlias], default(T), parentId, service);
-                if (content == null) continue;
+                var content = CreateContentFromXml(root, importedContentTypes[contentTypeAlias], default, parentId, service);
+                if (content == null)
+                    continue;
 
                 contents.Add(content);
 
@@ -217,7 +220,7 @@ namespace Umbraco.Cms.Core.Packaging
 
                 if (children.Count > 0)
                 {
-                    contents.AddRange(CreateContentFromXml<T, S>(children, content, importedContentTypes, typeService, service).WhereNotNull());
+                    contents.AddRange(CreateContentFromXml(children, content, importedContentTypes, typeService, service).WhereNotNull());
                 }
             }
             return contents;
@@ -229,8 +232,8 @@ namespace Umbraco.Cms.Core.Packaging
             IDictionary<string, S> importedContentTypes,
             IContentTypeBaseService<S> typeService,
             IContentServiceBase<T> service)
-            where T: class, IContentBase
-            where S: IContentTypeComposition
+            where T : class, IContentBase
+            where S : IContentTypeComposition
         {
             var list = new List<T>();
             foreach (var child in children)
@@ -254,7 +257,7 @@ namespace Umbraco.Cms.Core.Packaging
                                      select grand).ToList();
 
                 if (grandChildren.Any())
-                    list.AddRange(CreateContentFromXml(grandChildren, content,importedContentTypes, typeService, service));
+                    list.AddRange(CreateContentFromXml(grandChildren, content, importedContentTypes, typeService, service));
             }
 
             return list;
@@ -266,8 +269,8 @@ namespace Umbraco.Cms.Core.Packaging
             T parent,
             int parentId,
             IContentServiceBase<T> service)
-            where T: class, IContentBase
-            where S: IContentTypeComposition
+            where T : class, IContentBase
+            where S : IContentTypeComposition
         {
             var key = Guid.Empty;
             if (element.Attribute("key") != null && Guid.TryParse(element.Attribute("key").Value, out key))
@@ -417,7 +420,7 @@ namespace Umbraco.Cms.Core.Packaging
         /// <returns>An enumerable list of generated ContentTypes</returns>
         public IReadOnlyList<IContentType> ImportDocumentTypes(IEnumerable<XElement> docTypeElements, int userId)
         {
-            return ImportDocumentTypes<IContentType>(docTypeElements.ToList(), true, userId, _contentTypeService);
+            return ImportDocumentTypes(docTypeElements.ToList(), true, userId, _contentTypeService);
         }
 
         /// <summary>
@@ -428,7 +431,7 @@ namespace Umbraco.Cms.Core.Packaging
         /// <param name="userId">Optional id of the User performing the operation. Default is zero (admin).</param>
         /// <returns>An enumerable list of generated ContentTypes</returns>
         public IReadOnlyList<T> ImportDocumentTypes<T>(IReadOnlyCollection<XElement> unsortedDocumentTypes, bool importStructure, int userId, IContentTypeBaseService<T> service)
-        where T: class, IContentTypeComposition
+        where T : class, IContentTypeComposition
         {
             var importedContentTypes = new Dictionary<string, T>();
 
@@ -515,7 +518,8 @@ namespace Umbraco.Cms.Core.Packaging
                     var alias = documentType.Element("Info").Element("Alias").Value;
                     var structureElement = documentType.Element("Structure");
                     //Ensure that we only update ContentTypes which has actual structure-elements
-                    if (structureElement == null || structureElement.Elements().Any() == false) continue;
+                    if (structureElement == null || structureElement.Elements().Any() == false)
+                        continue;
 
                     var updated = UpdateContentTypesStructure(importedContentTypes[alias], structureElement, importedContentTypes, service);
                     updatedContentTypes.Add(updated);
@@ -627,7 +631,7 @@ namespace Umbraco.Cms.Core.Packaging
                 }
                 else
                 {
-                    return new ContentType(_shortStringHelper, (IContentType) parent, alias) as T;
+                    return new ContentType(_shortStringHelper, (IContentType)parent, alias) as T;
                 }
 
             }
@@ -731,7 +735,8 @@ namespace Umbraco.Cms.Core.Packaging
                     var template = _fileService.GetTemplate(alias.ToSafeAlias(_shortStringHelper));
                     if (template != null)
                     {
-                        if (allowedTemplates.Any(x => x.Id == template.Id)) continue;
+                        if (allowedTemplates.Any(x => x.Id == template.Id))
+                            continue;
                         allowedTemplates.Add(template);
                     }
                     else
@@ -758,7 +763,7 @@ namespace Umbraco.Cms.Core.Packaging
         }
 
         private void UpdateContentTypesTabs<T>(T contentType, XElement tabElement)
-            where T: IContentTypeComposition
+            where T : IContentTypeComposition
         {
             if (tabElement == null)
                 return;
@@ -785,7 +790,7 @@ namespace Umbraco.Cms.Core.Packaging
         }
 
         private void UpdateContentTypesProperties<T>(T contentType, XElement genericPropertiesElement)
-            where T: IContentTypeComposition
+            where T : IContentTypeComposition
         {
             var properties = genericPropertiesElement.Elements("GenericProperty");
             foreach (var property in properties)
@@ -830,9 +835,10 @@ namespace Umbraco.Cms.Core.Packaging
                         property.Element("Name").Value, dataTypeDefinitionId, property.Element("Type").Value.Trim());
 
                     //convert to a label!
-                    dataTypeDefinition = _dataTypeService.GetByEditorAlias(Cms.Core.Constants.PropertyEditors.Aliases.Label).FirstOrDefault();
+                    dataTypeDefinition = _dataTypeService.GetByEditorAlias(Constants.PropertyEditors.Aliases.Label).FirstOrDefault();
                     //if for some odd reason this isn't there then ignore
-                    if (dataTypeDefinition == null) continue;
+                    if (dataTypeDefinition == null)
+                        continue;
                 }
 
                 var sortOrder = 0;
@@ -878,7 +884,7 @@ namespace Umbraco.Cms.Core.Packaging
         }
 
         private T UpdateContentTypesStructure<T>(T contentType, XElement structureElement, IReadOnlyDictionary<string, T> importedContentTypes, IContentTypeBaseService<T> service)
-        where T: IContentTypeComposition
+        where T : IContentTypeComposition
         {
             var allowedChildren = contentType.AllowedContentTypes.ToList();
             int sortOrder = allowedChildren.Any() ? allowedChildren.Last().SortOrder : 0;
@@ -895,7 +901,8 @@ namespace Umbraco.Cms.Core.Packaging
                     continue;
                 }
 
-                if (allowedChildren.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id)) continue;
+                if (allowedChildren.Any(x => x.Id.IsValueCreated && x.Id.Value == allowedChild.Id))
+                    continue;
 
                 allowedChildren.Add(new ContentTypeSort(new Lazy<int>(() => allowedChild.Id), sortOrder, allowedChild.Alias));
                 sortOrder++;
@@ -911,7 +918,7 @@ namespace Umbraco.Cms.Core.Packaging
         /// <param name="contentTypeAlias"></param>
         /// <returns></returns>
         private S FindContentTypeByAlias<S>(string contentTypeAlias, IContentTypeBaseService<S> typeService)
-            where S: IContentTypeComposition
+            where S : IContentTypeComposition
         {
             var contentType = typeService.Get(contentTypeAlias);
 
@@ -1117,7 +1124,7 @@ namespace Umbraco.Cms.Core.Packaging
         private static bool DictionaryValueIsNew(IEnumerable<IDictionaryTranslation> translations, XElement valueElement)
         {
             return translations.All(t =>
-                String.Compare(t.Language.IsoCode, valueElement.Attribute("LanguageCultureAlias").Value,
+                string.Compare(t.Language.IsoCode, valueElement.Attribute("LanguageCultureAlias").Value,
                     StringComparison.InvariantCultureIgnoreCase) != 0
                 );
         }
@@ -1150,7 +1157,8 @@ namespace Umbraco.Cms.Core.Packaging
             {
                 var isoCode = languageElement.AttributeValue<string>("CultureAlias");
                 var existingLanguage = _localizationService.GetLanguageByIsoCode(isoCode);
-                if (existingLanguage != null) continue;
+                if (existingLanguage != null)
+                    continue;
                 var langauge = new Language(_globalSettings, isoCode)
                 {
                     CultureName = languageElement.AttributeValue<string>("FriendlyName")
@@ -1245,7 +1253,8 @@ namespace Umbraco.Cms.Core.Packaging
                         sortOrder = int.Parse(sortOrderAttribute.Value);
                     }
 
-                    if (macro.Properties.Values.Any(x => string.Equals(x.Alias, propertyAlias, StringComparison.OrdinalIgnoreCase))) continue;
+                    if (macro.Properties.Values.Any(x => string.Equals(x.Alias, propertyAlias, StringComparison.OrdinalIgnoreCase)))
+                        continue;
                     macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias));
                     sortOrder++;
                 }
@@ -1264,15 +1273,18 @@ namespace Umbraco.Cms.Core.Packaging
             foreach (var n in stylesheetElements)
             {
                 var stylesheetName = n.Element("Name")?.Value;
-                if (stylesheetName.IsNullOrWhiteSpace()) continue;
+                if (stylesheetName.IsNullOrWhiteSpace())
+                    continue;
 
                 var s = _fileService.GetStylesheetByName(stylesheetName);
                 if (s == null)
                 {
                     var fileName = n.Element("FileName")?.Value;
-                    if (fileName == null) continue;
+                    if (fileName == null)
+                        continue;
                     var content = n.Element("Content")?.Value;
-                    if (content == null) continue;
+                    if (content == null)
+                        continue;
 
                     s = new Stylesheet(fileName) { Content = content };
                     _fileService.SaveStylesheet(s);

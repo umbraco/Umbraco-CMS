@@ -12,6 +12,11 @@ namespace Umbraco.Cms.Core.Packaging
     [DataContract(IsReference = true)]
     public class InstallationSummary
     {
+        public InstallationSummary(string packageName)
+        {
+            PackageName = packageName;
+        }
+
         public InstallWarnings Warnings { get; set; } = new InstallWarnings();
 
         public IEnumerable<IDataType> DataTypesInstalled { get; set; } = Enumerable.Empty<IDataType>();
@@ -24,6 +29,7 @@ namespace Umbraco.Cms.Core.Packaging
         public IEnumerable<IFile> StylesheetsInstalled { get; set; } = Enumerable.Empty<IFile>();
         public IEnumerable<IContent> ContentInstalled { get; set; } = Enumerable.Empty<IContent>();
         public IEnumerable<IMedia> MediaInstalled { get; set; } = Enumerable.Empty<IMedia>();
+        public string PackageName { get; }
 
         public override string ToString()
         {

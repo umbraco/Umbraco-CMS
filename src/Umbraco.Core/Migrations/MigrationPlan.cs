@@ -105,7 +105,7 @@ namespace Umbraco.Cms.Core.Migrations
             where TMigration : IMigration
             => To(targetState, typeof(TMigration));
 
-        public virtual MigrationPlan To<TMigration>(Guid targetState)
+        public MigrationPlan To<TMigration>(Guid targetState)
             where TMigration : IMigration
             => To(targetState, typeof(TMigration));
 

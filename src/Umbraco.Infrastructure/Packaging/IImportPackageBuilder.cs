@@ -3,7 +3,7 @@ using System.Xml.Linq;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
-namespace Umbraco.Cms.Core.Packaging
+namespace Umbraco.Cms.Infrastructure.Packaging
 {
     public interface IImportPackageBuilder : IFluentBuilder
     {

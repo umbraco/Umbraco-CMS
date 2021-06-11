@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Infrastructure.DependencyInjection

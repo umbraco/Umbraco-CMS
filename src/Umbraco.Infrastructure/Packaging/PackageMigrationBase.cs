@@ -1,8 +1,9 @@
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Execute;
 
-namespace Umbraco.Cms.Core.Packaging
+namespace Umbraco.Cms.Infrastructure.Packaging
 {
 
     public abstract class PackageMigrationBase : MigrationBase

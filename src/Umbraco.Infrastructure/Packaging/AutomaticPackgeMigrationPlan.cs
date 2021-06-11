@@ -1,10 +1,11 @@
 using System;
 using System.Xml.Linq;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Extensions;
 
-namespace Umbraco.Cms.Core.Packaging
+namespace Umbraco.Cms.Infrastructure.Packaging
 {
     /// <summary>
     /// Used to automatically indicate that a package has an embedded package data manifest that needs to be installed
