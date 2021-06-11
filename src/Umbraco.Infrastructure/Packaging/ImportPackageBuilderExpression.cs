@@ -1,8 +1,4 @@
 using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Text;
 using System.Xml.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Services;
@@ -23,6 +19,8 @@ namespace Umbraco.Cms.Core.Packaging
         /// </summary>
         public Type EmbeddedResourceMigrationType { get; set; }
 
+        public XDocument PackageDataManifest { get; set; }
+
         public override void Execute()
         {
             if (_executed)
@@ -33,25 +31,22 @@ namespace Umbraco.Cms.Core.Packaging
             _executed = true;
             Context.BuildingExpression = false;
 
-            if (EmbeddedResourceMigrationType == null)
+            if (EmbeddedResourceMigrationType == null && PackageDataManifest == null)
             {
-                throw new InvalidOperationException($"Nothing to execute, {nameof(EmbeddedResourceMigrationType)} has not been set.");
+                throw new InvalidOperationException($"Nothing to execute, neither {nameof(EmbeddedResourceMigrationType)} or {nameof(PackageDataManifest)} has been set.");
             }
 
-            // lookup the embedded resource by convention            
-            Assembly currentAssembly = EmbeddedResourceMigrationType.Assembly;
-            var fileName = $"{EmbeddedResourceMigrationType.Namespace}.package.xml";
-            Stream stream = currentAssembly.GetManifestResourceStream(fileName);
-            if (stream == null)
-            {
-                throw new FileNotFoundException("Cannot find the embedded file.", fileName);
-            }
             XDocument xml;
-            using (stream)
+            if (EmbeddedResourceMigrationType != null)
             {
-                xml = XDocument.Load(stream);
+                // get the embedded resource
+                xml = PackageMigrationResource.GetEmbeddedPackageDataManifest(EmbeddedResourceMigrationType);
             }
-
+            else
+            {
+                xml = PackageDataManifest;
+            }
+            
             InstallationSummary installationSummary = _packagingService.InstallCompiledPackageData(xml);
 
             Logger.LogInformation($"Package migration executed. Summary: {installationSummary}");

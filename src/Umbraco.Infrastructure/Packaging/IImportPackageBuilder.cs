@@ -1,3 +1,5 @@
+using System;
+using System.Xml.Linq;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common;
 
@@ -7,5 +9,9 @@ namespace Umbraco.Cms.Core.Packaging
     {
         IExecutableBuilder FromEmbeddedResource<TPackageMigration>()
             where TPackageMigration : PackageMigrationBase;
+
+        IExecutableBuilder FromEmbeddedResource(Type packageMigrationType);
+
+        IExecutableBuilder FromXmlDataManifest(XDocument packageDataManifest);
     }
 }

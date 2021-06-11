@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Packaging
 {
@@ -40,7 +41,7 @@ namespace Umbraco.Cms.Core.Packaging
                 {
                     currentMigrationState = value;
 
-                    if (plan.FinalState != value)
+                    if (!plan.FinalState.InvariantEquals(value))
                     {
                         // Not equal so we need to run
                         pendingMigrations.Add(plan.Name);

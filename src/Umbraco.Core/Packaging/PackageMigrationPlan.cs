@@ -1,12 +1,10 @@
 using System;
-using System.IO;
-using System.Reflection;
-using System.Xml.Linq;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Packaging
-{
+{   
 
     /// <summary>
     /// Base class for package migration plans

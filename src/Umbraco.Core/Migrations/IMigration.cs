@@ -1,11 +1,11 @@
-﻿using Umbraco.Cms.Core.Composing;
+using Umbraco.Cms.Core.Composing;
 
 namespace Umbraco.Cms.Core.Migrations
 {
     /// <summary>
     /// Represents a migration.
     /// </summary>
-    public interface IMigration : IDiscoverable
+    public interface IMigration
     {
         /// <summary>
         /// Executes the migration.

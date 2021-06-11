@@ -207,7 +207,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetUmbracoPendingPackageMigrations(keyValues);
                     if (packagesRequiringMigration.Count > 0)
                     {
-                        _startupState.Add(PendingPacakgeMigrationsStateKey, packagesRequiringMigration);
+                        _startupState[PendingPacakgeMigrationsStateKey] = packagesRequiringMigration;
+
                         return UmbracoDatabaseState.NeedsPackageMigration;
                     }
                 }

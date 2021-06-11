@@ -51,8 +51,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations
 
             using (IScope scope = _scopeProvider.CreateScope(autoComplete: true))
             {
-                var context = new MigrationContext(scope.Database, _loggerFactory.CreateLogger<MigrationContext>());
-                context.PostMigrations.AddRange(plan.PostMigrationTypes);
+                var context = new MigrationContext(plan, scope.Database, _loggerFactory.CreateLogger<MigrationContext>());
 
                 while (transition != null)
                 {
