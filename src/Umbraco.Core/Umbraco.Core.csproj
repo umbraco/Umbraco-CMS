@@ -140,7 +140,7 @@
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyDataDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_0_0\Models\PropertyTypeDto80.cs" />
     <Compile Include="Migrations\Upgrade\V_8_10_0\AddPropertyTypeLabelOnTopColumn.cs" />
-    <Compile Include="Migrations\Upgrade\V_8_13_0\AddPropertyTypeTabsTable.cs" />
+    <Compile Include="Migrations\Upgrade\V_8_15_0\AddPropertyTypeGroupParentIdColumn.cs" />
     <Compile Include="Migrations\Upgrade\V_8_9_0\ExternalLoginTableUserData.cs" />
     <Compile Include="Models\Blocks\BlockEditorDataConverter.cs" />
     <Compile Include="Models\Blocks\BlockEditorData.cs" />
@@ -160,8 +160,6 @@
     <Compile Include="Models\MediaWithCrops.cs" />
     <Compile Include="Models\PublishedContent\PublishedContentTypeExtensions.cs" />
     <Compile Include="Models\RelationTypeExtensions.cs" />
-    <Compile Include="Persistence\Dtos\PropertyTypeTabReadOnlyDto.cs" />
-    <Compile Include="Persistence\Dtos\PropertyTypeTabDto.cs" />
     <Compile Include="Persistence\Repositories\IInstallationRepository.cs" />
     <Compile Include="Persistence\Repositories\Implement\InstallationRepository.cs" />
     <Compile Include="PropertyEditors\EyeDropperColorPickerConfiguration.cs" />
