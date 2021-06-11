@@ -7,6 +7,13 @@ namespace Umbraco.Cms.Core
         /// </summary>
         public static class Conventions
         {
+            public static class Migrations
+            {
+                public const string UmbracoUpgradePlanName = "Umbraco.Core";
+                public const string KeyValuePrefix = "Umbraco.Core.Upgrader.State+";
+                public const string UmbracoUpgradePlanKey = KeyValuePrefix + UmbracoUpgradePlanName;
+            }
+
             public static class PermissionCategories
             {
                 public const string ContentCategory = "content";

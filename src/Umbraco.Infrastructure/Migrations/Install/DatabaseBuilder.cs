@@ -412,7 +412,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Install
         /// configured and it is possible to connect to the database.</para>
         /// <para>Runs whichever migrations need to run.</para>
         /// </remarks>
-        public Result UpgradeSchemaAndData(MigrationPlan plan)
+        public Result UpgradeSchemaAndData(UmbracoPlan plan)
         {
             try
             {

@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Core.Cache
         /// <inheritdoc/>
         public void Handle(UmbracoApplicationStartingNotification notification)
         {
-            if (_runtimeState.Level < RuntimeLevel.Run)
+            if (_runtimeState.Level != RuntimeLevel.Run)
             {
                 return;
             }

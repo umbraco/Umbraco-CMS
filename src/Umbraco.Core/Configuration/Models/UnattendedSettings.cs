@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace Umbraco.Cms.Core.Configuration.Models
 {
@@ -24,6 +24,13 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// </summary>
         public bool UpgradeUnattended { get; set; } = false;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether unattended package migrations are enabled.
+        /// </summary>
+        /// <remarks>
+        /// This is true by default.
+        /// </remarks>
+        public bool PackageMigrationsUnattended { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value to use for creating a user with a name for Unattended Installs

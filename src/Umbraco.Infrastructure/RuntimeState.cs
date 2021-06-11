@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -7,6 +9,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -27,6 +30,7 @@ namespace Umbraco.Cms.Core
         private readonly ILogger<RuntimeState> _logger;
         private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
         private readonly IEventAggregator _eventAggregator;
+        private readonly PackageMigrationPlanCollection _packageMigrationPlans;
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -48,7 +52,8 @@ namespace Umbraco.Cms.Core
             IUmbracoDatabaseFactory databaseFactory,
             ILogger<RuntimeState> logger,
             DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            PackageMigrationPlanCollection packageMigrationPlans)
         {
             _globalSettings = globalSettings;
             _unattendedSettings = unattendedSettings;
@@ -57,6 +62,7 @@ namespace Umbraco.Cms.Core
             _logger = logger;
             _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
             _eventAggregator = eventAggregator;
+            _packageMigrationPlans = packageMigrationPlans;
         }
 
 
@@ -101,55 +107,62 @@ namespace Umbraco.Cms.Core
 
             switch (GetUmbracoDatabaseState(_databaseFactory))
             {
-                     case UmbracoDatabaseState.CannotConnect:
-                    {
-                        // cannot connect to configured database, this is bad, fail
-                        _logger.LogDebug("Could not connect to database.");
+                case UmbracoDatabaseState.CannotConnect:
+                {
+                    // cannot connect to configured database, this is bad, fail
+                    _logger.LogDebug("Could not connect to database.");
 
-                        if (_globalSettings.Value.InstallMissingDatabase)
-                        {
-                            // ok to install on a configured but missing database
-                            Level = RuntimeLevel.Install;
-                            Reason = RuntimeLevelReason.InstallMissingDatabase;
-                            return;
-                        }
-
-                        // else it is bad enough that we want to throw
-                        Reason = RuntimeLevelReason.BootFailedCannotConnectToDatabase;
-                        BootFailedException =new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
-                        throw BootFailedException;
-                    }
-                case UmbracoDatabaseState.NotInstalled:
+                    if (_globalSettings.Value.InstallMissingDatabase)
                     {
-                        // ok to install on an empty database
+                        // ok to install on a configured but missing database
                         Level = RuntimeLevel.Install;
-                        Reason = RuntimeLevelReason.InstallEmptyDatabase;
+                        Reason = RuntimeLevelReason.InstallMissingDatabase;
                         return;
                     }
-                case UmbracoDatabaseState.NeedsUpgrade:
-                    {
-                        // the db version does not match... but we do have a migration table
-                        // so, at least one valid table, so we quite probably are installed & need to upgrade
 
-                        // although the files version matches the code version, the database version does not
-                        // which means the local files have been upgraded but not the database - need to upgrade
-                        _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
-                        Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Run : RuntimeLevel.Upgrade;
-                        Reason = RuntimeLevelReason.UpgradeMigrations;
-                    }
+                    // else it is bad enough that we want to throw
+                    Reason = RuntimeLevelReason.BootFailedCannotConnectToDatabase;
+                    BootFailedException = new BootFailedException("A connection string is configured but Umbraco could not connect to the database.");
+                    throw BootFailedException;
+                }
+                case UmbracoDatabaseState.NotInstalled:
+                {
+                    // ok to install on an empty database
+                    Level = RuntimeLevel.Install;
+                    Reason = RuntimeLevelReason.InstallEmptyDatabase;
+                    return;
+                }
+                case UmbracoDatabaseState.NeedsUpgrade:
+                {
+                    // the db version does not match... but we do have a migration table
+                    // so, at least one valid table, so we quite probably are installed & need to upgrade
+
+                    // although the files version matches the code version, the database version does not
+                    // which means the local files have been upgraded but not the database - need to upgrade
+                    _logger.LogDebug("Has not reached the final upgrade step, need to upgrade Umbraco.");
+                    Level = _unattendedSettings.Value.UpgradeUnattended ? RuntimeLevel.Run : RuntimeLevel.Upgrade;
+                    Reason = RuntimeLevelReason.UpgradeMigrations;
+                }
+                break;
+                case UmbracoDatabaseState.NeedsPackageMigration:
+
+                    _logger.LogDebug("Package migrations need to execute.");
+                    Level = _unattendedSettings.Value.PackageMigrationsUnattended ? RuntimeLevel.Run : RuntimeLevel.PackageMigrations;
+                    Reason = RuntimeLevelReason.UpgradePackageMigrations;
+
                     break;
                 case UmbracoDatabaseState.Ok:
                 default:
-                    {
-                        // if we already know we want to upgrade, exit here
-                        if (Level == RuntimeLevel.Upgrade)
-                            return;
+                {
+                    // if we already know we want to upgrade, exit here
+                    if (Level == RuntimeLevel.Upgrade)
+                        return;
 
-                        // the database version matches the code & files version, all clear, can run
-                        Level = RuntimeLevel.Run;
-                        Reason = RuntimeLevelReason.Run;
-                    }
-                    break;
+                    // the database version matches the code & files version, all clear, can run
+                    Level = RuntimeLevel.Run;
+                    Reason = RuntimeLevelReason.Run;
+                }
+                break;
             }
         }
 
@@ -158,7 +171,8 @@ namespace Umbraco.Cms.Core
             Ok,
             CannotConnect,
             NotInstalled,
-            NeedsUpgrade
+            NeedsUpgrade,
+            NeedsPackageMigration
         }
 
         private UmbracoDatabaseState GetUmbracoDatabaseState(IUmbracoDatabaseFactory databaseFactory)
@@ -178,9 +192,23 @@ namespace Umbraco.Cms.Core
                         return UmbracoDatabaseState.NotInstalled;
                     }
 
-                    if (DoesUmbracoRequireUpgrade(database))
+                    // Make ONE SQL call to determine Umbraco upgrade vs package migrations state.
+                    // All will be prefixed with the same key.
+                    IReadOnlyDictionary<string, string> keyValues = database.GetFromKeyValueTable(Constants.Conventions.Migrations.KeyValuePrefix);
+
+                    // This could need both an upgrade AND package migrations to execute but
+                    // we will process them one at a time, first the upgrade, then the package migrations.
+                    if (DoesUmbracoRequireUpgrade(keyValues))
                     {
                         return UmbracoDatabaseState.NeedsUpgrade;
+                    }
+
+
+                    // TODO: Can we save the result of this since we'll need to re-use it?
+                    IReadOnlyList<string> packagesRequiringMigration = DoesUmbracoRequirePackageMigrations(keyValues);
+                    if (packagesRequiringMigration.Count > 0)
+                    {
+                        return UmbracoDatabaseState.NeedsPackageMigration;
                     }
                 }
 
@@ -206,31 +234,46 @@ namespace Umbraco.Cms.Core
 
         public void DoUnattendedInstall()
         {
-             // unattended install is not enabled
-            if (_unattendedSettings.Value.InstallUnattended == false) return;
+            // unattended install is not enabled
+            if (_unattendedSettings.Value.InstallUnattended == false)
+            {
+                return;
+            }
 
             // no connection string set
-            if (_databaseFactory.Configured == false) return;
+            if (_databaseFactory.Configured == false)
+            {
+                return;
+            }
 
-            var connect = false;
             var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
-            for (var i = 0;;)
+
+            bool connect;
+            for (var i = 0; ;)
             {
                 connect = _databaseFactory.CanConnect;
-                if (connect || ++i == tries) break;
+                if (connect || ++i == tries)
+                {
+                    break;
+                }
+
                 _logger.LogDebug("Could not immediately connect to database, trying again.");
                 Thread.Sleep(1000);
             }
 
             // could not connect to the database
-            if (connect == false) return;
+            if (connect == false)
+            {
+                return;
+            }
 
             using (var database = _databaseFactory.CreateDatabase())
             {
                 var hasUmbracoTables = database.IsUmbracoInstalled();
 
                 // database has umbraco tables, assume Umbraco is already installed
-                if (hasUmbracoTables) return;
+                if (hasUmbracoTables)
+                    return;
 
                 // all conditions fulfilled, do the install
                 _logger.LogInformation("Starting unattended install.");
@@ -263,17 +306,54 @@ namespace Umbraco.Cms.Core
             }
         }
 
-        private bool DoesUmbracoRequireUpgrade(IUmbracoDatabase database)
+        private bool DoesUmbracoRequireUpgrade(IReadOnlyDictionary<string, string> keyValues)
         {
             var upgrader = new Upgrader(new UmbracoPlan(_umbracoVersion));
             var stateValueKey = upgrader.StateValueKey;
 
-            CurrentMigrationState = database.GetFromKeyValueTable(stateValueKey);
+            _ = keyValues.TryGetValue(stateValueKey, out var value);
+
+            CurrentMigrationState = value;
             FinalMigrationState = upgrader.Plan.FinalState;
 
             _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
 
             return CurrentMigrationState != FinalMigrationState;
+        }
+
+        private IReadOnlyList<string> DoesUmbracoRequirePackageMigrations(IReadOnlyDictionary<string, string> keyValues)
+        {
+            var packageMigrationPlans = _packageMigrationPlans.ToList();
+
+            var result = new List<string>(packageMigrationPlans.Count);
+
+            foreach(PackageMigrationPlan plan in packageMigrationPlans)
+            {
+                string currentMigrationState = null;
+                var planKeyValueKey = Constants.Conventions.Migrations.KeyValuePrefix + plan.Name;
+                if (keyValues.TryGetValue(planKeyValueKey, out var value))
+                {
+                    currentMigrationState = value;
+
+                    if (plan.FinalState != value)
+                    {
+                        // Not equal so we need to run
+                        result.Add(plan.Name);
+                    }
+                }
+                else
+                {
+                    // If there is nothing in the DB then we need to run
+                    result.Add(plan.Name);
+                }
+
+                _logger.LogDebug("Final package migration for {PackagePlan} state is {FinalMigrationState}, database contains {DatabaseState}",
+                    plan.Name,
+                    plan.FinalState,
+                    currentMigrationState ?? "<null>");
+            }
+
+            return result;
         }
 
         private bool TryDbConnect(IUmbracoDatabaseFactory databaseFactory)
@@ -285,7 +365,8 @@ namespace Umbraco.Cms.Core
             for (var i = 0; ;)
             {
                 canConnect = databaseFactory.CanConnect;
-                if (canConnect || ++i == tries) break;
+                if (canConnect || ++i == tries)
+                    break;
                 _logger.LogDebug("Could not immediately connect to database, trying again.");
                 Thread.Sleep(1000);
             }

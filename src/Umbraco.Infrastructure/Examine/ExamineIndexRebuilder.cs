@@ -112,7 +112,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
             }
         }
 
-        private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level >= RuntimeLevel.Run;
+        private bool CanRun() => _mainDom.IsMainDom && _runtimeState.Level == RuntimeLevel.Run;
 
         private void RebuildIndex(string indexName, TimeSpan delay, CancellationToken cancellationToken)
         {

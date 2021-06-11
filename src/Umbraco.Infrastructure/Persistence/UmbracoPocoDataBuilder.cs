@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
@@ -33,6 +33,8 @@ namespace Umbraco.Cms.Infrastructure.Persistence
         {
             var columnInfo = base.GetColumnInfo(mi, type);
 
+            // TODO: Is this upgrade flag still relevant? It's a lot of hacking to just set this value
+            // including the interface method ConfigureForUpgrade for this one circumstance.
             if (_upgrading)
             {
                 if (type == typeof(UserDto) && mi.Name == "TourData") columnInfo.IgnoreColumn = true;

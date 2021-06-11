@@ -8,6 +8,7 @@ using Umbraco.Cms.Core.HealthChecks;
 using Umbraco.Cms.Core.HealthChecks.NotificationMethods;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Media.EmbedProviders;
+using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.Validators;
 using Umbraco.Cms.Core.Routing;
@@ -32,7 +33,9 @@ namespace Umbraco.Cms.Core.DependencyInjection
         {
             builder.CacheRefreshers().Add(() => builder.TypeLoader.GetCacheRefreshers());
             builder.DataEditors().Add(() => builder.TypeLoader.GetDataEditors());
-            builder.Actions().Add(() => builder.TypeLoader.GetTypes<IAction>());
+            builder.Actions().Add(() => builder.TypeLoader.GetActions());
+            builder.PackageMigrationPlans().Add(() => builder.TypeLoader.GetPackageMigrationPlans());
+
             // register known content apps
             builder.ContentApps()
                 .Append<ListViewContentAppFactory>()
@@ -42,6 +45,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
                 .Append<ContentTypeListViewContentAppFactory>()
                 .Append<ContentTypePermissionsContentAppFactory>()
                 .Append<ContentTypeTemplatesContentAppFactory>();
+
             // all built-in finders in the correct order,
             // devs can then modify this list on application startup
             builder.ContentFinders()
@@ -115,6 +119,13 @@ namespace Umbraco.Cms.Core.DependencyInjection
             builder.SearchableTrees().Add(() => builder.TypeLoader.GetTypes<ISearchableTree>());
             builder.BackOfficeAssets();
         }
+
+        /// <summary>
+        /// Gets the package migration plans collection builder.
+        /// </summary>
+        /// <param name="builder">The builder.</param>
+        public static PackageMigrationPlanCollectionBuilder PackageMigrationPlans(this IUmbracoBuilder builder)
+            => builder.WithCollectionBuilder<PackageMigrationPlanCollectionBuilder>();
 
         /// <summary>
         /// Gets the actions collection builder.

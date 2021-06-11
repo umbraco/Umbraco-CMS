@@ -1,4 +1,5 @@
 using System;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
@@ -13,10 +14,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
         /// <summary>
         /// Initializes a new instance of the <see ref="Upgrader"/> class.
         /// </summary>
-        public Upgrader(MigrationPlan plan)
-        {
-            Plan = plan;
-        }
+        public Upgrader(MigrationPlan plan) => Plan = plan;
 
         /// <summary>
         /// Gets the name of the migration plan.
@@ -31,7 +29,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
         /// <summary>
         /// Gets the key for the state value.
         /// </summary>
-        public virtual string StateValueKey => "Umbraco.Core.Upgrader.State+" + Name;
+        public virtual string StateValueKey => Constants.Conventions.Migrations.KeyValuePrefix + Name;
 
         /// <summary>
         /// Executes.

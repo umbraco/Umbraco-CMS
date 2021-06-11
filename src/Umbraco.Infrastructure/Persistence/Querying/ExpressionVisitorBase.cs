@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -453,19 +453,19 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
                     else
                         goto case "Contains**String";
 
-                case "SqlWildcard":
+                case nameof(SqlExpressionExtensions.SqlWildcard):
                 case "StartsWith":
                 case "EndsWith":
                 case "Contains**String": // see "Contains" above
                 case "Equals":
-                case "SqlStartsWith":
-                case "SqlEndsWith":
-                case "SqlContains":
-                case "SqlEquals":
-                case "InvariantStartsWith":
-                case "InvariantEndsWith":
-                case "InvariantContains":
-                case "InvariantEquals":
+                case nameof(SqlExpressionExtensions.SqlStartsWith):
+                case nameof(SqlExpressionExtensions.SqlEndsWith):
+                case nameof(SqlExpressionExtensions.SqlContains):
+                case nameof(SqlExpressionExtensions.SqlEquals):
+                case nameof(StringExtensions.InvariantStartsWith):
+                case nameof(StringExtensions.InvariantEndsWith):
+                case nameof(StringExtensions.InvariantContains):
+                case nameof(StringExtensions.InvariantEquals):                
 
                     string compareValue;
 
@@ -699,31 +699,31 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
         {
             switch (verb)
             {
-                case "SqlWildcard":
+                case nameof(SqlExpressionExtensions.SqlWildcard):
                     SqlParameters.Add(RemoveQuote(val));
                     return Visited ? string.Empty : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
 
                 case "Equals":
-                case "InvariantEquals":
-                case "SqlEquals":
+                case nameof(StringExtensions.InvariantEquals):
+                case nameof(SqlExpressionExtensions.SqlEquals):
                     SqlParameters.Add(RemoveQuote(val));
                     return Visited ? string.Empty : SqlSyntax.GetStringColumnEqualComparison(col, SqlParameters.Count - 1, columnType);
 
                 case "StartsWith":
-                case "InvariantStartsWith":
-                case "SqlStartsWith":
+                case nameof(StringExtensions.InvariantStartsWith):
+                case nameof(SqlExpressionExtensions.SqlStartsWith):
                     SqlParameters.Add(RemoveQuote(val) + SqlSyntax.GetWildcardPlaceholder());
                     return Visited ? string.Empty : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
 
                 case "EndsWith":
-                case "InvariantEndsWith":
-                case "SqlEndsWith":
+                case nameof(StringExtensions.InvariantEndsWith):
+                case nameof(SqlExpressionExtensions.SqlEndsWith):
                     SqlParameters.Add(SqlSyntax.GetWildcardPlaceholder() + RemoveQuote(val));
                     return Visited ? string.Empty : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
 
                 case "Contains":
-                case "InvariantContains":
-                case "SqlContains":
+                case nameof(StringExtensions.InvariantContains):
+                case nameof(SqlExpressionExtensions.SqlContains):
                     var wildcardPlaceholder = SqlSyntax.GetWildcardPlaceholder();
                     SqlParameters.Add(wildcardPlaceholder + RemoveQuote(val) + wildcardPlaceholder);
                     return Visited ? string.Empty : SqlSyntax.GetStringColumnWildcardComparison(col, SqlParameters.Count - 1, columnType);
