@@ -3,9 +3,9 @@ using Umbraco.Core.Persistence.Dtos;
 
 namespace Umbraco.Core.Migrations.Upgrade.V_8_15_0
 {
-    public class AddPropertyTypeGroupParentIdColumn : MigrationBase
+    public class AddPropertyTypeGroupColumns : MigrationBase
     {
-        public AddPropertyTypeGroupParentIdColumn(IMigrationContext context)
+        public AddPropertyTypeGroupColumns(IMigrationContext context)
             : base(context)
         { }
 
@@ -14,6 +14,7 @@ namespace Umbraco.Core.Migrations.Upgrade.V_8_15_0
             var columns = SqlSyntax.GetColumnsInSchema(Context.Database).ToList();
           
             AddColumnIfNotExists<PropertyTypeGroupDto>(columns, "parentId");
+            AddColumnIfNotExists<PropertyTypeGroupDto>(columns, "icon");
         }
     }
 }
