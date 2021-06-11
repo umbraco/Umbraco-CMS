@@ -1,4 +1,4 @@
-<div ng-click="vm.click()" class="umb-group-builder__tab" ng-class="{'is-active': vm.isOpen, 'is-inherited': vm.tab.inherited, 'umb-group-builder__tab-handle -sortable': vm.sorting && !vm.tab.inherited}">
+<div ng-click="vm.click()" class="umb-group-builder__tab" ng-class="{'is-active': vm.isOpen, 'is-inherited': vm.tab.inherited, 'umb-group-builder__tab-handle -sortable': vm.sorting && !vm.tab.inherited, 'has-error': vm.tab.hasError}">
   <div>
       <div class="umb-group-builder__tab-inherited-label" ng-if="vm.tab.inherited">
           <localize key="contentTypeEditor_inheritedFrom"></localize>: {{ vm.tab.inheritedFromName }}
@@ -41,7 +41,8 @@
                     umb-auto-focus
                     umb-auto-resize
                     val-server-field="{{ vm.valServerFieldName }}"
-                    data-lpignore="true" />
+                    data-lpignore="true"
+                    required />
                 
                 <div class="umb-group-builder__tab-val-message" ng-messages="tabNameForm.tabName.$error" show-validation-on-submit>
                     <div class="umb-validation-label -arrow-bottom" ng-message="valServerField">{{tabNameForm.tabName.errorMsg}}</div>

@@ -436,6 +436,15 @@
                 tab.icon = color ? icon + ' ' + color : icon;
             };
 
+            scope.getTabServerFieldName = function (tab) {
+                if (!tab) {
+                    return;
+                }
+
+                const indexInGroup = scope.model.groups.findIndex(group => group.key === tab.key);
+                return `Groups[${indexInGroup}].Name`;
+            };
+
             scope.addNewProperty = function (group) {
                 let newProperty = {
                     label: null,

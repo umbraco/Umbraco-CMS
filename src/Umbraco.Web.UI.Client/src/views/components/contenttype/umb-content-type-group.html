@@ -1,5 +1,5 @@
 <div data-element="group-{{vm.group.name}}" class="umb-group-builder__group" ng-class="{'-inherited': vm.group.inherited, 'umb-group-builder__group-handle -sortable': vm.sorting && !vm.group.inherited}" tabindex="0" ng-focus="vm.whenFocus()">
-    <ng-form name="groupForm{{vm.group.id}}">
+    <ng-form name="{{ vm.formName }}">
         <div class="umb-group-builder__group-title-wrapper" ng-if="vm.allowName">
 
             <ng-form name="groupNameForm" data-element="group-name">
@@ -21,7 +21,7 @@
                             val-server-field="{{vm.valServerFieldName}}"
                             data-lpignore="true" />
 
-                    <div ng-messages="groupNameForm.groupName.$error" show-validation-on-submit>
+                    <div class="umb-group-builder__group-title-val-message" ng-messages="groupNameForm.groupName.$error" show-validation-on-submit>
                         <div class="umb-validation-label -arrow-left" ng-message="valServerField">{{groupNameForm.groupName.errorMsg}}</div>
                         <div class="umb-validation-label -arrow-left" ng-message="required"><localize key="required"></localize></div>
                     </div>
