@@ -44,7 +44,7 @@
         <Content Remove="umbraco\MediaCache\**" />
     </ItemGroup>
 
-    <!-- Set this to true if ModelsBuilder mode is not PureLive -->
+    <!-- Set this to true if ModelsBuilder mode is not InMemoryAuto-->
     <PropertyGroup>
         <RazorCompileOnBuild>false</RazorCompileOnBuild>
     </PropertyGroup>
