@@ -391,11 +391,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 case IMediaType m:
                     if (parent is null)
                     {
-                        return new Models.Media(name, parentId, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
+                        return new Core.Models.Media(name, parentId, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
                     }
                     else
                     {
-                        return new Models.Media(name, (IMedia)parent, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
+                        return new Core.Models.Media(name, (IMedia)parent, m) { Key = key, Level = level, SortOrder = sortOrder, } as T;
                     }
 
                 default:
