@@ -113,7 +113,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Migrations
             TestMigration.MigrateCount = 0;
             TestPostMigration.MigrateCount = 0;
 
-            new MigrationContext(database, s_loggerFactory.CreateLogger<MigrationContext>());
+            new MigrationContext(plan, database, s_loggerFactory.CreateLogger<MigrationContext>());
 
             var upgrader = new Upgrader(plan);
             IMigrationPlanExecutor executor = GetMigrationPlanExecutor(scopeProvider, builder);

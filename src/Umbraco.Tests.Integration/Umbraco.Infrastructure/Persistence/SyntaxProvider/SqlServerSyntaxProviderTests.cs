@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -6,6 +6,7 @@ using Moq;
 using NPoco;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Common.Expressions;
 using Umbraco.Cms.Infrastructure.Migrations.Expressions.Create.Index;
@@ -26,6 +27,20 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Synta
     public class SqlServerSyntaxProviderTests : UmbracoIntegrationTest
     {
         private ISqlContext SqlContext => GetRequiredService<IUmbracoDatabaseFactory>().SqlContext;
+        private SqlServerSyntaxProvider GetSqlSyntax() => new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
+        private class TestPlan : MigrationPlan
+        {
+            public TestPlan() : base("Test")
+            {
+            }
+        }
+        private MigrationContext GetMigrationContext(out TestDatabase db)
+        {
+            ILogger<MigrationContext> logger = Mock.Of<ILogger<MigrationContext>>();
+            SqlServerSyntaxProvider sqlSyntax = GetSqlSyntax();
+            db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
+            return new MigrationContext(new TestPlan(), db, logger);
+        }
 
         [UmbracoTest(Database = UmbracoTestOptions.Database.NewEmptyPerTest)]
         [Test]
@@ -80,19 +95,19 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void Format_SqlServer_NonClusteredIndexDefinition_AddsNonClusteredDirective()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
+            SqlServerSyntaxProvider sqlSyntax = GetSqlSyntax();
 
             var indexDefinition = CreateIndexDefinition();
             indexDefinition.IndexType = IndexTypes.NonClustered;
 
             var actual = sqlSyntax.Format(indexDefinition);
-            Assert.AreEqual("CREATE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", actual);
+            Assert.AreEqual("CREATE NONCLUSTERED INDEX [IX_A] ON [TheTable] ([A])", actual);            
         }
 
         [Test]
         public void Format_SqlServer_NonClusteredIndexDefinition_UsingIsClusteredFalse_AddsClusteredDirective()
         {
-            var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
+            SqlServerSyntaxProvider sqlSyntax = GetSqlSyntax();
 
             var indexDefinition = CreateIndexDefinition();
             indexDefinition.IndexType = IndexTypes.Clustered;
@@ -104,10 +119,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void CreateIndexBuilder_SqlServer_NonClustered_CreatesNonClusteredIndex()
         {
-            var logger = Mock.Of<ILogger<MigrationContext>>();
-            var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
-            var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
-            var context = new MigrationContext(db, logger);
+            var context = GetMigrationContext(out var db);
 
             var createExpression = new CreateIndexExpression(context)
             {
@@ -125,10 +137,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void CreateIndexBuilder_SqlServer_Unique_CreatesUniqueNonClusteredIndex()
         {
-            var logger = Mock.Of<ILogger<MigrationContext>>();
-            var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
-            var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
-            var context = new MigrationContext(db, logger);
+            var context = GetMigrationContext(out var db);
 
             var createExpression = new CreateIndexExpression(context)
             {
@@ -146,10 +155,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void CreateIndexBuilder_SqlServer_Unique_CreatesUniqueNonClusteredIndex_Multi_Columnn()
         {
-            var logger = Mock.Of<ILogger<MigrationContext>>();
-            var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
-            var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
-            var context = new MigrationContext(db, logger);
+            var context = GetMigrationContext(out var db);
 
             var createExpression = new CreateIndexExpression(context)
             {
@@ -167,10 +173,7 @@ WHERE (([umbracoNode].[nodeObjectType] = @0))) x)".Replace(Environment.NewLine, 
         [Test]
         public void CreateIndexBuilder_SqlServer_Clustered_CreatesClusteredIndex()
         {
-            var logger = Mock.Of<ILogger<MigrationContext>>();
-            var sqlSyntax = new SqlServerSyntaxProvider(Options.Create(new GlobalSettings()));
-            var db = new TestDatabase(DatabaseType.SqlServer2005, sqlSyntax);
-            var context = new MigrationContext(db, logger);
+            var context = GetMigrationContext(out var db);
 
             var createExpression = new CreateIndexExpression(context)
             {
