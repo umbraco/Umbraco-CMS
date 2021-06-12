@@ -26,7 +26,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         public override bool IsConverter(IPublishedPropertyType propertyType) => Constants.PropertyEditors.Aliases.MultiUrlPicker.Equals(propertyType.EditorAlias);
 
         public override Type GetPropertyValueType(IPublishedPropertyType propertyType) =>
-            propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>().MaxNumber == 1 ?
+            propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>().ValidationLimit.Max== 1 ?
                 typeof(Link) :
                 typeof(IEnumerable<Link>);
 
@@ -40,7 +40,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         {
             using (_proflog.DebugDuration<MultiUrlPickerValueConverter>($"ConvertPropertyToLinks ({propertyType.DataType.Id})"))
             {
-                var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>().MaxNumber;
+                var maxNumber = propertyType.DataType.ConfigurationAs<MultiUrlPickerConfiguration>().ValidationLimit.Max;
 
                 if (inter == null)
                 {
@@ -85,7 +85,7 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 }
 
                 if (maxNumber == 1) return links.FirstOrDefault();
-                if (maxNumber > 0) return links.Take(maxNumber);
+                if (maxNumber > 0) return links.Take(maxNumber.Value);
                 return links;
             }
         }
