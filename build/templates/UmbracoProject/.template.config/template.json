@@ -112,15 +112,47 @@
             "type": "parameter",
             "datatype":"text",
             "description": "Password to use for Umbraco login when using Unattended install (Without installer wizard UI)",
-            "replaces": "PASSWORD_FROM_TEMPLATE",
             "defaultValue": ""
+        },
+        "PasswordReplaced":{
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "PASSWORD_FROM_TEMPLATE",
+            "parameters": {
+                "source": "Password",
+                "steps": [
+                    {
+                        "regex": "^test",
+                        "replacement": "[Replaced]"
+                    }
+                ]
+              }
         },
         "ConnectionString":{
             "type": "parameter",
             "datatype":"text",
             "description": "Database connection string when using Unattended install (Without installer wizard UI)",
-            "replaces": "CONNECTION_FROM_TEMPLATE",
             "defaultValue": ""
+        },
+        "ConnectionStringReplaced":{
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "CONNECTION_FROM_TEMPLATE",
+            "parameters": {
+                "source": "ConnectionString",
+                "steps": [
+                    {
+                        "regex": "\\\\",
+                        "replacement": "\\\\"
+                    },
+                    {
+                        "regex": "\\\"",
+                        "replacement": "\\\""
+                    }
+                ]
+              }
         },
         "UsingUnattenedInstall":{
             "type": "computed",
