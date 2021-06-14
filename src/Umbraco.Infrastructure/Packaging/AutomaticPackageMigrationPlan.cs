@@ -10,9 +10,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
     /// <summary>
     /// Used to automatically indicate that a package has an embedded package data manifest that needs to be installed
     /// </summary>
-    public abstract class AutomaticPackgeMigrationPlan : PackageMigrationPlan
+    public abstract class AutomaticPackageMigrationPlan : PackageMigrationPlan
     {
-        protected AutomaticPackgeMigrationPlan(string name)
+        protected AutomaticPackageMigrationPlan(string name)
             : base(name)
         {
         }
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             public override void Migrate()
             {
-                var plan = (AutomaticPackgeMigrationPlan)Context.Plan;
+                var plan = (AutomaticPackageMigrationPlan)Context.Plan;
                 XDocument xml = plan.PackageDataManifest;
                 ImportPackage.FromXmlDataManifest(xml).Do();
             }
