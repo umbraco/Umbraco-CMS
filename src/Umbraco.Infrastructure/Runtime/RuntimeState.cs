@@ -201,9 +201,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                         return UmbracoDatabaseState.NeedsUpgrade;
                     }
 
-                    // TODO: We will need to scan for implicit migrations.
-
-                    // TODO: Can we save the result of this since we'll need to re-use it?
                     IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetUmbracoPendingPackageMigrations(keyValues);
                     if (packagesRequiringMigration.Count > 0)
                     {

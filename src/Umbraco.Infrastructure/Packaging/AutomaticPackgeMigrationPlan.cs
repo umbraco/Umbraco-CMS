@@ -12,6 +12,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
     /// </summary>
     public abstract class AutomaticPackgeMigrationPlan : PackageMigrationPlan
     {
+        private XDocument _xdoc;
+
         protected AutomaticPackgeMigrationPlan(string name)
             : base(name)
         {
@@ -19,18 +21,28 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         protected sealed override void DefinePlan()
         {
-            // calculate the final state based on the hash value of the embedded resource
-            Type planType = GetType();
-            PackageDataManifest = PackageMigrationResource.GetEmbeddedPackageDataManifest(planType);
+            // calculate the final state based on the hash value of the embedded resource            
             var finalId = PackageDataManifest.ToString(SaveOptions.DisableFormatting).ToGuid();
-
             To<MigrateToPackageData>(finalId);
         }
 
         /// <summary>
-        /// Get/set the extracted package data xml manifest
+        /// Get the extracted package data xml manifest
         /// </summary>
-        private XDocument PackageDataManifest { get; set; }
+        private XDocument PackageDataManifest
+        {
+            get
+            {
+                if (_xdoc != null)
+                {
+                    return _xdoc;
+                }
+
+                Type planType = GetType();
+                _xdoc = PackageMigrationResource.GetEmbeddedPackageDataManifest(planType);
+                return _xdoc;
+            }
+        }
 
         private class MigrateToPackageData : PackageMigrationBase
         {
