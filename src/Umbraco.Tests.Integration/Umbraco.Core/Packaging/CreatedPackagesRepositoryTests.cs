@@ -11,11 +11,15 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
+using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Strings;
+using Umbraco.Cms.Tests.Common.Builders;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 using Umbraco.Extensions;
+using File = System.IO.File;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
 {
@@ -32,6 +36,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         public void DeleteTestFolder() =>
             Directory.Delete(HostingEnvironment.MapPathContentRoot("~/" + _testBaseFolder), true);
 
+        private IShortStringHelper ShortStringHelper => GetRequiredService<IShortStringHelper>();
         private IContentService ContentService => GetRequiredService<IContentService>();
 
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
@@ -62,7 +67,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             MacroService,
             LocalizationService,
             HostingEnvironment,
-            EntityXmlSerializer,            
+            EntityXmlSerializer,
             Microsoft.Extensions.Options.Options.Create(new GlobalSettings()),
             MediaService,
             MediaTypeService,
@@ -153,49 +158,34 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         [Test]
         public void Export()
         {
-            string file1 = $"~/{_testBaseFolder}/App_Plugins/MyPlugin/package.manifest";
-            string file2 = $"~/{_testBaseFolder}/App_Plugins/MyPlugin/styles.css";
-            string mappedFile1 = HostingEnvironment.MapPathContentRoot(file1);
-            string mappedFile2 = HostingEnvironment.MapPathContentRoot(file2);
-            Directory.CreateDirectory(Path.GetDirectoryName(mappedFile1));
-            Directory.CreateDirectory(Path.GetDirectoryName(mappedFile2));
-            File.WriteAllText(mappedFile1, "hello world");
-            File.WriteAllText(mappedFile2, "hello world");
+
+            var template = TemplateBuilder.CreateTextPageTemplate();
+
+            FileService.SaveTemplate(template);
 
             var def = new PackageDefinition
             {
-                Name = "test"
+                Name = "test",
+                Templates = new []{template.Id.ToString()}
             };
             bool result = PackageBuilder.SavePackage(def);
             Assert.IsTrue(result);
             Assert.IsTrue(def.PackagePath.IsNullOrWhiteSpace());
 
-            string zip = PackageBuilder.ExportPackage(def);
+            string packageXmlPath = PackageBuilder.ExportPackage(def);
 
             def = PackageBuilder.GetById(def.Id); // re-get
             Assert.IsNotNull(def.PackagePath);
 
-            using (ZipArchive archive = ZipFile.OpenRead(HostingEnvironment.MapPathWebRoot(zip)))
+            using (var packageXmlStream = File.OpenRead(packageXmlPath))
             {
-                Assert.AreEqual(1, archive.Entries.Count);
+                var xml = XDocument.Load(packageXmlStream);
+                Assert.AreEqual("umbPackage", xml.Root.Name.ToString());
 
-                // the 2 files we manually added
-                Assert.IsNotNull(archive.Entries.Where(x => x.Name == "package.manifest"));
-                Assert.IsNotNull(archive.Entries.Where(x => x.Name == "styles.css"));
+                Assert.AreEqual($"<Templates><Template><Name>Text page</Name><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>", xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
 
-                // this is the actual package definition/manifest (not the developer manifest!)
-                ZipArchiveEntry packageXml = archive.Entries.FirstOrDefault(x => x.Name == "package.xml");
-                Assert.IsNotNull(packageXml);
+                // TODO: There's a whole lot more assertions to be done
 
-                using (Stream stream = packageXml.Open())
-                {
-                    var xml = XDocument.Load(stream);
-                    Assert.AreEqual("umbPackage", xml.Root.Name.ToString());
-
-                    Assert.AreEqual("<Actions><Action alias=\"test\" /></Actions>", xml.Element("umbPackage").Element("Actions").ToString(SaveOptions.DisableFormatting));
-
-                    // TODO: There's a whole lot more assertions to be done
-                }
             }
         }
     }
