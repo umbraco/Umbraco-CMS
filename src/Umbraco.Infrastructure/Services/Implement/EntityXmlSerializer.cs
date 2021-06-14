@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -242,8 +242,11 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         private XElement Serialize(IDictionaryItem dictionaryItem)
         {
-            var xml = new XElement("DictionaryItem", new XAttribute("Key", dictionaryItem.ItemKey));
-            foreach (var translation in dictionaryItem.Translations)
+            var xml = new XElement("DictionaryItem",
+                new XAttribute("Id", dictionaryItem.Key),
+                new XAttribute("Key", dictionaryItem.ItemKey));
+
+            foreach (IDictionaryTranslation translation in dictionaryItem.Translations)
             {
                 xml.Add(new XElement("Value",
                     new XAttribute("LanguageId", translation.Language.Id),

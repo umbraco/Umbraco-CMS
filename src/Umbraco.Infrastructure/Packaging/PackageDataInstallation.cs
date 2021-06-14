@@ -1076,8 +1076,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList, List<ILanguage> languages, Guid? parentId, int userId)
         {
             var items = new List<IDictionaryItem>();
-            foreach (var dictionaryItemElement in dictionaryItemElementList)
+            foreach (XElement dictionaryItemElement in dictionaryItemElementList)
+            {
                 items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages, parentId, userId));
+            }
 
             return items;
         }
@@ -1086,12 +1088,22 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         {
             var items = new List<IDictionaryItem>();
 
+            // TODO: Key is not good enough, that is the string key, we need to use GUID
+
             IDictionaryItem dictionaryItem;
-            var key = dictionaryItemElement.Attribute("Key").Value;
-            if (_localizationService.DictionaryItemExists(key))
-                dictionaryItem = GetAndUpdateDictionaryItem(key, dictionaryItemElement, languages);
+            var itemName = dictionaryItemElement.Attribute("Key").Value;
+            var itemId = Guid.Parse(dictionaryItemElement.Attribute("Id").Value);
+
+            dictionaryItem = _localizationService.GetDictionaryItemById(itemId);
+            if (dictionaryItem != null)
+            {
+                dictionaryItem = UpdateDictionaryItem(dictionaryItem, dictionaryItemElement, languages);
+            }
             else
-                dictionaryItem = CreateNewDictionaryItem(key, dictionaryItemElement, languages, parentId);
+            {
+                dictionaryItem = CreateNewDictionaryItem(itemName, dictionaryItemElement, languages, parentId);
+            }
+
             _localizationService.Save(dictionaryItem, userId);
             items.Add(dictionaryItem);
 
@@ -1099,12 +1111,14 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return items;
         }
 
-        private IDictionaryItem GetAndUpdateDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages)
+        private IDictionaryItem UpdateDictionaryItem(IDictionaryItem dictionaryItem, XElement dictionaryItemElement, List<ILanguage> languages)
         {
-            var dictionaryItem = _localizationService.GetDictionaryItemByKey(key);
             var translations = dictionaryItem.Translations.ToList();
             foreach (var valueElement in dictionaryItemElement.Elements("Value").Where(v => DictionaryValueIsNew(translations, v)))
+            {
                 AddDictionaryTranslation(translations, valueElement, languages);
+            }
+
             dictionaryItem.Translations = translations;
             return dictionaryItem;
         }
