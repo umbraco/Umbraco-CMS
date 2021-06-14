@@ -182,7 +182,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
                 var xml = XDocument.Load(packageXmlStream);
                 Assert.AreEqual("umbPackage", xml.Root.Name.ToString());
 
-                Assert.AreEqual("<Templates><Template><Name>Text page</Name><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;\r\n@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage\r\n@{\r\n\tLayout = null;\r\n}]]></Design></Template></Templates>", xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
+                Assert.AreEqual($"<Templates><Template><Name>Text page</Name><Alias>textPage</Alias><Design><![CDATA[@using Umbraco.Cms.Web.Common.PublishedModels;{Environment.NewLine}@inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage{Environment.NewLine}@{{{Environment.NewLine}\tLayout = null;{Environment.NewLine}}}]]></Design></Template></Templates>", xml.Element("umbPackage").Element("Templates").ToString(SaveOptions.DisableFormatting));
 
                 // TODO: There's a whole lot more assertions to be done
 
