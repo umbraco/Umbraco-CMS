@@ -24,7 +24,7 @@
 
         </div>
 
-        <ul>
+        <ul ng-if="tree.root.children.length > 0">
             <umb-tree-item class="umb-animated"
                            ng-repeat="child in tree.root.children"
                            enablelistviewexpand="{{enablelistviewexpand}}"
@@ -63,7 +63,7 @@
             </umb-button-ellipsis>
         </div>
 
-        <ul>
+        <ul ng-if="group.children.length > 0">
             <umb-tree-item class="umb-animated"
                            ng-repeat="child in group.children"
                            enablelistviewexpand="{{enablelistviewexpand}}"
