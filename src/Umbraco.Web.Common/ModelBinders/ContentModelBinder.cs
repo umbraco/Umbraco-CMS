@@ -6,6 +6,7 @@ using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Web.Common.Routing;
 using Umbraco.Extensions;
 
@@ -161,7 +162,7 @@ namespace Umbraco.Cms.Web.Common.ModelBinders
             // raise event, to give model factories a chance at reporting
             // the error with more details, and optionally request that
             // the application restarts.
-            var args = new ModelBindingError(sourceType, modelType, msg);
+            var args = new ModelBindingErrorNotification(sourceType, modelType, msg);
             _eventAggregator.Publish(args);
 
             throw new ModelBindingException(msg.ToString());

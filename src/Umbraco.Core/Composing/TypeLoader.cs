@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Composing
     /// </remarks>
     public sealed class TypeLoader
     {
-        private const string CacheKey = "umbraco-types.list";
+        internal const string CacheKey = "umbraco-types.list";
 
         private readonly IAppPolicyCache _runtimeCache;
         private readonly ILogger<TypeLoader> _logger;
@@ -45,6 +45,7 @@ namespace Umbraco.Cms.Core.Composing
         private bool _reportedChange;
         private readonly DirectoryInfo _localTempPath;
         private readonly Lazy<string> _fileBasePath;
+        private readonly Dictionary<(string, string), IEnumerable<string>> EmptyCache = new Dictionary<(string, string), IEnumerable<string>>();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TypeLoader"/> class.
@@ -78,8 +79,6 @@ namespace Umbraco.Cms.Core.Composing
 
             _fileBasePath = new Lazy<string>(GetFileBasePath);
 
-            _fileBasePath = new Lazy<string>(GetFileBasePath);
-
             if (detectChanges)
             {
                 //first check if the cached hash is string.Empty, if it is then we need
@@ -92,7 +91,10 @@ namespace Umbraco.Cms.Core.Composing
                     // rescanning of all types including lazy ones.
                     // http://issues.umbraco.org/issue/U4-4789
                     var typesListFilePath = GetTypesListFilePath();
-                    DeleteFile(typesListFilePath, FileDeleteTimeout);
+                    if (typesListFilePath != null)
+                    {
+                        DeleteFile(typesListFilePath, FileDeleteTimeout);
+                    }                    
 
                     WriteCacheTypesHash();
                 }
@@ -103,7 +105,10 @@ namespace Umbraco.Cms.Core.Composing
                 // rescanning of all types including lazy ones.
                 // http://issues.umbraco.org/issue/U4-4789
                 var typesListFilePath = GetTypesListFilePath();
-                DeleteFile(typesListFilePath, FileDeleteTimeout);
+                if (typesListFilePath != null)
+                {
+                    DeleteFile(typesListFilePath, FileDeleteTimeout);
+                }
 
                 // always set to true if we're not detecting (generally only for testing)
                 RequiresRescanning = true;
@@ -162,11 +167,20 @@ namespace Umbraco.Cms.Core.Composing
             get
             {
                 if (_cachedAssembliesHash != null)
+                {
                     return _cachedAssembliesHash;
+                }
 
                 var typesHashFilePath = GetTypesHashFilePath();
-                if (!File.Exists(typesHashFilePath))
+                if (typesHashFilePath == null)
+                {
                     return string.Empty;
+                }
+
+                if (!File.Exists(typesHashFilePath))
+                {
+                    return string.Empty;
+                }
 
                 var hash = File.ReadAllText(typesHashFilePath, Encoding.UTF8);
 
@@ -198,7 +212,10 @@ namespace Umbraco.Cms.Core.Composing
         private void WriteCacheTypesHash()
         {
             var typesHashFilePath = GetTypesHashFilePath();
-            File.WriteAllText(typesHashFilePath, CurrentAssembliesHash, Encoding.UTF8);
+            if (typesHashFilePath != null)
+            {
+                File.WriteAllText(typesHashFilePath, CurrentAssembliesHash, Encoding.UTF8);
+            }   
         }
 
         #endregion
@@ -214,15 +231,18 @@ namespace Umbraco.Cms.Core.Composing
         // internal for tests
         public Attempt<IEnumerable<string>> TryGetCached(Type baseType, Type attributeType)
         {
-            var cache = _runtimeCache.GetCacheItem<Dictionary<Tuple<string, string>, IEnumerable<string>>>(CacheKey, ReadCacheSafe, TimeSpan.FromSeconds(ListFileCacheDuration));
+            var cache = _runtimeCache.GetCacheItem(CacheKey, ReadCacheSafe, TimeSpan.FromSeconds(ListFileCacheDuration));
 
-            cache.TryGetValue(Tuple.Create(baseType == null ? string.Empty : baseType.FullName, attributeType == null ? string.Empty : attributeType.FullName), out IEnumerable<string> types);
+            cache.TryGetValue(
+                (baseType == null ? string.Empty : baseType.FullName, attributeType == null ? string.Empty : attributeType.FullName),
+                out IEnumerable<string> types);
+
             return types == null
                 ? Attempt<IEnumerable<string>>.Fail()
                 : Attempt.Succeed(types);
         }
 
-        private Dictionary<Tuple<string, string>, IEnumerable<string>> ReadCacheSafe()
+        private Dictionary<(string, string), IEnumerable<string>> ReadCacheSafe()
         {
             try
             {
@@ -233,7 +253,10 @@ namespace Umbraco.Cms.Core.Composing
                 try
                 {
                     var typesListFilePath = GetTypesListFilePath();
-                    DeleteFile(typesListFilePath, FileDeleteTimeout);
+                    if (typesListFilePath != null)
+                    {
+                        DeleteFile(typesListFilePath, FileDeleteTimeout);
+                    }
                 }
                 catch
                 {
@@ -241,20 +264,19 @@ namespace Umbraco.Cms.Core.Composing
                 }
             }
 
-            return new Dictionary<Tuple<string, string>, IEnumerable<string>>();
+            return EmptyCache;
         }
 
         // internal for tests
-        public Dictionary<Tuple<string, string>, IEnumerable<string>> ReadCache()
+        public Dictionary<(string, string), IEnumerable<string>> ReadCache()
         {
-            var cache = new Dictionary<Tuple<string, string>, IEnumerable<string>>();
-
             var typesListFilePath = GetTypesListFilePath();
-            if (File.Exists(typesListFilePath) == false)
+            if (typesListFilePath == null || File.Exists(typesListFilePath) == false)
             {
-                return cache;
+                return EmptyCache;
             }
 
+            var cache = new Dictionary<(string, string), IEnumerable<string>>();
             using (var stream = GetFileStream(typesListFilePath, FileMode.Open, FileAccess.Read, FileShare.Read, ListFileOpenReadTimeout))
             using (var reader = new StreamReader(stream))
             {
@@ -288,7 +310,7 @@ namespace Umbraco.Cms.Core.Composing
                         }
                         if (type == string.Empty)
                         {
-                            cache[Tuple.Create(baseType, attributeType)] = types;
+                            cache[(baseType, attributeType)] = types;
                             break;
                         }
                         types.Add(type);
@@ -306,9 +328,9 @@ namespace Umbraco.Cms.Core.Composing
         }
 
         // internal for tests
-        public string GetTypesListFilePath() => _fileBasePath.Value + ".list";
+        public string GetTypesListFilePath() => _fileBasePath.Value == null ? null : _fileBasePath.Value + ".list";
 
-        private string GetTypesHashFilePath() => _fileBasePath.Value + ".hash";
+        private string GetTypesHashFilePath() => _fileBasePath.Value == null ? null : _fileBasePath.Value + ".hash";
 
         /// <summary>
         /// Used to produce the Lazy value of _fileBasePath
@@ -316,7 +338,12 @@ namespace Umbraco.Cms.Core.Composing
         /// <returns></returns>
         private string GetFileBasePath()
         {
-            var fileBasePath = Path.Combine(_localTempPath.FullName, "TypesCache", "umbraco-types." + NetworkHelper.FileSafeMachineName);
+            if (_localTempPath == null)
+            {
+                return null;
+            }
+
+            var fileBasePath = Path.Combine(_localTempPath.FullName, "TypesCache", "umbraco-types." + EnvironmentHelper.FileSafeMachineName);
 
             // ensure that the folder exists
             var directory = Path.GetDirectoryName(fileBasePath);
@@ -338,6 +365,11 @@ namespace Umbraco.Cms.Core.Composing
         {
             _logger.LogDebug("Writing cache file.");
             var typesListFilePath = GetTypesListFilePath();
+            if (typesListFilePath == null)
+            {
+                return;
+            }
+
             using (var stream = GetFileStream(typesListFilePath, FileMode.Create, FileAccess.Write, FileShare.None, ListFileOpenWriteTimeout))
             using (var writer = new StreamWriter(stream))
             {
@@ -394,10 +426,18 @@ namespace Umbraco.Cms.Core.Composing
         public void ClearTypesCache()
         {
             var typesListFilePath = GetTypesListFilePath();
+            if (typesListFilePath == null)
+            {
+                return;
+            }
+
             DeleteFile(typesListFilePath, FileDeleteTimeout);
 
             var typesHashFilePath = GetTypesHashFilePath();
-            DeleteFile(typesHashFilePath, FileDeleteTimeout);
+            if (typesHashFilePath != null)
+            {
+                DeleteFile(typesHashFilePath, FileDeleteTimeout);
+            }
 
             _runtimeCache.Clear(CacheKey);
         }
@@ -634,7 +674,8 @@ namespace Umbraco.Cms.Core.Composing
         }
 
         private IEnumerable<Type> GetTypesInternal(
-            Type baseType, Type attributeType,
+            Type baseType,
+            Type attributeType,
             Func<IEnumerable<Type>> finder,
             string action,
             bool cache)
@@ -692,7 +733,7 @@ namespace Umbraco.Cms.Core.Composing
             typeList = new TypeList(baseType, attributeType);
 
             var typesListFilePath = GetTypesListFilePath();
-            var scan = RequiresRescanning || File.Exists(typesListFilePath) == false;
+            var scan = RequiresRescanning || typesListFilePath == null || File.Exists(typesListFilePath) == false;
 
             if (scan)
             {

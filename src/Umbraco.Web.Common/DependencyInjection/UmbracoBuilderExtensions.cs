@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using Smidge;
@@ -30,6 +31,7 @@ using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Templates;
@@ -46,7 +48,6 @@ using Umbraco.Cms.Web.Common.ApplicationModels;
 using Umbraco.Cms.Web.Common.AspNetCore;
 using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.DependencyInjection;
-using Umbraco.Cms.Web.Common.Install;
 using Umbraco.Cms.Web.Common.Localization;
 using Umbraco.Cms.Web.Common.Macros;
 using Umbraco.Cms.Web.Common.Middleware;
@@ -196,7 +197,7 @@ namespace Umbraco.Extensions
                 options.IgnoredPaths.Remove("/content/");
             });
 
-            builder.AddNotificationHandler<UmbracoApplicationStarting, InitializeWebProfiling>();
+            builder.AddNotificationHandler<UmbracoApplicationStartingNotification, InitializeWebProfiling>();
             return builder;
         }
 
@@ -269,7 +270,7 @@ namespace Umbraco.Extensions
 
             // AspNetCore specific services
             builder.Services.AddUnique<IRequestAccessor, AspNetCoreRequestAccessor>();
-            builder.AddNotificationHandler<UmbracoRequestBegin, AspNetCoreRequestAccessor>();
+            builder.AddNotificationHandler<UmbracoRequestBeginNotification, AspNetCoreRequestAccessor>();
 
             // Password hasher
             builder.Services.AddUnique<IPasswordHasher, AspNetCorePasswordHasher>();
@@ -296,8 +297,6 @@ namespace Umbraco.Extensions
             builder.WithCollectionBuilder<UmbracoApiControllerTypeCollectionBuilder>()
                 .Add(umbracoApiControllerTypes);
 
-            builder.Services.AddUnique<InstallAreaRoutes>();
-
             builder.Services.AddUnique<UmbracoRequestLoggingMiddleware>();
             builder.Services.AddUnique<PreviewAuthenticationMiddleware>();
             builder.Services.AddUnique<UmbracoRequestMiddleware>();
@@ -315,17 +314,9 @@ namespace Umbraco.Extensions
 
             builder.AddHttpClients();
 
-            // TODO: Does this belong in web components??
-            builder.AddNuCache();
-
             return builder;
         }
 
-        public static IUmbracoBuilder AddUnattedInstallCreateUser(this IUmbracoBuilder builder)
-        {
-            builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
-            return builder;
-        }
 
         // TODO: Does this need to exist and/or be public?
         public static IUmbracoBuilder AddWebServer(this IUmbracoBuilder builder)
@@ -428,7 +419,17 @@ namespace Umbraco.Extensions
             var wrappedHostingSettings = new OptionsMonitorAdapter<HostingSettings>(hostingSettings);
             var wrappedWebRoutingSettings = new OptionsMonitorAdapter<WebRoutingSettings>(webRoutingSettings);
 
-            return new AspNetCoreHostingEnvironment(wrappedHostingSettings, wrappedWebRoutingSettings, webHostEnvironment);
+            // This is needed in order to create a unique Application Id
+            var serviceCollection = new ServiceCollection();
+            serviceCollection.AddDataProtection();
+            serviceCollection.AddSingleton<IHostEnvironment>(s => webHostEnvironment);
+            var serviceProvider = serviceCollection.BuildServiceProvider();
+
+            return new AspNetCoreHostingEnvironment(
+                serviceProvider,
+                wrappedHostingSettings,
+                wrappedWebRoutingSettings,
+                webHostEnvironment);
         }
 
     }

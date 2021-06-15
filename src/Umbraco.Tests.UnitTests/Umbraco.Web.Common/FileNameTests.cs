@@ -15,7 +15,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Tests.UnitTests.AutoFixture;
 using Umbraco.Cms.Web.BackOffice.Controllers;
-using Umbraco.Cms.Web.Common.Install;
+using Umbraco.Cms.Web.BackOffice.Install;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common
 {

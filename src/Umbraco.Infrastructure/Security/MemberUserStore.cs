@@ -1,9 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
@@ -17,13 +15,12 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
 {
-
     /// <summary>
     /// A custom user store that uses Umbraco member data
     /// </summary>
     public class MemberUserStore : UmbracoUserStore<MemberIdentityUser, UmbracoIdentityRole>, IMemberUserStore
     {
-        private const string genericIdentityErrorCode = "IdentityErrorUserStore";
+        private const string GenericIdentityErrorCode = "IdentityErrorUserStore";
         private readonly IMemberService _memberService;
         private readonly IUmbracoMapper _mapper;
         private readonly IScopeProvider _scopeProvider;
@@ -103,7 +100,7 @@ namespace Umbraco.Cms.Core.Security
             }
             catch (Exception ex)
             {
-                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = genericIdentityErrorCode, Description = ex.Message }));
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = GenericIdentityErrorCode, Description = ex.Message }));
             }
         }
 
@@ -134,7 +131,7 @@ namespace Umbraco.Cms.Core.Security
                     // we have to remember whether Logins property is dirty, since the UpdateMemberProperties will reset it.
                     var isLoginsPropertyDirty = user.IsPropertyDirty(nameof(MemberIdentityUser.Logins));
 
-                    var memberChangeType = UpdateMemberProperties(found, user);
+                    MemberDataChangeType memberChangeType = UpdateMemberProperties(found, user);
                     if (memberChangeType == MemberDataChangeType.FullSave)
                     {
                         _memberService.Save(found);
@@ -163,7 +160,7 @@ namespace Umbraco.Cms.Core.Security
             }
             catch (Exception ex)
             {
-                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = genericIdentityErrorCode, Description = ex.Message }));
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = GenericIdentityErrorCode, Description = ex.Message }));
             }
         }
 
@@ -192,7 +189,7 @@ namespace Umbraco.Cms.Core.Security
             }
             catch (Exception ex)
             {
-                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = genericIdentityErrorCode, Description = ex.Message }));
+                return Task.FromResult(IdentityResult.Failed(new IdentityError { Code = GenericIdentityErrorCode, Description = ex.Message }));
             }
         }
 
@@ -505,7 +502,7 @@ namespace Umbraco.Cms.Core.Security
 
         private MemberDataChangeType UpdateMemberProperties(IMember member, MemberIdentityUser identityUser)
         {
-            var changeType = MemberDataChangeType.None;
+            MemberDataChangeType changeType = MemberDataChangeType.None;
 
             // don't assign anything if nothing has changed as this will trigger the track changes of the model
             if (identityUser.IsPropertyDirty(nameof(MemberIdentityUser.LastLoginDateUtc))

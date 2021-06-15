@@ -30,7 +30,7 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
         var element = $(args.element);
         element.addClass('above-backdrop');
     });
-    
+
 
     //A list of query strings defined that when changed will not cause a reload of the route
     var nonRoutingQueryStrings = ["mculture", "cculture", "csegment", "lq", "sr"];
@@ -636,10 +636,10 @@ function navigationService($routeParams, $location, $q, $injector, eventsService
             if (packageTreeFolder) {
                 return (Umbraco.Sys.ServerVariables.umbracoSettings.appPluginsPath +
                     "/" + packageTreeFolder +
-                    "/backoffice/" + treeAlias + "/" + action + ".html").toLowerCase();
+                    "/backoffice/" + treeAlias + "/" + action + ".html");
             }
             else {
-                return ("views/" + treeAlias + "/" + action + ".html").toLowerCase();;
+                return ("views/" + treeAlias + "/" + action + ".html").toLowerCase();
             }
         },
 

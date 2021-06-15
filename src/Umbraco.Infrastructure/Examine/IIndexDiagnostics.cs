@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Examine;
 using Umbraco.Cms.Core;
 
 namespace Umbraco.Cms.Infrastructure.Examine
@@ -7,18 +9,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
     /// <summary>
     /// Exposes diagnostic information about an index
     /// </summary>
-    public interface IIndexDiagnostics
+    public interface IIndexDiagnostics : IIndexStats
     {
-        /// <summary>
-        /// The number of documents in the index
-        /// </summary>
-        int DocumentCount { get; }
-
-        /// <summary>
-        /// The number of fields in the index
-        /// </summary>
-        int FieldCount { get; }
-
         /// <summary>
         /// If the index can be open/read
         /// </summary>

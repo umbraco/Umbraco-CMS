@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.Migrations.Install;
@@ -30,6 +31,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly DatabaseBuilder _databaseBuilder;
         private readonly IUmbracoVersion _umbracoVersion;
+        private CancellationToken _cancellationToken;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="CoreRuntime"/> class.
@@ -67,8 +69,16 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         public IRuntimeState State { get; }
 
         /// <inheritdoc/>
+        public async Task RestartAsync()
+        {
+            await StopAsync(_cancellationToken);
+            await StartAsync(_cancellationToken);
+        }
+
+        /// <inheritdoc/>
         public async Task StartAsync(CancellationToken cancellationToken)
         {
+            _cancellationToken = cancellationToken;
             StaticApplicationLogging.Initialize(_loggerFactory);
 
             AppDomain.CurrentDomain.UnhandledException += (_, args) =>
@@ -90,6 +100,11 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
             AppDomain.CurrentDomain.SetData("DataDirectory", _hostingEnvironment?.MapPathContentRoot(Constants.SystemDirectories.Data));
 
+            // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
+            AcquireMainDom();
+
+            await _eventAggregator.PublishAsync(new UmbracoApplicationMainDomAcquiredNotification(), cancellationToken);
+
             DoUnattendedInstall();
             DetermineRuntimeLevel();
 
@@ -104,9 +119,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 throw new InvalidOperationException($"An instance of {typeof(IApplicationShutdownRegistry)} could not be resolved from the container, ensure that one if registered in your runtime before calling {nameof(IRuntime)}.{nameof(StartAsync)}");
             }
 
-            // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
-            AcquireMainDom();
-
             // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
             if (State.Reason == RuntimeLevelReason.UpgradeMigrations && State.Level == RuntimeLevel.Run)
             {
@@ -115,13 +127,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
                 // upgrade is done, set reason to Run
                 DetermineRuntimeLevel();
-
             }
 
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStarting(State.Level), cancellationToken);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationComponentsInstallingNotification(State.Level), cancellationToken);
 
             // create & initialize the components
             _components.Initialize();
+
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level), cancellationToken);
         }
 
         private void DoUnattendedUpgrade()
@@ -136,15 +149,12 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
         }
 
-        private void DoUnattendedInstall()
-        {
-            State.DoUnattendedInstall();
-        }
+        private void DoUnattendedInstall() => State.DoUnattendedInstall();
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
             _components.Terminate();
-            await _eventAggregator.PublishAsync(new UmbracoApplicationStopping(), cancellationToken);
+            await _eventAggregator.PublishAsync(new UmbracoApplicationStoppingNotification(), cancellationToken);
             StaticApplicationLogging.Initialize(null);
         }
 

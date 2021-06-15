@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.Persistence;
@@ -12,7 +13,7 @@ namespace Umbraco.Cms.Core.Cache
     /// <summary>
     /// Ensures that distributed cache events are setup and the <see cref="IServerMessenger"/> is initialized
     /// </summary>
-    public sealed class DatabaseServerMessengerNotificationHandler : INotificationHandler<UmbracoApplicationStarting>, INotificationHandler<UmbracoRequestEnd>
+    public sealed class DatabaseServerMessengerNotificationHandler : INotificationHandler<UmbracoApplicationStartingNotification>, INotificationHandler<UmbracoRequestEndNotification>
     {
         private readonly IServerMessenger _messenger;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
@@ -35,26 +36,26 @@ namespace Umbraco.Cms.Core.Cache
         }
 
         /// <inheritdoc/>
-        public void Handle(UmbracoApplicationStarting notification)
+        public void Handle(UmbracoApplicationStartingNotification notification)
         {
+            if (_runtimeState.Level < RuntimeLevel.Run)
+            {
+                return;
+            }
+
             if (_databaseFactory.CanConnect == false)
 			{
 				_logger.LogWarning("Cannot connect to the database, distributed calls will not be enabled for this server.");
-			}
-            else if (_runtimeState.Level != RuntimeLevel.Run)
-            {
-                _logger.LogWarning("Distributed calls are not available outside the Run runtime level");
+                return;
             }
-			else
-            {
-                // Sync on startup, this will run through the messenger's initialization sequence
-                _messenger?.Sync();
-            }
+
+            // Sync on startup, this will run through the messenger's initialization sequence
+            _messenger?.Sync();
         }
 
         /// <summary>
         /// Clear the batch on end request
         /// </summary>
-        public void Handle(UmbracoRequestEnd notification) => _messenger?.SendMessages();
+        public void Handle(UmbracoRequestEndNotification notification) => _messenger?.SendMessages();
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.Composing
 
         private readonly ITypeFinderConfig _typeFinderConfig;
         // used for benchmark tests
-        internal bool QueryWithReferencingAssemblies = true;
+        internal bool QueryWithReferencingAssemblies { get; set; } = true;
 
         public TypeFinder(ILogger<TypeFinder> logger, IAssemblyProvider assemblyProvider, IRuntimeHash runtimeHash, ITypeFinderConfig typeFinderConfig = null)
         {

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Collections;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Entities;
 using Umbraco.Cms.Core.Models.Packaging;
@@ -23,8 +24,8 @@ namespace Umbraco.Cms.Core.Packaging
 {
     public class PackageDataInstallation
     {
+        private readonly IDataValueEditorFactory _dataValueEditorFactory;
         private readonly ILogger<PackageDataInstallation> _logger;
-        private readonly ILoggerFactory _loggerFactory;
         private readonly IFileService _fileService;
         private readonly IMacroService _macroService;
         private readonly ILocalizationService _localizationService;
@@ -33,18 +34,16 @@ namespace Umbraco.Cms.Core.Packaging
         private readonly IScopeProvider _scopeProvider;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly GlobalSettings _globalSettings;
-        private readonly ILocalizedTextService _localizedTextService;
         private readonly IConfigurationEditorJsonSerializer _serializer;
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
-        private readonly IJsonSerializer _jsonSerializer;
         private readonly IEntityService _entityService;
         private readonly IContentTypeService _contentTypeService;
         private readonly IContentService _contentService;
 
         public PackageDataInstallation(
+            IDataValueEditorFactory dataValueEditorFactory,
             ILogger<PackageDataInstallation> logger,
-            ILoggerFactory loggerFactory,
             IFileService fileService,
             IMacroService macroService,
             ILocalizationService localizationService,
@@ -56,14 +55,12 @@ namespace Umbraco.Cms.Core.Packaging
             IScopeProvider scopeProvider,
             IShortStringHelper shortStringHelper,
             IOptions<GlobalSettings> globalSettings,
-            ILocalizedTextService localizedTextService,
             IConfigurationEditorJsonSerializer serializer,
             IMediaService mediaService,
-            IMediaTypeService mediaTypeService,
-            IJsonSerializer jsonSerializer)
+            IMediaTypeService mediaTypeService)
         {
+            _dataValueEditorFactory = dataValueEditorFactory;
             _logger = logger;
-            _loggerFactory = loggerFactory;
             _fileService = fileService;
             _macroService = macroService;
             _localizationService = localizationService;
@@ -72,9 +69,7 @@ namespace Umbraco.Cms.Core.Packaging
             _scopeProvider = scopeProvider;
             _shortStringHelper = shortStringHelper;
             _globalSettings = globalSettings.Value;
-            _localizedTextService = localizedTextService;
             _serializer = serializer;
-            _jsonSerializer = jsonSerializer;
             _mediaService = mediaService;
             _mediaTypeService = mediaTypeService;
             _entityService = entityService;
@@ -1087,7 +1082,7 @@ namespace Umbraco.Cms.Core.Packaging
 
                     var editorAlias = dataTypeElement.Attribute("Id")?.Value?.Trim();
                     if (!_propertyEditors.TryGet(editorAlias, out var editor))
-                        editor = new VoidEditor(_loggerFactory, _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper, _jsonSerializer) { Alias = editorAlias };
+                        editor = new VoidEditor(_dataValueEditorFactory) { Alias = editorAlias };
 
                     var dataType = new DataType(editor, _serializer)
                     {

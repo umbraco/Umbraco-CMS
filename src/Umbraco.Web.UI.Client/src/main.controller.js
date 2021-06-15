@@ -1,18 +1,18 @@
-/** 
+/**
  * @ngdoc controller
- * @name Umbraco.MainController  
+ * @name Umbraco.MainController
  * @function
- * 
- * @description  
+ *
+ * @description
  * The main application controller
- * 
+ *
  */
-function MainController($scope, $location, appState, treeService, notificationsService, 
-    userService, historyService, updateChecker, navigationService, eventsService, 
+function MainController($scope, $location, appState, treeService, notificationsService,
+    userService, historyService, updateChecker, navigationService, eventsService,
     tmhDynamicLocale, localStorageService, editorService, overlayService, assetsService, tinyMceAssets) {
- 
+
     //the null is important because we do an explicit bool check on this in the view
-    $scope.authenticated = null; 
+    $scope.authenticated = null;
     $scope.touchDevice = appState.getGlobalState("touchDevice");
     $scope.infiniteMode = false;
     $scope.overlay = {};
@@ -27,14 +27,14 @@ function MainController($scope, $location, appState, treeService, notificationsS
         assetsService.loadJs(tinyJsAsset, $scope);
     });
 
-    // There are a number of ways to detect when a focus state should be shown when using the tab key and this seems to be the simplest solution. 
+    // There are a number of ways to detect when a focus state should be shown when using the tab key and this seems to be the simplest solution.
     // For more information about this approach, see https://hackernoon.com/removing-that-ugly-focus-ring-and-keeping-it-too-6c8727fefcd2
     function handleFirstTab(evt) {
         if (evt.keyCode === 9) {
             enableTabbingActive();
         }
     }
-    
+
     function enableTabbingActive() {
         $scope.tabbingActive = true;
         $scope.$digest();
@@ -118,7 +118,8 @@ function MainController($scope, $location, appState, treeService, notificationsS
                         message: "Click to download",
                         sticky: true,
                         type: "info",
-                        url: update.url
+                        url: update.url,
+                        target: "_blank"
                     };
                     notificationsService.add(notification);
                 }
@@ -185,7 +186,7 @@ function MainController($scope, $location, appState, treeService, notificationsS
     evts.push(eventsService.on("appState.overlay", function (name, args) {
         $scope.overlay = args;
     }));
-    
+
     // events for tours
     evts.push(eventsService.on("appState.tour.start", function (name, args) {
         $scope.tour = args;

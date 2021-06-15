@@ -195,7 +195,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
             sb.Append("\t\tprivate IPublishedValueFallback _publishedValueFallback;");
 
             // write the ctor
-            sb.AppendFormat("\n\n\t\t// ctor\n\t\tpublic {0}(IPublished{1} content, IPublishedValueFallback publishedValueFallback)\n\t\t\t: base(content)\n\t\t{{\n\t\t\t_publishedValueFallback = publishedValueFallback;\n\t\t}}\n\n",
+            sb.AppendFormat("\n\n\t\t// ctor\n\t\tpublic {0}(IPublished{1} content, IPublishedValueFallback publishedValueFallback)\n\t\t\t: base(content, publishedValueFallback)\n\t\t{{\n\t\t\t_publishedValueFallback = publishedValueFallback;\n\t\t}}\n\n",
                 type.ClrName, type.IsElement ? "Element" : "Content");
 
             // write the properties

@@ -3,6 +3,7 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Core.Events
 {

@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
         private IDataTypeService DataTypeService => GetRequiredService<IDataTypeService>();
 
-        private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
+        private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
         private IConfigurationEditorJsonSerializer ConfigurationEditorJsonSerializer => GetRequiredService<IConfigurationEditorJsonSerializer>();
 

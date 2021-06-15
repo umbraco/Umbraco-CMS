@@ -5,11 +5,14 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Infrastructure.DependencyInjection;
+using Umbraco.Cms.Infrastructure.Examine.DependencyInjection;
 using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.BackOffice.Controllers;
 using Umbraco.Cms.Web.BackOffice.Filters;
+using Umbraco.Cms.Web.BackOffice.Install;
 using Umbraco.Cms.Web.BackOffice.Middleware;
 using Umbraco.Cms.Web.BackOffice.ModelsBuilder;
 using Umbraco.Cms.Web.BackOffice.Routing;
@@ -43,12 +46,20 @@ namespace Umbraco.Extensions
                 .AddWebServer()
                 .AddPreviewSupport()
                 .AddHostedServices()
+                .AddNuCache()
                 .AddDistributedCache()
                 .AddModelsBuilderDashboard()
-                .AddUnattedInstallCreateUser()
+                .AddUnattendedInstallInstallCreateUser()
                 .AddCoreNotifications()
                 .AddLogViewer()
-                .AddExamine();
+                .AddExamine()
+                .AddExamineIndexes();
+
+        public static IUmbracoBuilder AddUnattendedInstallInstallCreateUser(this IUmbracoBuilder builder)
+        {
+            builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
+            return builder;
+        }
 
         /// <summary>
         /// Adds Umbraco preview support
@@ -71,6 +82,7 @@ namespace Umbraco.Extensions
             builder.Services.AddSingleton<KeepAliveMiddleware>();
             builder.Services.ConfigureOptions<ConfigureGlobalOptionsForKeepAliveMiddlware>();
             builder.Services.AddUnique<ServerVariablesParser>();
+            builder.Services.AddUnique<InstallAreaRoutes>();
             builder.Services.AddUnique<BackOfficeAreaRoutes>();
             builder.Services.AddUnique<PreviewRoutes>();
             builder.AddNotificationAsyncHandler<ContentCacheRefresherNotification, PreviewHubUpdater>();

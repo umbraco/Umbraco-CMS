@@ -1763,9 +1763,9 @@ Er mwyn gweinyddu eich gwefan, agorwch swyddfa gefn Umbraco a dechreuwch ychwang
         </key>
         <key alias="sectionName">Enw Adran</key>
         <key alias="sectionMandatory">Mae Adran yn ofynnol</key>
-        <key alias="sectionMandatoryDesc">
+        <key alias="sectionMandatoryDesc"><![CDATA[
             Os yn ofynnol, rhaid i'r templed blentyn gynnwys diffiniad adran <code>@section</code>, fel arall bydd gwall yn cael ei ddangos.
-        </key>
+        ]]></key>
         <key alias="queryBuilder">Adeiladwr ymholiad</key>
         <key alias="buildQuery">Adeiladu ymholiad</key>
         <key alias="itemsReturned">o eitemau wedi dychwelyd, mewn</key>

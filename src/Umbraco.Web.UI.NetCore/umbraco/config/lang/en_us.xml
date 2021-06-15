@@ -360,7 +360,13 @@
   <area alias="member">
     <key alias="createNewMember">Create a new member</key>
     <key alias="allMembers">All Members</key>
+    <key alias="createNewMember">Create a new member</key>
+    <key alias="duplicateMemberLogin">A member with this login already exists</key>
     <key alias="memberGroupNoProperties">Member groups have no additional properties for editing.</key>
+    <key alias="memberHasGroup">The member is already in group '%0%'</key>
+    <key alias="memberHasPassword">The member already has a password set</key>
+    <key alias="memberLockoutNotEnabled">Lockout is not enabled for this member</key>
+    <key alias="memberNotInGroup">The member is not in group '%0%'</key>
   </area>
   <area alias="contentType">
      <key alias="copyFailed">Failed to copy content type</key>
@@ -369,6 +375,7 @@
   <area alias="mediaType">
      <key alias="copyFailed">Failed to copy media type</key>
      <key alias="moveFailed">Failed to move media type</key>
+     <key alias="autoPickMediaType">Auto pick</key>
   </area>
   <area alias="memberType">
      <key alias="copyFailed">Failed to copy member type</key>
@@ -656,6 +663,8 @@
     <key alias="errorRegExpWithoutTab">%0% is not in a correct format</key>
   </area>
   <area alias="errors">
+    <key alias="defaultError">An unknown failure has occurred</key>
+    <key alias="concurrencyError">Optimistic concurrency failure, object has been modified</key>
     <key alias="receivedErrorFromServer">Received an error from the server</key>
     <key alias="dissallowedMediaType">The specified file type has been disallowed by the administrator</key>
     <key alias="codemirroriewarning">NOTE! Even though CodeMirror is enabled by configuration, it is disabled in Internet Explorer because it's not stable enough.</key>
@@ -1365,6 +1374,17 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="pickedTrashedItem">You have picked a media item currently deleted or in the recycle bin</key>
     <key alias="pickedTrashedItems">You have picked media items currently deleted or in the recycle bin</key>
     <key alias="trashed">Trashed</key>
+    <key alias="openMedia">Open in Media Library</key>
+    <key alias="changeMedia">Change Media Item</key>
+    <key alias="resetMediaCrop">Reset media crop</key>
+    <key alias="editMediaEntryLabel">Edit %0% on %1%</key>
+    <key alias="confirmCancelMediaEntryCreationHeadline">Discard creation?</key>
+    <key alias="confirmCancelMediaEntryCreationMessage"><![CDATA[Are you sure you want to cancel the creation.]]></key>
+    <key alias="confirmCancelMediaEntryHasChanges">You have made changes to this content. Are you sure you want to discard them?</key>
+    <key alias="confirmRemoveMediaEntryMessage">Remove?</key>
+    <key alias="confirmRemoveAllMediaEntryMessage">Remove all medias?</key>
+    <key alias="tabClipboard">Clipboard</key>
+    <key alias="notAllowed">Not allowed</key>
   </area>
   <area alias="relatedlinks">
     <key alias="enterExternal">enter external link</key>
@@ -1444,7 +1464,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="validationFailedMessage">Validation errors must be fixed before the item can be saved</key>
     <key alias="operationFailedHeader">Failed</key>
     <key alias="operationSavedHeader">Saved</key>
-      <key alias="operationSavedHeaderReloadUser">Saved.  To view the changes please reload your browser</key>
+    <key alias="operationSavedHeaderReloadUser">Saved. To view the changes please reload your browser</key>
     <key alias="invalidUserPermissionsText">Insufficient user permissions, could not complete the operation</key>
     <key alias="operationCancelledHeader">Cancelled</key>
     <key alias="operationCancelledText">Operation was cancelled by a 3rd party add-in</key>
@@ -1590,9 +1610,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
       ]]></key>
     <key alias="sectionName">Section Name</key>
     <key alias="sectionMandatory">Section is mandatory</key>
-    <key alias="sectionMandatoryDesc">
+    <key alias="sectionMandatoryDesc"><![CDATA[
             If mandatory, the child template must contain a <code>@section</code> definition, otherwise an error is shown.
-        </key>
+    ]]></key>
     <key alias="queryBuilder">Query builder</key>
     <key alias="itemsReturned">items returned, in</key>
     <key alias="copyToClipboard">copy to clipboard</key>
@@ -1639,6 +1659,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="contentAllowed">This content is allowed here</key>
     <key alias="clickToEmbed">Click to embed</key>
     <key alias="clickToInsertImage">Click to insert image</key>
+    <key alias="clickToInsertMacro">Click to insert macro</key>
     <key alias="placeholderImageCaption">Image caption...</key>
     <key alias="placeholderWriteHere">Write here...</key>
     <key alias="gridLayouts">Grid Layouts</key>
@@ -1665,7 +1686,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="setAsDefault">Set as default</key>
     <key alias="chooseExtra">Choose extra</key>
     <key alias="chooseDefault">Choose default</key>
-    <key alias="areAdded">are added</key>
+      <key alias="areAdded">are added</key>
         <key alias="warning">Warning</key>
         <key alias="youAreDeleting">You are deleting the row configuration</key>
         <key alias="deletingARow">
@@ -1908,6 +1929,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="descriptionField">Description field</key>
     <key alias="disabled">Disable User</key>
     <key alias="documentType">Document Type</key>
+    <key alias="duplicateLogin">A user with this login already exists</key>
     <key alias="editors">Editor</key>
     <key alias="excerptField">Excerpt field</key>
     <key alias="failedPasswordAttempts">Failed login attempts</key>
@@ -1940,6 +1962,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="passwordInvalid">Invalid current password</key>
     <key alias="passwordIsDifferent">There was a difference between the new password and the confirmed password. Please try again!</key>
     <key alias="passwordMismatch">The confirmed password doesn't match the new password!</key>
+    <key alias="passwordRequiresDigit">The password must have at least one digit ('0'-'9')</key>
+    <key alias="passwordRequiresLower">The password must have at least one lowercase ('a'-'z')</key>
+    <key alias="passwordRequiresNonAlphanumeric">The password must have at least one non alphanumeric character</key>
+    <key alias="passwordRequiresUniqueChars">The password must use at least %0% different characters</key>
+    <key alias="passwordRequiresUpper">The password must have at least one uppercase ('A'-'Z')</key>
+    <key alias="passwordTooShort">The password must be at least %0% characters long</key>
     <key alias="permissionReplaceChildren">Replace child node permissions</key>
     <key alias="permissionSelectedPages">You are currently modifying permissions for the pages:</key>
     <key alias="permissionSelectPages">Select pages to modify their permissions</key>
@@ -1960,8 +1988,12 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="updateDate">User last updated</key>
     <key alias="userCreated">has been created</key>
     <key alias="userCreatedSuccessHelp">The new user has successfully been created. To log in to Umbraco use the password below.</key>
+    <key alias="userHasPassword">The user already has a password set</key>
+    <key alias="userHasGroup">The user is already in group '%0%'</key>
+    <key alias="userLockoutNotEnabled">Lockout is not enabled for this user</key>
     <key alias="userManagement">User management</key>
     <key alias="username">Name</key>
+    <key alias="userNotInGroup">The user is not in group '%0%'</key>
     <key alias="userPermissions">User permissions</key>
     <key alias="usergroup">User group</key>
     <key alias="userInvited">has been invited</key>
@@ -2111,6 +2143,14 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="invalidNull">Value cannot be null</key>
     <key alias="invalidEmpty">Value cannot be empty</key>
     <key alias="invalidPattern">Value is invalid, it does not match the correct pattern</key>
+    <key alias="invalidMemberGroupName">Invalid member group name</key>
+    <key alias="invalidUserGroupName">Invalid user group name</key>
+    <key alias="invalidToken">Invalid token</key>
+    <key alias="invalidUsername">Invalid username</key>
+    <key alias="duplicateEmail">Email '%0%' is already taken</key>
+    <key alias="duplicateUserGroupName">User group name '%0%' is already taken</key>
+    <key alias="duplicateMemberGroupName">Member group name '%0%' is already taken</key>
+    <key alias="duplicateUsername">Username '%0%' is already taken</key>
     <key alias="customValidation">Custom validation</key>
     <key alias="entriesShort"><![CDATA[Minimum %0% entries, requires <strong>%1%</strong> more.]]></key>
     <key alias="entriesExceed"><![CDATA[Maximum %0% entries, <strong>%1%</strong> too many.]]></key>
@@ -2145,6 +2185,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="trySkipIisCustomErrorsCheckErrorMessage">Try Skip IIS Custom Errors is currently '%0%'. It is recommended to set this to '%1%' for your IIS version (%2%).</key>
     <key alias="trySkipIisCustomErrorsCheckRectifySuccessMessage">Try Skip IIS Custom Errors successfully set to '%0%'.</key>
     <!-- The following keys get predefined tokens passed in that are not all the same, like above -->
+    <key alias="configurationServiceFileNotFound">File does not exist: '%0%'.</key>
     <key alias="configurationServiceNodeNotFound"><![CDATA[Unable to find <strong>'%0%'</strong> in config file <strong>'%1%'</strong>.]]></key>
     <key alias="configurationServiceError">There was an error, check log for full error: %0%.</key>
     <key alias="databaseSchemaValidationCheckDatabaseOk">Database - The database schema is correct for this version of Umbraco</key>
@@ -2401,6 +2442,7 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
   <area alias="clipboard">
     <key alias="labelForCopyAllEntries">Copy %0%</key>
     <key alias="labelForArrayOfItemsFrom">%0% from %1%</key>
+    <key alias="labelForArrayOfItems">Collection of %0%</key>
     <key alias="labelForRemoveAllEntries">Remove all items</key>
     <key alias="labelForClearClipboard">Clear clipboard</key>
   </area>

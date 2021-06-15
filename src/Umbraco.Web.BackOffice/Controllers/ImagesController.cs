@@ -16,14 +16,14 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class ImagesController : UmbracoAuthorizedApiController
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly IImageUrlGenerator _imageUrlGenerator;
 
         public ImagesController(
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IImageUrlGenerator imageUrlGenerator)
         {
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
             _imageUrlGenerator = imageUrlGenerator;
         }
 
@@ -63,7 +63,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             DateTimeOffset? imageLastModified = null;
             try
             {
-                imageLastModified = _mediaFileSystem.GetLastModified(imagePath);
+                imageLastModified = _mediaFileManager.FileSystem.GetLastModified(imagePath);
             }
             catch (Exception)
             {

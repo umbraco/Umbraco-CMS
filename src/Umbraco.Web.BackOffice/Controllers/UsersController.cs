@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [IsCurrentUserModelFilter]
     public class UsersController : UmbracoAuthorizedJsonController
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly ContentSettings _contentSettings;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly ISqlContext _sqlContext;
@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ILogger<UsersController> _logger;
 
         public UsersController(
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
             IHostingEnvironment hostingEnvironment,
             ISqlContext sqlContext,
@@ -96,7 +96,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             UserEditorAuthorizationHelper userEditorAuthorizationHelper,
             IPasswordChanger<BackOfficeIdentityUser> passwordChanger)
         {
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
             _contentSettings = contentSettings.Value;
             _hostingEnvironment = hostingEnvironment;
             _sqlContext = sqlContext;
@@ -125,7 +125,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// <returns></returns>
         public ActionResult<string[]> GetCurrentUserAvatarUrls()
         {
-            var urls = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
+            var urls = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
             if (urls == null)
                 return new ValidationErrorResult("Could not access Gravatar endpoint");
 
@@ -136,10 +136,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         [Authorize(Policy = AuthorizationPolicies.AdminUserEditsRequireAdmin)]
         public IActionResult PostSetAvatar(int id, IList<IFormFile> file)
         {
-            return PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache, _mediaFileSystem, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
+            return PostSetAvatarInternal(file, _userService, _appCaches.RuntimeCache, _mediaFileManager, _shortStringHelper, _contentSettings, _hostingEnvironment, _imageUrlGenerator, id);
         }
 
-        internal static IActionResult PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, IMediaFileSystem mediaFileSystem, IShortStringHelper shortStringHelper, ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
+        internal static IActionResult PostSetAvatarInternal(IList<IFormFile> files, IUserService userService, IAppCache cache, MediaFileManager mediaFileManager, IShortStringHelper shortStringHelper, ContentSettings contentSettings, IHostingEnvironment hostingEnvironment, IImageUrlGenerator imageUrlGenerator, int id)
         {
             if (files is null)
             {
@@ -176,13 +176,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                 using (var fs = file.OpenReadStream())
                 {
-                    mediaFileSystem.AddFile(user.Avatar, fs, true);
+                    mediaFileManager.FileSystem.AddFile(user.Avatar, fs, true);
                 }
 
                 userService.Save(user);
             }
 
-            return new OkObjectResult(user.GetUserAvatarUrls(cache, mediaFileSystem, imageUrlGenerator));
+            return new OkObjectResult(user.GetUserAvatarUrls(cache, mediaFileManager, imageUrlGenerator));
         }
 
         [AppendUserModifiedHeader("id")]
@@ -212,11 +212,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             if (filePath.IsNullOrWhiteSpace() == false)
             {
-                if (_mediaFileSystem.FileExists(filePath))
-                    _mediaFileSystem.DeleteFile(filePath);
+                if (_mediaFileManager.FileSystem.FileExists(filePath))
+                    _mediaFileManager.FileSystem.DeleteFile(filePath);
             }
 
-            return found.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator);
+            return found.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator);
         }
 
         /// <summary>
@@ -552,7 +552,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             var mailMessage = new EmailMessage(fromEmail, to.Email, emailSubject, emailBody, true);
 
-            await _emailSender.SendAsync(mailMessage);
+            await _emailSender.SendAsync(mailMessage, true);
         }
 
         /// <summary>
@@ -680,15 +680,15 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             IUser currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
-            // if it's the current user, the current user cannot reset their own password
-            if (currentUser.Username == found.Username)
+            // if it's the current user, the current user cannot reset their own password without providing their old password
+            if (currentUser.Username == found.Username && string.IsNullOrEmpty(changingPasswordModel.OldPassword))
             {
-                return new ValidationErrorResult("Password reset is not allowed");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("Password reset is not allowed without providing old password");
             }
 
             if (!currentUser.IsAdmin() && found.IsAdmin())
             {
-                return new ValidationErrorResult("The current user cannot change the password for the specified user");
+                return ValidationErrorResult.CreateNotificationValidationErrorResult("The current user cannot change the password for the specified user");
             }
 
             Attempt<PasswordChangedModel> passwordChangeResult = await _passwordChanger.ChangePasswordWithIdentityAsync(changingPasswordModel, _userManager);

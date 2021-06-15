@@ -62,12 +62,10 @@ namespace Umbraco.Extensions
                 throw new InvalidOperationException("No index found with name " + indexName);
             }
 
-            var searcher = index.GetSearcher();
-
             //var t = term.Escape().Value;
             //var luceneQuery = "+__Path:(" + content.Path.Replace("-", "\\-") + "*) +" + t;
 
-            var query = searcher.CreateQuery()
+            var query = index.Searcher.CreateQuery()
                 .Field(UmbracoExamineFieldNames.IndexPathFieldName, (content.Path + ",").MultipleCharacterWildcard())
                 .And()
                 .ManagedQuery(term);
@@ -83,12 +81,10 @@ namespace Umbraco.Extensions
                 throw new InvalidOperationException("No index found with name " + indexName);
             }
 
-            var searcher = index.GetSearcher();
-
             //var t = term.Escape().Value;
             //var luceneQuery = "+parentID:" + content.Id + " +" + t;
 
-            var query = searcher.CreateQuery()
+            var query = index.Searcher.CreateQuery()
                 .Field("parentID", content.Id)
                 .And()
                 .ManagedQuery(term);

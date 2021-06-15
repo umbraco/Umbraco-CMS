@@ -22,34 +22,21 @@ namespace Umbraco.Cms.Core.PropertyEditors
         Icon = "icon-application-window-alt")]
     public class TextAreaPropertyEditor : DataEditor
     {
-        private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;
         private readonly IIOHelper _ioHelper;
-        private readonly ILocalizedTextService _localizedTextService;
-        private readonly IShortStringHelper _shortStringHelper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TextAreaPropertyEditor"/> class.
         /// </summary>
         public TextAreaPropertyEditor(
-            ILoggerFactory loggerFactory,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            IIOHelper ioHelper,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper)
+            : base(dataValueEditorFactory)
         {
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
             _ioHelper = ioHelper;
-            _localizedTextService = localizedTextService;
-            _shortStringHelper = shortStringHelper;
         }
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new TextOnlyValueEditor(_dataTypeService, _localizationService, Attribute, _localizedTextService, _shortStringHelper, JsonSerializer);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<TextOnlyValueEditor>(Attribute);
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new TextAreaConfigurationEditor(_ioHelper);

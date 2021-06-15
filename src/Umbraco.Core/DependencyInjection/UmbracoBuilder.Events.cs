@@ -3,6 +3,7 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Notifications;
 
 namespace Umbraco.Cms.Core.DependencyInjection
 {

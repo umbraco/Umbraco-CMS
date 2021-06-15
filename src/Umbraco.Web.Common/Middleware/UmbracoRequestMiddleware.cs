@@ -13,9 +13,11 @@ using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.WebAssets;
@@ -47,6 +49,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly UmbracoRequestPaths _umbracoRequestPaths;
         private readonly BackOfficeWebAssets _backOfficeWebAssets;
+        private readonly IRuntimeState _runtimeState;
         private readonly SmidgeOptions _smidgeOptions;
         private readonly WebProfiler _profiler;
 
@@ -73,7 +76,8 @@ namespace Umbraco.Cms.Web.Common.Middleware
             IHostingEnvironment hostingEnvironment,
             UmbracoRequestPaths umbracoRequestPaths,
             BackOfficeWebAssets backOfficeWebAssets,
-            IOptions<SmidgeOptions> smidgeOptions)
+            IOptions<SmidgeOptions> smidgeOptions,
+            IRuntimeState runtimeState)
         {
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
@@ -83,6 +87,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _hostingEnvironment = hostingEnvironment;
             _umbracoRequestPaths = umbracoRequestPaths;
             _backOfficeWebAssets = backOfficeWebAssets;
+            _runtimeState = runtimeState;
             _smidgeOptions = smidgeOptions.Value;
             _profiler = profiler as WebProfiler; // Ignore if not a WebProfiler
         }
@@ -101,7 +106,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
             // Profiling start needs to be one of the first things that happens.
             // Also MiniProfiler.Current becomes null if it is handled by the event aggregator due to async/await
-            _profiler?.UmbracoApplicationBeginRequest(context);
+            _profiler?.UmbracoApplicationBeginRequest(context, _runtimeState.Level);
 
             EnsureContentCacheInitialized();
 
@@ -121,7 +126,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 try
                 {
                     LazyInitializeBackOfficeServices(context.Request.Path);
-                    await _eventAggregator.PublishAsync(new UmbracoRequestBegin(umbracoContextReference.UmbracoContext));
+                    await _eventAggregator.PublishAsync(new UmbracoRequestBeginNotification(umbracoContextReference.UmbracoContext));
                 }
                 catch (Exception ex)
                 {
@@ -137,7 +142,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
                     }
                     finally
                     {
-                        await _eventAggregator.PublishAsync(new UmbracoRequestEnd(umbracoContextReference.UmbracoContext));
+                        await _eventAggregator.PublishAsync(new UmbracoRequestEndNotification(umbracoContextReference.UmbracoContext));
                     }
                 }
             }
@@ -161,7 +166,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
             // Profiling end needs to be last of the first things that happens.
             // Also MiniProfiler.Current becomes null if it is handled by the event aggregator due to async/await
-            _profiler?.UmbracoApplicationEndRequest(context);
+            _profiler?.UmbracoApplicationEndRequest(context, _runtimeState.Level);
         }
 
         /// <summary>
@@ -212,7 +217,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             }
 
             // ensure this is disposed by DI at the end of the request
-            IHttpScopeReference httpScopeReference = request.HttpContext.RequestServices.GetRequiredService<IHttpScopeReference>();            
+            IHttpScopeReference httpScopeReference = request.HttpContext.RequestServices.GetRequiredService<IHttpScopeReference>();
             httpScopeReference.Register();
         }
 

@@ -22,7 +22,7 @@
         </Content>
         <None Include="build\**\*.*">
             <Pack>True</Pack>
-            <PackagePath>build</PackagePath>
+            <PackagePath>buildTransitive</PackagePath>
         </None>
     </ItemGroup>
 </Project>

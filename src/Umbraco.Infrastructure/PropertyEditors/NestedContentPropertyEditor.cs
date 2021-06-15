@@ -7,11 +7,13 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Core.Services.Implement;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
@@ -29,33 +31,18 @@ namespace Umbraco.Cms.Core.PropertyEditors
         Icon = "icon-thumbnail-list")]
     public class NestedContentPropertyEditor : DataEditor
     {
-        private readonly Lazy<PropertyEditorCollection> _propertyEditors;
-        private readonly IContentTypeService _contentTypeService;
         private readonly IIOHelper _ioHelper;
-        private readonly ILocalizedTextService _localizedTextService;
+
 
         public const string ContentTypeAliasPropertyKey = "ncContentTypeAlias";
 
         public NestedContentPropertyEditor(
-            ILoggerFactory loggerFactory,
-            Lazy<PropertyEditorCollection> propertyEditors,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            IContentTypeService contentTypeService,
-            IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper,
-            ILocalizedTextService localizedTextService,
-            IJsonSerializer jsonSerializer)
-            : base (loggerFactory, dataTypeService, localizationService, localizedTextService,  shortStringHelper, jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper)
+            : base (dataValueEditorFactory)
         {
-            _propertyEditors = propertyEditors;
-            _contentTypeService = contentTypeService;
             _ioHelper = ioHelper;
-            _localizedTextService = localizedTextService;
         }
-
-        // has to be lazy else circular dep in ctor
-        private PropertyEditorCollection PropertyEditors => _propertyEditors.Value;
 
         #region Pre Value Editor
 
@@ -65,40 +52,34 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         #region Value Editor
 
-        protected override IDataValueEditor CreateValueEditor() => new NestedContentPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, _contentTypeService, ShortStringHelper, Attribute, PropertyEditors, LoggerFactory.CreateLogger<NestedContentPropertyEditor>(), JsonSerializer);
+        protected override IDataValueEditor CreateValueEditor()
+            => DataValueEditorFactory.Create<NestedContentPropertyValueEditor>(Attribute);
 
         internal class NestedContentPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             private readonly PropertyEditorCollection _propertyEditors;
-            private readonly IContentTypeService _contentTypeService;
             private readonly IDataTypeService _dataTypeService;
             private readonly ILogger<NestedContentPropertyEditor> _logger;
             private readonly NestedContentValues _nestedContentValues;
 
-            private readonly Lazy<Dictionary<string, IContentType>> _contentTypes;
-
             public NestedContentPropertyValueEditor(
                 IDataTypeService dataTypeService,
-                ILocalizationService localizationService,
                 ILocalizedTextService localizedTextService,
                 IContentTypeService contentTypeService,
                 IShortStringHelper shortStringHelper,
                 DataEditorAttribute attribute,
                 PropertyEditorCollection propertyEditors,
                 ILogger<NestedContentPropertyEditor> logger,
-                IJsonSerializer jsonSerializer)
-                : base(dataTypeService, localizationService,  localizedTextService, shortStringHelper, jsonSerializer, attribute)
+                IJsonSerializer jsonSerializer,
+                IIOHelper ioHelper,
+                IPropertyValidationService propertyValidationService)
+                : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             {
                 _propertyEditors = propertyEditors;
-                _contentTypeService = contentTypeService;
                 _dataTypeService = dataTypeService;
                 _logger = logger;
                 _nestedContentValues = new NestedContentValues(contentTypeService);
-                Validators.Add(new NestedContentValidator(_nestedContentValues, propertyEditors, dataTypeService, localizedTextService, contentTypeService));
-
-                _contentTypes = new Lazy<Dictionary<string, IContentType>>(() =>
-                    _contentTypeService.GetAll().ToDictionary(c => c.Alias)
-                );
+                Validators.Add(new NestedContentValidator(propertyValidationService, _nestedContentValues, contentTypeService));
             }
 
             /// <inheritdoc />
@@ -119,7 +100,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             #region DB to String
 
-            public override string ConvertDbToString(IPropertyType propertyType, object propertyValue, IDataTypeService dataTypeService)
+            public override string ConvertDbToString(IPropertyType propertyType, object propertyValue)
             {
                 var rows = _nestedContentValues.GetPropertyValues(propertyValue);
 
@@ -136,9 +117,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
                             var propEditor = _propertyEditors[prop.Value.PropertyType.PropertyEditorAlias];
                             if (propEditor == null) continue;
 
-                            var tempConfig = DataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
+                            var tempConfig = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
                             var valEditor = propEditor.GetValueEditor(tempConfig);
-                            var convValue = valEditor.ConvertDbToString(prop.Value.PropertyType, prop.Value.Value, dataTypeService);
+                            var convValue = valEditor.ConvertDbToString(prop.Value.PropertyType, prop.Value.Value);
 
                             // update the raw value since this is what will get serialized out
                             row.RawPropertyValues[prop.Key] = convValue;
@@ -205,7 +186,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                                 continue;
                             }
 
-                            var tempConfig = DataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
+                            var tempConfig = _dataTypeService.GetDataType(prop.Value.PropertyType.DataTypeId).Configuration;
                             var valEditor = propEditor.GetValueEditor(tempConfig);
                             var convValue = valEditor.ToEditor(tempProp);
 
@@ -306,8 +287,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
             private readonly NestedContentValues _nestedContentValues;
             private readonly IContentTypeService _contentTypeService;
 
-            public NestedContentValidator(NestedContentValues nestedContentValues, PropertyEditorCollection propertyEditors, IDataTypeService dataTypeService, ILocalizedTextService textService, IContentTypeService contentTypeService)
-                : base(propertyEditors, dataTypeService, textService)
+            public NestedContentValidator(IPropertyValidationService propertyValidationService, NestedContentValues nestedContentValues, IContentTypeService contentTypeService)
+                : base(propertyValidationService)
             {
                 _nestedContentValues = nestedContentValues;
                 _contentTypeService = contentTypeService;

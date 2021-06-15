@@ -14,6 +14,7 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Scoping;
+using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.Persistence;
 using Umbraco.Cms.Infrastructure.Persistence.SqlSyntax;
 
@@ -30,7 +31,10 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
         private ScopeProvider GetScopeProvider(out Mock<ISqlSyntaxProvider> syntaxProviderMock)
         {
             var loggerFactory = NullLoggerFactory.Instance;
-            var fileSystem = new FileSystems(Mock.Of<IServiceProvider>(), loggerFactory.CreateLogger<FileSystems>(), loggerFactory, Mock.Of<IIOHelper>(), Mock.Of<IOptions<GlobalSettings>>(), Mock.Of<IHostingEnvironment>());
+            var fileSystems = new FileSystems(loggerFactory,
+                Mock.Of<IIOHelper>(), Mock.Of<IOptions<GlobalSettings>>(), Mock.Of<IHostingEnvironment>());
+            var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), Mock.Of<IMediaPathScheme>(),
+                loggerFactory.CreateLogger<MediaFileManager>(), Mock.Of<IShortStringHelper>());
             var databaseFactory = new Mock<IUmbracoDatabaseFactory>();
             var database = new Mock<IUmbracoDatabase>();
             var sqlContext = new Mock<ISqlContext>();
@@ -47,9 +51,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Scoping
 
             return new ScopeProvider(
                 databaseFactory.Object,
-                fileSystem,
+                fileSystems,
                 Options.Create(new CoreDebugSettings()),
-                Mock.Of<IMediaFileSystem>(),
+                mediaFileManager,
                 loggerFactory.CreateLogger<ScopeProvider>(),
                 loggerFactory,
                 Mock.Of<IRequestCache>(),

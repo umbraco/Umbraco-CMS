@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Migrations.PostMigrations
         /// <summary>
         /// Initializes a new instance of the <see cref="RebuildPublishedSnapshot"/> class.
         /// </summary>
-        public RebuildPublishedSnapshot(IPublishedSnapshotRebuilder rebuilder)
+        public RebuildPublishedSnapshot(IMigrationContext context, IPublishedSnapshotRebuilder rebuilder)
         {
             _rebuilder = rebuilder;
         }

@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
 		// ctor
 		public Type1(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
-			: base(content)
+			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
 		}
@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
 		// ctor
 		public Type1(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
-			: base(content)
+			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
 		}

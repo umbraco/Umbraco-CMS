@@ -4,8 +4,6 @@
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
@@ -18,14 +16,19 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class ColorPickerPropertyEditor : DataEditor
     {
         private readonly IIOHelper _ioHelper;
+        private readonly IJsonSerializer _jsonSerializer;
 
-        public ColorPickerPropertyEditor(ILoggerFactory loggerFactory, IDataTypeService dataTypeService, ILocalizationService localizationService, IIOHelper ioHelper, IShortStringHelper shortStringHelper, ILocalizedTextService localizedTextService, IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+        public ColorPickerPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper,
+            IJsonSerializer jsonSerializer)
+            : base(dataValueEditorFactory)
         {
             _ioHelper = ioHelper;
+            _jsonSerializer = jsonSerializer;
         }
 
         /// <inheritdoc />
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ColorPickerConfigurationEditor(_ioHelper, JsonSerializer);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ColorPickerConfigurationEditor(_ioHelper, _jsonSerializer);
     }
 }

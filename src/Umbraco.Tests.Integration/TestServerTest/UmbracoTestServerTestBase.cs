@@ -150,6 +150,7 @@ namespace Umbraco.Cms.Tests.Integration.TestServerTest
                 .AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
+                .AddNuCache()
                 .AddRuntimeMinifier()
                 .AddBackOfficeCore()
                 .AddBackOfficeAuthentication()

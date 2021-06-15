@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Umbraco.Cms.Core.Configuration;
 
 namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
 {
@@ -46,7 +47,7 @@ namespace Umbraco.Cms.Infrastructure.ModelsBuilder.Building
         /// </summary>
         /// <remarks>This should be null, unless something prevents the property from being
         /// generated, and then the value should explain what. This can be used to generate
-        /// commented out code eg in PureLive.</remarks>
+        /// commented out code eg in <see cref="ModelsMode.InMemoryAuto"/> mode.</remarks>
         public List<string> Errors;
 
         /// <summary>

@@ -19,7 +19,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Configuration.Models
         [InlineAutoMoqData("~/customPath", "/MyVirtualDir/", "custompath")]
         [InlineAutoMoqData("~/some-wacky/nestedPath", "/MyVirtualDir", "some-wacky-nestedpath")]
         [InlineAutoMoqData("~/some-wacky/nestedPath", "/MyVirtualDir/NestedVDir/", "some-wacky-nestedpath")]
-        public void Umbraco_Mvc_Area(string path, string rootPath, string outcome, [Frozen] IOptionsMonitor<HostingSettings> hostingSettings,  AspNetCoreHostingEnvironment hostingEnvironment)
+        public void Umbraco_Mvc_Area(
+            string path,
+            string rootPath,
+            string outcome,
+            [Frozen] IOptionsMonitor<HostingSettings> hostingSettings,
+            AspNetCoreHostingEnvironment hostingEnvironment)
         {
             hostingSettings.CurrentValue.ApplicationVirtualPath = rootPath;
 

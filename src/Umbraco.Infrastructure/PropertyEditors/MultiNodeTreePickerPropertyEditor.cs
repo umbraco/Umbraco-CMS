@@ -3,6 +3,7 @@
 
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -24,32 +25,26 @@ namespace Umbraco.Cms.Core.PropertyEditors
         private readonly IIOHelper _ioHelper;
 
         public MultiNodeTreePickerPropertyEditor(
-            ILoggerFactory loggerFactory,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            IDataValueEditorFactory dataValueEditorFactory,
+            IIOHelper ioHelper)
+            : base(dataValueEditorFactory)
         {
             _ioHelper = ioHelper;
         }
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new MultiNodePickerConfigurationEditor(_ioHelper);
 
-        protected override IDataValueEditor CreateValueEditor() => new MultiNodeTreePickerPropertyValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultiNodeTreePickerPropertyValueEditor>(Attribute);
 
         public class MultiNodeTreePickerPropertyValueEditor : DataValueEditor, IDataValueReference
         {
             public MultiNodeTreePickerPropertyValueEditor(
-                IDataTypeService dataTypeService,
-                ILocalizationService localizationService,
                 ILocalizedTextService localizedTextService,
                 IShortStringHelper shortStringHelper,
                 IJsonSerializer jsonSerializer,
+                IIOHelper ioHelper,
                 DataEditorAttribute attribute)
-                : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
+                : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             {
 
             }

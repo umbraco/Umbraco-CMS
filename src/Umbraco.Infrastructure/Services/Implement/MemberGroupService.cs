@@ -4,9 +4,9 @@ using System.Linq;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Scoping;
-using Umbraco.Cms.Core.Services.Notifications;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {

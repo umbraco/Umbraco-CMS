@@ -31,9 +31,10 @@ namespace Umbraco.Cms.Web.Website.ViewEngines
             {
                 string[] umbViewLocations = new string[]
                 {
+                    "/Views/{0}.cshtml",
+                    "/Views/Shared/{0}.cshtml",
                     "/Views/Partials/{0}.cshtml",
                     "/Views/MacroPartials/{0}.cshtml",
-                    "/Views/{0}.cshtml"
                 };
 
                 viewLocations = umbViewLocations.Concat(viewLocations);

@@ -6,13 +6,14 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
 using Umbraco.Cms.Core.Routing;
+using Umbraco.Core.Models;
 
 namespace Umbraco.Extensions
 {
     public static class ImageCropperTemplateCoreExtensions
     {
         /// <summary>
-        /// Gets the ImageProcessor URL by the crop alias (from the "umbracoFile" property alias) on the IPublishedContent item
+        /// Gets the underlying image processing service URL by the crop alias (from the "umbracoFile" property alias) on the IPublishedContent item
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -24,7 +25,7 @@ namespace Umbraco.Extensions
         /// <param name="publishedValueFallback">The published value fallback.</param>
         /// <param name="publishedUrlProvider">The published url provider.</param>
         /// <returns>
-        /// The ImageProcessor.Web URL.
+        /// The URL of the cropped image.
         /// </returns>
         public static string GetCropUrl(
             this IPublishedContent mediaItem,
@@ -36,8 +37,13 @@ namespace Umbraco.Extensions
             return mediaItem.GetCropUrl(imageUrlGenerator, publishedValueFallback, publishedUrlProvider, cropAlias: cropAlias, useCropDimensions: true);
         }
 
+        public static string GetCropUrl(this IPublishedContent mediaItem, string cropAlias, IImageUrlGenerator imageUrlGenerator, ImageCropperValue imageCropperValue)
+        {
+            return mediaItem.Url().GetCropUrl(imageUrlGenerator, imageCropperValue, cropAlias: cropAlias, useCropDimensions: true);
+        }
+
         /// <summary>
-        /// Gets the ImageProcessor URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
+        /// Gets the underlying image processing service URL by the crop alias using the specified property containing the image cropper Json data on the IPublishedContent item.
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -52,7 +58,7 @@ namespace Umbraco.Extensions
         /// <param name="publishedValueFallback">The published value fallback.</param>
         /// <param name="publishedUrlProvider">The published url provider.</param>
         /// <returns>
-        /// The ImageProcessor.Web URL.
+        /// The URL of the cropped image.
         /// </returns>
         public static string GetCropUrl(
             this IPublishedContent mediaItem,
@@ -66,7 +72,7 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Gets the ImageProcessor URL from the IPublishedContent item.
+        /// Gets the underlying image processing service URL from the IPublishedContent item.
         /// </summary>
         /// <param name="mediaItem">
         /// The IPublishedContent item.
@@ -118,9 +124,8 @@ namespace Umbraco.Extensions
         /// <param name="upScale">
         /// If the image should be upscaled to requested dimensions
         /// </param>
-
         /// <returns>
-        /// The <see cref="string"/>.
+        /// The URL of the cropped image.
         /// </returns>
         public static string GetCropUrl(
              this IPublishedContent mediaItem,
@@ -179,7 +184,7 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Gets the ImageProcessor URL from the image path.
+        /// Gets the underlying image processing service URL from the image path.
         /// </summary>
         /// <param name="imageUrl">
         /// The image URL.
@@ -215,7 +220,7 @@ namespace Umbraco.Extensions
         /// Add a serialized date of the last edit of the item to ensure client cache refresh when updated
         /// </param>
         /// <param name="furtherOptions">
-        /// These are any query string parameters (formatted as query strings) that ImageProcessor supports. For example:
+        /// These are any query string parameters (formatted as query strings) that the underlying image processing service supports. For example:
         /// <example>
         /// <![CDATA[
         /// furtherOptions: "&bgcolor=fff"
@@ -229,7 +234,7 @@ namespace Umbraco.Extensions
         /// If the image should be upscaled to requested dimensions
         /// </param>
         /// <returns>
-        /// The <see cref="string"/>.
+        /// The the URL of the cropped image.
         /// </returns>
         public static string GetCropUrl(
             this string imageUrl,
@@ -261,7 +266,7 @@ namespace Umbraco.Extensions
         }
 
         /// <summary>
-        /// Gets the ImageProcessor URL from the image path.
+        /// Gets the underlying image processing service URL from the image path.
         /// </summary>
         /// <param name="imageUrl">
         /// The image URL.
@@ -298,7 +303,7 @@ namespace Umbraco.Extensions
         /// Add a serialized date of the last edit of the item to ensure client cache refresh when updated
         /// </param>
         /// <param name="furtherOptions">
-        /// These are any query string parameters (formatted as query strings) that ImageProcessor supports. For example:
+        /// These are any query string parameters (formatted as query strings) that the underlying image processing service supports. For example:
         /// <example>
         /// <![CDATA[
         /// furtherOptions: "&bgcolor=fff"
@@ -397,6 +402,12 @@ namespace Umbraco.Extensions
             options.CacheBusterValue = cacheBusterValue;
 
             return imageUrlGenerator.GetImageUrl(options);
+        }
+
+        public static string GetLocalCropUrl(this MediaWithCrops mediaWithCrops, string alias, IImageUrlGenerator imageUrlGenerator, string cacheBusterValue)
+        {
+            return mediaWithCrops.LocalCrops.Src + mediaWithCrops.LocalCrops.GetCropUrl(alias, imageUrlGenerator, cacheBusterValue: cacheBusterValue);
+
         }
     }
 }

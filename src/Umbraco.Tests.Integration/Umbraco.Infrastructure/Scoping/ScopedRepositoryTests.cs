@@ -3,16 +3,17 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Extensions.DependencyInjection;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Services.Implement;
-using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Sync;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.Sync;
@@ -26,14 +27,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class ScopedRepositoryTests : UmbracoIntegrationTest
     {
-        private DistributedCacheBinder _distributedCacheBinder;
-
         private IUserService UserService => GetRequiredService<IUserService>();
 
         private ILocalizationService LocalizationService => GetRequiredService<ILocalizationService>();
-
-        private IServerMessenger ServerMessenger { get; } = new LocalServerMessenger();
-        private CacheRefresherCollection CacheRefresherCollection => GetRequiredService<CacheRefresherCollection>();
 
         protected override AppCaches GetAppCaches()
         {
@@ -48,6 +44,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Scoping
 
         protected override void CustomTestSetup(IUmbracoBuilder builder)
         {
+            builder.AddNuCache();
             builder.Services.AddUnique<IServerMessenger, LocalServerMessenger>();
             builder
                 .AddNotificationHandler<DictionaryItemDeletedNotification, DistributedCacheBinder>()

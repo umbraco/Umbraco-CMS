@@ -375,5 +375,13 @@ namespace Umbraco.Cms.Core.Security
         /// A user can only support a phone number if the BackOfficeUserStore is replaced with another that implements IUserPhoneNumberStore
         /// </remarks>
         Task<string> GetPhoneNumberAsync(TUser user);
+
+        /// <summary>
+        /// Validates that a user's credentials are correct without actually logging them in.
+        /// </summary>
+        /// <param name="username">The user name.</param>
+        /// <param name="password">The password.</param>
+        /// <returns>True if the credentials are valid.</returns>
+        Task<bool> ValidateCredentialsAsync(string username, string password);
     }
 }

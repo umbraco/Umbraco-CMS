@@ -10,13 +10,13 @@ namespace Umbraco.Cms.Core.IO
         /// <summary>
         /// Gets a media file path.
         /// </summary>
-        /// <param name="fileSystem">The media filesystem.</param>
+        /// <param name="fileManager">The media filesystem.</param>
         /// <param name="itemGuid">The (content, media) item unique identifier.</param>
         /// <param name="propertyGuid">The property type unique identifier.</param>
         /// <param name="filename">The file name.</param>
         /// <param name="previous">A previous filename.</param>
         /// <returns>The filesystem-relative complete file path.</returns>
-        string GetFilePath(IMediaFileSystem fileSystem, Guid itemGuid, Guid propertyGuid, string filename, string previous = null);
+        string GetFilePath(MediaFileManager fileManager, Guid itemGuid, Guid propertyGuid, string filename, string previous = null);
 
         /// <summary>
         /// Gets the directory that can be deleted when the file is deleted.
@@ -28,6 +28,6 @@ namespace Umbraco.Cms.Core.IO
         /// <para>The directory, and anything below it, will be deleted.</para>
         /// <para>Can return null (or empty) when no directory should be deleted.</para>
         /// </remarks>
-        string GetDeleteDirectory(IMediaFileSystem fileSystem, string filepath);
+        string GetDeleteDirectory(MediaFileManager fileSystem, string filepath);
     }
 }

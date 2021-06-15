@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
     internal class PropertyTypeDto
     {
         [Column("id")]
-        [PrimaryKeyColumn(IdentitySeed = 50)]
+        [PrimaryKeyColumn(IdentitySeed = 100)]
         public int Id { get; set; }
 
         [Column("dataTypeId")]

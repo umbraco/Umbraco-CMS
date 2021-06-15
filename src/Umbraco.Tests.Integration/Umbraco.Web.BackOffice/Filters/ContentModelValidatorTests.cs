@@ -11,6 +11,7 @@ using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using NUnit.Framework;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
@@ -271,16 +272,9 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters
         public class ComplexTestEditor : NestedContentPropertyEditor
         {
             public ComplexTestEditor(
-               ILoggerFactory loggerFactory,
-               Lazy<PropertyEditorCollection> propertyEditors,
-               IDataTypeService dataTypeService,
-               IContentTypeService contentTypeService,
-               ILocalizationService localizationService,
-               IIOHelper ioHelper,
-               ILocalizedTextService localizedTextService,
-               IShortStringHelper shortStringHelper,
-               IJsonSerializer jsonSerializer)
-                : base(loggerFactory, propertyEditors, dataTypeService, localizationService, contentTypeService, ioHelper, shortStringHelper, localizedTextService, jsonSerializer)
+                IDataValueEditorFactory dataValueEditorFactory,
+                IIOHelper ioHelper)
+                : base(dataValueEditorFactory, ioHelper)
             {
             }
 
@@ -297,28 +291,22 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice.Filters
         public class TestEditor : DataEditor
         {
             public TestEditor(
-                ILoggerFactory loggerFactory,
-                IDataTypeService dataTypeService,
-                ILocalizationService localizationService,
-                ILocalizedTextService localizedTextService,
-                IShortStringHelper shortStringHelper,
-                IJsonSerializer jsonSerializer)
-                : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+                IDataValueEditorFactory dataValueEditorFactory)
+                : base(dataValueEditorFactory)
             {
             }
 
-            protected override IDataValueEditor CreateValueEditor() => new TestValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer, Attribute);
+            protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<TestValueEditor>(Attribute);
 
             private class TestValueEditor : DataValueEditor
             {
                 public TestValueEditor(
-                    IDataTypeService dataTypeService,
-                    ILocalizationService localizationService,
                     ILocalizedTextService localizedTextService,
                     IShortStringHelper shortStringHelper,
                     IJsonSerializer jsonSerializer,
+                    IIOHelper ioHelper,
                     DataEditorAttribute attribute)
-                    : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
+                    : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
                 {
                     Validators.Add(new NeverValidateValidator());
                 }

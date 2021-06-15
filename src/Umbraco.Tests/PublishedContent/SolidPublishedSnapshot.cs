@@ -361,7 +361,7 @@ namespace Umbraco.Tests.PublishedContent
         #region Plumbing
 
         public ContentType2(IPublishedContent content, IPublishedValueFallback fallback)
-            : base(content)
+            : base(content, fallback)
         { }
 
         #endregion
@@ -384,7 +384,7 @@ namespace Umbraco.Tests.PublishedContent
     public class PublishedContentStrong1 : PublishedContentModel
     {
         public PublishedContentStrong1(IPublishedContent content, IPublishedValueFallback fallback)
-            : base(content)
+            : base(content, fallback)
         { }
 
         public int StrongValue => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "strongValue");
@@ -402,7 +402,7 @@ namespace Umbraco.Tests.PublishedContent
     public class PublishedContentStrong2 : PublishedContentModel
     {
         public PublishedContentStrong2(IPublishedContent content, IPublishedValueFallback fallback)
-            : base(content)
+            : base(content, fallback)
         { }
 
         public int StrongValue => this.Value<int>(Mock.Of<IPublishedValueFallback>(), "strongValue");
@@ -416,8 +416,7 @@ namespace Umbraco.Tests.PublishedContent
         {
             var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeServiceMock = new Mock<IDataTypeService>();
-            var dataType = new DataType(new VoidEditor(NullLoggerFactory.Instance, dataTypeServiceMock.Object,
-                    Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer()), serializer)
+            var dataType = new DataType(new VoidEditor(Mock.Of<IDataValueEditorFactory>()), serializer)
                 { Id = 666 };
             dataTypeServiceMock.Setup(x => x.GetAll()).Returns(dataType.Yield);
 

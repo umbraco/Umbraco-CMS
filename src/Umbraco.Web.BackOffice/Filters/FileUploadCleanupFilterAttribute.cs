@@ -43,9 +43,9 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 _incomingModel = incomingModel;
             }
 
-            public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+            public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
-                next(); // We only to do stuff after the action is executed
+                ActionExecutedContext resultContext = await next(); // We only to do stuff after the action is executed
 
                 var tempFolders = new List<string>();
 
@@ -72,8 +72,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger.LogError(ex,
-                                        "Could not delete temp file {FileName}", f.TempFilePath);
+                                    _logger.LogError(ex, "Could not delete temp file {FileName}", f.TempFilePath);
                                 }
                             }
                         }
@@ -81,24 +80,22 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 }
                 else
                 {
-                    if (context == null)
+                    if (resultContext == null)
                     {
-                        _logger.LogWarning("The context is null!!??");
-                        return Task.CompletedTask;
+                        _logger.LogWarning("The result context is null.");
+                        return;
                     }
 
-                    if (context.Result == null)
+                    if (resultContext.Result == null)
                     {
-                        _logger.LogWarning(
-                            "The context.Result is null!!??");
-                        return Task.CompletedTask;
+                        _logger.LogWarning("The result context's result is null");
+                        return;
                     }
 
-                    if(!(context.Result is ObjectResult objectResult))
+                    if (!(resultContext.Result is ObjectResult objectResult))
                     {
-                        _logger.LogWarning(
-                            "Could not acquire context.Result as ObjectResult");
-                        return Task.CompletedTask;
+                        _logger.LogWarning("Could not acquire the result context's result as ObjectResult");
+                        return;
                     }
 
                     if (objectResult.Value is IHaveUploadedFiles uploadedFiles)
@@ -117,8 +114,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                                         tempFolders.Add(dir);
                                     }
 
-                                    _logger.LogDebug(
-                                        "Removing temp file {FileName}", f.TempFilePath);
+                                    _logger.LogDebug("Removing temp file {FileName}", f.TempFilePath);
 
                                     try
                                     {
@@ -126,8 +122,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                                     }
                                     catch (Exception ex)
                                     {
-                                        _logger.LogError(ex,
-                                            "Could not delete temp file {FileName}", f.TempFilePath);
+                                        _logger.LogError(ex, "Could not delete temp file {FileName}", f.TempFilePath);
                                     }
 
                                     //clear out the temp path so it's not returned in the response
@@ -135,15 +130,13 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                                 }
                                 else
                                 {
-                                    _logger.LogWarning(
-                                        "The f.TempFilePath is null or whitespace!!??");
+                                    _logger.LogWarning("The f.TempFilePath is null or whitespace!!??");
                                 }
                             }
                         }
                         else
                         {
-                            _logger.LogWarning(
-                                "The uploadedFiles.UploadedFiles is null!!??");
+                            _logger.LogWarning("The uploadedFiles.UploadedFiles is null!!??");
                         }
                     }
                     else
@@ -153,7 +146,6 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                             objectResult.Value.GetType());
                     }
                 }
-                return Task.CompletedTask;
             }
         }
     }

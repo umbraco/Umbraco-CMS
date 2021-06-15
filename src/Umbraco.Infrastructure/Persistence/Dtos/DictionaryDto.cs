@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using NPoco;
 using Umbraco.Cms.Infrastructure.Persistence.DatabaseAnnotations;
@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
     [TableName(TableName)]
     [PrimaryKey("pk")]
     [ExplicitColumns]
-    internal class DictionaryDto
+    public class DictionaryDto  // public as required to be accessible from Deploy for the RepairDictionaryIdsWorkItem.
     {
         public const string TableName = Cms.Core.Constants.DatabaseSchema.Tables.DictionaryEntry;
         [Column("pk")]

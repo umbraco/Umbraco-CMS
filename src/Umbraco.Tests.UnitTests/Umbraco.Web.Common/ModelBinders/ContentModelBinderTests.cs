@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
             ModelBindingContext bindingContext = new DefaultModelBindingContext();
 
             // Act
-            _contentModelBinder.BindModel(bindingContext, new ContentModel<ContentType2>(new ContentType2(pc)), typeof(ContentModel<ContentType1>));
+            _contentModelBinder.BindModel(bindingContext, new ContentModel<ContentType2>(new ContentType2(pc, Mock.Of<IPublishedValueFallback>())), typeof(ContentModel<ContentType1>));
 
             // Assert
             Assert.True(bindingContext.Result.IsModelSet);
@@ -132,7 +132,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         [Test]
         public void BindModel_Returns_If_Same_Type()
         {
-            var content = new ContentType1(Mock.Of<IPublishedContent>());
+            var content = new ContentType1(Mock.Of<IPublishedContent>(), Mock.Of<IPublishedValueFallback>());
             var bindingContext = new DefaultModelBindingContext();
 
             _contentModelBinder.BindModel(bindingContext, content, typeof(ContentType1));
@@ -143,7 +143,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         [Test]
         public void BindModel_RenderModel_To_IPublishedContent()
         {
-            var content = new ContentType1(Mock.Of<IPublishedContent>());
+            var content = new ContentType1(Mock.Of<IPublishedContent>(), Mock.Of<IPublishedValueFallback>());
             var renderModel = new ContentModel(content);
 
             var bindingContext = new DefaultModelBindingContext();
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         [Test]
         public void BindModel_IPublishedContent_To_RenderModel()
         {
-            var content = new ContentType1(Mock.Of<IPublishedContent>());
+            var content = new ContentType1(Mock.Of<IPublishedContent>(), Mock.Of<IPublishedValueFallback>());
             var bindingContext = new DefaultModelBindingContext();
 
             _contentModelBinder.BindModel(bindingContext, content, typeof(ContentModel));
@@ -167,7 +167,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         [Test]
         public void BindModel_IPublishedContent_To_Generic_RenderModel()
         {
-            var content = new ContentType1(Mock.Of<IPublishedContent>());
+            var content = new ContentType1(Mock.Of<IPublishedContent>(), Mock.Of<IPublishedValueFallback>());
             var bindingContext = new DefaultModelBindingContext();
 
             _contentModelBinder.BindModel(bindingContext, content, typeof(ContentModel<ContentType1>));
@@ -223,20 +223,20 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.ModelBinders
         {
         }
 
-        private IPublishedContent CreatePublishedContent() => new ContentType2(new Mock<IPublishedContent>().Object);
+        private IPublishedContent CreatePublishedContent() => new ContentType2(new Mock<IPublishedContent>().Object, Mock.Of<IPublishedValueFallback>());
 
         public class ContentType1 : PublishedContentWrapped
         {
-            public ContentType1(IPublishedContent content)
-                : base(content)
+            public ContentType1(IPublishedContent content, IPublishedValueFallback fallback)
+                : base(content, fallback)
             {
             }
         }
 
         public class ContentType2 : ContentType1
         {
-            public ContentType2(IPublishedContent content)
-                : base(content)
+            public ContentType2(IPublishedContent content, IPublishedValueFallback fallback)
+                : base(content, fallback)
             {
             }
         }

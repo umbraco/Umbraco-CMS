@@ -15,7 +15,7 @@
     },
     "primaryOutputs": [
         {
-        "path": "UmbracoProject.csproj"
+            "path": "UmbracoProject.csproj"
         }
     ],
     "postActions": [
@@ -31,22 +31,35 @@
     ],
     "sourceName": "UmbracoProject",
     "symbols": {
+        "namespaceReplacer": {
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "Umbraco.Cms.Web.UI.NetCore",
+            "parameters": {
+                "source": "name",
+                "steps": [
+                    {
+                        "regex": "\\s",
+                        "replacement": "_"
+                    },
+                    {
+                        "regex": "-",
+                        "replacement": "_"
+                    },
+                    {
+                        "regex": "^[^a-zA-Z_]+",
+                        "replacement": "_"
+                    }
+                ]
+            }
+        },
         "version": {
             "type": "parameter",
             "datatype": "string",
-            "defaultValue": "9.0.0-beta001",
+            "defaultValue": "9.0.0-beta004",
             "description": "The version of Umbraco to load using NuGet",
             "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
-        },
-        "namespaceReplacer": {
-            "type": "generated",
-            "generator": "coalesce",
-            "parameters": {
-                "sourceVariableName": "name",
-                "defaultValue": "UmbracoProject",
-                "fallbackVariableName": "name"
-            },
-            "replaces":"Umbraco.Web.UI.NetCore"
         },
         "PackageTestSiteName": {
             "type": "parameter",
@@ -99,8 +112,8 @@
             "generator": "port",
             "replaces": "HTTPS_PORT_FROM_TEMPLATE",
             "parameters": {
-                "high": 65535,
-                "low": 1024,
+                "low": 44300,
+                "high": 44399,
                 "fallback": 5001
             }
         },
@@ -108,29 +121,133 @@
             "type": "parameter",
             "datatype":"text",
             "description": "The friendly name of the user for Umbraco login when using Unattended install (Without installer wizard UI)",
-            "replaces": "FRIENDLY_NAME_FROM_TEMPLATE",
             "defaultValue": ""
+        },
+        "FriendlyNameReplaced":{
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "FRIENDLY_NAME_FROM_TEMPLATE",
+            "parameters": {
+                "source": "FriendlyName",
+                "steps": [
+                    {
+                        "regex": "\\\\",
+                        "replacement": "\\\\"
+                    },
+                    {
+                        "regex": "\\\"",
+                        "replacement": "\\\""
+                    },
+                    {
+                        "regex": "\\\n",
+                        "replacement": "\\\n"
+                    },
+                    {
+                        "regex": "\\\t",
+                        "replacement": "\\\t"
+                    }
+                ]
+            }
         },
         "Email":{
             "type": "parameter",
             "datatype":"text",
             "description": "Email to use for Umbraco login when using Unattended install (Without installer wizard UI)",
-            "replaces": "EMAIL_FROM_TEMPLATE",
             "defaultValue": ""
+        },
+        "EmailReplaced":{
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "EMAIL_FROM_TEMPLATE",
+            "parameters": {
+                "source": "Email",
+                "steps": [
+                    {
+                        "regex": "\\\\",
+                        "replacement": "\\\\"
+                    },
+                    {
+                        "regex": "\\\"",
+                        "replacement": "\\\""
+                    },
+                    {
+                        "regex": "\\\n",
+                        "replacement": "\\\n"
+                    },
+                    {
+                        "regex": "\\\t",
+                        "replacement": "\\\t"
+                    }
+                ]
+            }
         },
         "Password":{
             "type": "parameter",
             "datatype":"text",
             "description": "Password to use for Umbraco login when using Unattended install (Without installer wizard UI)",
-            "replaces": "PASSWORD_FROM_TEMPLATE",
             "defaultValue": ""
+        },
+        "PasswordReplaced":{
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "PASSWORD_FROM_TEMPLATE",
+            "parameters": {
+                "source": "Password",
+                "steps": [
+                    {
+                        "regex": "\\\\",
+                        "replacement": "\\\\"
+                    },
+                    {
+                        "regex": "\\\"",
+                        "replacement": "\\\""
+                    },
+                    {
+                        "regex": "\\\n",
+                        "replacement": "\\\n"
+                    },
+                    {
+                        "regex": "\\\t",
+                        "replacement": "\\\t"
+                    }
+                ]
+              }
         },
         "ConnectionString":{
             "type": "parameter",
             "datatype":"text",
             "description": "Database connection string when using Unattended install (Without installer wizard UI)",
-            "replaces": "CONNECTION_FROM_TEMPLATE",
             "defaultValue": ""
+        },
+        "ConnectionStringReplaced":{
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "CONNECTION_FROM_TEMPLATE",
+            "parameters": {
+                "source": "ConnectionString",
+                "steps": [
+                    {
+                        "regex": "\\\\",
+                        "replacement": "\\\\"
+                    },
+                    {
+                        "regex": "\\\"",
+                        "replacement": "\\\""
+                    },
+                    {
+                        "regex": "\\\n",
+                        "replacement": "\\\n"
+                    },
+                    {
+                        "regex": "\\\t",
+                        "replacement": "\\\t"
+                    }
+                ]
+              }
         },
         "UsingUnattenedInstall":{
             "type": "computed",

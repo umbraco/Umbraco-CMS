@@ -21,6 +21,7 @@ using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.PropertyEditors.ValueConverters;
@@ -30,7 +31,6 @@ using Umbraco.Cms.Core.Runtime;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Core.Templates;
 using Umbraco.Cms.Core.Trees;
@@ -164,8 +164,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
-            // Register noop versions for examine to be overridden by examine
-            builder.Services.AddUnique<IUmbracoIndexesCreator, NoopUmbracoIndexesCreator>();
             builder.Services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
             builder.Services.AddUnique<UploadAutoFillProperties>();
@@ -180,7 +178,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             // Services required to run background jobs (with out the handler)
             builder.Services.AddUnique<IBackgroundTaskQueue, BackgroundTaskQueue>();
-            builder.Services.AddUnique<TaskHelper>();
 
             return builder;
         }
@@ -252,7 +249,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
         public static IUmbracoBuilder AddCoreNotifications(this IUmbracoBuilder builder)
         {
-// add handlers for sending user notifications (i.e. emails)
+            // add handlers for sending user notifications (i.e. emails)
             builder.Services.AddUnique<UserNotificationsHandler.Notifier>();
             builder
                 .AddNotificationHandler<ContentSavedNotification, UserNotificationsHandler>()

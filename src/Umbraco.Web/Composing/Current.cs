@@ -144,7 +144,7 @@ namespace Umbraco.Web.Composing
 
         // proxy Core for convenience
 
-        public static IMediaFileSystem MediaFileSystem => Factory.GetRequiredService<IMediaFileSystem>();
+        public static MediaFileManager MediaFileManager => Factory.GetRequiredService<MediaFileManager>();
 
         public static UmbracoMapper Mapper => Factory.GetRequiredService<UmbracoMapper>();
 

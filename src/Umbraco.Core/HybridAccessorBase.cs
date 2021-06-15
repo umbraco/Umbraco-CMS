@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Scoping;
 
@@ -16,9 +17,10 @@ namespace Umbraco.Cms.Core
     public abstract class HybridAccessorBase<T>
         where T : class
     {
+        private static readonly AsyncLocal<T> s_ambientContext = new AsyncLocal<T>();
+
         private readonly IRequestCache _requestCache;
         private string _itemKey;
-
         protected string ItemKey => _itemKey ??= GetType().FullName;
 
         // read
@@ -38,8 +40,8 @@ namespace Umbraco.Cms.Core
         // yes! flows with async!
         private T NonContextValue
         {
-            get => CallContext<T>.GetData(ItemKey);
-            set => CallContext<T>.SetData(ItemKey, value);
+            get => s_ambientContext.Value ?? default;
+            set => s_ambientContext.Value = value;
         }
 
         protected HybridAccessorBase(IRequestCache requestCache)

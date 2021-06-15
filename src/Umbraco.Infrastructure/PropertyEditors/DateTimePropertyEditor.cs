@@ -28,8 +28,8 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Initializes a new instance of the <see cref="DateTimePropertyEditor"/> class.
         /// </summary>
         /// <param name="loggerFactory"></param>
-        public DateTimePropertyEditor(ILoggerFactory loggerFactory, IIOHelper ioHelper, IDataTypeService dataTypeService, ILocalizationService localizationService, ILocalizedTextService localizedTextService, IShortStringHelper shortStringHelper, IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer)
+        public DateTimePropertyEditor(IDataValueEditorFactory dataValueEditorFactory, IIOHelper ioHelper)
+            : base(dataValueEditorFactory)
         {
             _ioHelper = ioHelper;
         }

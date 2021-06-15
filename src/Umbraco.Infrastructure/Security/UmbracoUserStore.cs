@@ -10,7 +10,8 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Security
 {
-    public abstract class UmbracoUserStore<TUser, TRole> : UserStoreBase<TUser, TRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityUserToken<string>, IdentityRoleClaim<string>>
+    public abstract class UmbracoUserStore<TUser, TRole>
+        : UserStoreBase<TUser, TRole, string, IdentityUserClaim<string>, IdentityUserRole<string>, IdentityUserLogin<string>, IdentityUserToken<string>, IdentityRoleClaim<string>>
         where TUser : UmbracoIdentityUser
         where TRole : IdentityRole<string>
     {

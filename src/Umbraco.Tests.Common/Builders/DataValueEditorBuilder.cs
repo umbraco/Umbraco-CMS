@@ -55,8 +55,6 @@ namespace Umbraco.Cms.Tests.Common.Builders
             var valueType = _valueType ?? Guid.NewGuid().ToString();
 
             return new DataValueEditor(
-                Mock.Of<IDataTypeService>(),
-                Mock.Of<ILocalizationService>(),
                 Mock.Of<ILocalizedTextService>(),
                 Mock.Of<IShortStringHelper>(),
                 Mock.Of<IJsonSerializer>())

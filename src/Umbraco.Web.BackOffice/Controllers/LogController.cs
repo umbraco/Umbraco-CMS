@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [PluginController(Constants.Web.Mvc.BackOfficeApiArea)]
     public class LogController : UmbracoAuthorizedJsonController
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly IImageUrlGenerator _imageUrlGenerator;
         private readonly IAuditService _auditService;
         private readonly IUmbracoMapper _umbracoMapper;
@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly ISqlContext _sqlContext;
 
         public LogController(
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileSystem,
             IImageUrlGenerator imageUrlGenerator,
             IAuditService auditService,
             IUmbracoMapper umbracoMapper,
@@ -43,7 +43,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             AppCaches appCaches,
             ISqlContext sqlContext)
          {
-            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
             _imageUrlGenerator = imageUrlGenerator ?? throw new ArgumentNullException(nameof(imageUrlGenerator));
             _auditService = auditService ?? throw new ArgumentNullException(nameof(auditService));
             _umbracoMapper = umbracoMapper ?? throw new ArgumentNullException(nameof(umbracoMapper));
@@ -111,7 +111,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         {
             var mappedItems = items.ToList();
             var userIds = mappedItems.Select(x => x.UserId).ToArray();
-            var userAvatars = Enumerable.ToDictionary(_userService.GetUsersById(userIds), x => x.Id, x => x.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileSystem, _imageUrlGenerator));
+            var userAvatars = Enumerable.ToDictionary(_userService.GetUsersById(userIds), x => x.Id, x => x.GetUserAvatarUrls(_appCaches.RuntimeCache, _mediaFileManager, _imageUrlGenerator));
             var userNames = Enumerable.ToDictionary(_userService.GetUsersById(userIds), x => x.Id, x => x.Name);
             foreach (var item in mappedItems)
             {

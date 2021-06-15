@@ -2,12 +2,8 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.Serialization;
-using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Serialization;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Strings;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -29,24 +25,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// <summary>
         /// Initializes a new instance of the <see cref="DataEditor"/> class.
         /// </summary>
-        public DataEditor(
-            ILoggerFactory loggerFactory,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer,
-            EditorType type = EditorType.PropertyValue)
+        public DataEditor(IDataValueEditorFactory dataValueEditorFactory, EditorType type = EditorType.PropertyValue)
         {
-            LoggerFactory = loggerFactory ?? throw new ArgumentNullException(nameof(loggerFactory));
-            DataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
-            LocalizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));
-            LocalizedTextService = localizedTextService  ?? throw new ArgumentNullException(nameof(localizedTextService));
-            ShortStringHelper = shortStringHelper ?? throw new ArgumentNullException(nameof(shortStringHelper));
-            JsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
-
 
             // defaults
+            DataValueEditorFactory = dataValueEditorFactory;
             Type = type;
             Icon = Constants.Icons.PropertyEditor;
             Group = Constants.PropertyEditors.Groups.Common;
@@ -68,16 +51,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// </summary>
         protected DataEditorAttribute Attribute { get; }
 
-        protected IShortStringHelper ShortStringHelper { get; }
-        public IJsonSerializer JsonSerializer { get; }
-        protected ILocalizedTextService LocalizedTextService { get; }
-        protected ILocalizationService LocalizationService { get; }
-        protected ILoggerFactory LoggerFactory { get; }
-        protected IDataTypeService DataTypeService { get; }
-
         /// <inheritdoc />
         [DataMember(Name = "alias", IsRequired = true)]
         public string Alias { get; set; }
+
+        protected IDataValueEditorFactory DataValueEditorFactory { get; }
 
         /// <inheritdoc />
         [IgnoreDataMember]
@@ -186,7 +164,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             if (Attribute == null)
                 throw new InvalidOperationException($"The editor is not attributed with {nameof(DataEditorAttribute)}");
 
-            return new DataValueEditor(DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, JsonSerializer, Attribute);
+            return DataValueEditorFactory.Create<DataValueEditor>(Attribute);
         }
 
         /// <summary>

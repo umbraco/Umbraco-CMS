@@ -694,7 +694,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 $http.get(
                     umbRequestHelper.getApiUrl(
                         "contentApiBaseUrl",
-                        "GetEmpty",
+                        "GetEmptyBlueprint",
                         { blueprintId: blueprintId, parentId: parentId })),
                 'Failed to retrieve blueprint for id ' + blueprintId)
                 .then(function (result) {
@@ -776,7 +776,7 @@ function contentResource($q, $http, umbDataFormatter, umbRequestHelper) {
                 options = {};
             }
             //overwrite the defaults if there are any specified
-            angular.extend(defaults, options);
+            Utilities.extend(defaults, options);
             //now copy back to the options we will use
             options = defaults;
             //change asc/desct

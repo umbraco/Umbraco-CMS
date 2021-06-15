@@ -11,6 +11,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Moq;
 using NUnit.Framework;
 using Serilog;
@@ -462,8 +463,8 @@ namespace Umbraco.Tests.Testing
 
             var scheme = Mock.Of<IMediaPathScheme>();
 
-            var mediaFileSystem = new MediaFileSystem(Mock.Of<IFileSystem>(), scheme, _loggerFactory.CreateLogger<MediaFileSystem>(), TestHelper.ShortStringHelper);
-            Builder.Services.AddUnique<IMediaFileSystem>(factory => mediaFileSystem);
+            var mediaFileManager = new MediaFileManager(Mock.Of<IFileSystem>(), scheme, Mock.Of<ILogger<MediaFileManager>>(), Mock.Of<IShortStringHelper>());
+            Builder.Services.AddUnique(factory => mediaFileManager);
 
             // no factory (noop)
             Builder.Services.AddUnique<IPublishedModelFactory, NoopPublishedModelFactory>();

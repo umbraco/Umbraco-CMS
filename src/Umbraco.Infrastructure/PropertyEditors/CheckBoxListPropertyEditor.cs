@@ -2,6 +2,7 @@
 // See LICENSE for more details.
 
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Serialization;
@@ -22,30 +23,25 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class CheckBoxListPropertyEditor : DataEditor
     {
         private readonly ILocalizedTextService _textService;
-        private readonly IDataTypeService _dataTypeService;
-        private readonly ILocalizationService _localizationService;
-        private readonly IShortStringHelper _shortStringHelper;
         private readonly IIOHelper _ioHelper;
-        private readonly ILocalizedTextService _localizedTextService;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
-        public CheckBoxListPropertyEditor(ILoggerFactory loggerFactory, ILocalizedTextService textService, IDataTypeService dataTypeService, ILocalizationService localizationService, IShortStringHelper shortStringHelper, IIOHelper ioHelper, ILocalizedTextService localizedTextService, IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer)
+        public CheckBoxListPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
+            ILocalizedTextService textService,
+            IIOHelper ioHelper)
+            : base(dataValueEditorFactory)
         {
             _textService = textService;
-            _dataTypeService = dataTypeService;
-            _localizationService = localizationService;
-            _shortStringHelper = shortStringHelper;
             _ioHelper = ioHelper;
-            _localizedTextService = localizedTextService;
         }
 
         /// <inheritdoc />
         protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_textService, _ioHelper);
 
         /// <inheritdoc />
-        protected override IDataValueEditor CreateValueEditor() => new MultipleValueEditor(LoggerFactory.CreateLogger<MultipleValueEditor>(), _dataTypeService, _localizationService, _localizedTextService, _shortStringHelper, JsonSerializer, Attribute);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<MultipleValueEditor>(Attribute);
     }
 }

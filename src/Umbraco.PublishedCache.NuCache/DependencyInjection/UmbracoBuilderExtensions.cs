@@ -1,12 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Umbraco.Cms.Core.DependencyInjection;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Notifications;
 using Umbraco.Cms.Infrastructure.PublishedCache;
 using Umbraco.Cms.Infrastructure.PublishedCache.Persistence;
 
@@ -31,9 +30,6 @@ namespace Umbraco.Extensions
             // must register default options, required in the service ctor
             builder.Services.TryAddTransient(factory => new PublishedSnapshotServiceOptions());
             builder.SetPublishedSnapshotService<PublishedSnapshotService>();
-
-            // Add as itself
-            builder.Services.TryAddSingleton<PublishedSnapshotService>();
             builder.Services.TryAddSingleton<IPublishedSnapshotStatus, PublishedSnapshotStatus>();
 
             // replace this service since we want to improve the content/media
@@ -71,7 +67,8 @@ namespace Umbraco.Extensions
                 .AddNotificationHandler<ContentTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MediaTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
                 .AddNotificationHandler<MemberTypeRefreshedNotification, PublishedSnapshotServiceEventHandler>()
-                .AddNotificationHandler<ScopedEntityRemoveNotification, PublishedSnapshotServiceEventHandler>();
+                .AddNotificationHandler<ScopedEntityRemoveNotification, PublishedSnapshotServiceEventHandler>()
+                ;
 
             return builder;
         }

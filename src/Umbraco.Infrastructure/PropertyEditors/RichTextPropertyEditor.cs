@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
@@ -43,19 +44,14 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
         public RichTextPropertyEditor(
-            ILoggerFactory loggerFactory,
+            IDataValueEditorFactory dataValueEditorFactory,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             HtmlImageSourceParser imageSourceParser,
             HtmlLocalLinkParser localLinkParser,
             RichTextEditorPastedImages pastedImages,
-            IShortStringHelper shortStringHelper,
             IIOHelper ioHelper,
-            ILocalizedTextService localizedTextService,
-            IImageUrlGenerator imageUrlGenerator,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            IImageUrlGenerator imageUrlGenerator)
+            : base(dataValueEditorFactory)
         {
             _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
             _imageSourceParser = imageSourceParser;
@@ -69,7 +65,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Create a custom value editor
         /// </summary>
         /// <returns></returns>
-        protected override IDataValueEditor CreateValueEditor() => new RichTextPropertyValueEditor(Attribute, _backOfficeSecurityAccessor, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _imageSourceParser, _localLinkParser, _pastedImages, _imageUrlGenerator, JsonSerializer);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<RichTextPropertyValueEditor>(Attribute);
 
         protected override IConfigurationEditor CreateConfigurationEditor() => new RichTextConfigurationEditor(_ioHelper);
 
@@ -89,16 +85,15 @@ namespace Umbraco.Cms.Core.PropertyEditors
             public RichTextPropertyValueEditor(
                 DataEditorAttribute attribute,
                 IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
-                IDataTypeService dataTypeService,
-                ILocalizationService localizationService,
                 ILocalizedTextService localizedTextService,
                 IShortStringHelper shortStringHelper,
                 HtmlImageSourceParser imageSourceParser,
                 HtmlLocalLinkParser localLinkParser,
                 RichTextEditorPastedImages pastedImages,
                 IImageUrlGenerator imageUrlGenerator,
-                IJsonSerializer jsonSerializer)
-                : base(dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer, attribute)
+                IJsonSerializer jsonSerializer,
+                IIOHelper ioHelper)
+                : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
             {
                 _backOfficeSecurityAccessor = backOfficeSecurityAccessor;
                 _imageSourceParser = imageSourceParser;

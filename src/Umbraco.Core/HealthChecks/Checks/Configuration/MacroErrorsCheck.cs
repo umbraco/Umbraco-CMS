@@ -1,10 +1,11 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Macros;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
@@ -56,12 +57,12 @@ namespace Umbraco.Cms.Core.HealthChecks.Checks.Configuration
                     new AcceptableConfiguration
                     {
                         IsRecommended = true,
-                        Value = "inline"
+                        Value = MacroErrorBehaviour.Inline.ToString()
                     },
                     new AcceptableConfiguration
                     {
                         IsRecommended = false,
-                        Value = "silent"
+                        Value = MacroErrorBehaviour.Silent.ToString()
                     }
                 };
 

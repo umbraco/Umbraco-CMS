@@ -8,5 +8,9 @@ namespace Umbraco.Cms.Web.Common.Authorization
     /// </summary>
     public class FeatureAuthorizeRequirement : IAuthorizationRequirement
     {
+        public FeatureAuthorizeRequirement()
+        {
+        }
+
     }
 }

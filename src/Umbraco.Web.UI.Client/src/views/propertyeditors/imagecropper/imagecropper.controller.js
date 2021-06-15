@@ -1,6 +1,6 @@
 angular.module('umbraco')
     .controller("Umbraco.PropertyEditors.ImageCropperController",
-        function ($scope, fileManager, $timeout) {
+        function ($scope, fileManager, $timeout, mediaHelper) {
 
             var config = Utilities.copy($scope.model.config);
 
@@ -18,6 +18,8 @@ angular.module('umbraco')
             //declare a special method which will be called whenever the value has changed from the server
             $scope.model.onValueChanged = onValueChanged;
 
+            var umbracoSettings = Umbraco.Sys.ServerVariables.umbracoSettings;
+            $scope.acceptFileExt = mediaHelper.formatFileTypes(umbracoSettings.imageFileTypes);
             /**
              * Called when the umgImageGravity component updates the focal point value
              * @param {any} left
@@ -41,7 +43,7 @@ angular.module('umbraco')
             function setModelValueWithSrc(src) {
                 if (!$scope.model.value || !$scope.model.value.src) {
                     //we are copying to not overwrite the original config
-                    $scope.model.value = angular.extend(Utilities.copy($scope.model.config), { src: src });
+                    $scope.model.value = Utilities.extend(Utilities.copy($scope.model.config), { src: src });
                 }
             }
 
@@ -150,7 +152,7 @@ angular.module('umbraco')
                     // we have a crop open already - close the crop (this will discard any changes made)
                     close();
 
-                    // the crop editor needs a digest cycle to close down properly, otherwise its state 
+                    // the crop editor needs a digest cycle to close down properly, otherwise its state
                     // is reused for the new crop... and that's really bad
                     $timeout(function () {
                         crop(targetCrop);
