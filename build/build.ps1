@@ -351,29 +351,6 @@
   $this.RemoveDirectory("$tmp\Templates\UmbracoProject\bin")
   })
 
-  $ubuild.DefineMethod("PackageZip",
-  {
-
-    Write-Host "Create Zip packages"
-
-    $src = "$($this.SolutionRoot)\src"
-    $tmp = $this.BuildTemp
-    $out = $this.BuildOutput
-
-    Write-Host "Zip all binaries"
-    &$this.BuildEnv.Zip a -r "$out\UmbracoCms.AllBinaries.$($this.Version.Semver).zip" `
-      "$tmp\bin\*" `
-      "-x!dotless.Core.*" `
-      > $null
-    if (-not $?) { throw "Failed to zip UmbracoCms.AllBinaries." }
-
-    Write-Host "Zip cms"
-    &$this.BuildEnv.Zip a -r "$out\UmbracoCms.$($this.Version.Semver).zip" `
-      "$tmp\WebApp\*" `
-      "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb" `
-      > $null
-    if (-not $?) { throw "Failed to zip UmbracoCms." }
-  })
 
   $ubuild.DefineMethod("PrepareBuild",
   {
@@ -540,8 +517,6 @@
     if ($this.OnError()) { return }
     # not running tests
     $this.PreparePackages()
-    if ($this.OnError()) { return }
-    $this.PackageZip()
     if ($this.OnError()) { return }
     $this.VerifyNuGet()
     if ($this.OnError()) { return }
