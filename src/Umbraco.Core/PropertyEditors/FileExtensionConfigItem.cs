@@ -2,6 +2,7 @@
 
 namespace Umbraco.Cms.Core.PropertyEditors
 {
+    [DataContract]
     public class FileExtensionConfigItem : IFileExtensionConfigItem
     {
         [DataMember(Name = "id")]
