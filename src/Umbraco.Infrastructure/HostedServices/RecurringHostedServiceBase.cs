@@ -62,8 +62,9 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             }
             finally
             {
-                // Resume now that the task is complete
-                _timer?.Change((int)_delay.TotalMilliseconds, (int)_period.TotalMilliseconds);
+                // Resume now that the task is complete - Note we use period in both because we don't want to execute again after the delay.
+                // So first execution is after _delay, and the we wait _period between each
+                _timer?.Change((int)_period.TotalMilliseconds, (int)_period.TotalMilliseconds);
             }
         }
 
