@@ -33,18 +33,31 @@
     "symbols": {
         "namespaceReplacer": {
             "type": "generated",
-            "generator": "coalesce",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "Umbraco.Cms.Web.UI.NetCore",
             "parameters": {
-                "sourceVariableName": "name",
-                "defaultValue": "UmbracoProject",
-                "fallbackVariableName": "name"
-            },
-            "replaces":"Umbraco.Cms.Web.UI.NetCore"
+                "source": "name",
+                "steps": [
+                    {
+                        "regex": "\\s", // whitespaces are not valid. Replace with _
+                        "replacement": "_"
+                    },
+                    {
+                        "regex": "-", // - are not valid. Replace with _
+                        "replacement": "_"
+                    },
+                    {
+                        "regex": "^[^a-zA-Z_]+", // should start with a-z, A-Z or _ to be a valid namespace
+                        "replacement": "_"
+                    }
+                ]
+            }
         },
         "version": {
             "type": "parameter",
             "datatype": "string",
-            "defaultValue": "9.0.0-beta003",
+            "defaultValue": "9.0.0-beta004",
             "description": "The version of Umbraco to load using NuGet",
             "replaces": "UMBRACO_VERSION_FROM_TEMPLATE"
         },
@@ -108,15 +121,67 @@
             "type": "parameter",
             "datatype":"text",
             "description": "The friendly name of the user for Umbraco login when using Unattended install (Without installer wizard UI)",
-            "replaces": "FRIENDLY_NAME_FROM_TEMPLATE",
             "defaultValue": ""
+        },
+        "FriendlyNameReplaced":{
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "FRIENDLY_NAME_FROM_TEMPLATE",
+            "parameters": {
+                "source": "FriendlyName",
+                "steps": [
+                    {
+                        "regex": "\\\\",
+                        "replacement": "\\\\"
+                    },
+                    {
+                        "regex": "\\\"",
+                        "replacement": "\\\""
+                    },
+                    {
+                        "regex": "\\\n",
+                        "replacement": "\\\n"
+                    },
+                    {
+                        "regex": "\\\t",
+                        "replacement": "\\\t"
+                    }
+                ]
+            }
         },
         "Email":{
             "type": "parameter",
             "datatype":"text",
             "description": "Email to use for Umbraco login when using Unattended install (Without installer wizard UI)",
-            "replaces": "EMAIL_FROM_TEMPLATE",
             "defaultValue": ""
+        },
+        "EmailReplaced":{
+            "type": "generated",
+            "generator": "regex",
+            "dataType": "string",
+            "replaces": "EMAIL_FROM_TEMPLATE",
+            "parameters": {
+                "source": "Email",
+                "steps": [
+                    {
+                        "regex": "\\\\",
+                        "replacement": "\\\\"
+                    },
+                    {
+                        "regex": "\\\"",
+                        "replacement": "\\\""
+                    },
+                    {
+                        "regex": "\\\n",
+                        "replacement": "\\\n"
+                    },
+                    {
+                        "regex": "\\\t",
+                        "replacement": "\\\t"
+                    }
+                ]
+            }
         },
         "Password":{
             "type": "parameter",
@@ -133,8 +198,20 @@
                 "source": "Password",
                 "steps": [
                     {
-                        "regex": "^test",
-                        "replacement": "[Replaced]"
+                        "regex": "\\\\",
+                        "replacement": "\\\\"
+                    },
+                    {
+                        "regex": "\\\"",
+                        "replacement": "\\\""
+                    },
+                    {
+                        "regex": "\\\n",
+                        "replacement": "\\\n"
+                    },
+                    {
+                        "regex": "\\\t",
+                        "replacement": "\\\t"
                     }
                 ]
               }
@@ -160,6 +237,14 @@
                     {
                         "regex": "\\\"",
                         "replacement": "\\\""
+                    },
+                    {
+                        "regex": "\\\n",
+                        "replacement": "\\\n"
+                    },
+                    {
+                        "regex": "\\\t",
+                        "replacement": "\\\t"
                     }
                 ]
               }
