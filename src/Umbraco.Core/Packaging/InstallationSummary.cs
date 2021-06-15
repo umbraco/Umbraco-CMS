@@ -49,7 +49,7 @@ namespace Umbraco.Cms.Core.Packaging
             if (templateConflicts.Count > 0)
             {
                 sb.Append("Conflicting templates found, they will be overwritten:");
-                foreach (IMacro m in templateConflicts)
+                foreach (ITemplate m in templateConflicts)
                 {
                     sb.Append(m.Alias);
                     sb.Append(',');
@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Core.Packaging
             if (stylesheetConflicts.Count > 0)
             {
                 sb.Append("Conflicting stylesheets found, they will be overwritten:");
-                foreach (IMacro m in stylesheetConflicts)
+                foreach (IFile m in stylesheetConflicts)
                 {
                     sb.Append(m.Alias);
                     sb.Append(',');

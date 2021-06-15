@@ -41,22 +41,20 @@ namespace Umbraco.Cms.Infrastructure.Migrations.Upgrade
             if (scopeProvider == null) throw new ArgumentNullException(nameof(scopeProvider));
             if (keyValueService == null) throw new ArgumentNullException(nameof(keyValueService));
 
-            var plan = Plan;
-
             using (var scope = scopeProvider.CreateScope())
             {
                 // read current state
                 var currentState = keyValueService.GetValue(StateValueKey);
                 var forceState = false;
 
-                if (currentState == null)
+                if (currentState == null || Plan.IgnoreCurrentState)
                 {
-                    currentState = plan.InitialState;
+                    currentState = Plan.InitialState;
                     forceState = true;
                 }
 
                 // execute plan
-                var state = migrationPlanExecutor.Execute(plan, currentState);
+                var state = migrationPlanExecutor.Execute(Plan, currentState);
                 if (string.IsNullOrWhiteSpace(state))
                 {
                     throw new Exception("Plan execution returned an invalid null or empty state.");

@@ -876,7 +876,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var sortOrder = 0;
                 var sortOrderElement = property.Element("SortOrder");
                 if (sortOrderElement != null)
+                {
                     int.TryParse(sortOrderElement.Value, out sortOrder);
+                }
+
                 var propertyType = new PropertyType(_shortStringHelper, dataTypeDefinition, property.Element("Alias").Value)
                 {
                     Name = property.Element("Name").Value,
@@ -900,8 +903,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         ? property.Element("LabelOnTop").Value.ToLowerInvariant().Equals("true")
                         : false
                 };
+
                 if (property.Element("Key") != null)
+                {
                     propertyType.Key = new Guid(property.Element("Key").Value);
+                }
 
                 var tab = (string)property.Element("Tab");
                 if (string.IsNullOrEmpty(tab))
@@ -1292,20 +1298,28 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             if (properties != null)
             {
                 int sortOrder = 0;
-                foreach (var property in properties.Elements())
+                foreach (XElement property in properties.Elements())
                 {
+                    var propertyId = property.AttributeValue<Guid>("id");
                     var propertyName = property.Attribute("name").Value;
                     var propertyAlias = property.Attribute("alias").Value;
                     var editorAlias = property.Attribute("propertyType").Value;
-                    var sortOrderAttribute = property.Attribute("sortOrder");
+                    XAttribute sortOrderAttribute = property.Attribute("sortOrder");
                     if (sortOrderAttribute != null)
                     {
                         sortOrder = int.Parse(sortOrderAttribute.Value);
                     }
 
                     if (macro.Properties.Values.Any(x => string.Equals(x.Alias, propertyAlias, StringComparison.OrdinalIgnoreCase)))
+                    {
                         continue;
-                    macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias));
+                    }
+
+                    macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias)
+                    {
+                        Key = propertyId
+                    });
+
                     sortOrder++;
                 }
             }
