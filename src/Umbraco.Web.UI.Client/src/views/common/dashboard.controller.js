@@ -32,9 +32,11 @@ function DashboardController($scope, $routeParams, $location, dashboardResource,
     });
 
     $scope.changeTab = function(tab) {
-        $scope.dashboard.tabs.forEach(function(tab) {
-            tab.active = false;
-        });
+        if ($scope.dashboard.tabs && $scope.dashboard.tabs.length > 0) {
+            $scope.dashboard.tabs.forEach(function(tab) {
+                tab.active = false;
+            });
+        }
 
         tab.active = true;
 
@@ -45,7 +47,7 @@ function DashboardController($scope, $routeParams, $location, dashboardResource,
         // check the query param for a dashboard alias
         const dashboardAlias = $location.search()[DASHBOARD_QUERY_PARAM];
         const dashboardIndex = $scope.dashboard.tabs.findIndex(tab => tab.alias === dashboardAlias);
-        // set the first dashboard to active if there is no query param of we can't find a matching dashboard for the alias
+        // set the first dashboard to active if there is no query parameter or we can't find a matching dashboard for the alias
         const activeIndex = dashboardIndex !== -1 ? dashboardIndex : 0;
 
         const tab = $scope.dashboard.tabs[activeIndex];
