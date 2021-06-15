@@ -11,7 +11,10 @@ namespace Umbraco.Extensions
         /// <param name="state"></param>
         /// <returns></returns>
         public static bool EnableInstaller(this IRuntimeState state)
-            => state.Level == RuntimeLevel.Install || state.Level == RuntimeLevel.Upgrade || state.Level == RuntimeLevel.PackageMigrations;
+            => state.Level == RuntimeLevel.Install || state.Level == RuntimeLevel.Upgrade;
+        // TODO: If we want to enable the installer for package migrations, but IMO i think we should do migrations in the back office
+        // if they are not unattended.
+        //=> state.Level == RuntimeLevel.Install || state.Level == RuntimeLevel.Upgrade || state.Level == RuntimeLevel.PackageMigrations;
 
         /// <summary>
         /// Returns true if Umbraco <see cref="IRuntimeState"/> is greater than <see cref="RuntimeLevel.BootFailed"/>

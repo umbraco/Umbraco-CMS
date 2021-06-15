@@ -30,7 +30,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly DatabaseBuilder _databaseBuilder;
         private readonly IUmbracoVersion _umbracoVersion;
         private CancellationToken _cancellationToken;
 
@@ -47,7 +46,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             IUmbracoDatabaseFactory databaseFactory,
             IEventAggregator eventAggregator,
             IHostingEnvironment hostingEnvironment,
-            DatabaseBuilder databaseBuilder,
             IUmbracoVersion umbracoVersion)
         {
             State = state;
@@ -59,7 +57,6 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             _databaseFactory = databaseFactory;
             _eventAggregator = eventAggregator;
             _hostingEnvironment = hostingEnvironment;
-            _databaseBuilder = databaseBuilder;
             _umbracoVersion = umbracoVersion;
             _logger = _loggerFactory.CreateLogger<CoreRuntime>();
         }
@@ -104,7 +101,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
             AcquireMainDom();
 
-            DoUnattendedInstall();
+            // notify for unattended install
+            await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification());
             DetermineRuntimeLevel();
 
             if (!State.UmbracoCanBoot())
@@ -119,36 +117,30 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             }
 
             // if level is Run and reason is UpgradeMigrations, that means we need to perform an unattended upgrade
-            if (State.RunUnattendedBootLogic())
+            var unattendedUpgradeNotification = new RuntimeUnattendedUpgradeNotification();
+            await _eventAggregator.PublishAsync(unattendedUpgradeNotification);
+            switch (unattendedUpgradeNotification.UnattendedUpgradeResult)
             {
-                // do the upgrade
-                DoUnattendedUpgrade();
-
-                // upgrade is done, set reason to Run
-                DetermineRuntimeLevel();
+                case RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors:
+                    if (State.BootFailedException == null)
+                    {
+                        throw new InvalidOperationException($"Unattended upgrade result was {RuntimeUnattendedUpgradeNotification.UpgradeResult.HasErrors} but no {nameof(BootFailedException)} was registered");
+                    }
+                    // we cannot continue here, the exception will be rethrown by BootFailedMiddelware
+                    return;
+                case RuntimeUnattendedUpgradeNotification.UpgradeResult.CoreUpgradeComplete:
+                case RuntimeUnattendedUpgradeNotification.UpgradeResult.PackageMigrationComplete:
+                    // upgrade is done, set reason to Run
+                    DetermineRuntimeLevel();
+                    break;
+                case RuntimeUnattendedUpgradeNotification.UpgradeResult.NotRequired:
+                    break;
             }
 
             // create & initialize the components
             _components.Initialize();
 
             await _eventAggregator.PublishAsync(new UmbracoApplicationStartingNotification(State.Level), cancellationToken);
-        }
-
-        private void DoUnattendedUpgrade()
-        {
-            var plan = new UmbracoPlan(_umbracoVersion);
-            using (_profilingLogger.TraceDuration<RuntimeState>("Starting unattended upgrade.", "Unattended upgrade completed."))
-            {
-                var result = _databaseBuilder.UpgradeSchemaAndData(plan);
-                if (result.Success == false)
-                    throw new UnattendedInstallException("An error occurred while running the unattended upgrade.\n" + result.Message);
-            }
-
-        }
-
-        private void DoUnattendedInstall()
-        {
-            State.DoUnattendedInstall();
         }
 
         public async Task StopAsync(CancellationToken cancellationToken)
@@ -176,6 +168,12 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
         private void DetermineRuntimeLevel()
         {
+            if (State.BootFailedException != null)
+            {
+                // there's already been an exception so cannot boot and no need to check
+                return;
+            }
+
             using DisposableTimer timer = _profilingLogger.DebugDuration<CoreRuntime>("Determining runtime level.", "Determined.");
 
             try

@@ -680,10 +680,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             IUser currentUser = _backofficeSecurityAccessor.BackOfficeSecurity.CurrentUser;
 
-            // if it's the current user, the current user cannot reset their own password
-            if (currentUser.Username == found.Username)
+            // if it's the current user, the current user cannot reset their own password without providing their old password
+            if (currentUser.Username == found.Username && string.IsNullOrEmpty(changingPasswordModel.OldPassword))
             {
-                return new ValidationErrorResult("Password reset is not allowed");
+                return new ValidationErrorResult("Password reset is not allowed without providing old password");
             }
 
             if (!currentUser.IsAdmin() && found.IsAdmin())

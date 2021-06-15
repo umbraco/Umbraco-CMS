@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Migrations;
 using Umbraco.Cms.Infrastructure.Persistence;
 
@@ -9,6 +9,11 @@ namespace Umbraco.Cms.Infrastructure.Migrations
     /// </summary>
     public interface IMigrationContext
     {
+        /// <summary>
+        /// Gets the current migration plan
+        /// </summary>
+        MigrationPlan Plan { get; }
+
         /// <summary>
         /// Gets the logger.
         /// </summary>

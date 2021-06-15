@@ -4,33 +4,32 @@ using System.Linq;
 using System.Threading;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Exceptions;
-using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Infrastructure.Migrations.Install;
 using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
 using Umbraco.Cms.Infrastructure.Persistence;
 
-namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Infrastructure.Runtime
 {
+
     /// <summary>
     /// Represents the state of the Umbraco runtime.
     /// </summary>
     public class RuntimeState : IRuntimeState
     {
+        internal const string PendingPacakgeMigrationsStateKey = "PendingPackageMigrations";
         private readonly IOptions<GlobalSettings> _globalSettings;
         private readonly IOptions<UnattendedSettings> _unattendedSettings;
         private readonly IUmbracoVersion _umbracoVersion;
         private readonly IUmbracoDatabaseFactory _databaseFactory;
         private readonly ILogger<RuntimeState> _logger;
-        private readonly DatabaseSchemaCreatorFactory _databaseSchemaCreatorFactory;
-        private readonly IEventAggregator _eventAggregator;
-        private readonly PackageMigrationPlanCollection _packageMigrationPlans;
+        private readonly PendingPackageMigrations _packageMigrationState;
+        private readonly Dictionary<string, object> _startupState = new Dictionary<string, object>();
 
         /// <summary>
         /// The initial <see cref="RuntimeState"/>
@@ -51,18 +50,14 @@ namespace Umbraco.Cms.Core
             IUmbracoVersion umbracoVersion,
             IUmbracoDatabaseFactory databaseFactory,
             ILogger<RuntimeState> logger,
-            DatabaseSchemaCreatorFactory databaseSchemaCreatorFactory,
-            IEventAggregator eventAggregator,
-            PackageMigrationPlanCollection packageMigrationPlans)
+            PendingPackageMigrations packageMigrationState)
         {
             _globalSettings = globalSettings;
             _unattendedSettings = unattendedSettings;
             _umbracoVersion = umbracoVersion;
             _databaseFactory = databaseFactory;
             _logger = logger;
-            _databaseSchemaCreatorFactory = databaseSchemaCreatorFactory;
-            _eventAggregator = eventAggregator;
-            _packageMigrationPlans = packageMigrationPlans;
+            _packageMigrationState = packageMigrationState;
         }
 
 
@@ -89,6 +84,9 @@ namespace Umbraco.Cms.Core
 
         /// <inheritdoc />
         public BootFailedException BootFailedException { get; internal set; }
+
+        /// <inheritdoc />
+        public IReadOnlyDictionary<string, object> StartupState => _startupState;
 
         /// <inheritdoc />
         public void DetermineRuntimeLevel()
@@ -203,11 +201,11 @@ namespace Umbraco.Cms.Core
                         return UmbracoDatabaseState.NeedsUpgrade;
                     }
 
-
-                    // TODO: Can we save the result of this since we'll need to re-use it?
-                    IReadOnlyList<string> packagesRequiringMigration = DoesUmbracoRequirePackageMigrations(keyValues);
+                    IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetUmbracoPendingPackageMigrations(keyValues);
                     if (packagesRequiringMigration.Count > 0)
                     {
+                        _startupState[PendingPacakgeMigrationsStateKey] = packagesRequiringMigration;
+
                         return UmbracoDatabaseState.NeedsPackageMigration;
                     }
                 }
@@ -226,83 +224,14 @@ namespace Umbraco.Cms.Core
             }
         }
 
-        public void Configure(RuntimeLevel level, RuntimeLevelReason reason)
+        public void Configure(RuntimeLevel level, RuntimeLevelReason reason, Exception bootFailedException = null)
         {
             Level = level;
             Reason = reason;
-        }
 
-        public void DoUnattendedInstall()
-        {
-            // unattended install is not enabled
-            if (_unattendedSettings.Value.InstallUnattended == false)
+            if (bootFailedException != null)
             {
-                return;
-            }
-
-            // no connection string set
-            if (_databaseFactory.Configured == false)
-            {
-                return;
-            }
-
-            var tries = _globalSettings.Value.InstallMissingDatabase ? 2 : 5;
-
-            bool connect;
-            for (var i = 0; ;)
-            {
-                connect = _databaseFactory.CanConnect;
-                if (connect || ++i == tries)
-                {
-                    break;
-                }
-
-                _logger.LogDebug("Could not immediately connect to database, trying again.");
-                Thread.Sleep(1000);
-            }
-
-            // could not connect to the database
-            if (connect == false)
-            {
-                return;
-            }
-
-            using (var database = _databaseFactory.CreateDatabase())
-            {
-                var hasUmbracoTables = database.IsUmbracoInstalled();
-
-                // database has umbraco tables, assume Umbraco is already installed
-                if (hasUmbracoTables)
-                    return;
-
-                // all conditions fulfilled, do the install
-                _logger.LogInformation("Starting unattended install.");
-
-                try
-                {
-                    database.BeginTransaction();
-                    var creator = _databaseSchemaCreatorFactory.Create(database);
-                    creator.InitializeDatabaseSchema();
-                    database.CompleteTransaction();
-                    _logger.LogInformation("Unattended install completed.");
-
-                    // Emit an event with EventAggregator that unattended install completed
-                    // Then this event can be listened for and create an unattended user
-                    _eventAggregator.Publish(new UnattendedInstallNotification());
-
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogInformation(ex, "Error during unattended install.");
-                    database.AbortTransaction();
-
-                    var innerException = new UnattendedInstallException(
-                        "The database configuration failed with the following message: " + ex.Message
-                        + "\n Please check log file for additional information (can be found in '/App_Data/Logs/')");
-                    BootFailedException = new BootFailedException(innerException.Message, innerException);
-
-                    throw BootFailedException;
-                }
+                BootFailedException = new BootFailedException(bootFailedException.Message, bootFailedException);
             }
         }
 
@@ -319,41 +248,6 @@ namespace Umbraco.Cms.Core
             _logger.LogDebug("Final upgrade state is {FinalMigrationState}, database contains {DatabaseState}", FinalMigrationState, CurrentMigrationState ?? "<null>");
 
             return CurrentMigrationState != FinalMigrationState;
-        }
-
-        private IReadOnlyList<string> DoesUmbracoRequirePackageMigrations(IReadOnlyDictionary<string, string> keyValues)
-        {
-            var packageMigrationPlans = _packageMigrationPlans.ToList();
-
-            var result = new List<string>(packageMigrationPlans.Count);
-
-            foreach(PackageMigrationPlan plan in packageMigrationPlans)
-            {
-                string currentMigrationState = null;
-                var planKeyValueKey = Constants.Conventions.Migrations.KeyValuePrefix + plan.Name;
-                if (keyValues.TryGetValue(planKeyValueKey, out var value))
-                {
-                    currentMigrationState = value;
-
-                    if (plan.FinalState != value)
-                    {
-                        // Not equal so we need to run
-                        result.Add(plan.Name);
-                    }
-                }
-                else
-                {
-                    // If there is nothing in the DB then we need to run
-                    result.Add(plan.Name);
-                }
-
-                _logger.LogDebug("Final package migration for {PackagePlan} state is {FinalMigrationState}, database contains {DatabaseState}",
-                    plan.Name,
-                    plan.FinalState,
-                    currentMigrationState ?? "<null>");
-            }
-
-            return result;
         }
 
         private bool TryDbConnect(IUmbracoDatabaseFactory databaseFactory)

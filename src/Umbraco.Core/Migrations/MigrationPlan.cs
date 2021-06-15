@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Migrations
     /// </summary>
     public class MigrationPlan
     {
-        private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>();
+        private readonly Dictionary<string, Transition> _transitions = new Dictionary<string, Transition>(StringComparer.InvariantCultureIgnoreCase);
         private readonly List<Type> _postMigrationTypes = new List<Type>();
 
         private string _prevState;
@@ -95,9 +95,9 @@ namespace Umbraco.Cms.Core.Migrations
         public MigrationPlan To(string targetState)
             => To<NoopMigration>(targetState);
 
-
         public MigrationPlan To(Guid targetState)
             => To<NoopMigration>(targetState.ToString());
+
         /// <summary>
         /// Adds a transition to a target state through a migration.
         /// </summary>

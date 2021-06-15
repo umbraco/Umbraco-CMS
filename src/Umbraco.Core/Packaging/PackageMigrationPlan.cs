@@ -1,11 +1,11 @@
 using System;
-using System.Collections.Generic;
-using System.Text;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Migrations;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Packaging
-{
+{   
+
     /// <summary>
     /// Base class for package migration plans
     /// </summary>
@@ -20,5 +20,6 @@ namespace Umbraco.Cms.Core.Packaging
         }
 
         protected abstract void DefinePlan();
+
     }
 }

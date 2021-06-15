@@ -106,8 +106,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             if (package == null)
                 return NotFound();
 
-            var fullPath = _hostingEnvironment.MapPathWebRoot(package.PackagePath);
-            if (!System.IO.File.Exists(fullPath))
+            if (!System.IO.File.Exists(package.PackagePath))
                 return ValidationErrorResult.CreateNotificationValidationErrorResult("No file found for path " + package.PackagePath);
 
             var fileName = Path.GetFileName(package.PackagePath);
@@ -122,18 +121,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             Response.Headers.Add("Content-Disposition", cd.ToString());
             // Set custom header so umbRequestHelper.downloadFile can save the correct filename
             Response.Headers.Add("x-filename", WebUtility.UrlEncode(fileName));
-            return new FileStreamResult(System.IO.File.OpenRead(fullPath), new MediaTypeHeaderValue("application/octet-stream")
+            return new FileStreamResult(System.IO.File.OpenRead(package.PackagePath), new MediaTypeHeaderValue("application/octet-stream")
             {
                 Charset = encoding.WebName,
             });
 
-        }
-
-        public ActionResult<PackageDefinition> GetInstalledPackageById(int id)
-        {
-            var pack = _packagingService.GetInstalledPackageById(id);
-            if (pack == null) return NotFound();
-            return pack;
         }
 
         /// <summary>
@@ -143,20 +135,6 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IEnumerable<PackageDefinition> GetInstalled()
         {
             return _packagingService.GetAllInstalledPackages()
-                .GroupBy(
-                    //group by name
-                    x => x.Name,
-                    //select the package with a parsed version
-                    pck => SemVersion.TryParse(pck.Version, out var pckVersion)
-                        ? new { package = pck, version = pckVersion }
-                        : new { package = pck, version = new SemVersion(0, 0, 0) })
-                .Select(grouping =>
-                {
-                    //get the max version for the package
-                    var maxVersion = grouping.Max(x => x.version);
-                    //only return the first package with this version
-                    return grouping.First(x => x.version == maxVersion).package;
-                })
                 .ToList();
         }
     }

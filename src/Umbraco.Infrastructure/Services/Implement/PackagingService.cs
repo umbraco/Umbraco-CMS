@@ -2,16 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Net.Http;
-using System.Threading.Tasks;
+using System.Xml.Linq;
 using Umbraco.Cms.Core.Events;
-using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
-using Umbraco.Cms.Core.Semver;
-using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -22,162 +18,60 @@ namespace Umbraco.Cms.Core.Services.Implement
     public class PackagingService : IPackagingService
     {
         private readonly IPackageInstallation _packageInstallation;
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IEventAggregator _eventAggregator;
         private readonly IAuditService _auditService;
         private readonly ICreatedPackagesRepository _createdPackages;
-        private readonly IInstalledPackagesRepository _installedPackages;
-        private static HttpClient _httpClient;
 
         public PackagingService(
             IAuditService auditService,
             ICreatedPackagesRepository createdPackages,
-            IInstalledPackagesRepository installedPackages,
             IPackageInstallation packageInstallation,
-            IHostingEnvironment hostingEnvironment,
             IEventAggregator eventAggregator)
         {
             _auditService = auditService;
             _createdPackages = createdPackages;
-            _installedPackages = installedPackages;
             _packageInstallation = packageInstallation;
-            _hostingEnvironment = hostingEnvironment;
             _eventAggregator = eventAggregator;
         }
 
-        #region Package Files
-
-        /// <inheritdoc />
-        public async Task<FileInfo> FetchPackageFileAsync(Guid packageId, Version umbracoVersion, int userId)
-        {
-            //includeHidden = true because we don't care if it's hidden we want to get the file regardless
-            var url = $"{Cms.Core.Constants.PackageRepository.RestApiBaseUrl}/{packageId}?version={umbracoVersion.ToString(3)}&includeHidden=true&asFile=true";
-            byte[] bytes;
-            try
-            {
-                if (_httpClient == null)
-                {
-                    _httpClient = new HttpClient();
-                }
-                bytes = await _httpClient.GetByteArrayAsync(url);
-            }
-            catch (HttpRequestException ex)
-            {
-                throw new HttpRequestException("An error occurring downloading the package from " + url, ex);
-            }
-
-            //successful
-            if (bytes.Length > 0)
-            {
-                var packagePath = _hostingEnvironment.MapPathContentRoot(Cms.Core.Constants.SystemDirectories.Packages);
-
-                // Check for package directory
-                if (Directory.Exists(packagePath) == false)
-                    Directory.CreateDirectory(packagePath);
-
-                var packageFilePath = Path.Combine(packagePath, packageId + ".umb");
-
-                using (var fs1 = new FileStream(packageFilePath, FileMode.Create))
-                {
-                    fs1.Write(bytes, 0, bytes.Length);
-                    return new FileInfo(packageFilePath);
-                }
-            }
-
-            _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package {packageId} fetched from {Cms.Core.Constants.PackageRepository.DefaultRepositoryId}");
-            return null;
-        }
-
-        #endregion
-
         #region Installation
 
-        public CompiledPackage GetCompiledPackageInfo(FileInfo packageFile) => _packageInstallation.ReadPackage(packageFile);
+        public CompiledPackage GetCompiledPackageInfo(XDocument xml) => _packageInstallation.ReadPackage(xml);
 
-        public IEnumerable<string> InstallCompiledPackageFiles(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public InstallationSummary InstallCompiledPackageData(XDocument packageXml, int userId = Constants.Security.SuperUserId)
         {
-            if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
-            if (packageDefinition.Id == default) throw new ArgumentException("The package definition has not been persisted");
-            if (packageDefinition.Name == default) throw new ArgumentException("The package definition has incomplete information");
+            CompiledPackage compiledPackage = GetCompiledPackageInfo(packageXml);
 
-            var compiledPackage = GetCompiledPackageInfo(packageFile);
-            if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFile);
-
-            var files = _packageInstallation.InstallPackageFiles(packageDefinition, compiledPackage, userId).ToList();
-
-            SaveInstalledPackage(packageDefinition);
-
-            _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package files installed for package '{compiledPackage.Name}'.");
-
-            return files;
-        }
-
-        public InstallationSummary InstallCompiledPackageData(PackageDefinition packageDefinition, FileInfo packageFile, int userId = Cms.Core.Constants.Security.SuperUserId)
-        {
-            if (packageDefinition == null) throw new ArgumentNullException(nameof(packageDefinition));
-            if (packageDefinition.Id == default) throw new ArgumentException("The package definition has not been persisted");
-            if (packageDefinition.Name == default) throw new ArgumentException("The package definition has incomplete information");
-
-            var compiledPackage = GetCompiledPackageInfo(packageFile);
-            if (compiledPackage == null) throw new InvalidOperationException("Could not read the package file " + packageFile);
-
-            // Trigger the Importing Package Notification and stop execution if event/user is cancelling it
-            var importingPackageNotification = new ImportingPackageNotification(packageFile.Name, compiledPackage);
-            if (_eventAggregator.PublishCancelable(importingPackageNotification))
+            if (compiledPackage == null)
             {
-                return new InstallationSummary { MetaData = compiledPackage };
+                throw new InvalidOperationException("Could not read the package file " + packageXml);
             }
 
-            var summary = _packageInstallation.InstallPackageData(packageDefinition, compiledPackage, userId);
+            // Trigger the Importing Package Notification and stop execution if event/user is cancelling it
+            var importingPackageNotification = new ImportingPackageNotification(compiledPackage.Name);
+            if (_eventAggregator.PublishCancelable(importingPackageNotification))
+            {
+                return new InstallationSummary(compiledPackage.Name);
+            }
 
-            SaveInstalledPackage(packageDefinition);
+            var summary = _packageInstallation.InstallPackageData(compiledPackage, userId, out _);
 
             _auditService.Add(AuditType.PackagerInstall, userId, -1, "Package", $"Package data installed for package '{compiledPackage.Name}'.");
 
             // trigger the ImportedPackage event
-            _eventAggregator.Publish(new ImportedPackageNotification(summary, compiledPackage).WithStateFrom(importingPackageNotification));
+            _eventAggregator.Publish(new ImportedPackageNotification(summary).WithStateFrom(importingPackageNotification));
 
             return summary;
         }
 
-        public UninstallationSummary UninstallPackage(string packageName, int userId = Cms.Core.Constants.Security.SuperUserId)
+        public InstallationSummary InstallCompiledPackageData(FileInfo packageXmlFile, int userId = Constants.Security.SuperUserId)
         {
-            //this is ordered by descending version
-            var allPackageVersions = GetInstalledPackageByName(packageName)?.ToList();
-            if (allPackageVersions == null || allPackageVersions.Count == 0)
-                throw new InvalidOperationException("No installed package found by name " + packageName);
-
-            var summary = new UninstallationSummary
+            XDocument xml;
+            using (StreamReader streamReader = System.IO.File.OpenText(packageXmlFile.FullName))
             {
-                MetaData = allPackageVersions[0]
-            };
-
-            var allSummaries = new List<UninstallationSummary>();
-
-            foreach (var packageVersion in allPackageVersions)
-            {
-                var versionUninstallSummary = _packageInstallation.UninstallPackage(packageVersion, userId);
-
-                allSummaries.Add(versionUninstallSummary);
-
-                //merge the summary
-                summary.DataTypesUninstalled = summary.DataTypesUninstalled.Concat(versionUninstallSummary.DataTypesUninstalled).Distinct().ToList();
-                summary.DictionaryItemsUninstalled = summary.DictionaryItemsUninstalled.Concat(versionUninstallSummary.DictionaryItemsUninstalled).Distinct().ToList();
-                summary.DocumentTypesUninstalled = summary.DocumentTypesUninstalled.Concat(versionUninstallSummary.DocumentTypesUninstalled).Distinct().ToList();
-                summary.FilesUninstalled = summary.FilesUninstalled.Concat(versionUninstallSummary.FilesUninstalled).Distinct().ToList();
-                summary.LanguagesUninstalled = summary.LanguagesUninstalled.Concat(versionUninstallSummary.LanguagesUninstalled).Distinct().ToList();
-                summary.MacrosUninstalled = summary.MacrosUninstalled.Concat(versionUninstallSummary.MacrosUninstalled).Distinct().ToList();
-                summary.StylesheetsUninstalled = summary.StylesheetsUninstalled.Concat(versionUninstallSummary.StylesheetsUninstalled).Distinct().ToList();
-                summary.TemplatesUninstalled = summary.TemplatesUninstalled.Concat(versionUninstallSummary.TemplatesUninstalled).Distinct().ToList();
-
-                SaveInstalledPackage(packageVersion);
-                DeleteInstalledPackage(packageVersion.Id, userId);
+                xml = XDocument.Load(streamReader);                
             }
-
-            // trigger the UninstalledPackage event
-            _eventAggregator.Publish(new UninstallPackageNotification(allSummaries));
-
-            return summary;
+            return InstallCompiledPackageData(xml, userId);
         }
 
         #endregion
@@ -202,46 +96,9 @@ namespace Umbraco.Cms.Core.Services.Implement
         public string ExportCreatedPackage(PackageDefinition definition) => _createdPackages.ExportPackage(definition);
 
 
-        public IEnumerable<PackageDefinition> GetAllInstalledPackages() => _installedPackages.GetAll();
-
-        public PackageDefinition GetInstalledPackageById(int id) => _installedPackages.GetById(id);
-
-        public IEnumerable<PackageDefinition> GetInstalledPackageByName(string name)
-        {
-            var found = _installedPackages.GetAll().Where(x => x.Name.InvariantEquals(name)).OrderByDescending(x => SemVersion.Parse(x.Version));
-            return found;
-        }
-
-        public PackageInstallType GetPackageInstallType(string packageName, SemVersion packageVersion, out PackageDefinition alreadyInstalled)
-        {
-            if (packageName == null) throw new ArgumentNullException(nameof(packageName));
-            if (packageVersion == null) throw new ArgumentNullException(nameof(packageVersion));
-
-            //get the latest version installed
-            alreadyInstalled = GetInstalledPackageByName(packageName)?.OrderByDescending(x => SemVersion.Parse(x.Version)).FirstOrDefault();
-            if (alreadyInstalled == null) return PackageInstallType.NewInstall;
-
-            if (!SemVersion.TryParse(alreadyInstalled.Version, out var installedVersion))
-                throw new InvalidOperationException("Could not parse the currently installed package version " + alreadyInstalled.Version);
-
-            //compare versions
-            if (installedVersion >= packageVersion) return PackageInstallType.AlreadyInstalled;
-
-            //it's an upgrade
-            return PackageInstallType.Upgrade;
-        }
-
-        public bool SaveInstalledPackage(PackageDefinition definition) => _installedPackages.SavePackage(definition);
-
-        public void DeleteInstalledPackage(int packageId, int userId = Cms.Core.Constants.Security.SuperUserId)
-        {
-            var package = GetInstalledPackageById(packageId);
-            if (package == null) return;
-
-            _auditService.Add(AuditType.PackagerUninstall, userId, -1, "Package", $"Installed package '{package.Name}' deleted. Package id: {package.Id}");
-            _installedPackages.Delete(packageId);
-        }
-
+        // TODO: Implement
+        public IEnumerable<PackageDefinition> GetAllInstalledPackages() => Enumerable.Empty<PackageDefinition>();
+        
         #endregion
     }
 }

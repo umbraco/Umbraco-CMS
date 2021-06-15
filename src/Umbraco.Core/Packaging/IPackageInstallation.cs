@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
 using System.IO;
+using System.Xml.Linq;
 using Umbraco.Cms.Core.Models.Packaging;
 
 namespace Umbraco.Cms.Core.Packaging
@@ -7,36 +7,24 @@ namespace Umbraco.Cms.Core.Packaging
     public interface IPackageInstallation
     {
         /// <summary>
-        /// This will run the uninstall sequence for this <see cref="PackageDefinition"/>
-        /// </summary>
-        /// <param name="packageDefinition"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        UninstallationSummary UninstallPackage(PackageDefinition packageDefinition, int userId);
-
-        /// <summary>
         /// Installs a packages data and entities
         /// </summary>
         /// <param name="packageDefinition"></param>
         /// <param name="compiledPackage"></param>
         /// <param name="userId"></param>
         /// <returns></returns>
-        InstallationSummary InstallPackageData(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId);
+        // TODO: The resulting PackageDefinition is only if we wanted to persist what was saved during package data installation.
+        // This used to be for the installedPackages.config but we don't have that anymore and don't really want it if we can help it.
+        // Possibly, we could continue to persist that file so that you could uninstall package data for an installed package in the
+        // back office (but it won't actually uninstall the package until you do that via nuget). If we want that functionality we'll have
+        // to restore a bunch of deleted code.
+        InstallationSummary InstallPackageData(CompiledPackage compiledPackage, int userId, out PackageDefinition packageDefinition);
 
         /// <summary>
-        /// Installs a packages files
-        /// </summary>
-        /// <param name="packageDefinition"></param>
-        /// <param name="compiledPackage"></param>
-        /// <param name="userId"></param>
-        /// <returns></returns>
-        IEnumerable<string> InstallPackageFiles(PackageDefinition packageDefinition, CompiledPackage compiledPackage, int userId);
-
-        /// <summary>
-        /// Reads the package (zip) file and returns the <see cref="CompiledPackage"/> model
+        /// Reads the package xml and returns the <see cref="CompiledPackage"/> model
         /// </summary>
         /// <param name="packageFile"></param>
         /// <returns></returns>
-        CompiledPackage ReadPackage(FileInfo packageFile);
+        CompiledPackage ReadPackage(XDocument packageXmlFile);
     }
 }
