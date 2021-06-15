@@ -40,15 +40,15 @@
                 "source": "name",
                 "steps": [
                     {
-                        "regex": "\\s", // whitespaces are not valid. Replace with _
+                        "regex": "\\s",
                         "replacement": "_"
                     },
                     {
-                        "regex": "-", // - are not valid. Replace with _
+                        "regex": "-",
                         "replacement": "_"
                     },
                     {
-                        "regex": "^[^a-zA-Z_]+", // should start with a-z, A-Z or _ to be a valid namespace
+                        "regex": "^[^a-zA-Z_]+",
                         "replacement": "_"
                     }
                 ]
