@@ -75,9 +75,12 @@ namespace Umbraco.Web.Models.Mapping
                 var group = new PropertyGroupDisplay<TPropertyType>
                 {
                     Id = tab.Id,
-                    Inherited = false,
+                    Key = tab.Key,
+                    ParentKey = tab.ParentKey,
+                    Level = tab.Level,
                     Name = tab.Name,
                     SortOrder = tab.SortOrder,
+                    Inherited = false,
                     ContentTypeId = source.Id
                 };
 
@@ -100,9 +103,12 @@ namespace Umbraco.Web.Models.Mapping
                 var group = new PropertyGroupDisplay<TPropertyType>
                 {
                     Id = tab.Id,
-                    Inherited = true,
+                    Key = tab.Key,
+                    ParentKey = tab.ParentKey,
+                    Level = tab.Level,
                     Name = tab.Name,
                     SortOrder = tab.SortOrder,
+                    Inherited = true,
                     ContentTypeId = definingContentType.Id,
                     ParentTabContentTypes = new[] { definingContentType.Id },
                     ParentTabContentTypeNames = new[] { definingContentType.Name }

@@ -300,6 +300,11 @@ namespace Umbraco.Web.Models.Mapping
         {
             if (source.Id > 0)
                 target.Id = source.Id;
+
+            target.Key = source.Key;
+            target.ParentKey = source.ParentKey;
+            target.Level = source.Level;
+            target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
         }
@@ -309,6 +314,11 @@ namespace Umbraco.Web.Models.Mapping
         {
             if (source.Id > 0)
                 target.Id = source.Id;
+
+            target.Key = source.Key;
+            target.ParentKey = source.ParentKey;
+            target.Level = source.Level;
+            target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
         }
@@ -319,10 +329,14 @@ namespace Umbraco.Web.Models.Mapping
             if (source.Id > 0)
                 target.Id = source.Id;
 
-            target.Inherited = source.Inherited;
+            target.Key = source.Key;
+            target.ParentKey = source.ParentKey;
+            target.Level = source.Level;
+            target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
 
+            target.Inherited = source.Inherited;
             target.Properties = context.MapEnumerable<PropertyTypeBasic, PropertyTypeDisplay>(source.Properties);
         }
 
@@ -332,10 +346,14 @@ namespace Umbraco.Web.Models.Mapping
             if (source.Id > 0)
                 target.Id = source.Id;
 
-            target.Inherited = source.Inherited;
+            target.Key = source.Key;
+            target.ParentKey = source.ParentKey;
+            target.Level = source.Level;
+            target.Icon = source.Icon;
             target.Name = source.Name;
             target.SortOrder = source.SortOrder;
 
+            target.Inherited = source.Inherited;
             target.Properties = context.MapEnumerable<MemberPropertyTypeBasic, MemberPropertyTypeDisplay>(source.Properties);
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Runtime.Serialization;
 
@@ -32,12 +33,24 @@ namespace Umbraco.Web.Models.ContentEditing
         [DataMember(Name = "id")]
         public int Id { get; set; }
 
-        [DataMember(Name = "sortOrder")]
-        public int SortOrder { get; set; }
+        [DataMember(Name = "key")]
+        public Guid Key { get; set; }
+
+        [DataMember(Name = "parentKey")]
+        public Guid? ParentKey { get; set; }
+
+        [DataMember(Name = "level")]
+        public short Level { get; set; }
+
+        [DataMember(Name = "icon")]
+        public string Icon { get; set; }
 
         [Required]
         [DataMember(Name = "name")]
         public string Name { get; set; }
+
+        [DataMember(Name = "sortOrder")]
+        public int SortOrder { get; set; }
     }
 
     [DataContract(Name = "propertyGroup", Namespace = "")]

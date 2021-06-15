@@ -34,10 +34,14 @@ namespace Umbraco.Core.Persistence.Factories
                     if (groupDto.ContentTypeNodeId == contentTypeId)
                         group.Id = groupDto.Id;
 
+                    group.Key = groupDto.UniqueId;
+                    group.ParentKey = groupDto.ParentKey;
+                    group.Level = groupDto.Level;
+                    group.Icon = groupDto.Icon;
                     group.Name = groupDto.Text;
                     group.SortOrder = groupDto.SortOrder;
+
                     group.PropertyTypes = new PropertyTypeCollection(isPublishing);
-                    group.Key = groupDto.UniqueId;
 
                     //Because we are likely to have a group with no PropertyTypes we need to ensure that these are excluded
                     var typeDtos = groupDto.PropertyTypeDtos.Where(x => x.Id > 0);
@@ -103,10 +107,13 @@ namespace Umbraco.Core.Persistence.Factories
         {
             var dto = new PropertyTypeGroupDto
             {
+                UniqueId = propertyGroup.Key,
+                ParentKey = propertyGroup.ParentKey,
+                Level = propertyGroup.Level,
                 ContentTypeNodeId = contentTypeId,
-                SortOrder = propertyGroup.SortOrder,
+                Icon = propertyGroup.Icon,
                 Text = propertyGroup.Name,
-                UniqueId = propertyGroup.Key
+                SortOrder = propertyGroup.SortOrder
             };
 
             if (propertyGroup.HasIdentity)

@@ -14,7 +14,10 @@ namespace Umbraco.Core.Models
     [DebuggerDisplay("Id: {Id}, Name: {Name}")]
     public class PropertyGroup : EntityBase, IEquatable<PropertyGroup>
     {
+        private Guid? _parentKey;
+        private short _level;
         private string _name;
+        private string _icon;
         private int _sortOrder;
         private PropertyTypeCollection _propertyTypes;
 
@@ -33,6 +36,26 @@ namespace Umbraco.Core.Models
         }
 
         /// <summary>
+        /// Gets or sets the parent key of the group.
+        /// </summary>
+        [DataMember]
+        public Guid? ParentKey
+        {
+            get => _parentKey;
+            set => SetPropertyValueAndDetectChanges(value, ref _parentKey, nameof(ParentKey));
+        }
+
+        /// <summary>
+        /// Gets or sets the Sort Order of the Group
+        /// </summary>
+        [DataMember]
+        public short Level
+        {
+            get => _level;
+            set => SetPropertyValueAndDetectChanges(value, ref _level, nameof(Level));
+        }
+
+        /// <summary>
         /// Gets or sets the Name of the Group, which corresponds to the Tab-name in the UI
         /// </summary>
         [DataMember]
@@ -40,6 +63,16 @@ namespace Umbraco.Core.Models
         {
             get => _name;
             set => SetPropertyValueAndDetectChanges(value, ref _name, nameof(Name));
+        }
+
+        /// <summary>
+        /// Gets or sets the icon of the group.
+        /// </summary>
+        [DataMember]
+        public string Icon
+        {
+            get => _icon;
+            set => SetPropertyValueAndDetectChanges(value, ref _icon, nameof(Icon));
         }
 
         /// <summary>
@@ -82,18 +115,9 @@ namespace Umbraco.Core.Models
             }
         }
 
-        public bool Equals(PropertyGroup other)
-        {
-            if (base.Equals(other)) return true;
-            return other != null && Name.InvariantEquals(other.Name);
-        }
+        public bool Equals(PropertyGroup other) => other != null && base.Equals(other) && ParentKey == other.ParentKey && Level == other.Level && Icon == other.Icon && Name.InvariantEquals(other.Name);
 
-        public override int GetHashCode()
-        {
-            var baseHash = base.GetHashCode();
-            var nameHash = Name.ToLowerInvariant().GetHashCode();
-            return baseHash ^ nameHash;
-        }
+        public override int GetHashCode() => (base.GetHashCode(), ParentKey, Level, Icon, Name.ToLowerInvariant()).GetHashCode();
 
         protected override void PerformDeepClone(object clone)
         {
