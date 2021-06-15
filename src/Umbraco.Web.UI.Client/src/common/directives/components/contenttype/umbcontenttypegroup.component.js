@@ -9,6 +9,8 @@
 
     const vm = this;
 
+    vm.$onInit = onInit;
+
     vm.removePromptIsVisible = false;
 
     vm.updateName = updateName;
@@ -18,6 +20,13 @@
     vm.whenNameFocus = whenNameFocus;
     vm.whenFocus = whenFocus;
     vm.changeSortOrderValue = changeSortOrderValue;
+
+    function onInit() {
+      // we need a group name for the validation and angular doesn't allow dashes in form name.
+      // this is a workaround to make it work
+      const identifier = vm.group.key.replaceAll('-', '');
+      vm.formName = `groupForm${identifier}`;
+    }
 
     function togglePrompt () {
       vm.removePromptIsVisible = !vm.removePromptIsVisible;

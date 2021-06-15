@@ -79,6 +79,8 @@
     animation-iteration-count: infinite;
     animation-name: umb-group-builder-tab--badge-bounce;
     animation-timing-function: ease;
+    display: none;
+
     @keyframes umb-group-builder-tab--badge-bounce {
         0%   { transform: translateY(0); }
         20%  { transform: translateY(-6px); }
@@ -124,6 +126,20 @@
   .umb-group-builder__group-title-input {
     &:disabled {
       cursor: pointer;
+    }
+  }
+}
+
+.show-validation {
+  .umb-group-builder__tab {
+    .badge {
+      display: block;
+    }
+
+    &.has-error {
+      &::before {
+        background-color: @red;
+      }
     }
   }
 }
@@ -335,9 +351,15 @@ input.umb-group-builder__group-title-input:disabled:hover {
 
 .umb-group-builder__group-inherited-label {
   font-size: 13px;
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   position: relative;
   top: 2px;
+}
+
+.umb-group-builder__group-title-val-message {
+  display: flex;
+  align-items: center;
 }
 
 .umb-group-builder__group-sort-order {

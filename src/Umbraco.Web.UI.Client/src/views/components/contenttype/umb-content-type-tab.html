@@ -1,4 +1,4 @@
-<div ng-click="vm.click()" class="umb-group-builder__tab" ng-class="{'is-active': vm.isOpen, 'is-inherited': vm.tab.inherited, 'umb-group-builder__tab-handle -sortable': vm.sorting && !vm.tab.inherited}">
+<div ng-click="vm.click()" class="umb-group-builder__tab" ng-class="{'is-active': vm.isOpen, 'is-inherited': vm.tab.inherited, 'umb-group-builder__tab-handle -sortable': vm.sorting && !vm.tab.inherited, 'has-error': vm.tab.hasError}">
   <div>
       <div class="umb-group-builder__tab-inherited-label" ng-if="vm.tab.inherited">
           <localize key="contentTypeEditor_inheritedFrom"></localize>: {{ vm.tab.inheritedFromName }}
@@ -12,11 +12,12 @@
 
             <ng-form data-element="tab-icon" name="vm.tabIconForm">
                 <button
-                    type="button" 
+                    type="button"
                     class="btn-reset umb-group-builder__tab-icon"
                     ng-click="vm.openIconPicker()"
                     ng-class="{'-placeholder': !vm.tab.icon }"
-                    title="{{vm.tab.icon}}">
+                    title="{{vm.tab.icon}}"
+                    ng-disabled="vm.sorting">
                         <umb-icon class="icon {{vm.tab.icon}}" icon="{{vm.tab.icon}}" ng-if="vm.tab.icon"></umb-icon>
                         <span class="umb-group-builder__tab-icon-text" ng-if="!vm.tab.icon">
                             <localize key="settings_addIcon">Add icon</localize>
@@ -40,7 +41,8 @@
                     umb-auto-focus
                     umb-auto-resize
                     val-server-field="{{ vm.valServerFieldName }}"
-                    data-lpignore="true" />
+                    data-lpignore="true"
+                    required />
                 
                 <div class="umb-group-builder__tab-val-message" ng-messages="tabNameForm.tabName.$error" show-validation-on-submit>
                     <div class="umb-validation-label -arrow-bottom" ng-message="valServerField">{{tabNameForm.tabName.errorMsg}}</div>
