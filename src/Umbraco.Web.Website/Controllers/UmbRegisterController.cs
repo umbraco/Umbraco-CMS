@@ -127,10 +127,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
             model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
 
-            // if the member is allowed to login directly, it means that it is approved
-            var isApproved = logMemberIn;
-
-            var identityUser = MemberIdentityUser.CreateNew(model.Username, model.Email, model.MemberTypeAlias, isApproved, model.Name);
+            var identityUser = MemberIdentityUser.CreateNew(model.Username, model.Email, model.MemberTypeAlias, true, model.Name);
             IdentityResult identityResult = await _memberManager.CreateAsync(
                 identityUser,
                 model.Password);
