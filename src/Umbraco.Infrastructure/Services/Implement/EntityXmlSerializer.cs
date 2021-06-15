@@ -351,7 +351,9 @@ namespace Umbraco.Cms.Core.Services.Implement
 
             var masterContentType = mediaType.CompositionAliases().FirstOrDefault();
             if (masterContentType != null)
+            {
                 info.Add(new XElement("Master", masterContentType));
+            }
 
             var structure = new XElement("Structure");
             foreach (var allowedType in mediaType.AllowedContentTypes)
@@ -460,8 +462,10 @@ namespace Umbraco.Cms.Core.Services.Implement
                                     new XElement("Variations", contentType.Variations.ToString()));
 
             var masterContentType = contentType.ContentTypeComposition.FirstOrDefault(x => x.Id == contentType.ParentId);
-            if(masterContentType != null)
+            if (masterContentType != null)
+            {
                 info.Add(new XElement("Master", masterContentType.Alias));
+            }
 
             var compositionsElement = new XElement("Compositions");
             var compositions = contentType.ContentTypeComposition;

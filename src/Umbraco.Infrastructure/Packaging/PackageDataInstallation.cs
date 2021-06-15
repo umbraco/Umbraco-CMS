@@ -477,17 +477,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
 
             //Sorting the Document Types based on dependencies - if its not a single doc type import ref. #U4-5921
-            var documentTypes = isSingleDocTypeImport
+            List<XElement> documentTypes = isSingleDocTypeImport
                 ? unsortedDocumentTypes.ToList()
                 : graph.GetSortedItems().Select(x => x.Item).ToList();
 
             //Iterate the sorted document types and create them as IContentType objects
-            foreach (var documentType in documentTypes)
+            foreach (XElement documentType in documentTypes)
             {
-                var alias = documentType.Element("Info").Element("Alias").Value;
+                var alias = documentType.Element("Info").Element("Alias").Value;                
+
                 if (importedContentTypes.ContainsKey(alias) == false)
                 {
-                    var contentType = service.Get(alias);
+                    T contentType = service.Get(alias);
+
                     importedContentTypes.Add(alias, contentType == null
                         ? CreateContentTypeFromXml(documentType, importedContentTypes, service)
                         : UpdateContentTypeFromXml(documentType, contentType, importedContentTypes, service));
@@ -526,7 +528,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
                 //Update ContentTypes with a newly added structure/list of allowed children
                 if (updatedContentTypes.Any())
+                {
                     service.Save(updatedContentTypes, userId);
+                }
             }
 
             return list;
@@ -595,13 +599,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return _contentTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
         }
 
-        private T CreateContentTypeFromXml<T>(XElement documentType, IReadOnlyDictionary<string, T> importedContentTypes, IContentTypeBaseService<T> service)
-         where T : class, IContentTypeComposition
+        private T CreateContentTypeFromXml<T>(
+            XElement documentType,
+            IReadOnlyDictionary<string, T> importedContentTypes,
+            IContentTypeBaseService<T> service)
+            where T : class, IContentTypeComposition
         {
-            var infoElement = documentType.Element("Info");
+            var key = Guid.Parse(documentType.Element("Info").Element("Key").Value);
+
+            XElement infoElement = documentType.Element("Info");
 
             //Name of the master corresponds to the parent
-            var masterElement = infoElement.Element("Master");
+            XElement masterElement = infoElement.Element("Master");
+
             T parent = default;
             if (masterElement != null)
             {
@@ -612,26 +622,35 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
 
             var alias = infoElement.Element("Alias").Value;
-            T contentType = CreateContentType(parent, -1, alias);
+            T contentType = CreateContentType(key, parent, -1, alias);
 
             if (parent != null)
+            {
                 contentType.AddContentType(parent);
+            }
 
             return UpdateContentTypeFromXml(documentType, contentType, importedContentTypes, service);
         }
 
-        private T CreateContentType<T>(T parent, int parentId, string alias)
+        private T CreateContentType<T>(Guid key, T parent, int parentId, string alias)
             where T : class, IContentTypeComposition
         {
             if (typeof(T) == typeof(IContentType))
             {
                 if (parent is null)
                 {
-                    return new ContentType(_shortStringHelper, parentId) { Alias = alias } as T;
+                    return new ContentType(_shortStringHelper, parentId)
+                    {
+                        Alias = alias,
+                        Key = key
+                    } as T;
                 }
                 else
                 {
-                    return new ContentType(_shortStringHelper, (IContentType)parent, alias) as T;
+                    return new ContentType(_shortStringHelper, (IContentType)parent, alias)
+                    {
+                        Key = key
+                    } as T;
                 }
 
             }
@@ -640,11 +659,18 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 if (parent is null)
                 {
-                    return new MediaType(_shortStringHelper, parentId) { Alias = alias } as T;
+                    return new MediaType(_shortStringHelper, parentId)
+                    {
+                        Alias = alias,
+                        Key = key
+                    } as T;
                 }
                 else
                 {
-                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias) as T;
+                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias)
+                    {
+                        Key = key
+                    } as T;
                 }
 
             }
@@ -652,12 +678,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             throw new NotSupportedException($"Type {typeof(T)} is not supported");
         }
 
-        private T UpdateContentTypeFromXml<T>(XElement documentType, T contentType, IReadOnlyDictionary<string, T> importedContentTypes, IContentTypeBaseService<T> service)
-        where T : IContentTypeComposition
+        private T UpdateContentTypeFromXml<T>(
+            XElement documentType,
+            T contentType,
+            IReadOnlyDictionary<string, T> importedContentTypes,
+            IContentTypeBaseService<T> service)
+            where T : IContentTypeComposition
         {
+            var key = Guid.Parse(documentType.Element("Info").Element("Key").Value);
+
             var infoElement = documentType.Element("Info");
             var defaultTemplateElement = infoElement.Element("DefaultTemplate");
 
+            contentType.Key = key;
             contentType.Name = infoElement.Element("Name").Value;
             if (infoElement.Element("Key") != null)
                 contentType.Key = new Guid(infoElement.Element("Key").Value);
@@ -780,8 +813,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                 }
 
-                int sortOrder;
-                if (tab.Element("SortOrder") != null && int.TryParse(tab.Element("SortOrder").Value, out sortOrder))
+                if (tab.Element("SortOrder") != null && int.TryParse(tab.Element("SortOrder").Value, out int sortOrder))
                 {
                     // Override the sort order with the imported value
                     contentType.PropertyGroups[caption].SortOrder = sortOrder;
