@@ -3,7 +3,7 @@
 @using Newtonsoft.Json.Linq
 @inherits Umbraco.Cms.Web.Common.Views.UmbracoViewPage<dynamic>
 
-@if (Model != null && Model.sections != null)
+@if (Model != null && Model.GetType() == typeof(JObject) && Model.sections != null)
 {
     var oneColumn = ((System.Collections.ICollection)Model.sections).Count == 1;
 

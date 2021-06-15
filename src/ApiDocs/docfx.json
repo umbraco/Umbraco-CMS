@@ -2,15 +2,20 @@
   "metadata": [
     {
       "src": [
-        { 
+        {
           "src": "../",
           "files": [
-            "Umbraco.Core/Umbraco.Core.csproj",
-            "Umbraco.Web/Umbraco.Web.csproj"
+            "**/*.csproj",
+            "**/Umbraco.Infrastructure/**/*.cs"
           ],
           "exclude": [
             "**/obj/**",
-            "**/bin/**"
+            "**/bin/**",
+            "**/Umbraco.Web.csproj",
+            "**/Umbraco.Infrastructure.csproj",
+            "**/Umbraco.Web.UI.csproj",
+            "**/Umbraco.Web.UI.Netcore.csproj",
+            "**/**.Test**/*.csproj"
           ]
         }
       ],
@@ -53,7 +58,7 @@
       "_enableSearch": true,
       "_disableContribution": false
     },
-    "dest": "../../build.tmp/_site",
+    "dest": "_site",
     "template": [
       "default", "umbracotemplate"
     ]

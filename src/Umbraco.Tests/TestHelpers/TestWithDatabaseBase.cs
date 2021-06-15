@@ -11,6 +11,7 @@ using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Persistence.Repositories;
@@ -61,6 +62,7 @@ namespace Umbraco.Tests.TestHelpers
 
         internal ScopeProvider ScopeProvider => Current.ScopeProvider as ScopeProvider;
         internal IUmbracoDatabaseFactory UmbracoDatabaseFactory => Factory.GetRequiredService<IUmbracoDatabaseFactory>();
+        internal IDataValueEditorFactory DataValueEditorFactory => Factory.GetRequiredService<IDataValueEditorFactory>();
 
         protected ISqlContext SqlContext => Factory.GetRequiredService<ISqlContext>();
 
@@ -267,7 +269,6 @@ namespace Umbraco.Tests.TestHelpers
                 HostingEnvironment,
                 HostingLifetime,
                 ShortStringHelper,
-                new SiteDomainHelper(),
                 Factory.GetRequiredService<IEntityXmlSerializer>(),
                 ContentTypesCache,
                 null, true, Options.PublishedRepositoryEvents);
@@ -303,7 +304,7 @@ namespace Umbraco.Tests.TestHelpers
             {
                 using (var scope = ScopeProvider.CreateScope())
                 {
-                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion);
+                    var schemaHelper = new DatabaseSchemaCreator(scope.Database, LoggerFactory.CreateLogger<DatabaseSchemaCreator>(), LoggerFactory, UmbracoVersion, Mock.Of<IEventAggregator>());
                     //Create the umbraco database and its base data
                     schemaHelper.InitializeDatabaseSchema();
 

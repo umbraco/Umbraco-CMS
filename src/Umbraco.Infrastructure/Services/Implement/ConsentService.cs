@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Events;
@@ -11,7 +11,7 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// <summary>
     /// Implements <see cref="IConsentService"/>.
     /// </summary>
-    internal class ConsentService : ScopeRepositoryService, IConsentService
+    internal class ConsentService : RepositoryService, IConsentService
     {
         private readonly IConsentRepository _consentRepository;
 

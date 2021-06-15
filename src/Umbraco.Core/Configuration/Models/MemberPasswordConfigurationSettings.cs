@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         public bool RequireUppercase { get; set; } = false;
 
         /// <inheritdoc/>
-        public string HashAlgorithmType { get; set; } = Constants.Security.AspNetUmbraco8PasswordHashAlgorithmName;
+        public string HashAlgorithmType { get; set; } = Constants.Security.AspNetCoreV3PasswordHashAlgorithmName;
 
         /// <inheritdoc/>
         public int MaxFailedAccessAttemptsBeforeLockout { get; set; } = 5;

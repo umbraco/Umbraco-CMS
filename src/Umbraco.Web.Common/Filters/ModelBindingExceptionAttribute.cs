@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Options;
+using Umbraco.Cms.Core.Configuration;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Web.Common.ModelBinders;
@@ -17,7 +18,7 @@ namespace Umbraco.Cms.Web.Common.Filters
     /// In which case it returns a redirect to the same page after 1 sec if not in debug mode.
     /// </summary>
     /// <remarks>
-    /// This is only enabled when running PureLive
+    /// This is only enabled when using <see cref="ModelsMode.InMemoryAuto"/> mode
     /// </remarks>
     public sealed class ModelBindingExceptionAttribute : TypeFilterAttribute
     {
@@ -69,7 +70,7 @@ namespace Umbraco.Cms.Web.Common.Filters
             /// </para>
             /// <para>
             ///     ModelBindingException:
-            ///     Cannot bind source content type Umbraco.Web.PublishedModels.Home to model type Umbraco.Web.PublishedModels.Home. Both view and content models are PureLive, with different versions. The application is in an unstable state and is going to be restarted. The application is restarting now.
+            ///     Cannot bind source content type Umbraco.Web.PublishedModels.Home to model type Umbraco.Web.PublishedModels.Home. Both view and content models are generated models, with different versions. The application is in an unstable state and is going to be restarted. The application is restarting now.
             /// </para>
             /// </remarks>
             private bool IsMessageAboutTheSameModelType(string exceptionMessage)

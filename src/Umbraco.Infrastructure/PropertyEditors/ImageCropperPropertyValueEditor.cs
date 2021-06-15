@@ -3,9 +3,11 @@
 
 using System;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Editors;
@@ -24,24 +26,26 @@ namespace Umbraco.Cms.Core.PropertyEditors
     internal class ImageCropperPropertyValueEditor : DataValueEditor // TODO: core vs web?
     {
         private readonly ILogger<ImageCropperPropertyValueEditor> _logger;
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly ContentSettings _contentSettings;
+        private readonly IDataTypeService _dataTypeService;
 
         public ImageCropperPropertyValueEditor(
             DataEditorAttribute attribute,
             ILogger<ImageCropperPropertyValueEditor> logger,
-            IMediaFileSystem mediaFileSystem,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
+            MediaFileManager mediaFileSystem,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
-            ContentSettings contentSettings,
-            IJsonSerializer jsonSerializer)
-            : base(dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer, attribute)
+            IOptions<ContentSettings> contentSettings,
+            IJsonSerializer jsonSerializer,
+            IIOHelper ioHelper,
+            IDataTypeService dataTypeService)
+            : base(localizedTextService, shortStringHelper, jsonSerializer, ioHelper, attribute)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
-            _contentSettings = contentSettings ?? throw new ArgumentNullException(nameof(contentSettings));
+            _mediaFileManager = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _contentSettings = contentSettings.Value;
+            _dataTypeService = dataTypeService;
         }
 
         /// <summary>
@@ -63,7 +67,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 value = new ImageCropperValue { Src = val.ToString() };
             }
 
-            var dataType = DataTypeService.GetDataType(property.PropertyType.DataTypeId);
+            var dataType = _dataTypeService.GetDataType(property.PropertyType.DataTypeId);
             if (dataType?.Configuration != null)
                 value.ApplyConfiguration(dataType.ConfigurationAs<ImageCropperConfiguration>());
 
@@ -97,7 +101,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 _logger.LogWarning(ex, "Could not parse current db value to a JObject.");
             }
             if (string.IsNullOrWhiteSpace(currentPath) == false)
-                currentPath = _mediaFileSystem.GetRelativePath(currentPath);
+                currentPath = _mediaFileManager.FileSystem.GetRelativePath(currentPath);
 
             // get the new json and path
             JObject editorJson = null;
@@ -130,7 +134,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 // value is unchanged.
                 if (string.IsNullOrWhiteSpace(editorFile) && string.IsNullOrWhiteSpace(currentPath) == false)
                 {
-                    _mediaFileSystem.DeleteFile(currentPath);
+                    _mediaFileManager.FileSystem.DeleteFile(currentPath);
                     return null; // clear
                 }
 
@@ -146,11 +150,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             // remove current file if replaced
             if (currentPath != filepath && string.IsNullOrWhiteSpace(currentPath) == false)
-                _mediaFileSystem.DeleteFile(currentPath);
+                _mediaFileManager.FileSystem.DeleteFile(currentPath);
 
             // update json and return
             if (editorJson == null) return null;
-            editorJson["src"] = filepath == null ? string.Empty : _mediaFileSystem.GetUrl(filepath);
+            editorJson["src"] = filepath == null ? string.Empty : _mediaFileManager.FileSystem.GetUrl(filepath);
             return editorJson.ToString();
         }
 
@@ -163,21 +167,21 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
             // get the filepath
             // in case we are using the old path scheme, try to re-use numbers (bah...)
-            var filepath = _mediaFileSystem.GetMediaPath(file.FileName, currentPath, cuid, puid); // fs-relative path
+            var filepath = _mediaFileManager.GetMediaPath(file.FileName, currentPath, cuid, puid); // fs-relative path
 
             using (var filestream = File.OpenRead(file.TempFilePath))
             {
                 // TODO: Here it would make sense to do the auto-fill properties stuff but the API doesn't allow us to do that right
                 // since we'd need to be able to return values for other properties from these methods
 
-                _mediaFileSystem.AddFile(filepath, filestream, true); // must overwrite!
+                _mediaFileManager.FileSystem.AddFile(filepath, filestream, true); // must overwrite!
             }
 
             return filepath;
         }
 
 
-        public override string ConvertDbToString(IPropertyType propertyType,  object value, IDataTypeService dataTypeService)
+        public override string ConvertDbToString(IPropertyType propertyType,  object value)
         {
             if (value == null || string.IsNullOrEmpty(value.ToString()))
                 return null;
@@ -188,7 +192,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                 return val;
 
             // more magic here ;-(
-            var configuration = DataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
+            var configuration = _dataTypeService.GetDataType(propertyType.DataTypeId).ConfigurationAs<ImageCropperConfiguration>();
             var crops = configuration?.Crops ?? Array.Empty<ImageCropperConfiguration.Crop>();
 
             return JsonConvert.SerializeObject(new

@@ -186,7 +186,7 @@
     <key alias="recycleBinDeleting"><![CDATA[Gli elementi presenti nel cestino verranno cancellati. Non chiudere questa finestra finchè l'operazione non è terminata.]]></key>
     <key alias="recycleBinIsEmpty"><![CDATA[Il cestino è vuoto]]></key>
     <key alias="recycleBinWarning"><![CDATA[Gli elementi cancellati dal cestino non potranno essere recuperati.]]></key>
-    <key alias="regexSearchError"><![CDATA[Il webservice <a target='_blank' href='http://regexlib.com'>regexlib.com</a> ha attualmente qualche problema, di cui non abbiamo il controllo. Siamo spiacevoli dell'inconveniente.]]></key>
+    <key alias="regexSearchError"><![CDATA[Il webservice <a target='_blank' rel='noopener' href='http://regexlib.com'>regexlib.com</a> ha attualmente qualche problema, di cui non abbiamo il controllo. Siamo spiacevoli dell'inconveniente.]]></key>
     <key alias="regexSearchHelp"><![CDATA[Ricerca un'espressione regolare da aggiungere al campo della form per poter validare il contenuto. Esempio: 'email, 'zip-code', 'URL'.]]></key>
     <key alias="removeMacro">Elimina Macro</key>
     <key alias="requiredField">Campo obbligatorio</key>
@@ -422,7 +422,7 @@ Fatti aiutare dalla nostra community, consulta la documentazione o guarda alcuni
     <key alias="theEndInstallFailed"><![CDATA[Per terminare l'installazione, dovrai modificare manualmente il file <strong>/web.config</strong> e aggiornare la chiave AppSetting <strong>UmbracoConfigurationStatus</strong> impostando il valore <strong>'%0%'</strong>.]]></key>
     <key alias="theEndInstallSuccess"><![CDATA[Puoi <strong>iniziare immediatamente</strong> cliccando sul bottone "Avvia Umbraco". <br />Se sei <strong>nuovo a Umbraco</strong>, si possono trovare un sacco di risorse sulle nostre pagine Getting Started.]]></key>
     <key alias="theEndOpenUmbraco"><![CDATA[<h3>Avvia Umbraco</h3>
-Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e iniziare ad aggiungere i contenuti, aggiornando i modelli e i fogli di stile o aggiungere nuove funzionalità]]></key>
+Per gestire il tuo sito web, è sufficiente aprire il backoffice di Umbraco e iniziare ad aggiungere i contenuti, aggiornando i modelli e i fogli di stile o aggiungere nuove funzionalità]]></key>
     <key alias="Unavailable">Connessione al database non riuscita.</key>
     <key alias="Version3">Umbraco Versione 3</key>
     <key alias="Version4">Umbraco Versione 4</key>
@@ -440,7 +440,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="renewSession">Riconnetti adesso per salvare il tuo lavoro</key>
   </area>
   <area alias="login">
-    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank">umbraco.com</a></p> ]]></key>
+    <key alias="bottomText"><![CDATA[<p style="text-align:right;">&copy; 2001 - %0% <br /><a href="https://umbraco.com" style="text-decoration: none" target="_blank" rel="noopener">umbraco.com</a></p> ]]></key>
   </area>
   <area alias="main">
     <key alias="dashboard">Dashboard</key>
@@ -603,7 +603,6 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="users">Utenti</key>
   </area>
   <area alias="settings">
-    <key alias="asAContentMasterType"><![CDATA[come tipo di contenuto master. Le tab del tipo di contenuto master non sono mostrate e possono essere modificate solo direttamente dal tipo di contenuto master.]]></key>
     <key alias="contentTypeEnabled">Tipo di contenuto master abilitato</key>
     <key alias="contentTypeUses">Questo tipo di contenuto usa</key>
     <key alias="defaulttemplate"><![CDATA[Template di base]]></key>
@@ -820,7 +819,7 @@ Per gestire il tuo sito web, è sufficiente aprire il back office di Umbraco e i
     <key alias="administrators">Amministratore</key>
     <key alias="categoryField">Campo Categoria</key>
     <key alias="changePassword">Cambia la tua password</key>
-    <key alias="changePasswordDescription"><![CDATA[È possibile modificare la password di accesso al Back Office Umbraco compilando il modulo sottostante e clicca sul pulsante 'Modifica password']]></key>
+    <key alias="changePasswordDescription"><![CDATA[È possibile modificare la password di accesso al backoffice Umbraco compilando il modulo sottostante e clicca sul pulsante 'Modifica password']]></key>
     <key alias="confirmNewPassword">Conferma la nuova password</key>
     <key alias="contentChannel">Contenuto del canale</key>
     <key alias="descriptionField">Campo Descrizione</key>

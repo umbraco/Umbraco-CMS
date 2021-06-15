@@ -2,9 +2,13 @@ using System;
 using System.Reflection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using Umbraco.Cms.Core.Net;
+using Umbraco.Cms.Core.Serialization;
 
 namespace Umbraco.Cms.Core.Security
 {
+
     public class BackOfficeIdentityBuilder : IdentityBuilder
     {
         /// <summary>
@@ -12,15 +16,44 @@ namespace Umbraco.Cms.Core.Security
         /// </summary>
         public BackOfficeIdentityBuilder(IServiceCollection services)
             : base(typeof(BackOfficeIdentityUser), services)
-        {
-        }
+            => InitializeServices(services);
 
         /// <summary>
         /// Initializes a new instance of the <see cref="BackOfficeIdentityBuilder"/> class.
         /// </summary>
         public BackOfficeIdentityBuilder(Type role, IServiceCollection services)
             : base(typeof(BackOfficeIdentityUser), role, services)
+            => InitializeServices(services);
+
+        private void InitializeServices(IServiceCollection services)
         {
+            // We need to manually register some identity services here because we cannot rely on normal
+            // AddIdentity calls for back office users
+            // For example: https://github.com/dotnet/aspnetcore/blob/master/src/Identity/Extensions.Core/src/IdentityServiceCollectionExtensions.cs#L33
+            // The reason we need our own is because the Identity system doesn't cater easily for multiple identity systems and particularly being
+            // able to configure IdentityOptions to a specific provider since there is no named options. So we have strongly typed options
+            // and strongly typed ILookupNormalizer and IdentityErrorDescriber since those are 'global' and we need to be unintrusive.
+
+            // Services used by identity
+            services.AddScoped<IUserValidator<BackOfficeIdentityUser>, UserValidator<BackOfficeIdentityUser>>();
+            services.AddScoped<IPasswordValidator<BackOfficeIdentityUser>, PasswordValidator<BackOfficeIdentityUser>>();
+            services.AddScoped<IPasswordHasher<BackOfficeIdentityUser>>(
+                services => new BackOfficePasswordHasher(
+                    new LegacyPasswordSecurity(),
+                    services.GetRequiredService<IJsonSerializer>()));
+            services.AddScoped<IUserConfirmation<BackOfficeIdentityUser>, UmbracoUserConfirmation<BackOfficeIdentityUser>>();
+        }
+
+        // override to add itself, by default identity only wants a single IdentityErrorDescriber
+        public override IdentityBuilder AddErrorDescriber<TDescriber>()
+        {
+            if (!typeof(BackOfficeErrorDescriber).IsAssignableFrom(typeof(TDescriber)))
+            {
+                throw new InvalidOperationException($"The type {typeof(TDescriber)} does not inherit from {typeof(BackOfficeErrorDescriber)}");
+            }
+
+            Services.AddScoped<TDescriber>();
+            return this;
         }
 
         /// <summary>

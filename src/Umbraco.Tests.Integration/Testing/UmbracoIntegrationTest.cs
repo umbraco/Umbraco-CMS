@@ -138,12 +138,13 @@ namespace Umbraco.Cms.Tests.Integration.Testing
 
                             Log.Logger = new LoggerConfiguration()
                                 .WriteTo.File(path, rollingInterval: RollingInterval.Day)
+                                .MinimumLevel.Debug()
                                 .CreateLogger();
 
                             builder.AddSerilog(Log.Logger);
                         });
                     case UmbracoTestOptions.Logger.Console:
-                        return Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder.AddConsole());
+                        return Microsoft.Extensions.Logging.LoggerFactory.Create(builder => builder.AddConsole().SetMinimumLevel(LogLevel.Debug));
                 }
             }
             catch
@@ -212,7 +213,7 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             builder.AddConfiguration()
                 .AddUmbracoCore()
                 .AddWebComponents()
-                .AddRuntimeMinifier(webHostEnvironment)
+                .AddRuntimeMinifier()
                 .AddBackOfficeAuthentication()
                 .AddBackOfficeIdentity()
                 .AddMembersIdentity()

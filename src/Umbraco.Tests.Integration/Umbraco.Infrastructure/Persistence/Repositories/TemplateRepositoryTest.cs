@@ -7,10 +7,12 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using Microsoft.Extensions.Logging;
+using Moq;
 using NUnit.Framework;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Configuration.Models;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
@@ -34,7 +36,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
     {
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
-        private IFileSystems FileSystems => GetRequiredService<IFileSystems>();
+        private FileSystems FileSystems => GetRequiredService<FileSystems>();
 
         private ITemplateRepository CreateRepository(IScopeProvider provider) =>
             new TemplateRepository((IScopeAccessor)provider, AppCaches.Disabled, LoggerFactory.CreateLogger<TemplateRepository>(), FileSystems, IOHelper, ShortStringHelper);
@@ -267,7 +269,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
                 var relationRepository = new RelationRepository(scopeAccessor, LoggerFactory.CreateLogger<RelationRepository>(), relationTypeRepository, entityRepository);
                 var propertyEditors = new Lazy<PropertyEditorCollection>(() => new PropertyEditorCollection(new DataEditorCollection(Enumerable.Empty<IDataEditor>())));
                 var dataValueReferences = new DataValueReferenceFactoryCollection(Enumerable.Empty<IDataValueReferenceFactory>());
-                var contentRepo = new DocumentRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, dataTypeService, serializer);
+                var contentRepo = new DocumentRepository(scopeAccessor, AppCaches.Disabled, LoggerFactory.CreateLogger<DocumentRepository>(), LoggerFactory, contentTypeRepository, templateRepository, tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditors, dataValueReferences, dataTypeService, serializer, Mock.Of<IEventAggregator>());
 
                 Template template = TemplateBuilder.CreateTextPageTemplate();
                 fileService.SaveTemplate(template); // else, FK violation on contentType!
@@ -372,13 +374,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 IEnumerable<ITemplate> childrenById = repository.GetChildren(created[1].Id);
-                IEnumerable<ITemplate> childrenByAlias = repository.GetChildren(created[1].Alias);
 
                 // Assert
                 Assert.AreEqual(2, childrenById.Count());
                 Assert.AreEqual(2, childrenById.DistinctBy(x => x.Id).Count());
-                Assert.AreEqual(2, childrenByAlias.Count());
-                Assert.AreEqual(2, childrenByAlias.DistinctBy(x => x.Id).Count());
             }
         }
 
@@ -416,14 +415,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Persistence.Repos
 
                 // Act
                 IEnumerable<ITemplate> descendantsById = repository.GetDescendants(created[1].Id);
-                IEnumerable<ITemplate> descendantsByAlias = repository.GetDescendants(created[1].Alias);
 
                 // Assert
                 Assert.AreEqual(3, descendantsById.Count());
                 Assert.AreEqual(3, descendantsById.DistinctBy(x => x.Id).Count());
-
-                Assert.AreEqual(3, descendantsByAlias.Count());
-                Assert.AreEqual(3, descendantsByAlias.DistinctBy(x => x.Id).Count());
             }
         }
 

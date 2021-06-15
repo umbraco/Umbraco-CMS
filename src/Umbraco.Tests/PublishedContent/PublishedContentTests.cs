@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using NUnit.Framework;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Composing;
 using Umbraco.Cms.Core.Hosting;
@@ -28,7 +29,6 @@ using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Extensions;
 using Umbraco.Tests.TestHelpers;
 using Umbraco.Web.Composing;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Tests.PublishedContent
 {
@@ -51,24 +51,24 @@ namespace Umbraco.Tests.PublishedContent
 
             var loggerFactory = NullLoggerFactory.Instance;
             var mediaService = Mock.Of<IMediaService>();
-            var mediaFileService = Mock.Of<IMediaFileSystem>();
             var contentTypeBaseServiceProvider = Mock.Of<IContentTypeBaseServiceProvider>();
             var umbracoContextAccessor = Mock.Of<IUmbracoContextAccessor>();
             var backOfficeSecurityAccessor = Mock.Of<IBackOfficeSecurityAccessor>();
             var publishedUrlProvider = Mock.Of<IPublishedUrlProvider>();
             var imageSourceParser = new HtmlImageSourceParser(publishedUrlProvider);
             var serializer = new ConfigurationEditorJsonSerializer();
+            var mediaFileService = new MediaFileManager(Mock.Of<IFileSystem>(), Mock.Of<IMediaPathScheme>(),
+                loggerFactory.CreateLogger<MediaFileManager>(), Mock.Of<IShortStringHelper>());
             var pastedImages = new RichTextEditorPastedImages(umbracoContextAccessor, loggerFactory.CreateLogger<RichTextEditorPastedImages>(), HostingEnvironment, mediaService, contentTypeBaseServiceProvider, mediaFileService, ShortStringHelper, publishedUrlProvider, serializer);
             var linkParser = new HtmlLocalLinkParser(umbracoContextAccessor, publishedUrlProvider);
-            var localizationService = Mock.Of<ILocalizationService>();
 
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, LocalizedTextService, ShortStringHelper, JsonNetSerializer), serializer) { Id = 1 },
-                new DataType(new TrueFalsePropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService, JsonNetSerializer), serializer) { Id = 1001 },
-                new DataType(new RichTextPropertyEditor(loggerFactory,backOfficeSecurityAccessor, Mock.Of<IDataTypeService>(),  localizationService, imageSourceParser, linkParser, pastedImages, ShortStringHelper, IOHelper, LocalizedTextService, Mock.Of<IImageUrlGenerator>(), JsonNetSerializer), serializer) { Id = 1002 },
-                new DataType(new IntegerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, ShortStringHelper, LocalizedTextService, JsonNetSerializer), serializer) { Id = 1003 },
-                new DataType(new TextboxPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService, JsonNetSerializer), serializer) { Id = 1004 },
-                new DataType(new MediaPickerPropertyEditor(loggerFactory, Mock.Of<IDataTypeService>(), localizationService, IOHelper, ShortStringHelper, LocalizedTextService, JsonNetSerializer), serializer) { Id = 1005 });
+                new DataType(new VoidEditor(DataValueEditorFactory), serializer) { Id = 1 },
+                new DataType(new TrueFalsePropertyEditor(DataValueEditorFactory, IOHelper), serializer) { Id = 1001 },
+                new DataType(new RichTextPropertyEditor(DataValueEditorFactory, backOfficeSecurityAccessor, imageSourceParser, linkParser, pastedImages, IOHelper, Mock.Of<IImageUrlGenerator>()), serializer) { Id = 1002 },
+                new DataType(new IntegerPropertyEditor(DataValueEditorFactory), serializer) { Id = 1003 },
+                new DataType(new TextboxPropertyEditor(DataValueEditorFactory, IOHelper), serializer) { Id = 1004 },
+                new DataType(new MediaPickerPropertyEditor(DataValueEditorFactory, IOHelper), serializer) { Id = 1005 });
             Builder.Services.AddUnique<IDataTypeService>(f => dataTypeService);
         }
 
@@ -247,7 +247,7 @@ namespace Umbraco.Tests.PublishedContent
         internal class Home : PublishedContentModel
         {
             public Home(IPublishedContent content, IPublishedValueFallback fallback)
-                : base(content)
+                : base(content, fallback)
             {}
         }
 
@@ -255,7 +255,7 @@ namespace Umbraco.Tests.PublishedContent
         internal class Anything : PublishedContentModel
         {
             public Anything(IPublishedContent content, IPublishedValueFallback fallback)
-                : base(content)
+                : base(content, fallback)
             { }
         }
 

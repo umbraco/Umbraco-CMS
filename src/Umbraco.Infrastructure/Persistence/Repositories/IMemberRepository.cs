@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Persistence.Querying;
@@ -7,6 +7,8 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
 {
     public interface IMemberRepository : IContentRepository<int, IMember>
     {
+        int[] GetMemberIds(string[] names);
+
         IMember GetByUsername(string username);
 
         /// <summary>

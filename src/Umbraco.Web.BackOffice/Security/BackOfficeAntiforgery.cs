@@ -1,10 +1,13 @@
-﻿using System.Linq;
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.Net.Http.Headers;
 using Umbraco.Cms.Core;
+using Umbraco.Cms.Core.Configuration.Models;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Security
@@ -20,100 +23,64 @@ namespace Umbraco.Cms.Web.BackOffice.Security
     /// </remarks>
     public class BackOfficeAntiforgery : IBackOfficeAntiforgery
     {
-        private readonly IAntiforgery _defaultAntiforgery;
-        private readonly IOptions<AntiforgeryOptions> _antiforgeryOptions;
+        private readonly IAntiforgery _internalAntiForgery;
+        private readonly GlobalSettings _globalSettings;
 
-        public BackOfficeAntiforgery(
-            IAntiforgery defaultAntiforgery,
-            IOptions<AntiforgeryOptions> antiforgeryOptions)
+        public BackOfficeAntiforgery(IOptions<GlobalSettings> globalSettings)
         {
-            _defaultAntiforgery = defaultAntiforgery;
-            _antiforgeryOptions = antiforgeryOptions;
+            // NOTE: This is the only way to create a separate IAntiForgery service :(
+            // Everything in netcore is internal. I have logged an issue here https://github.com/dotnet/aspnetcore/issues/22217
+            // but it will not be handled so we have to revert to this.
+            var services = new ServiceCollection();
+            services.AddLogging();
+            services.AddAntiforgery(x =>
+            {
+                x.HeaderName = Constants.Web.AngularHeadername;
+                x.Cookie.Name = Constants.Web.CsrfValidationCookieName;
+            });
+            ServiceProvider container = services.BuildServiceProvider();
+            _internalAntiForgery = container.GetRequiredService<IAntiforgery>();
+            _globalSettings = globalSettings.Value;
         }
 
         /// <inheritdoc />
         public async Task<Attempt<string>> ValidateRequestAsync(HttpContext httpContext)
         {
-            if (!httpContext.Request.Headers.TryGetValue(Constants.Web.AngularHeadername, out var headerVals))
+            try
             {
-                return Attempt.Fail("Missing header");
+                await _internalAntiForgery.ValidateRequestAsync(httpContext);
+                return Attempt<string>.Succeed();
             }
-            if (!httpContext.Request.Cookies.TryGetValue(Constants.Web.CsrfValidationCookieName, out var cookieToken))
+            catch (Exception ex)
             {
-                return Attempt.Fail("Missing cookie");
+                return Attempt.Fail(ex.Message);
             }
-
-            var headerToken = headerVals.FirstOrDefault();
-
-            // both header and cookie must be there
-            if (cookieToken == null || headerToken == null)
-            {
-                return Attempt.Fail("Missing token null");
-            }
-
-            if (await ValidateTokensAsync(httpContext, cookieToken, headerToken) == false)
-            {
-                return Attempt.Fail("Invalid token");
-            }
-
-            return Attempt<string>.Succeed();
         }
 
         /// <inheritdoc />
-        public void GetTokens(HttpContext httpContext, out string cookieToken, out string headerToken)
+        public void GetAndStoreTokens(HttpContext httpContext)
         {
-            var set = _defaultAntiforgery.GetTokens(httpContext);
+            AntiforgeryTokenSet set = _internalAntiForgery.GetAndStoreTokens(httpContext);
 
-            cookieToken = set.CookieToken;
-            headerToken = set.RequestToken;
-        }
-
-        /// <summary>
-        /// Validates the cookie and header tokens
-        /// </summary>
-        /// <param name="httpContext"></param>
-        /// <param name="cookieToken"></param>
-        /// <param name="headerToken"></param>
-        /// <returns></returns>
-        private async Task<bool> ValidateTokensAsync(HttpContext httpContext, string cookieToken, string headerToken)
-        {
-            // TODO: see https://github.com/dotnet/aspnetcore/issues/22217
-            // An alternative way to doing this would be to create a separate container specifically for antiforgery and add custom options to
-            // it and resolve services directly from there. Could be worth a shot and could actually be a way for us to deal with these global
-            // things later on if this problem arises again.
-
-            // We need to do some tricks here, save the initial cookie/header vals, then reset later
-            var originalCookies = httpContext.Request.Cookies;
-            var originalCookiesHeader = httpContext.Request.Headers[HeaderNames.Cookie];
-            var originalHeader = httpContext.Request.Headers[_antiforgeryOptions.Value.HeaderName];
-
-            try
+            if (set.RequestToken == null)
             {
-                // swap the cookie anti-forgery cookie value for the one we want to validate
-                // (this is how you modify request cookies, it's the only way)
-                var cookieHeaderVals = CookieHeaderValue.ParseList(originalCookiesHeader);
-                cookieHeaderVals.Add(new CookieHeaderValue(_antiforgeryOptions.Value.Cookie.Name, cookieToken));
-                httpContext.Request.Headers[HeaderNames.Cookie] = cookieHeaderVals.Select(c => c.ToString()).ToArray();
-
-                // swap the anti-forgery header value for the one we want to validate
-                httpContext.Request.Headers[_antiforgeryOptions.Value.HeaderName] = headerToken;
-
-                // now validate
-                return await _defaultAntiforgery.IsRequestValidAsync(httpContext);
+                throw new InvalidOperationException("Could not resolve a request token.");
             }
-            finally
-            {
-                // reset
 
-                // change request cookies back to original
-                var cookieHeaderVals = CookieHeaderValue.ParseList(originalCookiesHeader);
-                httpContext.Request.Headers[HeaderNames.Cookie] = cookieHeaderVals.Select(c => c.ToString()).ToArray();
-
-                // change the header back to normal
-                httpContext.Request.Headers[_antiforgeryOptions.Value.HeaderName] = originalHeader;
-            }
+            // We need to set 2 cookies:
+            // The cookie value that angular will use to set a header value on each request - we need to manually set this here
+            // The validation cookie value generated by the anti-forgery helper that we validate the header token against - set above in GetAndStoreTokens
+            httpContext.Response.Cookies.Append(
+                Constants.Web.AngularCookieName,
+                set.RequestToken,
+                new CookieOptions
+                {
+                    Path = "/",
+                    //must be js readable
+                    HttpOnly = false,
+                    Secure = _globalSettings.UseHttps
+                });
         }
-
 
     }
 }

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -279,8 +279,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
         {
             return new List<string>();
         }
-
-        protected override Guid NodeObjectTypeId => throw new InvalidOperationException("This property won't be implemented.");
 
         protected override void PersistDeletedItem(ContentPermissionSet entity)
         {

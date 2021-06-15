@@ -19,12 +19,12 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IMediaService _mediaService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly ContentModelBinderHelper _modelBinderHelper;
 
 
-        public MediaItemBinder(IJsonSerializer jsonSerializer, IHostingEnvironment hostingEnvironment, IMediaService mediaService, UmbracoMapper umbracoMapper, IMediaTypeService mediaTypeService)
+        public MediaItemBinder(IJsonSerializer jsonSerializer, IHostingEnvironment hostingEnvironment, IMediaService mediaService, IUmbracoMapper umbracoMapper, IMediaTypeService mediaTypeService)
         {
             _jsonSerializer = jsonSerializer ?? throw new ArgumentNullException(nameof(jsonSerializer));
             _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));

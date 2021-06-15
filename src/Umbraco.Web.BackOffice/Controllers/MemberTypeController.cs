@@ -30,7 +30,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IMemberTypeService _memberTypeService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
 
         public MemberTypeController(
@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IContentTypeService contentTypeService,
             IMediaTypeService mediaTypeService,
             IMemberTypeService memberTypeService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IShortStringHelper shortStringHelper)

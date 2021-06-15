@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration;
-using Umbraco.Cms.Core.Models.Identity;
 using Umbraco.Cms.Core.Net;
 
 namespace Umbraco.Cms.Core.Security
@@ -76,11 +75,9 @@ namespace Umbraco.Cms.Core.Security
         /// <returns>True if the session is valid, else false</returns>
         public virtual async Task<bool> ValidateSessionIdAsync(string userId, string sessionId)
         {
-            var userSessionStore = Store as IUserSessionStore<TUser>;
-
             // if this is not set, for backwards compat (which would be super rare), we'll just approve it
             // TODO: This should be removed after members supports this
-            if (userSessionStore == null)
+            if (Store is not IUserSessionStore<TUser> userSessionStore)
             {
                 return true;
             }
@@ -99,19 +96,7 @@ namespace Umbraco.Cms.Core.Security
             string password = _passwordGenerator.GeneratePassword();
             return password;
         }
-
-        /// <summary>
-        /// Generates a hashed password based on the default password hasher
-        /// No existing identity user is required and this does not validate the password
-        /// </summary>
-        /// <param name="password">The password to hash</param>
-        /// <returns>The hashed password</returns>
-        public string HashPassword(string password)
-        {
-            string hashedPassword = PasswordHasher.HashPassword(null, password);
-            return hashedPassword;
-        }
-
+        
         /// <summary>
         /// Used to validate the password without an identity user
         /// Validation code is based on the default ValidatePasswordAsync code
@@ -234,8 +219,7 @@ namespace Umbraco.Cms.Core.Security
                 throw new ArgumentNullException(nameof(user));
             }
 
-            var lockoutStore = Store as IUserLockoutStore<TUser>;
-            if (lockoutStore == null)
+            if (Store is not IUserLockoutStore<TUser> lockoutStore)
             {
                 throw new NotSupportedException("The current user store does not implement " + typeof(IUserLockoutStore<>));
             }
@@ -254,5 +238,23 @@ namespace Umbraco.Cms.Core.Security
             return result;
         }
 
+        /// <inheritdoc/>
+        public async Task<bool> ValidateCredentialsAsync(string username, string password)
+        {
+            TUser user = await FindByNameAsync(username);
+            if (user == null)
+            {
+                return false;
+            }
+
+            if (Store is not IUserPasswordStore<TUser> userPasswordStore)
+            {
+                throw new NotSupportedException("The current user store does not implement " + typeof(IUserPasswordStore<>));
+            }
+
+            var hash = await userPasswordStore.GetPasswordHashAsync(user, new CancellationToken());
+
+            return await VerifyPasswordAsync(userPasswordStore, user, password) == PasswordVerificationResult.Success;
+        }
     }
 }

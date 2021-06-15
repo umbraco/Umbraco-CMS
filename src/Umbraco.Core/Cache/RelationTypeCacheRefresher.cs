@@ -1,6 +1,7 @@
 using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 
 namespace Umbraco.Cms.Core.Cache
@@ -32,7 +33,7 @@ namespace Umbraco.Cms.Core.Cache
         public override void Refresh(int id)
         {
             var cache = AppCaches.IsolatedCaches.Get<IRelationType>();
-            if (cache) cache.Result.Clear(RepositoryCacheKeys.GetKey<IRelationType>(id));
+            if (cache) cache.Result.Clear(RepositoryCacheKeys.GetKey<IRelationType, int>(id));
             base.Refresh(id);
         }
 
@@ -45,7 +46,7 @@ namespace Umbraco.Cms.Core.Cache
         public override void Remove(int id)
         {
             var cache = AppCaches.IsolatedCaches.Get<IRelationType>();
-            if (cache) cache.Result.Clear(RepositoryCacheKeys.GetKey<IRelationType>(id));
+            if (cache) cache.Result.Clear(RepositoryCacheKeys.GetKey<IRelationType, int>(id));
             base.Remove(id);
         }
 

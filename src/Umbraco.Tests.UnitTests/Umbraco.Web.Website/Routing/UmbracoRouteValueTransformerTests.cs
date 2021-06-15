@@ -86,7 +86,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Website.Routing
                 });
 
         private IUmbracoRouteValuesFactory GetRouteValuesFactory(IPublishedRequest request)
-            => Mock.Of<IUmbracoRouteValuesFactory>(x => x.Create(It.IsAny<HttpContext>(), It.IsAny<IPublishedRequest>()) == GetRouteValues(request));
+            => Mock.Of<IUmbracoRouteValuesFactory>(x => x.CreateAsync(It.IsAny<HttpContext>(), It.IsAny<IPublishedRequest>()) == Task.FromResult(GetRouteValues(request)));
 
         private IPublishedRouter GetRouter(IPublishedRequest request)
             => Mock.Of<IPublishedRouter>(x => x.RouteRequestAsync(It.IsAny<IPublishedRequestBuilder>(), It.IsAny<RouteRequestOptions>()) == Task.FromResult(request));

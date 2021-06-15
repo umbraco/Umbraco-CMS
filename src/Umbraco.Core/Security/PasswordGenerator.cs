@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Core.Security
         {
             var password = PasswordStore.GeneratePassword(
                 _passwordConfiguration.RequiredLength,
-                _passwordConfiguration.RequireNonLetterOrDigit ? 2 : 0);
+                _passwordConfiguration.GetMinNonAlphaNumericChars());
 
             var random = new Random();
 

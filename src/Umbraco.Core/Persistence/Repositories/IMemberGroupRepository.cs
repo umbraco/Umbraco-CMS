@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Umbraco.Cms.Core.Models;
 
@@ -40,14 +40,12 @@ namespace Umbraco.Cms.Core.Persistence.Repositories
         /// <returns></returns>
         IEnumerable<IMemberGroup> GetMemberGroupsForMember(string username);
 
-        void AssignRoles(string[] usernames, string[] roleNames);
-
-        void DissociateRoles(string[] usernames, string[] roleNames);
+        void ReplaceRoles(int[] memberIds, string[] roleNames);
 
         void AssignRoles(int[] memberIds, string[] roleNames);
 
         void DissociateRoles(int[] memberIds, string[] roleNames);
 
-        int[] GetMemberIds(string[] names);
+        
     }
 }

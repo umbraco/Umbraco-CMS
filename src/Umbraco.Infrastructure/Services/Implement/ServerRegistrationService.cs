@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Core.Services.Implement
     /// <summary>
     /// Manages server registrations in the database.
     /// </summary>
-    public sealed class ServerRegistrationService : ScopeRepositoryService, IServerRegistrationService
+    public sealed class ServerRegistrationService : RepositoryService, IServerRegistrationService
     {
         private readonly IServerRegistrationRepository _serverRegistrationRepository;
         private readonly IHostingEnvironment _hostingEnvironment;
@@ -154,7 +154,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         /// <summary>
         /// Gets the local server identity.
         /// </summary>
-        private string GetCurrentServerIdentity() => NetworkHelper.MachineName // eg DOMAIN\SERVER
+        private string GetCurrentServerIdentity() => Environment.MachineName // eg DOMAIN\SERVER
                                                + "/" + _hostingEnvironment.ApplicationId; // eg /LM/S3SVC/11/ROOT;
     }
 }

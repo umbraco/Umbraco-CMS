@@ -9,8 +9,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
+using Umbraco.Cms.Web.Common.Controllers;
 using Umbraco.Cms.Web.Common.Routing;
-using Umbraco.Web.Common.Controllers;
 
 namespace Umbraco.Cms.Web.Common.Filters
 {

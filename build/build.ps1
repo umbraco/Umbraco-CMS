@@ -344,38 +344,13 @@
     $this.CopyFiles("$templates", "*", "$tmp\Templates")
 
     Write-Host "Copy files for dotnet templates"
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Program.cs", "$tmp\Templates\UmbracoSolution")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\UmbracoSolution")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.json", "$tmp\Templates\UmbracoSolution")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "appsettings.Development.json", "$tmp\Templates\UmbracoSolution")
-    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\Views", "*", "$tmp\Templates\UmbracoSolution\Views")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Program.cs", "$tmp\Templates\UmbracoProject")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore", "Startup.cs", "$tmp\Templates\UmbracoProject")
+    $this.CopyFiles("$src\Umbraco.Web.UI.NetCore\Views", "*", "$tmp\Templates\UmbracoProject\Views")
 
-  $this.RemoveDirectory("$tmp\Templates\UmbracoSolution\bin")
+  $this.RemoveDirectory("$tmp\Templates\UmbracoProject\bin")
   })
 
-  $ubuild.DefineMethod("PackageZip",
-  {
-
-    Write-Host "Create Zip packages"
-
-    $src = "$($this.SolutionRoot)\src"
-    $tmp = $this.BuildTemp
-    $out = $this.BuildOutput
-
-    Write-Host "Zip all binaries"
-    &$this.BuildEnv.Zip a -r "$out\UmbracoCms.AllBinaries.$($this.Version.Semver).zip" `
-      "$tmp\bin\*" `
-      "-x!dotless.Core.*" `
-      > $null
-    if (-not $?) { throw "Failed to zip UmbracoCms.AllBinaries." }
-
-    Write-Host "Zip cms"
-    &$this.BuildEnv.Zip a -r "$out\UmbracoCms.$($this.Version.Semver).zip" `
-      "$tmp\WebApp\*" `
-      "-x!dotless.Core.*" "-x!Content_Types.xml" "-x!*.pdb" `
-      > $null
-    if (-not $?) { throw "Failed to zip UmbracoCms." }
-  })
 
   $ubuild.DefineMethod("PrepareBuild",
   {
@@ -435,18 +410,17 @@
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cms.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms." }
 
-    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.Examine.Lucene.nuspec" `
-        -Properties BuildTmp="$($this.BuildTemp)" `
-        -Version "$($this.Version.Semver.ToString())" `
-        -Verbosity detailed  `
-        -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.examine.lucene.log"
-    if (-not $?) { throw "Failed to pack Nuget UmbracoCms.Lucene.nuspec"}
-
     &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.SqlCe.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
         -Version "$($this.Version.Semver.ToString())" `
         -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmssqlce.log"
     if (-not $?) { throw "Failed to pack NuGet UmbracoCms.SqlCe." }
+
+    &$this.BuildEnv.NuGet Pack "$nuspecs\UmbracoCms.StaticAssets.nuspec" `
+        -Properties BuildTmp="$($this.BuildTemp)" `
+        -Version "$($this.Version.Semver.ToString())" `
+        -Verbosity detailed -outputDirectory "$($this.BuildOutput)" > "$($this.BuildTemp)\nupack.cmsstaticassets.log"
+    if (-not $?) { throw "Failed to pack NuGet UmbracoCms.StaticAssets." }
 
     &$this.BuildEnv.NuGet Pack "$templates\Umbraco.Templates.nuspec" `
         -Properties BuildTmp="$($this.BuildTemp)" `
@@ -543,8 +517,6 @@
     if ($this.OnError()) { return }
     # not running tests
     $this.PreparePackages()
-    if ($this.OnError()) { return }
-    $this.PackageZip()
     if ($this.OnError()) { return }
     $this.VerifyNuGet()
     if ($this.OnError()) { return }

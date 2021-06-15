@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.PublishedCache;
@@ -14,20 +14,22 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         #region Constructors
 
-        public PublishedSnapshot(PublishedSnapshotService service, bool defaultPreview)
+        public PublishedSnapshot(IPublishedSnapshotService service, bool defaultPreview)
         {
-            _service = service;
+            _service = service as PublishedSnapshotService;
             _defaultPreview = defaultPreview;
         }
 
         public class PublishedSnapshotElements : IDisposable
         {
+#pragma warning disable IDE1006 // Naming Styles
             public ContentCache ContentCache;
             public MediaCache MediaCache;
             public MemberCache MemberCache;
             public DomainCache DomainCache;
             public IAppCache SnapshotCache;
             public IAppCache ElementsCache;
+#pragma warning restore IDE1006 // Naming Styles
 
             public void Dispose()
             {
@@ -36,7 +38,17 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
             }
         }
 
-        private PublishedSnapshotElements Elements => _elements ?? (_elements = _service.GetElements(_defaultPreview));
+        private PublishedSnapshotElements Elements
+        {
+            get
+            {
+                if (_service == null)
+                {
+                    throw new InvalidOperationException($"The {typeof(PublishedSnapshot)} cannot be used when the {typeof(IPublishedSnapshotService)} is not the default type {typeof(PublishedSnapshotService)}");
+                }
+                return _elements ??= _service.GetElements(_defaultPreview);
+            }
+        }
 
         public void Resync()
         {

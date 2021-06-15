@@ -63,11 +63,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             return list;
         }
 
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
-        }
-
         protected override void PersistNewItem(ILogViewerQuery entity)
         {
             var exists = Database.ExecuteScalar<int>($"SELECT COUNT(*) FROM {Core.Constants.DatabaseSchema.Tables.LogViewerQuery} WHERE name = @name",

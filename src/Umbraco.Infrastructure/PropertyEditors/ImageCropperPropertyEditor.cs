@@ -13,10 +13,10 @@ using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Strings;
-using Umbraco.Cms.Infrastructure.Services.Notifications;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.PropertyEditors
@@ -34,9 +34,10 @@ namespace Umbraco.Cms.Core.PropertyEditors
         Icon = "icon-crop")]
     public class ImageCropperPropertyEditor : DataEditor, IMediaUrlGenerator,
         INotificationHandler<ContentCopiedNotification>, INotificationHandler<ContentDeletedNotification>,
-        INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>
+        INotificationHandler<MediaDeletedNotification>, INotificationHandler<MediaSavingNotification>,
+        INotificationHandler<MemberDeletedNotification>
     {
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly ContentSettings _contentSettings;
         private readonly IDataTypeService _dataTypeService;
         private readonly IIOHelper _ioHelper;
@@ -48,20 +49,17 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Initializes a new instance of the <see cref="ImageCropperPropertyEditor"/> class.
         /// </summary>
         public ImageCropperPropertyEditor(
+            IDataValueEditorFactory dataValueEditorFactory,
             ILoggerFactory loggerFactory,
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IOptions<ContentSettings> contentSettings,
             IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
             IIOHelper ioHelper,
-            IShortStringHelper shortStringHelper,
-            ILocalizedTextService localizedTextService,
             UploadAutoFillProperties uploadAutoFillProperties,
-            IJsonSerializer jsonSerializer,
             IContentService contentService)
-            : base(loggerFactory, dataTypeService, localizationService, localizedTextService, shortStringHelper, jsonSerializer)
+            : base(dataValueEditorFactory)
         {
-            _mediaFileSystem = mediaFileSystem ?? throw new ArgumentNullException(nameof(mediaFileSystem));
+            _mediaFileManager = mediaFileManager ?? throw new ArgumentNullException(nameof(mediaFileManager));
             _contentSettings = contentSettings.Value ?? throw new ArgumentNullException(nameof(contentSettings));
             _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
             _ioHelper = ioHelper ?? throw new ArgumentNullException(nameof(ioHelper));
@@ -85,7 +83,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// Creates the corresponding property value editor.
         /// </summary>
         /// <returns>The corresponding property value editor.</returns>
-        protected override IDataValueEditor CreateValueEditor() => new ImageCropperPropertyValueEditor(Attribute, LoggerFactory.CreateLogger<ImageCropperPropertyValueEditor>(), _mediaFileSystem, DataTypeService, LocalizationService, LocalizedTextService, ShortStringHelper, _contentSettings, JsonSerializer);
+        protected override IDataValueEditor CreateValueEditor() => DataValueEditorFactory.Create<ImageCropperPropertyValueEditor>(Attribute);
 
         /// <summary>
         /// Creates the corresponding preValue editor.
@@ -131,10 +129,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
         /// The paths to all image cropper property files contained within a collection of content entities
         /// </summary>
         /// <param name="entities"></param>
-        /// <remarks>
-        /// This method must be made private once MemberService events have been replaced by notifications
-        /// </remarks>
-        internal IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
+        private IEnumerable<string> ContainedFilePaths(IEnumerable<IContentBase> entities) => entities
             .SelectMany(x => x.Properties)
             .Where(IsCropperField)
             .SelectMany(GetFilePathsFromPropertyValues)
@@ -153,11 +148,11 @@ namespace Umbraco.Cms.Core.PropertyEditors
             {
                 //check if the published value contains data and return it
                 var src = GetFileSrcFromPropertyValue(propertyValue.PublishedValue, out var _);
-                if (src != null) yield return _mediaFileSystem.GetRelativePath(src);
+                if (src != null) yield return _mediaFileManager.FileSystem.GetRelativePath(src);
 
                 //check if the edited value contains data and return it
                 src = GetFileSrcFromPropertyValue(propertyValue.EditedValue, out var _);
-                if (src != null) yield return _mediaFileSystem.GetRelativePath(src);
+                if (src != null) yield return _mediaFileManager.FileSystem.GetRelativePath(src);
             }
         }
 
@@ -176,7 +171,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
             deserializedValue = GetJObject(str, true);
             if (deserializedValue?["src"] == null) return null;
             var src = deserializedValue["src"].Value<string>();
-            return relative ? _mediaFileSystem.GetRelativePath(src) : src;
+            return relative ? _mediaFileManager.FileSystem.GetRelativePath(src) : src;
         }
 
         /// <summary>
@@ -200,9 +195,9 @@ namespace Umbraco.Cms.Core.PropertyEditors
                     {
                         continue;
                     }
-                    var sourcePath = _mediaFileSystem.GetRelativePath(src);
-                    var copyPath = _mediaFileSystem.CopyFile(notification.Copy, property.PropertyType, sourcePath);
-                    jo["src"] = _mediaFileSystem.GetUrl(copyPath);
+                    var sourcePath = _mediaFileManager.FileSystem.GetRelativePath(src);
+                    var copyPath = _mediaFileManager.CopyFile(notification.Copy, property.PropertyType, sourcePath);
+                    jo["src"] = _mediaFileManager.FileSystem.GetUrl(copyPath);
                     notification.Copy.SetValue(property.Alias, jo.ToString(), propertyValue.Culture, propertyValue.Segment);
                     isUpdated = true;
                 }
@@ -218,10 +213,12 @@ namespace Umbraco.Cms.Core.PropertyEditors
 
         public void Handle(MediaDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
 
+        public void Handle(MemberDeletedNotification notification) => DeleteContainedFiles(notification.DeletedEntities);
+
         private void DeleteContainedFiles(IEnumerable<IContentBase> deletedEntities)
         {
             var filePathsToDelete = ContainedFilePaths(deletedEntities);
-            _mediaFileSystem.DeleteMediaFiles(filePathsToDelete);
+            _mediaFileManager.DeleteMediaFiles(filePathsToDelete);
         }
 
         public void Handle(MediaSavingNotification notification)
@@ -282,7 +279,7 @@ namespace Umbraco.Cms.Core.PropertyEditors
                         if (src == null)
                             _autoFillProperties.Reset(model, autoFillConfig, pvalue.Culture, pvalue.Segment);
                         else
-                            _autoFillProperties.Populate(model, autoFillConfig, _mediaFileSystem.GetRelativePath(src), pvalue.Culture, pvalue.Segment);
+                            _autoFillProperties.Populate(model, autoFillConfig, _mediaFileManager.FileSystem.GetRelativePath(src), pvalue.Culture, pvalue.Segment);
                     }
                 }
             }

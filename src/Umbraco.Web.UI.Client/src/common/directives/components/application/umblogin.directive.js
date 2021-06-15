@@ -16,7 +16,7 @@
     function UmbLoginController($scope, $location, currentUserResource, formHelper,
         mediaHelper, umbRequestHelper, Upload, localizationService,
         userService, externalLoginInfo, externalLoginInfoService,
-        resetPasswordCodeInfo, $timeout, authResource, $q, $route) {
+        resetPasswordCodeInfo, authResource, $q) {
 
         const vm = this;
 
@@ -72,6 +72,7 @@
         vm.loginSubmit = loginSubmit;
         vm.requestPasswordResetSubmit = requestPasswordResetSubmit;
         vm.setPasswordSubmit = setPasswordSubmit;
+        vm.newPasswordKeyUp = newPasswordKeyUp;
         vm.labels = {};
         localizationService.localizeMany([
             vm.usernameIsEmail ? "general_email" : "general_username",
@@ -362,6 +363,9 @@
             });
         }
 
+        function newPasswordKeyUp(event) {
+            vm.passwordVal = event.target.value;
+        }
 
         ////
 

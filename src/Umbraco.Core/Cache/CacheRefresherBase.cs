@@ -1,6 +1,7 @@
 using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Entities;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Sync;
 
 namespace Umbraco.Cms.Core.Cache
@@ -50,7 +51,12 @@ namespace Umbraco.Cms.Core.Cache
         /// </summary>
         public virtual void RefreshAll()
         {
-            OnCacheUpdated(NotificationFactory.Create<TNotification>(null, MessageType.RefreshAll));
+            // NOTE: We pass in string.Empty here because if we pass in NULL this causes problems with
+            // the underlying ActivatorUtilities.CreateInstance which doesn't seem to support passing in
+            // null to an 'object' parameter and we end up with "A suitable constructor for type 'ZYZ' could not be located."
+            // In this case, all cache refreshers should be checking for the type first before checking for a msg value
+            // so this shouldn't cause any issues.
+            OnCacheUpdated(NotificationFactory.Create<TNotification>(string.Empty, MessageType.RefreshAll));
         }
 
         /// <summary>

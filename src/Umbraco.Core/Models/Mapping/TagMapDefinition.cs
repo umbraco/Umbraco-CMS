@@ -4,7 +4,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class TagMapDefinition : IMapDefinition
     {
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<ITag, TagModel>((source, context) => new TagModel(), Map);
         }

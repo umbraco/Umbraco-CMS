@@ -26,7 +26,7 @@ namespace Umbraco.Tests.Routing
             base.Compose();
 
             Builder.Services.AddUnique(Mock.Of<IDomainService>());
-            Builder.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
+            Builder.Services.AddTransient<ISiteDomainMapper, SiteDomainMapper>();
         }
 
         void SetDomains1()
@@ -186,7 +186,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains1();
@@ -219,7 +219,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains2();
@@ -244,7 +244,7 @@ namespace Umbraco.Tests.Routing
             var umbracoContextAccessor = new TestUmbracoContextAccessor(umbracoContext);
             var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains3();
@@ -276,7 +276,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains4();
@@ -298,7 +298,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains4();
@@ -362,7 +362,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains4();
@@ -387,7 +387,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             SetDomains5();

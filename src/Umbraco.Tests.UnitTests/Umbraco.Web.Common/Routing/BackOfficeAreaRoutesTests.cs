@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
     [TestFixture]
     public class BackOfficeAreaRoutesTests
     {
-        [TestCase(RuntimeLevel.Install)]
+
         [TestCase(RuntimeLevel.BootFailed)]
         [TestCase(RuntimeLevel.Unknown)]
         [TestCase(RuntimeLevel.Boot)]
@@ -38,22 +38,12 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Web.Common.Routing
         }
 
         [Test]
-        public void RuntimeState_Upgrade()
+        [TestCase(RuntimeLevel.Run)]
+        [TestCase(RuntimeLevel.Upgrade)]
+        [TestCase(RuntimeLevel.Install)]
+        public void RuntimeState_All_Routes(RuntimeLevel level)
         {
-            BackOfficeAreaRoutes routes = GetBackOfficeAreaRoutes(RuntimeLevel.Upgrade);
-            var endpoints = new TestRouteBuilder();
-            routes.CreateRoutes(endpoints);
-
-            Assert.AreEqual(1, endpoints.DataSources.Count);
-            EndpointDataSource route = endpoints.DataSources.First();
-            Assert.AreEqual(2, route.Endpoints.Count);
-            AssertMinimalBackOfficeRoutes(route);
-        }
-
-        [Test]
-        public void RuntimeState_Run()
-        {
-            BackOfficeAreaRoutes routes = GetBackOfficeAreaRoutes(RuntimeLevel.Run);
+            BackOfficeAreaRoutes routes = GetBackOfficeAreaRoutes(level);
             var endpoints = new TestRouteBuilder();
             routes.CreateRoutes(endpoints);
 

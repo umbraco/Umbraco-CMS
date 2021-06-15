@@ -31,7 +31,7 @@ namespace Umbraco.Cms.Core.Runtime
 
         private bool _isInitialized;
         // indicates whether...
-        private bool _isMainDom; // we are the main domain
+        private bool? _isMainDom; // we are the main domain
         private volatile bool _signaled; // we have been signaled
 
         // actions to run before releasing the main domain
@@ -64,7 +64,7 @@ namespace Umbraco.Cms.Core.Runtime
             {
                 hostingEnvironment.RegisterObject(this);
                 return Acquire();
-            });
+            }).Value;
         }
 
         /// <summary>
@@ -85,7 +85,11 @@ namespace Umbraco.Cms.Core.Runtime
                     return false;
                 }
 
-                if (_isMainDom == false)
+                if (_isMainDom.HasValue == false)
+                {
+                    throw new InvalidOperationException("Register called when MainDom has not been acquired");
+                }
+                else if (_isMainDom == false)
                 {
                     _logger.LogWarning("Register called when MainDom has not been acquired");
                     return false;
@@ -187,7 +191,14 @@ namespace Umbraco.Cms.Core.Runtime
                 _listenTask = _mainDomLock.ListenAsync();
                 _listenCompleteTask = _listenTask.ContinueWith(t =>
                 {
-                    _logger.LogDebug("Listening task completed with {TaskStatus}", _listenTask.Status);
+                    if (_listenTask.Exception != null)
+                    {
+                        _logger.LogWarning("Listening task completed with {TaskStatus}, Exception: {Exception}", _listenTask.Status, _listenTask.Exception);
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Listening task completed with {TaskStatus}", _listenTask.Status);
+                    }
 
                     OnSignal("signal");
                 }, TaskScheduler.Default); // Must explicitly specify this, see https://blog.stephencleary.com/2013/10/continuewith-is-dangerous-too.html
@@ -208,7 +219,17 @@ namespace Umbraco.Cms.Core.Runtime
         /// <remarks>
         /// Acquire must be called first else this will always return false
         /// </remarks>
-        public bool IsMainDom => _isMainDom;
+        public bool IsMainDom
+        {
+            get
+            {
+                if (!_isMainDom.HasValue)
+                {
+                    throw new InvalidOperationException("MainDom has not been acquired yet");
+                }
+                return _isMainDom.Value;
+            }
+        }
 
         // IRegisteredObject
         void IRegisteredObject.Stop(bool immediate)

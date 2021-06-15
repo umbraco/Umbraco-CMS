@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly GlobalSettings _globalSettings;
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
 
         public DictionaryController(
             ILogger<DictionaryController> logger,
@@ -48,7 +48,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IOptions<GlobalSettings> globalSettings,
             ILocalizedTextService localizedTextService,
-            UmbracoMapper umbracoMapper
+            IUmbracoMapper umbracoMapper
             )
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

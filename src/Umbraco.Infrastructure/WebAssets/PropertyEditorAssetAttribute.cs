@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Umbraco.Cms.Core.WebAssets;
 
 namespace Umbraco.Cms.Infrastructure.WebAssets
@@ -10,6 +10,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
     /// This wraps a CDF asset
     /// </remarks>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [Obsolete("Use the BackOfficeAssets collection on IUmbracoBuilder instead. Will be removed in the next major version")]
     public class PropertyEditorAssetAttribute : Attribute
     {
         public AssetType AssetType { get; }

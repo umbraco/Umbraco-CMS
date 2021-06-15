@@ -1,6 +1,5 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
-
 using Umbraco.Cms.Core.Models.PublishedContent;
 
 namespace Umbraco.Extensions

@@ -32,8 +32,8 @@ namespace Umbraco.Extensions
         private static IUmbracoContextAccessor UmbracoContextAccessor { get; } =
             StaticServiceProvider.Instance.GetRequiredService<IUmbracoContextAccessor>();
 
-        private static ISiteDomainHelper SiteDomainHelper { get; } =
-            StaticServiceProvider.Instance.GetRequiredService<ISiteDomainHelper>();
+        private static ISiteDomainMapper SiteDomainHelper { get; } =
+            StaticServiceProvider.Instance.GetRequiredService<ISiteDomainMapper>();
 
         private static IExamineManager ExamineManager { get; } =
             StaticServiceProvider.Instance.GetRequiredService<IExamineManager>();
@@ -108,6 +108,9 @@ namespace Umbraco.Extensions
 
         public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
             => content.IsAllowedTemplate(ContentTypeService, WebRoutingSettings.Value, templateId);
+
+        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
+            => content.IsAllowedTemplate(WebRoutingSettings.Value.DisableAlternativeTemplates, WebRoutingSettings.Value.ValidateAlternativeTemplates, templateAlias);
 
         public static bool IsAllowedTemplate(
             this IPublishedContent content,

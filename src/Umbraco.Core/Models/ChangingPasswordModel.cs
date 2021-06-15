@@ -1,4 +1,4 @@
-﻿using System.Runtime.Serialization;
+using System.Runtime.Serialization;
 
 namespace Umbraco.Cms.Core.Models
 {
@@ -20,7 +20,8 @@ namespace Umbraco.Cms.Core.Models
         public string OldPassword { get; set; }
 
         /// <summary>
-        /// The id of the user - required to allow changing password without the entire UserSave model
+        /// The ID of the current user/member requesting the password change
+        /// For users, required to allow changing password without the entire UserSave model
         /// </summary>
         [DataMember(Name = "id")]
         public int Id { get; set; }

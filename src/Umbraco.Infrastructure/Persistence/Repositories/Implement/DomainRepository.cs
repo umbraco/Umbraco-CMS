@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -79,11 +79,6 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     "DELETE FROM umbracoDomain WHERE id = @id"
                 };
             return list;
-        }
-
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
         }
 
         protected override void PersistNewItem(IDomain entity)

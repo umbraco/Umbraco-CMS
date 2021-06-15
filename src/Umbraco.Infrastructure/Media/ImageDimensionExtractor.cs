@@ -1,8 +1,8 @@
 using System;
-using System.Drawing;
 using System.IO;
+using SixLabors.ImageSharp;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Media;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Infrastructure.Media
 {
@@ -34,8 +34,12 @@ namespace Umbraco.Cms.Infrastructure.Media
             // we have no choice but to try to read in via GDI
             try
             {
-                // TODO: We should be using ImageSharp for this
-                using (var image = Image.FromStream(stream))
+                if (stream.CanRead && stream.CanSeek)
+                {
+                    stream.Seek(0, SeekOrigin.Begin);
+                }
+
+                using (var image = Image.Load(stream))
                 {
                     var fileWidth = image.Width;
                     var fileHeight = image.Height;

@@ -42,7 +42,17 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Manifest
             };
             _ioHelper = TestHelper.IOHelper;
             NullLoggerFactory loggerFactory = NullLoggerFactory.Instance;
-            _parser = new ManifestParser(AppCaches.Disabled, new ManifestValueValidatorCollection(validators), new ManifestFilterCollection(Array.Empty<IManifestFilter>()),  loggerFactory.CreateLogger<ManifestParser>(), loggerFactory, _ioHelper, TestHelper.GetHostingEnvironment(), Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), new JsonNetSerializer(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>());
+            _parser = new ManifestParser(
+                AppCaches.Disabled,
+                new ManifestValueValidatorCollection(validators),
+                new ManifestFilterCollection(Array.Empty<IManifestFilter>()),
+                loggerFactory.CreateLogger<ManifestParser>(),
+                _ioHelper,
+                TestHelper.GetHostingEnvironment(),
+                new JsonNetSerializer(),
+                Mock.Of<ILocalizedTextService>(),
+                Mock.Of<IShortStringHelper>(),
+                Mock.Of<IDataValueEditorFactory>());
         }
 
         [Test]
@@ -217,6 +227,8 @@ javascript: ['~/test.js',/*** some note about stuff asd09823-4**09234*/ '~/test2
 
             IDataEditor editor = manifest.PropertyEditors[1];
             Assert.IsTrue((editor.Type & EditorType.MacroParameter) > 0);
+            Assert.IsNotEmpty(editor.DefaultConfiguration);
+            Assert.AreEqual("some default val", editor.DefaultConfiguration["key1"]);
 
             editor = manifest.PropertyEditors[0];
             Assert.AreEqual("Test.Test1", editor.Alias);

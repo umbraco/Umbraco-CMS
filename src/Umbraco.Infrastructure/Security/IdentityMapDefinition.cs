@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Core.Security
             _appCaches = appCaches;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IUser, BackOfficeIdentityUser>(
                 (source, context) =>
@@ -48,10 +48,10 @@ namespace Umbraco.Cms.Core.Security
                     target.EnableChangeTracking();
                 });
 
-            mapper.Define<IMember, MembersIdentityUser>(
+            mapper.Define<IMember, MemberIdentityUser>(
                 (source, context) =>
                 {
-                    var target = new MembersIdentityUser(source.Id);
+                    var target = new MemberIdentityUser(source.Id);
                     target.DisableChangeTracking();
                     return target;
                 },
@@ -63,15 +63,10 @@ namespace Umbraco.Cms.Core.Security
                 });
         }
 
-        // Umbraco.Code.MapAll -Id -Groups -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled
+        // Umbraco.Code.MapAll -Id -LockoutEnabled -PhoneNumber -PhoneNumberConfirmed -TwoFactorEnabled -ConcurrencyStamp -NormalizedEmail -NormalizedUserName -Roles
         private void Map(IUser source, BackOfficeIdentityUser target)
         {
-            // well, the ctor has been fixed
-            /*
-            // these two are already set in ctor but BackOfficeIdentityUser ctor is CompletelyBroken
-            target.Id = source.Id;
-            target.Groups = source.Groups.ToArray();
-            */
+            // NOTE: Groups/Roles are set in the BackOfficeIdentityUser ctor
 
             target.CalculatedMediaStartNodeIds = source.CalculateMediaStartNodeIds(_entityService, _appCaches);
             target.CalculatedContentStartNodeIds = source.CalculateContentStartNodeIds(_entityService, _appCaches);
@@ -90,17 +85,10 @@ namespace Umbraco.Cms.Core.Security
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
-
-            // this was in AutoMapper but does not have a setter anyways
-            //target.AllowedSections = source.AllowedSections.ToArray(),
-
-            // these were marked as ignored for AutoMapper but don't have a setter anyways
-            //target.Logins =;
-            //target.Claims =;
-            //target.Roles =;
         }
 
-        private void Map(IMember source, MembersIdentityUser target)
+        // TODO: We need to validate this mapping is OK, we need to get Umbraco.Code working
+        private void Map(IMember source, MemberIdentityUser target)
         {
             target.Email = source.Email;
             target.UserName = source.Username;
@@ -114,6 +102,11 @@ namespace Umbraco.Cms.Core.Security
             target.IsApproved = source.IsApproved;
             target.SecurityStamp = source.SecurityStamp;
             target.LockoutEnd = source.IsLockedOut ? DateTime.MaxValue.ToUniversalTime() : (DateTime?)null;
+            target.Comments = source.Comments;
+            target.LastLockoutDateUtc = source.LastLockoutDate == DateTime.MinValue ? null : source.LastLockoutDate.ToUniversalTime();
+            target.CreatedDateUtc = source.CreateDate.ToUniversalTime();
+            target.Key = source.Key;
+            target.MemberTypeAlias = source.ContentTypeAlias;
 
             // NB: same comments re AutoMapper as per BackOfficeUser
         }

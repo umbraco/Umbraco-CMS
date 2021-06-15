@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Http;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Trees;
 
-namespace Umbraco.Cms.Web.BackOffice.Trees
+namespace Umbraco.Cms.Core.Notifications
 {
     /// <summary>
     /// A notification that allows developers to modify the tree node collection that is being rendered
@@ -22,10 +21,16 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         public FormCollection QueryString { get; }
 
-        public TreeNodesRenderingNotification(TreeNodeCollection nodes, FormCollection queryString)
+        /// <summary>
+        /// The alias of the tree rendered
+        /// </summary>
+        public string TreeAlias { get; }
+
+        public TreeNodesRenderingNotification(TreeNodeCollection nodes, FormCollection queryString, string treeAlias)
         {
             Nodes = nodes;
             QueryString = queryString;
+            TreeAlias = treeAlias;
         }
     }
 }

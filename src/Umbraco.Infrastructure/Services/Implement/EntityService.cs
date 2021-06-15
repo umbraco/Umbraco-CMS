@@ -15,7 +15,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
-    public class EntityService : ScopeRepositoryService, IEntityService
+    public class EntityService : RepositoryService, IEntityService
     {
         private readonly IEntityRepository _entityRepository;
         private readonly Dictionary<string, UmbracoObjectTypes> _objectTypes;

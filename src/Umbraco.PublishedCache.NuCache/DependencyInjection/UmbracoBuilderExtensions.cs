@@ -29,9 +29,6 @@ namespace Umbraco.Extensions
             // must register default options, required in the service ctor
             builder.Services.TryAddTransient(factory => new PublishedSnapshotServiceOptions());
             builder.SetPublishedSnapshotService<PublishedSnapshotService>();
-
-            // Add as itself
-            builder.Services.TryAddSingleton<PublishedSnapshotService>();
             builder.Services.TryAddSingleton<IPublishedSnapshotStatus, PublishedSnapshotStatus>();
 
             // replace this service since we want to improve the content/media

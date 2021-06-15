@@ -56,13 +56,13 @@ namespace Umbraco.Cms.Core.Scoping
         /// Read-locks some lock objects.
         /// </summary>
         /// <param name="lockIds">The lock object identifiers.</param>
-        void ReadLock(params int[] lockIds);
+        void ReadLock(int lockId);
 
         /// <summary>
         /// Write-locks some lock objects.
         /// </summary>
         /// <param name="lockIds">The lock object identifiers.</param>
-        void WriteLock(params int[] lockIds);
+        void WriteLock(int lockId);
 
         /// <summary>
         /// Write-locks some lock objects.

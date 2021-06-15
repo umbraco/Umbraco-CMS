@@ -47,7 +47,7 @@ namespace Umbraco.Tests.TestHelpers
 
             var serializer = new ConfigurationEditorJsonSerializer();
             var dataTypeService = new TestObjects.TestDataTypeService(
-                new DataType(new VoidEditor(NullLoggerFactory.Instance, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(),Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), JsonNetSerializer), serializer) { Id = 1 });
+                new DataType(new VoidEditor(DataValueEditorFactory), serializer) { Id = 1 });
 
             var factory = new PublishedContentTypeFactory(Mock.Of<IPublishedModelFactory>(), new PropertyValueConverterCollection(Array.Empty<IPropertyValueConverter>()), dataTypeService);
             var type = new AutoPublishedContentType(Guid.NewGuid(), 0, "anything", new PublishedPropertyType[] { });
@@ -110,10 +110,8 @@ namespace Umbraco.Tests.TestHelpers
                 Mock.Of<IPublishedUrlProvider>(),
                 Mock.Of<IRequestAccessor>(),
                 container?.GetRequiredService<IPublishedValueFallback>() ?? Current.Factory.GetRequiredService<IPublishedValueFallback>(),
-                container?.GetRequiredService<IPublicAccessChecker>() ?? Current.Factory.GetRequiredService<IPublicAccessChecker>(),
                 container?.GetRequiredService<IFileService>() ?? Current.Factory.GetRequiredService<IFileService>(),
                 container?.GetRequiredService<IContentTypeService>() ?? Current.Factory.GetRequiredService<IContentTypeService>(),
-                container?.GetRequiredService<IPublicAccessService>() ?? Current.Factory.GetRequiredService<IPublicAccessService>(),
                 umbracoContextAccessor,
                 Mock.Of<IEventAggregator>()
             );

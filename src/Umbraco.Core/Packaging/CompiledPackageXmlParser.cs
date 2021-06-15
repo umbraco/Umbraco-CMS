@@ -133,7 +133,7 @@ namespace Umbraco.Cms.Core.Packaging
 
         private static string PrepareAsFilePathElement(string pathElement)
         {
-            return pathElement.TrimStart(new[] { '\\', '/', '~' }).Replace("/", "\\");
+            return pathElement.TrimStart(new[] { '\\', '/', '~' }).Replace('/', Path.DirectorySeparatorChar);
         }
 
         private string UpdatePathPlaceholders(string path)

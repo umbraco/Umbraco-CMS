@@ -1,11 +1,20 @@
 using System;
-using Umbraco.Cms.Core.Models.Identity;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Factories
 {
     internal static class ExternalLoginFactory
     {
+        public static IIdentityUserToken BuildEntity(ExternalLoginTokenDto dto)
+        {
+            var entity = new IdentityUserToken(dto.Id, dto.ExternalLoginDto.LoginProvider, dto.Name, dto.Value, dto.ExternalLoginDto.UserId.ToString(), dto.CreateDate);
+
+            // reset dirty initial properties (U4-1946)
+            entity.ResetDirtyProperties(false);
+            return entity;
+        }
+
         public static IIdentityUserLogin BuildEntity(ExternalLoginDto dto)
         {
             var entity = new IdentityUserLogin(dto.Id, dto.LoginProvider, dto.ProviderKey, dto.UserId.ToString(), dto.CreateDate)
@@ -42,6 +51,20 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Factories
                 LoginProvider = entity.LoginProvider,
                 ProviderKey = entity.ProviderKey,
                 UserData = entity.UserData,
+                CreateDate = DateTime.Now
+            };
+
+            return dto;
+        }
+
+        public static ExternalLoginTokenDto BuildDto(int externalLoginId, IExternalLoginToken token, int? id = null)
+        {
+            var dto = new ExternalLoginTokenDto
+            {
+                Id = id ?? default,
+                ExternalLoginId = externalLoginId,
+                Name = token.Name,
+                Value = token.Value,
                 CreateDate = DateTime.Now
             };
 

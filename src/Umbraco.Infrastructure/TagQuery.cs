@@ -16,12 +16,12 @@ namespace Umbraco.Cms.Core
     {
         private readonly ITagService _tagService;
         private readonly IPublishedContentQuery _contentQuery;
-        private readonly UmbracoMapper _mapper;
+        private readonly IUmbracoMapper _mapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TagQuery"/> class.
         /// </summary>
-        public TagQuery(ITagService tagService, IPublishedContentQuery contentQuery, UmbracoMapper mapper)
+        public TagQuery(ITagService tagService, IPublishedContentQuery contentQuery, IUmbracoMapper mapper)
         {
             _tagService = tagService ?? throw new ArgumentNullException(nameof(tagService));
             _contentQuery = contentQuery ?? throw new ArgumentNullException(nameof(contentQuery));

@@ -11,9 +11,9 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         private readonly PublishedSnapshotService _service;
         private readonly INuCacheContentService _publishedContentService;
 
-        public PublishedSnapshotStatus(PublishedSnapshotService service, INuCacheContentService publishedContentService)
+        public PublishedSnapshotStatus(IPublishedSnapshotService service, INuCacheContentService publishedContentService)
         {
-            _service = service;
+            _service = service as PublishedSnapshotService;
             _publishedContentService = publishedContentService;
         }
 
@@ -23,6 +23,12 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         /// <inheritdoc/>
         public string GetStatus()
         {
+            if (_service == null)
+            {
+                return $"The current {typeof(IPublishedSnapshotService)} is not the default type. A status cannot be determined.";
+            } 
+
+            // TODO: This should be private
             _service.EnsureCaches();
 
             var dbCacheIsOk = _publishedContentService.VerifyContentDbCache()

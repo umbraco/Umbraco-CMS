@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IOptionsMonitor<WebRoutingSettings> _webRoutingSettings;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
         private readonly IRedirectUrlService _redirectUrlService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IConfigManipulator _configManipulator;
 
         public RedirectUrlManagementController(
@@ -36,7 +36,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IOptionsMonitor<WebRoutingSettings> webRoutingSettings,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
             IRedirectUrlService redirectUrlService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IConfigManipulator configManipulator)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));

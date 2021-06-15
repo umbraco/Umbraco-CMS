@@ -7,8 +7,7 @@ using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.IO;
 using Umbraco.Cms.Core.Models;
-using Umbraco.Cms.Core.Services;
-using Umbraco.Cms.Core.Services.Implement;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Strings;
 using Umbraco.Cms.Infrastructure.ModelsBuilder;
 using Umbraco.Cms.Infrastructure.WebAssets;
@@ -17,9 +16,12 @@ using Umbraco.Cms.Web.Common.ModelBinders;
 namespace Umbraco.Cms.Web.Common.ModelsBuilder
 {
     /// <summary>
-    /// Handles <see cref="UmbracoApplicationStarting"/> and <see cref="ServerVariablesParsing"/> notifications to initialize MB
+    /// Handles <see cref="UmbracoApplicationStartingNotification"/> and <see cref="ServerVariablesParsingNotification"/> notifications to initialize MB
     /// </summary>
-    internal class ModelsBuilderNotificationHandler : INotificationHandler<UmbracoApplicationStarting>, INotificationHandler<ServerVariablesParsing>, INotificationHandler<ModelBindingError>
+    internal class ModelsBuilderNotificationHandler :
+        INotificationHandler<ServerVariablesParsingNotification>,
+        INotificationHandler<ModelBindingErrorNotification>,
+        INotificationHandler<TemplateSavingNotification>
     {
         private readonly ModelsBuilderSettings _config;
         private readonly IShortStringHelper _shortStringHelper;
@@ -36,22 +38,9 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         }
 
         /// <summary>
-        /// Handles the <see cref="UmbracoApplicationStarting"/> notification
+        /// Handles the <see cref="ServerVariablesParsingNotification"/> notification to add custom urls and MB mode
         /// </summary>
-        public void Handle(UmbracoApplicationStarting notification)
-        {
-            // always setup the dashboard
-            // note: UmbracoApiController instances are automatically registered
-            if (_config.ModelsMode != ModelsMode.Nothing)
-            {
-                FileService.SavingTemplate += FileService_SavingTemplate;
-            }
-        }
-
-        /// <summary>
-        /// Handles the <see cref="ServerVariablesParsing"/> notification to add custom urls and MB mode
-        /// </summary>
-        public void Handle(ServerVariablesParsing notification)
+        public void Handle(ServerVariablesParsingNotification notification)
         {
             IDictionary<string, object> serverVars = notification.ServerVariables;
 
@@ -99,21 +88,26 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         /// Used to check if a template is being created based on a document type, in this case we need to
         /// ensure the template markup is correct based on the model name of the document type
         /// </summary>
-        private void FileService_SavingTemplate(IFileService sender, SaveEventArgs<ITemplate> e)
+        public void Handle(TemplateSavingNotification notification)
         {
-            // don't do anything if this special key is not found
-            if (!e.AdditionalData.ContainsKey("CreateTemplateForContentType"))
+            if (_config.ModelsMode == ModelsMode.Nothing)
+            {
+                return;
+            }
+
+            // Don't do anything if we're not requested to create a template for a content type
+            if (notification.CreateTemplateForContentType is false)
             {
                 return;
             }
 
             // ensure we have the content type alias
-            if (!e.AdditionalData.ContainsKey("ContentTypeAlias"))
+            if (notification.ContentTypeAlias is null)
             {
-                throw new InvalidOperationException("The additionalData key: ContentTypeAlias was not found");
+                throw new InvalidOperationException("ContentTypeAlias was not found on the notification");
             }
 
-            foreach (ITemplate template in e.SavedEntities)
+            foreach (ITemplate template in notification.SavedEntities)
             {
                 // if it is in fact a new entity (not been saved yet) and the "CreateTemplateForContentType" key
                 // is found, then it means a new template is being created based on the creation of a document type
@@ -121,7 +115,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                 {
                     // ensure is safe and always pascal cased, per razor standard
                     // + this is how we get the default model name in Umbraco.ModelsBuilder.Umbraco.Application
-                    var alias = e.AdditionalData["ContentTypeAlias"].ToString();
+                    var alias = notification.ContentTypeAlias;
                     var name = template.Name; // will be the name of the content type since we are creating
                     var className = UmbracoServices.GetClrName(_shortStringHelper, name, alias);
 
@@ -143,7 +137,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         /// <summary>
         /// Handles when a model binding error occurs
         /// </summary>
-        public void Handle(ModelBindingError notification)
+        public void Handle(ModelBindingErrorNotification notification)
         {
             ModelsBuilderAssemblyAttribute sourceAttr = notification.SourceType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
             ModelsBuilderAssemblyAttribute modelAttr = notification.ModelType.Assembly.GetCustomAttribute<ModelsBuilderAssemblyAttribute>();
@@ -167,17 +161,17 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
             }
 
             // both are ModelsBuilder types
-            var pureSource = sourceAttr.PureLive;
-            var pureModel = modelAttr.PureLive;
+            var pureSource = sourceAttr.IsInMemory;
+            var pureModel = modelAttr.IsInMemory;
 
-            if (sourceAttr.PureLive || modelAttr.PureLive)
+            if (sourceAttr.IsInMemory || modelAttr.IsInMemory)
             {
                 if (pureSource == false || pureModel == false)
                 {
                     // only one is pure - report, but better not restart (loops?)
                     notification.Message.Append(pureSource
-                        ? " The content model is PureLive, but the view model is not."
-                        : " The view model is PureLive, but the content model is not.");
+                        ? " The content model is in memory generated, but the view model is not."
+                        : " The view model is in memory generated, but the content model is not.");
                     notification.Message.Append(" The application is in an unstable state and should be restarted.");
                 }
                 else
@@ -186,7 +180,7 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
                     // if same version... makes no sense... and better not restart (loops?)
                     Version sourceVersion = notification.SourceType.Assembly.GetName().Version;
                     Version modelVersion = notification.ModelType.Assembly.GetName().Version;
-                    notification.Message.Append(" Both view and content models are PureLive, with ");
+                    notification.Message.Append(" Both view and content models are in memory generated, with ");
                     notification.Message.Append(sourceVersion == modelVersion
                         ? "same version. The application is in an unstable state and should be restarted."
                         : "different versions. The application is in an unstable state and should be restarted.");

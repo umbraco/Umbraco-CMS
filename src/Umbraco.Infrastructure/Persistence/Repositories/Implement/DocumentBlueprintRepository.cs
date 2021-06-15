@@ -1,6 +1,7 @@
 ﻿using System;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Cache;
+using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Scoping;
@@ -34,10 +35,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
             Lazy<PropertyEditorCollection> propertyEditorCollection,
             IDataTypeService dataTypeService,
             DataValueReferenceFactoryCollection dataValueReferenceFactories,
-            IJsonSerializer serializer)
+            IJsonSerializer serializer,
+            IEventAggregator eventAggregator)
             : base(scopeAccessor, appCaches, logger, loggerFactory, contentTypeRepository, templateRepository,
                 tagRepository, languageRepository, relationRepository, relationTypeRepository, propertyEditorCollection,
-                dataValueReferenceFactories, dataTypeService, serializer)
+                dataValueReferenceFactories, dataTypeService, serializer, eventAggregator)
         {
         }
 

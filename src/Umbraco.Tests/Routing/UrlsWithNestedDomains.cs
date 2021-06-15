@@ -29,7 +29,7 @@ namespace Umbraco.Tests.Routing
         {
             base.Compose();
             Builder.Services.AddUnique(Mock.Of<IDomainService>());
-            Builder.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
+            Builder.Services.AddTransient<ISiteDomainMapper, SiteDomainMapper>();
         }
 
         [Test]
@@ -48,7 +48,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             Assert.AreEqual("http://domain2.com/1001-1-1/", publishedUrlProvider.GetUrl(100111, UrlMode.Absolute));

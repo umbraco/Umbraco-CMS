@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             _tabsAndPropertiesMapper = new TabsAndPropertiesMapper<IMedia>(cultureDictionary, localizedTextService, contentTypeBaseServiceProvider);
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IMedia, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
             mapper.Define<IMedia, MediaItemDisplay>((source, context) => new MediaItemDisplay(), Map);

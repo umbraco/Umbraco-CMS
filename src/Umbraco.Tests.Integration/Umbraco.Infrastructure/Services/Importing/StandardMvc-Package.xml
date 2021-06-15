@@ -210,7 +210,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
         <panelContent1>
           <![CDATA[<h2>Built by Creative Founds</h2>
 <p><img src="/images/web_applications.jpg" alt="Web Applications" class="fr"/><strong>Creative Founds</strong> design and build first class software solutions that deliver big results. We provide ASP.NET web and mobile applications, Umbraco development service &amp; technical consultancy.</p>
-<p><a href="http://www.creativefounds.co.uk" target="_blank">www.creativefounds.co.uk</a></p>]]>
+<p><a href="http://www.creativefounds.co.uk" target="_blank" rel="noopener">www.creativefounds.co.uk</a></p>]]>
         </panelContent1>
         <panelContent2>
           <![CDATA[<h2>Umbraco Development</h2>
@@ -218,7 +218,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
         </panelContent2>
         <panelContent3>
           <![CDATA[<h2>Contact Us</h2>
-<p><a href="http://www.twitter.com/chriskoiak" target="_blank"><img src="/images/twitter_square.png" alt="Contact Us on Twitter" class="fr"/></a>We'd love to hear how this package has helped you and how it can be improved. Get in touch on the <a href="https://our.umbraco.com/projects/starter-kits/standard-website-mvc" target="_blank">project website</a> or via <a href="http://www.twitter.com/chriskoiak" target="_blank">twitter</a></p>]]>
+<p><a href="http://www.twitter.com/chriskoiak" target="_blank" rel="noopener"><img src="/images/twitter_square.png" alt="Contact Us on Twitter" class="fr"/></a>We'd love to hear how this package has helped you and how it can be improved. Get in touch on the <a href="https://our.umbraco.com/projects/starter-kits/standard-website-mvc" target="_blank" rel="noopener">project website</a> or via <a href="http://www.twitter.com/chriskoiak" target="_blank" rel="noopener">twitter</a></p>]]>
         </panelContent3>
         <primaryNavigation><![CDATA[1072,1073,1077,1079,1080]]></primaryNavigation>
         <address>Standard Website MVC, Company Address, Glasgow, Postcode</address>
@@ -418,7 +418,7 @@ Google Maps - A map macro that you can use within Rich Text Areas
               <![CDATA[<h3>Standard Website MVC</h3>
 <p>Well hello! This website package demonstrates all the standard functionality of Umbraco. It's a great starting point for <span>starting point for further development or as a prototype.</span></p>
 <h3>Creative Founds</h3>
-<p>This package was developed by <a href="http://www.twitter.com/chriskoiak" target="_blank">Chris Koiak</a> &amp; <a href="http://www.creativefounds.co.uk" target="_blank">Creative Founds</a>. </p>]]>
+<p>This package was developed by <a href="http://www.twitter.com/chriskoiak" target="_blank" rel="noopener">Chris Koiak</a> &amp; <a href="http://www.creativefounds.co.uk" target="_blank" rel="noopener">Creative Founds</a>. </p>]]>
             </bodyText>
             <umbracoNaviHide>1</umbracoNaviHide>
           </Slide>

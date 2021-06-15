@@ -24,7 +24,6 @@ using Umbraco.Cms.Core.Media;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Entities;
-using Umbraco.Cms.Core.Models.Membership;
 using Umbraco.Cms.Core.Models.Validation;
 using Umbraco.Cms.Core.Persistence.Querying;
 using Umbraco.Cms.Core.PropertyEditors;
@@ -42,7 +41,6 @@ using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
 using Umbraco.Extensions;
-using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -62,7 +60,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IMediaService _mediaService;
         private readonly IEntityService _entityService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IDataTypeService _dataTypeService;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly ISqlContext _sqlContext;
@@ -85,13 +83,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IMediaService mediaService,
             IEntityService entityService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IDataTypeService dataTypeService,
             ISqlContext sqlContext,
             IContentTypeBaseServiceProvider contentTypeBaseServiceProvider,
             IRelationService relationService,
             PropertyEditorCollection propertyEditors,
-            IMediaFileSystem mediaFileSystem,
+            MediaFileManager mediaFileManager,
             IHostingEnvironment hostingEnvironment,
             IImageUrlGenerator imageUrlGenerator,
             IJsonSerializer serializer,
@@ -112,7 +110,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _contentTypeBaseServiceProvider = contentTypeBaseServiceProvider;
             _relationService = relationService;
             _propertyEditors = propertyEditors;
-            _mediaFileSystem = mediaFileSystem;
+            _mediaFileManager = mediaFileManager;
             _hostingEnvironment = hostingEnvironment;
             _logger = loggerFactory.CreateLogger<MediaController>();
             _imageUrlGenerator = imageUrlGenerator;
@@ -290,7 +288,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         private int[] _userStartNodes;
         private readonly PropertyEditorCollection _propertyEditors;
-        private readonly IMediaFileSystem _mediaFileSystem;
+        private readonly MediaFileManager _mediaFileManager;
         private readonly IHostingEnvironment _hostingEnvironment;
 
 
@@ -647,7 +645,8 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
             // Authorize...
             var requirement = new MediaPermissionsResourceRequirement();
-            var authorizationResult = await _authorizationService.AuthorizeAsync(User, _mediaService.GetById(sorted.ParentId), requirement);
+            var resource = new MediaPermissionsResource(sorted.ParentId);
+            var authorizationResult = await _authorizationService.AuthorizeAsync(User, resource, requirement);
             if (!authorizationResult.Succeeded)
             {
                 return Forbid();
@@ -790,7 +789,31 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     if (contentTypeAlias == Constants.Conventions.MediaTypes.AutoSelect)
                     {
-                        if (_imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
+                        var mediaTypes = _mediaTypeService.GetAll();
+                        // Look up MediaTypes
+                        foreach (var mediaTypeItem in mediaTypes)
+                        {
+                            var fileProperty = mediaTypeItem.CompositionPropertyTypes.FirstOrDefault(x => x.Alias == "umbracoFile");
+                            if (fileProperty != null) {
+                                var dataTypeKey = fileProperty.DataTypeKey;
+                                var dataType = _dataTypeService.GetDataType(dataTypeKey);
+
+                                if (dataType != null && dataType.Configuration is IFileExtensionsConfig fileExtensionsConfig) {
+                                    var fileExtensions = fileExtensionsConfig.FileExtensions;
+                                    if (fileExtensions != null)
+                                    {
+                                        if (fileExtensions.Where(x => x.Value == ext).Count() != 0)
+                                        {
+                                            mediaType = mediaTypeItem.Alias;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // If media type is still File then let's check if it's an image.
+                        if (mediaType == Constants.Conventions.MediaTypes.File && _imageUrlGenerator.SupportedImageFileTypes.Contains(ext))
                         {
                             mediaType = Constants.Conventions.MediaTypes.Image;
                         }
@@ -807,7 +830,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
                     await using (var stream = formFile.OpenReadStream())
                     {
-                        f.SetValue(_mediaFileSystem,_shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File,fileName, stream);
+                        f.SetValue(_mediaFileManager,_shortStringHelper, _contentTypeBaseServiceProvider, _serializer, Constants.Conventions.Media.File,fileName, stream);
                     }
 
 

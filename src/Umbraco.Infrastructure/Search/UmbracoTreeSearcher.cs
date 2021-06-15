@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Infrastructure.Search
     {
         private readonly ILocalizationService _languageService;
         private readonly IEntityService _entityService;
-        private readonly UmbracoMapper _mapper;
+        private readonly IUmbracoMapper _mapper;
         private readonly ISqlContext _sqlContext;
         private readonly IBackOfficeExamineSearcher _backOfficeExamineSearcher;
         private readonly IPublishedUrlProvider _publishedUrlProvider;
@@ -33,7 +33,7 @@ namespace Umbraco.Cms.Infrastructure.Search
         public UmbracoTreeSearcher(
             ILocalizationService languageService,
             IEntityService entityService,
-            UmbracoMapper mapper,
+            IUmbracoMapper mapper,
             ISqlContext sqlContext,
             IBackOfficeExamineSearcher backOfficeExamineSearcher,
             IPublishedUrlProvider publishedUrlProvider)

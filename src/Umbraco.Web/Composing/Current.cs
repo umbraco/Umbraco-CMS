@@ -144,7 +144,7 @@ namespace Umbraco.Web.Composing
 
         // proxy Core for convenience
 
-        public static IMediaFileSystem MediaFileSystem => Factory.GetRequiredService<IMediaFileSystem>();
+        public static MediaFileManager MediaFileManager => Factory.GetRequiredService<MediaFileManager>();
 
         public static UmbracoMapper Mapper => Factory.GetRequiredService<UmbracoMapper>();
 
@@ -184,7 +184,6 @@ namespace Umbraco.Web.Composing
         public static IUmbracoVersion UmbracoVersion => Factory.GetRequiredService<IUmbracoVersion>();
         public static IPublishedUrlProvider PublishedUrlProvider => Factory.GetRequiredService<IPublishedUrlProvider>();
         public static IMenuItemCollectionFactory MenuItemCollectionFactory => Factory.GetRequiredService<IMenuItemCollectionFactory>();
-        public static MembershipHelper MembershipHelper => Factory.GetRequiredService<MembershipHelper>();
         public static IUmbracoApplicationLifetime UmbracoApplicationLifetime => Factory.GetRequiredService<IUmbracoApplicationLifetime>();
         public static IPublishedContentQuery PublishedContentQuery => Factory.GetRequiredService<IPublishedContentQuery>();
 

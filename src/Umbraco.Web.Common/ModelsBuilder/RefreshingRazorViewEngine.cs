@@ -19,7 +19,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
  *
  * The way that RazorReferenceManager works is by resolving references from the ApplicationPartsManager - either by
  * an application part that is specifically an ICompilationReferencesProvider or an AssemblyPart. So to fulfill this
- * requirement, we add the MB assembly to the assembly parts manager within the PureLiveModelFactory when the assembly
+ * requirement, we add the MB assembly to the assembly parts manager within the InMemoryModelFactory when the assembly
  * is (re)generated. But due to the above restrictions, when re-generating, this will have no effect since the references
  * have already been resolved with the LazyInitializer in the RazorReferenceManager.
  *
@@ -55,7 +55,7 @@ using Microsoft.AspNetCore.Mvc.ViewEngines;
  *   with razor defaults before ours are added.
  * - We replace the default implementation of IRazorViewEngine with our own. This is a wrapping service that wraps the default RazorViewEngine instance.
  *   The ctor for this service takes in a Factory method to re-construct the default RazorViewEngine and all of it's dependency graph.
- * - When the PureLive models change, the Factory is invoked and the default razor services are all re-created, thus clearing their caches and the newly
+ * - When the models change, the Factory is invoked and the default razor services are all re-created, thus clearing their caches and the newly
  *   created instance is wrapped. The RazorViewEngine is the only service that needs to be replaced and wrapped for this to work because it's dependency
  *   graph includes all of the above mentioned services, all the way up to the RazorProjectEngine and it's LazyMetadataReferenceFeature.
  */
@@ -66,14 +66,14 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
     /// Custom <see cref="IRazorViewEngine"/> that wraps aspnetcore's default implementation
     /// </summary>
     /// <remarks>
-    /// This is used so that when new PureLive models are built, the entire razor stack is re-constructed so all razor
+    /// This is used so that when new models are built, the entire razor stack is re-constructed so all razor
     /// caches and assembly references, etc... are cleared.
     /// </remarks>
     internal class RefreshingRazorViewEngine : IRazorViewEngine, IDisposable
     {
         private IRazorViewEngine _current;
         private bool _disposedValue;
-        private readonly PureLiveModelFactory _pureLiveModelFactory;
+        private readonly InMemoryModelFactory _inMemoryModelFactory;
         private readonly Func<IRazorViewEngine> _defaultRazorViewEngineFactory;
         private readonly ReaderWriterLockSlim _locker = new ReaderWriterLockSlim();
 
@@ -83,19 +83,19 @@ namespace Umbraco.Cms.Web.Common.ModelsBuilder
         /// <param name="defaultRazorViewEngineFactory">
         /// A factory method used to re-construct the default aspnetcore <see cref="RazorViewEngine"/>
         /// </param>
-        /// <param name="pureLiveModelFactory">The <see cref="PureLiveModelFactory"/></param>
-        public RefreshingRazorViewEngine(Func<IRazorViewEngine> defaultRazorViewEngineFactory, PureLiveModelFactory pureLiveModelFactory)
+        /// <param name="inMemoryModelFactory">The <see cref="InMemoryModelFactory"/></param>
+        public RefreshingRazorViewEngine(Func<IRazorViewEngine> defaultRazorViewEngineFactory, InMemoryModelFactory inMemoryModelFactory)
         {
-            _pureLiveModelFactory = pureLiveModelFactory;
+            _inMemoryModelFactory = inMemoryModelFactory;
             _defaultRazorViewEngineFactory = defaultRazorViewEngineFactory;
             _current = _defaultRazorViewEngineFactory();
-            _pureLiveModelFactory.ModelsChanged += PureLiveModelFactory_ModelsChanged;
+            _inMemoryModelFactory.ModelsChanged += InMemoryModelFactoryModelsChanged;
         }
 
         /// <summary>
-        /// When the pure live models change, re-construct the razor stack
+        /// When the models change, re-construct the razor stack
         /// </summary>
-        private void PureLiveModelFactory_ModelsChanged(object sender, EventArgs e)
+        private void InMemoryModelFactoryModelsChanged(object sender, EventArgs e)
         {
             _locker.EnterWriteLock();
             try

@@ -51,7 +51,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
 
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
@@ -111,7 +111,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             var result = publishedUrlProvider.GetUrl(nodeId);
@@ -151,7 +151,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             //even though we are asking for a specific culture URL, there are no domains assigned so all that can be returned is a normal relative URL.
@@ -205,7 +205,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
 
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
@@ -259,7 +259,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
 
 
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
@@ -279,7 +279,7 @@ namespace Umbraco.Tests.Routing
             var urlProvider = new DefaultUrlProvider(
                 Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), umbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), umbracoContextAccessor, UriUtility);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 
             Assert.AreEqual("/home/sub1/custom-sub-1/", publishedUrlProvider.GetUrl(1177));
@@ -295,7 +295,7 @@ namespace Umbraco.Tests.Routing
 
             var urlProvider = new DefaultUrlProvider(Microsoft.Extensions.Options.Options.Create(requestHandlerSettings),
                 LoggerFactory.CreateLogger<DefaultUrlProvider>(),
-                new SiteDomainHelper(), UmbracoContextAccessor, UriUtility);
+                new SiteDomainMapper(), UmbracoContextAccessor, UriUtility);
             var umbracoContext = GetUmbracoContext("http://example.com/test", 1111, globalSettings: _globalSettings);
             var publishedUrlProvider = GetPublishedUrlProvider(umbracoContext, urlProvider);
 

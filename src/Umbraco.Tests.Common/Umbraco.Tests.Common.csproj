@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-      <TargetFramework>netstandard2.0</TargetFramework>
+      <TargetFramework>net5.0</TargetFramework>
       <RootNamespace>Umbraco.Cms.Tests.Common</RootNamespace>
       <PackageId>Umbraco.Cms.Tests</PackageId>
       <Title>Umbraco CMS Test Tools</Title>
@@ -10,9 +10,13 @@
 
   <ItemGroup>
     <PackageReference Include="AutoFixture.AutoMoq" Version="4.15.0" />
+    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="MiniProfiler.AspNetCore" Version="4.2.22" />
     <PackageReference Include="Moq" Version="4.13.1" />
-    <PackageReference Include="AutoFixture.NUnit3" Version="4.15.0" />
+    <PackageReference Include="AutoFixture.NUnit3" Version="4.17.0" />
     <PackageReference Include="Moq" Version="4.16.1" />
     <PackageReference Include="NUnit" Version="3.13.1" />
   </ItemGroup>
@@ -20,5 +24,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Umbraco.Core\Umbraco.Core.csproj" />
     <ProjectReference Include="..\Umbraco.Infrastructure\Umbraco.Infrastructure.csproj" />
+    <ProjectReference Include="..\Umbraco.Web.Common\Umbraco.Web.Common.csproj" />
   </ItemGroup>
 </Project>

@@ -21,8 +21,8 @@ using Umbraco.Cms.Infrastructure.Persistence.Dtos;
 using Umbraco.Cms.Infrastructure.Serialization;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
+using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing;
 using Umbraco.Extensions;
-using Umbraco.Tests.Services.Importing;
 using Constants = Umbraco.Cms.Core.Constants;
 
 namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
@@ -41,8 +41,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         [DataEditor("7e062c13-7c41-4ad9-b389-41d88aeef87c", "Editor1", "editor1")]
         public class Editor1 : DataEditor
         {
-            public Editor1(ILoggerFactory loggerFactory)
-                : base(loggerFactory, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer())
+            public Editor1(IDataValueEditorFactory dataValueEditorFactory)
+                : base(dataValueEditorFactory)
             {
             }
         }
@@ -51,8 +51,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         [DataEditor("d15e1281-e456-4b24-aa86-1dda3e4299d5", "Editor2", "editor2")]
         public class Editor2 : DataEditor
         {
-            public Editor2(ILoggerFactory loggerFactory)
-                : base(loggerFactory, Mock.Of<IDataTypeService>(), Mock.Of<ILocalizationService>(), Mock.Of<ILocalizedTextService>(), Mock.Of<IShortStringHelper>(), new JsonNetSerializer())
+            public Editor2(IDataValueEditorFactory dataValueEditorFactory)
+                : base(dataValueEditorFactory)
             {
             }
         }
@@ -354,7 +354,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         public void Can_Import_Media_Package_Xml()
         {
             // Arrange
-            global::Umbraco.Cms.Core.Services.Implement.MediaTypeService.ClearScopeEvents();
             string strXml = ImportResources.MediaTypesAndMedia_Package_xml;
             var xml = XElement.Parse(strXml);
             XElement mediaTypesElement = xml.Descendants("MediaTypes").First();

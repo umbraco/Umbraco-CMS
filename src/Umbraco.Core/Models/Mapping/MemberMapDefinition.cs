@@ -7,7 +7,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
     public class MemberMapDefinition : IMapDefinition
     {
         /// <inheritdoc />
-        public void DefineMaps(UmbracoMapper mapper) => mapper.Define<MemberSave, IMember>(Map);
+        public void DefineMaps(IUmbracoMapper mapper) => mapper.Define<MemberSave, IMember>(Map);
 
         private static void Map(MemberSave source, IMember target, MapperContext context)
         {

@@ -86,6 +86,7 @@
       <Version>2.0.0-alpha.20200128.15</Version>
     </PackageReference>
     <PackageReference Include="Castle.Core" Version="4.3.1" />
+    <PackageReference Include="Examine" Version="1.2.0" />
     <PackageReference Include="HtmlAgilityPack">
       <Version>1.11.31</Version>
     </PackageReference>
@@ -148,6 +149,7 @@
     <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\TaskEventArgs.cs" />
     <Compile Include="LegacyXmlPublishedCache\LegacyBackgroundTask\ThreadingTaskImmutable.cs" />
     <Compile Include="LegacyXmlPublishedCache\PreviewXmlDto.cs" />
+    <Compile Include="LegacyXmlPublishedCache\PublishedMember.cs" />
     <Compile Include="Models\ContentXmlTest.cs" />
     <Compile Include="PublishedContent\SolidPublishedSnapshot.cs" />
     <Compile Include="Published\ModelTypeTests.cs" />
@@ -162,8 +164,6 @@
     <Compile Include="TestHelpers\Entities\MockedPropertyTypes.cs" />
     <Compile Include="TestHelpers\Entities\MockedUser.cs" />
     <Compile Include="TestHelpers\Entities\MockedUserGroup.cs" />
-    <Compile Include="UmbracoExamine\ExamineExtensions.cs" />
-    <Compile Include="Membership\MembersMembershipProviderTests.cs" />
     <Compile Include="Persistence\Mappers\MapperTestBase.cs" />
     <Compile Include="PublishedContent\NuCacheChildrenTests.cs" />
     <Compile Include="PublishedContent\PublishedContentLanguageVariantTests.cs" />
@@ -171,7 +171,6 @@
     <Compile Include="PublishedContent\NuCacheTests.cs" />
     <Compile Include="Routing\MediaUrlProviderTests.cs" />
     <Compile Include="Routing\GetContentUrlsTests.cs" />
-    <Compile Include="TestHelpers\RandomIdRamDirectory.cs" />
     <Compile Include="TestHelpers\Stubs\TestUserPasswordConfig.cs" />
     <Compile Include="Testing\Objects\TestDataSource.cs" />
     <Compile Include="Issues\U9560.cs" />
@@ -196,13 +195,11 @@
     <Compile Include="Testing\UmbracoTestBase.cs" />
     <Compile Include="TestHelpers\TestObjects-Mocks.cs" />
     <Compile Include="TestHelpers\TestObjects.cs" />
-    <Compile Include="UmbracoExamine\RandomIdRamDirectory.cs" />
     <Compile Include="Web\Controllers\AuthenticationControllerTests.cs" />
     <Compile Include="Web\HttpCookieExtensionsTests.cs" />
     <Compile Include="Persistence\NPocoTests\PetaPocoCachesTest.cs" />
     <Compile Include="Routing\RoutesCacheTests.cs" />
     <Compile Include="Routing\UrlRoutingTestBase.cs" />
-    <Compile Include="Web\PublishedContentQueryTests.cs" />
     <Compile Include="Web\Mvc\ViewDataDictionaryExtensionTests.cs" />
     <Compile Include="Persistence\Querying\ContentTypeSqlMappingTests.cs" />
     <Compile Include="PublishedContent\PublishedContentExtensionTests.cs" />
@@ -228,18 +225,6 @@
     <Compile Include="TestHelpers\Stubs\TestControllerFactory.cs" />
     <Compile Include="TestHelpers\BaseUsingSqlCeSyntax.cs" />
     <Compile Include="TestHelpers\BaseWebTest.cs" />
-    <Compile Include="UmbracoExamine\EventsTest.cs" />
-    <Compile Include="UmbracoExamine\ExamineBaseTest.cs" />
-    <Compile Include="UmbracoExamine\IndexInitializer.cs" />
-    <Compile Include="UmbracoExamine\IndexTest.cs" />
-    <Compile Include="UmbracoExamine\SearchTests.cs" />
-    <Compile Include="UmbracoExamine\TestFiles.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DesignTime>True</DesignTime>
-      <DependentUpon>TestFiles.resx</DependentUpon>
-    </Compile>
-    <Compile Include="UmbracoExamine\ExamineDemoDataMediaService.cs" />
-    <Compile Include="UmbracoExamine\ExamineDemoDataContentService.cs" />
     <Compile Include="TestHelpers\Stubs\TestLastChanceFinder.cs" />
     <Compile Include="TestHelpers\TestHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -264,10 +249,6 @@
     <None Include="App.config">
       <SubType>Designer</SubType>
     </None>
-    <None Include="UmbracoExamine\TestFiles\umbraco-sort.config">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="UmbracoExamine\TestFiles\umbraco.config" />
     <None Include="unit-test-logger.config">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -303,15 +284,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="UmbracoExamine\TestFiles.resx">
-      <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>TestFiles.Designer.cs</LastGenOutput>
-      <SubType>Designer</SubType>
-    </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Services\Importing\Dictionary-Package.xml" />
-    <Content Include="UmbracoExamine\TestFiles\media.xml" />
   </ItemGroup>
   <ItemGroup>
     <Service Include="{82A7F48D-3B50-4B1E-B82E-3ADA8210C358}" />

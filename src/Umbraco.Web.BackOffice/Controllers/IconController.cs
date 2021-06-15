@@ -1,12 +1,20 @@
-﻿using System.Collections.Generic;
+using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.BackOffice.Filters;
 using Umbraco.Cms.Web.Common.Attributes;
+using Umbraco.Cms.Web.Common.Controllers;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
     [PluginController("UmbracoApi")]
-    public class IconController : UmbracoAuthorizedApiController
+    [IsBackOffice]
+    [UmbracoRequireHttps]
+    [MiddlewareFilter(typeof(UnhandledExceptionLoggerFilter))]
+    public class IconController : UmbracoApiController
     {
         private readonly IIconService _iconService;
 
@@ -25,13 +33,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             return _iconService.GetIcon(iconName);
         }
 
+
         /// <summary>
         /// Gets a list of all svg icons found at at the global icons path.
         /// </summary>
         /// <returns></returns>
-        public IList<IconModel> GetAllIcons()
-        {
-            return _iconService.GetAllIcons();
-        }
+        public IReadOnlyDictionary<string, string> GetIcons() => _iconService.GetIcons();
     }
+
+
 }

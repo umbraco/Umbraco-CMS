@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +9,7 @@ using HttpRequestExtensions = Umbraco.Extensions.HttpRequestExtensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Middleware
 {
+
     /// <summary>
     /// Used to handle errors registered by external login providers
     /// </summary>

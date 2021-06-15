@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.BackOffice
     [TestFixture]
     public class UmbracoBackOfficeServiceCollectionExtensionsTests : UmbracoIntegrationTest
     {
-        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.Services.AddUmbracoBackOfficeIdentity();
+        protected override void CustomTestSetup(IUmbracoBuilder builder) => builder.AddBackOfficeIdentity();
 
         [Test]
         public void AddUmbracoBackOfficeIdentity_ExpectBackOfficeUserStoreResolvable()

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Diagnostics;
 using Umbraco.Cms.Core.Models.PublishedContent;
 using Umbraco.Cms.Core.PublishedCache;
@@ -115,7 +115,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         // everything that is common to both draft and published versions
         // keep this as small as possible
 
-
+#pragma warning disable IDE1006 // Naming Styles
         public readonly int Id;
         public readonly Guid Uid;
         public IPublishedContentType ContentType;
@@ -123,9 +123,11 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
         public readonly string Path;
         public readonly int SortOrder;
         public readonly int ParentContentId;
+#pragma warning restore IDE1006 // Naming Styles
 
         // TODO: Can we make everything readonly?? This would make it easier to debug and be less error prone especially for new developers.
         // Once a Node is created and exists in the cache it is readonly so we should be able to make that happen at the API level too.
+#pragma warning disable IDE1006 // Naming Styles
         public int FirstChildContentId;
         public int LastChildContentId;
         public int NextSiblingContentId;
@@ -133,6 +135,7 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache
 
         public readonly DateTime CreateDate;
         public readonly int CreatorId;
+#pragma warning restore IDE1006 // Naming Styles
 
         private ContentData _draftData;
         private ContentData _publishedData;

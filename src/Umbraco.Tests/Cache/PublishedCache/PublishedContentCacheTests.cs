@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Xml;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
@@ -67,7 +67,7 @@ namespace Umbraco.Tests.Cache.PublishedCache
             var publishedShapshot = new PublishedSnapshot(
                 new PublishedContentCache(xmlStore, domainCache, appCache, globalSettings, ContentTypesCache, null, VariationContextAccessor, null),
                 new PublishedMediaCache(xmlStore, Mock.Of<IMediaService>(), Mock.Of<IUserService>(), appCache, ContentTypesCache, Factory.GetRequiredService<IEntityXmlSerializer>(), umbracoContextAccessor, VariationContextAccessor),
-                new PublishedMemberCache(null, appCache, Mock.Of<IMemberService>(), ContentTypesCache, Mock.Of<IUserService>(), VariationContextAccessor),
+                new PublishedMemberCache(ContentTypesCache, VariationContextAccessor),
                 domainCache);
             var publishedSnapshotService = new Mock<IPublishedSnapshotService>();
             publishedSnapshotService.Setup(x => x.CreatePublishedSnapshot(It.IsAny<string>())).Returns(publishedShapshot);

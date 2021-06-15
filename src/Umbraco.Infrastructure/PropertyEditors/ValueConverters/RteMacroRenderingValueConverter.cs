@@ -60,11 +60,11 @@ namespace Umbraco.Cms.Core.PropertyEditors.ValueConverters
                     //callback for when text block is found
                     textBlock => sb.Append(textBlock),
                     //callback for when macro syntax is found
-                    (macroAlias, macroAttributes) => sb.Append(_macroRenderer.Render(
+                    (macroAlias, macroAttributes) => sb.Append(_macroRenderer.RenderAsync(
                         macroAlias,
                         umbracoContext.PublishedRequest?.PublishedContent,
                         //needs to be explicitly casted to Dictionary<string, object>
-                        macroAttributes.ConvertTo(x => (string)x, x => x)).Text));
+                        macroAttributes.ConvertTo(x => (string)x, x => x)).GetAwaiter().GetResult().Text));
 
                 return sb.ToString();
             }

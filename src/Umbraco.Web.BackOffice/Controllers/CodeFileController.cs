@@ -37,22 +37,22 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class CodeFileController : BackOfficeNotificationsController
     {
         private readonly IHostingEnvironment _hostingEnvironment;
-        private readonly IFileSystems _fileSystems;
+        private readonly FileSystems _fileSystems;
         private readonly IFileService _fileService;
         private readonly IBackOfficeSecurityAccessor _backOfficeSecurityAccessor;
 
         private readonly ILocalizedTextService _localizedTextService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly GlobalSettings _globalSettings;
 
         public CodeFileController(
             IHostingEnvironment hostingEnvironment,
-            IFileSystems fileSystems,
+            FileSystems fileSystems,
             IFileService fileService,
             IBackOfficeSecurityAccessor backOfficeSecurityAccessor,
             ILocalizedTextService localizedTextService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IShortStringHelper shortStringHelper,
             IOptions<GlobalSettings> globalSettings)
         {
@@ -668,7 +668,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private bool IsDirectory(string path)
         {
             var dirInfo = new DirectoryInfo(path);
-            return dirInfo.Attributes == FileAttributes.Directory;
+
+            // If you turn off indexing in Windows this will have the attribute:
+            // `FileAttributes.Directory | FileAttributes.NotContentIndexed`
+            return (dirInfo.Attributes & FileAttributes.Directory) != 0;
         }
 
         // this is an internal class for passing stylesheet data from the client to the controller while editing

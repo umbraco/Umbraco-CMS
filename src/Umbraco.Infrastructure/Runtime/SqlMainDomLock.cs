@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                dbProviderFactoryCreator,
                databaseSchemaCreatorFactory);
 
-            MainDomKey = MainDomKeyPrefix + "-" + (NetworkHelper.MachineName + MainDom.GetMainDomId(_hostingEnvironment)).GenerateHash<SHA1>();
+            MainDomKey = MainDomKeyPrefix + "-" + (Environment.MachineName + MainDom.GetMainDomId(_hostingEnvironment)).GenerateHash<SHA1>();
         }
 
         public async Task<bool> AcquireLockAsync(int millisecondsTimeout)
@@ -321,14 +321,14 @@ namespace Umbraco.Cms.Infrastructure.Runtime
 
                     // so now we update the row with our appdomain id
                     InsertLockRecord(_lockId, db);
-                            _logger.LogDebug("Acquired with ID {LockId}", _lockId);
-                            return true;
-                        }
-                        else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
-                        {
-                            // in this case, the prefixed ID is different which  means
-                            // another new AppDomain has come online and is wanting to take over. In that case, we will not
-                            // acquire.
+                    _logger.LogDebug("Acquired with ID {LockId}", _lockId);
+                    return true;
+                }
+                else if (mainDomRows.Count == 1 && !mainDomRows[0].Value.StartsWith(tempId))
+                {
+                    // in this case, the prefixed ID is different which  means
+                    // another new AppDomain has come online and is wanting to take over. In that case, we will not
+                    // acquire.
 
                     _logger.LogDebug("Cannot acquire, another booting application detected.");
                     return false;

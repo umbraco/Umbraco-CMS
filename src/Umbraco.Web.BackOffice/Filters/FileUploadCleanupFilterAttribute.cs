@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models.ContentEditing;
+using Umbraco.Cms.Core.Models.Editors;
 using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Filters
@@ -15,20 +16,17 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
     ///     Checks if the parameter is IHaveUploadedFiles and then deletes any temporary saved files from file uploads
     ///     associated with the request
     /// </summary>
-    internal sealed class FileUploadCleanupFilterAttribute : TypeFilterAttribute
+    public sealed class FileUploadCleanupFilterAttribute : TypeFilterAttribute
     {
         /// <summary>
         ///     Constructor specifies if the filter should analyze the incoming or outgoing model
         /// </summary>
         /// <param name="incomingModel"></param>
-        public FileUploadCleanupFilterAttribute( bool incomingModel = true) : base(typeof(FileUploadCleanupFilter))
-        {
-
+        public FileUploadCleanupFilterAttribute(bool incomingModel = true) : base(typeof(FileUploadCleanupFilter)) =>
             Arguments = new object[]
             {
                 incomingModel
             };
-        }
 
         // We need to use IAsyncActionFilter even that we dont have any async because we need access to
         // context.ActionArguments, and this is only available on ActionExecutingContext and not on
@@ -45,10 +43,9 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 _incomingModel = incomingModel;
             }
 
-
-            public Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+            public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
             {
-                next(); // We only to do stuff after the action is executed
+                ActionExecutedContext resultContext = await next(); // We only to do stuff after the action is executed
 
                 var tempFolders = new List<string>();
 
@@ -60,7 +57,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         if (context.ActionArguments.First().Value is IHaveUploadedFiles contentItem)
                         {
                             //cleanup any files associated
-                            foreach (var f in contentItem.UploadedFiles)
+                            foreach (ContentPropertyFile f in contentItem.UploadedFiles)
                             {
                                 //track all temp folders so we can remove old files afterwards
                                 var dir = Path.GetDirectoryName(f.TempFilePath);
@@ -75,8 +72,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                                 }
                                 catch (Exception ex)
                                 {
-                                    _logger.LogError(ex,
-                                        "Could not delete temp file {FileName}", f.TempFilePath);
+                                    _logger.LogError(ex, "Could not delete temp file {FileName}", f.TempFilePath);
                                 }
                             }
                         }
@@ -84,24 +80,22 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                 }
                 else
                 {
-                    if (context == null)
+                    if (resultContext == null)
                     {
-                        _logger.LogWarning("The context is null!!??");
-                        return Task.CompletedTask;
+                        _logger.LogWarning("The result context is null.");
+                        return;
                     }
 
-                    if (context.Result == null)
+                    if (resultContext.Result == null)
                     {
-                        _logger.LogWarning(
-                            "The context.Result is null!!??");
-                        return Task.CompletedTask;
+                        _logger.LogWarning("The result context's result is null");
+                        return;
                     }
 
-                    if(!(context.Result is ObjectResult objectResult))
+                    if (!(resultContext.Result is ObjectResult objectResult))
                     {
-                        _logger.LogWarning(
-                            "Could not acquire context.Result as ObjectResult");
-                        return Task.CompletedTask;
+                        _logger.LogWarning("Could not acquire the result context's result as ObjectResult");
+                        return;
                     }
 
                     if (objectResult.Value is IHaveUploadedFiles uploadedFiles)
@@ -109,7 +103,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                         if (uploadedFiles.UploadedFiles != null)
                         {
                             //cleanup any files associated
-                            foreach (var f in uploadedFiles.UploadedFiles)
+                            foreach (ContentPropertyFile f in uploadedFiles.UploadedFiles)
                             {
                                 if (f.TempFilePath.IsNullOrWhiteSpace() == false)
                                 {
@@ -120,8 +114,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                                         tempFolders.Add(dir);
                                     }
 
-                                    _logger.LogDebug(
-                                        "Removing temp file {FileName}", f.TempFilePath);
+                                    _logger.LogDebug("Removing temp file {FileName}", f.TempFilePath);
 
                                     try
                                     {
@@ -129,8 +122,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                                     }
                                     catch (Exception ex)
                                     {
-                                        _logger.LogError(ex,
-                                            "Could not delete temp file {FileName}", f.TempFilePath);
+                                        _logger.LogError(ex, "Could not delete temp file {FileName}", f.TempFilePath);
                                     }
 
                                     //clear out the temp path so it's not returned in the response
@@ -138,15 +130,13 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                                 }
                                 else
                                 {
-                                    _logger.LogWarning(
-                                        "The f.TempFilePath is null or whitespace!!??");
+                                    _logger.LogWarning("The f.TempFilePath is null or whitespace!!??");
                                 }
                             }
                         }
                         else
                         {
-                            _logger.LogWarning(
-                                "The uploadedFiles.UploadedFiles is null!!??");
+                            _logger.LogWarning("The uploadedFiles.UploadedFiles is null!!??");
                         }
                     }
                     else
@@ -156,7 +146,6 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
                             objectResult.Value.GetType());
                     }
                 }
-                return Task.CompletedTask;
             }
         }
     }

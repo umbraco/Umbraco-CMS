@@ -16,7 +16,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Tests.Common.Builders
         public void Is_Built_Correctly()
         {
             // Arrange
-            var testPath = WebPath.Combine("css", "styles.css");
+            var testPath = WebPath.PathSeparator + WebPath.Combine("css", "styles.css");
             const string testContent = @"body { color:#000; } .bold {font-weight:bold;}";
 
             var builder = new StylesheetBuilder();

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -76,10 +76,26 @@ namespace Umbraco.Extensions
         /// <returns>The <see cref="Attempt{T}"/></returns>
         public static Attempt<T> TryConvertTo<T>(this object input)
         {
-            var result = TryConvertTo(input, typeof(T));
+            Attempt<object> result = TryConvertTo(input, typeof(T));
 
             if (result.Success)
+            {
                 return Attempt<T>.Succeed((T)result.Result);
+            }
+
+            if (input == null)
+            {
+                if (typeof(T).IsValueType)
+                {
+                    // fail, cannot convert null to a value type
+                    return Attempt<T>.Fail();
+                }
+                else
+                {
+                    // sure, null can be any object
+                    return Attempt<T>.Succeed((T)input);
+                } 
+            } 
 
             // just try to cast
             try

@@ -2,8 +2,11 @@
 // See LICENSE for more details.
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Examine;
+using Examine.Lucene.Directories;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -21,7 +24,6 @@ using Umbraco.Cms.Core.WebAssets;
 using Umbraco.Cms.Infrastructure.Examine;
 using Umbraco.Cms.Infrastructure.HostedServices;
 using Umbraco.Cms.Infrastructure.PublishedCache;
-using Umbraco.Cms.Infrastructure.Search;
 using Umbraco.Cms.Tests.Common.TestHelpers.Stubs;
 using Umbraco.Cms.Tests.Integration.Implementations;
 using Umbraco.Extensions;
@@ -43,7 +45,7 @@ namespace Umbraco.Cms.Tests.Integration.DependencyInjection
             builder.Services.AddUnique(Mock.Of<IUmbracoBootPermissionChecker>());
             builder.Services.AddUnique(testHelper.MainDom);
 
-            builder.Services.AddUnique<BackgroundIndexRebuilder, TestBackgroundIndexRebuilder>();
+            builder.Services.AddUnique<ExamineIndexRebuilder, TestBackgroundIndexRebuilder>();
             builder.Services.AddUnique(factory => Mock.Of<IRuntimeMinifier>());
 
             // we don't want persisted nucache files in tests
@@ -51,7 +53,7 @@ namespace Umbraco.Cms.Tests.Integration.DependencyInjection
 
 #if IS_WINDOWS
             // ensure all lucene indexes are using RAM directory (no file system)
-            builder.Services.AddUnique<ILuceneDirectoryFactory, LuceneRAMDirectoryFactory>();
+            builder.Services.AddUnique<IDirectoryFactory, LuceneRAMDirectoryFactory>();
 #endif
 
             // replace this service so that it can lookup the correct file locations
@@ -97,18 +99,18 @@ namespace Umbraco.Cms.Tests.Integration.DependencyInjection
         }
 
         // replace the default so there is no background index rebuilder
-        private class TestBackgroundIndexRebuilder : BackgroundIndexRebuilder
+        private class TestBackgroundIndexRebuilder : ExamineIndexRebuilder
         {
-            public TestBackgroundIndexRebuilder(
-                IMainDom mainDom,
-                ILogger<BackgroundIndexRebuilder> logger,
-                IndexRebuilder indexRebuilder,
-                IBackgroundTaskQueue backgroundTaskQueue)
-                : base(mainDom, logger, indexRebuilder, backgroundTaskQueue)
+            public TestBackgroundIndexRebuilder(IMainDom mainDom, IRuntimeState runtimeState, ILogger<ExamineIndexRebuilder> logger, IExamineManager examineManager, IEnumerable<IIndexPopulator> populators, IBackgroundTaskQueue backgroundTaskQueue) : base(mainDom, runtimeState, logger, examineManager, populators, backgroundTaskQueue)
             {
             }
 
-            public override void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null)
+            public override void RebuildIndex(string indexName, TimeSpan? delay = null, bool useBackgroundThread = true)
+            {
+                // noop
+            }
+
+            public override void RebuildIndexes(bool onlyEmptyIndexes, TimeSpan? delay = null, bool useBackgroundThread = true)
             {
                 // noop
             }

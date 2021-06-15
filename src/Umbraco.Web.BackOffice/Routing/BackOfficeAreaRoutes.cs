@@ -47,12 +47,7 @@ namespace Umbraco.Cms.Web.BackOffice.Routing
             switch (_runtimeState.Level)
             {
                 case RuntimeLevel.Install:
-                    // a new install so we don't route the back office
-                    break;
                 case RuntimeLevel.Upgrade:
-                    // for upgrades we only need to route the back office and auth controllers
-                    MapMinimalBackOffice(endpoints);
-                    break;
                 case RuntimeLevel.Run:
 
                     MapMinimalBackOffice(endpoints);

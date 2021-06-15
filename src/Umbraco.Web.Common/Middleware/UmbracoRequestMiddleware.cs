@@ -6,15 +6,21 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Http.Extensions;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using Smidge.Options;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Logging;
+using Umbraco.Cms.Core.Notifications;
+using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Scoping;
 using Umbraco.Cms.Core.Security;
+using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Core.Web;
 using Umbraco.Cms.Infrastructure.PublishedCache;
+using Umbraco.Cms.Infrastructure.WebAssets;
 using Umbraco.Cms.Web.Common.Profiler;
 using Umbraco.Extensions;
 
@@ -41,10 +47,21 @@ namespace Umbraco.Cms.Web.Common.Middleware
         private readonly PublishedSnapshotServiceEventHandler _publishedSnapshotServiceEventHandler;
         private readonly IEventAggregator _eventAggregator;
         private readonly IHostingEnvironment _hostingEnvironment;
+        private readonly UmbracoRequestPaths _umbracoRequestPaths;
+        private readonly BackOfficeWebAssets _backOfficeWebAssets;
+        private readonly IRuntimeState _runtimeState;
+        private readonly SmidgeOptions _smidgeOptions;
         private readonly WebProfiler _profiler;
-        private static bool s_cacheInitialized = false;
+
+        private static bool s_cacheInitialized;
         private static bool s_cacheInitializedFlag = false;
         private static object s_cacheInitializedLock = new object();
+
+#pragma warning disable IDE0044 // Add readonly modifier
+        private static bool s_firstBackOfficeRequest;
+        private static bool s_firstBackOfficeReqestFlag;
+        private static object s_firstBackOfficeRequestLocker = new object();
+#pragma warning restore IDE0044 // Add readonly modifier
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UmbracoRequestMiddleware"/> class.
@@ -56,7 +73,11 @@ namespace Umbraco.Cms.Web.Common.Middleware
             PublishedSnapshotServiceEventHandler publishedSnapshotServiceEventHandler,
             IEventAggregator eventAggregator,
             IProfiler profiler,
-            IHostingEnvironment hostingEnvironment)
+            IHostingEnvironment hostingEnvironment,
+            UmbracoRequestPaths umbracoRequestPaths,
+            BackOfficeWebAssets backOfficeWebAssets,
+            IOptions<SmidgeOptions> smidgeOptions,
+            IRuntimeState runtimeState)
         {
             _logger = logger;
             _umbracoContextFactory = umbracoContextFactory;
@@ -64,6 +85,10 @@ namespace Umbraco.Cms.Web.Common.Middleware
             _publishedSnapshotServiceEventHandler = publishedSnapshotServiceEventHandler;
             _eventAggregator = eventAggregator;
             _hostingEnvironment = hostingEnvironment;
+            _umbracoRequestPaths = umbracoRequestPaths;
+            _backOfficeWebAssets = backOfficeWebAssets;
+            _runtimeState = runtimeState;
+            _smidgeOptions = smidgeOptions.Value;
             _profiler = profiler as WebProfiler; // Ignore if not a WebProfiler
         }
 
@@ -73,13 +98,15 @@ namespace Umbraco.Cms.Web.Common.Middleware
             // do not process if client-side request
             if (context.Request.IsClientSideRequest())
             {
+                // we need this here because for bundle requests, these are 'client side' requests that we need to handle
+                LazyInitializeBackOfficeServices(context.Request.Path);
                 await next(context);
                 return;
             }
 
             // Profiling start needs to be one of the first things that happens.
             // Also MiniProfiler.Current becomes null if it is handled by the event aggregator due to async/await
-            _profiler?.UmbracoApplicationBeginRequest(context);
+            _profiler?.UmbracoApplicationBeginRequest(context, _runtimeState.Level);
 
             EnsureContentCacheInitialized();
 
@@ -97,8 +124,9 @@ namespace Umbraco.Cms.Web.Common.Middleware
                 _logger.LogTrace("Begin request [{HttpRequestId}]: {RequestUrl}", httpRequestId, pathAndQuery);
 
                 try
-                {                    
-                    await _eventAggregator.PublishAsync(new UmbracoRequestBegin(umbracoContextReference.UmbracoContext));
+                {
+                    LazyInitializeBackOfficeServices(context.Request.Path);
+                    await _eventAggregator.PublishAsync(new UmbracoRequestBeginNotification(umbracoContextReference.UmbracoContext));
                 }
                 catch (Exception ex)
                 {
@@ -114,7 +142,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
                     }
                     finally
                     {
-                        await _eventAggregator.PublishAsync(new UmbracoRequestEnd(umbracoContextReference.UmbracoContext));
+                        await _eventAggregator.PublishAsync(new UmbracoRequestEndNotification(umbracoContextReference.UmbracoContext));
                     }
                 }
             }
@@ -138,7 +166,31 @@ namespace Umbraco.Cms.Web.Common.Middleware
 
             // Profiling end needs to be last of the first things that happens.
             // Also MiniProfiler.Current becomes null if it is handled by the event aggregator due to async/await
-            _profiler?.UmbracoApplicationEndRequest(context);
+            _profiler?.UmbracoApplicationEndRequest(context, _runtimeState.Level);
+        }
+
+        /// <summary>
+        /// Used to lazily initialize any back office services when the first request to the back office is made
+        /// </summary>
+        /// <param name="umbracoContext"></param>
+        /// <returns></returns>
+        private void LazyInitializeBackOfficeServices(PathString absPath)
+        {
+            if (s_firstBackOfficeRequest)
+            {
+                return;
+            }
+
+            if (_umbracoRequestPaths.IsBackOfficeRequest(absPath)
+                || absPath.Value.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.CompositeFilePath}")
+                || absPath.Value.InvariantStartsWith($"/{_smidgeOptions.UrlOptions.BundleFilePath}"))
+            {
+                LazyInitializer.EnsureInitialized(ref s_firstBackOfficeRequest, ref s_firstBackOfficeReqestFlag, ref s_firstBackOfficeRequestLocker, () =>
+                {
+                    _backOfficeWebAssets.CreateBundles();
+                    return true;
+                });
+            }
         }
 
         private Uri GetApplicationUrlFromCurrentRequest(HttpRequest request)
@@ -165,7 +217,7 @@ namespace Umbraco.Cms.Web.Common.Middleware
             }
 
             // ensure this is disposed by DI at the end of the request
-            IHttpScopeReference httpScopeReference = request.HttpContext.RequestServices.GetRequiredService<IHttpScopeReference>();            
+            IHttpScopeReference httpScopeReference = request.HttpContext.RequestServices.GetRequiredService<IHttpScopeReference>();
             httpScopeReference.Register();
         }
 

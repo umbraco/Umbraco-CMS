@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 
 namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
 {
@@ -6,14 +6,11 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Mappers
     /// An attribute used to decorate mappers to be associated with entities
     /// </summary>
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
-    internal sealed class MapperForAttribute : Attribute
+    public sealed class MapperForAttribute : Attribute
     {
         public Type EntityType { get; private set; }
 
-        public MapperForAttribute(Type entityType)
-        {
-            EntityType = entityType;
-        }
+        public MapperForAttribute(Type entityType) => EntityType = entityType;
     }
 
 }

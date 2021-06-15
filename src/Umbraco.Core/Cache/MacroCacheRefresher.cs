@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Serialization;
 
@@ -53,7 +54,7 @@ namespace Umbraco.Cms.Core.Cache
                 var macroRepoCache = AppCaches.IsolatedCaches.Get<IMacro>();
                 if (macroRepoCache)
                 {
-                    macroRepoCache.Result.Clear(RepositoryCacheKeys.GetKey<IMacro>(payload.Id));
+                    macroRepoCache.Result.Clear(RepositoryCacheKeys.GetKey<IMacro, int>(payload.Id));
                 }
             }
 

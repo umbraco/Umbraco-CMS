@@ -22,12 +22,12 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class TemplateController : BackOfficeNotificationsController
     {
         private readonly IFileService _fileService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IShortStringHelper _shortStringHelper;
 
         public TemplateController(
             IFileService fileService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IShortStringHelper shortStringHelper)
         {
             _fileService = fileService ?? throw new ArgumentNullException(nameof(fileService));

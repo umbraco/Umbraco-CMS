@@ -27,11 +27,11 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     public class LanguageController : UmbracoAuthorizedJsonController
     {
         private readonly ILocalizationService _localizationService;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly GlobalSettings _globalSettings;
 
         public LanguageController(ILocalizationService localizationService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IOptions<GlobalSettings> globalSettings)
         {
             _localizationService = localizationService ?? throw new ArgumentNullException(nameof(localizationService));

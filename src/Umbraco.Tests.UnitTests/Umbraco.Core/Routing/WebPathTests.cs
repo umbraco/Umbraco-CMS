@@ -15,13 +15,14 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Routing
         [TestCase("/umbraco", "/config", "/lang", ExpectedResult = "/umbraco/config/lang")]
         [TestCase("/umbraco/", "/config/", "/lang/", ExpectedResult = "/umbraco/config/lang")]
         [TestCase("/umbraco/", "config/", "lang/", ExpectedResult = "/umbraco/config/lang")]
-        [TestCase("umbraco", "config", "lang", ExpectedResult = "/umbraco/config/lang")]
-        [TestCase("umbraco", ExpectedResult = "/umbraco")]
+        [TestCase("umbraco", "config", "lang", ExpectedResult = "umbraco/config/lang")]
+        [TestCase("umbraco", ExpectedResult = "umbraco")]
         [TestCase("~/umbraco", "config", "lang", ExpectedResult = "~/umbraco/config/lang")]
         [TestCase("~/umbraco", "/config", "/lang", ExpectedResult = "~/umbraco/config/lang")]
         [TestCase("~/umbraco/", "/config/", "/lang/", ExpectedResult = "~/umbraco/config/lang")]
         [TestCase("~/umbraco/", "config/", "lang/", ExpectedResult = "~/umbraco/config/lang")]
         [TestCase("~/umbraco", ExpectedResult = "~/umbraco")]
+        [TestCase("https://hello.com/", "/world", ExpectedResult = "https://hello.com/world")]
         public string Combine(params string[] parts) => WebPath.Combine(parts);
 
         [Test]

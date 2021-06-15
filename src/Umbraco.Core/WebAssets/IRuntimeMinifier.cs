@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -25,7 +25,7 @@ namespace Umbraco.Cms.Core.WebAssets
         /// <exception cref="InvalidOperationException">
         /// Thrown if any of the paths specified are not absolute
         /// </exception>
-        void CreateCssBundle(string bundleName, params string[] filePaths);
+        void CreateCssBundle(string bundleName, bool optimizeOutput, params string[] filePaths);
 
         /// <summary>
         /// Renders the html link tag for the bundle
@@ -60,13 +60,22 @@ namespace Umbraco.Cms.Core.WebAssets
         Task<string> RenderJsHereAsync(string bundleName);
 
         /// <summary>
-        /// Returns the asset paths for the bundle name
+        /// Returns the asset paths for the JS bundle name
         /// </summary>
         /// <param name="bundleName"></param>
         /// <returns>
         /// If debug mode is enabled this will return all asset paths (not bundled), else it will return a bundle URL
         /// </returns>
-        Task<IEnumerable<string>> GetAssetPathsAsync(string bundleName);
+        Task<IEnumerable<string>> GetJsAssetPathsAsync(string bundleName);
+
+        /// <summary>
+        /// Returns the asset paths for the css bundle name
+        /// </summary>
+        /// <param name="bundleName"></param>
+        /// <returns>
+        /// If debug mode is enabled this will return all asset paths (not bundled), else it will return a bundle URL
+        /// </returns>
+        Task<IEnumerable<string>> GetCssAssetPathsAsync(string bundleName);
 
         /// <summary>
         /// Minify the file content, of a given type

@@ -17,10 +17,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
     [UmbracoTest(Mapper = true, Database = UmbracoTestOptions.Database.NewSchemaPerTest)]
     public class UserModelMapperTests : UmbracoIntegrationTest
     {
-        private UmbracoMapper _sut;
+        private IUmbracoMapper _sut;
 
         [SetUp]
-        public void Setup() => _sut = Services.GetRequiredService<UmbracoMapper>();
+        public void Setup() => _sut = Services.GetRequiredService<IUmbracoMapper>();
 
         [Test]
         public void Map_UserGroupSave_To_IUserGroup()

@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IEntityService _entityService;
         private readonly IMediaService _mediaService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly AppCaches _appCaches;
@@ -40,7 +40,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IEntityService entityService,
             IMediaService mediaService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             AppCaches appCaches)

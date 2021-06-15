@@ -23,10 +23,10 @@ module.exports = {
         // less files used by backoffice and preview
         // processed in the less task
         less: {
-            installer: { files: "./src/less/installer.less", watch: "./src/less/**/*.less", out: "installer.css" },
+            installer: { files: "./src/less/installer.less", watch: "./src/less/**/*.less", out: "installer.min.css" },
             nonodes: { files: "./src/less/pages/nonodes.less", watch: "./src/less/**/*.less", out: "nonodes.style.min.css"},
-            preview: { files: "./src/less/canvas-designer.less", watch: "./src/less/**/*.less", out: "canvasdesigner.css" },
-            umbraco: { files: "./src/less/belle.less", watch: "./src/**/*.less", out: "umbraco.css" },
+            preview: { files: "./src/less/canvas-designer.less", watch: "./src/less/**/*.less", out: "canvasdesigner.min.css" },
+            umbraco: { files: "./src/less/belle.less", watch: "./src/**/*.less", out: "umbraco.min.css" },
             rteContent: { files: "./src/less/rte-content.less", watch: "./src/less/**/*.less", out: "rte-content.css" }
         },
 

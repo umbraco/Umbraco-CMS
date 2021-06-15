@@ -66,7 +66,8 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
                 .AddRepositories()
                 .AddServices()
                 .AddCoreMappingProfiles()
-                .AddFileSystems();
+                .AddFileSystems()
+                .AddWebAssets();
 
             // register persistence mappers - required by database factory so needs to be done here
             // means the only place the collection can be modified is in a runtime - afterwards it
@@ -153,8 +154,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             builder.Services.AddUnique<IUmbracoComponentRenderer, UmbracoComponentRenderer>();
 
-            // Register noop versions for examine to be overridden by examine
-            builder.Services.AddUnique<IUmbracoIndexesCreator, NoopUmbracoIndexesCreator>();
             builder.Services.AddUnique<IBackOfficeExamineSearcher, NoopBackOfficeExamineSearcher>();
 
             builder.Services.AddUnique<UploadAutoFillProperties>();
@@ -169,7 +168,6 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
 
             // Services required to run background jobs (with out the handler)
             builder.Services.AddUnique<IBackgroundTaskQueue, BackgroundTaskQueue>();
-            builder.Services.AddUnique<TaskHelper>();
 
             return builder;
         }

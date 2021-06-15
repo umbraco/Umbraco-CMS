@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Options;
@@ -27,6 +27,7 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         private readonly IRuntimeMinifier _runtimeMinifier;
         private readonly IManifestParser _parser;
         private readonly GlobalSettings _globalSettings;
+        private readonly CustomBackOfficeAssetsCollection _customBackOfficeAssetsCollection;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly PropertyEditorCollection _propertyEditorCollection;
 
@@ -35,31 +36,33 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
             IManifestParser parser,
             PropertyEditorCollection propertyEditorCollection,
             IHostingEnvironment hostingEnvironment,
-            IOptions<GlobalSettings> globalSettings)
+            IOptions<GlobalSettings> globalSettings,
+            CustomBackOfficeAssetsCollection customBackOfficeAssetsCollection)
         {
             _runtimeMinifier = runtimeMinifier;
             _parser = parser;
             _propertyEditorCollection = propertyEditorCollection;
             _hostingEnvironment = hostingEnvironment;
             _globalSettings = globalSettings.Value;
+            _customBackOfficeAssetsCollection = customBackOfficeAssetsCollection;
         }
 
         public void CreateBundles()
         {
             // Create bundles
 
-            _runtimeMinifier.CreateCssBundle(UmbracoInitCssBundleName,
+            _runtimeMinifier.CreateCssBundle(UmbracoInitCssBundleName, false,
                 FormatPaths("lib/bootstrap-social/bootstrap-social.css",
-                "assets/css/umbraco.css",
+                "assets/css/umbraco.min.css",
                 "lib/font-awesome/css/font-awesome.min.css"));
 
-            _runtimeMinifier.CreateCssBundle(UmbracoUpgradeCssBundleName,
-                FormatPaths("assets/css/umbraco.css",
+            _runtimeMinifier.CreateCssBundle(UmbracoUpgradeCssBundleName, false,
+                FormatPaths("assets/css/umbraco.min.css",
                 "lib/bootstrap-social/bootstrap-social.css",
                 "lib/font-awesome/css/font-awesome.min.css"));
 
-            _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName,
-                FormatPaths("assets/css/canvasdesigner.css"));
+            _runtimeMinifier.CreateCssBundle(UmbracoPreviewCssBundleName, false,
+                FormatPaths("assets/css/canvasdesigner.min.css"));
 
             _runtimeMinifier.CreateJsBundle(UmbracoPreviewJsBundleName, false,
                 FormatPaths(GetScriptsForPreview()));
@@ -74,17 +77,21 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
                 .GroupBy(x => x.AssetType)
                 .ToDictionary(x => x.Key, x => x.Select(c => c.FilePath));
 
+            var customAssets = _customBackOfficeAssetsCollection.GroupBy(x => x.DependencyType).ToDictionary(x => x.Key, x => x.Select(c => c.FilePath));
+
+            var jsAssets = (customAssets.TryGetValue(AssetType.Javascript, out var customScripts) ? customScripts : Enumerable.Empty<string>())
+                .Union(propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>());
             _runtimeMinifier.CreateJsBundle(
                 UmbracoExtensionsJsBundleName, true,
                 FormatPaths(
-                    GetScriptsForBackOfficeExtensions(
-                        propertyEditorAssets.TryGetValue(AssetType.Javascript, out var scripts) ? scripts : Enumerable.Empty<string>())));
+                    GetScriptsForBackOfficeExtensions(jsAssets)));
 
+            var cssAssets = (customAssets.TryGetValue(AssetType.Css, out var customStyles) ? customStyles : Enumerable.Empty<string>())
+                .Union(propertyEditorAssets.TryGetValue(AssetType.Css, out var styles) ? styles : Enumerable.Empty<string>());
             _runtimeMinifier.CreateCssBundle(
-                UmbracoCssBundleName,
+                UmbracoCssBundleName, true,
                 FormatPaths(
-                    GetStylesheetsForBackOffice(
-                        propertyEditorAssets.TryGetValue(AssetType.Css, out var styles) ? styles : Enumerable.Empty<string>())));
+                    GetStylesheetsForBackOffice(cssAssets)));
         }
 
         /// <summary>
@@ -94,10 +101,15 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         private string[] GetScriptsForBackOfficeExtensions(IEnumerable<string> propertyEditorScripts)
         {
             var scripts = new HashSet<string>();
-            foreach (var script in _parser.Manifest.Scripts)
+            foreach (string script in _parser.Manifest.Scripts)
+            {
                 scripts.Add(script);
-            foreach (var script in propertyEditorScripts)
+            }
+
+            foreach (string script in propertyEditorScripts)
+            {
                 scripts.Add(script);
+            }
 
             return scripts.ToArray();
         }
@@ -120,10 +132,15 @@ namespace Umbraco.Cms.Infrastructure.WebAssets
         {
             var stylesheets = new HashSet<string>();
 
-            foreach (var script in _parser.Manifest.Stylesheets)
+            foreach (string script in _parser.Manifest.Stylesheets)
+            {
                 stylesheets.Add(script);
-            foreach (var stylesheet in propertyEditorStyles)
+            }
+
+            foreach (string stylesheet in propertyEditorStyles)
+            {
                 stylesheets.Add(stylesheet);
+            }
 
             return stylesheets.ToArray();
         }

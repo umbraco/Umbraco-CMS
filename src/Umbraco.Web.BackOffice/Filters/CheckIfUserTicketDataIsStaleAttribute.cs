@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         private class CheckIfUserTicketDataIsStaleFilter : IAsyncActionFilter
         {
             private readonly IRequestCache _requestCache;
-            private readonly UmbracoMapper _umbracoMapper;
+            private readonly IUmbracoMapper _umbracoMapper;
             private readonly IUserService _userService;
             private readonly IEntityService _entityService;
             private readonly ILocalizedTextService _localizedTextService;
@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             public CheckIfUserTicketDataIsStaleFilter(
                 IRequestCache requestCache,
-                UmbracoMapper umbracoMapper,
+                IUmbracoMapper umbracoMapper,
                 IUserService userService,
                 IEntityService entityService,
                 ILocalizedTextService localizedTextService,
@@ -88,10 +88,9 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
 
             private async Task UpdateTokensAndAppendCustomHeaders(ActionExecutingContext actionContext)
             {
-                var tokenFilter =
-                    new SetAngularAntiForgeryTokensAttribute.SetAngularAntiForgeryTokensFilter(_backOfficeAntiforgery,
-                        _globalSettings);
-                await tokenFilter.OnActionExecutionAsync(actionContext,
+                var tokenFilter = new SetAngularAntiForgeryTokensAttribute.SetAngularAntiForgeryTokensFilter(_backOfficeAntiforgery);
+                await tokenFilter.OnActionExecutionAsync(
+                    actionContext,
                     () => Task.FromResult(new ActionExecutedContext(actionContext, new List<IFilterMetadata>(), null)));
 
                 // add the header

@@ -29,16 +29,16 @@ namespace Umbraco.Cms.Web.Common.Macros
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IModelMetadataProvider _modelMetadataProvider;
-        private readonly ITempDataProvider _tempDataProvider;
+        private readonly ITempDataDictionaryFactory _tempDataDictionaryFactory;
 
         public PartialViewMacroEngine(
             IHttpContextAccessor httpContextAccessor,
             IModelMetadataProvider modelMetadataProvider,
-            ITempDataProvider tempDataProvider)
+            ITempDataDictionaryFactory tempDataDictionaryFactory)
         {
             _httpContextAccessor = httpContextAccessor;
             _modelMetadataProvider = modelMetadataProvider;
-            _tempDataProvider = tempDataProvider;
+            _tempDataDictionaryFactory = tempDataDictionaryFactory;
         }
 
         public MacroContent Execute(MacroModel macro, IPublishedContent content)
@@ -65,7 +65,7 @@ namespace Umbraco.Cms.Web.Common.Macros
             // Check if there's proxied ViewData (i.e. returned from a SurfaceController)
             ProxyViewDataFeature proxyViewDataFeature = httpContext.Features.Get<ProxyViewDataFeature>();
             ViewDataDictionary viewData = proxyViewDataFeature?.ViewData ?? new ViewDataDictionary(_modelMetadataProvider, new ModelStateDictionary());
-            ITempDataDictionary tempData = proxyViewDataFeature?.TempData ?? new TempDataDictionary(httpContext, _tempDataProvider);
+            ITempDataDictionary tempData = proxyViewDataFeature?.TempData ?? _tempDataDictionaryFactory.GetTempData(httpContext);
 
             var viewContext = new ViewContext(
                 new ActionContext(httpContext, currentRouteData, new ControllerActionDescriptor()),

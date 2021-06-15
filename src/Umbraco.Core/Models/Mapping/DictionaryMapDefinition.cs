@@ -20,7 +20,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _localizationService = localizationService;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IDictionaryItem, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<IDictionaryItem, DictionaryDisplay>((source, context) => new DictionaryDisplay(), Map);

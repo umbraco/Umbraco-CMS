@@ -116,6 +116,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
             DateTime lastLockoutDate = _lastLockoutDate ?? DateTime.Now;
             DateTime lastLoginDate = _lastLoginDate ?? DateTime.Now;
             DateTime lastPasswordChangeDate = _lastPasswordChangeDate ?? DateTime.Now;
+            var passwordConfig = _passwordConfig ?? "{\"hashAlgorithm\":\"PBKDF2.ASPNETCORE.V3\"}";
 
             if (_memberTypeBuilder is null && _memberType is null)
             {
@@ -135,6 +136,7 @@ namespace Umbraco.Cms.Tests.Common.Builders
                 Path = path,
                 SortOrder = sortOrder,
                 Trashed = trashed,
+                PasswordConfiguration = passwordConfig
             };
 
             if (_propertyIdsIncrementingFrom.HasValue)

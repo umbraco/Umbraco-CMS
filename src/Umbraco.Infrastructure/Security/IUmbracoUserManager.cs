@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
-using Umbraco.Cms.Core.Models.Identity;
 
 namespace Umbraco.Cms.Core.Security
 {
@@ -259,14 +258,7 @@ namespace Umbraco.Cms.Core.Security
         /// </summary>
         /// <returns>A generated password</returns>
         string GeneratePassword();
-
-        /// <summary>
-        /// Hashes a password for a null user based on the default password hasher
-        /// </summary>
-        /// <param name="password">The password to hash</param>
-        /// <returns>The hashed password</returns>
-        string HashPassword(string password);
-
+        
         /// <summary>
         /// Used to validate the password without an identity user
         /// Validation code is based on the default ValidatePasswordAsync code
@@ -383,5 +375,13 @@ namespace Umbraco.Cms.Core.Security
         /// A user can only support a phone number if the BackOfficeUserStore is replaced with another that implements IUserPhoneNumberStore
         /// </remarks>
         Task<string> GetPhoneNumberAsync(TUser user);
+
+        /// <summary>
+        /// Validates that a user's credentials are correct without actually logging them in.
+        /// </summary>
+        /// <param name="username">The user name.</param>
+        /// <param name="password">The password.</param>
+        /// <returns>True if the credentials are valid.</returns>
+        Task<bool> ValidateCredentialsAsync(string username, string password);
     }
 }

@@ -1,4 +1,4 @@
-﻿// ReSharper disable once CheckNamespace
+// ReSharper disable once CheckNamespace
 namespace Umbraco.Cms.Core
 {
     public static partial class Constants
@@ -52,6 +52,7 @@ namespace Umbraco.Cms.Core
                 public const string UserGroup2App = TableNamePrefix + "UserGroup2App";
                 public const string UserGroup2NodePermission = TableNamePrefix + "UserGroup2NodePermission";
                 public const string ExternalLogin = TableNamePrefix + "ExternalLogin";
+                public const string ExternalLoginToken = TableNamePrefix + "ExternalLoginToken";
 
                 public const string Macro = /*TableNamePrefix*/ "cms" + "Macro";
                 public const string MacroProperty = /*TableNamePrefix*/ "cms" + "MacroProperty";

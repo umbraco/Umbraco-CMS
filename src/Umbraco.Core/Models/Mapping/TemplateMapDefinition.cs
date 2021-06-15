@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _shortStringHelper = shortStringHelper;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<ITemplate, TemplateDisplay>((source, context) => new TemplateDisplay(), Map);
             mapper.Define<TemplateDisplay, ITemplate>((source, context) => new Template(_shortStringHelper, source.Name, source.Alias), Map);

@@ -1,6 +1,7 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Examine;
+using Microsoft.Extensions.Logging;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
 
@@ -11,6 +12,7 @@ namespace Umbraco.Cms.Infrastructure.Examine
     /// </summary>
     public class MediaIndexPopulator : IndexPopulator<IUmbracoContentIndex>
     {
+        private readonly ILogger<MediaIndexPopulator> _logger;
         private readonly int? _parentId;
         private readonly IMediaService _mediaService;
         private readonly IValueSetBuilder<IMedia> _mediaValueSetBuilder;
@@ -20,8 +22,8 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// </summary>
         /// <param name="mediaService"></param>
         /// <param name="mediaValueSetBuilder"></param>
-        public MediaIndexPopulator(IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
-            : this(null, mediaService, mediaValueSetBuilder)
+        public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
+            : this(logger, null, mediaService, mediaValueSetBuilder)
         {
         }
 
@@ -31,8 +33,9 @@ namespace Umbraco.Cms.Infrastructure.Examine
         /// <param name="parentId"></param>
         /// <param name="mediaService"></param>
         /// <param name="mediaValueSetBuilder"></param>
-        public MediaIndexPopulator(int? parentId, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
+        public MediaIndexPopulator(ILogger<MediaIndexPopulator> logger, int? parentId, IMediaService mediaService, IValueSetBuilder<IMedia> mediaValueSetBuilder)
         {
+            _logger = logger;
             _parentId = parentId;
             _mediaService = mediaService;
             _mediaValueSetBuilder = mediaValueSetBuilder;
@@ -40,7 +43,11 @@ namespace Umbraco.Cms.Infrastructure.Examine
 
         protected override void PopulateIndexes(IReadOnlyList<IIndex> indexes)
         {
-            if (indexes.Count == 0) return;
+            if (indexes.Count == 0)
+            {
+                _logger.LogDebug($"{nameof(PopulateIndexes)} called with no indexes to populate. Typically means no index is registered with this populator.");
+                return;
+            }
 
             const int pageSize = 10000;
             var pageIndex = 0;

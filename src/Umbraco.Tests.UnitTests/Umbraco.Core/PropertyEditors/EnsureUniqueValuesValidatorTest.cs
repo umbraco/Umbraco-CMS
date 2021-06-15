@@ -22,6 +22,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
     {
         private readonly ILoggerFactory _loggerFactory = NullLoggerFactory.Instance;
 
+
+        private ColorPickerPropertyEditor ColorPickerPropertyEditor => new ColorPickerPropertyEditor(
+            Mock.Of<IDataValueEditorFactory>(),
+            Mock.Of<IIOHelper>(),
+            new JsonNetSerializer());
         [Test]
         public void Only_Tests_On_JArray()
         {
@@ -31,12 +36,8 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                     "hello",
                     null,
                     new ColorPickerPropertyEditor(
-                        _loggerFactory,
-                        Mock.Of<IDataTypeService>(),
-                        Mock.Of<ILocalizationService>(),
+                        Mock.Of<IDataValueEditorFactory>(),
                         Mock.Of<IIOHelper>(),
-                        Mock.Of<IShortStringHelper>(),
-                        Mock.Of<ILocalizedTextService>(),
                         new JsonNetSerializer()));
             Assert.AreEqual(0, result.Count());
         }
@@ -49,14 +50,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                 validator.Validate(
                     new JArray("hello", "world"),
                     null,
-                    new ColorPickerPropertyEditor(
-                        _loggerFactory,
-                        Mock.Of<IDataTypeService>(),
-                        Mock.Of<ILocalizationService>(),
-                        Mock.Of<IIOHelper>(),
-                        Mock.Of<IShortStringHelper>(),
-                        Mock.Of<ILocalizedTextService>(),
-                        new JsonNetSerializer()));
+                    ColorPickerPropertyEditor);
             Assert.AreEqual(0, result.Count());
         }
 
@@ -70,14 +64,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                         JObject.FromObject(new { value = "hello" }),
                         JObject.FromObject(new { value = "world" })),
                     null,
-                    new ColorPickerPropertyEditor(
-                        _loggerFactory,
-                        Mock.Of<IDataTypeService>(),
-                        Mock.Of<ILocalizationService>(),
-                        Mock.Of<IIOHelper>(),
-                        Mock.Of<IShortStringHelper>(),
-                        Mock.Of<ILocalizedTextService>(),
-                        new JsonNetSerializer()));
+                    ColorPickerPropertyEditor);
             Assert.AreEqual(0, result.Count());
         }
 
@@ -91,14 +78,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                         JObject.FromObject(new { value = "hello" }),
                         JObject.FromObject(new { value = "hello" })),
                     null,
-                    new ColorPickerPropertyEditor(
-                        _loggerFactory,
-                        Mock.Of<IDataTypeService>(),
-                        Mock.Of<ILocalizationService>(),
-                        Mock.Of<IIOHelper>(),
-                        Mock.Of<IShortStringHelper>(),
-                        Mock.Of<ILocalizedTextService>(),
-                        new JsonNetSerializer()));
+                    ColorPickerPropertyEditor);
             Assert.AreEqual(1, result.Count());
         }
 
@@ -114,14 +94,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.PropertyEditors
                         JObject.FromObject(new { value = "world" }),
                         JObject.FromObject(new { value = "world" })),
                     null,
-                    new ColorPickerPropertyEditor(
-                        _loggerFactory,
-                        Mock.Of<IDataTypeService>(),
-                        Mock.Of<ILocalizationService>(),
-                        Mock.Of<IIOHelper>(),
-                        Mock.Of<IShortStringHelper>(),
-                        Mock.Of<ILocalizedTextService>(),
-                        new JsonNetSerializer()));
+                    ColorPickerPropertyEditor);
             Assert.AreEqual(2, result.Count());
         }
     }

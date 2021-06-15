@@ -54,6 +54,14 @@ namespace Umbraco.Cms.Infrastructure.PublishedCache.Persistence
         public void DeleteContentItem(IContentBase item)
             => _repository.DeleteContentItem(item);
 
+        public void DeleteContentItems(IEnumerable<IContentBase> items)
+        {
+            foreach (IContentBase item in items)
+            {
+                _repository.DeleteContentItem(item);
+            }
+        }
+
         /// <inheritdoc/>
         public void RefreshContent(IContent content)
             => _repository.RefreshContent(content);

@@ -1,6 +1,7 @@
 using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models.Membership;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 
 namespace Umbraco.Cms.Core.Cache
@@ -55,7 +56,7 @@ namespace Umbraco.Cms.Core.Cache
             var userGroupCache = AppCaches.IsolatedCaches.Get<IUserGroup>();
             if (userGroupCache)
             {
-                userGroupCache.Result.Clear(RepositoryCacheKeys.GetKey<IUserGroup>(id));
+                userGroupCache.Result.Clear(RepositoryCacheKeys.GetKey<IUserGroup, int>(id));
                 userGroupCache.Result.ClearByKey(CacheKeys.UserGroupGetByAliasCacheKeyPrefix);
             }
 

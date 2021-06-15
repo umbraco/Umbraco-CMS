@@ -3,6 +3,7 @@
 using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.Serialization;
 using Umbraco.Cms.Core.Services;
@@ -75,8 +76,8 @@ namespace Umbraco.Cms.Core.Cache
                 _idKeyMap.ClearCache(p.Id);
                 if (memberCache)
                 {
-                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember>(p.Id));
-                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember>(p.Username));
+                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember, int>(p.Id));
+                    memberCache.Result.Clear(RepositoryCacheKeys.GetKey<IMember, string>(p.Username));
                 }
             }
 

@@ -19,5 +19,8 @@
         public const string UserAllMediaStartNodesPrefix = "AllMediaStartNodes";
         public const string UserMediaStartNodePathsPrefix = "MediaStartNodePaths";
         public const string UserContentStartNodePathsPrefix = "ContentStartNodePaths";
+        
+        public const string ContentRecycleBinCacheKey = "recycleBin_content";
+        public const string MediaRecycleBinCacheKey = "recycleBin_media";
     }
 }

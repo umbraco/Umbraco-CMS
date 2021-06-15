@@ -38,7 +38,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IContentTypeService contentTypeService,
             IMediaTypeService mediaTypeService,
             IMemberTypeService memberTypeService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService)
         {
             _editorValidatorCollection = editorValidatorCollection ?? throw new ArgumentNullException(nameof(editorValidatorCollection));
@@ -54,7 +54,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         public IContentTypeService ContentTypeService { get; }
         public IMediaTypeService MediaTypeService { get; }
         public IMemberTypeService MemberTypeService { get; }
-        public UmbracoMapper UmbracoMapper { get; }
+        public IUmbracoMapper UmbracoMapper { get; }
         public ILocalizedTextService LocalizedTextService { get; }
 
         /// <summary>

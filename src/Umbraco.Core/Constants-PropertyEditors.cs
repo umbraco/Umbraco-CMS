@@ -52,6 +52,11 @@ namespace Umbraco.Cms.Core
                 public const string ColorPicker = "Umbraco.ColorPicker";
 
                 /// <summary>
+                /// EyeDropper Color Picker.
+                /// </summary>
+                public const string ColorPickerEyeDropper = "Umbraco.ColorPicker.EyeDropper";
+
+                /// <summary>
                 /// Content Picker.
                 /// </summary>
                 public const string ContentPicker = "Umbraco.ContentPicker";
@@ -95,6 +100,11 @@ namespace Umbraco.Cms.Core
                 /// Media Picker.
                 /// </summary>
                 public const string MediaPicker = "Umbraco.MediaPicker";
+
+                /// <summary>
+                /// Media Picker v.3.
+                /// </summary>
+                public const string MediaPicker3 = "Umbraco.MediaPicker3";
 
                 /// <summary>
                 /// Multiple Media Picker.

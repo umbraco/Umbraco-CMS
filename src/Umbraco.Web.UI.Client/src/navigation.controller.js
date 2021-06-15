@@ -325,6 +325,9 @@ function NavigationController($scope, $rootScope, $location, $log, $q, $routePar
             var queryParams = {};
             if ($scope.selectedLanguage && $scope.selectedLanguage.culture) {
                 queryParams["culture"] = $scope.selectedLanguage.culture;
+                if (!mainCulture) {
+                    $location.search("mculture", $scope.selectedLanguage.culture);
+                }
             }
             var queryString = $.param(queryParams); //create the query string from the params object
         }

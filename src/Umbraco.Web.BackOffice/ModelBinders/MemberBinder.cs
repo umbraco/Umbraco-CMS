@@ -24,7 +24,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
         private readonly IJsonSerializer _jsonSerializer;
         private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IMemberService _memberService;
         private readonly IMemberTypeService _memberTypeService;
 
@@ -32,7 +32,7 @@ namespace Umbraco.Cms.Web.BackOffice.ModelBinders
             IJsonSerializer jsonSerializer,
             IHostingEnvironment hostingEnvironment,
             IShortStringHelper shortStringHelper,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             IMemberService memberService,
             IMemberTypeService memberTypeService)
         {

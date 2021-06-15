@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using NPoco;
 using Umbraco.Cms.Core.Persistence.Querying;
 
@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Querying
     /// Represents the Sql Translator for translating a IQuery object to Sql
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    internal class SqlTranslator<T>
+    public class SqlTranslator<T>
     {
         private readonly Sql<ISqlContext> _sql;
 

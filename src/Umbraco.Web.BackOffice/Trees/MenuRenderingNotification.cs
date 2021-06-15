@@ -1,8 +1,7 @@
 using Microsoft.AspNetCore.Http;
-using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Trees;
 
-namespace Umbraco.Cms.Web.BackOffice.Trees
+namespace Umbraco.Cms.Core.Notifications
 {
     /// <summary>
     /// A notification that allows developers to modify the menu that is being rendered
@@ -18,6 +17,11 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         public string NodeId { get; }
 
         /// <summary>
+        /// The alias of the tree the menu is rendering for
+        /// </summary>
+        public string TreeAlias { get; }
+
+        /// <summary>
         /// The menu being rendered
         /// </summary>
         public MenuItemCollection Menu { get; }
@@ -27,11 +31,12 @@ namespace Umbraco.Cms.Web.BackOffice.Trees
         /// </summary>
         public FormCollection QueryString { get; }
 
-        public MenuRenderingNotification(string nodeId, MenuItemCollection menu, FormCollection queryString)
+        public MenuRenderingNotification(string nodeId, MenuItemCollection menu, FormCollection queryString, string treeAlias)
         {
             NodeId = nodeId;
             Menu = menu;
             QueryString = queryString;
+            TreeAlias = treeAlias;
         }
     }
 }

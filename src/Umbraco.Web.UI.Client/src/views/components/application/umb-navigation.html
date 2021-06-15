@@ -23,7 +23,7 @@
                         class="umb-language-picker__dropdown-item"
                         ng-class="{'umb-language-picker__dropdown-item--current': language.active}"
                         ng-click="selectLanguage(language)"
-                        ng-repeat="language in languages | orderBy:'name'"
+                        ng-repeat="language in languages"
                     >
                     <span class="sr-only">
                         <localize key="visuallyHiddenTexts_switchLanguage">Switch language to</localize>

@@ -13,7 +13,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _publishedUrlProvider = publishedUrlProvider;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IRedirectUrl, ContentRedirectUrl>((source, context) => new ContentRedirectUrl(), Map);
         }

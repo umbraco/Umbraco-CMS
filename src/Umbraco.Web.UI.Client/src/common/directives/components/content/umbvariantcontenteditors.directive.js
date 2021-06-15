@@ -202,6 +202,9 @@
             splitViewChanged();
             unbindSplitViewRequest();
         }
+        
+        // if split view was never closed, the listener is not disposed when changing nodes - this unbinds it
+        $scope.$on('$destroy', () => unbindSplitViewRequest());
 
         /**
          * Changes the currently selected variant

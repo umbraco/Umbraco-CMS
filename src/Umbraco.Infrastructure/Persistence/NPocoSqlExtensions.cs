@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -1015,6 +1015,7 @@ namespace Umbraco.Extensions
         /// </summary>
         /// <param name="sql">The Sql statement.</param>
         /// <returns>The Sql statement.</returns>
+        /// <remarks>NOTE: This method will not work for all queries, only simple ones!</remarks>
         public static Sql<ISqlContext> ForUpdate(this Sql<ISqlContext> sql)
         {
             // go find the first FROM clause, and append the lock hint

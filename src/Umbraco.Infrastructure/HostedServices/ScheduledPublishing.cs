@@ -60,7 +60,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _serverMessenger = serverMessenger;
         }
 
-        internal override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object state)
         {
             if (Suspendable.ScheduledPublishing.CanRun == false)
             {

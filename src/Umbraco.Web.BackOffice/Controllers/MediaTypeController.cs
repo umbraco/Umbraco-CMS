@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         private readonly IMediaService _mediaService;
         private readonly IMediaTypeService _mediaTypeService;
         private readonly IShortStringHelper _shortStringHelper;
-        private readonly UmbracoMapper _umbracoMapper;
+        private readonly IUmbracoMapper _umbracoMapper;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
         public MediaTypeController(ICultureDictionary cultureDictionary,
@@ -45,7 +45,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             IContentTypeService contentTypeService,
             IMediaTypeService mediaTypeService,
             IMemberTypeService memberTypeService,
-            UmbracoMapper umbracoMapper,
+            IUmbracoMapper umbracoMapper,
             ILocalizedTextService localizedTextService,
             IShortStringHelper shortStringHelper,
             IEntityService entityService,

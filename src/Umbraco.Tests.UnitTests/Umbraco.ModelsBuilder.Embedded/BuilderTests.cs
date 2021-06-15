@@ -88,7 +88,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
 		// ctor
 		public Type1(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
-			: base(content)
+			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
 		}
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		[ImplementPropertyType(""prop1"")]
-		public string Prop1 => this.Value<string>(_publishedValueFallback, ""prop1"");
+		public virtual string Prop1 => this.Value<string>(_publishedValueFallback, ""prop1"");
 	}
 }
 ";
@@ -194,7 +194,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
 		// ctor
 		public Type1(IPublishedContent content, IPublishedValueFallback publishedValueFallback)
-			: base(content)
+			: base(content, publishedValueFallback)
 		{
 			_publishedValueFallback = publishedValueFallback;
 		}
@@ -203,7 +203,7 @@ namespace Umbraco.Cms.Web.Common.PublishedModels
 
 		[global::System.CodeDom.Compiler.GeneratedCodeAttribute(""Umbraco.ModelsBuilder.Embedded"", """ + version + @""")]
 		[ImplementPropertyType(""foo"")]
-		public global::System.Collections.Generic.IEnumerable<global::Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::Foo>>(_publishedValueFallback, ""foo"");
+		public virtual global::System.Collections.Generic.IEnumerable<global::" + modelsBuilderConfig.ModelsNamespace + @".Foo> Foo => this.Value<global::System.Collections.Generic.IEnumerable<global::" + modelsBuilderConfig.ModelsNamespace + @".Foo>>(_publishedValueFallback, ""foo"");
 	}
 }
 ";

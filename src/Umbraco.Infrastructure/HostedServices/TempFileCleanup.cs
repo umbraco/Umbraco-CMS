@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _tempFolders = _ioHelper.GetTempFolders();
         }
 
-        internal override Task PerformExecuteAsync(object state)
+        public override Task PerformExecuteAsync(object state)
         {
             // Ensure we do not run if not main domain
             if (_mainDom.IsMainDom == false)

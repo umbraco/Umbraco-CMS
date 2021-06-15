@@ -16,18 +16,18 @@
                     <div ng-switch="wizardStep">
 
                         <div ng-switch-when="macroSelect" class="macro-select">
-
-                            <umb-search-filter
-                                input-id="macro-search"
-                                model="searchTerm"
-                                label-key="placeholders_filter"
-                                text="Type to filter..."
-                                css-class="w-100 mb-15"
-                                auto-focus="true">
+                            <label for="macro-search" class="sr-only">{{model.title}}</label>
+                            <umb-search-filter input-id="macro-search"
+                                               model="model.searchTerm"
+                                               label-key="placeholders_filter"
+                                               text="Type to filter..."
+                                               css-class="w-100 mb-15"
+                                               on-change="displayA11YMessageForFilter()"
+                                               auto-focus="true">
                             </umb-search-filter>
-
+                            <p ng-bind="a11yInfo" role="alert"></p>
                             <ul class="umb-card-grid -three-in-row">
-                                <li ng-repeat="availableItem in macros | orderBy:'name' | filter:searchTerm">
+                                <li ng-repeat="availableItem in macros | orderBy:'name' | filter:model.searchTerm">
                                     <button class="btn-reset umb-card-grid-item" title="{{availableItem.name}}" ng-click="selectMacro(availableItem)">
                                         <span>
                                             <i class="icon-settings-alt" aria-hidden="true"></i>
@@ -38,7 +38,7 @@
                             </ul>
 
                             <umb-empty-state ng-if="nomacros"
-                                                position="center">
+                                             position="center">
                                 <localize key="defaultdialogs_noMacros">
                                     There are no macros available to insert
                                 </localize>
@@ -53,7 +53,7 @@
                                 <li ng-repeat="param in model.macroParams">
 
                                     <ng-form name="parameterForm">
-                                        <umb-control-group label="{{param.name}}">
+                                        <umb-control-group label="{{param.name}}" alias="{{param.alias}}">
                                             <umb-property-editor model="param"></umb-property-editor>
                                         </umb-control-group>
                                     </ng-form>

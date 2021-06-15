@@ -42,7 +42,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing
             string body = await response.Content.ReadAsStringAsync();
 
             // Assert
-            Assert.AreEqual(HttpStatusCode.Forbidden, response.StatusCode);
+            Assert.AreEqual(HttpStatusCode.NoContent, response.StatusCode);
         }
     }
 
@@ -59,6 +59,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Web.Website.Routing
 
         public IActionResult Index() => Ok();
 
-        public IActionResult News() => Forbid();
+        public IActionResult News() => NoContent();
     }
 }

@@ -22,27 +22,25 @@ namespace Umbraco.Cms.Core.PropertyEditors
     public class RadioButtonsPropertyEditor : DataEditor
     {
         private readonly IIOHelper _ioHelper;
+        private readonly ILocalizedTextService _localizedTextService;
 
         /// <summary>
         /// The constructor will setup the property editor based on the attribute if one is found
         /// </summary>
         public RadioButtonsPropertyEditor(
-            ILoggerFactory loggerFactory,
+            IDataValueEditorFactory dataValueEditorFactory,
             IIOHelper ioHelper,
-            IDataTypeService dataTypeService,
-            ILocalizationService localizationService,
-            ILocalizedTextService localizedTextService,
-            IShortStringHelper shortStringHelper,
-            IJsonSerializer jsonSerializer)
-            : base(loggerFactory, dataTypeService, localizationService,localizedTextService, shortStringHelper, jsonSerializer)
+            ILocalizedTextService localizedTextService)
+            : base(dataValueEditorFactory)
         {
             _ioHelper = ioHelper;
+            _localizedTextService = localizedTextService;
         }
 
         /// <summary>
         /// Return a custom pre-value editor
         /// </summary>
         /// <returns></returns>
-        protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(LocalizedTextService, _ioHelper);
+        protected override IConfigurationEditor CreateConfigurationEditor() => new ValueListConfigurationEditor(_localizedTextService, _ioHelper);
     }
 }

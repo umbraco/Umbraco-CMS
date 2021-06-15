@@ -19,7 +19,7 @@ namespace Umbraco.Tests.Routing
         protected override void Compose()
         {
             base.Compose();
-            Builder.Services.AddTransient<ISiteDomainHelper, SiteDomainHelper>();
+            Builder.Services.AddTransient<ISiteDomainMapper, SiteDomainMapper>();
         }
 
         protected override void ComposeSettings()

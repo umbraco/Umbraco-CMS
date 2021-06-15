@@ -52,7 +52,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
             _hostingEnvironment = hostingEnvironment;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<DocumentTypeSave, IContentType>((source, context) => new ContentType(_shortStringHelper, source.ParentId), Map);
             mapper.Define<MediaTypeSave, IMediaType>((source, context) => new MediaType(_shortStringHelper, source.ParentId), Map);

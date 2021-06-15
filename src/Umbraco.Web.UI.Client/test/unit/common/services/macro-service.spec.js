@@ -62,7 +62,7 @@ describe('macro service tests', function () {
             expect(result.macroParamsDictionary.test2).not.toBeUndefined();
             expect(result.macroParamsDictionary.test2).toBe("hello");
         });
-        
+
         it('can parse syntax for macros with body', function () {
 
             var result = macroService.parseMacroSyntax("<?UMBRACO_MACRO macroAlias='Map' test1=\"asdf\" test2='hello' ><img src='blah.jpg'/></?UMBRACO_MACRO>");
@@ -108,7 +108,7 @@ describe('macro service tests', function () {
                 toBe("<?UMBRACO_MACRO macroAlias=\"myMacro\" />");
 
         });
-        
+
         it('can generate syntax for MVC', function () {
 
             var syntax = macroService.generateMvcSyntax({
@@ -121,11 +121,11 @@ describe('macro service tests', function () {
             });
 
             expect(syntax).
-                toBe("@Umbraco.RenderMacro(\"myMacro\", new {param1=\"value1\", param2=\"value2\", param3=\"value3\"})");
+                toBe("@await Umbraco.RenderMacroAsync(\"myMacro\", new {param1=\"value1\", param2=\"value2\", param3=\"value3\"})");
 
-           
+
         });
-        
+
         it('can generate syntax for MVC with no params', function () {
 
             var syntax = macroService.generateMvcSyntax({
@@ -134,7 +134,7 @@ describe('macro service tests', function () {
             });
 
             expect(syntax).
-                toBe("@Umbraco.RenderMacro(\"myMacro\")");
+                toBe("@await Umbraco.RenderMacroAsync(\"myMacro\")");
 
         });
 

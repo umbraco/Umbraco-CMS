@@ -8,7 +8,7 @@ namespace Umbraco.Cms.Core.Models.Mapping
 {
     public class LanguageMapDefinition : IMapDefinition
     {
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<ILanguage, EntityBasic>((source, context) => new EntityBasic(), Map);
             mapper.Define<ILanguage, ContentEditing.Language>((source, context) => new ContentEditing.Language(), Map);

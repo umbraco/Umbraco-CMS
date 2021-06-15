@@ -1,9 +1,11 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System.Collections.Generic;
 using System.Linq;
+using Examine.Lucene;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Hosting;
 
 namespace Umbraco.Cms.Infrastructure.Examine
@@ -12,8 +14,12 @@ namespace Umbraco.Cms.Infrastructure.Examine
     {
         private readonly UmbracoExamineIndex _index;
 
-        public UmbracoExamineIndexDiagnostics(UmbracoExamineIndex index, ILogger<UmbracoExamineIndexDiagnostics> logger, IHostingEnvironment hostingEnvironment)
-            : base(index, logger, hostingEnvironment)
+        public UmbracoExamineIndexDiagnostics(
+            UmbracoExamineIndex index,
+            ILogger<UmbracoExamineIndexDiagnostics> logger,
+            IHostingEnvironment hostingEnvironment,
+            IOptionsSnapshot<LuceneDirectoryIndexOptions> indexOptions)
+            : base(index, logger, hostingEnvironment, indexOptions)
         {
             _index = index;
         }

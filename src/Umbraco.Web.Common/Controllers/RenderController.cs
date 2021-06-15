@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.ViewEngines;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Web;
@@ -113,6 +114,6 @@ namespace Umbraco.Cms.Web.Common.Controllers
             {
                 return new PublishedContentNotFoundResult(UmbracoContext);
             }
-        }
+        }        
     }
 }

@@ -26,7 +26,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
         [SetUp]
         public void SetUp()
         {
-            _sut = Services.GetRequiredService<UmbracoMapper>();
+            _sut = Services.GetRequiredService<IUmbracoMapper>();
 
             _dataTypeService = Services.GetRequiredService<IDataTypeService>();
             _propertyEditorCollection = Services.GetRequiredService<PropertyEditorCollection>();
@@ -37,7 +37,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Mapping
             _localizedTextService = Services.GetRequiredService<ILocalizedTextService>();
         }
 
-        private UmbracoMapper _sut;
+        private IUmbracoMapper _sut;
         private IDataTypeService _dataTypeService;
         private PropertyEditorCollection _propertyEditorCollection;
         private MediaBuilder _mediaBuilder;

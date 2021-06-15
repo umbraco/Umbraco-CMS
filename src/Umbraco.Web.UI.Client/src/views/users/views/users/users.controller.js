@@ -245,6 +245,8 @@
                 $location.search("invite", null);
             }
             else if (state === "inviteUser") {
+                clearAddUserForm();
+
                 $location.search("create", null);
                 $location.search("invite", "true");
             }

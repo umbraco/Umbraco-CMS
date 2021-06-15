@@ -19,6 +19,7 @@ using Umbraco.Cms.Core.Dictionary;
 using Umbraco.Cms.Core.Editors;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Features;
+using Umbraco.Cms.Core.Handlers;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Install;
 using Umbraco.Cms.Core.IO;
@@ -26,6 +27,7 @@ using Umbraco.Cms.Core.Logging;
 using Umbraco.Cms.Core.Mail;
 using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models.PublishedContent;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.PropertyEditors;
 using Umbraco.Cms.Core.Routing;
 using Umbraco.Cms.Core.Runtime;
@@ -139,11 +141,11 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IUmbracoVersion, UmbracoVersion>();
 
             this.AddAllCoreCollectionBuilders();
-            this.AddNotificationHandler<UmbracoApplicationStarting, EssentialDirectoryCreator>();
+            this.AddNotificationHandler<UmbracoApplicationStartingNotification, EssentialDirectoryCreator>();
 
             Services.AddSingleton<ManifestWatcher>();
             Services.AddSingleton<UmbracoRequestPaths>();
-            this.AddNotificationAsyncHandler<UmbracoApplicationStarting, AppPluginsManifestWatcherNotificationHandler>();
+            this.AddNotificationAsyncHandler<UmbracoApplicationStartingNotification, AppPluginsManifestWatcherNotificationHandler>();
 
             Services.AddUnique<InstallStatusTracker>();
 
@@ -165,7 +167,7 @@ namespace Umbraco.Cms.Core.DependencyInjection
             Services.AddUnique<IGridConfig, GridConfig>();
 
             Services.AddUnique<IPublishedUrlProvider, UrlProvider>();
-            Services.AddUnique<ISiteDomainHelper, SiteDomainHelper>();
+            Services.AddUnique<ISiteDomainMapper, SiteDomainMapper>();
 
             Services.AddUnique<HtmlLocalLinkParser>();
             Services.AddUnique<HtmlImageSourceParser>();
@@ -186,6 +188,8 @@ namespace Umbraco.Cms.Core.DependencyInjection
 
             Services.AddUnique<ISmsSender, NotImplementedSmsSender>();
             Services.AddUnique<IEmailSender, NotImplementedEmailSender>();
+
+            Services.AddUnique<IDataValueEditorFactory, DataValueEditorFactory>();
 
             // register distributed cache
             Services.AddUnique(f => new DistributedCache(f.GetRequiredService<IServerMessenger>(), f.GetRequiredService<CacheRefresherCollection>()));
@@ -219,6 +223,12 @@ namespace Umbraco.Cms.Core.DependencyInjection
             // which may be replaced by models builder but the default is required to make plain old IPublishedContent
             // instances.
             Services.AddSingleton<IPublishedModelFactory>(factory => factory.CreateDefaultPublishedModelFactory());
+
+            Services
+                .AddNotificationHandler<MemberGroupSavedNotification, PublicAccessHandler>()
+                .AddNotificationHandler<MemberGroupDeletedNotification, PublicAccessHandler>();
+
+            Services.AddSingleton<ISyncBootStateAccessor, NonRuntimeLevelBootStateAccessor>();
         }
     }
 }

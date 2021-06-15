@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -77,11 +77,6 @@ JOIN umbracoNode ON umbracoRedirectUrl.contentKey=umbracoNode.uniqueID");
                     "DELETE FROM umbracoRedirectUrl WHERE id = @id"
                 };
             return list;
-        }
-
-        protected override Guid NodeObjectTypeId
-        {
-            get { throw new NotImplementedException(); }
         }
 
         protected override void PersistNewItem(IRedirectUrl entity)

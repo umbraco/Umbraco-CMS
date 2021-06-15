@@ -1,9 +1,10 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Services;
@@ -64,7 +65,7 @@ namespace Umbraco.Extensions
         /// <param name="username"></param>
         /// <param name="rolesCallback">A callback to retrieve the roles for this member</param>
         /// <returns></returns>
-        public static bool HasAccess(this IPublicAccessService publicAccessService, string path, string username, Func<string, IEnumerable<string>> rolesCallback)
+        public static async Task<bool> HasAccessAsync(this IPublicAccessService publicAccessService, string path, string username, Func<Task<IEnumerable<string>>> rolesCallback)
         {
             if (rolesCallback == null) throw new ArgumentNullException("roles");
             if (string.IsNullOrWhiteSpace(username)) throw new ArgumentException("Value cannot be null or whitespace.", "username");
@@ -73,13 +74,28 @@ namespace Umbraco.Extensions
             var entry = publicAccessService.GetEntryForContent(path.EnsureEndsWith(path));
             if (entry == null) return true;
 
-            var roles = rolesCallback(username);
+            var roles = await rolesCallback();
 
             return HasAccess(entry, username, roles);
         }
 
         private static bool HasAccess(PublicAccessEntry entry, string username, IEnumerable<string> roles)
         {
+            if (entry is null)
+            {
+                throw new ArgumentNullException(nameof(entry));
+            }
+
+            if (string.IsNullOrEmpty(username))
+            {
+                throw new ArgumentException($"'{nameof(username)}' cannot be null or empty.", nameof(username));
+            }
+
+            if (roles is null)
+            {
+                throw new ArgumentNullException(nameof(roles));
+            }
+
             return entry.Rules.Any(x =>
                 (x.RuleType == Constants.Conventions.PublicAccess.MemberUsernameRuleType && username.Equals(x.RuleValue, StringComparison.OrdinalIgnoreCase))
                 || (x.RuleType == Constants.Conventions.PublicAccess.MemberRoleRuleType && roles.Contains(x.RuleValue))

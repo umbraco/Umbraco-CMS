@@ -1,9 +1,12 @@
+using System;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Mapping;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.ContentEditing;
 using Umbraco.Cms.Core.Models.Mapping;
+using Umbraco.Cms.Core.Security;
 using Umbraco.Cms.Web.BackOffice.Trees;
 using Constants = Umbraco.Cms.Core.Constants;
 
@@ -17,22 +20,20 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
         private readonly CommonMapper _commonMapper;
         private readonly CommonTreeNodeMapper _commonTreeNodeMapper;
         private readonly MemberTabsAndPropertiesMapper _tabsAndPropertiesMapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public MemberMapDefinition(CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, MemberTabsAndPropertiesMapper tabsAndPropertiesMapper, IHttpContextAccessor httpContextAccessor)
+        public MemberMapDefinition(CommonMapper commonMapper, CommonTreeNodeMapper commonTreeNodeMapper, MemberTabsAndPropertiesMapper tabsAndPropertiesMapper)
         {
             _commonMapper = commonMapper;
             _commonTreeNodeMapper = commonTreeNodeMapper;
-
             _tabsAndPropertiesMapper = tabsAndPropertiesMapper;
-            _httpContextAccessor = httpContextAccessor;
         }
 
-        public void DefineMaps(UmbracoMapper mapper)
+        public void DefineMaps(IUmbracoMapper mapper)
         {
             mapper.Define<IMember, MemberDisplay>((source, context) => new MemberDisplay(), Map);
             mapper.Define<IMember, MemberBasic>((source, context) => new MemberBasic(), Map);
             mapper.Define<IMemberGroup, MemberGroupDisplay>((source, context) => new MemberGroupDisplay(), Map);
+            mapper.Define<UmbracoIdentityRole, MemberGroupDisplay>((source, context) => new MemberGroupDisplay(), Map);
             mapper.Define<IMember, ContentPropertyCollectionDto>((source, context) => new ContentPropertyCollectionDto(), Map);
         }
 
@@ -94,7 +95,17 @@ namespace Umbraco.Cms.Web.BackOffice.Mapping
             target.Path = $"-1,{source.Id}";
             target.Udi = Udi.Create(Constants.UdiEntityType.MemberGroup, source.Key);
         }
-        
+
+        // Umbraco.Code.MapAll -Icon -Trashed -ParentId -Alias -Key -Udi
+        private void Map(UmbracoIdentityRole source, MemberGroupDisplay target, MapperContext context)
+        {
+            target.Id = source.Id;
+            //target.Key = source.Key;
+            target.Name = source.Name;
+            target.Path = $"-1,{source.Id}";
+            //target.Udi = Udi.Create(Constants.UdiEntityType.MemberGroup, source.Key);
+        }
+
         // Umbraco.Code.MapAll
         private static void Map(IMember source, ContentPropertyCollectionDto target, MapperContext context)
         {

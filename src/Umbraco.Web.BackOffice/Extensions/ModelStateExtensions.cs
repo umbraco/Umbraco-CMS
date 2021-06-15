@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Microsoft.AspNetCore.Mvc;
@@ -8,7 +8,7 @@ using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Web.BackOffice.Extensions
 {
-    internal static class ModelStateExtensions
+    public static class ModelStateExtensions
     {
         /// <summary>
         /// Checks if there are any model errors on any fields containing the prefix
@@ -16,10 +16,8 @@ namespace Umbraco.Cms.Web.BackOffice.Extensions
         /// <param name="state"></param>
         /// <param name="prefix"></param>
         /// <returns></returns>
-        public static bool IsValid(this ModelStateDictionary state, string prefix)
-        {
-            return state.Where(v => v.Key.StartsWith(prefix + ".")).All(v => !v.Value.Errors.Any());
-        }
+        public static bool IsValid(this ModelStateDictionary state, string prefix) =>
+            state.Where(v => v.Key.StartsWith(prefix + ".")).All(v => !v.Value.Errors.Any());
 
         /// <summary>
         /// Adds the <see cref="ValidationResult"/> to the model state with the appropriate keys for property errors
@@ -30,8 +28,10 @@ namespace Umbraco.Cms.Web.BackOffice.Extensions
         /// <param name="culture"></param>
         /// <param name="segment"></param>
         internal static void AddPropertyValidationError(this ModelStateDictionary modelState,
-            ValidationResult result, string propertyAlias, string culture = "", string segment = "")
-        {
+            ValidationResult result,
+            string propertyAlias,
+            string culture = "",
+            string segment = "") =>
             modelState.AddValidationError(
                 result,
                 "_Properties",
@@ -40,7 +40,6 @@ namespace Umbraco.Cms.Web.BackOffice.Extensions
                 culture.IsNullOrWhiteSpace() ? "invariant" : culture,
                 // if the segment is null, we'll add the term 'null' as part of the key
                 segment.IsNullOrWhiteSpace() ? "null" : segment);
-        }
 
         /// <summary>
         /// Adds an <see cref="ContentPropertyValidationResult"/> error to model state for a property so we can use it on the client side.
@@ -50,11 +49,8 @@ namespace Umbraco.Cms.Web.BackOffice.Extensions
         /// <param name="propertyAlias"></param>
         /// <param name="culture">The culture for the property, if the property is invariant than this is empty</param>
         internal static void AddPropertyError(this ModelStateDictionary modelState,
-            ValidationResult result, string propertyAlias, string culture = "", string segment = "")
-        {
+            ValidationResult result, string propertyAlias, string culture = "", string segment = "") =>
             modelState.AddPropertyValidationError(new ContentPropertyValidationResult(result, culture, segment), propertyAlias, culture, segment);
-        }
-
 
         /// <summary>
         /// Adds a generic culture error for use in displaying the culture validation error in the save/publish/etc... dialogs
@@ -67,7 +63,11 @@ namespace Umbraco.Cms.Web.BackOffice.Extensions
             string culture, string segment, string errMsg)
         {
             var key = "_content_variant_" + (culture.IsNullOrWhiteSpace() ? "invariant" : culture) + "_" + (segment.IsNullOrWhiteSpace() ? "null" : segment) + "_";
-            if (modelState.ContainsKey(key)) return;
+            if (modelState.ContainsKey(key))
+            {
+                return;
+            }
+
             modelState.AddModelError(key, errMsg);
         }
 
@@ -115,10 +115,10 @@ namespace Umbraco.Cms.Web.BackOffice.Extensions
         /// </returns>
         internal static IReadOnlyList<(string culture, string segment)> GetVariantsWithErrors(this ModelStateDictionary modelState, string cultureForInvariantErrors)
         {
-            var propertyVariantErrors = modelState.GetVariantsWithPropertyErrors(cultureForInvariantErrors);
+            IReadOnlyList<(string culture, string segment)> propertyVariantErrors = modelState.GetVariantsWithPropertyErrors(cultureForInvariantErrors);
 
             //now check the other special variant errors that are
-            var genericVariantErrors = modelState.Keys
+            IEnumerable<(string culture, string segment)> genericVariantErrors = modelState.Keys
                 .Where(x => x.StartsWith("_content_variant_") && x.EndsWith("_"))
                 .Select(x => x.TrimStart("_content_variant_").TrimEnd("_"))
                 .Select(x =>
@@ -172,32 +172,13 @@ namespace Umbraco.Cms.Web.BackOffice.Extensions
 
         }
 
-        /// <summary>
-        /// Will add an error to model state for a key if that key and error don't already exist
-        /// </summary>
-        /// <param name="modelState"></param>
-        /// <param name="key"></param>
-        /// <param name="errorMsg"></param>
-        /// <returns></returns>
-        private static bool TryAddModelError(this ModelStateDictionary modelState, string key, string errorMsg)
-        {
-            if (modelState.TryGetValue(key, out var errs))
-            {
-                foreach(var e in errs.Errors)
-                    if (e.ErrorMessage == errorMsg) return false; //if this same error message exists for the same key, just exit
-            }
-
-            modelState.AddModelError(key, errorMsg);
-            return true;
-        }
-
         public static IDictionary<string, object> ToErrorDictionary(this ModelStateDictionary modelState)
         {
             var modelStateError = new Dictionary<string, object>();
-            foreach (var keyModelStatePair in modelState)
+            foreach (KeyValuePair<string, ModelStateEntry> keyModelStatePair in modelState)
             {
                 var key = keyModelStatePair.Key;
-                var errors = keyModelStatePair.Value.Errors;
+                ModelErrorCollection errors = keyModelStatePair.Value.Errors;
                 if (errors != null && errors.Count > 0)
                 {
                     modelStateError.Add(key, errors.Select(error => error.ErrorMessage));
@@ -211,23 +192,21 @@ namespace Umbraco.Cms.Web.BackOffice.Extensions
         /// </summary>
         /// <param name="state"></param>
         /// <returns></returns>
-        public static JsonResult ToJsonErrors(this ModelStateDictionary state)
-        {
-            return new JsonResult(new
+        public static JsonResult ToJsonErrors(this ModelStateDictionary state) =>
+            new JsonResult(new
             {
                 success = state.IsValid.ToString().ToLower(),
                 failureType = "ValidationError",
                 validationErrors = from e in state
-                    where e.Value.Errors.Count > 0
-                    select new
-                    {
-                        name = e.Key,
-                        errors = e.Value.Errors.Select(x => x.ErrorMessage)
-                            .Concat(
-                                e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception.Message))
-                    }
-            });
-        }
+                                   where e.Value.Errors.Count > 0
+                                   select new
+                                   {
+                                       name = e.Key,
+                                       errors = e.Value.Errors.Select(x => x.ErrorMessage)
+                                           .Concat(
+                                               e.Value.Errors.Where(x => x.Exception != null).Select(x => x.Exception.Message))
+                                   }
+        });
 
     }
 }

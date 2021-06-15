@@ -1,6 +1,7 @@
 using System;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Persistence.Repositories;
 using Umbraco.Cms.Core.PublishedCache;
 using Umbraco.Cms.Core.Serialization;
@@ -43,6 +44,7 @@ namespace Umbraco.Cms.Core.Cache
             if (anythingChanged)
             {
                 AppCaches.ClearPartialViewCache();
+                AppCaches.RuntimeCache.ClearByKey(CacheKeys.MediaRecycleBinCacheKey);
 
                 var mediaCache = AppCaches.IsolatedCaches.Get<IMedia>();
 
@@ -56,8 +58,8 @@ namespace Umbraco.Cms.Core.Cache
                     // repository cache
                     // it *was* done for each pathId but really that does not make sense
                     // only need to do it for the current media
-                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia>(payload.Id));
-                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia>(payload.Key));
+                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, int>(payload.Id));
+                    mediaCache.Result.Clear(RepositoryCacheKeys.GetKey<IMedia, Guid?>(payload.Key));
 
                     // remove those that are in the branch
                     if (payload.ChangeTypes.HasTypesAny(TreeChangeTypes.RefreshBranch | TreeChangeTypes.Remove))

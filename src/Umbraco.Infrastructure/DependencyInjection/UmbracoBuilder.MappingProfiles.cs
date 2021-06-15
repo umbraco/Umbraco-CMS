@@ -14,7 +14,7 @@ namespace Umbraco.Cms.Infrastructure.DependencyInjection
         /// </summary>
         public static IUmbracoBuilder AddCoreMappingProfiles(this IUmbracoBuilder builder)
         {
-            builder.Services.AddUnique<UmbracoMapper>();
+            builder.Services.AddUnique<IUmbracoMapper, UmbracoMapper>();
 
             builder.WithCollectionBuilder<MapDefinitionCollectionBuilder>()
                 .Add<AuditMapDefinition>()

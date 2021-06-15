@@ -56,6 +56,7 @@ namespace Umbraco.Tests.Testing.Objects
 
         public IEnumerable<ContentNodeKit> GetTypeMediaSources(IEnumerable<int> ids) => Enumerable.Empty<ContentNodeKit>();
         public void DeleteContentItem(IContentBase item) => throw new NotImplementedException();
+        public void DeleteContentItems(IEnumerable<IContentBase> items) => throw new NotImplementedException();
         public void RefreshContent(IContent content) => throw new NotImplementedException();
         public void RefreshEntity(IContentBase content) => throw new NotImplementedException();
         public bool VerifyContentDbCache() => throw new NotImplementedException();

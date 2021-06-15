@@ -27,9 +27,9 @@ namespace Umbraco.Cms.Web.BackOffice.Filters
         {
             private readonly IDataTypeService _dataTypeService;
             private readonly PropertyEditorCollection _propertyEditorCollection;
-            private readonly UmbracoMapper _umbracoMapper;
+            private readonly IUmbracoMapper _umbracoMapper;
 
-            public DataTypeValidateFilter(IDataTypeService dataTypeService, PropertyEditorCollection propertyEditorCollection, UmbracoMapper umbracoMapper)
+            public DataTypeValidateFilter(IDataTypeService dataTypeService, PropertyEditorCollection propertyEditorCollection, IUmbracoMapper umbracoMapper)
             {
                 _dataTypeService = dataTypeService ?? throw new ArgumentNullException(nameof(dataTypeService));
                 _propertyEditorCollection = propertyEditorCollection ?? throw new ArgumentNullException(nameof(propertyEditorCollection));

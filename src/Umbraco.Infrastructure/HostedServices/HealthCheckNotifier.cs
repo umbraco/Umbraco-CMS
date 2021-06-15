@@ -75,7 +75,7 @@ namespace Umbraco.Cms.Infrastructure.HostedServices
             _profilingLogger = profilingLogger;
         }
 
-        internal override async Task PerformExecuteAsync(object state)
+        public override async Task PerformExecuteAsync(object state)
         {
             if (_healthChecksSettings.Notification.Enabled == false)
             {

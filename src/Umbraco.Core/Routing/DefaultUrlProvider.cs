@@ -15,15 +15,15 @@ namespace Umbraco.Cms.Core.Routing
     {
         private readonly RequestHandlerSettings _requestSettings;
         private readonly ILogger<DefaultUrlProvider> _logger;
-        private readonly ISiteDomainHelper _siteDomainHelper;
+        private readonly ISiteDomainMapper _siteDomainMapper;
         private readonly IUmbracoContextAccessor _umbracoContextAccessor;
         private readonly UriUtility _uriUtility;
 
-        public DefaultUrlProvider(IOptions<RequestHandlerSettings> requestSettings, ILogger<DefaultUrlProvider> logger, ISiteDomainHelper siteDomainHelper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
+        public DefaultUrlProvider(IOptions<RequestHandlerSettings> requestSettings, ILogger<DefaultUrlProvider> logger, ISiteDomainMapper siteDomainMapper, IUmbracoContextAccessor umbracoContextAccessor, UriUtility uriUtility)
         {
             _requestSettings = requestSettings.Value;
             _logger = logger;
-            _siteDomainHelper = siteDomainHelper;
+            _siteDomainMapper = siteDomainMapper;
             _uriUtility = uriUtility;
             _umbracoContextAccessor = umbracoContextAccessor;
         }
@@ -56,7 +56,7 @@ namespace Umbraco.Cms.Core.Routing
             var path = pos == 0 ? route : route.Substring(pos);
             var domainUri = pos == 0
                 ? null
-                : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, int.Parse(route.Substring(0, pos)), current, culture);
+                : DomainUtilities.DomainForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, int.Parse(route.Substring(0, pos)), current, culture);
 
             // assemble the URL from domainUri (maybe null) and path
             var url = AssembleUrl(domainUri, path, current, mode).ToString();
@@ -90,11 +90,11 @@ namespace Umbraco.Cms.Core.Routing
 
             // look for domains, walking up the tree
             var n = node;
-            var domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, false);
+            var domainUris = DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, false);
             while (domainUris == null && n != null) // n is null at root
             {
                 n = n.Parent; // move to parent node
-                domainUris = n == null ? null : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainHelper, n.Id, current, excludeDefault: true);
+                domainUris = n == null ? null : DomainUtilities.DomainsForNode(umbracoContext.PublishedSnapshot.Domains, _siteDomainMapper, n.Id, current, excludeDefault: true);
             }
 
             // no domains = exit

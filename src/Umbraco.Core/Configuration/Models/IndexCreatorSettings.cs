@@ -1,6 +1,8 @@
 // Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
+
 namespace Umbraco.Cms.Core.Configuration.Models
 {
     /// <summary>
@@ -11,6 +13,7 @@ namespace Umbraco.Cms.Core.Configuration.Models
         /// <summary>
         /// Gets or sets a value for lucene directory factory type.
         /// </summary>
-        public string LuceneDirectoryFactory { get; set; }
+        public LuceneDirectoryFactory LuceneDirectoryFactory { get; set; }
+
     }
 }

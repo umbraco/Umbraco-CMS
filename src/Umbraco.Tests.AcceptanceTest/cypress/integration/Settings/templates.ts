@@ -23,14 +23,18 @@ context('Templates', () => {
         cy.umbracoEnsureTemplateNameNotExists(name);
 
         createTemplate();
+        // We have to wait for the ace editor to load, because when the editor is loading it will "steal" the focus briefly,
+        // which causes the save event to fire if we've added something to the header field, causing errors.
+        cy.wait(500);
+
         //Type name
         cy.umbracoEditorHeaderName(name);
         // Save
         // We must drop focus for the auto save event to occur.
         cy.get('.btn-success').focus();
         // And then wait for the auto save event to finish by finding the page in the tree view.
-        // This is a bit of a roundabout way to find items in a treev view since we dont use umbracoTreeItem
-        // but we must be able to wait for the save evnent to finish, and we can't do that with umbracoTreeItem
+        // This is a bit of a roundabout way to find items in a tree view since we dont use umbracoTreeItem
+        // but we must be able to wait for the save event to finish, and we can't do that with umbracoTreeItem
         cy.get('[data-element="tree-item-templates"] > :nth-child(2) > .umb-animated > .umb-tree-item__inner > .umb-tree-item__label')
             .contains(name).should('be.visible', { timeout: 10000 });
         // Now that the auto save event has finished we can save
@@ -135,7 +139,7 @@ context('Templates', () => {
         cy.get('.umb-card-grid-item').contains(name).click();
 
         // Assert
-        cy.get('.ace_content').contains('@Umbraco.RenderMacro("' + name + '")').should('exist');
+        cy.get('.ace_content').contains('@await Umbraco.RenderMacroAsync("' + name + '")').should('exist');
 
         // Clean
         cy.umbracoEnsureTemplateNameNotExists(name);

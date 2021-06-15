@@ -1,4 +1,5 @@
-﻿using Smidge.Nuglify;
+using Smidge;
+using Smidge.Nuglify;
 
 namespace Umbraco.Cms.Web.Common.RuntimeMinification
 {
@@ -7,8 +8,8 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
     /// </summary>
     public class SmidgeNuglifyJs : NuglifyJs
     {
-        public SmidgeNuglifyJs(NuglifySettings settings, ISourceMapDeclaration sourceMapDeclaration)
-            : base(GetSettings(settings), sourceMapDeclaration)
+        public SmidgeNuglifyJs(NuglifySettings settings, ISourceMapDeclaration sourceMapDeclaration, IRequestHelper requestHelper)
+            : base(GetSettings(settings), sourceMapDeclaration, requestHelper)
         {
         }
 
