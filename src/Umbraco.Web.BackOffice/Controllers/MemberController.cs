@@ -366,6 +366,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                 contentItem.Username,
                 contentItem.Email,
                 memberType.Alias,
+                contentItem.IsApproved,
                 contentItem.Name);
 
             IdentityResult created = await _memberManager.CreateAsync(identityMember, contentItem.Password.NewPassword);
