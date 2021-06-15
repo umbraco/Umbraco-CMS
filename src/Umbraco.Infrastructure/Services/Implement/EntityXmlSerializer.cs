@@ -422,6 +422,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             var xml = new XElement("macro");
             xml.Add(new XElement("name", macro.Name));
+            xml.Add(new XElement("id", macro.Key));
             xml.Add(new XElement("alias", macro.Alias));
             xml.Add(new XElement("macroSource", macro.MacroSource));
             xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));

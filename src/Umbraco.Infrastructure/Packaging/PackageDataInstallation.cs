@@ -1101,7 +1101,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
             else
             {
-                dictionaryItem = CreateNewDictionaryItem(itemName, dictionaryItemElement, languages, parentId);
+                dictionaryItem = CreateNewDictionaryItem(itemId, itemName, dictionaryItemElement, languages, parentId);
             }
 
             _localizationService.Save(dictionaryItem, userId);
@@ -1123,13 +1123,17 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return dictionaryItem;
         }
 
-        private static DictionaryItem CreateNewDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages, Guid? parentId)
+        private static DictionaryItem CreateNewDictionaryItem(Guid itemId, string key, XElement dictionaryItemElement, List<ILanguage> languages, Guid? parentId)
         {
-            var dictionaryItem = parentId.HasValue ? new DictionaryItem(parentId.Value, key) : new DictionaryItem(key);
+            DictionaryItem dictionaryItem = parentId.HasValue ? new DictionaryItem(parentId.Value, key) : new DictionaryItem(key);
+            dictionaryItem.Key = itemId;
+
             var translations = new List<IDictionaryTranslation>();
 
-            foreach (var valueElement in dictionaryItemElement.Elements("Value"))
+            foreach (XElement valueElement in dictionaryItemElement.Elements("Value"))
+            {
                 AddDictionaryTranslation(translations, valueElement, languages);
+            }
 
             dictionaryItem.Translations = translations;
             return dictionaryItem;
@@ -1200,10 +1204,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             foreach (var macro in macros)
             {
-                var existing = _macroService.GetByAlias(macro.Alias);
-                if (existing != null)
-                    macro.Id = existing.Id;
-
                 _macroService.Save(macro, userId);
             }
 
@@ -1212,6 +1212,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         private IMacro ParseMacroElement(XElement macroElement)
         {
+            var macroId = Guid.Parse(macroElement.Element("id").Value);
             var macroName = macroElement.Element("name").Value;
             var macroAlias = macroElement.Element("alias").Value;
             var macroSource = macroElement.Element("macroSource").Value;
@@ -1248,9 +1249,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 dontRender = bool.Parse(dontRenderElement.Value);
             }
 
-            var existingMacro = _macroService.GetByAlias(macroAlias) as Macro;
+            var existingMacro = _macroService.GetById(macroId) as Macro;
             var macro = existingMacro ?? new Macro(_shortStringHelper, macroAlias, macroName, macroSource,
-                cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
+                cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration)
+            {
+                Key = macroId
+            };
 
             var properties = macroElement.Element("properties");
             if (properties != null)
