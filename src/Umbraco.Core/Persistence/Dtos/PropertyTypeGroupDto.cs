@@ -17,9 +17,20 @@ namespace Umbraco.Core.Persistence.Dtos
         [PrimaryKeyColumn(IdentitySeed = 12)]
         public int Id { get; set; }
 
-        [Column("parentId")]
+        [Column("uniqueID")]
+        [NullSetting(NullSetting = NullSettings.NotNull)]
+        [Constraint(Default = SystemMethods.NewGuid)]
+        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsPropertyTypeGroupUniqueID")]
+        public Guid UniqueId { get; set; }
+
+        [Column("parentKey")]
         [NullSetting(NullSetting = NullSettings.Null)]
-        public int? ParentId { get; set; }
+        [ForeignKey(typeof(PropertyTypeGroupDto), Column = "uniqueID", Name = "FK_" + TableName + "_parentKey")]
+        public Guid? ParentKey { get; set; }
+
+        [Column("level")]
+        [Constraint(Default = 1)] // TODO We default to 1 (property group) for backwards compatibility, but should use zero/no default at some point.
+        public short Level { get; set; }
 
         [Column("contenttypeNodeId")]
         [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
@@ -38,11 +49,5 @@ namespace Umbraco.Core.Persistence.Dtos
         [ResultColumn]
         [Reference(ReferenceType.Many, ReferenceMemberName = "PropertyTypeGroupId")]
         public List<PropertyTypeDto> PropertyTypeDtos { get; set; }
-
-        [Column("uniqueID")]
-        [NullSetting(NullSetting = NullSettings.NotNull)]
-        [Constraint(Default = SystemMethods.NewGuid)]
-        [Index(IndexTypes.UniqueNonClustered, Name = "IX_cmsPropertyTypeGroupUniqueID")]
-        public Guid UniqueId { get; set; }
     }
 }
