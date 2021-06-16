@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <files />
   <info>
@@ -8,7 +8,7 @@
   </info>
   <Documents>
     <DocumentSet importMode="root">
-      <NewType id="1148" parentID="-1" level="1" creatorID="0" sortOrder="9" createDate="2013-07-23T12:06:07" updateDate="2013-07-23T15:56:37" nodeName="DoIt" urlName="doit" path="-1,1148" isDoc="" nodeType="1134" creatorName="admin" writerName="admin" writerID="0" template="1133" nodeTypeAlias="NewType">
+      <NewType key="9c9b55d0-2fbf-4f12-afea-023bd7b2519d" id="1148" parentID="-1" level="1" creatorID="0" sortOrder="9" createDate="2013-07-23T12:06:07" updateDate="2013-07-23T15:56:37" nodeName="DoIt" urlName="doit" path="-1,1148" isDoc="" nodeType="1134" creatorName="admin" writerName="admin" writerID="0" template="1133" nodeTypeAlias="NewType">
         <testList><![CDATA[test3]]></testList>
       </NewType>
     </DocumentSet>

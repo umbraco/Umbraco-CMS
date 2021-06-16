@@ -372,8 +372,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
         }
 
         [Test]
-        public void Can_Import_CheckboxList_Content_Package_Xml_With_Property_Editor_Aliases() =>
-            AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package);
+        public void Can_Import_CheckboxList_Content_Package_Xml_With_Property_Editor_Aliases()
+            => AssertCheckBoxListTests(ImportResources.CheckboxList_Content_Package);
 
         private void AssertCheckBoxListTests(string strXml)
         {
