@@ -17,13 +17,14 @@
             scope.sortingButtonKey = "general_reorder";
             scope.compositionsButtonState = "init";
             scope.tabs = [];
+            scope.openTabKey = null;
             
             scope.$watchCollection('model.groups', (newValue, oldValue) => {
                 if (newValue && newValue.length === 0) return;
                 if (newValue === oldValue) return;
 
                 scope.tabs = $filter("filter")(scope.model.groups, (group) => {
-                    return group.parentKey === "00000000-0000-0000-0000-000000000000"
+                    return group.level === 0;
                 });
             });
 
@@ -397,7 +398,8 @@
                 const tab = {
                     key: String.CreateGuid(),
                     name: "",
-                    parentKey: "00000000-0000-0000-0000-000000000000",
+                    parentKey: null,
+                    level: 0,
                     sortOrder,
                     icon: "icon-document color-black"
                 };
@@ -498,7 +500,8 @@
                     parentTabContentTypes: [],
                     parentTabContentTypeNames: [],
                     name: "",
-                    parentKey: tabKey || "",
+                    parentKey: tabKey || null,
+                    level: 1,
                     sortOrder: lastGroupSortOrder
                 };
 

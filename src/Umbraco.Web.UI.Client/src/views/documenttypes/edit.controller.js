@@ -406,15 +406,6 @@
 
         function init(contentType) {
 
-            // TODO - Do we get a key from the server?
-            if (contentType.groups && contentType.groups.length > 0) {
-                contentType.groups.forEach((group) => {
-                    if (!group.key) {
-                        group.key = String.CreateGuid();
-                    }
-                });
-            }
-
             // insert template on new doc types
             if (!noTemplate && contentType.id === 0) {
                 contentType.defaultTemplate = contentTypeHelper.insertDefaultTemplatePlaceholder(contentType.defaultTemplate);
