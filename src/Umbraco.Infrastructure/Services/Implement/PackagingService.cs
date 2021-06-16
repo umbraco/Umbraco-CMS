@@ -9,6 +9,7 @@ using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -23,7 +24,6 @@ namespace Umbraco.Cms.Core.Services.Implement
         private readonly IManifestParser _manifestParser;
         private readonly IKeyValueService _keyValueService;
         private readonly PackageMigrationPlanCollection _packageMigrationPlans;
-        private readonly PendingPackageMigrations _pendingPackageMigrations;
         private readonly IAuditService _auditService;
         private readonly ICreatedPackagesRepository _createdPackages;
 
@@ -34,8 +34,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             IEventAggregator eventAggregator,
             IManifestParser manifestParser,
             IKeyValueService keyValueService,
-            PackageMigrationPlanCollection packageMigrationPlans,
-            PendingPackageMigrations pendingPackageMigrations)
+            PackageMigrationPlanCollection packageMigrationPlans)
         {
             _auditService = auditService;
             _createdPackages = createdPackages;
@@ -44,7 +43,6 @@ namespace Umbraco.Cms.Core.Services.Implement
             _manifestParser = manifestParser;
             _keyValueService = keyValueService;
             _packageMigrationPlans = packageMigrationPlans;
-            _pendingPackageMigrations = pendingPackageMigrations;
         }
 
         #region Installation
@@ -111,10 +109,10 @@ namespace Umbraco.Cms.Core.Services.Implement
         public IEnumerable<InstalledPackage> GetAllInstalledPackages()
         {
             IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
-            IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
 
             var installedPackages = new Dictionary<string, InstalledPackage>();
 
+            // Collect the package from the package migration plans
             foreach(PackageMigrationPlan plan in _packageMigrationPlans)
             {
                 if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage installedPackage))
@@ -137,6 +135,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 installedPackage.PackageMigrationPlans = currentPlans;
             }
 
+            // Collect and merge the packages from the manifests
             foreach(PackageManifest package in _manifestParser.GetManifests())
             {
                 if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage installedPackage))
@@ -151,7 +150,11 @@ namespace Umbraco.Cms.Core.Services.Implement
                 installedPackage.PackageView = package.PackageView;
             }
 
-            return installedPackages.Values;
+            // Filter the packages listed here. i.e. only packages that have migrations or views.
+            // Else whats the point in showing them?
+            return installedPackages
+                .Values
+                .Where(x => !x.PackageView.IsNullOrWhiteSpace() || x.PackageMigrationPlans.Any());
         }
 
         #endregion
