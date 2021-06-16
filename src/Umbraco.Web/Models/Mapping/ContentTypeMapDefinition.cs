@@ -451,6 +451,7 @@ namespace Umbraco.Web.Models.Mapping
             var destOrigProperties = target.PropertyTypes.ToArray(); // all properties, in groups or not
             var destGroups = new List<PropertyGroup>();
             var sourceGroups = source.Groups.Where(x => x.IsGenericProperties == false).ToArray();
+            var parentKeys = sourceGroups.Where(x => x.ParentKey.HasValue).Select(x => x.ParentKey.Value).Distinct().ToArray();
             foreach (var sourceGroup in sourceGroups)
             {
                 // get the dest group
@@ -462,9 +463,9 @@ namespace Umbraco.Web.Models.Mapping
                     .Select(x => MapSaveProperty(x, destOrigProperties, context))
                     .ToArray();
 
-                // if the group has no local properties, skip it, ie sort-of garbage-collect
+                // if the group has no local properties and is not used as parent, skip it, ie sort-of garbage-collect
                 // local groups which would not have local properties anymore
-                if (destProperties.Length == 0)
+                if (destProperties.Length == 0 && !parentKeys.Contains(sourceGroup.Key))
                     continue;
 
                 // ensure no duplicate alias, then assign the group properties collection
