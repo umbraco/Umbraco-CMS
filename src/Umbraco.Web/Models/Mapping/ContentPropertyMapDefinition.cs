@@ -36,6 +36,10 @@ namespace Umbraco.Web.Models.Mapping
         private void Map(PropertyGroup source, Tab<ContentPropertyDisplay> target, MapperContext mapper)
         {
             target.Id = source.Id;
+            target.Key = source.Key;
+            target.ParentKey = source.ParentKey;
+            target.Level = source.Level;
+            target.Icon = source.Icon;
             target.IsActive = true;
             target.Label = source.Name;
         }
