@@ -1127,8 +1127,8 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             IDictionaryItem dictionaryItem;
             var itemName = dictionaryItemElement.Attribute("Name").Value;
-            var key = Guid.Parse(dictionaryItemElement.Attribute("Key").Value);
-
+            Guid key = dictionaryItemElement.RequiredAttributeValue<Guid>("Key");
+            
             dictionaryItem = _localizationService.GetDictionaryItemById(key);
             if (dictionaryItem != null)
             {

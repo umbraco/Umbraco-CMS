@@ -71,7 +71,8 @@ namespace Umbraco.Cms.Core.Packaging
             string packagesFolderPath = null,
             string mediaFolderPath = null)
         {
-            if (string.IsNullOrWhiteSpace(packageRepositoryFileName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(packageRepositoryFileName));
+            if (string.IsNullOrWhiteSpace(packageRepositoryFileName))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(packageRepositoryFileName));
             _contentService = contentService;
             _contentTypeService = contentTypeService;
             _dataTypeService = dataTypeService;
@@ -114,7 +115,8 @@ namespace Umbraco.Cms.Core.Packaging
         {
             var packagesXml = EnsureStorage(out var packagesFile);
             var packageXml = packagesXml?.Root?.Elements("package").FirstOrDefault(x => x.AttributeValue<int>("id") == id);
-            if (packageXml == null) return;
+            if (packageXml == null)
+                return;
 
             packageXml.Remove();
 
@@ -123,7 +125,8 @@ namespace Umbraco.Cms.Core.Packaging
 
         public bool SavePackage(PackageDefinition definition)
         {
-            if (definition == null) throw new ArgumentNullException(nameof(definition));
+            if (definition == null)
+                throw new ArgumentNullException(nameof(definition));
 
             var packagesXml = EnsureStorage(out var packagesFile);
 
@@ -162,8 +165,10 @@ namespace Umbraco.Cms.Core.Packaging
 
         public string ExportPackage(PackageDefinition definition)
         {
-            if (definition.Id == default) throw new ArgumentException("The package definition does not have an ID, it must be saved before being exported");
-            if (definition.PackageId == default) throw new ArgumentException("the package definition does not have a GUID, it must be saved before being exported");
+            if (definition.Id == default)
+                throw new ArgumentException("The package definition does not have an ID, it must be saved before being exported");
+            if (definition.PackageId == default)
+                throw new ArgumentException("the package definition does not have a GUID, it must be saved before being exported");
 
             //ensure it's valid
             ValidatePackage(definition);
@@ -248,9 +253,11 @@ namespace Umbraco.Cms.Core.Packaging
             var dataTypes = new XElement("DataTypes");
             foreach (var dtId in definition.DataTypes)
             {
-                if (!int.TryParse(dtId, out var outInt)) continue;
+                if (!int.TryParse(dtId, out var outInt))
+                    continue;
                 var dataType = _dataTypeService.GetDataType(outInt);
-                if (dataType == null) continue;
+                if (dataType == null)
+                    continue;
                 dataTypes.Add(_serializer.Serialize(dataType));
             }
             root.Add(dataTypes);
@@ -261,9 +268,11 @@ namespace Umbraco.Cms.Core.Packaging
             var languages = new XElement("Languages");
             foreach (var langId in definition.Languages)
             {
-                if (!int.TryParse(langId, out var outInt)) continue;
+                if (!int.TryParse(langId, out var outInt))
+                    continue;
                 var lang = _languageService.GetLanguageById(outInt);
-                if (lang == null) continue;
+                if (lang == null)
+                    continue;
                 languages.Add(_serializer.Serialize(lang));
             }
             root.Add(languages);
@@ -271,15 +280,74 @@ namespace Umbraco.Cms.Core.Packaging
 
         private void PackageDictionaryItems(PackageDefinition definition, XContainer root)
         {
-            var dictionaryItems = new XElement("DictionaryItems");
+            var rootDictionaryItems = new XElement("DictionaryItems");
+            var items = new Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)>();
+
             foreach (var dictionaryId in definition.DictionaryItems)
             {
-                if (!int.TryParse(dictionaryId, out var outInt)) continue;
-                var di = _languageService.GetDictionaryItemById(outInt);
-                if (di == null) continue;
-                dictionaryItems.Add(_serializer.Serialize(di, false));
+                if (!int.TryParse(dictionaryId, out var outInt))
+                {
+                    continue;
+                }
+
+                IDictionaryItem di = _languageService.GetDictionaryItemById(outInt);
+
+                if (di == null)
+                {
+                    continue;
+                }
+
+                items[di.Key] = (di, _serializer.Serialize(di, false));
             }
-            root.Add(dictionaryItems);
+
+            // organize them in hierarchy ...
+            var itemCount = items.Count;
+            var processed = new Dictionary<Guid, XElement>();
+            while (processed.Count < itemCount)
+            {
+                foreach(Guid key in items.Keys.ToList())
+                {
+                    (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue) = items[key];
+
+                    if (!dictionaryItem.ParentId.HasValue)
+                    {
+                        // if it has no parent, its definitely just at the root
+                        AppendDictionaryElement(rootDictionaryItems, items, processed, key, serializedDictionaryValue);
+                    }
+                    else
+                    {
+                        if (processed.ContainsKey(dictionaryItem.ParentId.Value))
+                        {
+                            // we've processed this parent element already so we can just append this xml child to it
+                            AppendDictionaryElement(processed[dictionaryItem.ParentId.Value], items, processed, key, serializedDictionaryValue);
+                        }
+                        else if (items.ContainsKey(dictionaryItem.ParentId.Value))
+                        {
+                            // we know the parent exists in the dictionary but 
+                            // we haven't processed it yet so we'll leave it for the next loop
+                            continue;
+                        }
+                        else
+                        {
+                            // in this case, the parent of this item doesn't exist in our collection, we have no
+                            // choice but to add it to the root.
+                            AppendDictionaryElement(rootDictionaryItems, items, processed, key, serializedDictionaryValue);
+                        }
+                    }
+                }
+            }
+
+            root.Add(rootDictionaryItems);
+
+            static void AppendDictionaryElement(XElement rootDictionaryItems, Dictionary<Guid, (IDictionaryItem dictionaryItem, XElement serializedDictionaryValue)> items, Dictionary<Guid, XElement> processed, Guid key, XElement serializedDictionaryValue)
+            {
+                // track it
+                processed.Add(key, serializedDictionaryValue);
+                // append it
+                rootDictionaryItems.Add(serializedDictionaryValue);
+                // remove it so its not re-processed
+                items.Remove(key);
+            }
         }
 
         private void PackageMacros(PackageDefinition definition, XContainer root)
@@ -287,11 +355,13 @@ namespace Umbraco.Cms.Core.Packaging
             var macros = new XElement("Macros");
             foreach (var macroId in definition.Macros)
             {
-                if (!int.TryParse(macroId, out var outInt)) continue;
+                if (!int.TryParse(macroId, out var outInt))
+                    continue;
 
                 var macroXml = GetMacroXml(outInt, out var macro);
-                if (macroXml == null) continue;
-                macros.Add(macroXml);                
+                if (macroXml == null)
+                    continue;
+                macros.Add(macroXml);
             }
             root.Add(macros);
         }
@@ -301,7 +371,8 @@ namespace Umbraco.Cms.Core.Packaging
             var stylesheetsXml = new XElement("Stylesheets");
             foreach (var stylesheetName in definition.Stylesheets)
             {
-                if (stylesheetName.IsNullOrWhiteSpace()) continue;
+                if (stylesheetName.IsNullOrWhiteSpace())
+                    continue;
                 var xml = GetStylesheetXml(stylesheetName, true);
                 if (xml != null)
                     stylesheetsXml.Add(xml);
@@ -314,9 +385,11 @@ namespace Umbraco.Cms.Core.Packaging
             var templatesXml = new XElement("Templates");
             foreach (var templateId in definition.Templates)
             {
-                if (!int.TryParse(templateId, out var outInt)) continue;
+                if (!int.TryParse(templateId, out var outInt))
+                    continue;
                 var template = _fileService.GetTemplate(outInt);
-                if (template == null) continue;
+                if (template == null)
+                    continue;
                 templatesXml.Add(_serializer.Serialize(template));
             }
             root.Add(templatesXml);
@@ -328,9 +401,11 @@ namespace Umbraco.Cms.Core.Packaging
             var docTypesXml = new XElement("DocumentTypes");
             foreach (var dtId in definition.DocumentTypes)
             {
-                if (!int.TryParse(dtId, out var outInt)) continue;
+                if (!int.TryParse(dtId, out var outInt))
+                    continue;
                 var contentType = _contentTypeService.Get(outInt);
-                if (contentType == null) continue;
+                if (contentType == null)
+                    continue;
                 AddDocumentType(contentType, contentTypes);
             }
             foreach (var contentType in contentTypes)
@@ -345,9 +420,11 @@ namespace Umbraco.Cms.Core.Packaging
             var mediaTypesXml = new XElement("MediaTypes");
             foreach (var mediaTypeId in definition.MediaTypes)
             {
-                if (!int.TryParse(mediaTypeId, out var outInt)) continue;
+                if (!int.TryParse(mediaTypeId, out var outInt))
+                    continue;
                 var mediaType = _mediaTypeService.Get(outInt);
-                if (mediaType == null) continue;
+                if (mediaType == null)
+                    continue;
                 AddMediaType(mediaType, mediaTypes);
             }
             foreach (var mediaType in mediaTypes)
@@ -456,7 +533,8 @@ namespace Umbraco.Cms.Core.Packaging
         private XElement GetMacroXml(int macroId, out IMacro macro)
         {
             macro = _macroService.GetById(macroId);
-            if (macro == null) return null;
+            if (macro == null)
+                return null;
             var xml = _serializer.Serialize(macro);
             return xml;
         }
@@ -469,15 +547,18 @@ namespace Umbraco.Cms.Core.Packaging
         /// <returns></returns>
         private XElement GetStylesheetXml(string name, bool includeProperties)
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
             var sts = _fileService.GetStylesheetByName(name);
-            if (sts == null) return null;
+            if (sts == null)
+                return null;
             var stylesheetXml = new XElement("Stylesheet");
             stylesheetXml.Add(new XElement("Name", sts.Alias));
             stylesheetXml.Add(new XElement("FileName", sts.Name));
             stylesheetXml.Add(new XElement("Content", new XCData(sts.Content)));
 
-            if (!includeProperties) return stylesheetXml;
+            if (!includeProperties)
+                return stylesheetXml;
 
             var properties = new XElement("Properties");
             foreach (var ssP in sts.Properties)
