@@ -21,7 +21,7 @@ using Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services.Importing;
 using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
 {
     [TestFixture]
     [Category("Slow")]
@@ -333,10 +333,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
             IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
             var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
-            IReadOnlyList<IContent> contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(),  importedContentTypes, 0, ContentTypeService, ContentService);
+            IReadOnlyList<IContent> contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, 0, ContentTypeService, ContentService);
             int numberOfDocs = (from doc in element.Descendants()
-                where (string)doc.Attribute("isDoc") == string.Empty
-                select doc).Count();
+                                where (string)doc.Attribute("isDoc") == string.Empty
+                                select doc).Count();
 
             // Assert
             Assert.That(contents, Is.Not.Null);
@@ -359,10 +359,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             // Act
             IReadOnlyList<IMediaType> mediaTypes = PackageDataInstallation.ImportMediaTypes(mediaTypesElement.Elements("MediaType"), 0);
             var importedMediaTypes = mediaTypes.ToDictionary(x => x.Alias, x => x);
-            IReadOnlyList<IMedia> medias = PackageDataInstallation.ImportContentBase(packageMedia.Yield(),  importedMediaTypes, 0, MediaTypeService, MediaService);
+            IReadOnlyList<IMedia> medias = PackageDataInstallation.ImportContentBase(packageMedia.Yield(), importedMediaTypes, 0, MediaTypeService, MediaService);
             int numberOfDocs = (from doc in element.Descendants()
-                where (string)doc.Attribute("isDoc") == string.Empty
-                select doc).Count();
+                                where (string)doc.Attribute("isDoc") == string.Empty
+                                select doc).Count();
 
             // Assert
             Assert.That(medias, Is.Not.Null);
@@ -388,13 +388,13 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             IReadOnlyList<IDataType> dataTypeDefinitions = PackageDataInstallation.ImportDataTypes(dataTypeElement.Elements("DataType").ToList(), 0);
             IReadOnlyList<IContentType> contentTypes = PackageDataInstallation.ImportDocumentTypes(docTypesElement.Elements("DocumentType"), 0);
             var importedContentTypes = contentTypes.ToDictionary(x => x.Alias, x => x);
-            IReadOnlyList<IContent> contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(),  importedContentTypes, 0, ContentTypeService, ContentService);
+            IReadOnlyList<IContent> contents = PackageDataInstallation.ImportContentBase(packageDocument.Yield(), importedContentTypes, 0, ContentTypeService, ContentService);
             int numberOfDocs = (from doc in element.Descendants()
                                 where (string)doc.Attribute("isDoc") == string.Empty
                                 select doc).Count();
 
             string configuration;
-            using (global::Umbraco.Cms.Core.Scoping.IScope scope = ScopeProvider.CreateScope())
+            using (IScope scope = ScopeProvider.CreateScope())
             {
                 List<DataTypeDto> dtos = scope.Database.Fetch<DataTypeDto>("WHERE nodeId = @Id", new { dataTypeDefinitions.First().Id });
                 configuration = dtos.Single().Configuration;
@@ -743,10 +743,10 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             LocalizationService.Save(english, 0);
         }
 
-        private void AssertDictionaryItem(string key, string expectedValue, string cultureCode)
+        private void AssertDictionaryItem(string dictionaryItemName, string expectedValue, string cultureCode)
         {
-            Assert.That(LocalizationService.DictionaryItemExists(key), "DictionaryItem key does not exist");
-            IDictionaryItem dictionaryItem = LocalizationService.GetDictionaryItemByKey(key);
+            Assert.That(LocalizationService.DictionaryItemExists(dictionaryItemName), "DictionaryItem key does not exist");
+            IDictionaryItem dictionaryItem = LocalizationService.GetDictionaryItemByKey(dictionaryItemName);
             IDictionaryTranslation translation = dictionaryItem.Translations.SingleOrDefault(i => i.Language.IsoCode == cultureCode);
             Assert.IsNotNull(translation, "Translation to {0} was not added", cultureCode);
             string value = translation.Value;
@@ -760,6 +760,8 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             LocalizationService.Save(
                 new DictionaryItem("Parent")
                 {
+                    // This matches what is in the package.xml file
+                    Key = new System.Guid("28f2e02a-8c66-4fcd-85e3-8524d551c0d3"),
                     Translations = new List<IDictionaryTranslation>
                                     {
                                             new DictionaryTranslation(englishLanguage, expectedEnglishParentValue),

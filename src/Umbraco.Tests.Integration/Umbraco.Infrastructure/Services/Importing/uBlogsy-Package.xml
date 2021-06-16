@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <info>
     <package>
@@ -1703,7 +1703,7 @@ e.g Mid-code Crisis
   <Macros>
     <macro>
       <name>[uBlogsy] Show Some Love</name>
-      <id>91AD32D5-7381-4C5A-BD03-97F3CE2511D2</id>
+      <key>91AD32D5-7381-4C5A-BD03-97F3CE2511D2</key>
       <alias>uBlogsyShowSomeLove</alias>
       <macroType>Unknown</macroType>
       <macroSource />
@@ -1716,56 +1716,56 @@ e.g Mid-code Crisis
     </macro>
   </Macros>
   <DictionaryItems>
-    <DictionaryItem Key="uBlogsy">
+    <DictionaryItem Name="uBlogsy" Key="36F5C64A-0BE5-448F-A443-3B09D6162D90">
       <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[]]></Value>
-      <DictionaryItem Key="uBlogsyDicArchive">
+      <DictionaryItem Name="uBlogsyDicArchive" Key="36F5C64A-0BE5-448F-A443-3B09D6162D99">>
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Archive]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicAuthors">
+      <DictionaryItem Name="uBlogsyDicAuthors" Key="36F5C64A-0BE5-448F-A443-3B09D6162D98">>
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Authors]]></Value>
-        <DictionaryItem Key="uBlogsyDicPostWrittenBy">
+        <DictionaryItem Name="uBlogsyDicPostWrittenBy" Key="36F5C64A-0BE5-448F-A443-3B09D6162D97">>
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Written by]]></Value>
-          <DictionaryItem Key="uBlogsyDicPostWrittenAt">
+          <DictionaryItem Name="uBlogsyDicPostWrittenAt" Key="36F5C64A-0BE5-448F-A443-3B09D6162D96">>
             <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[at]]></Value>
           </DictionaryItem>
         </DictionaryItem>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicCategories">
+      <DictionaryItem Name="uBlogsyDicCategories">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Categories]]></Value>
-        <DictionaryItem Key="uBlogsyDicCategoriesAll">
+        <DictionaryItem Name="uBlogsyDicCategoriesAll" Key="36F5C64A-0BE5-448F-A443-3B09D6162D95">>
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[All Categories]]></Value>
         </DictionaryItem>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicPagination">
+      <DictionaryItem Name="uBlogsyDicPagination" Key="36F5C64A-0BE5-448F-A443-3B09D6162D94">>
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[]]></Value>
-        <DictionaryItem Key="uBlogsyDicPaginationNewer">
+        <DictionaryItem Name="uBlogsyDicPaginationNewer" Key="36F5C64A-0BE5-448F-A443-3B09D6162D93">
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Newer]]></Value>
         </DictionaryItem>
-        <DictionaryItem Key="uBlogsyDicPaginationOlder">
+        <DictionaryItem Name="uBlogsyDicPaginationOlder" Key="36F5C64A-0BE5-448F-A443-3B09D6162D92">
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Older]]></Value>
         </DictionaryItem>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicPostsLatest">
+      <DictionaryItem Name="uBlogsyDicPostsLatest" Key="36F5C64A-0BE5-448F-A443-3B09D6162D91">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Latest Posts]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicPostsRelated">
+      <DictionaryItem Name="uBlogsyDicPostsRelated" Key="26F5C64A-0BE5-448F-A443-3B09D6162D90">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Related]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicRssSubscribe">
+      <DictionaryItem Name="uBlogsyDicRssSubscribe" Key="26F5C64A-0BE5-448F-A443-3B09D6162D99">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Subscribe]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicSearch">
+      <DictionaryItem Name="uBlogsyDicSearch" Key="26F5C64A-0BE5-448F-A443-3B09D6162D98">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Search]]></Value>
-        <DictionaryItem Key="uBlogsyDicSearchSubmit">
+        <DictionaryItem Name="uBlogsyDicSearchSubmit" Key="26F5C64A-0BE5-448F-A443-3B09D6162D97">
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Submit]]></Value>
         </DictionaryItem>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyDicTags">
+      <DictionaryItem Name="uBlogsyDicTags" Key="26F5C64A-0BE5-448F-A443-3B09D6162D96">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Tags]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="uBlogsyNavigation">
+      <DictionaryItem Name="uBlogsyNavigation" Key="26F5C64A-0BE5-448F-A443-3B09D6162D95">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[]]></Value>
-        <DictionaryItem Key="uBlogsyNavigationHome">
+        <DictionaryItem Name="uBlogsyNavigationHome" Key="26F5C64A-0BE5-448F-A443-3B09D6162D94">
           <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Home]]></Value>
         </DictionaryItem>
       </DictionaryItem>

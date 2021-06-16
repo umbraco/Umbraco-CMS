@@ -35,8 +35,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         [TearDown]
         public void DeleteTestFolder() =>
             Directory.Delete(HostingEnvironment.MapPathContentRoot("~/" + _testBaseFolder), true);
-
-        private IShortStringHelper ShortStringHelper => GetRequiredService<IShortStringHelper>();
+        
         private IContentService ContentService => GetRequiredService<IContentService>();
 
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
@@ -52,8 +51,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         private IEntityXmlSerializer EntityXmlSerializer => GetRequiredService<IEntityXmlSerializer>();
 
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
-
-        private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
 
         private IMediaService MediaService => GetRequiredService<IMediaService>();
 

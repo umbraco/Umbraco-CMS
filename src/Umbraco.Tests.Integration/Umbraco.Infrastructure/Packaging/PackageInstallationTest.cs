@@ -9,10 +9,11 @@ using NUnit.Framework;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Cms.Infrastructure.Packaging;
 using Umbraco.Cms.Tests.Common.Testing;
 using Umbraco.Cms.Tests.Integration.Testing;
 
-namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
+namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Packaging
 {
     [TestFixture]
     [UmbracoTest(Database = UmbracoTestOptions.Database.NewSchemaPerFixture)]
@@ -20,7 +21,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
     {
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
 
-        private IPackageInstallation PackageInstallation => GetRequiredService<IPackageInstallation>();
+        private PackageInstallation PackageInstallation => (PackageInstallation)GetRequiredService<IPackageInstallation>();
 
         private const string DocumentTypePickerPackage = "Document_Type_Picker_1.1.package.xml";
         private const string HelloPackage = "Hello_1.0.0.package.xml";
@@ -76,7 +77,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             var testPackageFile = new FileInfo(Path.Combine(HostingEnvironment.MapPathContentRoot("~/TestData/Packages"), DocumentTypePickerPackage));
             using var fileStream = testPackageFile.OpenRead();
             CompiledPackage package = PackageInstallation.ReadPackage(XDocument.Load(fileStream));
-            
+
             InstallationSummary summary = PackageInstallation.InstallPackageData(package, -1, out PackageDefinition def);
 
             Assert.AreEqual(1, summary.DataTypesInstalled.Count());

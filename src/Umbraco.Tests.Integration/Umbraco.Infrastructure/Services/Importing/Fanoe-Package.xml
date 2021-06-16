@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <info>
     <package>
@@ -3909,6 +3909,7 @@ nav > ul li.active ul li a {
   </Stylesheets>
   <Macros>
     <macro>
+      <key>E4F0830F-26AB-4CE9-BD71-98273875C4CB</key>
       <name>Insert form</name>
       <alias>umbracoforms.RenderForm</alias>
       <scriptType>
@@ -3925,6 +3926,7 @@ nav > ul li.active ul li a {
       </properties>
     </macro>
     <macro>
+      <key>E4F0830F-26AB-4CE9-BD71-98273875C4C0</key>
       <name>Render Forms Scripts</name>
       <alias>umbracoforms.RenderScripts</alias>
       <scriptType>

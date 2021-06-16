@@ -272,12 +272,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             where T : class, IContentBase
             where S : IContentTypeComposition
         {
-            var key = Guid.Empty;
-            if (element.Attribute("key") != null && Guid.TryParse(element.Attribute("key").Value, out key))
+            Guid key = element.RequiredAttributeValue<Guid>("key");
+
+            // we need to check if the content already exists and if so we ignore the installation for this item
+            if (service.GetById(key) != null)
             {
-                //if a Key is supplied, then we need to check if the content already exists and if so we ignore the installation for this item
-                if (service.GetById(key) != null)
-                    return null;
+                return null;
             }
 
             var id = element.Attribute("id").Value;
@@ -804,7 +804,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var tabs = tabElement.Elements("Tab");
             foreach (var tab in tabs)
             {
-                var id = tab.Element("Id").Value;//Do we need to use this for tracking?
                 var caption = tab.Element("Caption").Value;
 
                 if (contentType.PropertyGroups.Contains(caption) == false)
@@ -986,7 +985,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 var dataTypeDefinitionName = dataTypeElement.AttributeValue<string>("Name");
 
-                var dataTypeDefinitionId = dataTypeElement.AttributeValue<Guid>("Definition");
+                var dataTypeDefinitionId = dataTypeElement.RequiredAttributeValue<Guid>("Definition");
                 var databaseTypeAttribute = dataTypeElement.Attribute("DatabaseType");
 
                 var parentId = -1;
@@ -1126,20 +1125,18 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         {
             var items = new List<IDictionaryItem>();
 
-            // TODO: Key is not good enough, that is the string key, we need to use GUID
-
             IDictionaryItem dictionaryItem;
-            var itemName = dictionaryItemElement.Attribute("Key").Value;
-            var itemId = Guid.Parse(dictionaryItemElement.Attribute("Id").Value);
+            var itemName = dictionaryItemElement.Attribute("Name").Value;
+            var key = Guid.Parse(dictionaryItemElement.Attribute("Key").Value);
 
-            dictionaryItem = _localizationService.GetDictionaryItemById(itemId);
+            dictionaryItem = _localizationService.GetDictionaryItemById(key);
             if (dictionaryItem != null)
             {
                 dictionaryItem = UpdateDictionaryItem(dictionaryItem, dictionaryItemElement, languages);
             }
             else
             {
-                dictionaryItem = CreateNewDictionaryItem(itemId, itemName, dictionaryItemElement, languages, parentId);
+                dictionaryItem = CreateNewDictionaryItem(key, itemName, dictionaryItemElement, languages, parentId);
             }
 
             _localizationService.Save(dictionaryItem, userId);
@@ -1161,9 +1158,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return dictionaryItem;
         }
 
-        private static DictionaryItem CreateNewDictionaryItem(Guid itemId, string key, XElement dictionaryItemElement, List<ILanguage> languages, Guid? parentId)
+        private static DictionaryItem CreateNewDictionaryItem(Guid itemId, string itemName, XElement dictionaryItemElement, List<ILanguage> languages, Guid? parentId)
         {
-            DictionaryItem dictionaryItem = parentId.HasValue ? new DictionaryItem(parentId.Value, key) : new DictionaryItem(key);
+            DictionaryItem dictionaryItem = parentId.HasValue ? new DictionaryItem(parentId.Value, itemName) : new DictionaryItem(itemName);
             dictionaryItem.Key = itemId;
 
             var translations = new List<IDictionaryTranslation>();
@@ -1190,7 +1187,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var languageId = valueElement.Attribute("LanguageCultureAlias").Value;
             var language = languages.SingleOrDefault(l => l.IsoCode == languageId);
             if (language == null)
+            {
                 return;
+            }
+
             var translation = new DictionaryTranslation(language, valueElement.Value);
             translations.Add(translation);
         }
@@ -1250,7 +1250,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         private IMacro ParseMacroElement(XElement macroElement)
         {
-            var macroId = Guid.Parse(macroElement.Element("id").Value);
+            var macroKey = Guid.Parse(macroElement.Element("key").Value);
             var macroName = macroElement.Element("name").Value;
             var macroAlias = macroElement.Element("alias").Value;
             var macroSource = macroElement.Element("macroSource").Value;
@@ -1287,11 +1287,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 dontRender = bool.Parse(dontRenderElement.Value);
             }
 
-            var existingMacro = _macroService.GetById(macroId) as Macro;
+            var existingMacro = _macroService.GetById(macroKey) as Macro;
             var macro = existingMacro ?? new Macro(_shortStringHelper, macroAlias, macroName, macroSource,
                 cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration)
             {
-                Key = macroId
+                Key = macroKey
             };
 
             var properties = macroElement.Element("properties");
@@ -1300,7 +1300,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 int sortOrder = 0;
                 foreach (XElement property in properties.Elements())
                 {
-                    var propertyId = property.AttributeValue<Guid>("id");
+                    var propertyKey = property.RequiredAttributeValue<Guid>("key");
                     var propertyName = property.Attribute("name").Value;
                     var propertyAlias = property.Attribute("alias").Value;
                     var editorAlias = property.Attribute("propertyType").Value;
@@ -1317,7 +1317,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                     macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias)
                     {
-                        Key = propertyId
+                        Key = propertyKey
                     });
 
                     sortOrder++;

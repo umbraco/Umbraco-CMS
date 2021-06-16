@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <info>
     <package>
@@ -2052,6 +2052,7 @@ table th, td {border: 0px solid #fff;}
   </Stylesheets>
   <Macros>
     <macro>
+      <key>E4F0830F-26AB-4CE9-BD71-98273875C4C0</key>
       <name>Map</name>
       <alias>Map</alias>
       <scriptType>

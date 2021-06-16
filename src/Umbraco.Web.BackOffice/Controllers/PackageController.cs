@@ -29,16 +29,13 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     [Authorize(Policy = AuthorizationPolicies.SectionAccessPackages)]
     public class PackageController : UmbracoAuthorizedJsonController
     {
-        private readonly IHostingEnvironment _hostingEnvironment;
         private readonly IPackagingService _packagingService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
 
         public PackageController(
-            IHostingEnvironment hostingEnvironment,
             IPackagingService packagingService,
             IBackOfficeSecurityAccessor backofficeSecurityAccessor)
         {
-            _hostingEnvironment = hostingEnvironment ?? throw new ArgumentNullException(nameof(hostingEnvironment));
             _packagingService = packagingService ?? throw new ArgumentNullException(nameof(packagingService));
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
         }

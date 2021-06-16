@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8" ?>
+<?xml version="1.0" encoding="utf-8" ?>
 <umbPackage>
   <files />
   <info>
@@ -7,10 +7,10 @@
     </package>
   </info>
   <DictionaryItems>
-    <DictionaryItem Id="28f2e02a-8c66-4fcd-85e3-8524d551c0d3" Key="Parent">
+    <DictionaryItem Key="28f2e02a-8c66-4fcd-85e3-8524d551c0d3" Name="Parent">
       <Value LanguageId="2" LanguageCultureAlias="nb-NO"><![CDATA[ForelderVerdi]]></Value>
       <Value LanguageId="3" LanguageCultureAlias="en-GB"><![CDATA[ParentValue]]></Value>
-      <DictionaryItem Id="e7dba0a9-d517-4ba4-8e18-2764d392c611" Key="Child">
+      <DictionaryItem Key="e7dba0a9-d517-4ba4-8e18-2764d392c611" Name="Child">
         <Value LanguageId="2" LanguageCultureAlias="nb-NO"><![CDATA[BarnVerdi]]></Value>
         <Value LanguageId="3" LanguageCultureAlias="en-GB"><![CDATA[ChildValue]]></Value>
       </DictionaryItem>

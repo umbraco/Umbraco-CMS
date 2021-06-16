@@ -243,8 +243,8 @@ namespace Umbraco.Cms.Core.Services.Implement
         private XElement Serialize(IDictionaryItem dictionaryItem)
         {
             var xml = new XElement("DictionaryItem",
-                new XAttribute("Id", dictionaryItem.Key),
-                new XAttribute("Key", dictionaryItem.ItemKey));
+                new XAttribute("Key", dictionaryItem.Key),
+                new XAttribute("Name", dictionaryItem.ItemKey));
 
             foreach (IDictionaryTranslation translation in dictionaryItem.Translations)
             {
@@ -414,7 +414,7 @@ namespace Umbraco.Cms.Core.Services.Implement
         {
             var xml = new XElement("macro");
             xml.Add(new XElement("name", macro.Name));
-            xml.Add(new XElement("id", macro.Key));
+            xml.Add(new XElement("key", macro.Key));
             xml.Add(new XElement("alias", macro.Alias));
             xml.Add(new XElement("macroSource", macro.MacroSource));
             xml.Add(new XElement("useInEditor", macro.UseInEditor.ToString()));
@@ -427,7 +427,7 @@ namespace Umbraco.Cms.Core.Services.Implement
             foreach (var property in macro.Properties)
             {
                 properties.Add(new XElement("property",
-                    new XAttribute("id", property.Key),
+                    new XAttribute("key", property.Key),
                     new XAttribute("name", property.Name),
                     new XAttribute("alias", property.Alias),
                     new XAttribute("sortOrder", property.SortOrder),
