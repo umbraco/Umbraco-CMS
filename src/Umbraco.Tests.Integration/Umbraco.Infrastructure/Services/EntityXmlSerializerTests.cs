@@ -1,6 +1,7 @@
-// Copyright (c) Umbraco.
+﻿// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -103,7 +104,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
                 .Build();
             localizationService.Save(languageEnGb);
 
-            var parentItem = new DictionaryItem("Parent");
+            var parentItem = new DictionaryItem("Parent") {Key = Guid.Parse("28f2e02a-8c66-4fcd-85e3-8524d551c0d3")};
             var parentTranslations = new List<IDictionaryTranslation>
             {
                 new DictionaryTranslation(languageNbNo, "ForelderVerdi"),
@@ -112,7 +113,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Infrastructure.Services
             parentItem.Translations = parentTranslations;
             localizationService.Save(parentItem);
 
-            var childItem = new DictionaryItem(parentItem.Key, "Child");
+            var childItem = new DictionaryItem(parentItem.Key, "Child"){Key = Guid.Parse("e7dba0a9-d517-4ba4-8e18-2764d392c611")};
             var childTranslations = new List<IDictionaryTranslation>
             {
                 new DictionaryTranslation(languageNbNo, "BarnVerdi"),
