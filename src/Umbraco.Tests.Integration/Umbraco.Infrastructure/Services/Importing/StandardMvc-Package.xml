@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <info>
     <package>
       <name>StandardWebsiteMVC</name>
-    </package>    
+    </package>
   </info>
   <Documents>
     <DocumentSet importMode="root">
@@ -282,6 +282,7 @@
     <DocumentType>
       <Info>
         <Name>Base</Name>
+        <Key>2db296c1-5c60-45e9-b6d3-8148926dd863</Key>
         <Alias>Base</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -312,6 +313,7 @@
     <DocumentType>
       <Info>
         <Name>Client Area Folder</Name>
+        <Key>84d692d2-11fe-45ba-927e-2c4ecdb11400</Key>
         <Alias>ClientArea</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -334,6 +336,7 @@
     <DocumentType>
       <Info>
         <Name>Content Master</Name>
+        <Key>f6d25616-9f16-4c70-9e8c-e0ad4cd92dfc</Key>
         <Alias>ContentMaster</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -391,6 +394,7 @@
     <DocumentType>
       <Info>
         <Name>Standard</Name>
+        <Key>95a532e7-064f-4651-a619-786f4beac7c1</Key>
         <Alias>Standard</Alias>
         <Icon>.sprTreeDoc</Icon>
         <Thumbnail>doc.png</Thumbnail>
@@ -449,6 +453,7 @@
     <DocumentType>
       <Info>
         <Name>ContactForm</Name>
+        <Key>67ce11c5-0493-4d8f-9678-d131bd8996ea</Key>
         <Alias>ContactForm</Alias>
         <Icon>newsletter.gif</Icon>
         <Thumbnail>doc.png</Thumbnail>
@@ -520,6 +525,7 @@
     <DocumentType>
       <Info>
         <Name>ContentPanel</Name>
+        <Key>503b6a5e-69b6-444a-a728-074a1b201b84</Key>
         <Alias>ContentPanel</Alias>
         <Icon>.sprTreeDoc</Icon>
         <Thumbnail>doc.png</Thumbnail>
@@ -555,6 +561,7 @@
     <DocumentType>
       <Info>
         <Name>ContentPanels</Name>
+        <Key>3d1433fc-22a2-4a70-b7cb-b7fafe4a0622</Key>
         <Alias>ContentPanels</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -575,6 +582,7 @@
     <DocumentType>
       <Info>
         <Name>Homepage</Name>
+        <Key>a5f79cf6-9a2f-4672-ab56-f8bb31fdbb20</Key>
         <Alias>Homepage</Alias>
         <Icon>.sprTreeSettingDomain</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -784,6 +792,7 @@
     <DocumentType>
       <Info>
         <Name>NewsArticle</Name>
+        <Key>c4662a2d-4698-4880-9243-2e449d9e0cfd</Key>
         <Alias>NewsArticle</Alias>
         <Icon>doc.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -831,6 +840,7 @@
     <DocumentType>
       <Info>
         <Name>Slide</Name>
+        <Key>cf2153f2-4881-442b-ab58-50c1c786522b</Key>
         <Alias>Slide</Alias>
         <Icon>.sprTreeMediaPhoto</Icon>
         <Thumbnail>docWithImage.png</Thumbnail>
@@ -877,6 +887,7 @@
     <DocumentType>
       <Info>
         <Name>Slideshow</Name>
+        <Key>9acb68aa-03e1-4474-823d-c21af8356756</Key>
         <Alias>Slideshow</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>

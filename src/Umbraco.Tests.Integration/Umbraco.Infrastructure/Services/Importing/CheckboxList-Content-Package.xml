@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <files />
   <info>
     <package>
-      <name>CheckboxListTest</name>      
-    </package>    
+      <name>CheckboxListTest</name>
+    </package>
   </info>
   <Documents>
     <DocumentSet importMode="root">
@@ -17,6 +17,7 @@
     <DocumentType>
       <Info>
         <Name>NewType</Name>
+        <Key>e52d7dfa-1509-4e49-8f01-c27ed55e791e</Key>
         <Alias>NewType</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>

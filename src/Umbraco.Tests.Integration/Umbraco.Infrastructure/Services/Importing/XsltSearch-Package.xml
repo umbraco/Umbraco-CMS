@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <info>
     <package>
-      <name>XSLTsearch</name>      
+      <name>XSLTsearch</name>
     </package>
   </info>
   <Documents>
@@ -16,6 +16,7 @@
     <DocumentType>
       <Info>
         <Name>XSLTsearch</Name>
+        <Key>c7d19488-f11c-4c28-be14-da8be9c9a675</Key>
         <Alias>XSLTsearch</Alias>
         <Icon>.sprTreeDoc2</Icon>
         <Thumbnail>doc.png</Thumbnail>
@@ -54,10 +55,10 @@
       <Design>
         <![CDATA[<%@ Master Language="C#" MasterPageFile="~/masterpages/RunwayMaster.master" AutoEventWireup="true" %>
 
-  
+
 <asp:Content ContentPlaceHolderId="RunwayMasterContentPlaceHolder" runat="server">
   <div id="content">
-    <div id="contentHeader">  
+    <div id="contentHeader">
         <h2><umbraco:Item runat="server" field="pageName"/></h2>
     </div>
 
@@ -107,6 +108,7 @@ p.xsltsearch_result_description {padding-bottom: 10px;}
   <Macros>
     <macro>
       <name>XSLTsearch</name>
+      <id>0712FAC7-ADD7-48F7-9098-C80220B0D2F0</id>
       <alias>XSLTsearch</alias>
       <macroType>Unknown</macroType>
       <macroSource />
@@ -116,17 +118,17 @@ p.xsltsearch_result_description {padding-bottom: 10px;}
       <scriptingFile>
       </scriptingFile>
       <properties>
-        <property name="Source" alias="source" show="True" propertyType="contentTree" />
-        <property name="Umbraco fields to search" alias="searchFields" show="True" propertyType="text" />
-        <property name="Umbraco fields shown in results preview" alias="previewFields" show="True" propertyType="text" />
-        <property name="Display search box at TOP, BOTTOM, BOTH, or NONE" alias="searchBoxLocation" show="True" propertyType="text" />
-        <property name="Display BEGINNING or CONTEXT of each result" alias="previewType" show="True" propertyType="text" />
-        <property name="Number of search results to display per page" alias="resultsPerPage" show="True" propertyType="number" />
-        <property name="Number of characters of preview text to display" alias="previewChars" show="True" propertyType="number" />
-        <property name="Display 'Showing result X to Y'?" alias="showPageRange" show="True" propertyType="bool" />
-        <property name="Display numbers before each result?" alias="showOrdinals" show="True" propertyType="bool" />
-        <property name="Display search score for each result?" alias="showScores" show="True" propertyType="bool" />
-        <property name="Display 'Searched X documents in Y seconds'?" alias="showStats" show="True" propertyType="bool" />
+        <property name="Source" alias="source" show="True" propertyType="contentTree" id="921e17a2-1b70-4d90-9448-85a378938096" />
+        <property name="Umbraco fields to search" alias="searchFields" show="True" propertyType="text" id="230669fd-5cc3-4946-a307-474ebcf904c4" />
+        <property name="Umbraco fields shown in results preview" alias="previewFields" show="True" propertyType="text" id="6b9168b8-d70a-4950-8d8d-056688b33dc9" />
+        <property name="Display search box at TOP, BOTTOM, BOTH, or NONE" alias="searchBoxLocation" show="True" propertyType="text" id="6fc99a63-2f17-4906-a007-5aa918b526af" />
+        <property name="Display BEGINNING or CONTEXT of each result" alias="previewType" show="True" propertyType="text" id="a89b2320-fabe-48d0-8949-a2d66fb9cd31" />
+        <property name="Number of search results to display per page" alias="resultsPerPage" show="True" propertyType="number" id="fac01eb0-2cca-4980-b68d-eb1eb44e6896" />
+        <property name="Number of characters of preview text to display" alias="previewChars" show="True" propertyType="number" id="ccb30dfa-3c00-452d-8a51-22bc2f3efd51" />
+        <property name="Display 'Showing result X to Y'?" alias="showPageRange" show="True" propertyType="bool" id="0a10391a-b174-4980-bb6d-35a656687aca" />
+        <property name="Display numbers before each result?" alias="showOrdinals" show="True" propertyType="bool" id="305d3c2d-f062-420c-83b8-be91f2efd56b" />
+        <property name="Display search score for each result?" alias="showScores" show="True" propertyType="bool" id="ff8bc866-f58b-4d02-9bfe-87461f08ce39" />
+        <property name="Display 'Searched X documents in Y seconds'?" alias="showStats" show="True" propertyType="bool" id="a3c8b300-9726-468e-b199-544f0f9145c7" />
       </properties>
     </macro>
   </Macros>

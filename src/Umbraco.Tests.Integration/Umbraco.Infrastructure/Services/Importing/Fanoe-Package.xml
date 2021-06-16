@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <info>
     <package>
-      <name>Fanoe</name>  
+      <name>Fanoe</name>
     </package>
   </info>
   <Documents>
@@ -1201,6 +1201,7 @@
     <DocumentType>
       <Info>
         <Name>Master</Name>
+        <Key>b96c565b-0490-4b34-aed2-ffa0c7f63f2a</Key>
         <Alias>Master</Alias>
         <Icon>icon-desktop</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1252,6 +1253,7 @@
     <DocumentType>
       <Info>
         <Name>Blogpost</Name>
+        <Key>10dbe2ef-ee50-4ea6-b4d0-dc0c08919424</Key>
         <Alias>Blogpost</Alias>
         <Icon>icon-edit</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1288,6 +1290,7 @@
     <DocumentType>
       <Info>
         <Name>Blogpost Repository</Name>
+        <Key>7d58f0d9-bfe3-4dfe-be18-9f48cc53c768</Key>
         <Alias>BlogpostRepository</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1306,6 +1309,7 @@
     <DocumentType>
       <Info>
         <Name>Home</Name>
+        <Key>61100eb2-92c7-43d9-9fd8-94707dcbb142</Key>
         <Alias>Home</Alias>
         <Icon>icon-home</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1328,6 +1332,7 @@
     <DocumentType>
       <Info>
         <Name>Landing page</Name>
+        <Key>dd8c9f38-9847-465a-924d-87983fcec124</Key>
         <Alias>LandingPage</Alias>
         <Icon>icon-stamp</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -1366,6 +1371,7 @@
     <DocumentType>
       <Info>
         <Name>Text page</Name>
+        <Key>8fe738e3-8724-484f-944f-cb0d8fa78aa1</Key>
         <Alias>TextPage</Alias>
         <Icon>icon-document</Icon>
         <Thumbnail>folder.png</Thumbnail>

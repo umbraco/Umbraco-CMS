@@ -1,10 +1,10 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <files />
   <info>
     <package>
-      <name>Compositions Packaged</name>      
-    </package>    
+      <name>Compositions Packaged</name>
+    </package>
   </info>
   <Documents>
     <DocumentSet importMode="root">
@@ -115,6 +115,7 @@
     <DocumentType>
       <Info>
         <Name>Master</Name>
+        <Key>111adde6-9741-407e-ab35-b46b53471382</Key>
         <Alias>umbMaster</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -159,6 +160,7 @@
     <DocumentType>
       <Info>
         <Name>Home</Name>
+        <Key>e2f9e463-904a-4c0d-a7f3-f7c9fa31272b</Key>
         <Alias>umbHomePage</Alias>
         <Icon>.sprTreeSettingDomain</Icon>
         <Thumbnail>docWithImage.png</Thumbnail>
@@ -375,6 +377,7 @@
     <DocumentType>
       <Info>
         <Name>Meta</Name>
+        <Key>8adeed0a-489e-4e74-be6e-2e2f219a04a9</Key>
         <Alias>Meta</Alias>
         <Icon>icon-truck</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -409,6 +412,7 @@
     <DocumentType>
       <Info>
         <Name>News Item</Name>
+        <Key>b43c90ef-f0d4-448e-b2aa-7915b743cab1</Key>
         <Alias>umbNewsItem</Alias>
         <Icon>.sprTreeDocPic</Icon>
         <Thumbnail>docWithImage.png</Thumbnail>
@@ -478,6 +482,7 @@
     <DocumentType>
       <Info>
         <Name>News Overview</Name>
+        <Key>a22ca7e7-bdc4-4c3f-9193-b8773664e61d</Key>
         <Alias>umbNewsOverview</Alias>
         <Icon>package.png</Icon>
         <Thumbnail>folder_media.png</Thumbnail>
@@ -502,6 +507,7 @@
     <DocumentType>
       <Info>
         <Name>Seo</Name>
+        <Key>67f4dfe3-c505-43b9-86a4-6d23481c5e87</Key>
         <Alias>Seo</Alias>
         <Icon>icon-wifi</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -536,6 +542,7 @@
     <DocumentType>
       <Info>
         <Name>Text Page</Name>
+        <Key>d8ab5350-3064-487f-92fe-9735c015f631</Key>
         <Alias>umbTextyPage</Alias>
         <Icon>.sprTreeDoc</Icon>
         <Thumbnail>doc.png</Thumbnail>
