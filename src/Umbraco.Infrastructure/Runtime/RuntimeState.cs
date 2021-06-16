@@ -144,9 +144,20 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 break;
                 case UmbracoDatabaseState.NeedsPackageMigration:
 
-                    _logger.LogDebug("Package migrations need to execute.");
-                    Level = _unattendedSettings.Value.PackageMigrationsUnattended ? RuntimeLevel.Run : RuntimeLevel.PackageMigrations;
-                    Reason = RuntimeLevelReason.UpgradePackageMigrations;
+                    // no matter what the level is run for package migrations.
+                    // they either run unattended, or only manually via the back office.
+                    Level = RuntimeLevel.Run;
+                    
+                    if (_unattendedSettings.Value.PackageMigrationsUnattended)
+                    {
+                        _logger.LogDebug("Package migrations need to execute.");
+                        Reason = RuntimeLevelReason.UpgradePackageMigrations;
+                    }
+                    else
+                    {
+                        _logger.LogDebug("Package migrations need to execute but unattended package migrations is disabled. They will need to be run from the back office.");
+                        Reason = RuntimeLevelReason.Run;
+                    }
 
                     break;
                 case UmbracoDatabaseState.Ok:
