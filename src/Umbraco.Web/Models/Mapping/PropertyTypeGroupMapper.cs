@@ -146,6 +146,7 @@ namespace Umbraco.Web.Models.Mapping
                 var genericTab = new PropertyGroupDisplay<TPropertyType>
                 {
                     Id = PropertyGroupBasic.GenericPropertiesGroupId,
+                    Level = 1,
                     Name = "Generic properties",
                     ContentTypeId = source.Id,
                     SortOrder = 999,
