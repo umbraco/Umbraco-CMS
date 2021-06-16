@@ -17,16 +17,19 @@
             scope.sortingButtonKey = "general_reorder";
             scope.compositionsButtonState = "init";
             scope.tabs = [];
-            scope.openTabKey = null;
+            scope.openTabKey = getFirstTab() ? getFirstTab().key : null;
             
-            scope.$watchCollection('model.groups', (newValue, oldValue) => {
+            scope.$watchCollection('model.groups', (newValue) => {
                 if (newValue && newValue.length === 0) return;
-                if (newValue === oldValue) return;
 
                 scope.tabs = $filter("filter")(scope.model.groups, (group) => {
                     return group.level === 0;
                 });
             });
+
+            function getFirstTab () {
+                return scope.model.groups.find(group => group.level === 0);
+            }
 
             function activate() {
                 setSortingOptions();
