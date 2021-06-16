@@ -2470,7 +2470,7 @@ namespace Umbraco.Tests.Services
             Assert.That(sut.GetValue<string>("ddl"), Is.EqualTo("1234"));
             Assert.That(sut.GetValue<string>("chklist"), Is.EqualTo("randomc"));
             Assert.That(sut.GetValue<Udi>("contentPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Document, new Guid("74ECA1D4-934E-436A-A7C7-36CC16D4095C"))));
-            Assert.That(sut.GetValue<Udi>("mediaPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Media, new Guid("44CB39C8-01E5-45EB-9CF8-E70AAF2D1691"))));
+            Assert.That(sut.GetValue("mediapicker3"), Is.EqualTo("[{\"key\": \"8f78ce9e-8fe0-4500-a52d-4c4f35566ba9\",\"mediaKey\": \"44CB39C8-01E5-45EB-9CF8-E70AAF2D1691\",\"crops\": [],\"focalPoint\": {\"left\": 0.5,\"top\": 0.5}}]"));
             Assert.That(sut.GetValue<Udi>("memberPicker"), Is.EqualTo(Udi.Create(Constants.UdiEntityType.Member, new Guid("9A50A448-59C0-4D42-8F93-4F1D55B0F47D"))));
             Assert.That(sut.GetValue<string>("multiUrlPicker"), Is.EqualTo("[{\"name\":\"https://test.com\",\"url\":\"https://test.com\"}]"));
             Assert.That(sut.GetValue<string>("tags"), Is.EqualTo("this,is,tags"));

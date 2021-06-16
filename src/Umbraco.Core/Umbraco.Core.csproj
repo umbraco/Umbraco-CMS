@@ -132,6 +132,7 @@
     <Compile Include="Constants-CharArrays.cs" />
     <Compile Include="Collections\EventClearingObservableCollection.cs" />
     <Compile Include="Constants-SqlTemplates.cs" />
+    <Compile Include="Events\UnattendedInstallEventArgs.cs" />
     <Compile Include="Logging\ILogger2.cs" />
     <Compile Include="Logging\Logger2Extensions.cs" />
     <Compile Include="Dashboards\ContentDashboardSettings.cs" />
