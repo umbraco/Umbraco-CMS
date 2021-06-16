@@ -39,7 +39,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Server_Role_Is_Replica()
         {
-            KeepAlive sut = CreateKeepAlive(serverRole: ServerRole.Replica);
+            KeepAlive sut = CreateKeepAlive(serverRole: ServerRole.Website);
             await sut.PerformExecuteAsync(null);
             VerifyKeepAliveRequestNotSent();
         }

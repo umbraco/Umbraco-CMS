@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core.Sync
+namespace Umbraco.Cms.Core.Sync
 {
     /// <summary>
     /// The role of a server in an application environment.
@@ -16,13 +16,13 @@
         Single = 1,
 
         /// <summary>
-        /// In a multi-servers environment, the server is a replica server.
+        /// In a multi-servers environment, the server is a website/frontend server.
         /// </summary>
-        Replica = 2,
+        Website = 2,
 
         /// <summary>
-        /// In a multi-servers environment, the server is the master server.
+        /// In a multi-servers environment, the server is the scheduler server.
         /// </summary>
-        Master = 3
+        Scheduler = 3
     }
 }

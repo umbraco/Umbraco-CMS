@@ -151,7 +151,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 switch (serverRole)
                 {
                     case ServerRole.Single:
-                    case ServerRole.Master:
+                    case ServerRole.Scheduler:
                         PruneOldInstructions();
                         instructionsWerePruned = true;
                         break;

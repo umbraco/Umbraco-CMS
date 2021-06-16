@@ -55,7 +55,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Server_Role_Is_Replica()
         {
-            HealthCheckNotifier sut = CreateHealthCheckNotifier(serverRole: ServerRole.Replica);
+            HealthCheckNotifier sut = CreateHealthCheckNotifier(serverRole: ServerRole.Website);
             await sut.PerformExecuteAsync(null);
             VerifyNotificationsNotSent();
         }

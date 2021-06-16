@@ -46,7 +46,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Server_Role_Is_Replica()
         {
-            ScheduledPublishing sut = CreateScheduledPublishing(serverRole: ServerRole.Replica);
+            ScheduledPublishing sut = CreateScheduledPublishing(serverRole: ServerRole.Website);
             await sut.PerformExecuteAsync(null);
             VerifyScheduledPublishingNotPerformed();
         }

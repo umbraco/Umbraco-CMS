@@ -82,7 +82,7 @@ namespace Umbraco.Cms.Core.Services.Implement
                 // default role is single server, but if registrations contain more
                 // than one active server, then role is master or replica
                 _currentServerRole = regs.Count(x => x.IsActive) > 1
-                    ? (server.IsMaster ? ServerRole.Master : ServerRole.Replica)
+                    ? (server.IsMaster ? ServerRole.Scheduler : ServerRole.Website)
                     : ServerRole.Single;
 
                 scope.Complete();

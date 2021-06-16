@@ -29,7 +29,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.HostedServices
         [Test]
         public async Task Does_Not_Execute_When_Server_Role_Is_Replica()
         {
-            LogScrubber sut = CreateLogScrubber(serverRole: ServerRole.Replica);
+            LogScrubber sut = CreateLogScrubber(serverRole: ServerRole.Website);
             await sut.PerformExecuteAsync(null);
             VerifyLogsNotScrubbed();
         }
