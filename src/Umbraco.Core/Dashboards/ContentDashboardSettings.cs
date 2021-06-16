@@ -4,6 +4,7 @@ namespace Umbraco.Core.Dashboards
 {
     public class ContentDashboardSettings: IContentDashboardSettings
     {
+        private const string DefaultContentDashboardPath = "cms";
 
         /// <summary>
         /// Gets a value indicating whether the content dashboard should be available to all users.
@@ -22,12 +23,12 @@ namespace Umbraco.Core.Dashboards
         }
 
         /// <summary>
-        /// Gets the base URL for content on the content dashboard when running on Umbraco Cloud.
+        /// Gets the path to use when constructing the URL for retrieving data for the content dashboard.
         /// </summary>
-        /// <value>The base URL.</value>
-        public string ContentDashboardBaseUrl =>
-            ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ContentDashboardBaseUrl)
-                ? ConfigurationManager.AppSettings[Constants.AppSettings.ContentDashboardBaseUrl]
-                : string.Empty;
+        /// <value>The URL path.</value>
+        public string ContentDashboardPath =>
+            ConfigurationManager.AppSettings.ContainsKey(Constants.AppSettings.ContentDashboardPath)
+                ? ConfigurationManager.AppSettings[Constants.AppSettings.ContentDashboardPath]
+                : DefaultContentDashboardPath;
     }
 }

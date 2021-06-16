@@ -116,9 +116,9 @@ namespace Umbraco.Core
             public const string AllowContentDashboardAccessToAllUsers = "Umbraco.Core.AllowContentDashboardAccessToAllUsers";
 
             /// <summary>
-            /// The base URL for displaying different content on the content dashboard when running on Umbraco Cloud.
+            /// The path to use when constructing the URL for retrieving data for the content dashboard.
             /// </summary>
-            public const string ContentDashboardBaseUrl = "Umbraco.Core.ContentDashboardBaseUrl";
+            public const string ContentDashboardPath = "Umbraco.Core.ContentDashboardPath";
 
             /// <summary>
             /// TODO: FILL ME IN

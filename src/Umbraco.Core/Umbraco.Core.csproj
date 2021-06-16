@@ -128,7 +128,6 @@
     </Compile>
     -->
     <Compile Include="AssemblyExtensions.cs" />
-    <Compile Include="Configuration\HostingOptions.cs" />
     <Compile Include="Constants-CharArrays.cs" />
     <Compile Include="Collections\EventClearingObservableCollection.cs" />
     <Compile Include="Constants-SqlTemplates.cs" />

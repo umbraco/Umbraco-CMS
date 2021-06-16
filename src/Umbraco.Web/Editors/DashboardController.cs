@@ -53,23 +53,22 @@ namespace Umbraco.Web.Editors
 
         //we have baseurl as a param to make previewing easier, so we can test with a dev domain from client side
         [ValidateAngularAntiForgeryToken]
-        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.org/")
+        public async Task<JObject> GetRemoteDashboardContent(string section, string baseUrl = "https://dashboard.umbraco.com/")
         {
             var user = Security.CurrentUser;
             var allowedSections = string.Join(",", user.AllowedSections);
             var language = user.Language;
             var version = UmbracoVersion.SemanticVersion.ToSemanticString();
             var isAdmin = user.IsAdmin();
-            var hosting = HostingOptions.OnPremises.ToString().ToLower();
 
-            // check if the site is running on Umbraco Cloud
-            if (IOHelper.IsOnCloud)
-            {
-                hosting = HostingOptions.Cloud.ToString().ToLower();
-                baseUrl = _dashboardSettings.ContentDashboardBaseUrl.IsNullOrWhiteSpace() ? baseUrl : _dashboardSettings.ContentDashboardBaseUrl;
-            }
-
-            var url = string.Format(baseUrl + "{0}?section={0}&allowed={1}&lang={2}&version={3}&admin={4}&hosting={5}", section, allowedSections, language, version, isAdmin, hosting);
+            var url = string.Format("{0}{1}?section={2}&allowed={3}&lang={4}&version={5}&admin={6}",
+                baseUrl,
+                _dashboardSettings.ContentDashboardPath,
+                section,
+                allowedSections,
+                language,
+                version,
+                isAdmin);
             var key = "umbraco-dynamic-dashboard-" + language + allowedSections.Replace(",", "-") + section;
 
             var content = AppCaches.RuntimeCache.GetCacheItem<JObject>(key);

@@ -12,9 +12,9 @@
         bool AllowContentDashboardAccessToAllUsers { get; }
 
         /// <summary>
-        /// Gets the base URL for content on the content dashboard when running on Umbraco Cloud.
+        /// Gets the path to use when constructing the URL for retrieving data for the content dashboard.
         /// </summary>
-        /// <value>The base URL.</value>
-        string ContentDashboardBaseUrl { get; }
+        /// <value>The URL path.</value>
+        string ContentDashboardPath { get; }
     }
 }

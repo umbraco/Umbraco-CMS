@@ -31,20 +31,6 @@ namespace Umbraco.Core.IO
 
         public static char DirSepChar => Path.DirectorySeparatorChar;
 
-        /// <summary>
-        /// Gets a value indicating whether Umbraco is running on Umbraco Cloud.
-        /// </summary>
-        public static bool IsOnCloud
-        {
-            get
-            {
-                var binFolder = GetRootDirectoryBinFolder();
-                var deployDll = Path.Combine(binFolder, "Umbraco.Deploy.Cloud.dll");
-
-                return File.Exists(deployDll);
-            }
-        }
-
         //helper to try and match the old path to a new virtual one
         public static string FindFile(string virtualPath)
         {
