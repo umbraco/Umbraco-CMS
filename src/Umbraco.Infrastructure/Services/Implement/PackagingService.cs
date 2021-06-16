@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Notifications;
@@ -19,6 +20,10 @@ namespace Umbraco.Cms.Core.Services.Implement
     {
         private readonly IPackageInstallation _packageInstallation;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IManifestParser _manifestParser;
+        private readonly IKeyValueService _keyValueService;
+        private readonly PackageMigrationPlanCollection _packageMigrationPlans;
+        private readonly PendingPackageMigrations _pendingPackageMigrations;
         private readonly IAuditService _auditService;
         private readonly ICreatedPackagesRepository _createdPackages;
 
@@ -26,12 +31,20 @@ namespace Umbraco.Cms.Core.Services.Implement
             IAuditService auditService,
             ICreatedPackagesRepository createdPackages,
             IPackageInstallation packageInstallation,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IManifestParser manifestParser,
+            IKeyValueService keyValueService,
+            PackageMigrationPlanCollection packageMigrationPlans,
+            PendingPackageMigrations pendingPackageMigrations)
         {
             _auditService = auditService;
             _createdPackages = createdPackages;
             _packageInstallation = packageInstallation;
             _eventAggregator = eventAggregator;
+            _manifestParser = manifestParser;
+            _keyValueService = keyValueService;
+            _packageMigrationPlans = packageMigrationPlans;
+            _pendingPackageMigrations = pendingPackageMigrations;
         }
 
         #region Installation
@@ -95,10 +108,52 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public string ExportCreatedPackage(PackageDefinition definition) => _createdPackages.ExportPackage(definition);
 
+        public IEnumerable<InstalledPackage> GetAllInstalledPackages()
+        {
+            IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+            IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
 
-        // TODO: Implement
-        public IEnumerable<PackageDefinition> GetAllInstalledPackages() => Enumerable.Empty<PackageDefinition>();
-        
+            var installedPackages = new Dictionary<string, InstalledPackage>();
+
+            foreach(PackageMigrationPlan plan in _packageMigrationPlans)
+            {
+                if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage installedPackage))
+                {
+                    installedPackage = new InstalledPackage
+                    {
+                        PackageName = plan.PackageName
+                    };
+                    installedPackages.Add(plan.PackageName, installedPackage);                    
+                }
+
+                var currentPlans = installedPackage.PackageMigrationPlans.ToList();
+                keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.PackageName, out var currentState);
+                currentPlans.Add(new InstalledPackageMigrationPlans
+                {
+                    CurrentMigrationId = currentState,
+                    FinalMigrationId = plan.FinalState
+                });
+
+                installedPackage.PackageMigrationPlans = currentPlans;
+            }
+
+            foreach(PackageManifest package in _manifestParser.GetManifests())
+            {
+                if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage installedPackage))
+                {
+                    installedPackage = new InstalledPackage
+                    {
+                        PackageName = package.PackageName
+                    };
+                    installedPackages.Add(package.PackageName, installedPackage);
+                }
+
+                installedPackage.PackageView = package.PackageView;
+            }
+
+            return installedPackages.Values;
+        }
+
         #endregion
     }
 }

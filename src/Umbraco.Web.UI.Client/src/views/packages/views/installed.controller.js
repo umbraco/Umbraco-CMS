@@ -1,7 +1,7 @@
 (function () {
     "use strict";
 
-    function PackagesInstalledController($scope, $route, $location, packageResource, $timeout, $window, localStorageService, localizationService) {
+    function PackagesInstalledController($location, packageResource, localizationService) {
 
         var vm = this;
 

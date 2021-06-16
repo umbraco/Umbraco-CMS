@@ -9,7 +9,7 @@
 
             <table class="table">
                 <tbody>
-                    <tr ng-repeat="installedPackage in vm.installedPackages track by installedPackage.id">
+                    <tr ng-repeat="installedPackage in vm.installedPackages track by installedPackage.name">
                         <td class="flex items-center">
                             <div class="umb-package-list__item-icon">
                                 <umb-icon ng-if="!installedPackage.iconUrl" icon="icon-box" class="icon-box"></umb-icon>
@@ -17,25 +17,30 @@
                             </div>
                             <div class="umb-package-list__item-content">
                                 <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
-                                <div class="umb-package-list__item-description">
-                                    {{ installedPackage.version }} | <a href="{{ installedPackage.url }}" target="_blank" rel="noopener">{{ installedPackage.url }}</a> | {{ installedPackage.author }}
-                                </div>
                             </div>
                         </td>
                         <td style="text-align: right;">
-                            <umb-button ng-show="installedPackage.packageView"
-                                        type="button"
-                                        button-style="info"
-                                        size="xxs"
-                                        label-key="packager_packageOptions"
-                                        action="vm.packageOptions(installedPackage)">
-                            </umb-button>
+                          <umb-button ng-show="installedPackage.hasPendingMigrations"
+                                      type="button"
+                                      button-style="info"
+                                      size="xxs"
+                                      label-key="packager_packageMigrationsRun"
+                                      action="vm.packageOptions(installedPackage)">
+                          </umb-button>
 
-                            <umb-button type="button"
-                                        button-style="danger"
-                                        label-key="packager_packageUninstallHeader"
-                                        action="vm.confirmUninstall(installedPackage)">
-                            </umb-button>
+                          <umb-button ng-show="installedPackage.packageView"
+                                      type="button"
+                                      button-style="info"
+                                      size="xxs"
+                                      label-key="packager_packageOptions"
+                                      action="vm.packageOptions(installedPackage)">
+                          </umb-button>
+
+                          <umb-button type="button"
+                                      button-style="danger"
+                                      label-key="packager_packageUninstallHeader"
+                                      action="vm.confirmUninstall(installedPackage)">
+                          </umb-button>
                         </td>
                     </tr>
                 </tbody>

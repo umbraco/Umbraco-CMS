@@ -212,7 +212,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                         return UmbracoDatabaseState.NeedsUpgrade;
                     }
 
-                    IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetUmbracoPendingPackageMigrations(keyValues);
+                    IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetPendingPackageMigrations(keyValues);
                     if (packagesRequiringMigration.Count > 0)
                     {
                         _startupState[PendingPacakgeMigrationsStateKey] = packagesRequiringMigration;

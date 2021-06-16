@@ -13,11 +13,11 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Packaging
     {
         private static readonly Guid s_step1 = Guid.NewGuid();
         private static readonly Guid s_step2 = Guid.NewGuid();
-        private const string PackageName = "Test1";
+        private const string TestPackageName = "Test1";
 
         private class TestPackageMigrationPlan : PackageMigrationPlan
         {
-            public TestPackageMigrationPlan() : base(PackageName)
+            public TestPackageMigrationPlan() : base(TestPackageName)
             {
             }
 
@@ -41,7 +41,7 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Packaging
         {
             PendingPackageMigrations pendingPackageMigrations = GetPendingPackageMigrations();
             var registeredMigrations = new Dictionary<string, string>();
-            IReadOnlyList<string> pending = pendingPackageMigrations.GetUmbracoPendingPackageMigrations(registeredMigrations);
+            IReadOnlyList<string> pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
             Assert.AreEqual(1, pending.Count);
         }
 
@@ -51,9 +51,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Packaging
             PendingPackageMigrations pendingPackageMigrations = GetPendingPackageMigrations();
             var registeredMigrations = new Dictionary<string, string>
             {
-                [Constants.Conventions.Migrations.KeyValuePrefix + PackageName] = s_step2.ToString()
+                [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step2.ToString()
             };
-            IReadOnlyList<string> pending = pendingPackageMigrations.GetUmbracoPendingPackageMigrations(registeredMigrations);
+            IReadOnlyList<string> pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
             Assert.AreEqual(0, pending.Count);
         }
 
@@ -63,9 +63,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Packaging
             PendingPackageMigrations pendingPackageMigrations = GetPendingPackageMigrations();
             var registeredMigrations = new Dictionary<string, string>
             {
-                [Constants.Conventions.Migrations.KeyValuePrefix + PackageName] = s_step1.ToString()
+                [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step1.ToString()
             };
-            IReadOnlyList<string> pending = pendingPackageMigrations.GetUmbracoPendingPackageMigrations(registeredMigrations);
+            IReadOnlyList<string> pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
             Assert.AreEqual(1, pending.Count);
         }
 
@@ -75,9 +75,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Core.Packaging
             PendingPackageMigrations pendingPackageMigrations = GetPendingPackageMigrations();
             var registeredMigrations = new Dictionary<string, string>
             {
-                [Constants.Conventions.Migrations.KeyValuePrefix + PackageName] = s_step1.ToString().ToUpper()
+                [Constants.Conventions.Migrations.KeyValuePrefix + TestPackageName] = s_step1.ToString().ToUpper()
             };
-            IReadOnlyList<string> pending = pendingPackageMigrations.GetUmbracoPendingPackageMigrations(registeredMigrations);
+            IReadOnlyList<string> pending = pendingPackageMigrations.GetPendingPackageMigrations(registeredMigrations);
             Assert.AreEqual(1, pending.Count);
         }
     }

@@ -129,10 +129,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         /// Returns all installed packages - only shows their latest versions
         /// </summary>
         /// <returns></returns>
-        public IEnumerable<PackageDefinition> GetInstalled()
-        {
-            return _packagingService.GetAllInstalledPackages()
-                .ToList();
-        }
+        public IEnumerable<InstalledPackage> GetInstalled()
+            => _packagingService.GetAllInstalledPackages().ToList();
     }
 }
