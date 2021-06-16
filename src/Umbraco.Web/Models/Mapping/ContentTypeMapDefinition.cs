@@ -681,7 +681,7 @@ namespace Umbraco.Web.Models.Mapping
         {
             var groupsA = groups.ToArray();
             var distinctProperties = groupsA
-                .Select(x => x.Name.ToUpperInvariant())
+                .Select(x => (x.Name?.ToUpperInvariant(), x.Level))
                 .Distinct()
                 .Count();
             if (distinctProperties != groupsA.Length)

@@ -88,7 +88,7 @@ namespace Umbraco.Web.Models.ContentEditing
                 yield return validationResult;
             }
 
-            var duplicateGroups = Groups.GroupBy(x => x.Name).Where(x => x.Count() > 1).ToArray();
+            var duplicateGroups = Groups.GroupBy(x => (x.Name?.ToUpperInvariant(), x.Level)).Where(x => x.Count() > 1).ToArray();
             if (duplicateGroups.Any())
             {
                 //we need to return the field name with an index so it's wired up correctly
