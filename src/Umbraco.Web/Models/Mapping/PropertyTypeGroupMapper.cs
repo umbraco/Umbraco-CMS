@@ -171,36 +171,36 @@ namespace Umbraco.Web.Models.Mapping
 
             // now merge tabs based on names
             // as for one name, we might have one local tab, plus some inherited tabs
-            var groupsGroupsByName = groups.GroupBy(x => x.Name).ToArray();
+            var groupsGroupsByNameAndLevel = groups.GroupBy(x => (x.Name, x.Level)).ToArray();
             groups = new List<PropertyGroupDisplay<TPropertyType>>(); // start with a fresh list
-            foreach (var groupsByName in groupsGroupsByName)
+            foreach (var groupsByNameAndLevel in groupsGroupsByNameAndLevel)
             {
                 // single group, just use it
-                if (groupsByName.Count() == 1)
+                if (groupsByNameAndLevel.Count() == 1)
                 {
-                    groups.Add(groupsByName.First());
+                    groups.Add(groupsByNameAndLevel.First());
                     continue;
                 }
 
                 // multiple groups, merge
-                var group = groupsByName.FirstOrDefault(x => x.Inherited == false) // try local
-                    ?? groupsByName.First(); // else pick one randomly
+                var group = groupsByNameAndLevel.FirstOrDefault(x => x.Inherited == false) // try local
+                    ?? groupsByNameAndLevel.First(); // else pick one randomly
                 groups.Add(group);
 
                 // in case we use the local one, flag as inherited
                 group.Inherited = true;
 
                 // merge (and sort) properties
-                var properties = groupsByName.SelectMany(x => x.Properties).OrderBy(x => x.SortOrder).ToArray();
+                var properties = groupsByNameAndLevel.SelectMany(x => x.Properties).OrderBy(x => x.SortOrder).ToArray();
                 group.Properties = properties;
 
                 // collect parent group info
-                var parentGroups = groupsByName.Where(x => x.ContentTypeId != source.Id).ToArray();
+                var parentGroups = groupsByNameAndLevel.Where(x => x.ContentTypeId != source.Id).ToArray();
                 group.ParentTabContentTypes = parentGroups.SelectMany(x => x.ParentTabContentTypes).ToArray();
                 group.ParentTabContentTypeNames = parentGroups.SelectMany(x => x.ParentTabContentTypeNames).ToArray();
             }
 
-            return groups.OrderBy(x => x.SortOrder);
+            return groups.OrderBy(x => x.Level).ThenBy(x => x.SortOrder);
         }
 
         private IEnumerable<TPropertyType> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
