@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     // no matter what the level is run for package migrations.
                     // they either run unattended, or only manually via the back office.
                     Level = RuntimeLevel.Run;
-                    
+
                     if (_unattendedSettings.Value.PackageMigrationsUnattended)
                     {
                         _logger.LogDebug("Package migrations need to execute.");
@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     }
                     else
                     {
-                        _logger.LogDebug("Package migrations need to execute but unattended package migrations is disabled. They will need to be run from the back office.");
+                        _logger.LogInformation("Package migrations need to execute but unattended package migrations is disabled. They will need to be run from the back office.");
                         Reason = RuntimeLevelReason.Run;
                     }
 
