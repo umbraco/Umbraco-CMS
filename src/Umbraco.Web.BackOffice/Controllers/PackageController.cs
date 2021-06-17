@@ -7,18 +7,21 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using Umbraco.Cms.Core.Hosting;
+using Umbraco.Extensions;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Packaging;
 using Umbraco.Cms.Core.Security;
-using Umbraco.Cms.Core.Semver;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Cms.Web.BackOffice.Extensions;
 using Umbraco.Cms.Web.Common.ActionsResults;
 using Umbraco.Cms.Web.Common.Attributes;
 using Umbraco.Cms.Web.Common.Authorization;
-using Umbraco.Extensions;
 using Constants = Umbraco.Cms.Core.Constants;
+using Umbraco.Cms.Infrastructure.Migrations.Upgrade;
+using Umbraco.Cms.Core.Migrations;
+using Umbraco.Cms.Core.Scoping;
+using Microsoft.Extensions.Logging;
+using System.Numerics;
 
 namespace Umbraco.Cms.Web.BackOffice.Controllers
 {
@@ -31,13 +34,31 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
     {
         private readonly IPackagingService _packagingService;
         private readonly IBackOfficeSecurityAccessor _backofficeSecurityAccessor;
+        private readonly IKeyValueService _keyValueService;
+        private readonly PendingPackageMigrations _pendingPackageMigrations;
+        private readonly PackageMigrationPlanCollection _packageMigrationPlans;
+        private readonly IMigrationPlanExecutor _migrationPlanExecutor;
+        private readonly IScopeProvider _scopeProvider;
+        private readonly ILogger<PackageController> _logger;
 
         public PackageController(
             IPackagingService packagingService,
-            IBackOfficeSecurityAccessor backofficeSecurityAccessor)
+            IBackOfficeSecurityAccessor backofficeSecurityAccessor,
+            IKeyValueService keyValueService,
+            PendingPackageMigrations pendingPackageMigrations,
+            PackageMigrationPlanCollection packageMigrationPlans,
+            IMigrationPlanExecutor migrationPlanExecutor,
+            IScopeProvider scopeProvider,
+            ILogger<PackageController> logger)
         {
             _packagingService = packagingService ?? throw new ArgumentNullException(nameof(packagingService));
             _backofficeSecurityAccessor = backofficeSecurityAccessor ?? throw new ArgumentNullException(nameof(backofficeSecurityAccessor));
+            _keyValueService = keyValueService;
+            _pendingPackageMigrations = pendingPackageMigrations;
+            _packageMigrationPlans = packageMigrationPlans;
+            _migrationPlanExecutor = migrationPlanExecutor;
+            _scopeProvider = scopeProvider;
+            _logger = logger;
         }
 
         public IEnumerable<PackageDefinition> GetCreatedPackages()
@@ -94,6 +115,34 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             _packagingService.DeleteCreatedPackage(packageId, _backofficeSecurityAccessor.BackOfficeSecurity.GetUserId().ResultOr(0));
 
             return Ok();
+        }
+
+        [HttpPost]
+        public ActionResult<IEnumerable<InstalledPackage>> RunMigrations(string packageName)
+        {
+            IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+            IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
+            foreach(PackageMigrationPlan plan in _packageMigrationPlans.Where(x => x.PackageName.InvariantEquals(packageName)))
+            {
+                if (pendingMigrations.Contains(plan.Name))
+                {
+                    var upgrader = new Upgrader(plan);
+
+                    try
+                    {
+                        upgrader.Execute(_migrationPlanExecutor, _scopeProvider, _keyValueService);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Package migration failed on package {Package} for {Plan}", packageName, plan.Name);
+
+                        return ValidationErrorResult.CreateNotificationValidationErrorResult(
+                            $"Package migration failed on package {packageName} for {plan.Name} with error: {ex.Message}. Check log for full details.");
+                    }
+                }
+            }
+
+            return _packagingService.GetAllInstalledPackages().ToList();
         }
 
         [HttpGet]
