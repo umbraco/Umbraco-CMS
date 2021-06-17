@@ -36,7 +36,6 @@ namespace Umbraco.Cms.Web.BackOffice.Routing
             {
                 case RuntimeLevel.Install:
                 case RuntimeLevel.Upgrade:
-                case RuntimeLevel.PackageMigrations:
                 case RuntimeLevel.Run:
                     endpoints.MapHub<PreviewHub>(GetPreviewHubRoute());
                     endpoints.MapUmbracoRoute<PreviewController>(_umbracoPathSegment, Constants.Web.Mvc.BackOfficeArea, null);

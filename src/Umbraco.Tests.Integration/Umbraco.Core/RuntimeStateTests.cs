@@ -60,15 +60,15 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core
         }
 
         [Test]
-        public void GivenPackageMigrationsExist_WhenNotUnattendedMigrations_ThenLevelIsPackageMigrations()
+        public void GivenPackageMigrationsExist_WhenNotUnattendedMigrations_ThenLevelIsRun()
         {
             var unattendedOptions = Services.GetRequiredService<IOptions<UnattendedSettings>>();
             unattendedOptions.Value.PackageMigrationsUnattended = false;
 
             RuntimeState.DetermineRuntimeLevel();
 
-            Assert.AreEqual(RuntimeLevel.PackageMigrations, RuntimeState.Level);
-            Assert.AreEqual(RuntimeLevelReason.UpgradePackageMigrations, RuntimeState.Reason);
+            Assert.AreEqual(RuntimeLevel.Run, RuntimeState.Level);
+            Assert.AreEqual(RuntimeLevelReason.Run, RuntimeState.Reason);
         }
 
         private class TestMigrationPlan : PackageMigrationPlan

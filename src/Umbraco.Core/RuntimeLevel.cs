@@ -1,4 +1,4 @@
-﻿namespace Umbraco.Cms.Core
+namespace Umbraco.Cms.Core
 {
     /// <summary>
     /// Describes the levels in which the runtime can run.
@@ -31,11 +31,6 @@
         /// is currently upgrading Umbraco.
         /// </summary>
         Upgrade = 3,
-
-        /// <summary>
-        /// The runtime has detected that Package Migrations need to be executed.
-        /// </summary>
-        PackageMigrations = 4,
 
         /// <summary>
         /// The runtime has detected an up-to-date Umbraco install and is running.
