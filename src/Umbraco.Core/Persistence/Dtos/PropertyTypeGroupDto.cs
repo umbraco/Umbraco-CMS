@@ -30,7 +30,7 @@ namespace Umbraco.Core.Persistence.Dtos
 
         [Column("level")]
         [Constraint(Default = 1)] // TODO We default to 1 (property group) for backwards compatibility, but should use zero/no default at some point.
-        public short Level { get; set; }
+        public short Level { get; set; } = 1;
 
         [Column("contenttypeNodeId")]
         [ForeignKey(typeof(ContentTypeDto), Column = "nodeId")]
