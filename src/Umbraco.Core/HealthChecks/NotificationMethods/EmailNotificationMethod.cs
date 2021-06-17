@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.Mail;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Core.Services;
 using Umbraco.Extensions;
 
