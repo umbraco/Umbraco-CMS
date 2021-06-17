@@ -8,6 +8,7 @@ using System.Text;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.XPath;
+using Umbraco.Cms.Core;
 using Umbraco.Cms.Core.Xml;
 
 namespace Umbraco.Extensions
@@ -238,7 +239,7 @@ namespace Umbraco.Extensions
         {
             if (xml == null)
             {
-                throw new ArgumentNullException("xml");
+                throw new ArgumentNullException(nameof(xml));
             }
 
             if (xml.HasAttributes == false)
@@ -246,19 +247,19 @@ namespace Umbraco.Extensions
                 throw new InvalidOperationException($"{attributeName} not found in xml");
             }
 
-            if (xml.Attribute(attributeName) == null)
+            XAttribute attribute = xml.Attribute(attributeName);
+            if (attribute is null)
             {
                 throw new InvalidOperationException($"{attributeName} not found in xml");
             }
 
-            var val = xml.Attribute(attributeName).Value;
-            var result = val.TryConvertTo<T>();
+            Attempt<T> result = attribute.Value.TryConvertTo<T>();
             if (result.Success)
             {
                 return result.Result;
             }
 
-            throw new InvalidOperationException($"{val} attribute value cannot be converted to {typeof(T)}");
+            throw new InvalidOperationException($"{attribute.Value} attribute value cannot be converted to {typeof(T)}");
         }
 
         public static T AttributeValue<T>(this XElement xml, string attributeName)
