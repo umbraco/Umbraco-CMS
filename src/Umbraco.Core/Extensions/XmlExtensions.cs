@@ -1,4 +1,4 @@
-﻿// Copyright (c) Umbraco.
+// Copyright (c) Umbraco.
 // See LICENSE for more details.
 
 using System;
@@ -234,6 +234,33 @@ namespace Umbraco.Extensions
             }
         }
 
+        public static T RequiredAttributeValue<T>(this XElement xml, string attributeName)
+        {
+            if (xml == null)
+            {
+                throw new ArgumentNullException("xml");
+            }
+
+            if (xml.HasAttributes == false)
+            {
+                throw new InvalidOperationException($"{attributeName} not found in xml");
+            }
+
+            if (xml.Attribute(attributeName) == null)
+            {
+                throw new InvalidOperationException($"{attributeName} not found in xml");
+            }
+
+            var val = xml.Attribute(attributeName).Value;
+            var result = val.TryConvertTo<T>();
+            if (result.Success)
+            {
+                return result.Result;
+            }
+
+            throw new InvalidOperationException($"{val} attribute value cannot be converted to {typeof(T)}");
+        }
+
         public static T AttributeValue<T>(this XElement xml, string attributeName)
         {
             if (xml == null) throw new ArgumentNullException("xml");
@@ -249,6 +276,7 @@ namespace Umbraco.Extensions
 
             return default(T);
         }
+
         public static T AttributeValue<T>(this XmlNode xml, string attributeName)
         {
             if (xml == null) throw new ArgumentNullException("xml");

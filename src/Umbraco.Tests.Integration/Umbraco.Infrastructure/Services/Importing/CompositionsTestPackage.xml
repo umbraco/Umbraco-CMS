@@ -3,12 +3,12 @@
   <files />
   <info>
     <package>
-      <name>Compositions Packaged</name>      
-    </package>    
+      <name>Compositions Packaged</name>
+    </package>
   </info>
   <Documents>
     <DocumentSet importMode="root">
-      <umbHomePage id="1068" parentID="-1" level="1" creatorID="0" sortOrder="0" createDate="2014-11-26T12:52:35" updateDate="2014-11-26T12:52:36" nodeName="Home" urlName="home" path="-1,1068" isDoc="" nodeType="1056" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1051" nodeTypeAlias="umbHomePage">
+      <umbHomePage key="9c9b55d0-2fbf-4f12-afea-023bd7b2519d" id="1068" parentID="-1" level="1" creatorID="0" sortOrder="0" createDate="2014-11-26T12:52:35" updateDate="2014-11-26T12:52:36" nodeName="Home" urlName="home" path="-1,1068" isDoc="" nodeType="1056" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1051" nodeTypeAlias="umbHomePage">
         <umbracoNaviHide>0</umbracoNaviHide>
         <title><![CDATA[Txt: A responsive starter kit for Umbraco]]></title>
         <facebookLink><![CDATA[http://facebook.com/Umbraco]]></facebookLink>
@@ -26,7 +26,7 @@
         <siteName><![CDATA[Umbraco Txt]]></siteName>
         <byline><![CDATA[A responsive starter kit for Umbraco]]></byline>
         <copyright><![CDATA[Umbraco]]></copyright>
-        <umbTextPage id="1069" parentID="1068" level="2" creatorID="0" sortOrder="0" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Getting Started" urlName="getting-started" path="-1,1068,1069" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
+        <umbTextPage key="9c9b55d0-2fbf-4f12-afea-023bd7b25190" id="1069" parentID="1068" level="2" creatorID="0" sortOrder="0" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Getting Started" urlName="getting-started" path="-1,1068,1069" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
           <umbracoNaviHide>0</umbracoNaviHide>
           <featuredPage>1</featuredPage>
           <image><![CDATA[/media/SampleImages/1063/pic01.jpg]]></image>
@@ -38,7 +38,7 @@
 <p>Once you're happy with your site's design, you might want to add more functionality, such as maps, image galleries or forms. This is done by <a href="http://umbraco.org/help-and-support/video-tutorials/getting-started" title="Umbraco Modules">installing Umbraco modules</a>.</p>]]>
           </bodyText>
         </umbTextPage>
-        <umbTextPage id="1070" parentID="1068" level="2" creatorID="0" sortOrder="1" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Go Further" urlName="go-further" path="-1,1068,1070" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
+        <umbTextPage key="9c9b55d0-2fbf-4f12-afea-023bd7b25199" id="1070" parentID="1068" level="2" creatorID="0" sortOrder="1" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Go Further" urlName="go-further" path="-1,1068,1070" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
           <umbracoNaviHide>0</umbracoNaviHide>
           <featuredPage>1</featuredPage>
           <image><![CDATA[/media/SampleImages/1060/pic02.jpg]]></image>
@@ -51,7 +51,7 @@
 <p>The sky is the limit with Umbraco, and you have the benefit a friendly community, training, and guaranteed support. Find out how to <a href="http://umbraco.org/help-and-support" title="Get Umbraco Support">get help</a>.</p>]]>
           </bodyText>
         </umbTextPage>
-        <umbTextPage id="1071" parentID="1068" level="2" creatorID="0" sortOrder="2" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Installing Modules" urlName="installing-modules" path="-1,1068,1071" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
+        <umbTextPage key="9c9b55d0-2fbf-4f12-afea-023bd7b25198" id="1071" parentID="1068" level="2" creatorID="0" sortOrder="2" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Installing Modules" urlName="installing-modules" path="-1,1068,1071" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
           <umbracoNaviHide>0</umbracoNaviHide>
           <featuredPage>1</featuredPage>
           <image><![CDATA[/media/SampleImages/1061/pic04.jpg]]></image>
@@ -64,7 +64,7 @@
 <p><a href="http://umbraco.org/get-started" title="Get Started with Umbraco">Get more information</a> about the umbraco way.</p>]]>
           </bodyText>
         </umbTextPage>
-        <umbTextPage id="1072" parentID="1068" level="2" creatorID="0" sortOrder="3" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="About" urlName="about" path="-1,1068,1072" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
+        <umbTextPage  key="9c9b55d0-2fbf-4f12-afea-023bd7b25197" id="1072" parentID="1068" level="2" creatorID="0" sortOrder="3" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="About" urlName="about" path="-1,1068,1072" isDoc="" nodeType="1059" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1054" nodeTypeAlias="umbTextPage">
           <umbracoNaviHide>0</umbracoNaviHide>
           <featuredPage>1</featuredPage>
           <image><![CDATA[/media/SampleImages/1001/pic03.jpg]]></image>
@@ -73,31 +73,31 @@
 <p>Now that you know what the Txt Starter Kit is, it is time to get started using Umbraco.</p>]]>
           </bodyText>
         </umbTextPage>
-        <umbNewsOverview id="1073" parentID="1068" level="2" creatorID="0" sortOrder="4" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="News" urlName="news" path="-1,1068,1073" isDoc="" nodeType="1058" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1053" nodeTypeAlias="umbNewsOverview">
+        <umbNewsOverview key="9c9b55d0-2fbf-4f12-afea-023bd7b25196" id="1073" parentID="1068" level="2" creatorID="0" sortOrder="4" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="News" urlName="news" path="-1,1068,1073" isDoc="" nodeType="1058" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1053" nodeTypeAlias="umbNewsOverview">
           <umbracoNaviHide>0</umbracoNaviHide>
           <title><![CDATA[Adventure log]]></title>
-          <umbNewsItem id="1074" parentID="1073" level="3" creatorID="0" sortOrder="0" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="The 10 remarkable features of object" urlName="the-10-remarkable-features-of-object" path="-1,1068,1073,1074" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
+          <umbNewsItem key="9c9b55d0-2fbf-4f12-afea-023bd7b25195" id="1074" parentID="1073" level="3" creatorID="0" sortOrder="0" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="The 10 remarkable features of object" urlName="the-10-remarkable-features-of-object" path="-1,1068,1073,1074" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
             <umbracoNaviHide>0</umbracoNaviHide>
             <bodyText>
               <![CDATA[<p>Ita prorsus, inquam; Hanc ergo intuens debet institutum illud quasi signum absolvere. Ergo adhuc, quantum equidem intellego, causa non videtur fuisse mutandi nominis. Quia dolori non voluptas contraria est, sed doloris privatio. Nos autem non solum beatae vitae istam esse oblectationem videmus, sed etiam levamentum miseriarum. Quodsi ipsam honestatem undique pertectam atque absolutam. Nos cum te, M. Quod vestri non item.</p>
 <p>Cum id quoque, ut cupiebat, audivisset, evelli iussit eam, qua erat transfixus, hastam. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Quid iudicant sensus? Quo tandem modo?</p>]]>
             </bodyText>
           </umbNewsItem>
-          <umbNewsItem id="1075" parentID="1073" level="3" creatorID="0" sortOrder="1" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="This is a wonderful news item" urlName="this-is-a-wonderful-news-item" path="-1,1068,1073,1075" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
+          <umbNewsItem key="9c9b55d0-2fbf-4f12-afea-023bd7b25194" id="1075" parentID="1073" level="3" creatorID="0" sortOrder="1" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="This is a wonderful news item" urlName="this-is-a-wonderful-news-item" path="-1,1068,1073,1075" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
             <umbracoNaviHide>0</umbracoNaviHide>
             <bodyText>
               <![CDATA[<p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Commoda autem et incommoda in eo genere sunt, quae praeposita et reiecta diximus; Bestiarum vero nullum iudicium puto. Est enim effectrix multarum et magnarum voluptatum. Duo Reges: constructio interrete. Claudii libidini, qui tum erat summo ne imperio, dederetur. Quarum ambarum rerum cum medicinam pollicetur, luxuriae licentiam pollicetur. Sed virtutem ipsam inchoavit, nihil amplius.</p>
 <p>Ita redarguitur ipse a sese, convincunturque scripta eius probitate ipsius ac moribus. Istam voluptatem, inquit, Epicurus ignorat? Sed venio ad inconstantiae crimen, ne saepius dicas me aberrare; Sic, et quidem diligentius saepiusque ista loquemur inter nos agemusque communiter. Primum in nostrane potestate est, quid meminerimus? Consequens enim est et post oritur, ut dixi. Hoc mihi cum tuo fratre convenit. Immo videri fortasse. Itaque in rebus minime obscuris non multus est apud eos disserendi labor. Aliud igitur esse censet gaudere, aliud non dolere.</p>]]>
             </bodyText>
           </umbNewsItem>
-          <umbNewsItem id="1076" parentID="1073" level="3" creatorID="0" sortOrder="2" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="You really need to read this!" urlName="you-really-need-to-read-this" path="-1,1068,1073,1076" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
+          <umbNewsItem key="9c9b55d0-2fbf-4f12-afea-023bd7b25193" id="1076" parentID="1073" level="3" creatorID="0" sortOrder="2" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="You really need to read this!" urlName="you-really-need-to-read-this" path="-1,1068,1073,1076" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
             <umbracoNaviHide>0</umbracoNaviHide>
             <bodyText>
               <![CDATA[<p><span>Ut aliquid scire se gaudeant? Hanc ergo intuens debet institutum illud quasi signum absolvere. Vestri haec verecundius, illi fortasse constantius. Itaque sensibus rationem adiunxit et ratione effecta sensus non reliquit. Sed ea mala virtuti magnitudine obruebantur. Quasi ego id curem, quid ille aiat aut neget. Verum tamen cum de rebus grandioribus dicas, ipsae res verba rapiunt; Apparet statim, quae sint officia, quae actiones.</span></p>
 <p><span><span>Virtutibus igitur rectissime mihi videris et ad consuetudinem nostrae orationis vitia posuisse contraria. Nonne videmus quanta perturbatio rerum omnium consequatur, quanta confusio? Sed eum qui audiebant, quoad poterant, defendebant sententiam suam. Ut necesse sit omnium rerum, quae natura vigeant, similem esse finem, non eundem.</span></span></p>]]>
             </bodyText>
           </umbNewsItem>
-          <umbNewsItem id="1077" parentID="1073" level="3" creatorID="0" sortOrder="3" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Txt Starter Kit For Umbraco Released" urlName="txt-starter-kit-for-umbraco-released" path="-1,1068,1073,1077" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
+          <umbNewsItem key="9c9b55d0-2fbf-4f12-afea-023bd7b25192" id="1077" parentID="1073" level="3" creatorID="0" sortOrder="3" createDate="2014-11-26T12:52:36" updateDate="2014-11-26T12:52:36" nodeName="Txt Starter Kit For Umbraco Released" urlName="txt-starter-kit-for-umbraco-released" path="-1,1068,1073,1077" isDoc="" nodeType="1057" creatorName="Morten Christensen" writerName="Morten Christensen" writerID="0" template="1052" nodeTypeAlias="umbNewsItem">
             <umbracoNaviHide>0</umbracoNaviHide>
             <publishDate>2021-09-20T00:00:00</publishDate>
             <image><![CDATA[/media/SampleImages/1077/pic05.jpg]]></image>
@@ -115,6 +115,7 @@
     <DocumentType>
       <Info>
         <Name>Master</Name>
+        <Key>111adde6-9741-407e-ab35-b46b53471382</Key>
         <Alias>umbMaster</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -159,6 +160,7 @@
     <DocumentType>
       <Info>
         <Name>Home</Name>
+        <Key>e2f9e463-904a-4c0d-a7f3-f7c9fa31272b</Key>
         <Alias>umbHomePage</Alias>
         <Icon>.sprTreeSettingDomain</Icon>
         <Thumbnail>docWithImage.png</Thumbnail>
@@ -375,6 +377,7 @@
     <DocumentType>
       <Info>
         <Name>Meta</Name>
+        <Key>8adeed0a-489e-4e74-be6e-2e2f219a04a9</Key>
         <Alias>Meta</Alias>
         <Icon>icon-truck</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -409,6 +412,7 @@
     <DocumentType>
       <Info>
         <Name>News Item</Name>
+        <Key>b43c90ef-f0d4-448e-b2aa-7915b743cab1</Key>
         <Alias>umbNewsItem</Alias>
         <Icon>.sprTreeDocPic</Icon>
         <Thumbnail>docWithImage.png</Thumbnail>
@@ -478,6 +482,7 @@
     <DocumentType>
       <Info>
         <Name>News Overview</Name>
+        <Key>a22ca7e7-bdc4-4c3f-9193-b8773664e61d</Key>
         <Alias>umbNewsOverview</Alias>
         <Icon>package.png</Icon>
         <Thumbnail>folder_media.png</Thumbnail>
@@ -502,6 +507,7 @@
     <DocumentType>
       <Info>
         <Name>Seo</Name>
+        <Key>67f4dfe3-c505-43b9-86a4-6d23481c5e87</Key>
         <Alias>Seo</Alias>
         <Icon>icon-wifi</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -536,6 +542,7 @@
     <DocumentType>
       <Info>
         <Name>Text Page</Name>
+        <Key>d8ab5350-3064-487f-92fe-9735c015f631</Key>
         <Alias>umbTextyPage</Alias>
         <Icon>.sprTreeDoc</Icon>
         <Thumbnail>doc.png</Thumbnail>

@@ -19,6 +19,12 @@ namespace Umbraco.Cms.Core.Packaging
             DefinePlan();
         }
 
+        /// <summary>
+        /// Inform the plan executor to ignore all saved package state and
+        /// run the migration from initial state to it's end state.
+        /// </summary>
+        public override bool IgnoreCurrentState => true;
+
         protected abstract void DefinePlan();
 
     }

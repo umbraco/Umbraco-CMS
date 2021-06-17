@@ -272,12 +272,12 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             where T : class, IContentBase
             where S : IContentTypeComposition
         {
-            var key = Guid.Empty;
-            if (element.Attribute("key") != null && Guid.TryParse(element.Attribute("key").Value, out key))
+            Guid key = element.RequiredAttributeValue<Guid>("key");
+
+            // we need to check if the content already exists and if so we ignore the installation for this item
+            if (service.GetById(key) != null)
             {
-                //if a Key is supplied, then we need to check if the content already exists and if so we ignore the installation for this item
-                if (service.GetById(key) != null)
-                    return null;
+                return null;
             }
 
             var id = element.Attribute("id").Value;
@@ -477,17 +477,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
 
             //Sorting the Document Types based on dependencies - if its not a single doc type import ref. #U4-5921
-            var documentTypes = isSingleDocTypeImport
+            List<XElement> documentTypes = isSingleDocTypeImport
                 ? unsortedDocumentTypes.ToList()
                 : graph.GetSortedItems().Select(x => x.Item).ToList();
 
             //Iterate the sorted document types and create them as IContentType objects
-            foreach (var documentType in documentTypes)
+            foreach (XElement documentType in documentTypes)
             {
-                var alias = documentType.Element("Info").Element("Alias").Value;
+                var alias = documentType.Element("Info").Element("Alias").Value;                
+
                 if (importedContentTypes.ContainsKey(alias) == false)
                 {
-                    var contentType = service.Get(alias);
+                    T contentType = service.Get(alias);
+
                     importedContentTypes.Add(alias, contentType == null
                         ? CreateContentTypeFromXml(documentType, importedContentTypes, service)
                         : UpdateContentTypeFromXml(documentType, contentType, importedContentTypes, service));
@@ -526,7 +528,9 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 }
                 //Update ContentTypes with a newly added structure/list of allowed children
                 if (updatedContentTypes.Any())
+                {
                     service.Save(updatedContentTypes, userId);
+                }
             }
 
             return list;
@@ -595,13 +599,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return _contentTypeService.GetContainer(tryCreateFolder.Result.Entity.Id);
         }
 
-        private T CreateContentTypeFromXml<T>(XElement documentType, IReadOnlyDictionary<string, T> importedContentTypes, IContentTypeBaseService<T> service)
-         where T : class, IContentTypeComposition
+        private T CreateContentTypeFromXml<T>(
+            XElement documentType,
+            IReadOnlyDictionary<string, T> importedContentTypes,
+            IContentTypeBaseService<T> service)
+            where T : class, IContentTypeComposition
         {
-            var infoElement = documentType.Element("Info");
+            var key = Guid.Parse(documentType.Element("Info").Element("Key").Value);
+
+            XElement infoElement = documentType.Element("Info");
 
             //Name of the master corresponds to the parent
-            var masterElement = infoElement.Element("Master");
+            XElement masterElement = infoElement.Element("Master");
+
             T parent = default;
             if (masterElement != null)
             {
@@ -612,26 +622,35 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             }
 
             var alias = infoElement.Element("Alias").Value;
-            T contentType = CreateContentType(parent, -1, alias);
+            T contentType = CreateContentType(key, parent, -1, alias);
 
             if (parent != null)
+            {
                 contentType.AddContentType(parent);
+            }
 
             return UpdateContentTypeFromXml(documentType, contentType, importedContentTypes, service);
         }
 
-        private T CreateContentType<T>(T parent, int parentId, string alias)
+        private T CreateContentType<T>(Guid key, T parent, int parentId, string alias)
             where T : class, IContentTypeComposition
         {
             if (typeof(T) == typeof(IContentType))
             {
                 if (parent is null)
                 {
-                    return new ContentType(_shortStringHelper, parentId) { Alias = alias } as T;
+                    return new ContentType(_shortStringHelper, parentId)
+                    {
+                        Alias = alias,
+                        Key = key
+                    } as T;
                 }
                 else
                 {
-                    return new ContentType(_shortStringHelper, (IContentType)parent, alias) as T;
+                    return new ContentType(_shortStringHelper, (IContentType)parent, alias)
+                    {
+                        Key = key
+                    } as T;
                 }
 
             }
@@ -640,11 +659,18 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 if (parent is null)
                 {
-                    return new MediaType(_shortStringHelper, parentId) { Alias = alias } as T;
+                    return new MediaType(_shortStringHelper, parentId)
+                    {
+                        Alias = alias,
+                        Key = key
+                    } as T;
                 }
                 else
                 {
-                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias) as T;
+                    return new MediaType(_shortStringHelper, (IMediaType)parent, alias)
+                    {
+                        Key = key
+                    } as T;
                 }
 
             }
@@ -652,12 +678,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             throw new NotSupportedException($"Type {typeof(T)} is not supported");
         }
 
-        private T UpdateContentTypeFromXml<T>(XElement documentType, T contentType, IReadOnlyDictionary<string, T> importedContentTypes, IContentTypeBaseService<T> service)
-        where T : IContentTypeComposition
+        private T UpdateContentTypeFromXml<T>(
+            XElement documentType,
+            T contentType,
+            IReadOnlyDictionary<string, T> importedContentTypes,
+            IContentTypeBaseService<T> service)
+            where T : IContentTypeComposition
         {
+            var key = Guid.Parse(documentType.Element("Info").Element("Key").Value);
+
             var infoElement = documentType.Element("Info");
             var defaultTemplateElement = infoElement.Element("DefaultTemplate");
 
+            contentType.Key = key;
             contentType.Name = infoElement.Element("Name").Value;
             if (infoElement.Element("Key") != null)
                 contentType.Key = new Guid(infoElement.Element("Key").Value);
@@ -771,7 +804,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var tabs = tabElement.Elements("Tab");
             foreach (var tab in tabs)
             {
-                var id = tab.Element("Id").Value;//Do we need to use this for tracking?
                 var caption = tab.Element("Caption").Value;
 
                 if (contentType.PropertyGroups.Contains(caption) == false)
@@ -780,8 +812,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
                 }
 
-                int sortOrder;
-                if (tab.Element("SortOrder") != null && int.TryParse(tab.Element("SortOrder").Value, out sortOrder))
+                if (tab.Element("SortOrder") != null && int.TryParse(tab.Element("SortOrder").Value, out int sortOrder))
                 {
                     // Override the sort order with the imported value
                     contentType.PropertyGroups[caption].SortOrder = sortOrder;
@@ -844,7 +875,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 var sortOrder = 0;
                 var sortOrderElement = property.Element("SortOrder");
                 if (sortOrderElement != null)
+                {
                     int.TryParse(sortOrderElement.Value, out sortOrder);
+                }
+
                 var propertyType = new PropertyType(_shortStringHelper, dataTypeDefinition, property.Element("Alias").Value)
                 {
                     Name = property.Element("Name").Value,
@@ -868,8 +902,11 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                         ? property.Element("LabelOnTop").Value.ToLowerInvariant().Equals("true")
                         : false
                 };
+
                 if (property.Element("Key") != null)
+                {
                     propertyType.Key = new Guid(property.Element("Key").Value);
+                }
 
                 var tab = (string)property.Element("Tab");
                 if (string.IsNullOrEmpty(tab))
@@ -948,7 +985,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             {
                 var dataTypeDefinitionName = dataTypeElement.AttributeValue<string>("Name");
 
-                var dataTypeDefinitionId = dataTypeElement.AttributeValue<Guid>("Definition");
+                var dataTypeDefinitionId = dataTypeElement.RequiredAttributeValue<Guid>("Definition");
                 var databaseTypeAttribute = dataTypeElement.Attribute("DatabaseType");
 
                 var parentId = -1;
@@ -1076,8 +1113,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         private IReadOnlyList<IDictionaryItem> ImportDictionaryItems(IEnumerable<XElement> dictionaryItemElementList, List<ILanguage> languages, Guid? parentId, int userId)
         {
             var items = new List<IDictionaryItem>();
-            foreach (var dictionaryItemElement in dictionaryItemElementList)
+            foreach (XElement dictionaryItemElement in dictionaryItemElementList)
+            {
                 items.AddRange(ImportDictionaryItem(dictionaryItemElement, languages, parentId, userId));
+            }
 
             return items;
         }
@@ -1087,11 +1126,19 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var items = new List<IDictionaryItem>();
 
             IDictionaryItem dictionaryItem;
-            var key = dictionaryItemElement.Attribute("Key").Value;
-            if (_localizationService.DictionaryItemExists(key))
-                dictionaryItem = GetAndUpdateDictionaryItem(key, dictionaryItemElement, languages);
+            var itemName = dictionaryItemElement.Attribute("Name").Value;
+            Guid key = dictionaryItemElement.RequiredAttributeValue<Guid>("Key");
+            
+            dictionaryItem = _localizationService.GetDictionaryItemById(key);
+            if (dictionaryItem != null)
+            {
+                dictionaryItem = UpdateDictionaryItem(dictionaryItem, dictionaryItemElement, languages);
+            }
             else
-                dictionaryItem = CreateNewDictionaryItem(key, dictionaryItemElement, languages, parentId);
+            {
+                dictionaryItem = CreateNewDictionaryItem(key, itemName, dictionaryItemElement, languages, parentId);
+            }
+
             _localizationService.Save(dictionaryItem, userId);
             items.Add(dictionaryItem);
 
@@ -1099,23 +1146,29 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             return items;
         }
 
-        private IDictionaryItem GetAndUpdateDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages)
+        private IDictionaryItem UpdateDictionaryItem(IDictionaryItem dictionaryItem, XElement dictionaryItemElement, List<ILanguage> languages)
         {
-            var dictionaryItem = _localizationService.GetDictionaryItemByKey(key);
             var translations = dictionaryItem.Translations.ToList();
             foreach (var valueElement in dictionaryItemElement.Elements("Value").Where(v => DictionaryValueIsNew(translations, v)))
+            {
                 AddDictionaryTranslation(translations, valueElement, languages);
+            }
+
             dictionaryItem.Translations = translations;
             return dictionaryItem;
         }
 
-        private static DictionaryItem CreateNewDictionaryItem(string key, XElement dictionaryItemElement, List<ILanguage> languages, Guid? parentId)
+        private static DictionaryItem CreateNewDictionaryItem(Guid itemId, string itemName, XElement dictionaryItemElement, List<ILanguage> languages, Guid? parentId)
         {
-            var dictionaryItem = parentId.HasValue ? new DictionaryItem(parentId.Value, key) : new DictionaryItem(key);
+            DictionaryItem dictionaryItem = parentId.HasValue ? new DictionaryItem(parentId.Value, itemName) : new DictionaryItem(itemName);
+            dictionaryItem.Key = itemId;
+
             var translations = new List<IDictionaryTranslation>();
 
-            foreach (var valueElement in dictionaryItemElement.Elements("Value"))
+            foreach (XElement valueElement in dictionaryItemElement.Elements("Value"))
+            {
                 AddDictionaryTranslation(translations, valueElement, languages);
+            }
 
             dictionaryItem.Translations = translations;
             return dictionaryItem;
@@ -1134,7 +1187,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
             var languageId = valueElement.Attribute("LanguageCultureAlias").Value;
             var language = languages.SingleOrDefault(l => l.IsoCode == languageId);
             if (language == null)
+            {
                 return;
+            }
+
             var translation = new DictionaryTranslation(language, valueElement.Value);
             translations.Add(translation);
         }
@@ -1186,10 +1242,6 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
             foreach (var macro in macros)
             {
-                var existing = _macroService.GetByAlias(macro.Alias);
-                if (existing != null)
-                    macro.Id = existing.Id;
-
                 _macroService.Save(macro, userId);
             }
 
@@ -1198,6 +1250,7 @@ namespace Umbraco.Cms.Infrastructure.Packaging
 
         private IMacro ParseMacroElement(XElement macroElement)
         {
+            var macroKey = Guid.Parse(macroElement.Element("key").Value);
             var macroName = macroElement.Element("name").Value;
             var macroAlias = macroElement.Element("alias").Value;
             var macroSource = macroElement.Element("macroSource").Value;
@@ -1234,28 +1287,39 @@ namespace Umbraco.Cms.Infrastructure.Packaging
                 dontRender = bool.Parse(dontRenderElement.Value);
             }
 
-            var existingMacro = _macroService.GetByAlias(macroAlias) as Macro;
+            var existingMacro = _macroService.GetById(macroKey) as Macro;
             var macro = existingMacro ?? new Macro(_shortStringHelper, macroAlias, macroName, macroSource,
-                cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration);
+                cacheByPage, cacheByMember, dontRender, useInEditor, cacheDuration)
+            {
+                Key = macroKey
+            };
 
             var properties = macroElement.Element("properties");
             if (properties != null)
             {
                 int sortOrder = 0;
-                foreach (var property in properties.Elements())
+                foreach (XElement property in properties.Elements())
                 {
+                    var propertyKey = property.RequiredAttributeValue<Guid>("key");
                     var propertyName = property.Attribute("name").Value;
                     var propertyAlias = property.Attribute("alias").Value;
                     var editorAlias = property.Attribute("propertyType").Value;
-                    var sortOrderAttribute = property.Attribute("sortOrder");
+                    XAttribute sortOrderAttribute = property.Attribute("sortOrder");
                     if (sortOrderAttribute != null)
                     {
                         sortOrder = int.Parse(sortOrderAttribute.Value);
                     }
 
                     if (macro.Properties.Values.Any(x => string.Equals(x.Alias, propertyAlias, StringComparison.OrdinalIgnoreCase)))
+                    {
                         continue;
-                    macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias));
+                    }
+
+                    macro.Properties.Add(new MacroProperty(propertyAlias, propertyName, sortOrder, editorAlias)
+                    {
+                        Key = propertyKey
+                    });
+
                     sortOrder++;
                 }
             }

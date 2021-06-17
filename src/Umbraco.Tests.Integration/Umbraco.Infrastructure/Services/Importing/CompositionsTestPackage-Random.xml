@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <files />
   <info>
     <package>
-      <name>Composite Test</name>      
+      <name>Composite Test</name>
     </package>
   </info>
   <Documents>
@@ -20,6 +20,7 @@
     <DocumentType>
       <Info>
         <Name>Composite Test</Name>
+        <Key>eebd6e3a-91bc-4bac-be16-3c8d47ee3359</Key>
         <Alias>CompositeTest</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -43,6 +44,7 @@
     <DocumentType>
       <Info>
         <Name>Content</Name>
+        <Key>1c51fc0a-79f7-4d3f-9174-95a2628505de</Key>
         <Alias>Content</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -77,6 +79,7 @@
     <DocumentType>
       <Info>
         <Name>Meta</Name>
+        <Key>0e0ad7de-aff1-4e4b-af8c-85e790669412</Key>
         <Alias>Meta</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -121,6 +124,7 @@
     <DocumentType>
       <Info>
         <Name>SEO</Name>
+        <Key>cc58b45e-369c-4429-be1b-1b9f7acfd360</Key>
         <Alias>Seo</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>

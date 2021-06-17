@@ -38,6 +38,12 @@ namespace Umbraco.Cms.Core.Migrations
         }
 
         /// <summary>
+        /// If set to true the plan executor will ignore any current state persisted and
+        /// run the plan from its initial state to its end state.
+        /// </summary>
+        public virtual bool IgnoreCurrentState { get; } = false;
+
+        /// <summary>
         /// Gets the transitions.
         /// </summary>
         public IReadOnlyDictionary<string, Transition> Transitions => _transitions;

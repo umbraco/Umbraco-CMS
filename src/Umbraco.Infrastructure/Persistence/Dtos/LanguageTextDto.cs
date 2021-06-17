@@ -21,6 +21,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Dtos
         [ForeignKey(typeof(DictionaryDto), Column = "id")]
         public Guid UniqueId { get; set; }
 
+        // TODO: Need a unique constraint on LanguageId, UniqueId, Value
         [Column("value")]
         [Length(1000)]
         public string Value { get; set; }

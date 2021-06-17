@@ -55,8 +55,6 @@ namespace Umbraco.Cms.Infrastructure.Install
         {
             if (_runtimeState.RunUnattendedBootLogic())
             {
-                // TODO: Here is also where we would run package migrations!
-
                 switch (_runtimeState.Reason)
                 {
                     case RuntimeLevelReason.UpgradeMigrations:

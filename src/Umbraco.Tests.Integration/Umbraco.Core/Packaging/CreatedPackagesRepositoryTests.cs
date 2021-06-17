@@ -35,8 +35,7 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         [TearDown]
         public void DeleteTestFolder() =>
             Directory.Delete(HostingEnvironment.MapPathContentRoot("~/" + _testBaseFolder), true);
-
-        private IShortStringHelper ShortStringHelper => GetRequiredService<IShortStringHelper>();
+        
         private IContentService ContentService => GetRequiredService<IContentService>();
 
         private IContentTypeService ContentTypeService => GetRequiredService<IContentTypeService>();
@@ -52,8 +51,6 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
         private IEntityXmlSerializer EntityXmlSerializer => GetRequiredService<IEntityXmlSerializer>();
 
         private IHostingEnvironment HostingEnvironment => GetRequiredService<IHostingEnvironment>();
-
-        private IUmbracoVersion UmbracoVersion => GetRequiredService<IUmbracoVersion>();
 
         private IMediaService MediaService => GetRequiredService<IMediaService>();
 
@@ -153,6 +150,72 @@ namespace Umbraco.Cms.Tests.Integration.Umbraco.Core.Packaging
             Assert.AreEqual("updated", def.Name);
 
             // TODO: There's a whole lot more assertions to be done
+        }
+
+        [Test]
+        public void GivenNestedDictionaryItems_WhenPackageExported_ThenTheXmlIsNested()
+        {
+            var parent = new DictionaryItem("Parent")
+            {
+                Key = Guid.NewGuid()                
+            };
+            LocalizationService.Save(parent);
+            var child1 = new DictionaryItem(parent.Key, "Child1")
+            {
+                Key = Guid.NewGuid()
+            };
+            LocalizationService.Save(child1);
+            var child2 = new DictionaryItem(child1.Key, "Child2")
+            {
+                Key = Guid.NewGuid()
+            };
+            LocalizationService.Save(child2);
+            var child3 = new DictionaryItem(child2.Key, "Child3")
+            {
+                Key = Guid.NewGuid()
+            };
+            LocalizationService.Save(child3);
+            var child4 = new DictionaryItem(child3.Key, "Child4")
+            {
+                Key = Guid.NewGuid()
+            };
+            LocalizationService.Save(child4);
+
+            var def = new PackageDefinition
+            {
+                Name = "test",
+
+                // put these out of order to ensure that it doesn't matter.
+                DictionaryItems = new List<string>
+                {
+                    child2.Id.ToString(),
+                    child1.Id.ToString(),
+                    // we are missing 3 here so 4 will be orphaned and end up in the root
+                    child4.Id.ToString(),
+                    parent.Id.ToString()
+                }
+            };
+
+            PackageBuilder.SavePackage(def);
+            
+            string packageXmlPath = PackageBuilder.ExportPackage(def);
+
+            using (var stream = File.OpenRead(packageXmlPath))
+            {
+                var xml = XDocument.Load(stream);
+                var dictionaryItems = xml.Root.Element("DictionaryItems");
+                Assert.IsNotNull(dictionaryItems);
+                var rootItems = dictionaryItems.Elements("DictionaryItem").ToList();
+                Assert.AreEqual(2, rootItems.Count);
+                Assert.AreEqual("Child4", rootItems[0].AttributeValue<string>("Name"));
+                Assert.AreEqual("Parent", rootItems[1].AttributeValue<string>("Name"));
+                var children = rootItems[1].Elements("DictionaryItem").ToList();
+                Assert.AreEqual(1, children.Count);
+                Assert.AreEqual("Child1", children[0].AttributeValue<string>("Name"));
+                children = children[0].Elements("DictionaryItem").ToList();
+                Assert.AreEqual(1, children.Count);
+                Assert.AreEqual("Child2", children[0].AttributeValue<string>("Name"));
+            }
         }
 
         [Test]

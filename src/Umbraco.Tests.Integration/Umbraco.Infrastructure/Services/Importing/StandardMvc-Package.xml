@@ -3,11 +3,11 @@
   <info>
     <package>
       <name>StandardWebsiteMVC</name>
-    </package>    
+    </package>
   </info>
   <Documents>
     <DocumentSet importMode="root">
-      <Homepage id="1072" parentID="-1" level="1" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:39" updateDate="2013-02-17T09:10:47" nodeName="Home" urlName="home" path="-1,1072" isDoc="" nodeType="1062" creatorName="admin" writerName="admin" writerID="0" template="1049">
+      <Homepage key="9c9b55d0-2fbf-4f12-afea-023bd7b2519d" id="1072" parentID="-1" level="1" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:39" updateDate="2013-02-17T09:10:47" nodeName="Home" urlName="home" path="-1,1072" isDoc="" nodeType="1062" creatorName="admin" writerName="admin" writerID="0" template="1049">
         <slideshow><![CDATA[1091,1092,1093]]></slideshow>
         <panelContent1>
           <![CDATA[<h2>Built by Creative Founds</h2>
@@ -36,7 +36,7 @@
         <description><![CDATA[]]></description>
         <keywords><![CDATA[]]></keywords>
         <umbracoNaviHide>0</umbracoNaviHide>
-        <Standard id="1073" parentID="1072" level="2" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:40" updateDate="2013-02-17T09:17:48" nodeName="About" urlName="about" path="-1,1072,1073" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+        <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25190" id="1073" parentID="1072" level="2" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:40" updateDate="2013-02-17T09:17:48" nodeName="About" urlName="about" path="-1,1072,1073" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
           <bodyText>
             <![CDATA[<h2>About Us</h2>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur dictum, nisi non gravida blandit, odio nulla ultrices orci, quis blandit tortor libero vitae massa. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nulla at velit lacus.</p>
@@ -62,14 +62,14 @@
           <description><![CDATA[]]></description>
           <keywords><![CDATA[]]></keywords>
           <umbracoNaviHide>0</umbracoNaviHide>
-          <Standard id="1074" parentID="1073" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:04:46" nodeName="Sub Navigation 1" urlName="sub-navigation-1" path="-1,1072,1073,1074" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+          <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25199" id="1074" parentID="1073" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:04:46" nodeName="Sub Navigation 1" urlName="sub-navigation-1" path="-1,1072,1073,1074" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
             <bodyText><![CDATA[]]></bodyText>
             <contentPanels><![CDATA[]]></contentPanels>
             <title />
             <description><![CDATA[]]></description>
             <keywords><![CDATA[]]></keywords>
             <umbracoNaviHide>0</umbracoNaviHide>
-            <Standard id="1075" parentID="1074" level="4" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:04:46" nodeName="3rd level nav 2" urlName="3rd-level-nav-2" path="-1,1072,1073,1074,1075" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+            <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25198" id="1075" parentID="1074" level="4" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:04:46" nodeName="3rd level nav 2" urlName="3rd-level-nav-2" path="-1,1072,1073,1074,1075" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
               <bodyText><![CDATA[]]></bodyText>
               <contentPanels><![CDATA[]]></contentPanels>
               <title />
@@ -78,7 +78,7 @@
               <umbracoNaviHide>0</umbracoNaviHide>
             </Standard>
           </Standard>
-          <Standard id="1076" parentID="1073" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:04:46" nodeName="Sub Navigation 2" urlName="sub-navigation-2" path="-1,1072,1073,1076" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+          <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25197" id="1076" parentID="1073" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:04:46" nodeName="Sub Navigation 2" urlName="sub-navigation-2" path="-1,1072,1073,1076" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
             <bodyText><![CDATA[]]></bodyText>
             <contentPanels><![CDATA[]]></contentPanels>
             <title />
@@ -87,14 +87,14 @@
             <umbracoNaviHide>0</umbracoNaviHide>
           </Standard>
         </Standard>
-        <Standard id="1077" parentID="1072" level="2" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:10:47" nodeName="News" urlName="news" path="-1,1072,1077" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1046">
+        <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25196" id="1077" parentID="1072" level="2" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:41" updateDate="2013-02-17T09:10:47" nodeName="News" urlName="news" path="-1,1072,1077" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1046">
           <bodyText><![CDATA[<h2>News</h2>]]></bodyText>
           <contentPanels><![CDATA[]]></contentPanels>
           <title />
           <description><![CDATA[]]></description>
           <keywords><![CDATA[]]></keywords>
           <umbracoNaviHide>0</umbracoNaviHide>
-          <NewsArticle id="1078" parentID="1077" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:11:22" nodeName="Article 1" urlName="article-1" path="-1,1072,1077,1078" isDoc="" nodeType="1063" creatorName="admin" writerName="admin" writerID="0" template="1053">
+          <NewsArticle key="9c9b55d0-2fbf-4f12-afea-023bd7b25195" id="1078" parentID="1077" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:11:22" nodeName="Article 1" urlName="article-1" path="-1,1072,1077,1078" isDoc="" nodeType="1063" creatorName="admin" writerName="admin" writerID="0" template="1053">
             <articleSummary><![CDATA[Here is an article summary, you can add as much of a description as you require.]]></articleSummary>
             <articleDate>2012-11-08T00:00:00</articleDate>
             <bodyText>
@@ -109,7 +109,7 @@
             <umbracoNaviHide>0</umbracoNaviHide>
           </NewsArticle>
         </Standard>
-        <Standard id="1079" parentID="1072" level="2" creatorID="0" sortOrder="2" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:10:55" nodeName="Clients" urlName="clients" path="-1,1072,1079" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+        <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25194" id="1079" parentID="1072" level="2" creatorID="0" sortOrder="2" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:10:55" nodeName="Clients" urlName="clients" path="-1,1072,1079" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
           <bodyText>
             <![CDATA[<h2>Clients</h2>
 <p><strong>This is a standard content page.</strong></p>
@@ -123,7 +123,7 @@
           <keywords><![CDATA[]]></keywords>
           <umbracoNaviHide>0</umbracoNaviHide>
         </Standard>
-        <ContactForm id="1080" parentID="1072" level="2" creatorID="0" sortOrder="3" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:04:46" nodeName="Contact Us" urlName="contact-us" path="-1,1072,1080" isDoc="" nodeType="1059" creatorName="admin" writerName="admin" writerID="0" template="1048">
+        <ContactForm key="9c9b55d0-2fbf-4f12-afea-023bd7b25193" id="1080" parentID="1072" level="2" creatorID="0" sortOrder="3" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:04:46" nodeName="Contact Us" urlName="contact-us" path="-1,1072,1080" isDoc="" nodeType="1059" creatorName="admin" writerName="admin" writerID="0" template="1048">
           <recipientEmailAddress>chriskoiak@gmail.com</recipientEmailAddress>
           <emailSubject>Standard Website Contact Form</emailSubject>
           <thankYouPage>1124</thankYouPage>
@@ -138,7 +138,7 @@
           <description><![CDATA[]]></description>
           <keywords><![CDATA[]]></keywords>
           <umbracoNaviHide>0</umbracoNaviHide>
-          <Standard id="1081" parentID="1080" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:04:46" nodeName="Thank You" urlName="thank-you" path="-1,1072,1080,1081" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+          <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25192" id="1081" parentID="1080" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:04:46" nodeName="Thank You" urlName="thank-you" path="-1,1072,1080,1081" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
             <bodyText><![CDATA[<p><strong>Email sent successfully</strong></p>]]></bodyText>
             <contentPanels><![CDATA[]]></contentPanels>
             <title />
@@ -147,7 +147,7 @@
             <umbracoNaviHide>1</umbracoNaviHide>
           </Standard>
         </ContactForm>
-        <Standard id="1082" parentID="1072" level="2" creatorID="0" sortOrder="4" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:10:47" nodeName="Search" urlName="search" path="-1,1072,1082" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1051">
+        <Standard key="9c9b55d0-2fbf-4f12-afea-023bd7b25191" id="1082" parentID="1072" level="2" creatorID="0" sortOrder="4" createDate="2013-02-17T09:04:42" updateDate="2013-02-17T09:10:47" nodeName="Search" urlName="search" path="-1,1072,1082" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1051">
           <bodyText><![CDATA[<h2>Search</h2>]]></bodyText>
           <contentPanels><![CDATA[]]></contentPanels>
           <title />
@@ -155,7 +155,7 @@
           <keywords><![CDATA[]]></keywords>
           <umbracoNaviHide>0</umbracoNaviHide>
         </Standard>
-        <Standard id="1083" parentID="1072" level="2" creatorID="0" sortOrder="5" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:10:47" nodeName="Sitemap" urlName="sitemap" path="-1,1072,1083" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1052">
+        <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25190" id="1083" parentID="1072" level="2" creatorID="0" sortOrder="5" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:10:47" nodeName="Sitemap" urlName="sitemap" path="-1,1072,1083" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1052">
           <bodyText>
             <![CDATA[<h2>Sitemap</h2>
 <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur dictum, nisi non gravida blandit, odio nulla ultrices orci, quis blandit tortor libero vitae massa.<a href="/contact-us.aspx"><br /></a></p>]]>
@@ -166,16 +166,16 @@
           <keywords><![CDATA[]]></keywords>
           <umbracoNaviHide>0</umbracoNaviHide>
         </Standard>
-        <ClientArea id="1084" parentID="1072" level="2" creatorID="0" sortOrder="6" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Client Area" urlName="client-area" path="-1,1072,1084" isDoc="" nodeType="1056" creatorName="admin" writerName="admin" writerID="0" template="1047">
+        <ClientArea key="8c9b55d0-2fbf-4f12-afea-023bd7b25199" id="1084" parentID="1072" level="2" creatorID="0" sortOrder="6" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Client Area" urlName="client-area" path="-1,1072,1084" isDoc="" nodeType="1056" creatorName="admin" writerName="admin" writerID="0" template="1047">
           <umbracoNaviHide>0</umbracoNaviHide>
-          <Standard id="1085" parentID="1084" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Client Area 1" urlName="client-area-1" path="-1,1072,1084,1085" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+          <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25198" id="1085" parentID="1084" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Client Area 1" urlName="client-area-1" path="-1,1072,1084,1085" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
             <bodyText><![CDATA[]]></bodyText>
             <contentPanels><![CDATA[]]></contentPanels>
             <title />
             <description><![CDATA[]]></description>
             <keywords><![CDATA[]]></keywords>
             <umbracoNaviHide>0</umbracoNaviHide>
-            <Standard id="1086" parentID="1085" level="4" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Page 1" urlName="page-1" path="-1,1072,1084,1085,1086" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+            <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25197" id="1086" parentID="1085" level="4" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Page 1" urlName="page-1" path="-1,1072,1084,1085,1086" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
               <bodyText><![CDATA[]]></bodyText>
               <contentPanels><![CDATA[]]></contentPanels>
               <title />
@@ -184,7 +184,7 @@
               <umbracoNaviHide>0</umbracoNaviHide>
             </Standard>
           </Standard>
-          <Standard id="1087" parentID="1084" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Client Area 2" urlName="client-area-2" path="-1,1072,1084,1087" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+          <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25196" id="1087" parentID="1084" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:43" updateDate="2013-02-17T09:04:46" nodeName="Client Area 2" urlName="client-area-2" path="-1,1072,1084,1087" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
             <bodyText><![CDATA[]]></bodyText>
             <contentPanels><![CDATA[]]></contentPanels>
             <title />
@@ -193,7 +193,7 @@
             <umbracoNaviHide>0</umbracoNaviHide>
           </Standard>
         </ClientArea>
-        <Standard id="1088" parentID="1072" level="2" creatorID="0" sortOrder="7" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Insufficent Access" urlName="insufficent-access" path="-1,1072,1088" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
+        <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25195" id="1088" parentID="1072" level="2" creatorID="0" sortOrder="7" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Insufficent Access" urlName="insufficent-access" path="-1,1072,1088" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1053">
           <bodyText>
             <![CDATA[<h2>Insufficent Access</h2>
 <p>You have tried to access a page you do not have access to.</p>]]>
@@ -204,7 +204,7 @@
           <keywords><![CDATA[]]></keywords>
           <umbracoNaviHide>1</umbracoNaviHide>
         </Standard>
-        <Standard id="1089" parentID="1072" level="2" creatorID="0" sortOrder="8" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:10:47" nodeName="Login" urlName="login" path="-1,1072,1089" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1050">
+        <Standard key="8c9b55d0-2fbf-4f12-afea-023bd7b25194" id="1089" parentID="1072" level="2" creatorID="0" sortOrder="8" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:10:47" nodeName="Login" urlName="login" path="-1,1072,1089" isDoc="" nodeType="1058" creatorName="admin" writerName="admin" writerID="0" template="1050">
           <bodyText><![CDATA[<h2>Login</h2>]]></bodyText>
           <contentPanels><![CDATA[]]></contentPanels>
           <title />
@@ -212,9 +212,9 @@
           <keywords><![CDATA[]]></keywords>
           <umbracoNaviHide>1</umbracoNaviHide>
         </Standard>
-        <Slideshow id="1090" parentID="1072" level="2" creatorID="0" sortOrder="9" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Slideshow" urlName="slideshow" path="-1,1072,1090" isDoc="" nodeType="1065" creatorName="admin" writerName="admin" writerID="0" template="0">
+        <Slideshow key="8c9b55d0-2fbf-4f12-afea-023bd7b25193" id="1090" parentID="1072" level="2" creatorID="0" sortOrder="9" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Slideshow" urlName="slideshow" path="-1,1072,1090" isDoc="" nodeType="1065" creatorName="admin" writerName="admin" writerID="0" template="0">
           <umbracoNaviHide>0</umbracoNaviHide>
-          <Slide id="1091" parentID="1090" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Purple Hat" urlName="purple-hat" path="-1,1072,1090,1091" isDoc="" nodeType="1064" creatorName="admin" writerName="admin" writerID="0" template="0">
+          <Slide key="8c9b55d0-2fbf-4f12-afea-023bd7b25192" id="1091" parentID="1090" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Purple Hat" urlName="purple-hat" path="-1,1072,1090,1091" isDoc="" nodeType="1064" creatorName="admin" writerName="admin" writerID="0" template="0">
             <mainImage>/media/1813/cap.png</mainImage>
             <bodyText>
               <![CDATA[<h3>Standard Website MVC</h3>
@@ -224,7 +224,7 @@
             </bodyText>
             <umbracoNaviHide>1</umbracoNaviHide>
           </Slide>
-          <Slide id="1092" parentID="1090" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Red Dice" urlName="red-dice" path="-1,1072,1090,1092" isDoc="" nodeType="1064" creatorName="admin" writerName="admin" writerID="0" template="0">
+          <Slide key="8c9b55d0-2fbf-4f12-afea-023bd7b25191" id="1092" parentID="1090" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Red Dice" urlName="red-dice" path="-1,1072,1090,1092" isDoc="" nodeType="1064" creatorName="admin" writerName="admin" writerID="0" template="0">
             <mainImage>/media/1824/dice.png</mainImage>
             <bodyText>
               <![CDATA[<h3>Secure Client Areas</h3>
@@ -234,7 +234,7 @@
             </bodyText>
             <umbracoNaviHide>1</umbracoNaviHide>
           </Slide>
-          <Slide id="1093" parentID="1090" level="3" creatorID="0" sortOrder="2" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Umbraco Speechbubble" urlName="umbraco-speechbubble" path="-1,1072,1090,1093" isDoc="" nodeType="1064" creatorName="admin" writerName="admin" writerID="0" template="0">
+          <Slide key="7c9b55d0-2fbf-4f12-afea-023bd7b25190" id="1093" parentID="1090" level="3" creatorID="0" sortOrder="2" createDate="2013-02-17T09:04:44" updateDate="2013-02-17T09:04:46" nodeName="Umbraco Speechbubble" urlName="umbraco-speechbubble" path="-1,1072,1090,1093" isDoc="" nodeType="1064" creatorName="admin" writerName="admin" writerID="0" template="0">
             <mainImage>/media/2075/chat.jpg</mainImage>
             <bodyText>
               <![CDATA[<h3>News List</h3>
@@ -245,9 +245,9 @@
             <umbracoNaviHide>1</umbracoNaviHide>
           </Slide>
         </Slideshow>
-        <ContentPanels id="1094" parentID="1072" level="2" creatorID="0" sortOrder="10" createDate="2013-02-17T09:04:45" updateDate="2013-02-17T09:04:46" nodeName="Content Panels" urlName="content-panels" path="-1,1072,1094" isDoc="" nodeType="1061" creatorName="admin" writerName="admin" writerID="0" template="0">
+        <ContentPanels key="7c9b55d0-2fbf-4f12-afea-023bd7b25199" id="1094" parentID="1072" level="2" creatorID="0" sortOrder="10" createDate="2013-02-17T09:04:45" updateDate="2013-02-17T09:04:46" nodeName="Content Panels" urlName="content-panels" path="-1,1072,1094" isDoc="" nodeType="1061" creatorName="admin" writerName="admin" writerID="0" template="0">
           <umbracoNaviHide>1</umbracoNaviHide>
-          <ContentPanel id="1095" parentID="1094" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:45" updateDate="2013-02-17T09:04:46" nodeName="Introductory Offers" urlName="introductory-offers" path="-1,1072,1094,1095" isDoc="" nodeType="1060" creatorName="admin" writerName="admin" writerID="0" template="0">
+          <ContentPanel key="7c9b55d0-2fbf-4f12-afea-023bd7b25198" id="1095" parentID="1094" level="3" creatorID="0" sortOrder="0" createDate="2013-02-17T09:04:45" updateDate="2013-02-17T09:04:46" nodeName="Introductory Offers" urlName="introductory-offers" path="-1,1072,1094,1095" isDoc="" nodeType="1060" creatorName="admin" writerName="admin" writerID="0" template="0">
             <bodyText>
               <![CDATA[
 <h3>Introductory Offers</h3>
@@ -263,7 +263,7 @@
             </bodyText>
             <umbracoNaviHide>1</umbracoNaviHide>
           </ContentPanel>
-          <ContentPanel id="1096" parentID="1094" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:45" updateDate="2013-02-17T09:04:46" nodeName="Sample Panel" urlName="sample-panel" path="-1,1072,1094,1096" isDoc="" nodeType="1060" creatorName="admin" writerName="admin" writerID="0" template="0">
+          <ContentPanel key="7c9b55d0-2fbf-4f12-afea-023bd7b25197" id="1096" parentID="1094" level="3" creatorID="0" sortOrder="1" createDate="2013-02-17T09:04:45" updateDate="2013-02-17T09:04:46" nodeName="Sample Panel" urlName="sample-panel" path="-1,1072,1094,1096" isDoc="" nodeType="1060" creatorName="admin" writerName="admin" writerID="0" template="0">
             <bodyText>
               <![CDATA[<p><strong>Sample Panel</strong></p>
 <p>Don't you just love MVC?</p>
@@ -282,6 +282,7 @@
     <DocumentType>
       <Info>
         <Name>Base</Name>
+        <Key>2db296c1-5c60-45e9-b6d3-8148926dd863</Key>
         <Alias>Base</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -312,6 +313,7 @@
     <DocumentType>
       <Info>
         <Name>Client Area Folder</Name>
+        <Key>84d692d2-11fe-45ba-927e-2c4ecdb11400</Key>
         <Alias>ClientArea</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -334,6 +336,7 @@
     <DocumentType>
       <Info>
         <Name>Content Master</Name>
+        <Key>f6d25616-9f16-4c70-9e8c-e0ad4cd92dfc</Key>
         <Alias>ContentMaster</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -391,6 +394,7 @@
     <DocumentType>
       <Info>
         <Name>Standard</Name>
+        <Key>95a532e7-064f-4651-a619-786f4beac7c1</Key>
         <Alias>Standard</Alias>
         <Icon>.sprTreeDoc</Icon>
         <Thumbnail>doc.png</Thumbnail>
@@ -449,6 +453,7 @@
     <DocumentType>
       <Info>
         <Name>ContactForm</Name>
+        <Key>67ce11c5-0493-4d8f-9678-d131bd8996ea</Key>
         <Alias>ContactForm</Alias>
         <Icon>newsletter.gif</Icon>
         <Thumbnail>doc.png</Thumbnail>
@@ -520,6 +525,7 @@
     <DocumentType>
       <Info>
         <Name>ContentPanel</Name>
+        <Key>503b6a5e-69b6-444a-a728-074a1b201b84</Key>
         <Alias>ContentPanel</Alias>
         <Icon>.sprTreeDoc</Icon>
         <Thumbnail>doc.png</Thumbnail>
@@ -555,6 +561,7 @@
     <DocumentType>
       <Info>
         <Name>ContentPanels</Name>
+        <Key>3d1433fc-22a2-4a70-b7cb-b7fafe4a0622</Key>
         <Alias>ContentPanels</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -575,6 +582,7 @@
     <DocumentType>
       <Info>
         <Name>Homepage</Name>
+        <Key>a5f79cf6-9a2f-4672-ab56-f8bb31fdbb20</Key>
         <Alias>Homepage</Alias>
         <Icon>.sprTreeSettingDomain</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -784,6 +792,7 @@
     <DocumentType>
       <Info>
         <Name>NewsArticle</Name>
+        <Key>c4662a2d-4698-4880-9243-2e449d9e0cfd</Key>
         <Alias>NewsArticle</Alias>
         <Icon>doc.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -831,6 +840,7 @@
     <DocumentType>
       <Info>
         <Name>Slide</Name>
+        <Key>cf2153f2-4881-442b-ab58-50c1c786522b</Key>
         <Alias>Slide</Alias>
         <Icon>.sprTreeMediaPhoto</Icon>
         <Thumbnail>docWithImage.png</Thumbnail>
@@ -877,6 +887,7 @@
     <DocumentType>
       <Info>
         <Name>Slideshow</Name>
+        <Key>9acb68aa-03e1-4474-823d-c21af8356756</Key>
         <Alias>Slideshow</Alias>
         <Icon>.sprTreeFolder</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -2041,6 +2052,7 @@ table th, td {border: 0px solid #fff;}
   </Stylesheets>
   <Macros>
     <macro>
+      <key>E4F0830F-26AB-4CE9-BD71-98273875C4C0</key>
       <name>Map</name>
       <alias>Map</alias>
       <scriptType>
