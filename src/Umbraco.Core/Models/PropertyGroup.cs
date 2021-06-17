@@ -28,6 +28,7 @@ namespace Umbraco.Core.Models
         public PropertyGroup(PropertyTypeCollection propertyTypeCollection)
         {
             PropertyTypes = propertyTypeCollection;
+            Level = 1; // TODO We default to 1 (property group) for backwards compatibility, but should use zero/no default at some point.
         }
 
         private void PropertyTypesChanged(object sender, NotifyCollectionChangedEventArgs e)
