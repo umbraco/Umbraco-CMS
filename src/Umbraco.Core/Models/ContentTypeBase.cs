@@ -348,7 +348,7 @@ namespace Umbraco.Core.Models
             // get new group, if required, and ensure it exists
             var newPropertyGroup = propertyGroupName == null
                 ? null
-                : PropertyGroups.FirstOrDefault(x => x.Name == propertyGroupName);
+                : PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName) && x.ParentKey == null && x.Level == 1);
             if (propertyGroupName != null && newPropertyGroup == null) return false;
 
             // get old group
@@ -403,11 +403,11 @@ namespace Umbraco.Core.Models
         public void RemovePropertyGroup(string propertyGroupName)
         {
             // if no group exists with that name, do nothing
-            var group = PropertyGroups[propertyGroupName];
+            var group = PropertyGroups.FirstOrDefault(x => x.Name.InvariantEquals(propertyGroupName) && x.ParentKey == null && x.Level == 1);
             if (group == null) return;
 
             // first remove the group
-            PropertyGroups.RemoveItem(propertyGroupName);
+            PropertyGroups.Remove(group);
 
             // Then re-assign the group's properties to no group
             foreach (var property in group.PropertyTypes)
