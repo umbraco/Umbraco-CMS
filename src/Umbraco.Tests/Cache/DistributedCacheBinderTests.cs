@@ -9,6 +9,7 @@ using Umbraco.Core.Events;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.Membership;
 using Umbraco.Core.Services;
+using Umbraco.Core.Services.Changes;
 using Umbraco.Tests.Testing;
 using Umbraco.Tests.Testing.Objects.Accessors;
 using Umbraco.Web;
@@ -148,7 +149,6 @@ namespace Umbraco.Tests.Cache
             {
                 // works because that event definition maps to an empty handler
                 new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, Current.Services.ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>()), "Saved"),
-
             };
 
             var umbracoContextFactory = new UmbracoContextFactory(
@@ -165,6 +165,20 @@ namespace Umbraco.Tests.Cache
             // just assert it does not throw
             var refreshers = new DistributedCacheBinder(null, umbracoContextFactory, null);
             refreshers.HandleEvents(definitions);
+        }
+
+        [Test]
+        public void OnlyHandlesOnContentTypeEvent()
+        {
+            var definitions = new IEventDefinition[]
+            {
+                new EventDefinition<IContentTypeService, ContentTypeChange<IContentType>.EventArgs>(null, Current.Services.ContentTypeService, new ContentTypeChange<IContentType>.EventArgs(Enumerable.Empty<ContentTypeChange<IContentType>>()), "Changed"),
+                new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, Current.Services.ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>()), "Saved"),
+                new EventDefinition<IContentTypeService, ContentTypeChange<IContentType>.EventArgs>(null, Current.Services.ContentTypeService, new ContentTypeChange<IContentType>.EventArgs(Enumerable.Empty<ContentTypeChange<IContentType>>()), "Changed"),
+                new EventDefinition<IContentTypeService, SaveEventArgs<IContentType>>(null, Current.Services.ContentTypeService, new SaveEventArgs<IContentType>(Enumerable.Empty<IContentType>()), "Saved"),
+            };
+            var result = DistributedCacheBinder.GetReducedEventList(definitions);
+            Assert.AreEqual(1, result.Count());
         }
     }
 }

@@ -26,7 +26,7 @@ angular.module("umbraco.directives")
                     forceUpdate: '@?'
                 },
 
-                link: function (scope, element, attrs) {
+                link: function (scope, element, attrs, windowResizeListener) {
 
                     var unsubscribe = [];
                     let sliderRef = null;
