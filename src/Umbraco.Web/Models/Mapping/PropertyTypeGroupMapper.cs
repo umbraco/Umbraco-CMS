@@ -200,7 +200,7 @@ namespace Umbraco.Web.Models.Mapping
                 group.ParentTabContentTypeNames = parentGroups.SelectMany(x => x.ParentTabContentTypeNames).ToArray();
             }
 
-            return groups.OrderBy(x => x.Level).ThenBy(x => x.SortOrder);
+            return groups.OrderBy(x => x.Level).ThenBy(x => x.SortOrder).ToArray();
         }
 
         private IEnumerable<TPropertyType> MapProperties(IEnumerable<PropertyType> properties, IContentTypeBase contentType, int groupId, bool inherited)
