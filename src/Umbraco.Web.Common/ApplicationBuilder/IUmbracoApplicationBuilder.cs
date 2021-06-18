@@ -4,7 +4,7 @@ using Umbraco.Cms.Core.Services;
 
 namespace Umbraco.Cms.Web.Common.ApplicationBuilder
 {
-    public interface IUmbracoApplicationBuilder : IUmbracoMiddlewareBuilder
+    public interface IUmbracoApplicationBuilder
     {
         /// <summary>
         /// Called to include umbraco middleware

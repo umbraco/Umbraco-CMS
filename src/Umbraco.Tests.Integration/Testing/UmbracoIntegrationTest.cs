@@ -90,9 +90,13 @@ namespace Umbraco.Cms.Tests.Integration.Testing
             s_firstTestInSession = false;
 
             // Ensure CoreRuntime stopped (now it's a HostedService)
-            IHost host = Services.GetRequiredService<IHost>();
-            await host.StopAsync();
-            host.Dispose();
+            IHost host = Services?.GetService<IHost>();
+            if (host is not null)
+            {
+                await host.StopAsync();
+                host.Dispose();
+            }
+
         }
 
         [TearDown]

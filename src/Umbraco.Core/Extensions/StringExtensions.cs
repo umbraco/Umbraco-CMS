@@ -186,7 +186,7 @@ namespace Umbraco.Extensions
         /// This methods ensures that the resulting URL is structured correctly, that there's only one '?' and that things are
         /// delimited properly with '&'
         /// </remarks>
-        internal static string AppendQueryStringToUrl(this string url, params string[] queryStrings)
+        public static string AppendQueryStringToUrl(this string url, params string[] queryStrings)
         {
             //remove any prefixed '&' or '?'
             for (var i = 0; i < queryStrings.Length; i++)

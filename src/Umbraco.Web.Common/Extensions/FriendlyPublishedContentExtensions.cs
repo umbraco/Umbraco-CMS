@@ -109,6 +109,9 @@ namespace Umbraco.Extensions
         public static bool IsAllowedTemplate(this IPublishedContent content, int templateId)
             => content.IsAllowedTemplate(ContentTypeService, WebRoutingSettings.Value, templateId);
 
+        public static bool IsAllowedTemplate(this IPublishedContent content, string templateAlias)
+            => content.IsAllowedTemplate(WebRoutingSettings.Value.DisableAlternativeTemplates, WebRoutingSettings.Value.ValidateAlternativeTemplates, templateAlias);
+
         public static bool IsAllowedTemplate(
             this IPublishedContent content,
             bool disableAlternativeTemplates,

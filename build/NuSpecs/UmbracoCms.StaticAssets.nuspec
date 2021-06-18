@@ -28,6 +28,6 @@
         <file src="tools\ReadmeUpgrade.txt" target="ReadmeUpgrade.txt" />
 
         <!-- UmbracoCms props and targets used to copy the content into the solution -->
-        <file src="build\**" target="build\" />
+        <file src="build\**" target="buildTransitive\" />
     </files>
 </package>
