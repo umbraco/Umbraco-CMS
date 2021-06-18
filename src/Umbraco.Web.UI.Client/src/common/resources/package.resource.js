@@ -29,7 +29,8 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
         $http.post(
           umbRequestHelper.getApiUrl(
             "packageApiBaseUrl",
-            "RunMigrations"), { packageName: packageName }),
+            "RunMigrations",
+            { packageName: packageName })),
         'Failed to run migrations for package');
     },
 

@@ -20,6 +20,15 @@ namespace Umbraco.Cms.Core.Packaging
         [DataMember(Name = "plans")]
         public IEnumerable<InstalledPackageMigrationPlans> PackageMigrationPlans { get; set; } = Enumerable.Empty<InstalledPackageMigrationPlans>();
 
+        /// <summary>
+        /// It the package contains any migrations at all
+        /// </summary>
+        [DataMember(Name = "hasMigrations")]
+        public bool HasMigrations => PackageMigrationPlans.Any();
+
+        /// <summary>
+        /// If the package has any pending migrations to run
+        /// </summary>
         [DataMember(Name = "hasPendingMigrations")]
         public bool HasPendingMigrations => PackageMigrationPlans.Any(x => x.HasPendingMigrations);
     }

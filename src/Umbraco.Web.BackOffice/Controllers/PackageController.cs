@@ -118,7 +118,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
         }
 
         [HttpPost]
-        public ActionResult<IEnumerable<InstalledPackage>> RunMigrations(string packageName)
+        public ActionResult<IEnumerable<InstalledPackage>> RunMigrations([FromQuery]string packageName)
         {
             IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
             IReadOnlyList<string> pendingMigrations = _pendingPackageMigrations.GetPendingPackageMigrations(keyValues);
@@ -134,10 +134,10 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogError(ex, "Package migration failed on package {Package} for {Plan}", packageName, plan.Name);
+                        _logger.LogError(ex, "Package migration failed on package {Package} for plan {Plan}", packageName, plan.Name);
 
                         return ValidationErrorResult.CreateNotificationValidationErrorResult(
-                            $"Package migration failed on package {packageName} for {plan.Name} with error: {ex.Message}. Check log for full details.");
+                            $"Package migration failed on package {packageName} for plan {plan.Name} with error: {ex.Message}. Check log for full details.");
                     }
                 }
             }

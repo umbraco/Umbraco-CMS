@@ -5,11 +5,13 @@
 
     var vm = this;
 
+    vm.confirmMigrations = confirmMigrations;
     vm.packageOptions = packageOptions;
     vm.runMigrations = runMigrations;
     vm.state = "list";
     vm.installState = {
-      status: ""
+      status: "",
+      state: ""
     };
     vm.package = {};
 
@@ -20,17 +22,13 @@
         .then(function (packs) {
           vm.installedPackages = packs;
         });
-      vm.installState.status = "";
-      vm.state = "list";
-
+      
       var labelKeys = [
-        "packager_installStateUninstalling",
-        "packager_installStateComplete"
+        "packager_packageMigrationsComplete"
       ];
 
       localizationService.localizeMany(labelKeys).then(function (values) {
-        labels.installStateUninstalling = values[0];
-        labels.installStateComplete = values[1];
+        labels.packageMigrationsComplete = values[0];
       });
     }
 
@@ -39,10 +37,23 @@
         .search("packageId", null); //ensure the installId flag is gone, it's only available on first install
     }
 
+    function confirmMigrations(pck) {
+      vm.state = "runMigration";
+      vm.package = pck;
+      vm.installState.state = "";
+      vm.installState.status = "";
+    }
+
     function runMigrations(pck) {
+      vm.installState.state = "running";
       packageResource.runMigrations(pck.name)
         .then(function (packs) {
+          vm.installState.state = "success";
+          vm.installState.status = labels.packageMigrationsComplete;
           vm.installedPackages = packs;
+        }, function (err) {
+          vm.installState.state = "error";
+          vm.installState.status = err.data.message;
         });
     }
 
