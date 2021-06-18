@@ -127,7 +127,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
 
             model.Username = (model.UsernameIsEmail || model.Username == null) ? model.Email : model.Username;
 
-            var identityUser = MemberIdentityUser.CreateNew(model.Username, model.Email, model.MemberTypeAlias, model.Name);
+            var identityUser = MemberIdentityUser.CreateNew(model.Username, model.Email, model.MemberTypeAlias, true, model.Name);
             IdentityResult identityResult = await _memberManager.CreateAsync(
                 identityUser,
                 model.Password);
@@ -142,6 +142,7 @@ namespace Umbraco.Cms.Web.Website.Controllers
                     // should never happen
                     throw new InvalidOperationException($"Could not find a member with key: {member.Key}.");
                 }
+
                 if (model.MemberProperties != null)
                 {
                     foreach (MemberPropertyModel property in model.MemberProperties.Where(p => p.Value != null)
@@ -159,7 +160,6 @@ namespace Umbraco.Cms.Web.Website.Controllers
             }
 
             return identityResult;
-
         }
     }
 }

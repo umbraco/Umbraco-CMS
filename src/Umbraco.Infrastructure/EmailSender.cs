@@ -7,7 +7,7 @@ using Microsoft.Extensions.Options;
 using Umbraco.Cms.Core.Configuration.Models;
 using Umbraco.Cms.Core.Events;
 using Umbraco.Cms.Core.Mail;
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Infrastructure.Extensions;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
@@ -53,7 +53,8 @@ namespace Umbraco.Cms.Infrastructure
             {
                 if (enableNotification)
                 {
-                    await _eventAggregator.PublishAsync(new SendEmailNotification(message));
+                    await _eventAggregator.PublishAsync(
+                        new SendEmailNotification(message.ToNotificationEmail(_globalSettings.Smtp?.From)));
                 }
                 return;
             }

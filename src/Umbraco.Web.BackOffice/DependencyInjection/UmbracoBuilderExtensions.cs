@@ -1,6 +1,7 @@
 using System.Linq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Umbraco.Cms.Core.Cache;
 using Umbraco.Cms.Core.DependencyInjection;
 using Umbraco.Cms.Core.Hosting;
 using Umbraco.Cms.Core.IO;
@@ -49,6 +50,8 @@ namespace Umbraco.Extensions
                 .AddDistributedCache()
                 .AddModelsBuilderDashboard()
                 .AddUnattendedInstallInstallCreateUser()
+                .AddCoreNotifications()
+                .AddLogViewer()
                 .AddExamine()
                 .AddExamineIndexes();
 
@@ -57,7 +60,6 @@ namespace Umbraco.Extensions
             builder.AddNotificationAsyncHandler<UnattendedInstallNotification, CreateUnattendedUserNotificationHandler>();
             return builder;
         }
-
 
         /// <summary>
         /// Adds Umbraco preview support

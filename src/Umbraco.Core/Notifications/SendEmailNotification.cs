@@ -1,11 +1,11 @@
-using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Email;
 
 namespace Umbraco.Cms.Core.Notifications
 {
     public class SendEmailNotification : INotification
     {
-        public SendEmailNotification(EmailMessage message) => Message = message;
+        public SendEmailNotification(NotificationEmailModel message) => Message = message;
 
-        public EmailMessage Message { get; set; }
+        public NotificationEmailModel Message { get; }
     }
 }

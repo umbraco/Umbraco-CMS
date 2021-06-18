@@ -401,7 +401,7 @@ stages:
                       publishJUnitResults: true
                       testResultsFiles: '**\TESTS-*.xml'
                 - task: PowerShell@1
-                  displayName: Prepare Packages & Zip
+                  displayName: Prepare Packages
                   inputs:
                       scriptType: inlineScript
                       inlineScript: |
@@ -410,19 +410,6 @@ stages:
 
                           $ubuild.CompileUmbraco()
                           $ubuild.PreparePackages()
-                          $ubuild.PackageZip()
-                - task: CopyFiles@2
-                  displayName: Copy Zip Files to Staging
-                  inputs:
-                      SourceFolder: build.out
-                      Contents: '*.zip'
-                      TargetFolder: $(build.artifactstagingdirectory)
-                      CleanTargetFolder: true
-                - task: PublishBuildArtifacts@1
-                  displayName: Publish Zip Files
-                  inputs:
-                      PathtoPublish: $(build.artifactstagingdirectory)
-                      ArtifactName: zips
                 - task: PowerShell@1
                   displayName: Verify & Package NuGet
                   inputs:

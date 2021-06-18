@@ -34,7 +34,7 @@ namespace Umbraco.Cms.Core.Security
         /// <summary>
         ///  Used to construct a new instance without an identity
         /// </summary>
-        public static MemberIdentityUser CreateNew(string username, string email, string memberTypeAlias, string name = null)
+        public static MemberIdentityUser CreateNew(string username, string email, string memberTypeAlias, bool isApproved, string name = null)
         {
             if (string.IsNullOrWhiteSpace(username))
             {
@@ -46,6 +46,7 @@ namespace Umbraco.Cms.Core.Security
             user.UserName = username;
             user.Email = email;
             user.MemberTypeAlias = memberTypeAlias;
+            user.IsApproved = isApproved;
             user.Id = null;
             user.HasIdentity = false;
             user.Name = name;

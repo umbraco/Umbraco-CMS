@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 using Umbraco.Cms.Core.Models;
+using Umbraco.Cms.Core.Models.Email;
 using Umbraco.Cms.Infrastructure.Extensions;
 
 namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions
@@ -24,9 +25,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions
             const string subject = "Subject";
             const string body = "<p>Message</p>";
             const bool isBodyHtml = true;
-            var emailMesasge = new EmailMessage(from, to, subject, body, isBodyHtml);
+            var emailMessage = new EmailMessage(from, to, subject, body, isBodyHtml);
 
-            var result = emailMesasge.ToMimeMessage(ConfiguredSender);
+            var result = emailMessage.ToMimeMessage(ConfiguredSender);
 
             Assert.AreEqual(1, result.From.Count());
             Assert.AreEqual(from, result.From.First().ToString());
@@ -54,9 +55,9 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions
                 {
                     new EmailMessageAttachment(attachmentStream, "test.txt"),
                 };
-            var emailMesasge = new EmailMessage(from, to, cc, bcc, replyTo, subject, body, isBodyHtml, attachments);
+            var emailMessage = new EmailMessage(from, to, cc, bcc, replyTo, subject, body, isBodyHtml, attachments);
 
-            var result = emailMesasge.ToMimeMessage(ConfiguredSender);
+            var result = emailMessage.ToMimeMessage(ConfiguredSender);
 
             Assert.AreEqual(1, result.From.Count());
             Assert.AreEqual(from, result.From.First().ToString());
@@ -75,6 +76,148 @@ namespace Umbraco.Cms.Tests.UnitTests.Umbraco.Infrastructure.Extensions
             Assert.AreEqual(subject, result.Subject);
             Assert.IsNull(result.HtmlBody);
             Assert.AreEqual(body, result.TextBody.ToString());
+            Assert.AreEqual(1, result.Attachments.Count());
+        }
+
+        [Test]
+        public void Can_Construct_MimeMessage_With_ConfiguredSender()
+        {
+            const string to = "to@email.com";
+            const string subject = "Subject";
+            const string body = "<p>Message</p>";
+            const bool isBodyHtml = true;
+            var emailMessage = new EmailMessage(null, to, subject, body, isBodyHtml);
+
+            var result = emailMessage.ToMimeMessage(ConfiguredSender);
+
+            Assert.AreEqual(1, result.From.Count());
+            Assert.AreEqual(ConfiguredSender, result.From.First().ToString());
+            Assert.AreEqual(1, result.To.Count());
+            Assert.AreEqual(to, result.To.First().ToString());
+            Assert.AreEqual(subject, result.Subject);
+            Assert.IsNull(result.TextBody);
+            Assert.AreEqual(body, result.HtmlBody.ToString());
+        }
+
+        [Test]
+        public void Can_Construct_NotificationEmailModel_From_Simple_MailMessage()
+        {
+            const string from = "from@email.com";
+            const string to = "to@email.com";
+            const string subject = "Subject";
+            const string body = "<p>Message</p>";
+            const bool isBodyHtml = true;
+            var emailMessage = new EmailMessage(from, to, subject, body, isBodyHtml);
+
+            NotificationEmailModel result = emailMessage.ToNotificationEmail(ConfiguredSender);
+
+            Assert.AreEqual(from, result.From.Address);
+            Assert.AreEqual("", result.From.DisplayName);
+            Assert.AreEqual(1, result.To.Count());
+            Assert.AreEqual(to, result.To.First().Address);
+            Assert.AreEqual("", result.To.First().DisplayName);
+            Assert.AreEqual(subject, result.Subject);
+            Assert.AreEqual(body, result.Body);
+            Assert.IsTrue(result.IsBodyHtml);
+            Assert.IsFalse(result.HasAttachments);
+        }
+
+        [Test]
+        public void Can_Construct_NotificationEmailModel_From_Simple_MailMessage_With_Configured_Sender()
+        {
+            const string to = "to@email.com";
+            const string subject = "Subject";
+            const string body = "<p>Message</p>";
+            const bool isBodyHtml = true;
+            var emailMessage = new EmailMessage(null, to, subject, body, isBodyHtml);
+
+            NotificationEmailModel result = emailMessage.ToNotificationEmail(ConfiguredSender);
+
+            Assert.AreEqual(ConfiguredSender, result.From.Address);
+            Assert.AreEqual("", result.From.DisplayName);
+            Assert.AreEqual(1, result.To.Count());
+            Assert.AreEqual(to, result.To.First().Address);
+            Assert.AreEqual("", result.To.First().DisplayName);
+            Assert.AreEqual(subject, result.Subject);
+            Assert.AreEqual(body, result.Body);
+            Assert.IsTrue(result.IsBodyHtml);
+            Assert.IsFalse(result.HasAttachments);
+        }
+
+        [Test]
+        public void Can_Construct_NotificationEmailModel_From_Simple_MailMessage_With_DisplayName()
+        {
+            const string from = "\"From Email\" <from@from.com>";
+            const string to = "\"To Email\" <to@to.com>";
+            const string subject = "Subject";
+            const string body = "<p>Message</p>";
+            const bool isBodyHtml = true;
+            var emailMessage = new EmailMessage(from, to, subject, body, isBodyHtml);
+
+            NotificationEmailModel result = emailMessage.ToNotificationEmail(ConfiguredSender);
+
+            Assert.AreEqual("from@from.com", result.From.Address);
+            Assert.AreEqual("From Email", result.From.DisplayName);
+            Assert.AreEqual(1, result.To.Count());
+            Assert.AreEqual("to@to.com", result.To.First().Address);
+            Assert.AreEqual("To Email", result.To.First().DisplayName);
+            Assert.AreEqual(subject, result.Subject);
+            Assert.AreEqual(body, result.Body);
+            Assert.IsTrue(result.IsBodyHtml);
+            Assert.IsFalse(result.HasAttachments);
+        }
+
+
+        [Test]
+        public void Can_Construct_NotificationEmailModel_From_Full_EmailMessage()
+        {
+            const string from = "\"From Email\" <from@from.com>";
+            string[] to = { "to@email.com", "\"Second Email\" <to2@email.com>", "invalid@invalid@invalid" };
+            string[] cc = { "\"First CC\" <cc@email.com>", "cc2@email.com", "invalid@invalid@invalid" };
+            string[] bcc = { "bcc@email.com", "bcc2@email.com", "\"Third BCC\" <bcc3@email.com>", "invalid@email@address" };
+            string[] replyTo = { "replyto@email.com", "invalid@invalid@invalid" };
+            const string subject = "Subject";
+            const string body = "Message";
+            const bool isBodyHtml = false;
+
+            using var attachmentStream = new MemoryStream(Encoding.UTF8.GetBytes("test"));
+            var attachments = new List<EmailMessageAttachment>
+                {
+                    new EmailMessageAttachment(attachmentStream, "test.txt"),
+                };
+            var emailMessage = new EmailMessage(from, to, cc, bcc, replyTo, subject, body, isBodyHtml, attachments);
+
+            var result = emailMessage.ToNotificationEmail(ConfiguredSender);
+
+            Assert.AreEqual("from@from.com", result.From.Address);
+            Assert.AreEqual("From Email", result.From.DisplayName);
+
+            Assert.AreEqual(2, result.To.Count());
+            Assert.AreEqual("to@email.com", result.To.First().Address);
+            Assert.AreEqual("", result.To.First().DisplayName);
+            Assert.AreEqual("to2@email.com", result.To.Skip(1).First().Address);
+            Assert.AreEqual("Second Email", result.To.Skip(1).First().DisplayName);
+
+            Assert.AreEqual(2, result.Cc.Count());
+            Assert.AreEqual("cc@email.com", result.Cc.First().Address);
+            Assert.AreEqual("First CC", result.Cc.First().DisplayName);
+            Assert.AreEqual("cc2@email.com", result.Cc.Skip(1).First().Address);
+            Assert.AreEqual("", result.Cc.Skip(1).First().DisplayName);
+
+            Assert.AreEqual(3, result.Bcc.Count());
+            Assert.AreEqual("bcc@email.com", result.Bcc.First().Address);
+            Assert.AreEqual("", result.Bcc.First().DisplayName);
+            Assert.AreEqual("bcc2@email.com", result.Bcc.Skip(1).First().Address);
+            Assert.AreEqual("", result.Bcc.Skip(1).First().DisplayName);
+            Assert.AreEqual("bcc3@email.com", result.Bcc.Skip(2).First().Address);
+            Assert.AreEqual("Third BCC", result.Bcc.Skip(2).First().DisplayName);
+
+            Assert.AreEqual(1, result.ReplyTo.Count());
+            Assert.AreEqual("replyto@email.com", result.ReplyTo.First().Address);
+            Assert.AreEqual("", result.ReplyTo.First().DisplayName);
+
+            Assert.AreEqual(subject, result.Subject);
+            Assert.AreEqual(body, result.Body);
             Assert.AreEqual(1, result.Attachments.Count());
         }
     }

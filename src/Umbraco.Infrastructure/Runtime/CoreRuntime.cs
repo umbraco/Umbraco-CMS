@@ -101,6 +101,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
             // acquire the main domain - if this fails then anything that should be registered with MainDom will not operate
             AcquireMainDom();
 
+            await _eventAggregator.PublishAsync(new UmbracoApplicationMainDomAcquiredNotification(), cancellationToken);
+
             // notify for unattended install
             await _eventAggregator.PublishAsync(new RuntimeUnattendedInstallNotification());
             DetermineRuntimeLevel();
@@ -136,6 +138,8 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                 case RuntimeUnattendedUpgradeNotification.UpgradeResult.NotRequired:
                     break;
             }
+
+            await _eventAggregator.PublishAsync(new UmbracoApplicationComponentsInstallingNotification(State.Level), cancellationToken);
 
             // create & initialize the components
             _components.Initialize();

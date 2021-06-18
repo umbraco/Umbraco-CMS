@@ -155,7 +155,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     }
                     else
                     {
-                        _logger.LogDebug("Package migrations need to execute but unattended package migrations is disabled. They will need to be run from the back office.");
+                        _logger.LogInformation("Package migrations need to execute but unattended package migrations is disabled. They will need to be run from the back office.");
                         Reason = RuntimeLevelReason.Run;
                     }
 

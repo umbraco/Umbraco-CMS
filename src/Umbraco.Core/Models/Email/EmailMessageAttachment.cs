@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models.Email
 {
     public class EmailMessageAttachment
     {

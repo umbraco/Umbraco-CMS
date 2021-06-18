@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Umbraco.Cms.Core.Models
+namespace Umbraco.Cms.Core.Models.Email
 {
     public class EmailMessage
     {
@@ -33,7 +33,6 @@ namespace Umbraco.Cms.Core.Models
 
         public EmailMessage(string from, string[] to, string[] cc, string[] bcc, string[] replyTo, string subject, string body, bool isBodyHtml, IEnumerable<EmailMessageAttachment> attachments)
         {
-            ArgumentIsNotNullOrEmpty(from, nameof(from));
             ArgumentIsNotNullOrEmpty(to, nameof(to));
             ArgumentIsNotNullOrEmpty(subject, nameof(subject));
             ArgumentIsNotNullOrEmpty(body, nameof(body));
