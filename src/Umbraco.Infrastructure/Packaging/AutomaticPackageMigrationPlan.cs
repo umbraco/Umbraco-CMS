@@ -19,6 +19,10 @@ namespace Umbraco.Cms.Infrastructure.Packaging
         {
         }
 
+        protected AutomaticPackageMigrationPlan(string packageName, string planName) : base(packageName, planName)
+        {
+        }
+
         protected sealed override void DefinePlan()
         {
             // calculate the final state based on the hash value of the embedded resource            
