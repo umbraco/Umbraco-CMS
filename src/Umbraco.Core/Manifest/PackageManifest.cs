@@ -16,13 +16,6 @@ namespace Umbraco.Cms.Core.Manifest
         [DataMember(Name = "packageView", IsRequired = true)]
         public string PackageView { get; set; }
 
-        // TODO: iconUrl? since we cannot retrieve from nuget
-
-        // TODO: Version since we cannot retrieve from nuget
-
-        //[DataMember(Name = "name", IsRequired = true)]
-        //public Guid PackageId { get; set; }
-
         /// <summary>
         /// Gets the source path of the manifest.
         /// </summary>
