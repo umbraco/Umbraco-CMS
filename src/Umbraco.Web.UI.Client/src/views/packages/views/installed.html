@@ -18,7 +18,7 @@
                             <div class="umb-package-list__item-content">
                               <div class="umb-package-list__item-name">{{ installedPackage.name }}</div>
                               <div class="umb-package-list__item-description">
-                                <localize ng-if="installedPackage.hasMigrations"
+                                <localize ng-if="installedPackage.hasMigrations && !installedPackage.hasPendingMigrations"
                                           key="packager_packageMigrationsNonePending">No pending migrations</localize>
                               </div>
                             </div>
@@ -27,7 +27,7 @@
                         <td style="text-align: right;">
                           <umb-button ng-show="installedPackage.hasPendingMigrations"
                                       type="button"
-                                      button-style="info"
+                                      button-style="warning"
                                       size="xxs"
                                       label-key="packager_packageMigrationsRun"
                                       action="vm.confirmMigrations(installedPackage)">

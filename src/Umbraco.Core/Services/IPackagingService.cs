@@ -30,6 +30,8 @@ namespace Umbraco.Cms.Core.Services
         /// <returns></returns>
         IEnumerable<InstalledPackage> GetAllInstalledPackages();
 
+        InstalledPackage GetInstalledPackageByName(string packageName);
+
         /// <summary>
         /// Returns the created packages
         /// </summary>

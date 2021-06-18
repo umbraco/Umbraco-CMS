@@ -12,7 +12,7 @@ namespace Umbraco.Cms.Core.Packaging
         [Required]
         public string PackageName { get; set; }
 
-        // TODO: Version? Icon? Other metadata?
+        // TODO: Version? Icon? Other metadata? This would need to come from querying the package on Our
 
         [DataMember(Name = "packageView")]
         public string PackageView { get; set; }

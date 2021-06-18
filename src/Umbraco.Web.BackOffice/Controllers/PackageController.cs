@@ -174,6 +174,17 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
 
         }
 
+        public ActionResult<InstalledPackage> GetInstalledPackageByName([FromQuery] string packageName)
+        {
+            InstalledPackage pack = _packagingService.GetInstalledPackageByName(packageName);
+            if (pack == null)
+            {
+                return NotFound();
+            }
+
+            return pack;
+        }
+
         /// <summary>
         /// Returns all installed packages - only shows their latest versions
         /// </summary>

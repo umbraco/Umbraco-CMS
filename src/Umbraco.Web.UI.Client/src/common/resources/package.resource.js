@@ -69,13 +69,13 @@ function packageResource($q, $http, umbDataFormatter, umbRequestHelper) {
         'Failed to get package');
     },
 
-    getInstalledById: function (id) {
+    getInstalledByName: function (packageName) {
       return umbRequestHelper.resourcePromise(
         $http.get(
           umbRequestHelper.getApiUrl(
             "packageApiBaseUrl",
-            "GetInstalledPackageById",
-            { id: id })),
+            "GetInstalledPackageByName",
+            { packageName: packageName })),
         'Failed to get package');
     },
 

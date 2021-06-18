@@ -106,6 +106,9 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public string ExportCreatedPackage(PackageDefinition definition) => _createdPackages.ExportPackage(definition);
 
+        public InstalledPackage GetInstalledPackageByName(string packageName)
+            => GetAllInstalledPackages().Where(x => x.PackageName.InvariantEquals(packageName)).FirstOrDefault();
+
         public IEnumerable<InstalledPackage> GetAllInstalledPackages()
         {
             IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);

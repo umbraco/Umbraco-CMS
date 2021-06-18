@@ -33,7 +33,7 @@
     }
 
     function packageOptions(pck) {
-      $location.path("packages/packages/options/" + pck.id)
+      $location.path("packages/packages/options/" + pck.name)
         .search("packageId", null); //ensure the installId flag is gone, it's only available on first install
     }
 
