@@ -119,6 +119,26 @@ namespace Umbraco.Core
                 public const string Image = "Image";
 
                 /// <summary>
+                /// MediaType name for a video.
+                /// </summary>
+                public const string VideoName = "Video";
+
+                /// <summary>
+                /// MediaType name for an audio.
+                /// </summary>
+                public const string AudioName = "Audio";
+
+                /// <summary>
+                /// MediaType name for an article.
+                /// </summary>
+                public const string ArticleName = "Article";
+
+                /// <summary>
+                /// MediaType name for vector graphics.
+                /// </summary>
+                public const string VectorGraphicsName = "VectorGraphics";
+
+                /// <summary>
                 /// MediaType alias for a video.
                 /// </summary>
                 public const string Video = "umbracoMediaVideo";
