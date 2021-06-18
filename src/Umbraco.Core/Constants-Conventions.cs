@@ -121,42 +121,42 @@ namespace Umbraco.Core
                 /// <summary>
                 /// MediaType name for a video.
                 /// </summary>
-                public const string VideoName = "Video";
+                public const string Video = "Video";
 
                 /// <summary>
                 /// MediaType name for an audio.
                 /// </summary>
-                public const string AudioName = "Audio";
+                public const string Audio = "Audio";
 
                 /// <summary>
                 /// MediaType name for an article.
                 /// </summary>
-                public const string ArticleName = "Article";
+                public const string Article = "Article";
 
                 /// <summary>
                 /// MediaType name for vector graphics.
                 /// </summary>
-                public const string VectorGraphicsName = "VectorGraphics";
+                public const string VectorGraphics = "VectorGraphics";
 
                 /// <summary>
                 /// MediaType alias for a video.
                 /// </summary>
-                public const string Video = "umbracoMediaVideo";
+                public const string VideoAlias = "umbracoMediaVideo";
 
                 /// <summary>
                 /// MediaType alias for an audio.
                 /// </summary>
-                public const string Audio = "umbracoMediaAudio";
+                public const string AudioAlias = "umbracoMediaAudio";
 
                 /// <summary>
                 /// MediaType alias for an article.
                 /// </summary>
-                public const string Article = "umbracoMediaArticle";
+                public const string ArticleAlias = "umbracoMediaArticle";
 
                 /// <summary>
                 /// MediaType alias for vector graphics.
                 /// </summary>
-                public const string VectorGraphics = "umbracoMediaVectorGraphics";
+                public const string VectorGraphicsAlias = "umbracoMediaVectorGraphics";
 
                 /// <summary>
                 /// MediaType alias indicating allowing auto-selection.
