@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <umbPackage>
   <files />
   <info>
     <package>
-      <name>Package With MediaTypes And Media + Folder</name>      
+      <name>Package With MediaTypes And Media + Folder</name>
     </package>
   </info>
   <DocumentTypes />
@@ -11,6 +11,7 @@
     <MediaType>
       <Info>
         <Name>Folder</Name>
+        <Key>c3ddc08e-3b5e-42b2-9f0b-6e5c79a2e2e0</Key>
         <Alias>Folder</Alias>
         <Icon>icon-folder</Icon>
         <Thumbnail>icon-folder</Thumbnail>
@@ -28,6 +29,7 @@
     <MediaType>
       <Info>
         <Name>Image</Name>
+        <Key>ee78bb5b-3734-4b86-bd48-d9ca2e6d6846</Key>
         <Alias>Image</Alias>
         <Icon>icon-picture</Icon>
         <Thumbnail>icon-picture</Thumbnail>

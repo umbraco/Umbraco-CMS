@@ -1,15 +1,16 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+﻿<?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <umbPackage>
   <files />
   <info>
     <package>
-      <name>DocTypeError</name>      
+      <name>DocTypeError</name>
     </package>
   </info>
   <DocumentTypes>
     <DocumentType>
       <Info>
         <Name>MR Basisseite</Name>
+        <Key>02e4e119-2eeb-4b92-9880-0c35d66a16b2</Key>
         <Alias>MRBasePage</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>
@@ -66,6 +67,7 @@
     <DocumentType>
       <Info>
         <Name>MR Startseite</Name>
+        <Key>4ecde940-89bd-47c2-9c9c-3cfcc32e8e52</Key>
         <Alias>MRStartPage</Alias>
         <Icon>folder.gif</Icon>
         <Thumbnail>folder.png</Thumbnail>

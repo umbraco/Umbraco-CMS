@@ -2,7 +2,7 @@
 <umbPackage>
   <info>
     <package>
-      <name>XSLTsearch</name>      
+      <name>XSLTsearch</name>
     </package>
   </info>
   <Documents>
@@ -16,6 +16,7 @@
     <DocumentType>
       <Info>
         <Name>XSLTsearch</Name>
+        <Key>c7d19488-f11c-4c28-be14-da8be9c9a675</Key>
         <Alias>XSLTsearch</Alias>
         <Icon>.sprTreeDoc2</Icon>
         <Thumbnail>doc.png</Thumbnail>
@@ -54,10 +55,10 @@
       <Design>
         <![CDATA[<%@ Master Language="C#" MasterPageFile="~/masterpages/RunwayMaster.master" AutoEventWireup="true" %>
 
-  
+
 <asp:Content ContentPlaceHolderId="RunwayMasterContentPlaceHolder" runat="server">
   <div id="content">
-    <div id="contentHeader">  
+    <div id="contentHeader">
         <h2><umbraco:Item runat="server" field="pageName"/></h2>
     </div>
 
@@ -107,6 +108,7 @@ p.xsltsearch_result_description {padding-bottom: 10px;}
   <Macros>
     <macro>
       <name>XSLTsearch</name>
+      <key>0712FAC7-ADD7-48F7-9098-C80220B0D2F0</key>
       <alias>XSLTsearch</alias>
       <macroType>Unknown</macroType>
       <macroSource />
@@ -116,72 +118,72 @@ p.xsltsearch_result_description {padding-bottom: 10px;}
       <scriptingFile>
       </scriptingFile>
       <properties>
-        <property name="Source" alias="source" show="True" propertyType="contentTree" />
-        <property name="Umbraco fields to search" alias="searchFields" show="True" propertyType="text" />
-        <property name="Umbraco fields shown in results preview" alias="previewFields" show="True" propertyType="text" />
-        <property name="Display search box at TOP, BOTTOM, BOTH, or NONE" alias="searchBoxLocation" show="True" propertyType="text" />
-        <property name="Display BEGINNING or CONTEXT of each result" alias="previewType" show="True" propertyType="text" />
-        <property name="Number of search results to display per page" alias="resultsPerPage" show="True" propertyType="number" />
-        <property name="Number of characters of preview text to display" alias="previewChars" show="True" propertyType="number" />
-        <property name="Display 'Showing result X to Y'?" alias="showPageRange" show="True" propertyType="bool" />
-        <property name="Display numbers before each result?" alias="showOrdinals" show="True" propertyType="bool" />
-        <property name="Display search score for each result?" alias="showScores" show="True" propertyType="bool" />
-        <property name="Display 'Searched X documents in Y seconds'?" alias="showStats" show="True" propertyType="bool" />
+        <property name="Source" alias="source" show="True" propertyType="contentTree" key="921e17a2-1b70-4d90-9448-85a378938096" />
+        <property name="Umbraco fields to search" alias="searchFields" show="True" propertyType="text" key="230669fd-5cc3-4946-a307-474ebcf904c4" />
+        <property name="Umbraco fields shown in results preview" alias="previewFields" show="True" propertyType="text" key="6b9168b8-d70a-4950-8d8d-056688b33dc9" />
+        <property name="Display search box at TOP, BOTTOM, BOTH, or NONE" alias="searchBoxLocation" show="True" propertyType="text" key="6fc99a63-2f17-4906-a007-5aa918b526af" />
+        <property name="Display BEGINNING or CONTEXT of each result" alias="previewType" show="True" propertyType="text" key="a89b2320-fabe-48d0-8949-a2d66fb9cd31" />
+        <property name="Number of search results to display per page" alias="resultsPerPage" show="True" propertyType="number" key="fac01eb0-2cca-4980-b68d-eb1eb44e6896" />
+        <property name="Number of characters of preview text to display" alias="previewChars" show="True" propertyType="number" key="ccb30dfa-3c00-452d-8a51-22bc2f3efd51" />
+        <property name="Display 'Showing result X to Y'?" alias="showPageRange" show="True" propertyType="bool" key="0a10391a-b174-4980-bb6d-35a656687aca" />
+        <property name="Display numbers before each result?" alias="showOrdinals" show="True" propertyType="bool" key="305d3c2d-f062-420c-83b8-be91f2efd56b" />
+        <property name="Display search score for each result?" alias="showScores" show="True" propertyType="bool" key="ff8bc866-f58b-4d02-9bfe-87461f08ce39" />
+        <property name="Display 'Searched X documents in Y seconds'?" alias="showStats" show="True" propertyType="bool" key="a3c8b300-9726-468e-b199-544f0f9145c7" />
       </properties>
     </macro>
   </Macros>
   <DictionaryItems>
-    <DictionaryItem Key="XSLTsearch">
+    <DictionaryItem Name="XSLTsearch" Key="26F5C64A-0BE5-448F-A443-3B09D6162D90">
       <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[]]></Value>
-      <DictionaryItem Key="[XSLTsearch]Button-Search">
+      <DictionaryItem Name="[XSLTsearch]Button-Search" Key="26F5C64A-0BE5-448F-A443-3B09D6162D99">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Search]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Description-Context">
+      <DictionaryItem Name="[XSLTsearch]Description-Context" Key="26F5C64A-0BE5-448F-A443-3B09D6162D98">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Context]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Description-ContextUnavailable">
+      <DictionaryItem Name="[XSLTsearch]Description-ContextUnavailable" Key="26F5C64A-0BE5-448F-A443-3B09D6162D97">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[unavailable]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Heading-SearchResults">
+      <DictionaryItem Name="[XSLTsearch]Heading-SearchResults" Key="26F5C64A-0BE5-448F-A443-3B09D6162D96">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Search Results]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Navigation-Next">
+      <DictionaryItem Name="[XSLTsearch]Navigation-Next" Key="26F5C64A-0BE5-448F-A443-3B09D6162D95">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Next]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Navigation-Previous">
+      <DictionaryItem Name="[XSLTsearch]Navigation-Previous" Key="26F5C64A-0BE5-448F-A443-3B09D6162D94">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Previous]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]PageRange-ShowingResults">
+      <DictionaryItem Name="[XSLTsearch]PageRange-ShowingResults" Key="26F5C64A-0BE5-448F-A443-3B09D6162D93">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Showing results]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]PageRange-To">
+      <DictionaryItem Name="[XSLTsearch]PageRange-To" Key="26F5C64A-0BE5-448F-A443-3B09D6162D92">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[to]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Score-Score">
+      <DictionaryItem Name="[XSLTsearch]Score-Score" Key="26F5C64A-0BE5-448F-A443-3B09D6162D91">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[score]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Stats-PagesIn">
+      <DictionaryItem Name="[XSLTsearch]Stats-PagesIn" Key="56F5C64A-0BE5-448F-A443-3B09D6162D90">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[pages in]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Stats-Searched">
+      <DictionaryItem Name="[XSLTsearch]Stats-Searched" Key="56F5C64A-0BE5-448F-A443-3B09D6162D99">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Searched]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Stats-Seconds">
+      <DictionaryItem Name="[XSLTsearch]Stats-Seconds" Key="56F5C64A-0BE5-448F-A443-3B09D6162D98">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[seconds]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Summary-Matches">
+      <DictionaryItem Name="[XSLTsearch]Summary-Matches" Key="56F5C64A-0BE5-448F-A443-3B09D6162D97">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[matches]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Summary-NoMatchesWereFoundFor">
+      <DictionaryItem Name="[XSLTsearch]Summary-NoMatchesWereFoundFor" Key="56F5C64A-0BE5-448F-A443-3B09D6162D96">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[No matches were found for]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Summary-Page">
+      <DictionaryItem Name="[XSLTsearch]Summary-Page" Key="56F5C64A-0BE5-448F-A443-3B09D6162D95">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[page]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Summary-Pages">
+      <DictionaryItem Name="[XSLTsearch]Summary-Pages" Key="56F5C64A-0BE5-448F-A443-3B09D6162D94">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[pages]]></Value>
       </DictionaryItem>
-      <DictionaryItem Key="[XSLTsearch]Summary-YourSearchFor">
+      <DictionaryItem Name="[XSLTsearch]Summary-YourSearchFor" Key="56F5C64A-0BE5-448F-A443-3B09D6162D93">
         <Value LanguageId="1" LanguageCultureAlias="en-US"><![CDATA[Your search for]]></Value>
       </DictionaryItem>
     </DictionaryItem>
