@@ -121,22 +121,22 @@ namespace Umbraco.Core
                 /// <summary>
                 /// MediaType alias for a video.
                 /// </summary>
-                public const string Video = "Video";
+                public const string Video = "umbracoMediaVideo";
 
                 /// <summary>
                 /// MediaType alias for an audio.
                 /// </summary>
-                public const string Audio = "Audio";
+                public const string Audio = "umbracoMediaAudio";
 
                 /// <summary>
                 /// MediaType alias for an article.
                 /// </summary>
-                public const string Article = "Article";
+                public const string Article = "umbracoMediaArticle";
 
                 /// <summary>
                 /// MediaType alias for vector graphics.
                 /// </summary>
-                public const string VectorGraphics = "VectorGraphics";
+                public const string VectorGraphics = "umbracoMediaVectorGraphics";
 
                 /// <summary>
                 /// MediaType alias indicating allowing auto-selection.
