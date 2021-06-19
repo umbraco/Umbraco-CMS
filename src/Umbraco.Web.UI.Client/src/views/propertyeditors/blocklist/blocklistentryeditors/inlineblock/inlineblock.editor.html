@@ -5,7 +5,7 @@
             ng-click="vm.openBlock(block)"
             ng-focus="block.focus">
         <span class="caret"></span>
-        <i class="icon {{block.content.icon}}" aria-hidden="true"></i>
+        <umb-icon icon="{{block.content.icon}}" class="icon {{block.content.icon}}"></umb-icon>
         <span class="name">{{block.label}}</span>
     </button>
     <div class="blockelement-inlineblock-editor__inner" ng-class="{'--singleGroup':block.content.variants[0].tabs.length === 1}" ng-if="block.active === true">

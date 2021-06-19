@@ -13,26 +13,28 @@
                 </a>
             </h5>
 
-            <umb-button-ellipsis
-                element="tree-item-options"
-                action="options(tree.root, $event)"
-                text="Open context node for {{tree.name}}"
-                state="hidden"
-                class="umb-options"
-                ng-hide="tree.root.isContainer || !tree.root.menuUrl"
-                ng-swipe-right="options(tree.root, $event)">
+            <umb-button-ellipsis element="tree-item-options"
+                                 action="options(tree.root, $event)"
+                                 text="Open context node for {{tree.name}}"
+                                 state="hidden"
+                                 class="umb-options"
+                                 ng-hide="tree.root.isContainer || !tree.root.menuUrl"
+                                 ng-swipe-right="options(tree.root, $event)">
             </umb-button-ellipsis>
 
         </div>
-        <umb-tree-item class="umb-animated"
-                       ng-repeat="child in tree.root.children"
-                       enablelistviewexpand="{{enablelistviewexpand}}"
-                       node="child"
-                       current-node="currentNode"
-                       tree="this"
-                       is-dialog="isdialog"
-                       section="{{section}}">
-        </umb-tree-item>
+
+        <ul ng-if="tree.root.children.length > 0">
+            <umb-tree-item class="umb-animated"
+                           ng-repeat="child in tree.root.children"
+                           enablelistviewexpand="{{enablelistviewexpand}}"
+                           node="child"
+                           current-node="currentNode"
+                           tree="this"
+                           is-dialog="isdialog"
+                           section="{{section}}">
+            </umb-tree-item>
+        </ul>
     </li>
 
     <!-- REPEAT for each group in the tree -->
@@ -51,26 +53,27 @@
                 </a>
             </h5>
 
-            <umb-button-ellipsis
-                element="tree-item-options"
-                action="options(group, $event)"
-                text="Open context node for {{group.name}}"
-                state="hidden"
-                class="umb-options"
-                ng-hide="group.isContainer || !group.menuUrl"
-                ng-swipe-right="options(group, $event)">
+            <umb-button-ellipsis element="tree-item-options"
+                                 action="options(group, $event)"
+                                 text="Open context node for {{group.name}}"
+                                 state="hidden"
+                                 class="umb-options"
+                                 ng-hide="group.isContainer || !group.menuUrl"
+                                 ng-swipe-right="options(group, $event)">
             </umb-button-ellipsis>
         </div>
 
-        <umb-tree-item class="umb-animated"
-                       ng-repeat="child in group.children"
-                       enablelistviewexpand="{{enablelistviewexpand}}"
-                       node="child"
-                       current-node="currentNode"
-                       tree="this"
-                       is-dialog="isdialog"
-                       section="{{section}}">
-        </umb-tree-item>
+        <ul ng-if="group.children.length > 0">
+            <umb-tree-item class="umb-animated"
+                           ng-repeat="child in group.children"
+                           enablelistviewexpand="{{enablelistviewexpand}}"
+                           node="child"
+                           current-node="currentNode"
+                           tree="this"
+                           is-dialog="isdialog"
+                           section="{{section}}">
+            </umb-tree-item>
+        </ul>
     </li>
     <!-- END REPEAT -->
 </ul>
