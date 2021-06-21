@@ -8,7 +8,7 @@ namespace Umbraco.Web.PropertyEditors
 {
     /// <summary>
     /// Represents a media picker property editor.
-    /// Nameed "(legacy)" as it's best to use the NEW Media Picker aka MediaPicker3
+    /// Named "(legacy)" as it's best to use the NEW Media Picker aka MediaPicker3
     /// </summary>
     [DataEditor(
         Constants.PropertyEditors.Aliases.MediaPicker,
