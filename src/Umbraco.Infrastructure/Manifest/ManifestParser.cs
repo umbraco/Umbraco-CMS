@@ -28,7 +28,7 @@ namespace Umbraco.Cms.Core.Manifest
         private readonly ILocalizedTextService _localizedTextService;
         private readonly IShortStringHelper _shortStringHelper;
         private readonly IDataValueEditorFactory _dataValueEditorFactory;
-        private static readonly string Utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
+        private static readonly string s_utf8Preamble = Encoding.UTF8.GetString(Encoding.UTF8.GetPreamble());
 
         private readonly IAppPolicyCache _cache;
         private readonly ILogger<ManifestParser> _logger;
@@ -97,7 +97,7 @@ namespace Umbraco.Cms.Core.Manifest
         /// <summary>
         /// Gets all manifests.
         /// </summary>
-        private IEnumerable<PackageManifest> GetManifests()
+        public IEnumerable<PackageManifest> GetManifests()
         {
             var manifests = new List<PackageManifest>();
 
@@ -108,8 +108,11 @@ namespace Umbraco.Cms.Core.Manifest
                     var text = File.ReadAllText(path);
                     text = TrimPreamble(text);
                     if (string.IsNullOrWhiteSpace(text))
+                    {
                         continue;
-                    var manifest = ParseManifest(text);
+                    }
+
+                    PackageManifest manifest = ParseManifest(text);
                     manifest.Source = path;
                     manifests.Add(manifest);
                 }
@@ -167,15 +170,18 @@ namespace Umbraco.Cms.Core.Manifest
         private IEnumerable<string> GetManifestFiles()
         {
             if (Directory.Exists(_path) == false)
-                return new string[0];
+            {
+                return Array.Empty<string>();
+            }
+
             return Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
         }
 
         private static string TrimPreamble(string text)
         {
             // strangely StartsWith(preamble) would always return true
-            if (text.Substring(0, 1) == Utf8Preamble)
-                text = text.Remove(0, Utf8Preamble.Length);
+            if (text.Substring(0, 1) == s_utf8Preamble)
+                text = text.Remove(0, s_utf8Preamble.Length);
 
             return text;
         }

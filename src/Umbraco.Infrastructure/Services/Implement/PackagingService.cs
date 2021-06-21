@@ -4,10 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Xml.Linq;
 using Umbraco.Cms.Core.Events;
+using Umbraco.Cms.Core.Manifest;
 using Umbraco.Cms.Core.Models;
 using Umbraco.Cms.Core.Models.Packaging;
 using Umbraco.Cms.Core.Notifications;
 using Umbraco.Cms.Core.Packaging;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Services.Implement
 {
@@ -19,6 +21,9 @@ namespace Umbraco.Cms.Core.Services.Implement
     {
         private readonly IPackageInstallation _packageInstallation;
         private readonly IEventAggregator _eventAggregator;
+        private readonly IManifestParser _manifestParser;
+        private readonly IKeyValueService _keyValueService;
+        private readonly PackageMigrationPlanCollection _packageMigrationPlans;
         private readonly IAuditService _auditService;
         private readonly ICreatedPackagesRepository _createdPackages;
 
@@ -26,12 +31,18 @@ namespace Umbraco.Cms.Core.Services.Implement
             IAuditService auditService,
             ICreatedPackagesRepository createdPackages,
             IPackageInstallation packageInstallation,
-            IEventAggregator eventAggregator)
+            IEventAggregator eventAggregator,
+            IManifestParser manifestParser,
+            IKeyValueService keyValueService,
+            PackageMigrationPlanCollection packageMigrationPlans)
         {
             _auditService = auditService;
             _createdPackages = createdPackages;
             _packageInstallation = packageInstallation;
             _eventAggregator = eventAggregator;
+            _manifestParser = manifestParser;
+            _keyValueService = keyValueService;
+            _packageMigrationPlans = packageMigrationPlans;
         }
 
         #region Installation
@@ -95,10 +106,60 @@ namespace Umbraco.Cms.Core.Services.Implement
 
         public string ExportCreatedPackage(PackageDefinition definition) => _createdPackages.ExportPackage(definition);
 
+        public InstalledPackage GetInstalledPackageByName(string packageName)
+            => GetAllInstalledPackages().Where(x => x.PackageName.InvariantEquals(packageName)).FirstOrDefault();
 
-        // TODO: Implement
-        public IEnumerable<PackageDefinition> GetAllInstalledPackages() => Enumerable.Empty<PackageDefinition>();
-        
+        public IEnumerable<InstalledPackage> GetAllInstalledPackages()
+        {
+            IReadOnlyDictionary<string, string> keyValues = _keyValueService.FindByKeyPrefix(Constants.Conventions.Migrations.KeyValuePrefix);
+
+            var installedPackages = new Dictionary<string, InstalledPackage>();
+
+            // Collect the package from the package migration plans
+            foreach(PackageMigrationPlan plan in _packageMigrationPlans)
+            {
+                if (!installedPackages.TryGetValue(plan.PackageName, out InstalledPackage installedPackage))
+                {
+                    installedPackage = new InstalledPackage
+                    {
+                        PackageName = plan.PackageName
+                    };
+                    installedPackages.Add(plan.PackageName, installedPackage);                    
+                }
+
+                var currentPlans = installedPackage.PackageMigrationPlans.ToList();
+                keyValues.TryGetValue(Constants.Conventions.Migrations.KeyValuePrefix + plan.PackageName, out var currentState);
+                currentPlans.Add(new InstalledPackageMigrationPlans
+                {
+                    CurrentMigrationId = currentState,
+                    FinalMigrationId = plan.FinalState
+                });
+
+                installedPackage.PackageMigrationPlans = currentPlans;
+            }
+
+            // Collect and merge the packages from the manifests
+            foreach(PackageManifest package in _manifestParser.GetManifests())
+            {
+                if (!installedPackages.TryGetValue(package.PackageName, out InstalledPackage installedPackage))
+                {
+                    installedPackage = new InstalledPackage
+                    {
+                        PackageName = package.PackageName
+                    };
+                    installedPackages.Add(package.PackageName, installedPackage);
+                }
+
+                installedPackage.PackageView = package.PackageView;
+            }
+
+            // Filter the packages listed here. i.e. only packages that have migrations or views.
+            // Else whats the point in showing them?
+            return installedPackages
+                .Values
+                .Where(x => !x.PackageView.IsNullOrWhiteSpace() || x.PackageMigrationPlans.Any());
+        }
+
         #endregion
     }
 }

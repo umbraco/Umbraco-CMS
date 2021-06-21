@@ -1,6 +1,8 @@
-﻿using System;
+using System;
+using System.IO;
 using System.Runtime.Serialization;
 using Umbraco.Cms.Core.PropertyEditors;
+using Umbraco.Extensions;
 
 namespace Umbraco.Cms.Core.Manifest
 {
@@ -10,6 +12,32 @@ namespace Umbraco.Cms.Core.Manifest
     [DataContract]
     public class PackageManifest
     {
+        private string _packageName;
+
+        /// <summary>
+        /// An optional package name. If not specified then the directory name is used.
+        /// </summary>
+        [DataMember(Name = "name")]
+        public string PackageName
+        {
+            get
+            {
+                if (!_packageName.IsNullOrWhiteSpace())
+                {
+                    return _packageName;
+                }
+                if (!Source.IsNullOrWhiteSpace())
+                {
+                    _packageName = Path.GetFileName(Path.GetDirectoryName(Source));
+                }
+                return _packageName;
+            }
+            set => _packageName = value;
+        }
+
+        [DataMember(Name = "packageView")]
+        public string PackageView { get; set; }
+
         /// <summary>
         /// Gets the source path of the manifest.
         /// </summary>

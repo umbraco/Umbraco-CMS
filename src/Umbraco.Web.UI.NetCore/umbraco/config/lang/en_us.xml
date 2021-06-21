@@ -1276,6 +1276,9 @@ To manage your website, simply open the Umbraco backoffice and start adding cont
     <key alias="packageNoItemsText"><![CDATA[This package file doesn't contain any items to uninstall.<br/><br/>
       You can safely remove this from the system by clicking "uninstall package" below.]]></key>
     <key alias="packageOptions">Package options</key>
+    <key alias="packageMigrationsRun">Run pending package migrations</key>
+    <key alias="packageMigrationsComplete">Package migrations have successfully completed.</key>
+    <key alias="packageMigrationsNonePending">All package migrations have successfully completed.</key>
     <key alias="packageReadme">Package readme</key>
     <key alias="packageRepository">Package repository</key>
     <key alias="packageUninstallConfirm">Confirm package uninstall</key>

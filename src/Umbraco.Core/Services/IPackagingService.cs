@@ -24,10 +24,27 @@ namespace Umbraco.Cms.Core.Services
 
         InstallationSummary InstallCompiledPackageData(XDocument packageXml, int userId = Constants.Security.SuperUserId);
 
-        IEnumerable<PackageDefinition> GetAllInstalledPackages();
+        /// <summary>
+        /// Returns the advertised installed packages
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<InstalledPackage> GetAllInstalledPackages();
 
+        InstalledPackage GetInstalledPackageByName(string packageName);
+
+        /// <summary>
+        /// Returns the created packages
+        /// </summary>
+        /// <returns></returns>
         IEnumerable<PackageDefinition> GetAllCreatedPackages();
+
+        /// <summary>
+        /// Returns a created package by id
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         PackageDefinition GetCreatedPackageById(int id);
+
         void DeleteCreatedPackage(int id, int userId = Constants.Security.SuperUserId);
 
         /// <summary>

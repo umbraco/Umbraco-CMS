@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace Umbraco.Cms.Core.Manifest
 {
     public interface IManifestParser
@@ -14,5 +16,11 @@ namespace Umbraco.Cms.Core.Manifest
         /// Parses a manifest.
         /// </summary>
         PackageManifest ParseManifest(string text);
+
+        /// <summary>
+        /// Returns all package individual manifests
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<PackageManifest> GetManifests();
     }
 }

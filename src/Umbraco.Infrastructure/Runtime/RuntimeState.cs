@@ -147,7 +147,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                     // no matter what the level is run for package migrations.
                     // they either run unattended, or only manually via the back office.
                     Level = RuntimeLevel.Run;
-
+                    
                     if (_unattendedSettings.Value.PackageMigrationsUnattended)
                     {
                         _logger.LogDebug("Package migrations need to execute.");
@@ -212,7 +212,7 @@ namespace Umbraco.Cms.Infrastructure.Runtime
                         return UmbracoDatabaseState.NeedsUpgrade;
                     }
 
-                    IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetUmbracoPendingPackageMigrations(keyValues);
+                    IReadOnlyList<string> packagesRequiringMigration = _packageMigrationState.GetPendingPackageMigrations(keyValues);
                     if (packagesRequiringMigration.Count > 0)
                     {
                         _startupState[PendingPacakgeMigrationsStateKey] = packagesRequiringMigration;

@@ -7,7 +7,13 @@ using Umbraco.Cms.Core.Models.Packaging;
 
 namespace Umbraco.Cms.Core.Packaging
 {
-    // This is the thing that goes in the createdPackages.config
+
+    /// <summary>
+    /// A created package in the back office.
+    /// </summary>
+    /// <remarks>
+    /// This data structure is persisted to createdPackages.config when creating packages in the back office.
+    /// </remarks>
     [DataContract(Name = "packageInstance")]
     public class PackageDefinition
     {

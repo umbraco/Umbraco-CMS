@@ -27,7 +27,7 @@ namespace Umbraco.Cms.Core.Packaging
         /// These are the key/value pairs from the keyvalue storage of migration names and their final values
         /// </param>
         /// <returns></returns>
-        public IReadOnlyList<string> GetUmbracoPendingPackageMigrations(IReadOnlyDictionary<string, string> keyValues)
+        public IReadOnlyList<string> GetPendingPackageMigrations(IReadOnlyDictionary<string, string> keyValues)
         {
             var packageMigrationPlans = _packageMigrationPlans.ToList();
 
