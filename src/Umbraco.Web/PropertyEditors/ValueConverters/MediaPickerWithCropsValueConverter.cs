@@ -2,11 +2,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
+using Umbraco.Core;
+using Umbraco.Core.Logging;
 using Umbraco.Core.Models;
 using Umbraco.Core.Models.PublishedContent;
 using Umbraco.Core.PropertyEditors;
 using Umbraco.Core.PropertyEditors.ValueConverters;
+using Umbraco.Core.Serialization;
 using Umbraco.Web.PublishedCache;
 
 namespace Umbraco.Web.PropertyEditors.ValueConverters
@@ -16,10 +18,13 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
     {
 
         private readonly IPublishedSnapshotAccessor _publishedSnapshotAccessor;
+        private readonly ILogger _logger;
 
-        public MediaPickerWithCropsValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor)
+
+        public MediaPickerWithCropsValueConverter(IPublishedSnapshotAccessor publishedSnapshotAccessor, ILogger logger)
         {
             _publishedSnapshotAccessor = publishedSnapshotAccessor ?? throw new ArgumentNullException(nameof(publishedSnapshotAccessor));
+            _logger = logger;
         }
 
         public override PropertyCacheLevel GetPropertyCacheLevel(IPublishedPropertyType propertyType) => PropertyCacheLevel.Snapshot;
@@ -57,7 +62,21 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
                 return isMultiple ? mediaItems: null;
             }
 
-            var dtos = JsonConvert.DeserializeObject<IEnumerable<MediaWithCropsDto>>(inter.ToString());
+            var value = inter.ToString();
+            if (value.DetectIsJson() == false)
+            {
+                // If the value is not yet JSON we'll try to convert it
+                try
+                {
+                    value = JsonConvert.SerializeObject(value, Formatting.Indented, new MediaWithCropsDtoConverter());
+                }
+                catch (Exception ex)
+                {
+                    _logger.Error<MediaWithCropsDtoConverter>(ex, $"Could not convert data to Media Picker v3 format, the data stored is: {value}");
+                }
+            }
+
+            var dtos = JsonConvert.DeserializeObject<IEnumerable<MediaWithCropsDto>>(value);
 
             foreach(var media in dtos)
             {
@@ -94,26 +113,6 @@ namespace Umbraco.Web.PropertyEditors.ValueConverters
         private object FirstOrDefault(IList mediaItems)
         {
             return mediaItems.Count == 0 ? null : mediaItems[0];
-        }
-
-
-        /// <summary>
-        /// Model/DTO that represents the JSON that the MediaPicker3 stores
-        /// </summary>
-        [DataContract]
-        internal class MediaWithCropsDto
-        {
-            [DataMember(Name = "key")]
-            public Guid Key { get; set; }
-
-            [DataMember(Name = "mediaKey")]
-            public Guid MediaKey { get; set; }
-
-            [DataMember(Name = "crops")]
-            public IEnumerable<ImageCropperValue.ImageCropperCrop> Crops { get; set; }
-
-            [DataMember(Name = "focalPoint")]
-            public ImageCropperValue.ImageCropperFocalPoint FocalPoint { get; set; }
         }
     }
 }
