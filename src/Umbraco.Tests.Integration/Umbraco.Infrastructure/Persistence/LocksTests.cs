@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using Microsoft.Data.SqlClient;
 using System.Threading.Tasks;
 using NPoco;
 using NUnit.Framework;

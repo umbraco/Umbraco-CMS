@@ -677,7 +677,7 @@ namespace Umbraco.Cms.Infrastructure.Persistence.Repositories.Implement
                     // TODO: NPoco InsertBulk issue?
                     // we should use the native NPoco InsertBulk here but it causes problems (not sure exactly all scenarios)
                     // but by using SQL Server and updating a variants name will cause: Unable to cast object of type
-                    // 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'System.Data.SqlClient.SqlConnection'.
+                    // 'Umbraco.Core.Persistence.FaultHandling.RetryDbConnection' to type 'Microsoft.Data.SqlClient.SqlConnection'.
                     // (same in PersistNewItem above)
 
                     // insert content variations
