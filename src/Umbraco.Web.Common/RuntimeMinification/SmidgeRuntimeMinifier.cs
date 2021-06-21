@@ -98,8 +98,6 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
                             .ForDebug(builder => builder
                                 // auto-invalidate bundle if files change in debug
                                 .EnableFileWatcher()
-                                // keep using composite files in debug, not raw static files
-                                .EnableCompositeProcessing()
                                 // use the cache buster defined in config
                                 .SetCacheBusterType(_cacheBusterType))
                             .ForProduction(builder => builder
@@ -144,8 +142,6 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
                             .ForDebug(builder => builder
                                 // auto-invalidate bundle if files change in debug
                                 .EnableFileWatcher()
-                                // keep using composite files in debug, not raw static files
-                                .EnableCompositeProcessing()
                                 // use the cache buster defined in config
                                 .SetCacheBusterType(_cacheBusterType))
                             .ForProduction(builder => builder
@@ -182,10 +178,10 @@ namespace Umbraco.Cms.Web.Common.RuntimeMinification
                 case AssetType.Javascript:
                     return await _jsMinPipeline.Value
                         .ProcessAsync(
-                            new FileProcessContext(fileContent, new JavaScriptFile(), BundleContext.CreateEmpty()));
+                            new FileProcessContext(fileContent, new JavaScriptFile(), BundleContext.CreateEmpty(CacheBuster)));
                 case AssetType.Css:
                     return await _cssMinPipeline.Value
-                        .ProcessAsync(new FileProcessContext(fileContent, new CssFile(), BundleContext.CreateEmpty()));
+                        .ProcessAsync(new FileProcessContext(fileContent, new CssFile(), BundleContext.CreateEmpty(CacheBuster)));
                 default:
                     throw new NotSupportedException("Unexpected AssetType");
             }
