@@ -10,10 +10,10 @@ namespace Umbraco.Cms.Core.Manifest
     [DataContract]
     public class PackageManifest
     {
-        [DataMember(Name = "name", IsRequired = true)]
+        [DataMember(Name = "name", IsRequired = false)]
         public string PackageName { get; set; }
 
-        [DataMember(Name = "packageView", IsRequired = true)]
+        [DataMember(Name = "packageView", IsRequired = false)]
         public string PackageView { get; set; }
 
         /// <summary>
