@@ -1,4 +1,5 @@
 config:
+  processor: "./umbracoDataFlow.js"
   phases:
     # ramps up the arrival rate of virtual users from A to X over Y seconds
     - duration: 10
@@ -10,4 +11,5 @@ scenarios:
       - loop:
           - get:
               url: "/"
+              afterResponse: "expect200Or302"
         count: 250

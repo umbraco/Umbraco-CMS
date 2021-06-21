@@ -8,6 +8,7 @@ module.exports = {
     afterResponse: umbracoFlow.afterResponse,
     beforeScenario: umbracoFlow.beforeScenario,
     afterScenario: umbracoFlow.afterScenario,
+    expect200: umbracoFlow.expect200,
     configureDocType,
     storeDocTypeId
 }

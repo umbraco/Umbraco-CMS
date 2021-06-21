@@ -1,3 +1,11 @@
+# TODO: We need to figure out how to measure boot time.
+# The thing we really care about is the time it takes to boot which
+# we store in the log files. But to try to get that information
+# from a load test we just need to know the time it took for the first
+# 200 response once the restarter has been executed.
+# That should be possible but would need to be done in a custom way
+# (See booting.js)
+
 config:
   processor: "./booting.js"
   http:

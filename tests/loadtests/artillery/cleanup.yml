@@ -2,6 +2,8 @@
 
 config:
   processor: "./umbracoDataFlow.js"
+  http:
+    timeout: 600000
   phases:
     - duration: 1
       arrivalRate: 1

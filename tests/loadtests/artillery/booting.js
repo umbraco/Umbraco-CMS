@@ -5,8 +5,18 @@ module.exports = {
 }
 
 /** Stores the response status code in the context */
-function storeStatusCode(requestParams, response, context, ee, next) {
+function storeStatusCode(req, response, context, ee, next) {
     context.vars.bootResponse = response.statusCode;
+
+    if (response.statusCode === 200) {
+        // TODO: We can emit our own timing events
+        // to track the specific time of this request
+
+        // console.log(response.timingPhases);
+
+        // ee.emit('bootTime', { stat: `boot time for ${req.name || req.url}`, value: response.timingPhases.total });
+    }
+
     return next();
 }
 

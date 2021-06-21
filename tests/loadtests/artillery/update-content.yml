@@ -17,7 +17,9 @@ scenarios:
   - name: "Update content"
     beforeScenario: "configureContentIdsToUpdate"
     beforeRequest: "beforeRequest"
-    afterResponse: "afterResponse"
+    afterResponse:
+      - "afterResponse"
+      - "expect200"
     flow:
     - loop:
       - post:

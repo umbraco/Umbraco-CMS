@@ -53,6 +53,8 @@ function Start-CounterCollection {
         $ReportName
     )
 
+    Write-Host "Starting counters..."
+
     if ($CounterType -eq "windows") {
         return Start-WindowsCounters -ProcessName $ProcessName -ServerName $ServerName -ReportName $ReportName
     }
@@ -184,7 +186,12 @@ $ArtilleryOverrides = '{""config"": {""phases"": [{""duration"": ' + $Duration +
 ## Then we need to use these process id to query for the corresponding app domain
 #$w3wpCounterProcesses = (Get-Counter -Counter "\Process(w3wp*)\ID Process").CounterSamples
 
-Foreach ($app in $Config.apps) {
+# randomize the order of the versions tested
+$shuffledApps = $Config.apps | Sort-Object {Get-Random}
+
+Foreach ($app in $shuffledApps) {
+
+
     # TODO: Ideally we'd start with fresh DBs and do the install as part of an artillery run
     # This is actually going to be quite important to have correct metrics, else there's a few risks:
     # There will be a lot of content in each of these DBs the more they are run, therefore possibly
@@ -254,7 +261,7 @@ Foreach ($app in $Config.apps) {
     # The list of the load tests to run for reporting, these MUST
     # be in order because tests rely on previous data.
     $Artillery = @(
-        @{ script = "warmup.yml"; useOverrides = $true; collectCounters = $true },
+        @{ script = "warmup.yml"; useOverrides = $false; collectCounters = $true },
         @{ script = "coldboot.yml"; useOverrides = $false; collectCounters = $false },
         @{ script = "warmboot.yml"; useOverrides = $false; collectCounters = $false },
         @{ script = "login-and-load.yml"; useOverrides = $true; collectCounters = $true },
@@ -277,9 +284,17 @@ Foreach ($app in $Config.apps) {
     Write-Host "Site warmup..."
     & artillery run "$PSScriptRoot\artillery\warmup.yml" --target $($app.baseUrl) --quiet
 
+    if (!$?) {
+        exit 1
+    }
+
     # Then run the cleanup without counters or reporting
     Write-Host "Site cleanup..."
-    & artillery run "$PSScriptRoot\artillery\cleanup.yml" --target $($app.baseUrl) --quiet
+    & artillery run "$PSScriptRoot\artillery\cleanup.yml" --target $($app.baseUrl)
+
+    if (!$?) {
+        exit 1
+    }
 
     # Run the artillery load testing
     foreach ( $art in $Artillery ) {
@@ -312,7 +327,6 @@ Foreach ($app in $Config.apps) {
             else {
                 & artillery run "$PSScriptRoot\artillery\$($art.script)" --output "$PSScriptRoot\output\$($art.script).json" --target $($app.baseUrl)
             }
-
 
             if ($?) {
                 & artillery report --output "$PSScriptRoot\output\$($art.script).html" "$PSScriptRoot\output\$($art.script).json"
@@ -351,6 +365,7 @@ Foreach ($app in $Config.apps) {
 
                 }
                 else {
+
                     $Job | Receive-Job -Keep # see if there are any errors
                     $Batch = Get-Job -Name "MyCounters"
                     $Batch | Stop-Job

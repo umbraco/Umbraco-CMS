@@ -12,7 +12,9 @@ module.exports = {
     writeDebug,
     writeError,
     configureNewGuid,
-    reportLatency
+    reportLatency,
+    expect200,
+    expect200Or302
 }
 
 // TODO: If we don't re-use this thing we should just make it specific to doc types instead of generically like this
@@ -177,17 +179,30 @@ function beforeRequest(requestParams, context, ee, next) {
     return next();
 }
 
+function expect200Or302(requestParams, response, context, ee, next) {
+    expectStatusCode([200, 302], response, next);
+}
+
+function expect200(requestParams, response, context, ee, next) {
+    expectStatusCode([200], response, next);
+}
+
+function expectStatusCode(expected, response, next) {
+    expected.forEach(acceptedStatusCode => {
+        if (response.statusCode != 200) {
+            // Kill the process if we don't have an expected code
+            const msg = `Non ${acceptedStatusCode} status code returned: ${response.statusCode}`;
+            writeError(msg);
+            writeError(response);
+            throw msg;
+        }
+    });
+
+    return next();
+}
+
 /** Called when artillery receives a response to capture the cookies/xsrf */
 function afterResponse(requestParams, response, context, ee, next) {
-
-    let acceptedStatusCode = context.acceptedStatusCode || 200;
-    if (response.statusCode != acceptedStatusCode) {
-        // Kill the process if we don't have a 200 code
-        const msg = `Non ${acceptedStatusCode} status code returned: ${response.statusCode}`;
-        writeError(msg);
-        writeError(response);
-        throw msg;
-    }
 
     writeDebug(context, `Status Code: ${response.statusCode}`);
 

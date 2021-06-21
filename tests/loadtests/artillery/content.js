@@ -7,6 +7,7 @@ module.exports = {
     beforeRequest: umbracoFlow.beforeRequest,
     afterResponse: umbracoFlow.afterResponse,
     configureNewGuid: umbracoFlow.configureNewGuid,
+    expect200: umbracoFlow.expect200,
     checkDeleteResponse,
     configureContentIdsToDelete,
     configureContentIdsToUpdate,
@@ -134,6 +135,14 @@ function checkDeleteResponse(requestParams, response, context, ee, next) {
 
         // Mark one as completed
         context.vars.contentIdsToDeleteRemaining--;
+    }
+
+    if (response.statusCode !== context.acceptedStatusCode) {
+        // Kill the process if we don't have an accepted code
+        const msg = `Non ${context.acceptedStatusCode} status code returned: ${response.statusCode}`;
+        umbracoFlow.writeError(msg);
+        umbracoFlow.writeError(response);
+        throw msg;
     }
 
     return next();

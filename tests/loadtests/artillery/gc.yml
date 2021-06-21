@@ -7,7 +7,7 @@ config:
       arrivalRate: 1
 scenarios:
   - name: "GCCollect"
-    afterResponse: "afterResponse"
     flow:
       - get:
           url: "/umbraco/surface/Restarter/GCCollect"
+          afterResponse: "expect200"

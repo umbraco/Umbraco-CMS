@@ -8,10 +8,10 @@ config:
       arrivalRate: 1
 scenarios:
   - name: "Warmup"
-    afterResponse: "afterResponse"
     flow:
       - loop:
         - get:
             url: "/"
+            afterResponse: "expect200Or302"
         - think: 2
         count: 5

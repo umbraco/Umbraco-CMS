@@ -15,7 +15,9 @@ scenarios:
     beforeScenario: "beforeScenario"
     afterScenario: "afterScenario"
     beforeRequest: "beforeRequest"
-    afterResponse: "afterResponse"
+    afterResponse:
+      - "afterResponse"
+      - "expect200"
     flow:
     - post:
         url: "{{ backOfficeApiPath }}/Authentication/PostLogin"

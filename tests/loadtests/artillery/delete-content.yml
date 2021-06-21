@@ -18,7 +18,7 @@ scenarios:
     beforeScenario: "configureContentIdsToDelete"
     beforeRequest: "beforeRequest"
     afterResponse:
-      - "checkDeleteResponse" # Must run first to check the response code
+      - "checkDeleteResponse"
       - "afterResponse"
     flow:
     - loop:

@@ -26,7 +26,9 @@ scenarios:
           beforeRequest:
             - "configureNewGuid"
             - "configureContentTypeAlias"
-          afterResponse: "storeContentId"
+          afterResponse:
+            - "storeContentId"
+            - "expect200"
           formData:
             contentItem: '{"id":0,"contentTypeAlias":"{{ contentTypeAlias }}","parentId":-1,"action":"publishNew","variants":[{"name":"benchmarkTest{{ newGuid }}","properties":[{"id":0,"alias":"email","value":"test@example.com"},{"id":0,"alias":"description","value":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at orci in massa dignissim maximus at nec turpis. Fusce fringilla, turpis tempus egestas tempor, est leo lobortis purus, in vestibulum mauris urna quis risus. Integer vel dui vel turpis congue molestie. Vestibulum vitae maximus justo, vel semper erat. Vivamus fermentum commodo pulvinar. Integer quis aliquet risus, in congue sapien. Mauris non dignissim elit."},{"id":0,"alias":"publishedDate","value":"2021-03-22 12:00:00"}],"culture":null,"segment":null,"publish":true,"save":true,"releaseDate":null,"expireDate":null}],"expireDate":null,"releaseDate":null,"templateAlias":"{{ contentTypeAlias }}"}'
           capture:
@@ -42,7 +44,9 @@ scenarios:
             beforeRequest:
               - "configureNewGuid"
               - "configureParentId"
-            afterResponse: "storeContentId"
+            afterResponse:
+              - "storeContentId"
+              - "expect200"
             formData:
               contentItem: '{"id":0,"contentTypeAlias":"{{ contentTypeAlias }}","parentId": {{ parentId }},"action":"publishNew","variants":[{"name":"benchmarkTest{{ newGuid }}","properties":[{"id":0,"alias":"email","value":"test@example.com"},{"id":0,"alias":"description","value":"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed at orci in massa dignissim maximus at nec turpis. Fusce fringilla, turpis tempus egestas tempor, est leo lobortis purus, in vestibulum mauris urna quis risus. Integer vel dui vel turpis congue molestie. Vestibulum vitae maximus justo, vel semper erat. Vivamus fermentum commodo pulvinar. Integer quis aliquet risus, in congue sapien. Mauris non dignissim elit."},{"id":0,"alias":"publishedDate","value":"2021-03-22 12:00:00"}],"culture":null,"segment":null,"publish":true,"save":true,"releaseDate":null,"expireDate":null}],"expireDate":null,"releaseDate":null,"templateAlias":"{{ contentTypeAlias }}"}'
             capture:
