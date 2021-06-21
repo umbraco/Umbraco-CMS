@@ -170,7 +170,10 @@ namespace Umbraco.Cms.Core.Manifest
         private IEnumerable<string> GetManifestFiles()
         {
             if (Directory.Exists(_path) == false)
-                return new string[0];
+            {
+                return Array.Empty<string>();
+            }
+
             return Directory.GetFiles(_path, "package.manifest", SearchOption.AllDirectories);
         }
 
