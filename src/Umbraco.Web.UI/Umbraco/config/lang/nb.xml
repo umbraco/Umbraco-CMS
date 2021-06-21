@@ -90,7 +90,7 @@
     <key alias="tableInsert">Sett inn tabell</key>
   </area>
   <area alias="changeDocType">
-    <key alias="changeDocTypeInstruction">For å endre det valge innholdets dokumenttype, velger du først en ny dokumenttype som er gyldig på gjeldende plassering.</key>
+    <key alias="changeDocTypeInstruction">For å endre den valgte innholds dokumenttypen, så velger du først en ny dokumenttype som er gyldig på gjeldende plassering.</key>
     <key alias="changeDocTypeInstruction2">Kontroller deretter at alle egenskaper blir overført riktig til den nye dokumenttypen og klikk på Lagre.</key>
     <key alias="contentRepublished">Innholdet har blitt republisert.</key>
     <key alias="currentProperty">Nåværende egenskap</key>
