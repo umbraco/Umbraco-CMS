@@ -608,7 +608,7 @@ namespace Umbraco.Cms.Web.BackOffice.Controllers
             //TODO: We should really fix this in the EntityService but if we don't we should allow the ISearchableTree for the members controller
             // to be used for this search instead of the built in/internal searcher
 
-            var searchResult = _treeSearcher.ExamineSearch(filter ?? "", type, pageSize, pageNumber - 1, out long total, id);
+            var searchResult = _treeSearcher.ExamineSearch(filter ?? "", type, pageSize, pageNumber - 1, out long total, null, id);
 
             return new PagedResult<EntityBasic>(total, pageNumber, pageSize)
             {
