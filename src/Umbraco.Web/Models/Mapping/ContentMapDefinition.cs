@@ -86,7 +86,9 @@ namespace Umbraco.Web.Models.Mapping
         // Umbraco.Code.MapAll -AllowPreview -Errors -PersistedContent
         private void Map(IContent source, ContentItemDisplay target, MapperContext context)
         {
-            target.AllowedActions = GetActions(source);
+            var parent = _contentService.GetParent(source);
+
+            target.AllowedActions = GetActions(source, parent);
             target.AllowedTemplates = GetAllowedTemplates(source);
             target.ContentApps = _commonMapper.GetContentApps(source);
             target.ContentTypeId = source.ContentType.Id;
@@ -97,7 +99,7 @@ namespace Umbraco.Web.Models.Mapping
             target.Icon = source.ContentType.Icon;
             target.Id = source.Id;
             target.IsBlueprint = source.Blueprint;
-            target.IsChildOfListView = DetermineIsChildOfListView(source, context);
+            target.IsChildOfListView = DetermineIsChildOfListView(source, parent, context);
             target.IsContainer = source.ContentType.IsContainer;
             target.IsElement = source.ContentType.IsElement;
             target.Key = source.Key;
@@ -156,7 +158,7 @@ namespace Umbraco.Web.Models.Mapping
             target.VariesByCulture = source.ContentType.VariesByCulture();
         }
 
-        private IEnumerable<string> GetActions(IContent source)
+        private IEnumerable<string> GetActions(IContent source, IContent parent)
         {
             var umbracoContext = _umbracoContextAccessor.UmbracoContext;
 
@@ -169,7 +171,6 @@ namespace Umbraco.Web.Models.Mapping
                 path = source.Path;
             else
             {
-                var parent = _contentService.GetById(source.ParentId);
                 path = parent == null ? "-1" : parent.Path;
             }
 
@@ -232,6 +233,7 @@ namespace Umbraco.Web.Models.Mapping
         /// Checks if the content item is a descendant of a list view
         /// </summary>
         /// <param name="source"></param>
+        /// <param name="parent"></param>
         /// <param name="context"></param>
         /// <returns>
         /// Returns true if the content item is a descendant of a list view and where the content is
@@ -243,7 +245,7 @@ namespace Umbraco.Web.Models.Mapping
         /// false because the item is technically not being rendered as part of a list view but instead as a
         /// real tree node. If we didn't perform this check then tree syncing wouldn't work correctly.
         /// </remarks>
-        private bool DetermineIsChildOfListView(IContent source, MapperContext context)
+        private bool DetermineIsChildOfListView(IContent source, IContent parent, MapperContext context)
         {
             var userStartNodes = Array.Empty<int>();
 
@@ -261,8 +263,6 @@ namespace Umbraco.Web.Models.Mapping
                         return false;
                 }
             }
-
-            var parent = _contentService.GetParent(source);
 
             if (parent == null)
                 return false;
