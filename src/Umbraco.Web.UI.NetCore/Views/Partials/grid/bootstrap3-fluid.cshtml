@@ -51,7 +51,8 @@
                         <div @RenderElementAttributes(area)>
                             @foreach (var control in area.controls)
                             {
-                                if (control != null && control.editor != null && control.editor.view != null ) {
+                                if (control != null && control.editor != null && control.editor.view != null)
+                                {
                                     <text>@await Html.PartialAsync("grid/editors/base", (object)control)</text>
                                 }
                             }
