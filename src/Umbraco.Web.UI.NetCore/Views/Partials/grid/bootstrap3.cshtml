@@ -10,7 +10,8 @@
     <div class="umb-grid">
         @if (oneColumn)
         {
-            foreach (var section in Model.sections) {
+            foreach (var section in Model.sections)
+            {
                 <div class="grid-section">
                     @foreach (var row in section.rows)
                     {
@@ -18,10 +19,13 @@
                     }
                 </div>
             }
-        }else {
+        }
+        else
+        {
             <div class="container">
                 <div class="row clearfix">
-                    @foreach (var sec in Model.sections) {
+                    @foreach (var sec in Model.sections)
+                    {
                         <div class="grid-section">
                             <div class="col-md-@sec.grid column">
                                 @foreach (var row in sec.rows)
