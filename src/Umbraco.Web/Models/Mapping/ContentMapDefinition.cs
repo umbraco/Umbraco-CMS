@@ -258,7 +258,7 @@ namespace Umbraco.Web.Models.Mapping
                     // return false if this is the user's actual start node, the node will be rendered in the tree
                     // regardless of if it's a list view or not
                     if (userStartNodes.Contains(source.Id))
-                        return false;                    
+                        return false;
                 }
             }
 
@@ -297,6 +297,12 @@ namespace Umbraco.Web.Models.Mapping
 
         private IDictionary<string, string> GetAllowedTemplates(IContent source)
         {
+            // Element types can't have templates, so no need to query to get the content type
+            if (source.ContentType.IsElement)
+            {
+                return new Dictionary<string, string>();
+            }
+
             var contentType = _contentTypeService.Get(source.ContentTypeId);
 
             return contentType.AllowedTemplates
